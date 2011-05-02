@@ -180,7 +180,7 @@ def _insertSpecialForm(caret, specialForm):
 
 
 
-def _onDrop_inlineObject(element, pos, data, action):
+def _onDrop_embeddedObject(element, pos, data, action):
 	def _displayResourceException(e):
 		ApplyPerspective( None, Pres.coerce( e ) ).popupAtMousePosition( element, True, True )
 	def _displayModelException(e):
@@ -198,41 +198,41 @@ def _onDrop_inlineObject(element, pos, data, action):
 			_displayResourceException( t )
 		else:
 			try:
-				modelType = Schema.getInlineObjectModelType( model )
+				modelType = Schema.getEmbeddedObjectModelType( model )
 			except Exception, e:
 				_displayModelException( e )
 			else:
 				if modelType is Schema.Expr:
-					expr = Schema.InlineObjectExpr( embeddedValue=embeddedValue )
+					expr = Schema.EmbeddedObjectExpr( embeddedValue=embeddedValue )
 					_insertSpecialForm( caret, expr )
 				elif modelType is Schema.Stmt:
-					stmt = Schema.InlineObjectStmt( embeddedValue=embeddedValue )
+					stmt = Schema.EmbeddedObjectStmt( embeddedValue=embeddedValue )
 					_insertSpecialForm( caret, stmt )
 	return True
 
 
 
 
-def _inlineObjectExprContextMenuFactory(element, menu):
+def _embeddedObjectExprContextMenuFactory(element, menu):
 	fragment = element.getFragmentContext()
 	model = fragment.getModel()
 
 	def _onDelete(item):
 		pyReplaceNode( model, Schema.Load( name='None' ) )
 
-	menu.add( MenuItem.menuItemWithLabel( 'Delete inline object', _onDelete ) )
+	menu.add( MenuItem.menuItemWithLabel( 'Delete embedded object', _onDelete ) )
 
 	return False
 
 
-def _inlineObjectStmtContextMenuFactory(element, menu):
+def _embeddedObjectStmtContextMenuFactory(element, menu):
 	fragment = element.getFragmentContext()
 	model = fragment.getModel()
 
 	def _onDelete(item):
 		pyReplaceNode( model, Schema.BlankLine() )
 
-	menu.add( MenuItem.menuItemWithLabel( 'Delete inline object', _onDelete ) )
+	menu.add( MenuItem.menuItemWithLabel( 'Delete embedded object', _onDelete ) )
 
 	return False
 
@@ -409,8 +409,8 @@ class Python25View (ObjectNodeDispatchView):
 		else:
 			lineViews = SREInnerFragment.map( suite, PRECEDENCE_NONE, EditMode.EDIT )
 		s = suiteView( lineViews ).alignHPack().alignVRefY()
-		_inlineObject_dropDest = ObjectDndHandler.DropDest( FragmentView.FragmentModel, _onDrop_inlineObject )
-		s = s.withDropDest( _inlineObject_dropDest )
+		_embeddedObject_dropDest = ObjectDndHandler.DropDest( FragmentView.FragmentModel, _onDrop_embeddedObject )
+		s = s.withDropDest( _embeddedObject_dropDest )
 		s = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._makeSuiteEditListener( suite ), self._topLevel ], suite, s )
 		s = s.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		s = s.withCommands( PythonCommands.pythonCommands )
@@ -426,8 +426,8 @@ class Python25View (ObjectNodeDispatchView):
 		else:
 			lineViews = SREInnerFragment.map( suite, PRECEDENCE_NONE, EditMode.EDIT )
 		s = suiteView( lineViews ).alignHPack().alignVRefY()
-		_inlineObject_dropDest = ObjectDndHandler.DropDest( FragmentView.FragmentModel, _onDrop_inlineObject )
-		s = s.withDropDest( _inlineObject_dropDest )
+		_embeddedObject_dropDest = ObjectDndHandler.DropDest( FragmentView.FragmentModel, _onDrop_embeddedObject )
+		s = s.withDropDest( _embeddedObject_dropDest )
 		s = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._makeSuiteEditListener( suite ), self._topLevel ], suite, s )
 		s = s.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		s = s.withCommands( PythonCommands.pythonCommands )
@@ -445,8 +445,8 @@ class Python25View (ObjectNodeDispatchView):
 			exprView = SREInnerFragment( expr, PRECEDENCE_NONE, EditMode.DISPLAY )
 			seg = Segment( exprView )
 		e = Paragraph( [ seg ] ).alignHPack().alignVRefY()
-		_inlineObject_dropDest = ObjectDndHandler.DropDest( FragmentView.FragmentModel, _onDrop_inlineObject )
-		e = e.withDropDest( _inlineObject_dropDest )
+		_embeddedObject_dropDest = ObjectDndHandler.DropDest( FragmentView.FragmentModel, _onDrop_embeddedObject )
+		e = e.withDropDest( _embeddedObject_dropDest )
 		e = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._exprOuter, self._exprTopLevel ],  model,  e )
 		e = e.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		e = e.withCommands( PythonCommands.pythonCommands )
@@ -982,10 +982,10 @@ class Python25View (ObjectNodeDispatchView):
 	#
 	#
 
-	# Inline object expression
-	@DMObjectNodeDispatchMethod( Schema.InlineObjectExpr )
+	# Embedded object expression
+	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectExpr )
 	@SpecialFormExpression
-	def InlineObjectExpr(self, fragment, inheritedState, model, embeddedValue):
+	def EmbeddedObjectExpr(self, fragment, inheritedState, model, embeddedValue):
 		value = embeddedValue.getValue()
 		valueView = ApplyPerspective( None, value )
 
@@ -993,20 +993,20 @@ class Python25View (ObjectNodeDispatchView):
 			modelFn = value.__py_model__
 		except AttributeError:
 			# Standard view
-			view = inlineObject( valueView )
-			return view.withContextMenuInteractor( _inlineObjectExprContextMenuFactory )
+			view = embeddedObject( valueView )
+			return view.withContextMenuInteractor( _embeddedObjectExprContextMenuFactory )
 		else:
 			# Macro view
 			def createModelView():
 				return Pres.coerce( modelFn() )
-			view = inlineObjectMacro( valueView, LazyPres( createModelView ) )
-			return view.withContextMenuInteractor( _inlineObjectExprContextMenuFactory )
+			view = embeddedObjectMacro( valueView, LazyPres( createModelView ) )
+			return view.withContextMenuInteractor( _embeddedObjectExprContextMenuFactory )
 
 
-	# Inline object statement
-	@DMObjectNodeDispatchMethod( Schema.InlineObjectStmt )
+	# Embedded object statement
+	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectStmt )
 	@SpecialFormStatement
-	def InlineObjectStmt(self, fragment, inheritedState, model, embeddedValue):
+	def EmbeddedObjectStmt(self, fragment, inheritedState, model, embeddedValue):
 		value = embeddedValue.getValue()
 		valueView = ApplyPerspective( None, value )
 
@@ -1014,14 +1014,14 @@ class Python25View (ObjectNodeDispatchView):
 			modelFn = value.__py_model__
 		except AttributeError:
 			# Standard view
-			view = inlineObject( valueView )
-			return view.withContextMenuInteractor( _inlineObjectStmtContextMenuFactory )
+			view = embeddedObject( valueView )
+			return view.withContextMenuInteractor( _embeddedObjectStmtContextMenuFactory )
 		else:
 			# Macro view
 			def createModelView():
 				return Pres.coerce( modelFn() )
-			view = inlineObjectMacro( valueView, LazyPres( createModelView ) )
-			return view.withContextMenuInteractor( _inlineObjectStmtContextMenuFactory )
+			view = embeddedObjectMacro( valueView, LazyPres( createModelView ) )
+			return view.withContextMenuInteractor( _embeddedObjectStmtContextMenuFactory )
 
 
 
