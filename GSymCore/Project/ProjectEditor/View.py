@@ -459,6 +459,6 @@ class ProjectView (ObjectDispatchView):
 
 
 
-
-perspective = Perspective( ProjectView(), None )
+_view = ProjectView()
+perspective = Perspective( _view.fragmentViewFunction, None )
 
