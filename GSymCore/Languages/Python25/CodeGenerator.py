@@ -490,15 +490,15 @@ class Python25CodeGenerator (object):
 	
 	
 	
-	# Inline object
-	@DMObjectNodeDispatchMethod( Schema.InlineObjectExpr )
-	def InlineObjectExpr(self, node, embeddedValue):
-		raise ValueError, 'Python25CodeGenerator does not support inline object expressions; a Python25ModuleCodeGenerator must be used'
+	# Embedded object
+	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectExpr )
+	def EmbeddedObjectExpr(self, node, embeddedValue):
+		raise ValueError, 'Python25CodeGenerator does not support embedded object expressions; a Python25ModuleCodeGenerator must be used'
 	
 	
-	@DMObjectNodeDispatchMethod( Schema.InlineObjectStmt )
-	def InlineObjectStmt (self, node, embeddedValue):
-		raise ValueError, 'Python25CodeGenerator does not support inline object statements; a Python25ModuleCodeGenerator must be used'
+	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectStmt )
+	def EmbeddedObjectStmt (self, node, embeddedValue):
+		raise ValueError, 'Python25CodeGenerator does not support embedded object statements; a Python25ModuleCodeGenerator must be used'
 		
 	
 	
@@ -900,9 +900,9 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 		
 		
 		
-	# Inline object expression
-	@DMObjectNodeDispatchMethod( Schema.InlineObjectExpr )
-	def InlineObjectExpr(self, node, embeddedValue):
+	# Embedded object expression
+	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectExpr )
+	def EmbeddedObjectExpr(self, node, embeddedValue):
 		value = embeddedValue.getValue()
 		
 		try:
@@ -919,9 +919,9 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 		
 	
 	
-	# Inline object
-	@DMObjectNodeDispatchMethod( Schema.InlineObjectStmt )
-	def InlineObjectStmt(self, node, embeddedValue):
+	# Embedded object
+	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectStmt )
+	def EmbeddedObjectStmt(self, node, embeddedValue):
 		value = embeddedValue.getValue()
 		
 		try:

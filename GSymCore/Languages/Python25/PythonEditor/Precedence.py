@@ -35,7 +35,7 @@ PRECEDENCE_YIELDEXPR = 200
 PRECEDENCE_CONDITIONAL = 100
 
 PRECEDENCE_EXTERNALEXPR = 1000
-PRECEDENCE_INLINEOBJECTEXPR = 1000
+PRECEDENCE_EMBEDDEDOBJECTEXPR = 1000
 
 PRECEDENCE_LAMBDAEXPR = 50
 
@@ -134,8 +134,8 @@ nodePrecedence[Schema.LambdaExpr] = PRECEDENCE_LAMBDAEXPR
 nodePrecedence[Schema.ConditionalExpr] = PRECEDENCE_CONDITIONAL
 nodePrecedence[Schema.ExternalExpr] = PRECEDENCE_EXTERNALEXPR
 
-nodePrecedence[Schema.InlineObjectExpr] = PRECEDENCE_INLINEOBJECTEXPR
-nodePrecedence[Schema.InlineObjectStmt] = PRECEDENCE_STMT
+nodePrecedence[Schema.EmbeddedObjectExpr] = PRECEDENCE_EMBEDDEDOBJECTEXPR
+nodePrecedence[Schema.EmbeddedObjectStmt] = PRECEDENCE_STMT
 
 
 nodePrecedence.commit()

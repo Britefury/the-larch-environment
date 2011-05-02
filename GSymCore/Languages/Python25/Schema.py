@@ -10,7 +10,7 @@ from BritefuryJ.DocModel import DMSchema, DMObjectClass, DMNode
 
 
 
-schema = DMSchema( 'Python25', 'py', 'GSymCore.Languages.Python25', 3 )
+schema = DMSchema( 'Python25', 'py', 'GSymCore.Languages.Python25', 4 )
 
 
 #
@@ -216,9 +216,9 @@ Dedent = schema.newClass( 'Dedent', Node, [] )
 IndentedBlock = schema.newClass( 'IndentedBlock', CompoundStmt, [ 'suite' ] )
 
 
-# Inline object
-InlineObjectExpr = schema.newClass( 'InlineObjectExpr', Expr, [ 'embeddedValue' ] )
-InlineObjectStmt = schema.newClass( 'InlineObjectStmt', SimpleStmt, [ 'embeddedValue' ] )
+# Embedded object
+EmbeddedObjectExpr = schema.newClass( 'EmbeddedObjectExpr', Expr, [ 'embeddedValue' ] )
+EmbeddedObjectStmt = schema.newClass( 'EmbeddedObjectStmt', SimpleStmt, [ 'embeddedValue' ] )
 
 
 
@@ -264,13 +264,13 @@ def _readInlineObjectExpr_v2(fieldValues):
 	# Version 2 called the field 'resource', rather than 'embeddedValue'
 	embeddedValue = fieldValues['resource']
 	embeddedValue = DMNode.embed( None )
-	return InlineObjectExpr( embeddedValue=embeddedValue )
+	return EmbeddedObjectExpr( embeddedValue=embeddedValue )
 
 def _readInlineObjectStmt_v2(fieldValues):
 	# Version 2 called the field 'resource', rather than 'embeddedValue'
 	embeddedValue = fieldValues['resource']
 	embeddedValue = DMNode.embed( None )
-	return InlineObjectStmt( embeddedValue=embeddedValue )
+	return EmbeddedObjectStmt( embeddedValue=embeddedValue )
 
 schema.registerReader( 'InlineObjectExpr', 2, _readInlineObjectExpr_v2 )
 schema.registerReader( 'InlineObjectStmt', 2, _readInlineObjectStmt_v2 )
@@ -278,9 +278,31 @@ schema.registerReader( 'InlineObjectStmt', 2, _readInlineObjectStmt_v2 )
 
 
 
+#
+#
+# Version 3 backwards compatibility
+#
+#
+
+def _readInlineObjectExpr_v3(fieldValues):
+	# Version 3 used the class name 'InlineObjectExpr'
+	embeddedValue = fieldValues['embeddedValue']
+	return EmbeddedObjectExpr( embeddedValue=embeddedValue )
+
+def _readInlineObjectStmt_v3(fieldValues):
+	# Version 3 used the class name 'InlineObjectStmt'
+	embeddedValue = fieldValues['embeddedValue']
+	return EmbeddedObjectStmt( embeddedValue=embeddedValue )
+
+schema.registerReader( 'InlineObjectExpr', 3, _readInlineObjectExpr_v3 )
+schema.registerReader( 'InlineObjectStmt', 3, _readInlineObjectStmt_v3 )
 
 
-def getInlineObjectModelType(value):
+
+
+
+
+def getEmbeddedObjectModelType(value):
 	try:
 		modelType = value.__py_model_type__
 	except AttributeError:

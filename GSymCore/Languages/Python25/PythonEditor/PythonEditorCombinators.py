@@ -81,9 +81,9 @@ class PythonEditorStyle (object):
 	externalExprTitleStyle = InheritedAttributeNonNull( pythonEditor, 'externalExprTitleStyle', StyleSheet,
 	                                                    StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.5, 1.0 ) ).withAttr( Primitive.fontSize, 10 ) )
 
-	inlineObjectLineStyle = InheritedAttributeNonNull( pythonEditor, 'inlineObjectLineStyle', StyleSheet,
+	embeddedObjectLineStyle = InheritedAttributeNonNull( pythonEditor, 'embeddedObjectLineStyle', StyleSheet,
 	                                                   StyleSheet.instance.withAttr( Primitive.shapePainter, FillPainter( Color( 0.1, 0.2, 0.3 ) ) ) )
-	inlineObjectButtonStyle = InheritedAttributeNonNull( pythonEditor, 'inlineObjectButtonStyle', StyleSheet,
+	embeddedObjectButtonStyle = InheritedAttributeNonNull( pythonEditor, 'embeddedObjectButtonStyle', StyleSheet,
 	                                                     StyleSheet.instance.withAttr( Primitive.background, FillPainter( Color( 0.85, 0.85, 0.85 ) ) ).withAttr( Primitive.hoverBackground, FillPainter( Color( 0.7, 0.7, 0.7 ) ) ) )
 
 
@@ -567,7 +567,7 @@ def externalExpr(ctx, style, exprView, title, deleteButton):
 
 
 @PyPresCombinatorFn
-def inlineObject(ctx, style, valueView):
+def embeddedObject(ctx, style, valueView):
 	externalExprBorderStyle = style.get( PythonEditorStyle.externalExprBorderStyle )
 
 	box = externalExprBorderStyle.applyTo( Border( valueView.pad( 3.0, 3.0 ) ) ).pad( 1.0, 1.0 )
@@ -578,17 +578,17 @@ def inlineObject(ctx, style, valueView):
 
 
 @PyPresCombinatorFn
-def inlineObjectMacro(ctx, style, valueView, modelView):
+def embeddedObjectMacro(ctx, style, valueView, modelView):
 	modelView = StyleSheet.instance.withAttr( Primitive.editable, False ).applyTo( modelView )
 
 	externalExprBorderStyle = style.get( PythonEditorStyle.externalExprBorderStyle )
-	inlineObjectLineStyle = style.get( PythonEditorStyle.inlineObjectLineStyle )
-	inlineObjectButtonStyle = style.get( PythonEditorStyle.inlineObjectButtonStyle )
+	embeddedObjectLineStyle = style.get( PythonEditorStyle.embeddedObjectLineStyle )
+	embeddedObjectButtonStyle = style.get( PythonEditorStyle.embeddedObjectButtonStyle )
 
-	hLine = inlineObjectLineStyle.applyTo( Box( 1, 1 ).alignHExpand() ).pad( 8.0, 5.0 ).alignHExpand()
-	vLine = inlineObjectLineStyle.applyTo( Box( 1, 1 ).alignVExpand() ).pad( 5.0, 8.0 ).alignVExpand()
-	expandButton = CustomExpander.expanderButton( inlineObjectButtonStyle.applyTo( Image.systemIcon( 'expand_plus' ) ) )
-	contractButton = CustomExpander.expanderButton( inlineObjectButtonStyle.applyTo( Image.systemIcon( 'expand_minus' ) ) )
+	hLine = embeddedObjectLineStyle.applyTo( Box( 1, 1 ).alignHExpand() ).pad( 8.0, 5.0 ).alignHExpand()
+	vLine = embeddedObjectLineStyle.applyTo( Box( 1, 1 ).alignVExpand() ).pad( 5.0, 8.0 ).alignVExpand()
+	expandButton = CustomExpander.expanderButton( embeddedObjectButtonStyle.applyTo( Image.systemIcon( 'expand_plus' ) ) )
+	contractButton = CustomExpander.expanderButton( embeddedObjectButtonStyle.applyTo( Image.systemIcon( 'expand_minus' ) ) )
 
 	contracted = externalExprBorderStyle.applyTo( Border( Row( [ valueView, vLine, expandButton.alignVBottom() ] ).pad( 3.0, 3.0 ) ) ).pad( 1.0, 1.0 )
 	expanded = externalExprBorderStyle.applyTo( Border( Column( [ Row( [ valueView, vLine, contractButton.alignVBottom() ] ), hLine, modelView ] ).pad( 3.0, 3.0 ) ) ).pad( 1.0, 1.0 )
