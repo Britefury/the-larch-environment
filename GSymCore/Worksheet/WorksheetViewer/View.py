@@ -178,8 +178,8 @@ class WorksheetViewer (ObjectDispatchView):
 
 
 
-
-perspective = Perspective( WorksheetViewer(), None )
+_view = WorksheetViewer()
+perspective = Perspective( _view.fragmentViewFunction, None )
 
 
 class _WorksheetModuleLoader (object):

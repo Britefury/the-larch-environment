@@ -221,8 +221,8 @@ class ConsoleView (ObjectDispatchView):
 
 
 	
-	
-perspective = Perspective( ConsoleView(), None )
+_view = ConsoleView()
+perspective = Perspective( _view.fragmentViewFunction, None )
 
 
 class ConsoleSubject (Subject):

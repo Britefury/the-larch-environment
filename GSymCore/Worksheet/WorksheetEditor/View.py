@@ -294,8 +294,8 @@ class WorksheetEditor (ObjectDispatchView):
 
 
 
-
-perspective = SequentialEditorPerspective( WorksheetEditor(), WorksheetSequentialEditor.instance )
+_view = WorksheetEditor()
+perspective = SequentialEditorPerspective( _view.fragmentViewFunction, WorksheetSequentialEditor.instance )
 
 
 class WorksheetEditorSubject (Subject):
