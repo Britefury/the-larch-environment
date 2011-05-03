@@ -9,30 +9,40 @@ package BritefuryJ.Editor.Table;
 import java.util.ArrayList;
 import java.util.List;
 
+import BritefuryJ.Incremental.IncrementalValueMonitor;
+
 public class GenericTableModel implements GenericTableModelInterface
 {
 	public static interface CellFactory
 	{
 		Object createCell();
+	}
+	
+	public static interface CellCopier
+	{
 		Object copyCell(Object cell);
 	}
 	
 	
 	private ArrayList<ArrayList<Object>> data = new ArrayList<ArrayList<Object>>();
 	private CellFactory cellFactory;
+	private CellCopier cellCopier;
+	private IncrementalValueMonitor incr = new IncrementalValueMonitor();
 	
 	
 	
 	
-	public GenericTableModel(CellFactory cellFactory)
+	public GenericTableModel(CellFactory cellFactory, CellCopier cellCopier)
 	{
 		this.cellFactory = cellFactory;
+		this.cellCopier = cellCopier;
 	}
 
 	
 	@Override
 	public int getWidth()
 	{
+		incr.onAccess();
 		int width = 0;
 		for (ArrayList<Object> row: data)
 		{
@@ -44,18 +54,21 @@ public class GenericTableModel implements GenericTableModelInterface
 	@Override
 	public int getHeight()
 	{
+		incr.onAccess();
 		return data.size();
 	}
 
 	@Override
 	public List<?> getRowCells(int rowIndex)
 	{
+		incr.onAccess();
 		return data.get( rowIndex );
 	}
 
 	@Override
 	public Object[][] getBlock(int x, int y, int w, int h)
 	{
+		incr.onAccess();
 		Object[][] block = new Object[h][];
 		for (int j = y; j < y + h; j++)
 		{
@@ -90,9 +103,10 @@ public class GenericTableModel implements GenericTableModelInterface
 			
 			for (int i = x; i < x + rowWidth; i++)
 			{
-				destRow.set( i, cellFactory.copyCell( srcRow[i-x] ) );
+				destRow.set( i, cellCopier.copyCell( srcRow[i-x] ) );
 			}
 		}
+		incr.onChanged();
 	}
 	
 	
