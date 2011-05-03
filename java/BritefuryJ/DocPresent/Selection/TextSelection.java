@@ -14,7 +14,6 @@ import java.util.List;
 import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRegion;
-import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Marker.MarkerListener;
 
@@ -30,9 +29,9 @@ public class TextSelection extends Selection implements MarkerListener
 	private boolean  bRefreshRequired;
 	
 	
-	public TextSelection(PresentationComponent.RootElement rootElement, Marker m0, Marker m1)
+	public TextSelection(DPElement element, Marker m0, Marker m1)
 	{
-		super( rootElement );
+		super( element );
 		
 		bRefreshRequired = true;
 		
@@ -41,8 +40,6 @@ public class TextSelection extends Selection implements MarkerListener
 		
 		marker0.addMarkerListener( this );
 		marker1.addMarkerListener( this );
-		
-		this.rootElement = rootElement;
 	}
 	
 	

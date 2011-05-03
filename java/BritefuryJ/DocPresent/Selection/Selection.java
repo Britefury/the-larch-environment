@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent.Selection;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.PresentationComponent;
 
@@ -18,8 +19,9 @@ public abstract class Selection
 	protected PresentationComponent.RootElement rootElement;
 	
 	
-	public Selection(PresentationComponent.RootElement rootElement)
+	public Selection(DPElement element)
 	{
+		this.rootElement = element.getRootElement();
 	}
 	
 	
