@@ -9,6 +9,8 @@ from BritefuryJ.Command import *
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
+from BritefuryJ.Controls import *
+
 from BritefuryJ.Pres import *
 from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.Pres.ObjectPres import *
@@ -43,13 +45,24 @@ class EmbeddedDisplay (object):
 		
 	
 	def __present__(self, fragment, inheritedState):
+		def _embeddedDisplayMenu(element, menu):
+			def _onClear(item):
+				del self._values[:]
+				self._incr.onChanged()
+			
+			menu.add( MenuItem.menuItemWithLabel( 'Clear collected values', _onClear ) )
+			
+			return False
+				
+		
+		
 		self._incr.onAccess()
 		exprPres = pyPerspective.applyTo( self._expr )
 		
 		valuesPres = ObjectBox( 'Values', Column( [ value   for value in self._values ] ) )
 		
 		contents = Column( [ exprPres, valuesPres ] )
-		return ObjectBox( 'Embedded display', contents )
+		return ObjectBox( 'Embedded display', contents ).withContextMenuInteractor( _embeddedDisplayMenu )
 
 
 
