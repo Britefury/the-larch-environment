@@ -300,7 +300,7 @@ public class TextEntry extends ControlPres
 			PresentationComponent.RootElement root = textElement.getRootElement();
 			if ( root != null )
 			{
-				root.setSelection( new TextSelection( root, textElement.markerAtStart(), textElement.markerAtEnd() ) );
+				root.setSelection( new TextSelection( textElement, textElement.markerAtStart(), textElement.markerAtEnd() ) );
 			}
 			else
 			{

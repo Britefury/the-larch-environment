@@ -8,7 +8,6 @@ package BritefuryJ.DocPresent.Selection;
 
 import BritefuryJ.DocPresent.DPContentLeafEditable;
 import BritefuryJ.DocPresent.DPRegion;
-import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Marker.Marker;
 
 public class TextSelectionPoint extends SelectionPoint
@@ -36,8 +35,6 @@ public class TextSelectionPoint extends SelectionPoint
 					DPContentLeafEditable elementB = markerB.getElement();
 					DPRegion regionB = elementB.getRegion();
 					
-					PresentationComponent.RootElement rootElement = elementB.getRootElement();
-					
 					if ( regionB != regionA )
 					{
 						int order = Marker.markerOrder( markerA, markerB );
@@ -63,12 +60,12 @@ public class TextSelectionPoint extends SelectionPoint
 						
 						if ( markerBInSameRegion != null )
 						{
-							return new TextSelection( rootElement, markerA, markerBInSameRegion );
+							return new TextSelection( elementB, markerA, markerBInSameRegion );
 						}
 					}
 					else
 					{
-						return new TextSelection( rootElement, markerA, markerB );
+						return new TextSelection( elementB, markerA, markerB );
 					}
 				}
 			}
