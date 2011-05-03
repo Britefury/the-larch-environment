@@ -120,6 +120,11 @@ public abstract class TextClipboardHandler extends ClipboardHandlerInterface
 		if ( selection instanceof TextSelection )
 		{
 			ts = (TextSelection)selection;
+			
+			if ( !ts.isValid() )
+			{
+				ts = null;
+			}
 		}
 		
 		if ( target instanceof Caret )

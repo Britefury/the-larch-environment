@@ -11,7 +11,6 @@ import java.util.Arrays;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.DocPresent.Selection.Selection;
-import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Clipboard.AbstractSelectionExporter;
 import BritefuryJ.Pres.Clipboard.ClipboardHandler;
@@ -79,8 +78,7 @@ public abstract class AbstractTableEditor<ModelType>
 			TableBuffer buffer = (TableBuffer)data;
 
 			DPElement tableElem = (DPElement)target.table;
-			FragmentView fragment = (FragmentView)tableElem.getFragmentContext();
-			ModelType model = (ModelType)fragment.getModel();
+			ModelType model = (ModelType)tableElem.getFixedValue();
 			Object[][] subtable = buffer.contents;
 			
 			putBlock( model, target.x, target.y, subtable, (AbstractTableEditorInstance<ModelType>)target.editorInstance );

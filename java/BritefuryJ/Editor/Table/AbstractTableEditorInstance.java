@@ -15,7 +15,6 @@ import BritefuryJ.DocPresent.Interactor.TargetElementInteractor;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.SelectionPoint;
 import BritefuryJ.DocPresent.Target.Target;
-import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
@@ -90,11 +89,13 @@ public abstract class AbstractTableEditorInstance <ModelType>
 	private class TableEditorPres extends Pres
 	{
 		private Pres contents;
+		private ModelType model;
 		
 		
-		public TableEditorPres(Object contents)
+		public TableEditorPres(Object contents, ModelType model)
 		{
 			this.contents = Pres.coerce( contents );
+			this.model = model;
 		}
 
 		@Override
@@ -105,6 +106,7 @@ public abstract class AbstractTableEditorInstance <ModelType>
 			DPElement element = contents.present( ctx, style );
 			DPElement tableElement = element.bredthFirstSearchByType( TableElement.class );
 			tableElement.addElementInteractor( interactor );
+			tableElement.setFixedValue( model );
 			return element;
 		}
 		
@@ -129,9 +131,8 @@ public abstract class AbstractTableEditorInstance <ModelType>
 	{
 		if ( tableElement.isRealised() )
 		{
-			FragmentView fragment = (FragmentView)tableElement.getFragmentContext();
 			@SuppressWarnings("unchecked")
-			ModelType model = (ModelType)fragment.getModel();
+			ModelType model = (ModelType)tableElement.getFixedValue();
 			return editor.getBlock( model, x0, y0, x1 + 1 - x0, y1 + 1 - y0 );
 		}
 		else
@@ -145,7 +146,7 @@ public abstract class AbstractTableEditorInstance <ModelType>
 		Pres table = presentTable( model );
 		table = table.withFixedValue( model );
 		Pres region = new Region( table, editor.clipboardHandler );
-		Pres t = new TableEditorPres( region );
+		Pres t = new TableEditorPres( region, model );
 		return t;
 	}
 
