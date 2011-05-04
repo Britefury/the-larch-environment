@@ -109,7 +109,6 @@ public abstract class AbstractTableEditorInstance <ModelType>
 			tableElement.setFixedValue( model );
 			return element;
 		}
-		
 	}
 	
 	
