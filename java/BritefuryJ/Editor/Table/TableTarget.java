@@ -9,6 +9,8 @@ package BritefuryJ.Editor.Table;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
@@ -47,9 +49,13 @@ public class TableTarget extends Target
 			double x1 = table.getColumnBoundaryX( ex + 1 );
 			double y1 = table.getRowBoundaryY( ey + 1 );
 			AffineTransform current = tableElement.pushGraphicsTransform( graphics );
+			Paint prevPaint = graphics.getPaint();
+			Stroke prevStroke = graphics.getStroke();
 			graphics.setPaint( new Color( 0.2f, 0.3f, 0.4f ) );
 			graphics.setStroke( new BasicStroke( 2.0f ) );
 			graphics.draw( new Rectangle2D.Double( x0, y0, x1 - x0, y1 - y0 ) );
+			graphics.setPaint( prevPaint );
+			graphics.setStroke( prevStroke );
 			tableElement.popGraphicsTransform( graphics, current );
 		}
 	}
