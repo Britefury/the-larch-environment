@@ -12,6 +12,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Clipboard.AbstractSelectionExporter;
 import BritefuryJ.Pres.Clipboard.ClipboardHandler;
 import BritefuryJ.Pres.Clipboard.DataExporter;
@@ -22,6 +23,8 @@ import BritefuryJ.Pres.Clipboard.DataImporterInterface;
 import BritefuryJ.Pres.Clipboard.SelectionExporter;
 import BritefuryJ.Pres.Clipboard.SelectionExporter.SelectionContentsFn;
 import BritefuryJ.Pres.Clipboard.TargetImporter;
+import BritefuryJ.StyleSheet.StyleSheet;
+import BritefuryJ.StyleSheet.StyleValues;
 
 public abstract class AbstractTableEditor<ModelType>
 {
@@ -126,9 +129,23 @@ public abstract class AbstractTableEditor<ModelType>
 	
 	public Pres editTable(Object model)
 	{
-		ModelType m = coerceModel( model );
-		AbstractTableEditorInstance<ModelType> instance = createInstance();
-		return instance.editTable( m );
+		final ModelType m = coerceModel( model );
+		
+		Pres p = new Pres()
+		{
+			@Override
+			public DPElement present(PresentationContext ctx, StyleValues style)
+			{
+				StyleSheet styleSheet = TableEditorStyle.tableStyle( style );
+				StyleValues used = TableEditorStyle.useTableAttrs( style );
+				
+				AbstractTableEditorInstance<ModelType> instance = createInstance();
+				Pres editor = instance.editTable( m );
+				
+				return editor.present( ctx, used.withAttrs( styleSheet ) );
+			}
+		};
+		return p;
 	}
 
 
