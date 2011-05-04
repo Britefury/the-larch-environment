@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
@@ -55,9 +56,16 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 		@Override
 		public Key next()
 		{
-			Key k = (Key)next.get();
-			next = fetchNext();
-			return k;
+			if ( next != null )
+			{
+				Key k = (Key)next.get();
+				next = fetchNext();
+				return k;
+			}
+			else
+			{
+				throw new NoSuchElementException();
+			}
 		}
 
 		@Override

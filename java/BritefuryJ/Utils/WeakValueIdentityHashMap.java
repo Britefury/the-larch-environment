@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 public class WeakValueIdentityHashMap <Key, Value> implements Map<Key, Value>
@@ -115,9 +116,16 @@ public class WeakValueIdentityHashMap <Key, Value> implements Map<Key, Value>
 		@Override
 		public Value next()
 		{
-			Value v = (Value)next.get();
-			next = fetchNext();
-			return v;
+			if ( next != null )
+			{
+				Value v = (Value)next.get();
+				next = fetchNext();
+				return v;
+			}
+			else
+			{
+				throw new NoSuchElementException();
+			}
 		}
 
 		@Override
@@ -489,7 +497,8 @@ public class WeakValueIdentityHashMap <Key, Value> implements Map<Key, Value>
 	public Value get(Object key)
 	{
 		cleanup();
-		return map.get( key ).get();
+		WeakValue<Value, Key> w = map.get( key );
+		return w != null  ?  w.get()  :  null;
 	}
 
 	@Override
@@ -510,7 +519,8 @@ public class WeakValueIdentityHashMap <Key, Value> implements Map<Key, Value>
 	public Value put(Key key, Value value)
 	{
 		cleanup();
-		return map.put( key, new WeakValue<Value, Key>( value, refQueue, key ) ).get();
+		WeakValue<Value, Key> w = map.put( key, new WeakValue<Value, Key>( value, refQueue, key ) );
+		return w != null  ?  w.get()  :  null;
 	}
 
 	@Override
@@ -528,7 +538,8 @@ public class WeakValueIdentityHashMap <Key, Value> implements Map<Key, Value>
 	public Value remove(Object key)
 	{
 		cleanup();
-		return map.remove( key ).get();
+		WeakValue<Value, Key> w = map.remove( key );
+		return w != null  ?  w.get()  :  null;
 	}
 	
 	@Override

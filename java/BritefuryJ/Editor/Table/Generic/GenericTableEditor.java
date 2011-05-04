@@ -50,12 +50,9 @@ public class GenericTableEditor extends AbstractTableEditor<GenericTableModelInt
 	
 	
 	@Override
-	protected void checkModel(GenericTableModelInterface model)
+	protected GenericTableModelInterface coerceModel(Object model)
 	{
-		if ( !( model instanceof GenericTableModelInterface ) )
-		{
-			throw new RuntimeException( "Cannot edit model, as it is not an instance of GenericModelInterface" );
-		}
+		return (GenericTableModelInterface)model;
 	}
 
 	@Override

@@ -61,7 +61,7 @@ public class TableSelection extends Selection
 			double rx1 = table.getColumnBoundaryX( ex1 + 1 );
 			double ry1 = table.getRowBoundaryY( ey1 + 1 );
 			AffineTransform current = tableElement.pushGraphicsTransform( graphics );
-			Shape shape = new Rectangle2D.Double( rx0, ry0, rx1 - x0, ry1 - ry0 );
+			Shape shape = new Rectangle2D.Double( rx0, ry0, rx1 - rx0, ry1 - ry0 );
 			graphics.setPaint( new Color( 0.875f, 0.9f, 0.925f ) );
 			graphics.fill( shape );
 			graphics.setPaint( new Color( 0.0f, 0.0f, 1.0f ) );

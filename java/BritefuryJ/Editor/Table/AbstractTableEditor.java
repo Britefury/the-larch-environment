@@ -124,15 +124,15 @@ public abstract class AbstractTableEditor<ModelType>
 	}
 	
 	
-	public Pres editTable(ModelType model)
+	public Pres editTable(Object model)
 	{
-		checkModel( model );
+		ModelType m = coerceModel( model );
 		AbstractTableEditorInstance<ModelType> instance = createInstance();
-		return instance.editTable( model );
+		return instance.editTable( m );
 	}
 
 
-	protected abstract void checkModel(ModelType model);
+	protected abstract ModelType coerceModel(Object model);
 
 	protected abstract AbstractTableEditorInstance<ModelType> createInstance();
 	

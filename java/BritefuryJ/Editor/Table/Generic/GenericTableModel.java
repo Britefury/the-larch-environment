@@ -91,7 +91,7 @@ public class GenericTableModel implements GenericTableModelInterface
 	{
 		incr.onAccess();
 		Object[][] block = new Object[h][];
-		for (int j = y; j < y + h; j++)
+		for (int j = y, b = 0; b < h; j++, b++)
 		{
 			ArrayList<Object> srcRow = data.get( j );
 			int numCells = Math.max( 0, Math.min( w, srcRow.size() - x ) );
@@ -100,7 +100,7 @@ public class GenericTableModel implements GenericTableModelInterface
 			{
 				System.arraycopy( srcRow.toArray(), x, destRow, 0, numCells );
 			}
-			block[j-y] = destRow;
+			block[b] = destRow;
 		}
 		
 		return block;
@@ -113,18 +113,18 @@ public class GenericTableModel implements GenericTableModelInterface
 		
 		growHeight( y + blockHeight );
 		
-		for (int j = y; j < y + blockHeight; j++)
+		for (int j = y, b = 0; b < blockHeight; j++, b++)
 		{
-			Object srcRow[] = block[j-y];
+			Object srcRow[] = block[b];
 			ArrayList<Object> destRow = data.get( j );
 			
 			int rowWidth = srcRow.length;
 			
 			growRowWidth( destRow, x + rowWidth );
 			
-			for (int i = x; i < x + rowWidth; i++)
+			for (int i = x, a = 0; a < rowWidth; i++, a++)
 			{
-				destRow.set( i, cellCopier.copyValue( srcRow[i-x] ) );
+				destRow.set( i, cellCopier.copyValue( srcRow[a] ) );
 			}
 		}
 		incr.onChanged();
