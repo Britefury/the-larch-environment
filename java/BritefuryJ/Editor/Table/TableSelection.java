@@ -9,7 +9,9 @@ package BritefuryJ.Editor.Table;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
@@ -62,11 +64,15 @@ public class TableSelection extends Selection
 			double ry1 = table.getRowBoundaryY( ey1 + 1 );
 			AffineTransform current = tableElement.pushGraphicsTransform( graphics );
 			Shape shape = new Rectangle2D.Double( rx0, ry0, rx1 - rx0, ry1 - ry0 );
+			Paint prevPaint = graphics.getPaint();
+			Stroke prevStroke = graphics.getStroke();
 			graphics.setPaint( new Color( 0.875f, 0.9f, 0.925f ) );
 			graphics.fill( shape );
 			graphics.setPaint( new Color( 0.0f, 0.0f, 1.0f ) );
 			graphics.setStroke( new BasicStroke( 2.0f ) );
 			graphics.draw( shape );
+			graphics.setPaint( prevPaint );
+			graphics.setStroke( prevStroke );
 			tableElement.popGraphicsTransform( graphics, current );
 		}
 	}
