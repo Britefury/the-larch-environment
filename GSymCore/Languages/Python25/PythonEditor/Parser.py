@@ -9,6 +9,8 @@
 import re
 import string
 
+from copy import deepcopy
+
 from BritefuryJ.DocModel import DMObject, DMNode
 
 from BritefuryJ.Parser import Action, Condition, Suppress, Literal, Keyword, RegEx, Word, Sequence, Combine, Choice, Optional, Repetition, ZeroOrMore, OneOrMore, Peek, PeekNot, SeparatedList, ObjectNode
@@ -49,7 +51,7 @@ def _incrementParens(node):
 		except ValueError:
 			pass
 	numParens += 1
-	newNode = node.clone()
+	newNode = deepcopy( node )
 	newNode['parens'] = str( numParens )
 	return  newNode
 

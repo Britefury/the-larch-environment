@@ -286,7 +286,6 @@ public abstract class DMNode
 	
 	public PyObject __getstate__()
 	{
-		System.out.println( "DMNode.__getstate__" );
 		PyObject state;
 		try
 		{
