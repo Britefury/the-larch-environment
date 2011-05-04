@@ -9,9 +9,7 @@ package BritefuryJ.DocModel;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -33,7 +31,7 @@ import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Utils.HashUtils;
 
-public class DMObject extends DMNode implements DMObjectInterface, Trackable, Serializable, Cloneable, IncrementalOwner, Presentable
+public class DMObject extends DMNode implements DMObjectInterface, Trackable, IncrementalOwner, Presentable
 {
 	private static final long serialVersionUID = 1L;
 
@@ -290,7 +288,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	
 	
 	
-	public Object clone()
+	protected Object createDeepCopy(PyDictionary memo)
 	{
 		onAccess();
 		Object[] ys = new Object[fieldData.length];
@@ -298,28 +296,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 		int i = 0;
 		for (Object x: fieldData)
 		{
-			ys[i++] = x;
-		}
-		
-		return new DMObject( objClass, ys );
-	}
-	
-	protected Object createDeepCopy(IdentityHashMap<Object, Object> memo)
-	{
-		onAccess();
-		Object[] ys = new Object[fieldData.length];
-		
-		int i = 0;
-		for (Object x: fieldData)
-		{
-			if ( x instanceof DMNode )
-			{
-				ys[i++] = ((DMNode)x).deepCopy( memo );
-			}
-			else
-			{
-				ys[i++] = x;
-			}
+			ys[i++] = deepCopyOf( x, memo );
 		}
 		
 		return new DMObject( objClass, ys );

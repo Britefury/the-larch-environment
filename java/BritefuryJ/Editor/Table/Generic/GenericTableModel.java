@@ -13,26 +13,26 @@ import BritefuryJ.Incremental.IncrementalValueMonitor;
 
 public class GenericTableModel implements GenericTableModelInterface
 {
-	public static interface CellFactory
+	public static interface ValueFactory
 	{
-		Object createCell();
+		Object createValue();
 	}
 	
-	public static interface CellCopier
+	public static interface ValueCopier
 	{
-		Object copyCell(Object cell);
+		Object copyValue(Object value);
 	}
 	
 	
 	private ArrayList<ArrayList<Object>> data = new ArrayList<ArrayList<Object>>();
-	private CellFactory cellFactory;
-	private CellCopier cellCopier;
+	private ValueFactory cellFactory;
+	private ValueCopier cellCopier;
 	private IncrementalValueMonitor incr = new IncrementalValueMonitor();
 	
 	
 	
 	
-	public GenericTableModel(CellFactory cellFactory, CellCopier cellCopier)
+	public GenericTableModel(ValueFactory cellFactory, ValueCopier cellCopier)
 	{
 		this.cellFactory = cellFactory;
 		this.cellCopier = cellCopier;
@@ -59,11 +59,32 @@ public class GenericTableModel implements GenericTableModelInterface
 	}
 
 	@Override
-	public List<?> getRowCells(int rowIndex)
+	public List<Object> getRow(int rowIndex)
 	{
 		incr.onAccess();
 		return data.get( rowIndex );
 	}
+	
+	
+
+	@Override
+	public Object get(int x, int y)
+	{
+		incr.onAccess();
+		return data.get( y ).get( x );
+	}
+
+
+	@Override
+	public void set(int x, int y, Object value)
+	{
+		growHeight( y + 1 );
+		ArrayList<Object> row = data.get( y );
+		growRowWidth( row, x + 1 );
+		row.set( x, value );
+		incr.onChanged();
+	}
+
 
 	@Override
 	public Object[][] getBlock(int x, int y, int w, int h)
@@ -103,7 +124,7 @@ public class GenericTableModel implements GenericTableModelInterface
 			
 			for (int i = x; i < x + rowWidth; i++)
 			{
-				destRow.set( i, cellCopier.copyCell( srcRow[i-x] ) );
+				destRow.set( i, cellCopier.copyValue( srcRow[i-x] ) );
 			}
 		}
 		incr.onChanged();
@@ -130,7 +151,7 @@ public class GenericTableModel implements GenericTableModelInterface
 		{
 			for (int x = width; x < w; x++)
 			{
-				row.add( cellFactory.createCell() );
+				row.add( cellFactory.createValue() );
 			}
 		}
 	}

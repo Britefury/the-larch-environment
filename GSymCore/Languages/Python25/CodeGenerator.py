@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
+from copy import deepcopy
+
 from BritefuryJ.DocModel import DMObject, DMList, DMEmbeddedObject, DMEmbeddedIsolatedObject
 
 from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod, dmObjectNodeMethodDispatch
@@ -905,7 +907,7 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 			return _runtime_DMList_Name + '( [' + ', '.join( [ self._quotedNode( v )   for v in node ] ) + '] )'
 		elif isinstance( node, DMEmbeddedObject )  or  isinstance( node, DMEmbeddedIsolatedObject ):
 			index = len( self._resourceMap )
-			self._resourceMap.append( node.deepCopy() )
+			self._resourceMap.append( deepcopy( node ) )
 			return _runtime_resourceMap_Name + '[%d]'  %  ( index, )
 		else:
 			raise TypeError, 'Cannot quote a %s'  %  type( node )

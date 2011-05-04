@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
+from copy import deepcopy
+
 from java.lang import Throwable
 
 from java.awt.event import KeyEvent
@@ -89,11 +91,11 @@ def _isValidUnparsedStatementValue(value):
 def _commitUnparsedStatment(model, value):
 	withoutNewline = value[:-1]
 	unparsed = Schema.UnparsedStmt( value=Schema.UNPARSED( value=withoutNewline.getItemValues() ) )
-	pyReplaceNode( model, unparsed.deepCopy() )
+	pyReplaceNode( model, deepcopy( unparsed ) )
 
 def _commitInnerUnparsed(model, value):
 	unparsed = Schema.UNPARSED( value=value.getItemValues() )
-	pyReplaceNode( model, unparsed.deepCopy() )
+	pyReplaceNode( model, deepcopy( unparsed ) )
 
 
 

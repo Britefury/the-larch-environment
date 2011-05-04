@@ -9,17 +9,16 @@ package BritefuryJ.DocModel;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
 import org.python.core.Py;
+import org.python.core.PyDictionary;
 import org.python.core.PySlice;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
@@ -34,7 +33,7 @@ import BritefuryJ.JythonInterface.JythonSlice;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Utils.HashUtils;
 
-public class DMList extends DMNode implements DMListInterface, Trackable, Serializable, Cloneable, IncrementalOwner, Presentable
+public class DMList extends DMNode implements DMListInterface, Trackable, IncrementalOwner, Presentable
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -409,12 +408,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	}
 	
 	
-	public Object clone()
-	{
-		return new DMList( this );
-	}
-	
-	protected Object createDeepCopy(IdentityHashMap<Object, Object> memo)
+	protected Object createDeepCopy(PyDictionary memo)
 	{
 		onAccess();
 
@@ -423,14 +417,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		
 		for (Object x: value)
 		{
-			if ( x instanceof DMNode )
-			{
-				ys.add( ((DMNode)x).deepCopy( memo ) );
-			}
-			else
-			{
-				ys.add( x );
-			}
+			ys.add( deepCopyOf( x, memo ) );
 		}
 		
 		return new DMList( ys );
@@ -929,7 +916,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	
 	public DMListInterface __add__(List<Object> xs)
 	{
-		DMList result = (DMList)clone();
+		DMList result = new DMList( this );
 		result.addAll( xs );
 		return result;
 	}

@@ -9,11 +9,11 @@ package BritefuryJ.DocModel;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 
 import org.python.core.Py;
+import org.python.core.PyDictionary;
 import org.python.core.PyJavaType;
 import org.python.core.PyObject;
 import org.python.core.PyObjectDerived;
@@ -24,7 +24,7 @@ import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
 import BritefuryJ.DocModel.DMIOWriter.InvalidDataTypeException;
 
 
-public abstract class DMNode implements Cloneable
+public abstract class DMNode
 {
 	public static class CannotChangeNodeClassException extends RuntimeException
 	{
@@ -286,6 +286,7 @@ public abstract class DMNode implements Cloneable
 	
 	public PyObject __getstate__()
 	{
+		System.out.println( "DMNode.__getstate__" );
 		PyObject state;
 		try
 		{
@@ -317,28 +318,44 @@ public abstract class DMNode implements Cloneable
 	}
 	
 	
+	
+	
+	
 	public abstract void become(Object x);
 	
 	
 	
-	public Object deepCopy()
+	protected static Object deepCopyOf(Object x, PyDictionary memo)
 	{
-		return deepCopy( new IdentityHashMap<Object,Object>() );
-	}
-
-	public Object deepCopy(IdentityHashMap<Object, Object> memo)
-	{
-		if ( memo.containsKey( this ) )
+		if ( x instanceof DMNode )
 		{
-			return memo.get( this );
+			return Py.tojava( ((DMNode)x).__deepcopy__( memo ), DMNode.class );
 		}
 		else
 		{
-			return createDeepCopy( memo );
+			return x;
+		}
+	}
+	
+	public PyObject __deepcopy__(PyDictionary memo)
+	{
+		long id = Py.java_obj_id( this );
+		PyObject key = Py.newInteger( id );
+		
+		PyObject value = memo.get( key );
+		if ( value != Py.None )
+		{
+			return value;
+		}
+		else
+		{
+			Object copy = createDeepCopy( memo );
+			memo.__setitem__( key, value );
+			return Py.java2py( copy );
 		}
 	}
 
-	protected abstract Object createDeepCopy(IdentityHashMap<Object, Object> memo);
+	protected abstract Object createDeepCopy(PyDictionary memo);
 	
 	
 	public abstract DMNodeClass getDMNodeClass();

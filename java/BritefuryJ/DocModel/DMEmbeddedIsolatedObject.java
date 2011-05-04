@@ -6,11 +6,11 @@
 //##************************
 package BritefuryJ.DocModel;
 
-import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import org.python.core.Py;
+import org.python.core.PyDictionary;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 
@@ -18,6 +18,7 @@ import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Isolation.IsolationBarrier;
+import BritefuryJ.JythonInterface.Jython_copy;
 import BritefuryJ.Pres.Pres;
 
 public class DMEmbeddedIsolatedObject extends DMNode implements DMEmbeddedPyObjectInterface, Presentable
@@ -129,11 +130,11 @@ public class DMEmbeddedIsolatedObject extends DMNode implements DMEmbeddedPyObje
 	}
 
 	@Override
-	protected Object createDeepCopy(IdentityHashMap<Object, Object> memo)
+	protected Object createDeepCopy(PyDictionary memo)
 	{
 		if ( iso != null )
 		{
-			return new DMEmbeddedIsolatedObject( iso.getValue() );
+			return new DMEmbeddedIsolatedObject( Jython_copy.deepcopy( iso.getValue() ) );
 		}
 		else
 		{

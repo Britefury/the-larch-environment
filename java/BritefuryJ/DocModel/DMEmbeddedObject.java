@@ -6,17 +6,18 @@
 //##************************
 package BritefuryJ.DocModel;
 
-import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import org.python.core.Py;
+import org.python.core.PyDictionary;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.JythonInterface.Jython_copy;
 import BritefuryJ.Pres.Pres;
 
 public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterface, Presentable
@@ -128,11 +129,11 @@ public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterf
 	}
 
 	@Override
-	protected Object createDeepCopy(IdentityHashMap<Object, Object> memo)
+	protected Object createDeepCopy(PyDictionary memo)
 	{
 		if ( value != null )
 		{
-			return new DMEmbeddedObject( value );
+			return new DMEmbeddedObject( Jython_copy.deepcopy( value ) );
 		}
 		else
 		{

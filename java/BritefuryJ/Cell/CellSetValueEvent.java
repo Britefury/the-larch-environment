@@ -4,17 +4,15 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.Editor.Table.Generic;
+package BritefuryJ.Cell;
 
-import java.util.List;
-
-public interface GenericTableModelInterface
+public class CellSetValueEvent
 {
-	int getWidth();
-	int getHeight();
-	List<Object> getRow(int rowIndex);
-	Object get(int x, int y);
-	void set(int x, int y, Object value);
-	Object[][] getBlock(int x, int y, int w, int h);
-	void putBlock(int x, int y, Object[][] block);
+	public Object value;
+	
+	
+	public CellSetValueEvent(Object value)
+	{
+		this.value = value;
+	}
 }
