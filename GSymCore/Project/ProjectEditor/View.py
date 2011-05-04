@@ -23,7 +23,7 @@ from Britefury.Kernel.View.DispatchView import ObjectDispatchView
 
 from Britefury.Util.NodeUtil import *
 
-from BritefuryJ.Cell import LiteralCell
+from BritefuryJ.IncrementalUnit import LiteralUnit
 
 from BritefuryJ.AttributeTable import *
 
@@ -246,7 +246,7 @@ class ProjectView (ObjectDispatchView):
 				project.pythonPackageName = text
 
 			def onCancel(self, textEntry, originalText):
-				pythonPackageCell.setLiteralValue( pythonPackageNameLabelBox )
+				pythonPackageUnit.setLiteralValue( pythonPackageNameLabelBox )
 
 
 		class _PythonPackageNameInteractor (ClickElementInteractor):
@@ -258,7 +258,7 @@ class ProjectView (ObjectDispatchView):
 				n = n   if n is not None   else 'Untitled'
 				textEntry = TextEntry( n, _PythonPackageNameListener(), _pythonPackageNameRegex, 'Please enter a valid dotted identifier' )
 				textEntry.grabCaretOnRealise()
-				pythonPackageCell.setLiteralValue( textEntry )
+				pythonPackageUnit.setLiteralValue( textEntry )
 				return True
 
 
@@ -316,8 +316,8 @@ class ProjectView (ObjectDispatchView):
 			pythonPackageNameLabel = _itemHoverHighlightStyle.applyTo( _pythonPackageNameStyle.applyTo( Label( project.pythonPackageName ) ) )
 			pythonPackageNameLabel = pythonPackageNameLabel.withElementInteractor( _PythonPackageNameInteractor() )
 			pythonPackageNameLabelBox = Row( [ pythonPackageNameLabel ] )
-		pythonPackageCell = LiteralCell( pythonPackageNameLabelBox )
-		pythonPackageNameBox = Row( [ pythonPackageNamePrompt, pythonPackageCell.defaultPerspectiveValuePresInFragment() ] )
+		pythonPackageUnit = LiteralUnit( pythonPackageNameLabelBox )
+		pythonPackageNameBox = Row( [ pythonPackageNamePrompt, pythonPackageUnit.defaultPerspectiveValuePresInFragment() ] )
 		
 		
 		# Clear imported modules
@@ -369,12 +369,12 @@ class ProjectView (ObjectDispatchView):
 				package.name = text
 
 			def onCancel(self, textEntry, originalText):
-				nameCell.setLiteralValue( nameBox )
+				nameUnit.setLiteralValue( nameBox )
 
 		def _onRename(menuItem):
 			textEntry = TextEntry( package.name, _RenameListener(), _nameRegex, 'Please enter a valid identifier' )
 			textEntry.grabCaretOnRealise()
-			nameCell.setLiteralValue( textEntry )
+			nameUnit.setLiteralValue( textEntry )
 		
 		def _onDelete(menuItem):
 			if package.parent is not None:
@@ -409,11 +409,11 @@ class ProjectView (ObjectDispatchView):
 		nameBox = nameBox.withDragSource( _dragSource )
 		nameBox = nameBox.withDropDest( _packageDropDest )
 
-		nameCell = LiteralCell( nameBox )
+		nameUnit = LiteralUnit( nameBox )
 
 		itemsBox = Column( items )
 
-		return Column( [ nameCell.defaultPerspectiveValuePresInFragment(), itemsBox.padX( _packageContentsIndentation, 0.0 ).alignHExpand() ] )
+		return Column( [ nameUnit.defaultPerspectiveValuePresInFragment(), itemsBox.padX( _packageContentsIndentation, 0.0 ).alignHExpand() ] )
 
 
 
@@ -424,12 +424,12 @@ class ProjectView (ObjectDispatchView):
 				page.name = text
 
 			def onCancel(self, textEntry, originalText):
-				nameCell.setLiteralValue( nameBox )
+				nameUnit.setLiteralValue( nameBox )
 
 		def _onRename(menuItem):
 			textEntry = TextEntry( page.name, _RenameListener(), _nameRegex, 'Please enter a valid identifier' )
 			textEntry.grabCaretOnRealise()
-			nameCell.setLiteralValue( textEntry )
+			nameUnit.setLiteralValue( textEntry )
 
 		def _onDelete(menuItem):
 			if page.parent is not None:
@@ -451,9 +451,9 @@ class ProjectView (ObjectDispatchView):
 		nameBox = nameBox.withDragSource( _dragSource )
 		nameBox = nameBox.withDropDest( _pageDropDest )
 
-		nameCell = LiteralCell( nameBox )
+		nameUnit = LiteralUnit( nameBox )
 
-		return nameCell.defaultPerspectiveValuePresInFragment()
+		return nameUnit.defaultPerspectiveValuePresInFragment()
 
 
 

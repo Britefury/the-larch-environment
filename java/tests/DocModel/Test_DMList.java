@@ -15,13 +15,13 @@ import org.python.core.Py;
 import org.python.core.PyInteger;
 import org.python.core.PySlice;
 
-import BritefuryJ.Cell.Cell;
-import BritefuryJ.Cell.CellEvaluator;
 import BritefuryJ.ChangeHistory.ChangeHistory;
 import BritefuryJ.DocModel.DMIOReader;
 import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
 import BritefuryJ.DocModel.DMList;
 import BritefuryJ.DocModel.DMNode;
+import BritefuryJ.IncrementalUnit.Unit;
+import BritefuryJ.IncrementalUnit.UnitEvaluator;
 
 public class Test_DMList extends Test_DMNode_base
 {
@@ -126,14 +126,14 @@ public class Test_DMList extends Test_DMNode_base
 	{
 		final DMList xs = readDMListSX( "[a b c]" );
 		
-		CellEvaluator eval = new CellEvaluator()
+		UnitEvaluator eval = new UnitEvaluator()
 		{
 			public Object evaluate()
 			{
 				return xs.size();
 			}
 		};
-		Cell yCell = new Cell();
+		Unit yCell = new Unit();
 		yCell.setEvaluator( eval );
 		
 		assertEquals( yCell.getValue(), new Integer( 3 ) );

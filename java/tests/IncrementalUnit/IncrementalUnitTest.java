@@ -5,16 +5,16 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 1999-2008.
 //##************************
-package tests.Cell;
+package tests.IncrementalUnit;
 
-import BritefuryJ.Cell.Cell;
-import BritefuryJ.Cell.CellEvaluator;
+import BritefuryJ.IncrementalUnit.Unit;
+import BritefuryJ.IncrementalUnit.UnitEvaluator;
 
-public class CellTest extends CellTest_base
+public class IncrementalUnitTest extends IncrementalUnitTest_base
 {
 	public void testLiteral()
 	{
-		Cell cell = new Cell();
+		Unit cell = new Unit();
 		
 		cell.setLiteralValue( new Integer( 1 ) );
 	
@@ -31,7 +31,7 @@ public class CellTest extends CellTest_base
 	{
 		assertEquals( getSignalCount( "changed" ), 0 );
 		
-		Cell cell = new Cell();
+		Unit cell = new Unit();
 		
 		cell.setLiteralValue( new Integer( 1 ) );
 		assertEquals( cell.getValue(), new Integer( 1 ) );
@@ -48,7 +48,7 @@ public class CellTest extends CellTest_base
 	
 	public void testFunction()
 	{
-		CellEvaluator evaluator = new CellEvaluator()
+		UnitEvaluator evaluator = new UnitEvaluator()
 		{
 			public Object evaluate()
 			{
@@ -59,7 +59,7 @@ public class CellTest extends CellTest_base
 		
 		assertEquals( getSignalCount( "changed" ), 0 );
 
-		Cell cell = new Cell();
+		Unit cell = new Unit();
 
 		cell.setLiteralValue( new Integer( 1 ) );
 		assertEquals( cell.getValue(), new Integer( 1 ) );
@@ -75,10 +75,10 @@ public class CellTest extends CellTest_base
 	
 	public void testChain()
 	{
-		final Cell cell1 = new Cell();
-		final Cell cell2 = new Cell();
+		final Unit cell1 = new Unit();
+		final Unit cell2 = new Unit();
 		
-		CellEvaluator evaluator = new CellEvaluator()
+		UnitEvaluator evaluator = new UnitEvaluator()
 		{
 			public Object evaluate()
 			{
@@ -103,10 +103,10 @@ public class CellTest extends CellTest_base
 	public void testValueCache()
 	{
 		final int[] callCount = { 0 };
-		final Cell cell1 = new Cell();
-		final Cell cell2 = new Cell();
+		final Unit cell1 = new Unit();
+		final Unit cell2 = new Unit();
 		
-		CellEvaluator evaluator = new CellEvaluator()
+		UnitEvaluator evaluator = new UnitEvaluator()
 		{
 			public Object evaluate()
 			{
@@ -142,11 +142,11 @@ public class CellTest extends CellTest_base
 		assertEquals( getSignalCount( "1changed" ), 0 );
 		assertEquals( getSignalCount( "3changed" ), 0 );
 		
-		final Cell cell1 = new Cell();
-		final Cell cell2 = new Cell();
-		final Cell cell3 = new Cell();
+		final Unit cell1 = new Unit();
+		final Unit cell2 = new Unit();
+		final Unit cell3 = new Unit();
 		
-		CellEvaluator evaluator2 = new CellEvaluator()
+		UnitEvaluator evaluator2 = new UnitEvaluator()
 		{
 			public Object evaluate()
 			{
@@ -154,7 +154,7 @@ public class CellTest extends CellTest_base
 			}
 		};
 		
-		CellEvaluator evaluator3 = new CellEvaluator()
+		UnitEvaluator evaluator3 = new UnitEvaluator()
 		{
 			public Object evaluate()
 			{

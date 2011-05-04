@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.Editor.Table;
+package BritefuryJ.Editor.Table.Generic;
 
 import java.util.ArrayList;
 import java.util.List;

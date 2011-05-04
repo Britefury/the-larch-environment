@@ -23,7 +23,7 @@ from Britefury.Kernel.Document import Document
 from Britefury.Util.NodeUtil import *
 
 
-from BritefuryJ.Cell import LiteralCell
+from BritefuryJ.IncrementalUnit import LiteralUnit
 
 from BritefuryJ.AttributeTable import *
 
@@ -129,13 +129,13 @@ class ConsoleView (ObjectDispatchView):
 				
 			def _finish(entry):
 				caret.moveTo( marker )
-				dropPromptCell.setLiteralValue( HiddenContent( '' ) )
+				dropPromptUnit.setLiteralValue( HiddenContent( '' ) )
 			
 			dropPrompt = _dropPrompt( _VarNameEntryListener() )
 			rootElement = element.getRootElement()
 			caret = rootElement.getCaret()
 			marker = caret.getMarker().copy()
-			dropPromptCell.setLiteralValue( dropPrompt )
+			dropPromptUnit.setLiteralValue( dropPrompt )
 			rootElement.grabFocus()
 			
 			return True
@@ -164,8 +164,8 @@ class ConsoleView (ObjectDispatchView):
 			element.ensureVisible()
 		m = m.withCustomElementAction( _ensureCurrentModuleVisible )
 		
-		dropPromptCell = LiteralCell( HiddenContent( '' ) )
-		dropPromptView = dropPromptCell.defaultPerspectiveValuePresInFragment()
+		dropPromptUnit = LiteralUnit( HiddenContent( '' ) )
+		dropPromptView = dropPromptUnit.defaultPerspectiveValuePresInFragment()
 		
 		if len( blocks ) > 0:
 			blockList = _consoleBlockListStyle.applyTo( Column( blocks ) ).alignHExpand()

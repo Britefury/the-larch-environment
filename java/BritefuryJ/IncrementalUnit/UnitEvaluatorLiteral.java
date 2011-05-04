@@ -5,16 +5,16 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 1999-2008.
 //##************************
-package BritefuryJ.Cell;
+package BritefuryJ.IncrementalUnit;
 
 
-public class CellEvaluatorLiteral extends CellEvaluator
+public class UnitEvaluatorLiteral extends UnitEvaluator
 {
 	private Object value;
 	
 		
 	
-	public CellEvaluatorLiteral(Object value)
+	public UnitEvaluatorLiteral(Object value)
 	{
 		super();
 		this.value = value;

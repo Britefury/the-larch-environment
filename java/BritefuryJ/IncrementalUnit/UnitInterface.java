@@ -5,7 +5,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 1999-2008.
 //##************************
-package BritefuryJ.Cell;
+package BritefuryJ.IncrementalUnit;
 
 
 import java.awt.Color;
@@ -29,16 +29,16 @@ import BritefuryJ.StyleSheet.StyleValues;
 
 
 
-public abstract class CellInterface implements IncrementalOwner, Presentable
+public abstract class UnitInterface implements IncrementalOwner, Presentable
 {
 	public static class ValuePres extends Pres
 	{
-		private CellInterface cell;
+		private UnitInterface unit;
 		
 		
-		private ValuePres(CellInterface cell)
+		private ValuePres(UnitInterface unit)
 		{
-			this.cell = cell;
+			this.unit = unit;
 		}
 		
 
@@ -48,12 +48,12 @@ public abstract class CellInterface implements IncrementalOwner, Presentable
 			Object value = null;
 			try
 			{
-				value = cell.getValue();
+				value = unit.getValue();
 			}
 			catch (Throwable t)
 			{
 				Pres exceptionView = new ApplyPerspective( null, t );
-				return new ErrorBox( "CellInterface.ValuePres presentation error - exception during cell evaluation", exceptionView ).present( ctx, style );
+				return new ErrorBox( "UnitInterface.ValuePres presentation error - exception during unit evaluation", exceptionView ).present( ctx, style );
 			}
 
 			if ( value != null )
@@ -84,7 +84,7 @@ public abstract class CellInterface implements IncrementalOwner, Presentable
 	@Override
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return cellStyle.applyTo( new ObjectBox( getClass().getName(), new InnerFragment( getValue() ) ) );
+		return unitStyle.applyTo( new ObjectBox( getClass().getName(), new InnerFragment( getValue() ) ) );
 	}
 	
 	
@@ -100,5 +100,5 @@ public abstract class CellInterface implements IncrementalOwner, Presentable
 	}
 	
 	
-	private static StyleSheet cellStyle = StyleSheet.instance.withAttr( ObjectPresStyle.objectBorderPaint, new Color( 0.5f, 0.0f, 0.5f ) ).withAttr( ObjectPresStyle.objectTitlePaint, new Color( 0.5f, 0.0f, 0.5f ) );
+	private static StyleSheet unitStyle = StyleSheet.instance.withAttr( ObjectPresStyle.objectBorderPaint, new Color( 0.5f, 0.0f, 0.5f ) ).withAttr( ObjectPresStyle.objectTitlePaint, new Color( 0.5f, 0.0f, 0.5f ) );
 }

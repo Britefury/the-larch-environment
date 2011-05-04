@@ -4,8 +4,10 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.Editor.Table;
+package BritefuryJ.Editor.Table.Generic;
 
+import BritefuryJ.Editor.Table.AbstractTableEditor;
+import BritefuryJ.Editor.Table.AbstractTableEditorInstance;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Text;
 
