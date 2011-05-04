@@ -8,7 +8,7 @@
 from Britefury.Util.TrackedList import TrackedListProperty
 
 from BritefuryJ.ChangeHistory import Trackable
-from BritefuryJ.Cell import Cell
+from BritefuryJ.IncrementalUnit import Unit
 
 from GSymCore.Project.ProjectNode import ProjectNode
 
@@ -19,7 +19,7 @@ class ProjectContainer (ProjectNode):
 		super( ProjectContainer, self ).__init__()
 		self._contents_ = []
 		self._prevContents = []
-		self._contentsMapCell = Cell( self._computeContentsMap )
+		self._contentsMapUnit = Unit( self._computeContentsMap )
 		if contents is not None:
 			self[:] = contents
 	
@@ -33,7 +33,7 @@ class ProjectContainer (ProjectNode):
 		super( ProjectContainer, self ).__setstate__( state )
 		self._contents_ = state['contents']
 		self._prevContents = []
-		self._contentsMapCell = Cell( self._computeContentsMap )
+		self._contentsMapUnit = Unit( self._computeContentsMap )
 
 		for x in self._contents_:
 			x._parent = self
@@ -98,7 +98,7 @@ class ProjectContainer (ProjectNode):
 		
 		
 	def getContentsMap(self):
-		return self._contentsMapCell.getValue()
+		return self._contentsMapUnit.getValue()
 	
 	
 	def trackContents(self, history):

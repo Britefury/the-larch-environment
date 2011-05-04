@@ -4,18 +4,18 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.CellEditor;
+package BritefuryJ.IncrementalUnit.Editor;
 
-import BritefuryJ.Cell.LiteralCell;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
+import BritefuryJ.IncrementalUnit.LiteralUnit;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.ObjectPres.ObjectBox;
 import BritefuryJ.Pres.Primitive.Label;
 
-public class ObjectCellEditorDropBox extends LiteralCellEditor
+public class ObjectUnitEditorDropBox extends LiteralUnitEditor
 {
 	protected class DropBoxEditor extends Editor
 	{
@@ -52,7 +52,7 @@ public class ObjectCellEditorDropBox extends LiteralCellEditor
 	};
 	
 	
-	public ObjectCellEditorDropBox(LiteralCell cell)
+	public ObjectUnitEditorDropBox(LiteralUnit cell)
 	{
 		super( cell );
 	}

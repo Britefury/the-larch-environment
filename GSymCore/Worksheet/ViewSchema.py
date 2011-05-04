@@ -10,7 +10,7 @@ from weakref import WeakValueDictionary
 import imp
 
 from BritefuryJ.Incremental import IncrementalOwner, IncrementalValueMonitor
-from BritefuryJ.Cell import Cell
+from BritefuryJ.IncrementalUnit import Unit
 
 from BritefuryJ.Pres import InnerFragment
 
@@ -120,7 +120,7 @@ class WorksheetView (NodeView):
 class BodyView (NodeView):
 	def __init__(self, worksheet, model):
 		super( BodyView, self ).__init__( worksheet, model )
-		self._contentsCell = Cell( self._computeContents )
+		self._contentsUnit = Unit( self._computeContents )
 		
 		
 	def refreshResults(self, module):
@@ -129,7 +129,7 @@ class BodyView (NodeView):
 		
 		
 	def getContents(self):
-		return self._contentsCell.getValue()
+		return self._contentsUnit.getValue()
 	
 	
 	def appendModel(self, node):

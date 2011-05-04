@@ -4,12 +4,12 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.CellEditor;
+package BritefuryJ.IncrementalUnit.Editor;
 
-import BritefuryJ.Cell.LiteralCell;
 import BritefuryJ.Controls.TextEntry;
+import BritefuryJ.IncrementalUnit.LiteralUnit;
 
-public class StringCellEditorTextEntry extends LiteralCellEditor
+public class StringUnitEditorTextEntry extends LiteralUnitEditor
 {
 	protected class StringEditor extends Editor
 	{
@@ -53,7 +53,7 @@ public class StringCellEditorTextEntry extends LiteralCellEditor
 	};
 	
 	
-	public StringCellEditorTextEntry(LiteralCell cell)
+	public StringUnitEditorTextEntry(LiteralUnit cell)
 	{
 		super( cell );
 	}

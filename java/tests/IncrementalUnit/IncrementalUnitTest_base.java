@@ -5,7 +5,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 1999-2008.
 //##************************
-package tests.Cell;
+package tests.IncrementalUnit;
 
 import java.util.HashMap;
 
@@ -13,7 +13,7 @@ import junit.framework.TestCase;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
 
-public abstract class CellTest_base extends TestCase
+public abstract class IncrementalUnitTest_base extends TestCase
 {
 	private HashMap<String, Integer> sigs;
 	
@@ -62,7 +62,7 @@ public abstract class CellTest_base extends TestCase
 	
 	protected IncrementalMonitorListener makeListener(final String prefix)
 	{
-		final CellTest_base tester = this;
+		final IncrementalUnitTest_base tester = this;
 
 		IncrementalMonitorListener listener = new IncrementalMonitorListener()
 		{

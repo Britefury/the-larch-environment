@@ -5,7 +5,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 1999-2008.
 //##************************
-package BritefuryJ.Cell;
+package BritefuryJ.IncrementalUnit;
 
 import org.python.core.PyObject;
 
@@ -14,39 +14,39 @@ import BritefuryJ.Incremental.IncrementalMonitorListener;
 
 
 
-public class Cell extends CellInterface
+public class Unit extends UnitInterface
 {
 	private IncrementalFunctionMonitor inc;
-	private CellEvaluator evaluator;
+	private UnitEvaluator evaluator;
 	private Object valueCache;
 	
 
 	
 	
-	public Cell()
+	public Unit()
 	{
-		this( new CellEvaluatorLiteral( null ) );
+		this( new UnitEvaluatorLiteral( null ) );
 	}
 	
-	public Cell(CellEvaluator evaluator)
+	public Unit(UnitEvaluator evaluator)
 	{
 		inc = new IncrementalFunctionMonitor();
 		this.evaluator = evaluator;
 		valueCache = null;
 	}
 	
-	public Cell(PyObject function)
+	public Unit(PyObject function)
 	{
-		this( new CellEvaluatorPythonFunction( function ) );
+		this( new UnitEvaluatorPythonFunction( function ) );
 	}
 	
 	
-	public CellEvaluator getEvaluator()
+	public UnitEvaluator getEvaluator()
 	{
 		return evaluator;
 	}
 
-	public void setEvaluator(CellEvaluator eval)
+	public void setEvaluator(UnitEvaluator eval)
 	{
 		setEval( eval );
 	}
@@ -67,7 +67,7 @@ public class Cell extends CellInterface
 
 	public void setLiteralValue(Object value)
 	{
-		setEval( new CellEvaluatorLiteral( value ) );
+		setEval( new UnitEvaluatorLiteral( value ) );
 	}
 
 	public boolean isLiteral()
@@ -79,7 +79,7 @@ public class Cell extends CellInterface
 	
 	public void setFunction(PyObject function)
 	{
-		setEval( new CellEvaluatorPythonFunction( function ) );
+		setEval( new UnitEvaluatorPythonFunction( function ) );
 	}
 	
 	
@@ -97,7 +97,7 @@ public class Cell extends CellInterface
 	
 
 
-	private void setEval(CellEvaluator eval)
+	private void setEval(UnitEvaluator eval)
 	{
 		evaluator = eval;
 		inc.onChanged();
@@ -135,13 +135,13 @@ public class Cell extends CellInterface
 	
 	
 	
-	public static Cell functionCell(PyObject function)
+	public static Unit functionUnit(PyObject function)
 	{
-		return new Cell( function );
+		return new Unit( function );
 	}
 	
-	public static Cell valueCell(Object value)
+	public static Unit valueUnit(Object value)
 	{
-		return new Cell( new CellEvaluatorLiteral( value ) );
+		return new Unit( new UnitEvaluatorLiteral( value ) );
 	}
 }

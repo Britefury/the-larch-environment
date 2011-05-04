@@ -5,16 +5,16 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 1999-2008.
 //##************************
-package tests.Cell;
+package tests.IncrementalUnit;
 
-import BritefuryJ.Cell.LiteralCell;
+import BritefuryJ.IncrementalUnit.LiteralUnit;
 
 
-public class LiteralCellTest extends CellTest_base
+public class LiteralIncrementalUnitTest extends IncrementalUnitTest_base
 {
 	public void testLiteral()
 	{
-		LiteralCell cell = new LiteralCell( new Integer( 1 ) );
+		LiteralUnit cell = new LiteralUnit( new Integer( 1 ) );
 	
 		assertEquals( cell.getValue(), new Integer( 1 ) );
 		
@@ -29,7 +29,7 @@ public class LiteralCellTest extends CellTest_base
 	{
 		assertEquals( getSignalCount( "changed" ), 0 );
 		
-		LiteralCell cell = new LiteralCell( new Integer( 1 ) );
+		LiteralUnit cell = new LiteralUnit( new Integer( 1 ) );
 		
 		cell.addListener( makeListener( "" ) );
 		

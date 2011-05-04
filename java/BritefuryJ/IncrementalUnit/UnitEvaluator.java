@@ -5,28 +5,14 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 1999-2008.
 //##************************
-package BritefuryJ.Cell;
+package BritefuryJ.IncrementalUnit;
 
-
-import org.python.core.Py;
-import org.python.core.PyObject;
-
-
-public class CellEvaluatorPythonFunction extends CellEvaluator
+public abstract class UnitEvaluator
 {
-	private PyObject func;
+	public abstract Object evaluate();
 	
-		
-	
-	public CellEvaluatorPythonFunction(PyObject func)
+	public boolean isLiteral()
 	{
-		super();
-		this.func = func;
-	}
-
-
-	public Object evaluate()
-	{
-		return Py.tojava( func.__call__(), Object.class );
+		return false;
 	}
 }

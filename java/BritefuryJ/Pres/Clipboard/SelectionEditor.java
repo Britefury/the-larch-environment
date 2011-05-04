@@ -62,12 +62,19 @@ public class SelectionEditor <SelectionType extends Selection> extends Selection
 	@SuppressWarnings("unchecked")
 	protected boolean replaceSelectionWithText(Selection selection, Target target, String replacement)
 	{
-		if ( !selectionClass.isInstance( selection ) )
+		if ( replaceSelectionWithTextFn != null )
 		{
-			throw new RuntimeException( "SelectionEditor.replaceSelectionWithText(): selection is not an instance of " + selectionClass.getName() );
+			if ( !selectionClass.isInstance( selection ) )
+			{
+				throw new RuntimeException( "SelectionEditor.replaceSelectionWithText(): selection is not an instance of " + selectionClass.getName() );
+			}
+			
+			return replaceSelectionWithTextFn.replaceSelectionWithText( (SelectionType)selection, target, replacement );
 		}
-		
-		return replaceSelectionWithTextFn.replaceSelectionWithText( (SelectionType)selection, target, replacement );
+		else
+		{
+			return false;
+		}
 	}
 
 	@SuppressWarnings("unchecked")

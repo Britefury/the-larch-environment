@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.CellEditor;
+package BritefuryJ.IncrementalUnit.Editor;
 
 import java.awt.Color;
 import java.util.WeakHashMap;
@@ -12,24 +12,24 @@ import java.util.WeakHashMap;
 import javax.swing.SwingUtilities;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.Cell.LiteralCell;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
+import BritefuryJ.IncrementalUnit.LiteralUnit;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public abstract class LiteralCellEditor implements Presentable, IncrementalMonitorListener
+public abstract class LiteralUnitEditor implements Presentable, IncrementalMonitorListener
 {
 	private static final StyleSheet errorStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.8f, 0.0f, 0.0f ) );
 	
 	protected abstract class Editor
 	{
 		private boolean bSettingCellValue = false;
-		private LiteralCell presCell = new LiteralCell();
+		private LiteralUnit presCell = new LiteralUnit();
 		private Pres pres = presCell.defaultPerspectiveValuePresInFragment();
 
 		
@@ -80,11 +80,11 @@ public abstract class LiteralCellEditor implements Presentable, IncrementalMonit
 	};
 	
 	
-	protected LiteralCell cell;
+	protected LiteralUnit cell;
 	protected WeakHashMap<Editor, Object> editors = new WeakHashMap<Editor, Object>();
 	
 	
-	public LiteralCellEditor(LiteralCell cell)
+	public LiteralUnitEditor(LiteralUnit cell)
 	{
 		this.cell = cell;
 		this.cell.addListener( this );
