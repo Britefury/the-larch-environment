@@ -9,16 +9,12 @@ package BritefuryJ.EditPerspective;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 
-import org.python.core.PyObject;
-
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.DefaultObjectPresenterRegistry;
 import BritefuryJ.DefaultPerspective.DefaultPerspective;
 import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.ObjectPresentation.ObjectPresentationPerspective;
-import BritefuryJ.ObjectPresentation.ObjectPresenter;
-import BritefuryJ.ObjectPresentation.PyObjectPresenter;
 import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Projection.AbstractPerspective;
@@ -57,18 +53,6 @@ public class EditPerspective extends ObjectPresentationPerspective
 			members[i] = new InnerFragment( Array.get( x, i ) );
 		}
 		return DefaultObjectPresenterRegistry.arrayView( Arrays.asList( members ) );
-	}
-	
-	@Override
-	protected Pres invokeObjectPresenter(ObjectPresenter presenter, Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
-	{
-		return presenter.presentObject( x, fragment, inheritedState );
-	}
-	
-	@Override
-	protected Pres invokePyObjectPresenter(PyObjectPresenter presenter, PyObject x, FragmentView fragment, SimpleAttributeTable inheritedState)
-	{
-		return presenter.presentObject( x, fragment, inheritedState );
 	}
 	
 

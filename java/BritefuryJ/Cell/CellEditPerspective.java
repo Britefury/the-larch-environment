@@ -2,46 +2,47 @@
 //##* under the terms of the GNU General Public License version 2 as published by the
 //##* Free Software Foundation. The full text of the GNU General Public License
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
-//##* program. This source code is (C)copyright Geoffrey French 2008.
+//##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.DefaultPerspective;
+package BritefuryJ.Cell;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.DefaultPerspective.DefaultObjectPresenterRegistry;
 import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
+import BritefuryJ.EditPerspective.EditPerspective;
 import BritefuryJ.IncrementalView.FragmentView;
-import BritefuryJ.Inspect.InspectorPerspective;
 import BritefuryJ.ObjectPresentation.ObjectPresentationPerspective;
 import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Projection.AbstractPerspective;
 
-public class DefaultPerspective extends ObjectPresentationPerspective
+public class CellEditPerspective extends ObjectPresentationPerspective
 {
-	private DefaultPerspective(AbstractPerspective fallbackPerspective)
+	private CellEditPerspective(AbstractPerspective fallbackPerspective)
 	{
-		super( "__present__", fallbackPerspective );
-		DefaultObjectPresenterRegistry.instance.registerPerspective( this );
+		super( "__edit_cell_present__", fallbackPerspective );
+		CellEditObjectPresenterRegistry.instance.registerPerspective( this );
 	}
 
 	
-
+	
 	@Override
 	protected Pres presentWithJavaInterface(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		if ( x instanceof Presentable )
+		if ( x instanceof CellEditPresentable )
 		{
-			Presentable p = (Presentable)x;
-			return p.present( fragment, inheritedState );
+			CellEditPresentable p = (CellEditPresentable)x;
+			return p.editCellPresent( fragment, inheritedState );
 		}
 		else
 		{
 			return null;
 		}
 	}
-	
+
 	@Override
 	protected Pres presentJavaArray(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
@@ -53,10 +54,7 @@ public class DefaultPerspective extends ObjectPresentationPerspective
 		}
 		return DefaultObjectPresenterRegistry.arrayView( Arrays.asList( members ) );
 	}
-	
 
-	
-	
 	@Override
 	public ClipboardHandlerInterface getClipboardHandler()
 	{
@@ -65,5 +63,5 @@ public class DefaultPerspective extends ObjectPresentationPerspective
 
 
 
-	public static final DefaultPerspective instance = new DefaultPerspective( InspectorPerspective.instance );
+	public static final CellEditPerspective instance = new CellEditPerspective( EditPerspective.instance );
 }

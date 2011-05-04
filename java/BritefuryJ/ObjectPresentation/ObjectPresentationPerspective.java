@@ -23,7 +23,7 @@ public abstract class ObjectPresentationPerspective extends AbstractPerspective
 {
 	private PyString pythonPresentMethodName;
 	private PolymorphicMap<Object> objectPresenters = new PolymorphicMap<Object>();
-	private AbstractPerspective fallbackPerspective;
+	protected AbstractPerspective fallbackPerspective;
 	
 	
 	public ObjectPresentationPerspective(String pythonMethodName, AbstractPerspective fallbackPerspective)
@@ -42,8 +42,17 @@ public abstract class ObjectPresentationPerspective extends AbstractPerspective
 	
 	protected abstract Pres presentWithJavaInterface(Object x, FragmentView fragment, SimpleAttributeTable inheritedState);
 	protected abstract Pres presentJavaArray(Object x, FragmentView fragment, SimpleAttributeTable inheritedState);
-	protected abstract Pres invokeObjectPresenter(ObjectPresenter presenter, Object x, FragmentView fragment, SimpleAttributeTable inheritedState);
-	protected abstract Pres invokePyObjectPresenter(PyObjectPresenter presenter, PyObject x, FragmentView fragment, SimpleAttributeTable inheritedState);
+	
+	
+	protected Pres invokeObjectPresenter(ObjectPresenter presenter, Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
+	{
+		return presenter.presentObject( x, fragment, inheritedState );
+	}
+	
+	protected Pres invokePyObjectPresenter(PyObjectPresenter presenter, PyObject x, FragmentView fragment, SimpleAttributeTable inheritedState)
+	{
+		return presenter.presentObject( x, fragment, inheritedState );
+	}
 	
 
 	@Override

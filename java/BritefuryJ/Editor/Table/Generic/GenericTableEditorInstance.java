@@ -33,21 +33,27 @@ public class GenericTableEditorInstance extends AbstractTableEditorInstance<Gene
 		
 		for (int y = 0; y < height; y++)
 		{
-			List<?> row = model.getRowCells( y );
+			List<?> row = model.getRow( y );
 			
 			if ( genericEditor.showEmptyColumnAtRight )
 			{
-				Object r[] = row.toArray();
 				cells[y] = new Object[numColumns];
-				System.arraycopy( r, 0, cells[y], 0, r.length );
-				for (int x = r.length; x < numColumns; x++)
+				for (int x = 0; x < row.size(); x++)
+				{
+					cells[y][x] = new GenericTableCell( model, x, y );
+				}
+				for (int x = row.size(); x < numColumns; x++)
 				{
 					cells[y][x] = genericEditor.emptyCellFac.createEmptyCell();
 				}
 			}
 			else
 			{
-				cells[y] = row.toArray();
+				cells[y] = new Object[row.size()];
+				for (int x = 0; x < row.size(); x++)
+				{
+					cells[y][x] = new GenericTableCell( model, x, y );
+				}
 			}
 		}
 		

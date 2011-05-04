@@ -9,7 +9,7 @@ from java.lang import StringBuilder
 
 import sys
 import imp
-from copy import copy
+from copy import copy, deepcopy
 
 from Britefury import LoadBuiltins
 
@@ -68,7 +68,7 @@ class Console (IncrementalOwner):
 			if a != blank:
 				self._before.append( a )
 		if module != blank:
-			self._before.append( module.deepCopy() )
+			self._before.append( deepcopy( module ) )
 		self._after = []
 		self._currentPythonModule = Python25.py25NewModule()
 		self._incr.onChanged()

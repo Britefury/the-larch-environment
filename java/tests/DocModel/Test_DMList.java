@@ -116,12 +116,6 @@ public class Test_DMList extends Test_DMNode_base
 		cmpListSX( ys, "[a b c [x y z]]" );
 	}
 	
-	public void testClone()
-	{
-		DMList xs = readDMListSX( "[a b c `null`]" );
-		cmpListSX( (DMList)xs.clone(), "[a b c `null`]" );
-	}
-
 	public void testCell()
 	{
 		final DMList xs = readDMListSX( "[a b c]" );

@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2010.
 ##-*************************
+from copy import deepcopy
+
 from BritefuryJ.DocPresent.Clipboard import *
 from BritefuryJ.DocPresent.Selection import TextSelection
 from BritefuryJ.DocPresent.StyleParams import *
@@ -76,7 +78,7 @@ class PythonSyntaxRecognizingEditor (SyntaxRecognizingEditor):
 		return joinStreamsAroundDeletionPoint( before, after )
 	
 	def copyStructuralValue(self, x):
-		return x.deepCopy()
+		return deepcopy( x )
 
 	
 	

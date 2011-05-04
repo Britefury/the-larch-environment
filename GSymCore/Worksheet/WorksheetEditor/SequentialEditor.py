@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2010.
 ##-*************************
+from copy import deepcopy
+
 from BritefuryJ.Editor.Sequential import SequentialEditor
 
 
@@ -14,7 +16,7 @@ class WorksheetSequentialEditor (SequentialEditor):
 	
 	
 	def copyStructuralValue(self, x):
-		return x.deepCopy()
+		return deepcopy( x )
 
 
 WorksheetSequentialEditor.instance = WorksheetSequentialEditor()
