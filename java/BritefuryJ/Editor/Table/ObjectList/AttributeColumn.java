@@ -14,11 +14,19 @@ import org.python.core.__builtin__;
 public class AttributeColumn extends AbstractColumn
 {
 	private PyString attrname;
+	private PyObject textToValue;
 	
+	
+	public AttributeColumn(PyString attrname, PyObject textToValue)
+	{
+		super();
+		this.attrname = __builtin__.intern( attrname );
+		this.textToValue = textToValue;
+	}
 	
 	public AttributeColumn(PyString attrname)
 	{
-		this.attrname = __builtin__.intern( attrname );
+		this( attrname, null );
 	}
 	
 	
@@ -35,5 +43,18 @@ public class AttributeColumn extends AbstractColumn
 		PyObject pyRow = Py.java2py( modelRow );
 		PyObject pyValue = Py.java2py( value );
 		__builtin__.setattr( pyRow, attrname, pyValue );
+	}
+
+	@Override
+	public Object textToValue(String text)
+	{
+		if ( textToValue != null )
+		{
+			return textToValue.__call__( Py.newString( text ) );
+		}
+		else
+		{
+			return text;
+		}
 	}
 }

@@ -42,7 +42,7 @@ public class TargetImporter <TargetType extends Target>
 		{
 			for (DataImporterInterface<TargetType> importer: importers)
 			{
-				if ( importer.getDataFlavors().contains( flavor ) )
+				if ( importer.canImportFlavor( flavor ) )
 				{
 					try
 					{
@@ -72,7 +72,7 @@ public class TargetImporter <TargetType extends Target>
 		{
 			for (DataImporterInterface<TargetType> importer: importers)
 			{
-				if ( importer.getDataFlavors().contains( flavor ) )
+				if ( importer.canImportFlavor( flavor ) )
 				{
 					try
 					{

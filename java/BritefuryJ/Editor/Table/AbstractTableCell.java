@@ -18,6 +18,6 @@ public abstract class AbstractTableCell extends AbstractCell
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		Pres cellContents = presentCell( fragment, inheritedState );
-		return new Bin( cellContents.alignHPack().alignVRefY() ).alignHExpand().alignVExpand();
+		return new Bin( cellContents.alignHPack().alignVRefY() ).alignHPack().alignVRefY();
 	}
 }

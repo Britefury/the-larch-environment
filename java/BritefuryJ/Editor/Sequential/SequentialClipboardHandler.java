@@ -121,9 +121,9 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	
 	private AbstractDataImporter<Caret> streamImporter = new AbstractDataImporter<Caret>()
 	{
-		protected DataFlavor getDataFlavor()
+		protected boolean canImportFlavor(DataFlavor flavor)
 		{
-			return dataFlavorForClass( sequentialEditor.getSelectionBufferType() );
+			return flavor.equals( dataFlavorForClass( sequentialEditor.getSelectionBufferType() ) );
 		}
 		
 		protected boolean importData(Caret caret, Selection selection, Object data)
@@ -140,9 +140,9 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	
 	private AbstractDataImporter<Caret> stringImporter = new AbstractDataImporter<Caret>()
 	{
-		protected DataFlavor getDataFlavor()
+		protected boolean canImportFlavor(DataFlavor flavor)
 		{
-			return DataFlavor.stringFlavor;
+			return flavor.equals( DataFlavor.stringFlavor );
 		}
 		
 		protected boolean importData(Caret caret, Selection selection, Object data)

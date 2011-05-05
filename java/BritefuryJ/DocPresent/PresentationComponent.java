@@ -342,7 +342,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				}
 				else
 				{
-					DPRegion region = rootElement.getCaretRegion();
+					DPRegion region = rootElement.getTargetRegion();
 					if ( region != null )
 					{
 						ClipboardHandlerInterface clipboardHandler = region.getClipboardHandler();
@@ -371,7 +371,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				}
 				else
 				{
-					DPRegion region = rootElement.getCaretRegion();
+					DPRegion region = rootElement.getTargetRegion();
 					if ( region != null )
 					{
 						ClipboardHandlerInterface clipboardHandler = region.getClipboardHandler();
@@ -1472,11 +1472,12 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		//
 		//
 		
-		protected DPRegion getCaretRegion()
+		protected DPRegion getTargetRegion()
 		{
-			if ( caret.isValid() )
+			Target target = getTarget();
+			if ( target.isValid() )
 			{
-				return caret.getMarker().getElement().getRegion();
+				return target.getElement().getRegion();
 			}
 			else
 			{
@@ -1486,6 +1487,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		protected DPRegion getSelectionRegion()
 		{
+			Selection selection = getSelection();
 			return selection != null  ?  selection.getRegion()  :  null;
 		}
 	}
