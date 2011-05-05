@@ -10,6 +10,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.util.List;
 
 import BritefuryJ.Command.CommandSetSource;
+import BritefuryJ.DocPresent.Corner;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementPainter;
 import BritefuryJ.DocPresent.ElementValueFunction;
@@ -347,22 +348,28 @@ public abstract class Pres
 	// Popup methods
 	//
 	
+	public void popup(DPElement element, PresentationContext ctx, StyleValues style, Corner targetAnchor, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	{
+		DPElement popupElement = present( ctx, style );
+		popupElement.popup( element, targetAnchor, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+	}
+	
 	public void popupToRightOf(DPElement element, PresentationContext ctx, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		DPElement popupElement = present( ctx, style );
-		popupElement.popupToRightOf( element, bCloseOnLoseFocus, bRequestFocus );
+		popupElement.popup( element, Corner.UPPER_RIGHT, Corner.UPPER_LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
 	public void popupBelow(DPElement element, PresentationContext ctx, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		DPElement popupElement = present( ctx, style );
-		popupElement.popupBelow( element, bCloseOnLoseFocus, bRequestFocus );
+		popupElement.popup( element, Corner.LOWER_LEFT, Corner.UPPER_LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popupAtMousePosition(DPElement element, PresentationContext ctx, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public void popupAtMousePosition(DPElement element, PresentationContext ctx, StyleValues style, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		DPElement popupElement = present( ctx, style );
-		element.getRootElement().createPopupAtMousePosition( popupElement, bCloseOnLoseFocus, bRequestFocus );
+		element.getRootElement().createPopupAtMousePosition( popupElement, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
 	
@@ -409,52 +416,70 @@ public abstract class Pres
 	
 	
 	
-	public void popupToRightOf(DPElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public void popup(DPElement element, Corner targetAnchor, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		DPElement popupElement = createPopupElement( element );
-		popupElement.popupToRightOf( element, bCloseOnLoseFocus, bRequestFocus );
+		popupElement.popup( element, targetAnchor, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+	}
+	
+	public void popup(DPElement element, StyleValues style, Corner targetAnchor, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	{
+		DPElement popupElement = createPopupElement( element, style );
+		popupElement.popup( element, targetAnchor, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+	}
+	
+	public void popupToRightOf(DPElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	{
+		popup( element, Corner.UPPER_RIGHT, Corner.UPPER_LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
 	public void popupToRightOf(DPElement element, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		DPElement popupElement = createPopupElement( element, style );
-		popupElement.popupToRightOf( element, bCloseOnLoseFocus, bRequestFocus );
+		popup( element, style, Corner.UPPER_RIGHT, Corner.UPPER_LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
 	public void popupBelow(DPElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		DPElement popupElement = createPopupElement( element );
-		popupElement.popupBelow( element, bCloseOnLoseFocus, bRequestFocus );
+		popup( element, Corner.LOWER_LEFT, Corner.UPPER_LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
 	public void popupBelow(DPElement element, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		DPElement popupElement = createPopupElement( element, style );
-		popupElement.popupBelow( element, bCloseOnLoseFocus, bRequestFocus );
+		popup( element, style, Corner.LOWER_LEFT, Corner.UPPER_LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popupOver(DPElement element, Point2 targetLocalPos, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public void popupOver(DPElement element, Point2 targetLocalPos, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		DPElement popupElement = createPopupElement( element );
-		popupElement.popupOver( element, targetLocalPos, bCloseOnLoseFocus, bRequestFocus );
+		popupElement.popupOver( element, targetLocalPos, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popupOver(DPElement element, Point2 targetLocalPos, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public void popupOver(DPElement element, Point2 targetLocalPos, StyleValues style, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		DPElement popupElement = createPopupElement( element, style );
-		popupElement.popupOver( element, targetLocalPos, bCloseOnLoseFocus, bRequestFocus );
+		popupElement.popupOver( element, targetLocalPos, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+	}
+	
+	public void popupAtMousePosition(DPElement element, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	{
+		DPElement popupElement = createPopupElement( element );
+		element.getRootElement().createPopupAtMousePosition( popupElement, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+	}
+	
+	public void popupAtMousePosition(DPElement element, StyleValues style, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	{
+		DPElement popupElement = createPopupElement( element, style );
+		element.getRootElement().createPopupAtMousePosition( popupElement, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
 	public void popupAtMousePosition(DPElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		DPElement popupElement = createPopupElement( element );
-		element.getRootElement().createPopupAtMousePosition( popupElement, bCloseOnLoseFocus, bRequestFocus );
+		popupAtMousePosition( element, Corner.UPPER_LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
 	public void popupAtMousePosition(DPElement element, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		DPElement popupElement = createPopupElement( element, style );
-		element.getRootElement().createPopupAtMousePosition( popupElement, bCloseOnLoseFocus, bRequestFocus );
+		popupAtMousePosition( element, style, Corner.UPPER_LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
 	

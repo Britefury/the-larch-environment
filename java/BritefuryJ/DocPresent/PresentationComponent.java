@@ -100,7 +100,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		private boolean bOpen;
 		
 		private PresentationPopup(PopupChain popupChain, Window ownerWindow, PresentationComponent parentComponent, DPElement popupContents, int x, int y,
-				boolean bCloseOnLoseFocus, boolean bRequestFocus)
+				Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 		{
 			chain = popupChain;
 			chain.addPopup( this );
@@ -120,8 +120,19 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			popupComponent.getRootElement().setChild( popupContents.layoutWrap( HAlignment.EXPAND, VAlignment.EXPAND ) );
 			
 			popupWindow.add( popupComponent );
-			popupWindow.setLocation( x, y );
+			//popupWindow.setLocation( x, y );
+			//popupWindow.pack();
+			
+			
 			popupWindow.pack();
+			Dimension sz = popupWindow.getSize();
+			AABox2 windowBox = new AABox2( 0.0, 0.0, sz.getWidth(), sz.getHeight() );
+			Point2 windowAnchor = popupAnchor.getBoxCorner( windowBox );
+			x -= (int)( windowAnchor.x + 0.5 );
+			y -= (int)( windowAnchor.y + 0.5 );
+			popupWindow.setLocation( x, y );
+
+			
 			popupWindow.setVisible( true );
 			if ( bRequestFocus )
 			{
@@ -1376,15 +1387,15 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		
 		
-		protected PresentationPopup createPopupPresentation(DPElement popupContents, Point2 localPos, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+		protected PresentationPopup createPopupPresentation(DPElement popupContents, Point2 localPos, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 		{
-			return component.createPopupPresentation( popupContents, (int)( localPos.x + 0.5 ), (int)( localPos.y + 0.5 ), bCloseOnLoseFocus, bRequestFocus );
+			return component.createPopupPresentation( popupContents, (int)( localPos.x + 0.5 ), (int)( localPos.y + 0.5 ), popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 		}
 		
-		public PresentationPopup createPopupAtMousePosition(DPElement popupContents, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+		public PresentationPopup createPopupAtMousePosition(DPElement popupContents, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 		{
 			Point mouse = component.getMousePosition();
-			return component.createPopupPresentation( popupContents, mouse.x, mouse.y, bCloseOnLoseFocus, bRequestFocus );
+			return component.createPopupPresentation( popupContents, mouse.x, mouse.y, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 		}
 
 		
@@ -1876,7 +1887,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	}
 	
 	
-	private PresentationPopup createPopupPresentation(DPElement popupContents, int x, int y, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	private PresentationPopup createPopupPresentation(DPElement popupContents, int x, int y, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		// Offset the popup position by the location of this presentation component on the screen
 		Point locOnScreen = getLocationOnScreen();
@@ -1891,15 +1902,14 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			chain.closeAllChildrenOf( containingPopup );
 		}
 		
+		Window ownerWindow = null;
 		if ( chain == null )
 		{
 			// No chain; create a new one, rooted here
 			chain = createPopupChain();
 			
 			// Get the owning window of this presentation component
-			Window ownerWindow = SwingUtilities.getWindowAncestor( this );
-
-			return new PresentationPopup( chain, ownerWindow, this, popupContents, x, y, bCloseOnLoseFocus, bRequestFocus );
+			ownerWindow = SwingUtilities.getWindowAncestor( this );
 		}
 		else
 		{
@@ -1907,9 +1917,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			PresentationComponent root = chain.owner;
 			
 			// Get the owning window of the root presentation component
-			Window ownerWindow = SwingUtilities.getWindowAncestor( root );
-
-			return new PresentationPopup( chain, ownerWindow, this, popupContents, x, y, bCloseOnLoseFocus, bRequestFocus );
+			ownerWindow = SwingUtilities.getWindowAncestor( root );
 		}
+
+		return new PresentationPopup( chain, ownerWindow, this, popupContents, x, y, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 	}
 }

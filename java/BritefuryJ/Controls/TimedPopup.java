@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.Timer;
 
+import BritefuryJ.DocPresent.Corner;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.Pres.Pres;
@@ -33,65 +34,45 @@ public class TimedPopup
 
 
 
-	public void popupToRightOf(DPElement element, PresentationContext ctx, StyleValues style)
+	public void popup(DPElement element, Corner targetAnchor, Corner popupAnchor, PresentationContext ctx, StyleValues style)
 	{
 		DPElement childElement = child.present( ctx, style );
-		childElement.popupToRightOf( element, true, bRequestFocus );
+		childElement.popup( element, targetAnchor, popupAnchor, true, bRequestFocus );
 		initialiseTimeout( childElement );
 	}
 	
-	public void popupBelow(DPElement element, PresentationContext ctx, StyleValues style)
+	public void popupAtMousePosition(DPElement element, Corner popupAnchor, PresentationContext ctx, StyleValues style)
 	{
 		DPElement childElement = child.present( ctx, style );
-		childElement.popupBelow( element, true, bRequestFocus );
-		initialiseTimeout( childElement );
-	}
-	
-	public void popupAtMousePosition(DPElement element, PresentationContext ctx, StyleValues style)
-	{
-		DPElement childElement = child.present( ctx, style );
-		element.getRootElement().createPopupAtMousePosition( childElement, true, bRequestFocus );
+		element.getRootElement().createPopupAtMousePosition( childElement, popupAnchor, true, bRequestFocus );
 		initialiseTimeout( childElement );
 	}
 	
 	
 	
-	public void popupToRightOf(DPElement element)
+	public void popup(DPElement element, Corner targetAnchor, Corner popupAnchor)
 	{
 		FragmentContext ctx = element.getFragmentContext();
 		if ( ctx != null )
 		{
-			popupToRightOf( element, ctx.createPresentationContext(), ctx.getStyleValues() );
+			popup( element, targetAnchor, popupAnchor, ctx.createPresentationContext(), ctx.getStyleValues() );
 		}
 		else
 		{
-			popupToRightOf( element, PresentationContext.defaultCtx, StyleValues.instance );
+			popup( element, targetAnchor, popupAnchor, PresentationContext.defaultCtx, StyleValues.instance );
 		}
 	}
 	
-	public void popupBelow(DPElement element)
+	public void popupAtMousePosition(DPElement element, Corner popupAnchor)
 	{
 		FragmentContext ctx = element.getFragmentContext();
 		if ( ctx != null )
 		{
-			popupBelow( element, ctx.createPresentationContext(), ctx.getStyleValues() );
+			popupAtMousePosition( element, popupAnchor, ctx.createPresentationContext(), ctx.getStyleValues() );
 		}
 		else
 		{
-			popupBelow( element, PresentationContext.defaultCtx, StyleValues.instance );
-		}
-	}
-	
-	public void popupAtMousePosition(DPElement element)
-	{
-		FragmentContext ctx = element.getFragmentContext();
-		if ( ctx != null )
-		{
-			popupAtMousePosition( element, ctx.createPresentationContext(), ctx.getStyleValues() );
-		}
-		else
-		{
-			popupAtMousePosition( element, PresentationContext.defaultCtx, StyleValues.instance );
+			popupAtMousePosition( element, popupAnchor, PresentationContext.defaultCtx, StyleValues.instance );
 		}
 	}
 	
