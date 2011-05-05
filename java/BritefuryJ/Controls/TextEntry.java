@@ -9,6 +9,7 @@ package BritefuryJ.Controls;
 import java.awt.event.KeyEvent;
 import java.util.regex.Pattern;
 
+import BritefuryJ.DocPresent.Corner;
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRegion;
@@ -338,7 +339,7 @@ public class TextEntry extends ControlPres
 				if ( failMessage != null )
 				{
 					Tooltip tooltip = new Tooltip( failMessage, 5.0 );
-					tooltip.popupBelow( outerElement, ctx, style );
+					tooltip.popup( outerElement, Corner.UPPER_LEFT, Corner.LOWER_LEFT, ctx, style );
 				}
 				return;
 			}

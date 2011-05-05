@@ -9,6 +9,7 @@ package BritefuryJ.Controls;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import BritefuryJ.DocPresent.Corner;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.Pres.Pres;
@@ -50,58 +51,70 @@ public abstract class PopupMenu extends Pres
 	// Popup methods
 	//
 
+	public void popup(DPElement element, StyleValues style, Corner targetAnchor, Corner popupAnchor)
+	{
+		popup( element, style, targetAnchor, popupAnchor, true, true );
+	}
+	
+	public void popup(DPElement element, Corner targetAnchor, Corner popupAnchor)
+	{
+		FragmentContext ctx = element.getFragmentContext();
+		if ( ctx != null )
+		{
+			popup( element, ctx.getStyleValues().withAttrs( popupMenuContentsStyle ), targetAnchor, popupAnchor );
+		}
+		else
+		{
+			popup( element, defaultPopupMenuContentsStyleValues, targetAnchor, popupAnchor );
+		}
+	}
+	
 	public void popupToRightOf(DPElement element, StyleValues style)
 	{
-		popupToRightOf( element, style, true, true );
+		popup( element, style, Corner.UPPER_RIGHT, Corner.UPPER_LEFT );
 	}
 	
 	public void popupToRightOf(DPElement element)
 	{
-		FragmentContext ctx = element.getFragmentContext();
-		if ( ctx != null )
-		{
-			popupToRightOf( element, ctx.getStyleValues().withAttrs( popupMenuContentsStyle ) );
-		}
-		else
-		{
-			popupToRightOf( element, defaultPopupMenuContentsStyleValues );
-		}
+		popup( element, Corner.UPPER_RIGHT, Corner.UPPER_LEFT );
 	}
 	
 	public void popupBelow(DPElement element, StyleValues style)
 	{
-		popupBelow( element, style, true, true );
+		popup( element, style, Corner.LOWER_LEFT, Corner.UPPER_LEFT );
 	}
 	
 	public void popupBelow(DPElement element)
 	{
+		popup( element, Corner.LOWER_LEFT, Corner.UPPER_LEFT );
+	}
+	
+	public void popupAtMousePosition(DPElement element, StyleValues style, Corner popupAnchor)
+	{
+		popupAtMousePosition( element, style, popupAnchor, true, true );
+	}
+	
+	public void popupAtMousePosition(DPElement element, Corner popupAnchor)
+	{
 		FragmentContext ctx = element.getFragmentContext();
 		if ( ctx != null )
 		{
-			popupBelow( element, ctx.getStyleValues().withAttrs( popupMenuContentsStyle ) );
+			popupAtMousePosition( element, ctx.getStyleValues().withAttrs( popupMenuContentsStyle ), popupAnchor );
 		}
 		else
 		{
-			popupBelow( element, defaultPopupMenuContentsStyleValues );
+			popupAtMousePosition( element, defaultPopupMenuContentsStyleValues, popupAnchor );
 		}
 	}
 	
 	public void popupAtMousePosition(DPElement element, StyleValues style)
 	{
-		popupAtMousePosition( element, style, true, true );
+		popupAtMousePosition( element, style, Corner.UPPER_LEFT );
 	}
 	
 	public void popupAtMousePosition(DPElement element)
 	{
-		FragmentContext ctx = element.getFragmentContext();
-		if ( ctx != null )
-		{
-			popupAtMousePosition( element, ctx.getStyleValues().withAttrs( popupMenuContentsStyle ) );
-		}
-		else
-		{
-			popupAtMousePosition( element, defaultPopupMenuContentsStyleValues );
-		}
+		popupAtMousePosition( element, Corner.UPPER_LEFT );
 	}
 
 	

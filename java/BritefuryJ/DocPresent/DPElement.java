@@ -2821,29 +2821,24 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	//
 	//
 	
-	public PresentationComponent.PresentationPopup popupBelow(DPElement targetElement, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationComponent.PresentationPopup popup(DPElement targetElement, Corner targetAnchor, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		AABox2 visibleBox = targetElement.getVisibleBoxInLocalSpace();
-		return popupOver( targetElement, new Point2( visibleBox.getLowerX(), visibleBox.getUpperY() ), bCloseOnLoseFocus, bRequestFocus );
+		Point2 targerCorner = targetAnchor.getBoxCorner( visibleBox );
+		return popupOver( targetElement, targerCorner, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public PresentationComponent.PresentationPopup popupToRightOf(DPElement targetElement, boolean bCloseOnLoseFocus, boolean bRequestFocus)
-	{
-		AABox2 visibleBox = targetElement.getVisibleBoxInLocalSpace();
-		return popupOver( targetElement, new Point2( visibleBox.getUpperX(), visibleBox.getLowerY() ), bCloseOnLoseFocus, bRequestFocus );
-	}
-	
-	public PresentationComponent.PresentationPopup popupOver(DPElement targetElement, Point2 targetLocalPos, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationComponent.PresentationPopup popupOver(DPElement targetElement, Point2 targetLocalPos, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		if ( targetElement.isLocalSpacePointVisible( targetLocalPos ) )
 		{
 			Xform2 x = targetElement.getLocalToRootXform();
 			Point2 rootPos = x.transform( targetLocalPos );
-			return targetElement.getRootElement().createPopupPresentation( this, rootPos, bCloseOnLoseFocus, bRequestFocus );
+			return targetElement.getRootElement().createPopupPresentation( this, rootPos, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 		}
 		else
 		{
-			return targetElement.getRootElement().createPopupAtMousePosition( this, bCloseOnLoseFocus, bRequestFocus );
+			return targetElement.getRootElement().createPopupAtMousePosition( this, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 		}
 	}
 	
@@ -3006,7 +3001,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 			DPElement model = (DPElement)fragment.getModel();
 
 			Pres p = inspect( model );
-			p.popupAtMousePosition( el, true, true );
+			p.popupAtMousePosition( el, Corner.UPPER_LEFT, true, true );
 		}
 		
 		
