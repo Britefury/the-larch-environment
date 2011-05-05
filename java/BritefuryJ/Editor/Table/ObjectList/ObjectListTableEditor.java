@@ -290,4 +290,34 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 			}
 		}
 	}
+
+
+	@Override
+	protected Object[][] textBlockToValueBlock(int posX, int posY, String[][] textBlock)
+	{
+		Object destBlock[][] = new Object[textBlock.length][];
+		for (int b = 0; b < textBlock.length; b++)
+		{
+			String[] srcRow = textBlock[b];
+			Object[] destRow = new Object[srcRow.length];
+			destBlock[b] = destRow;
+			
+			for (int a = 0, i = posX; a < srcRow.length; a++, i++)
+			{
+				String cellText = srcRow[a];
+				Object x;
+				if ( i < columns.length )
+				{
+					x = columns[i].textToValue( cellText );
+				}
+				else
+				{
+					x = cellText;
+				}
+				destRow[a] = x;
+			}
+		}
+		
+		return destBlock;
+	}
 }

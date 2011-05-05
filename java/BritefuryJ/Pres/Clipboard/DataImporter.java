@@ -7,17 +7,12 @@
 package BritefuryJ.Pres.Clipboard;
 
 import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
-import BritefuryJ.DocPresent.Clipboard.DataTransfer;
 import BritefuryJ.DocPresent.Clipboard.LocalDataFlavor;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.Target.Target;
 
-public class DataImporter <TargetType extends Target> extends DataImporterInterface<TargetType>
+public class DataImporter <TargetType extends Target> extends AbstractDataImporter<TargetType>
 {
 	public interface ImportDataFn <TargetType extends Target>
 	{
@@ -29,66 +24,72 @@ public class DataImporter <TargetType extends Target> extends DataImporterInterf
 		boolean canImport(TargetType target, Selection selection, Object data);
 	}
 	
+	public interface CanImportFlavorFn
+	{
+		boolean canImportFlavor(DataFlavor flavor);
+	}
 	
-	private DataFlavor flavor;
+	
+	private CanImportFlavorFn canImportFlavorFn;
 	private ImportDataFn<TargetType> importDataFn;
 	private CanImportFn<TargetType> canImportFn;
 	
 	
 	
-	public DataImporter(DataFlavor flavor, ImportDataFn<TargetType> importDataFn, CanImportFn<TargetType> canImportFn)
+	public DataImporter(CanImportFlavorFn canImportFlavorFn, ImportDataFn<TargetType> importDataFn, CanImportFn<TargetType> canImportFn)
 	{
-		this.flavor = flavor;
+		this.canImportFlavorFn = canImportFlavorFn;
 		this.importDataFn = importDataFn;
 		this.canImportFn = canImportFn;
 	}
 	
-	public DataImporter(DataFlavor flavor, ImportDataFn<TargetType> importDataFn)
+	public DataImporter(CanImportFlavorFn flavor, ImportDataFn<TargetType> importDataFn)
 	{
 		this( flavor, importDataFn, null );
 	}
 	
 	public DataImporter(Class<?> type, ImportDataFn<TargetType> importDataFn, CanImportFn<TargetType> canImportFn)
 	{
-		this( new LocalDataFlavor( type ), importDataFn, canImportFn );
+		this( localFlavorImportFn( type ), importDataFn, canImportFn );
 	}
 	
 	public DataImporter(Class<?> type, DataFlavor flavor, ImportDataFn<TargetType> importDataFn)
 	{
-		this( new LocalDataFlavor( type ), importDataFn, null );
+		this( localFlavorImportFn( type ), importDataFn, null );
 	}
 	
 	
 	@Override
-	protected List<DataFlavor> getDataFlavors()
+	protected boolean canImportFlavor(DataFlavor flavor)
 	{
-		return Arrays.asList( new DataFlavor[] { flavor } );
+		return canImportFlavorFn.canImportFlavor( flavor );
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	protected boolean canImport(Target target, Selection selection, DataTransfer dataTransfer, DataFlavor flavor) throws UnsupportedFlavorException, IOException
+	protected boolean canImport(TargetType target, Selection selection, Object data)
 	{
-		if ( flavor.equals( this.flavor ) )
-		{
-			return canImportFn == null  ||  canImportFn.canImport( (TargetType)target, selection, dataTransfer.getTransferData( flavor ) );
-		}
-
-		return false;
+		return canImportFn == null  ||  canImportFn.canImport( (TargetType)target, selection, data );
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	protected boolean importData(Target target, Selection selection, DataTransfer dataTransfer, DataFlavor flavor) throws UnsupportedFlavorException, IOException
+	protected boolean importData(TargetType target, Selection selection, Object data)
 	{
-		if ( flavor.equals( this.flavor ) )
+		return importDataFn.importData( (TargetType)target, selection, data );
+	}
+	
+	
+	
+	private static CanImportFlavorFn localFlavorImportFn(Class<?> type)
+	{
+		final DataFlavor localFlavor = new LocalDataFlavor( type );
+		CanImportFlavorFn test = new CanImportFlavorFn()
 		{
-			Object data = dataTransfer.getTransferData( flavor );
-			if ( canImportFn == null  ||  canImportFn.canImport( (TargetType)target, selection, data ) )
+			@Override
+			public boolean canImportFlavor(DataFlavor flavor)
 			{
-				return importDataFn.importData( (TargetType)target, selection, data );
+				return flavor.equals( localFlavor );
 			}
-		}
-		return false;
+		};
+		return test;
 	}
 }

@@ -13,8 +13,10 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import net.htmlparser.jericho.Source;
 import BritefuryJ.Controls.DropDownExpander;
 import BritefuryJ.Controls.TextArea;
+import BritefuryJ.DefaultPerspective.DefaultPerspective;
 import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
@@ -194,7 +196,10 @@ public class ClipboardTestPage extends SystemPage
 					{
 						if ( flavor.getRepresentationClass() == String.class )
 						{
-							return new UnescapedStringAsParagraph( (String)transfer.getTransferData( flavor ) );
+							System.out.println( flavor.getMimeType() );
+							System.out.println( flavor.getHumanPresentableName() );
+							Source html = new Source( (String)transfer.getTransferData( flavor ) );
+							return DefaultPerspective.instance.applyTo( html );
 						}
 						else
 						{

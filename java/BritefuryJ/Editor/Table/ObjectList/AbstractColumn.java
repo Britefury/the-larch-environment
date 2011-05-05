@@ -14,6 +14,9 @@ public abstract class AbstractColumn
 	public abstract void set(Object modelRow, Object value);
 	
 	
+	public abstract Object textToValue(String text);
+	
+	
 	protected static AbstractColumn coerce(Object x)
 	{
 		if ( x instanceof AbstractColumn )

@@ -266,11 +266,6 @@ public class PrimitiveCellEditPresenter
 
 
 	
-	private static interface TextToValue
-	{
-		Object textToValue(String textValue);
-	}
-	
 	private static final TextClipboardHandler clipboardHandler = new TextClipboardHandler()
 	{
 		@Override

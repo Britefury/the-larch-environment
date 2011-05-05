@@ -43,11 +43,12 @@ import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Controls.DropDownExpander;
 import BritefuryJ.DefaultPerspective.Presenters.PresentersAWT;
 import BritefuryJ.DefaultPerspective.Presenters.PresentersConcurrency;
+import BritefuryJ.DefaultPerspective.Presenters.PresentersJericho;
 import BritefuryJ.DefaultPerspective.Presenters.PresentersSQL;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.ObjectPresentation.ObjectPresentationPerspective;
-import BritefuryJ.ObjectPresentation.ObjectPresenterRegistry;
 import BritefuryJ.ObjectPresentation.ObjectPresenter;
+import BritefuryJ.ObjectPresentation.ObjectPresenterRegistry;
 import BritefuryJ.ObjectPresentation.PyObjectPresenter;
 import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;
@@ -77,6 +78,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 	private PresentersAWT awt = new PresentersAWT();
 	private PresentersSQL sql = new PresentersSQL();
 	private PresentersConcurrency concurrency = new PresentersConcurrency();
+	private PresentersJericho jericho = new PresentersJericho();
 	
 	private DefaultObjectPresenterRegistry()
 	{
@@ -124,6 +126,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 		awt.registerPerspective( perspective );
 		sql.registerPerspective( perspective );
 		concurrency.registerPerspective( perspective );
+		jericho.registerPerspective( perspective );
 	}
 	
 	public static final ObjectPresenter presenter_Boolean = new ObjectPresenter()

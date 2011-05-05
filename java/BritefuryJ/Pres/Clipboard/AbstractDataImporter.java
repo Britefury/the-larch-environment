@@ -9,8 +9,6 @@ package BritefuryJ.Pres.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 import BritefuryJ.DocPresent.Clipboard.DataTransfer;
 import BritefuryJ.DocPresent.Clipboard.LocalDataFlavor;
@@ -21,11 +19,9 @@ public abstract class AbstractDataImporter<TargetType extends Target> extends Da
 {
 	//
 	//
-	// OVERRIDE THESE THREE (canExport is optional)
+	// OVERRIDE THESE TWO (canImport is optional), and canImportFlavor
 	//
 	//
-	
-	abstract protected DataFlavor getDataFlavor();
 	
 	protected boolean canImport(TargetType target, Selection selection, Object data)
 	{
@@ -37,17 +33,11 @@ public abstract class AbstractDataImporter<TargetType extends Target> extends Da
 	
 	
 	
-	@Override
-	protected List<DataFlavor> getDataFlavors()
-	{
-		return Arrays.asList( new DataFlavor[] { getDataFlavor() } );
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	protected boolean canImport(Target target, Selection selection, DataTransfer dataTransfer, DataFlavor flavor) throws UnsupportedFlavorException, IOException
 	{
-		if ( flavor.equals( getDataFlavor() ) )
+		if ( canImportFlavor( flavor ) )
 		{
 			return canImport( (TargetType)target, selection, dataTransfer.getTransferData( flavor ) );
 		}
@@ -59,7 +49,7 @@ public abstract class AbstractDataImporter<TargetType extends Target> extends Da
 	@Override
 	protected boolean importData(Target target, Selection selection, DataTransfer dataTransfer, DataFlavor flavor) throws UnsupportedFlavorException, IOException
 	{
-		if ( flavor.equals( getDataFlavor() ) )
+		if ( canImportFlavor( flavor ) )
 		{
 			Object data = dataTransfer.getTransferData( flavor );
 			if ( canImport( (TargetType)target, selection, data ) )

@@ -6,8 +6,14 @@
 //##************************
 package BritefuryJ.Editor.Table;
 
+import java.awt.datatransfer.DataFlavor;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
+import net.htmlparser.jericho.Element;
+import net.htmlparser.jericho.Source;
+import net.htmlparser.jericho.TextExtractor;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.DocPresent.Selection.Selection;
@@ -62,7 +68,7 @@ public abstract class AbstractTableEditor<ModelType>
 	};
 	
 	
-	DataImporter.CanImportFn<TableTarget> canImport = new DataImporter.CanImportFn<TableTarget>()
+	DataImporter.CanImportFn<TableTarget> canImportBuffer = new DataImporter.CanImportFn<TableTarget>()
 	{
 		@Override
 		public boolean canImport(TableTarget target, Selection selection, Object data)
@@ -72,7 +78,7 @@ public abstract class AbstractTableEditor<ModelType>
 		}
 	};
 	
-	DataImporter.ImportDataFn<TableTarget> importData = new DataImporter.ImportDataFn<TableTarget>()
+	DataImporter.ImportDataFn<TableTarget> importBufferData = new DataImporter.ImportDataFn<TableTarget>()
 	{
 		@SuppressWarnings("unchecked")
 		@Override
@@ -87,6 +93,86 @@ public abstract class AbstractTableEditor<ModelType>
 			putBlock( model, target.x, target.y, subtable, (AbstractTableEditorInstance<ModelType>)target.editorInstance );
 
 			return true;
+		}
+	};
+	
+	DataImporter.CanImportFlavorFn canImportHtmlFlavor = new DataImporter.CanImportFlavorFn()
+	{
+		@Override
+		public boolean canImportFlavor(DataFlavor flavor)
+		{
+			return flavor.getMimeType().startsWith( "text/html;" )  &&  flavor.getRepresentationClass() == String.class;
+		}
+	};
+
+	DataImporter.ImportDataFn<TableTarget> importHtmlData = new DataImporter.ImportDataFn<TableTarget>()
+	{
+		@SuppressWarnings("unchecked")
+		@Override
+		public boolean importData(TableTarget target, Selection selection, Object data)
+		{
+			String htmlText = (String)data;
+			
+			Source html = new Source( htmlText );
+			
+			Element table = html.getFirstElement( "table" );
+			
+			if ( table != null )
+			{
+				ArrayList<String[]> tableData = new ArrayList<String[]>();
+				
+				List<Element> trs = table.getAllElements( "tr" );
+				
+				int rowPos = table.getBegin();
+				for (Element tr: trs)
+				{
+					if ( tr.getBegin() > rowPos )
+					{
+						// We have found a non-nested TR
+						ArrayList<String> rowData = new ArrayList<String>();
+						
+						// Read TD elements
+						List<Element> tds = tr.getAllElements( "td" );
+						
+						int cellPos = tr.getBegin();
+						for (Element td: tds)
+						{
+							if ( td.getBegin() > cellPos )
+							{
+								// We have found a non-nested TD
+								TextExtractor extractor = td.getContent().getTextExtractor();
+								
+								String cellData = extractor.toString();
+								
+								rowData.add( cellData );
+								
+								cellPos = td.getEnd();
+							}
+						}
+						// Done reading TD elements
+						
+						tableData.add( rowData.toArray( new String[0] ) );
+
+						rowPos = tr.getEnd();
+					}
+				}
+
+			
+			
+				DPElement tableElem = (DPElement)target.table;
+				ModelType model = (ModelType)tableElem.getFixedValue();
+				String textBlock[][] = tableData.toArray( new String[0][] );
+				
+				Object[][] subtable = textBlockToValueBlock( target.x, target.y, textBlock );
+				
+				putBlock( model, target.x, target.y, subtable, (AbstractTableEditorInstance<ModelType>)target.editorInstance );
+
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 	};
 	
@@ -106,9 +192,10 @@ public abstract class AbstractTableEditor<ModelType>
 				Arrays.asList( exporters ) );
 		AbstractSelectionExporter<?, ?> selectionExporters[] = new AbstractSelectionExporter[] { selectionExporter };
 		
-		DataImporter<TableTarget> bufferImporter = new DataImporter<TableTarget>( TableBuffer.class, importData, canImport );
+		DataImporter<TableTarget> bufferImporter = new DataImporter<TableTarget>( TableBuffer.class, importBufferData, canImportBuffer );
+		DataImporter<TableTarget> htmlImporter = new DataImporter<TableTarget>( canImportHtmlFlavor, importHtmlData );
 		@SuppressWarnings("unchecked")
-		DataImporterInterface<TableTarget> importers[] = new DataImporterInterface[] { bufferImporter };
+		DataImporterInterface<TableTarget> importers[] = new DataImporterInterface[] { bufferImporter, htmlImporter };
 		TargetImporter<TableTarget> targetImporter = new TargetImporter<TableTarget>( TableTarget.class, Arrays.asList( importers ) );
 		TargetImporter<?> targetImporters[] = new TargetImporter[] { targetImporter };
 		
@@ -156,4 +243,9 @@ public abstract class AbstractTableEditor<ModelType>
 	protected abstract Object[][] getBlock(ModelType model, int x, int y, int w, int h);
 
 	protected abstract void putBlock(ModelType model, int x, int y, Object[][] data, AbstractTableEditorInstance<ModelType> editorInstance);
+
+	protected Object[][] textBlockToValueBlock(int posX, int posY, String[][] textBlock)
+	{
+		return textBlock;
+	}
 }
