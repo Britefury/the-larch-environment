@@ -508,8 +508,14 @@ public class ObjectDndHandler extends DndHandler
 				return;
 			}
 			
-			ExportDoneFn exportDoneFn = sourceData.acceptedMatch.source.exportDoneFn;
-			exportDoneFn.exportDone( sourceElement, sourceData.acceptedMatch.dragData, action );
+			if ( sourceData.acceptedMatch != null )
+			{
+				ExportDoneFn exportDoneFn = sourceData.acceptedMatch.source.exportDoneFn;
+				if ( exportDoneFn != null )
+				{
+					exportDoneFn.exportDone( sourceElement, sourceData.acceptedMatch.dragData, action );
+				}
+			}
 		}
 	}
 
