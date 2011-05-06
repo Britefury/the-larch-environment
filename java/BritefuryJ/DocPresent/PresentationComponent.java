@@ -1424,7 +1424,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		//
 		//
 		
-		protected boolean deleteSelection()
+		public boolean deleteSelection()
 		{
 			DPRegion selectionRegion = getSelectionRegion();
 			if ( selectionRegion != null )
@@ -1448,7 +1448,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			return false;
 		}
 
-		protected boolean replaceSelectionWithText(String replacement)
+		public boolean replaceSelectionWithText(String replacement)
 		{
 			DPRegion selectionRegion = getSelectionRegion();
 			if ( selectionRegion != null )
