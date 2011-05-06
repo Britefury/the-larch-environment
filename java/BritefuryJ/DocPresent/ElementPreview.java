@@ -129,7 +129,6 @@ public class ElementPreview
 	
 	public void detach()
 	{
-		System.out.println( "ElementPreview.detach" );
 		if ( this.root != null )
 		{
 			this.root.removeElementPreview( this );

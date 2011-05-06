@@ -315,6 +315,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			{
 				rootElement.detachElementPreview( data );
 				drop.getSourceElement().getDndHandler().exportDone( drop.getSourceElement(), data, action );
+				drop = null;
 			}
 			else
 			{
@@ -391,14 +392,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			}
 		}
 
-		public void beginExportDnd(DndDropLocal drop)
+		public void initiateExportDnd(DndDropLocal drop)
 		{
 			this.drop = drop;
-		}
-
-		public void endExportDnd()
-		{
-			drop = null;
 		}
 	}
 	
@@ -1216,9 +1212,8 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		public void dndInitiateDrag(DndDropLocal drop, MouseEvent mouseEvent, int requestedAction)
 		{
 			PresentationComponent.PresAreaTransferHandler xferHandler = getDndTransferHandler();
-			xferHandler.beginExportDnd( drop );
+			xferHandler.initiateExportDnd( drop );
 			xferHandler.exportAsDrag( component, mouseEvent, requestedAction );
-			xferHandler.endExportDnd();
 		}
 
 		
