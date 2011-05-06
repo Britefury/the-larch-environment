@@ -130,6 +130,38 @@ public class GenericTableModel implements GenericTableModelInterface
 		incr.onChanged();
 	}
 	
+	@Override
+	public void deleteBlock(int x, int y, int w, int h)
+	{
+		int bottomRowIndex = Math.min( y + h - 1, data.size() - 1 );
+		for (int j = bottomRowIndex; j >= y; j--)
+		{
+			ArrayList<Object> row = data.get( j );
+			
+			if ( x == 0  &&  w >= row.size() )
+			{
+				// We are removing all elements in the row - remove it
+				data.remove( j );
+			}
+			else
+			{
+				if ( x + w  >=  row.size() )
+				{
+					// We are removing all the elements from @x onwards - trim
+					row.subList( x, row.size() ).clear();
+				}
+				else
+				{
+					for (int i = x; i < x + w; i++)
+					{
+						row.set( i, cellFactory.createValue() );
+					}
+				}
+			}
+		}
+		incr.onChanged();
+	}
+
 	
 	
 	private void growHeight(int h)

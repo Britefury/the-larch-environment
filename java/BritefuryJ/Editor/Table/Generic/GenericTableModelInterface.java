@@ -17,4 +17,5 @@ public interface GenericTableModelInterface
 	void set(int x, int y, Object value);
 	Object[][] getBlock(int x, int y, int w, int h);
 	void putBlock(int x, int y, Object[][] block);
+	void deleteBlock(int x, int y, int w, int h);
 }

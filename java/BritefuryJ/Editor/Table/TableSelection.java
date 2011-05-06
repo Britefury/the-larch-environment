@@ -22,8 +22,8 @@ import BritefuryJ.DocPresent.Selection.Selection;
 
 public class TableSelection extends Selection
 {
-	private AbstractTableEditorInstance<?> editorInstance;
-	private TableElement table;
+	protected AbstractTableEditorInstance<?> editorInstance;
+	protected TableElement table;
 	private int x0, y0, x1, y1;
 	
 	
@@ -81,5 +81,26 @@ public class TableSelection extends Selection
 	protected Object[][] getSelectedData()
 	{
 		return editorInstance.getSelectedData( this, (DPElement)table, x0, y0, x1, y1 );
+	}
+	
+	
+	protected int getX()
+	{
+		return x0;
+	}
+	
+	protected int getY()
+	{
+		return y0;
+	}
+	
+	protected int getWidth()
+	{
+		return x1 - x0;
+	}
+	
+	protected int getHeight()
+	{
+		return y1 - y0;
 	}
 }
