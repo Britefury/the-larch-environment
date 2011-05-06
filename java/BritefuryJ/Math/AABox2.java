@@ -113,6 +113,11 @@ public class AABox2 implements Cloneable, Serializable
 		return new Point2( upperX, upperY );
 	}
 	
+	public Vector2 getSize()
+	{
+		return new Vector2( upperX - lowerX, upperY - lowerY );
+	}
+	
 	
 	public double getLowerX()
 	{

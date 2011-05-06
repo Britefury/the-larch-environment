@@ -14,6 +14,8 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.ElementPreview;
 import BritefuryJ.DocPresent.Clipboard.LocalDataFlavor;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Utils.HashUtils;
@@ -264,6 +266,7 @@ public class ObjectDndHandler extends DndHandler
 		private int sourceAspect;
 		private ObjectDndHandler handler;
 		private ObjectDndTransferData objectDndTransferData;
+		private ElementPreview elementPreview;
 		
 		
 		public ObjectDndTransferable(PointerInputElement sourceElement, int aspect, ObjectDndHandler handler)
@@ -271,6 +274,10 @@ public class ObjectDndHandler extends DndHandler
 			this.sourceElement = sourceElement;
 			sourceAspect = aspect;
 			this.handler = handler;
+			if ( sourceElement instanceof DPElement )
+			{
+				elementPreview = new ElementPreview( (DPElement)sourceElement );
+			}
 		}
 		
 		
@@ -284,6 +291,10 @@ public class ObjectDndHandler extends DndHandler
 				}
 				return objectDndTransferData;
 			}
+			else if ( elementPreview != null  &&  flavor.equals( ElementPreview.flavor ) )
+			{
+				return elementPreview;
+			}
 			else
 			{
 				throw new UnsupportedFlavorException( flavor );
@@ -292,12 +303,19 @@ public class ObjectDndHandler extends DndHandler
 
 		public DataFlavor[] getTransferDataFlavors()
 		{
-			return new DataFlavor[] { ObjectDndDataFlavor.flavor };
+			if ( elementPreview != null )
+			{
+				return new DataFlavor[] { ObjectDndDataFlavor.flavor, ElementPreview.flavor };
+			}
+			else
+			{
+				return new DataFlavor[] { ObjectDndDataFlavor.flavor };
+			}
 		}
 
 		public boolean isDataFlavorSupported(DataFlavor flavor)
 		{
-			return flavor.equals( ObjectDndDataFlavor.flavor );
+			return flavor.equals( ObjectDndDataFlavor.flavor )  ||  ( elementPreview != null  && flavor.equals( ElementPreview.flavor ) );
 		}
 	}
 	

@@ -669,6 +669,14 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		Vector2 size = getSize();
 		return new Shape[] { new Rectangle2D.Double( 0.0, 0.0, size.x, size.y ) };
 	}
+	
+	// For most elements, this is the bounding box. For layout-less elements, it is their bounds within the closest
+	// non-layout-less parent
+	public AABox2 getVisibleSpaceBox()
+	{
+		Vector2 size = getSize();
+		return new AABox2( 0.0, 0.0, size.x, size.y );
+	}
 
 	
 	public Xform2 getLocalToParentAllocationSpaceXform()
