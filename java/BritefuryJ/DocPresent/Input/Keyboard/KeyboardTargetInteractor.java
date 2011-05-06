@@ -14,6 +14,7 @@ import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Input.Modifier;
 import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
 import BritefuryJ.DocPresent.Interactor.KeyElementInteractor;
+import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.Selection.SelectionManager;
 import BritefuryJ.DocPresent.Target.Target;
 
@@ -33,6 +34,11 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 	private Target getTarget()
 	{
 		return root.getTarget();
+	}
+	
+	private Selection getSelection()
+	{
+		return root.getSelection();
 	}
 	
 	private SelectionManager getSelectionManager()
@@ -56,6 +62,16 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 			}
 			else
 			{
+				Selection selection = getSelection();
+				if ( selection != null )
+				{
+					if ( event.getKeyCode() == KeyEvent.VK_BACK_SPACE  ||  event.getKeyCode() == KeyEvent.VK_DELETE )
+					{
+						root.deleteSelection();
+						return true;
+					}
+				}
+
 				Target target = getTarget();
 				if ( target.isValid() )
 				{
@@ -66,12 +82,10 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 					
 					return target.onContentKeyPress( event );
 				}
-				else
-				{
-					return false;
-				}
 			}
 		}
+		
+		return false;
 	}
 
 
@@ -99,12 +113,10 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 
 					return target.onContentKeyRelease( event );
 				}
-				else
-				{
-					return false;
-				}
 			}
 		}
+		
+		return false;
 	}
 
 
@@ -125,10 +137,24 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 			{
 				return false;
 			}
-			else
+			else if ( !bCtrl  &&  !bAlt)
 			{
+				Selection selection = getSelection();
+				if ( selection != null )
+				{
+					if ( !Character.isISOControl( event.getKeyChar() )  ||  event.getKeyChar() == '\n' )
+					{
+						String str = String.valueOf( event.getKeyChar() );
+						if ( str.length() > 0 )
+						{
+							root.replaceSelectionWithText( str );
+							return true;
+						}
+					}
+				}
+				
 				Target target = getTarget();
-				if ( target.isValid()  &&  !bCtrl  &&  !bAlt )
+				if ( target.isValid() )
 				{
 					if ( sendKeyTypedEvent( event ) )
 					{
@@ -143,6 +169,8 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 				}
 			}
 		}
+		
+		return false;
 	}
 	
 	

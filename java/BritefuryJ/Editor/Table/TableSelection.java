@@ -24,7 +24,7 @@ public class TableSelection extends Selection
 {
 	protected AbstractTableEditorInstance<?> editorInstance;
 	protected TableElement table;
-	private int x0, y0, x1, y1;
+	private int x0, y0, x1, y1;		// bounds are INCLUSIVE
 	
 	
 	public TableSelection(AbstractTableEditorInstance<?> editorInstance, TableElement table, int x0, int y0, int x1, int y1)
@@ -96,11 +96,11 @@ public class TableSelection extends Selection
 	
 	protected int getWidth()
 	{
-		return x1 - x0;
+		return x1 - x0 + 1;
 	}
 	
 	protected int getHeight()
 	{
-		return y1 - y0;
+		return y1 - y0 + 1;
 	}
 }

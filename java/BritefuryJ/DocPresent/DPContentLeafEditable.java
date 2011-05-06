@@ -16,7 +16,6 @@ import java.util.List;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.Selection.TextSelection;
 import BritefuryJ.DocPresent.StyleParams.ContentLeafEditableStyleParams;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Pres.Primitive.Label;
@@ -642,14 +641,6 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	protected boolean handleBackspace(Caret caret)
 	{
-		if ( rootElement.getSelection() instanceof TextSelection )
-		{
-			if ( rootElement.deleteSelection() )
-			{
-				return true;
-			}
-		}
-		
 		if ( isMarkerAtStart( caret.getMarker() ) )
 		{
 			DPContentLeaf left = getContentLeafToLeft();
@@ -697,14 +688,6 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	protected boolean handleDelete(Caret caret)
 	{
-		if ( rootElement.getSelection() instanceof TextSelection )
-		{
-			if ( rootElement.deleteSelection() )
-			{
-				return true;
-			}
-		}
-
 		if ( isMarkerAtEnd( caret.getMarker() ) )
 		{
 			DPContentLeaf right = getContentLeafToRight();
@@ -775,14 +758,6 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 			String str = String.valueOf( event.getKeyChar() );
 			if ( str.length() > 0 )
 			{
-				if ( rootElement.getSelection() instanceof TextSelection )
-				{
-					if ( rootElement.replaceSelectionWithText( str ) )
-					{
-						return true;
-					}
-				}
-
 				if ( isEditable() )
 				{
 					insertText( caret.getMarker(), String.valueOf( event.getKeyChar() ) );
