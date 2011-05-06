@@ -196,8 +196,6 @@ public class ClipboardTestPage extends SystemPage
 					{
 						if ( flavor.getRepresentationClass() == String.class )
 						{
-							System.out.println( flavor.getMimeType() );
-							System.out.println( flavor.getHumanPresentableName() );
 							Source html = new Source( (String)transfer.getTransferData( flavor ) );
 							return DefaultPerspective.instance.applyTo( html );
 						}
