@@ -49,12 +49,66 @@ public abstract class AbstractTableEditor<ModelType>
 
 
 
-	ExportFn<Object[][]> export = new ExportFn<Object[][]>()
+	ExportFn<Object[][]> exportBuffer = new ExportFn<Object[][]>()
 	{
 		@Override
 		public Object export(Object[][] selectionContents)
 		{
 			return new TableBuffer( AbstractTableEditor.this, selectionContents );
+		}
+	};
+	
+	ExportFn<Object[][]> exportTextHtml = new ExportFn<Object[][]>()
+	{
+		@Override
+		public Object export(Object[][] selectionContents)
+		{
+			StringBuilder b = new StringBuilder();
+			b.append( "<html>\n" );
+			b.append( "\t<head>\n" );
+			b.append( "\t\t<title>Table export</title>\n" );
+			b.append( "\t</head>\n" );
+			b.append( "\t<body>\n" );
+			b.append( "\t\t<table>\n" );
+			for (Object row[]: selectionContents)
+			{
+				b.append( "\t\t\t<tr>\n" );
+				for (Object cell: row)
+				{
+					b.append( "\t\t\t\t<td>" );
+					b.append( cell.toString() );
+					b.append( "</td>\n" );
+				}
+				b.append( "\t\t\t</tr>\n" );
+			}
+			b.append( "\t\t</table>\n" );
+			b.append( "\t</body>\n" );
+			b.append( "</html>\n" );
+			return b.toString();
+		}
+	};
+	
+	ExportFn<Object[][]> exportTextPlain = new ExportFn<Object[][]>()
+	{
+		@Override
+		public Object export(Object[][] selectionContents)
+		{
+			StringBuilder b = new StringBuilder();
+			for (Object row[]: selectionContents)
+			{
+				boolean first = true;
+				for (Object cell: row)
+				{
+					if ( !first )
+					{
+						b.append( "\t" );
+					}
+					b.append( cell.toString() );
+					first = false;
+				}
+				b.append( "\n" );
+			}
+			return b.toString();
 		}
 	};
 	
@@ -185,9 +239,22 @@ public abstract class AbstractTableEditor<ModelType>
 	
 	public AbstractTableEditor()
 	{
-		DataExporter<Object[][]> bufferExporter = new DataExporter<Object[][]>( TableBuffer.class, export );
+		DataFlavor textHtmlFlavor, textPlainFlavor;
+		try
+		{
+			textHtmlFlavor = new DataFlavor( "text/html; class=java.lang.String" );
+			textPlainFlavor = new DataFlavor( "text/plain; class=java.lang.String" );
+		}
+		catch (ClassNotFoundException e)
+		{
+			throw new RuntimeException( e );
+		}
+	
+		DataExporter<Object[][]> bufferExporter = new DataExporter<Object[][]>( TableBuffer.class, exportBuffer );
+		DataExporter<Object[][]> textHtmlExporter = new DataExporter<Object[][]>( textHtmlFlavor, exportTextHtml );
+		DataExporter<Object[][]> textPlainExporter = new DataExporter<Object[][]>( textPlainFlavor, exportTextPlain );
 		@SuppressWarnings("unchecked")
-		DataExporterInterface<Object[][]> exporters[] = new DataExporterInterface[] { bufferExporter };
+		DataExporterInterface<Object[][]> exporters[] = new DataExporterInterface[] { bufferExporter, textHtmlExporter, textPlainExporter };
 		SelectionExporter<Object[][], TableSelection> selectionExporter = new SelectionExporter<Object[][], TableSelection>( TableSelection.class, SelectionExporter.COPY, selectionContents,
 				Arrays.asList( exporters ) );
 		AbstractSelectionExporter<?, ?> selectionExporters[] = new AbstractSelectionExporter[] { selectionExporter };
