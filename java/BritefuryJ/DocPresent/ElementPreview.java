@@ -31,8 +31,8 @@ public class ElementPreview
 	public static final DataFlavor flavor = new DataFlavor( ElementPreview.class, DataFlavor.javaJVMLocalObjectMimeType );
 	
 	
-	private static final double MAX_WIDTH = 128.0;
-	private static final double MAX_HEIGHT = 256.0;
+	private static final double MAX_WIDTH = 256.0;
+	private static final double MAX_HEIGHT = 384.0;
 	private static final double MIN_SCALE = 0.25;
 	
 	

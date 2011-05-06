@@ -10,6 +10,7 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPParagraph;
+import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.SequentialPres;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -31,7 +32,7 @@ public class Paragraph extends SequentialPres
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
 		DPParagraph element = new DPParagraph( Primitive.paragraphParams.get( style ) );
-		element.setChildren( mapPresent( ctx, Primitive.useParagraphParams( style ), children ) );
+		element.setChildren( mapPresent( ctx, Primitive.useParagraphParams( style ).withAttr( Primitive.hAlign, HAlignment.PACK ), children ) );
 		return element;
 	}
 }

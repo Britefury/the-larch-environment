@@ -820,6 +820,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 				if ( superClass != null )
 				{
 					inheritanceItems.add( javaKeywordStyle.applyTo( new StaticText( " " ) ) );
+					inheritanceItems.add( new LineBreak() );
 				}
 				inheritanceItems.add( javaKeywordStyle.applyTo( new StaticText( "Implements " ) ) );
 				boolean bFirst = true;
@@ -828,6 +829,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 					if ( !bFirst )
 					{
 						inheritanceItems.add( classPunctuationStyle.applyTo( new StaticText( ", " ) ) );
+						inheritanceItems.add( new LineBreak() );
 					}
 					inheritanceItems.add( PrimitivePresenter.presentJavaClassName( iface, classNameStyle ) );
 					bFirst = false;
