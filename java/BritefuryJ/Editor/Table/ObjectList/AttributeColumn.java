@@ -15,18 +15,27 @@ public class AttributeColumn extends AbstractColumn
 {
 	private PyString attrname;
 	private PyObject textToValue;
+	private PyObject defaultValue, defaultValueCallable;
 	
 	
-	public AttributeColumn(PyString attrname, PyObject textToValue)
+	public AttributeColumn(PyString attrname, PyObject textToValue, PyObject defaultValue)
 	{
 		super();
 		this.attrname = __builtin__.intern( attrname );
 		this.textToValue = textToValue;
+		if ( defaultValue.isCallable() )
+		{
+			this.defaultValueCallable = defaultValue;
+		}
+		else
+		{
+			this.defaultValue = defaultValue;
+		}
 	}
 	
 	public AttributeColumn(PyString attrname)
 	{
-		this( attrname, null );
+		this( attrname, null, Py.None );
 	}
 	
 	
@@ -43,6 +52,19 @@ public class AttributeColumn extends AbstractColumn
 		PyObject pyRow = Py.java2py( modelRow );
 		PyObject pyValue = Py.java2py( value );
 		__builtin__.setattr( pyRow, attrname, pyValue );
+	}
+
+	@Override
+	public Object defaultValue()
+	{
+		if ( defaultValueCallable != null )
+		{
+			return defaultValueCallable.__call__();
+		}
+		else
+		{
+			return defaultValue;
+		}
 	}
 
 	@Override

@@ -72,4 +72,10 @@ public class GenericTableEditor extends AbstractTableEditor<GenericTableModelInt
 	{
 		model.putBlock( x, y, data );
 	}
+
+	@Override
+	protected void deleteBlock(GenericTableModelInterface model, int x, int y, int w, int h, AbstractTableEditorInstance<GenericTableModelInterface> editorInstance)
+	{
+		model.deleteBlock( x, y, w, h );
+	}
 }

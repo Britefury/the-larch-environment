@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.python.core.Py;
 import org.python.core.PyObject;
+import org.python.core.PySlice;
 import org.python.core.PyString;
 import org.python.core.PyType;
 import org.python.core.__builtin__;
@@ -118,6 +119,12 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 		{
 			model.add( x );
 		}
+
+		@Override
+		public void removeRange(int start, int stop)
+		{
+			model.subList( start, stop ).clear();
+		}
 	}
 	
 	
@@ -125,6 +132,7 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 	private static class PyObjectModelWrapper implements ObjectListInterface
 	{
 		private static final PyString append = __builtin__.intern( Py.newString( "append" ) );
+		private static final PyString __delitem__ = __builtin__.intern( Py.newString( "__delitem__" ) );
 		
 		private PyObject model;
 		
@@ -149,6 +157,12 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 		public void append(Object x)
 		{
 			__builtin__.getattr( model, append ).__call__( Py.java2py( x ) );
+		}
+
+		@Override
+		public void removeRange(int start, int end)
+		{
+			__builtin__.getattr( model, __delitem__ ).__call__( new PySlice( Py.newInteger( start ), Py.newInteger( end ), Py.None ) );
 		}
 	}
 	
@@ -279,6 +293,37 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 		}
 	}
 	
+	@Override
+	protected void deleteBlock(ObjectListInterface model, int x, int y, int w, int h, AbstractTableEditorInstance<ObjectListInterface> editorInstance)
+	{
+		ObjectListTableEditorInstance instance = (ObjectListTableEditorInstance)editorInstance;
+		
+		if ( x == 0  &&  w >= columns.length )
+		{
+			// We are removing entire rows
+			model.removeRange( y, y + h );
+		}
+		else
+		{
+			int bottomRowIndex = Math.min( y + h - 1, model.size() - 1 );
+			for (int j = bottomRowIndex; j >= y; j--)
+			{
+				Object modelRow = model.get( j );
+				
+				for (int i = x; i < x + w; i++)
+				{
+					AbstractColumn column = columns[i];
+					column.set( modelRow, column.defaultValue() );
+				}
+
+				if ( !rowsAreLive )
+				{
+					instance.onRowChanged( modelRow );
+				}
+			}
+		}
+	}
+
 	
 	private void growHeight(ObjectListInterface model, int h)
 	{

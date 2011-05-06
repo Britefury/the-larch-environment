@@ -17,6 +17,7 @@ import net.htmlparser.jericho.TextExtractor;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.DocPresent.Selection.Selection;
+import BritefuryJ.DocPresent.Target.Target;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Clipboard.AbstractSelectionExporter;
@@ -26,6 +27,8 @@ import BritefuryJ.Pres.Clipboard.DataExporter.ExportFn;
 import BritefuryJ.Pres.Clipboard.DataExporterInterface;
 import BritefuryJ.Pres.Clipboard.DataImporter;
 import BritefuryJ.Pres.Clipboard.DataImporterInterface;
+import BritefuryJ.Pres.Clipboard.SelectionEditor;
+import BritefuryJ.Pres.Clipboard.SelectionEditorInterface;
 import BritefuryJ.Pres.Clipboard.SelectionExporter;
 import BritefuryJ.Pres.Clipboard.SelectionExporter.SelectionContentsFn;
 import BritefuryJ.Pres.Clipboard.TargetImporter;
@@ -49,7 +52,7 @@ public abstract class AbstractTableEditor<ModelType>
 
 
 
-	ExportFn<Object[][]> exportBuffer = new ExportFn<Object[][]>()
+	private final ExportFn<Object[][]> exportBuffer = new ExportFn<Object[][]>()
 	{
 		@Override
 		public Object export(Object[][] selectionContents)
@@ -58,7 +61,7 @@ public abstract class AbstractTableEditor<ModelType>
 		}
 	};
 	
-	ExportFn<Object[][]> exportTextHtml = new ExportFn<Object[][]>()
+	private final ExportFn<Object[][]> exportTextHtml = new ExportFn<Object[][]>()
 	{
 		@Override
 		public Object export(Object[][] selectionContents)
@@ -88,7 +91,7 @@ public abstract class AbstractTableEditor<ModelType>
 		}
 	};
 	
-	ExportFn<Object[][]> exportTextPlain = new ExportFn<Object[][]>()
+	private final ExportFn<Object[][]> exportTextPlain = new ExportFn<Object[][]>()
 	{
 		@Override
 		public Object export(Object[][] selectionContents)
@@ -112,7 +115,7 @@ public abstract class AbstractTableEditor<ModelType>
 		}
 	};
 	
-	SelectionContentsFn<Object[][], TableSelection> selectionContents = new SelectionContentsFn<Object[][], TableSelection>()
+	private final SelectionContentsFn<Object[][], TableSelection> selectionContents = new SelectionContentsFn<Object[][], TableSelection>()
 	{
 		@Override
 		public Object[][] getSelectionContents(TableSelection selection)
@@ -122,7 +125,7 @@ public abstract class AbstractTableEditor<ModelType>
 	};
 	
 	
-	DataImporter.CanImportFn<TableTarget> canImportBuffer = new DataImporter.CanImportFn<TableTarget>()
+	private final DataImporter.CanImportFn<TableTarget> canImportBuffer = new DataImporter.CanImportFn<TableTarget>()
 	{
 		@Override
 		public boolean canImport(TableTarget target, Selection selection, Object data)
@@ -132,7 +135,7 @@ public abstract class AbstractTableEditor<ModelType>
 		}
 	};
 	
-	DataImporter.ImportDataFn<TableTarget> importBufferData = new DataImporter.ImportDataFn<TableTarget>()
+	private final DataImporter.ImportDataFn<TableTarget> importBufferData = new DataImporter.ImportDataFn<TableTarget>()
 	{
 		@SuppressWarnings("unchecked")
 		@Override
@@ -150,7 +153,7 @@ public abstract class AbstractTableEditor<ModelType>
 		}
 	};
 	
-	DataImporter.CanImportFlavorFn canImportHtmlFlavor = new DataImporter.CanImportFlavorFn()
+	private final DataImporter.CanImportFlavorFn canImportHtmlFlavor = new DataImporter.CanImportFlavorFn()
 	{
 		@Override
 		public boolean canImportFlavor(DataFlavor flavor)
@@ -159,7 +162,7 @@ public abstract class AbstractTableEditor<ModelType>
 		}
 	};
 
-	DataImporter.ImportDataFn<TableTarget> importHtmlData = new DataImporter.ImportDataFn<TableTarget>()
+	private final DataImporter.ImportDataFn<TableTarget> importHtmlData = new DataImporter.ImportDataFn<TableTarget>()
 	{
 		@SuppressWarnings("unchecked")
 		@Override
@@ -231,6 +234,22 @@ public abstract class AbstractTableEditor<ModelType>
 	};
 	
 	
+	private final SelectionEditor.DeleteSelectionFn<TableSelection> deleteSelection = new SelectionEditor.DeleteSelectionFn<TableSelection>()
+	{
+		@SuppressWarnings("unchecked")
+		@Override
+		public boolean deleteSelection(TableSelection selection, Target target)
+		{
+			DPElement tableElem = (DPElement)selection.table;
+			ModelType model = (ModelType)tableElem.getFixedValue();
+
+			deleteBlock( model, selection.getX(), selection.getY(), selection.getWidth(), selection.getHeight(), (AbstractTableEditorInstance<ModelType>)selection.editorInstance );
+
+			return true;
+		}
+	};
+	
+	
 
 	
 	protected ClipboardHandlerInterface clipboardHandler;
@@ -266,9 +285,10 @@ public abstract class AbstractTableEditor<ModelType>
 		TargetImporter<TableTarget> targetImporter = new TargetImporter<TableTarget>( TableTarget.class, Arrays.asList( importers ) );
 		TargetImporter<?> targetImporters[] = new TargetImporter[] { targetImporter };
 		
+		SelectionEditor<TableSelection> selectionEditor = new SelectionEditor<TableSelection>( TableSelection.class, null, deleteSelection );
+		SelectionEditorInterface selectionEditors[] = new SelectionEditorInterface[] { selectionEditor };
 		
-		
-		clipboardHandler = new ClipboardHandler( Arrays.asList( selectionExporters ), Arrays.asList( targetImporters ), null );
+		clipboardHandler = new ClipboardHandler( Arrays.asList( selectionExporters ), Arrays.asList( targetImporters ), Arrays.asList( selectionEditors ) );
 	}
 
 	
@@ -310,6 +330,8 @@ public abstract class AbstractTableEditor<ModelType>
 	protected abstract Object[][] getBlock(ModelType model, int x, int y, int w, int h);
 
 	protected abstract void putBlock(ModelType model, int x, int y, Object[][] data, AbstractTableEditorInstance<ModelType> editorInstance);
+
+	protected abstract void deleteBlock(ModelType model, int x, int y, int w, int h, AbstractTableEditorInstance<ModelType> editorInstance);
 
 	protected Object[][] textBlockToValueBlock(int posX, int posY, String[][] textBlock)
 	{
