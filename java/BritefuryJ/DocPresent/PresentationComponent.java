@@ -16,6 +16,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Window;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.FocusEvent;
@@ -34,6 +35,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.ImageObserver;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -120,8 +122,6 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			popupComponent.getRootElement().setChild( popupContents.layoutWrap( HAlignment.EXPAND, VAlignment.EXPAND ) );
 			
 			popupWindow.add( popupComponent );
-			//popupWindow.setLocation( x, y );
-			//popupWindow.pack();
 			
 			
 			popupWindow.pack();
@@ -313,6 +313,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		{
 			if ( drop != null )
 			{
+				rootElement.detachElementPreview( data );
 				drop.getSourceElement().getDndHandler().exportDone( drop.getSourceElement(), data, action );
 			}
 			else
@@ -442,6 +443,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		protected ArrayList<Runnable> waitingImmediateEvents;			// only initialised when non-empty; otherwise null
 
 		
+		private ArrayList<ElementPreview> elementPreviews = new ArrayList<ElementPreview>();;
 		
 		protected PresentationComponent metaElementComponent;
 		
@@ -976,6 +978,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				drawTarget( graphics );
 			}
 			
+			// Draw any element previews
+			drawElementPreviews( graphics );
+			
 			// Emit any immediate events
 			emitImmediateEvents();
 		}
@@ -1207,6 +1212,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		}
 		
 		
+		@Override
 		public void dndInitiateDrag(DndDropLocal drop, MouseEvent mouseEvent, int requestedAction)
 		{
 			PresentationComponent.PresAreaTransferHandler xferHandler = getDndTransferHandler();
@@ -1216,10 +1222,71 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		}
 
 		
+		
+		private ElementPreview getElementPreview(Transferable transferable)
+		{
+			// Attach element previews
+			if ( transferable.isDataFlavorSupported( ElementPreview.flavor ) )
+			{
+				try
+				{
+					return (ElementPreview)transferable.getTransferData( ElementPreview.flavor );
+				}
+				catch (UnsupportedFlavorException e)
+				{
+				}
+				catch (IOException e)
+				{
+				}
+			}
+			return null;
+		}
+		
+		private ElementPreview getElementPreview(TransferHandler.TransferSupport transfer)
+		{
+			// Attach element previews
+			Transferable transferable = transfer.getTransferable();
+			return getElementPreview( transferable );
+		}
+		
+		private void attachElementPreview(TransferHandler.TransferSupport transfer, Point2 pos)
+		{
+			// Attach element previews
+			ElementPreview preview = getElementPreview( transfer );
+			if ( preview != null )
+			{
+				preview.attachTo( this, pos );
+			}
+		}
+		
+		private void detachElementPreview(TransferHandler.TransferSupport transfer)
+		{
+			// Attach element previews
+			ElementPreview preview = getElementPreview( transfer );
+			if ( preview != null )
+			{
+				preview.detach();
+			}
+		}
+		
+		private void detachElementPreview(Transferable transferable)
+		{
+			// Attach element previews
+			ElementPreview preview = getElementPreview( transferable );
+			if ( preview != null )
+			{
+				preview.detach();
+			}
+		}
+		
 		private boolean swingDndCanImport(TransferHandler.TransferSupport transfer)
 		{
 			Point windowPos = transfer.getDropLocation().getDropPoint();
 			Point2 rootPos = new Point2( windowPos.x, windowPos.y );
+
+			// Attach element preview
+			attachElementPreview( transfer, rootPos );
+			
 			List<PointerInputElement.DndTarget> targets = PointerInputElement.getDndTargets( this, rootPos );
 			for (PointerInputElement.DndTarget target: targets)
 			{
@@ -1239,6 +1306,10 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		{
 			Point windowPos = transfer.getDropLocation().getDropPoint();
 			Point2 rootPos = new Point2( windowPos.x, windowPos.y );
+
+			// Detach element preview
+			detachElementPreview( transfer );
+			
 			List<PointerInputElement.DndTarget> targets = PointerInputElement.getDndTargets( this, rootPos );
 			for (PointerInputElement.DndTarget target: targets)
 			{
@@ -1296,6 +1367,35 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			}
 			
 			return g2;
+		}
+		
+		
+		
+		
+		//
+		//
+		// ELEMENT PREVIEW METHODS
+		//
+		//
+		
+		protected void addElementPreview(ElementPreview preview)
+		{
+			elementPreviews.add( preview );
+			queueFullRedraw();
+		}
+		
+		protected void removeElementPreview(ElementPreview preview)
+		{
+			elementPreviews.remove( preview );
+			queueFullRedraw();
+		}
+		
+		private void drawElementPreviews(Graphics2D graphics)
+		{
+			for (ElementPreview preview: elementPreviews)
+			{
+				preview.draw( graphics );
+			}
 		}
 		
 		
