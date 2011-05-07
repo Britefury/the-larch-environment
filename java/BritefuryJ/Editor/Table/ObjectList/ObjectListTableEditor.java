@@ -18,8 +18,6 @@ import org.python.core.__builtin__;
 
 import BritefuryJ.Editor.Table.AbstractTableEditor;
 import BritefuryJ.Editor.Table.AbstractTableEditorInstance;
-import BritefuryJ.Pres.Pres;
-import BritefuryJ.Pres.Primitive.Text;
 
 public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterface>
 {
@@ -74,23 +72,6 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 			return Py.tojava( x, Object.class );
 		}
 	}
-	
-	
-	public interface EmptyCellFactory
-	{
-		Pres createEmptyCell();
-	}
-	
-	
-	private static final EmptyCellFactory emptyTextCellFactory = new EmptyCellFactory()
-	{
-		@Override
-		public Pres createEmptyCell()
-		{
-			return new Text( "" );
-		}
-	};
-	
 	
 	
 	private static class ListModelWrapper implements ObjectListInterface
@@ -171,10 +152,9 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 	protected AbstractColumn columns[];
 	private RowFactory rowFactory;
 	protected boolean showEmptyRowAtBottom, rowsAreLive;
-	protected EmptyCellFactory emptyCellFac;
 
 	
-	public ObjectListTableEditor(List<Object> columns, RowFactory rowFactory, boolean showEmptyRowAtBottom, boolean rowsAreLive, EmptyCellFactory emptyCellFac)
+	public ObjectListTableEditor(List<Object> columns, RowFactory rowFactory, boolean showEmptyRowAtBottom, boolean rowsAreLive)
 	{
 		this.columns = new AbstractColumn[columns.size()];
 		for (int i = 0; i < this.columns.length; i++)
@@ -185,34 +165,18 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 		this.rowFactory = rowFactory;
 		this.showEmptyRowAtBottom = showEmptyRowAtBottom;
 		this.rowsAreLive = rowsAreLive;
-		this.emptyCellFac = emptyCellFac;
 	}
 	
-	public ObjectListTableEditor(List<Object> columns, RowFactory rowFactory, boolean showEmptyRowAtBottom, boolean rowsAreLive)
-	{
-		this( columns, rowFactory, showEmptyRowAtBottom, rowsAreLive, emptyTextCellFactory );
-	}
-	
-	
-	public ObjectListTableEditor(List<Object> columns, Class<?> rowClass, boolean showEmptyRowAtBottom, boolean rowsAreLive, EmptyCellFactory emptyCellFac)
-	{
-		this( columns, new ClassRowFactory( rowClass ), showEmptyRowAtBottom, rowsAreLive, emptyCellFac );
-	}
 	
 	public ObjectListTableEditor(List<Object> columns, Class<?> rowClass, boolean showEmptyRowAtBottom, boolean rowsAreLive)
 	{
-		this( columns, new ClassRowFactory( rowClass ), showEmptyRowAtBottom, rowsAreLive, emptyTextCellFactory );
+		this( columns, new ClassRowFactory( rowClass ), showEmptyRowAtBottom, rowsAreLive );
 	}
 	
-	
-	public ObjectListTableEditor(List<Object> columns, PyType rowType, boolean showEmptyRowAtBottom, boolean rowsAreLive, EmptyCellFactory emptyCellFac)
-	{
-		this( columns, new PyTypeRowFactory( rowType ), showEmptyRowAtBottom, rowsAreLive, emptyCellFac );
-	}
 	
 	public ObjectListTableEditor(List<Object> columns, PyType rowType, boolean showEmptyRowAtBottom, boolean rowsAreLive)
 	{
-		this( columns, new PyTypeRowFactory( rowType ), showEmptyRowAtBottom, rowsAreLive, emptyTextCellFactory );
+		this( columns, new PyTypeRowFactory( rowType ), showEmptyRowAtBottom, rowsAreLive );
 	}
 	
 	
@@ -344,6 +308,14 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 				model.append( rowFactory.createRow() );
 			}
 		}
+	}
+	
+	
+	protected Object newRow(ObjectListInterface model)
+	{
+		Object row = rowFactory.createRow();
+		model.append( row );
+		return row;
 	}
 
 

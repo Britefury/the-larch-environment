@@ -8,6 +8,8 @@ package BritefuryJ.Editor.Table.ObjectList;
 
 import org.python.core.Py;
 
+import BritefuryJ.Cell.TextToValue;
+
 public abstract class AbstractColumn
 {
 	public abstract Object get(Object modelRow);
@@ -32,5 +34,20 @@ public abstract class AbstractColumn
 		{
 			throw new RuntimeException( "Could not coerce type " + x.getClass().getName() + " to create an AbstractColumn" );
 		}
+	}
+	
+	
+	protected TextToValue createTextToValueFn()
+	{
+		TextToValue fn = new TextToValue()
+		{
+			@Override
+			public Object textToValue(String textValue)
+			{
+				return AbstractColumn.this.textToValue( textValue );
+			}
+			
+		};
+		return fn;
 	}
 }

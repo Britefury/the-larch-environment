@@ -32,59 +32,59 @@ public class PrimitiveCellEditPresenter
 	public static Pres presentChar(char c, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		String str = Character.toString( c );
-		return charStyle.applyTo( presentEditableText( str, textToChar ) );
+		return charStyle.applyTo( presentEditableTextWithCachedListener( str, textToChar ) );
 	}
 	
 	public static Pres presentString(String text, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return stringStyle.applyTo( presentEditableText( text, textToString ) );
+		return stringStyle.applyTo( presentEditableTextWithCachedListener( text, textToString ) );
 	}
 
 	public static Pres presentByte(byte b, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return integerStyle.applyTo( presentEditableText( Integer.toHexString( ((int)b) & 0xff ), textToByte ) );
+		return integerStyle.applyTo( presentEditableTextWithCachedListener( Integer.toHexString( ((int)b) & 0xff ), textToByte ) );
 	}
 	
 	
 	public static Pres presentShort(short x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return integerStyle.applyTo( presentEditableText( Short.toString( x ), textToShort ) );
+		return integerStyle.applyTo( presentEditableTextWithCachedListener( Short.toString( x ), textToShort ) );
 	}
 	
 	public static Pres presentInt(int x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return integerStyle.applyTo( presentEditableText( Integer.toString( x ), textToInt ) );
+		return integerStyle.applyTo( presentEditableTextWithCachedListener( Integer.toString( x ), textToInt ) );
 	}
 	
 	public static Pres presentLong(long x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return integerStyle.applyTo( presentEditableText( Long.toString( x ), textToLong ) );
+		return integerStyle.applyTo( presentEditableTextWithCachedListener( Long.toString( x ), textToLong ) );
 	}
 	
 	public static Pres presentBigInteger(BigInteger x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return integerStyle.applyTo( presentEditableText( x.toString(), textToBigInteger ) );
+		return integerStyle.applyTo( presentEditableTextWithCachedListener( x.toString(), textToBigInteger ) );
 	}
 	
 	public static Pres presentBigDecimal(BigDecimal x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return integerStyle.applyTo( presentEditableText( x.toString(), textToBigDecimal ) );
+		return integerStyle.applyTo( presentEditableTextWithCachedListener( x.toString(), textToBigDecimal ) );
 	}
 	
 	public static Pres presentDouble(double x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return floatStyle.applyTo( presentEditableText( Double.toString( x ), textToDouble ) );
+		return floatStyle.applyTo( presentEditableTextWithCachedListener( Double.toString( x ), textToDouble ) );
 	}
 	
 	public static Pres presentBoolean(boolean b, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		if ( b )
 		{
-			return booleanStyle.applyTo( presentEditableText( "True", textToBoolean ) );
+			return booleanStyle.applyTo( presentEditableTextWithCachedListener( "True", textToBoolean ) );
 		}
 		else
 		{
-			return booleanStyle.applyTo( presentEditableText( "False", textToBoolean ) );
+			return booleanStyle.applyTo( presentEditableTextWithCachedListener( "False", textToBoolean ) );
 		}
 	}
 	
@@ -255,7 +255,17 @@ public class PrimitiveCellEditPresenter
 	
 	
 	
-	private static Pres presentEditableText(String text, TextToValue textToValue)
+	private static Pres presentEditableTextWithCachedListener(String text, TextToValue textToValue)
+	{
+		TreeEventListener listener = cachedTreeEventListenerFor( textToValue );
+		Pres textPres = new Text( text );
+		textPres = textPres.withTreeEventListener( listener );
+		Region r = new Region( textPres, clipboardHandler );
+		return r;
+	}
+
+
+	public static Pres presentEditableText(String text, TextToValue textToValue)
 	{
 		TreeEventListener listener = treeEventListenerFor( textToValue );
 		Pres textPres = new Text( text );
@@ -265,6 +275,7 @@ public class PrimitiveCellEditPresenter
 	}
 
 
+	
 	
 	private static final TextClipboardHandler clipboardHandler = new TextClipboardHandler()
 	{
@@ -301,34 +312,40 @@ public class PrimitiveCellEditPresenter
 	
 	private static final IdentityHashMap<TextToValue, TreeEventListener> textCellTreeEventListeners = new IdentityHashMap<TextToValue, TreeEventListener>();
 	
-	private static TreeEventListener treeEventListenerFor(final TextToValue textToValue)
+	private static TreeEventListener cachedTreeEventListenerFor(final TextToValue textToValue)
 	{
 		TreeEventListener listener = textCellTreeEventListeners.get( textToValue );
 		
 		if ( listener == null )
 		{
-			listener = new TreeEventListener()
-			{
-				@Override
-				public boolean onTreeEvent(DPElement element, DPElement sourceElement, Object event)
-				{
-					if ( event instanceof TextEditEvent )
-					{
-						String textValue = element.getTextRepresentation();
-						Object value = textToValue.textToValue( textValue );
-						if ( value != null )
-						{
-							CellSetValueEvent cellEvent = new CellSetValueEvent( value );
-							return element.postTreeEvent( cellEvent );
-						}
-					}
-					return false;
-				}
-			};
-			
-			
+			listener = treeEventListenerFor( textToValue );
 			textCellTreeEventListeners.put( textToValue, listener );
 		}
+		
+		return listener;
+	}
+	
+	
+	private static TreeEventListener treeEventListenerFor(final TextToValue textToValue)
+	{
+		TreeEventListener listener = new TreeEventListener()
+		{
+			@Override
+			public boolean onTreeEvent(DPElement element, DPElement sourceElement, Object event)
+			{
+				if ( event instanceof TextEditEvent )
+				{
+					String textValue = element.getTextRepresentation();
+					Object value = textToValue.textToValue( textValue );
+					if ( value != null )
+					{
+						CellSetValueEvent cellEvent = new CellSetValueEvent( value );
+						return element.postTreeEvent( cellEvent );
+					}
+				}
+				return false;
+			}
+		};
 		
 		return listener;
 	}

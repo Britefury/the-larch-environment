@@ -12,30 +12,25 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.TreeEventListener;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
-import BritefuryJ.Pres.Primitive.Text;
 
-public abstract class AbstractCell implements Presentable
+public abstract class AbstractBlankCell implements Presentable
 {
-	public abstract Object getValue();
+	private Pres blankPres;
+	
+	
+	public AbstractBlankCell(Pres blankPres)
+	{
+		this.blankPres = blankPres;
+	}
+	
+	
 	public abstract void setValue(Object value);
 	
 	
 	
 	protected Pres presentCell(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		Object value = getValue();
-		
-		Pres valuePres;
-		if ( value == null )
-		{
-			valuePres = new Text( "" );
-		}
-		else
-		{
-			valuePres = CellEditPerspective.instance.applyTo( value );
-		}
-		
-		return valuePres.withTreeEventListener( cellSetListener );
+		return blankPres.withTreeEventListener( cellSetListener );
 	}
 	
 	
@@ -58,7 +53,7 @@ public abstract class AbstractCell implements Presentable
 				CellSetValueEvent setValueEvent = (CellSetValueEvent)event;
 				FragmentView fragment = (FragmentView)element.getFragmentContext();
 				Object model = fragment.getModel();
-				AbstractCell cell = (AbstractCell)model;
+				AbstractBlankCell cell = (AbstractBlankCell)model;
 				cell.setValue( setValueEvent.value );
 				return true;
 			}
