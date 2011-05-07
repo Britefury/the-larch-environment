@@ -14,14 +14,14 @@ import BritefuryJ.Pres.Primitive.Table;
 
 public class GenericTableEditorInstance extends AbstractTableEditorInstance<GenericTableModelInterface>
 {
-	protected GenericTableEditorInstance(GenericTableEditor editor)
+	protected GenericTableEditorInstance(GenericTableEditor editor, GenericTableModelInterface model)
 	{
-		super( editor );
+		super( editor, model );
 	}
 
 	
 	@Override
-	protected Pres presentTable(GenericTableModelInterface model)
+	protected Pres presentTable()
 	{
 		int width = model.getWidth();
 		int height = model.getHeight();
@@ -68,5 +68,20 @@ public class GenericTableEditorInstance extends AbstractTableEditorInstance<Gene
 		}
 		
 		return new Table( cells );
+	}
+
+
+	
+	@Override
+	protected int getHeight()
+	{
+		return model.getHeight();
+	}
+
+
+	@Override
+	protected int getRowWidth(int row)
+	{
+		return model.getRow( row ).size();
 	}
 }

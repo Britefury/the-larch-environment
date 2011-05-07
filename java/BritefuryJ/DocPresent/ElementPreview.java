@@ -39,6 +39,7 @@ public class ElementPreview
 	private TexturePaint previewPaint;
 	private Vector2 previewSize;
 	private Point2 pos;
+	private boolean success;
 	private PresentationComponent.RootElement root;
 	
 	
@@ -111,7 +112,7 @@ public class ElementPreview
 	}
 	
 	
-	public void attachTo(PresentationComponent.RootElement root, Point2 pos)
+	public void attachTo(PresentationComponent.RootElement root, Point2 pos, boolean success)
 	{
 		if ( this.root != null )
 		{
@@ -120,6 +121,7 @@ public class ElementPreview
 		
 		this.root = root;
 		this.pos = pos;
+		this.success = success;
 		
 		if ( this.root != null )
 		{
@@ -150,6 +152,12 @@ public class ElementPreview
 		graphics.setComposite( AlphaComposite.getInstance( AlphaComposite.SRC_OVER, 0.75f ) );
 		Shape shape = new Rectangle2D.Double( 0.0, 0.0, previewSize.x, previewSize.y );
 		graphics.fill( shape );
+		if ( !success )
+		{
+			graphics.setComposite( AlphaComposite.SrcOver );
+			graphics.setPaint( new Color( 1.0f, 0.0f, 0.0f, 0.15f ) );
+			graphics.fill( shape );
+		}
 		
 		graphics.setPaint( prevPaint );
 		graphics.setTransform( prevXform );

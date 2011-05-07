@@ -23,9 +23,9 @@ from GSymCore.Project.ProjectPage import ProjectPage
 
 
 
-class PageData (Trackable):
+class PageData (object):
 	def __init__(self, contents=None):
-		self._changeHistory = None
+		self.__change_history__ = None
 		if contents is None:
 			self.contents = self.makeEmptyContents()
 		else:
@@ -42,15 +42,11 @@ class PageData (Trackable):
 		pass
 
 	
-	# Required due to inheriting Trackable
-	def __reduce__(self):
-		return self.__class__, (), self.__getstate__()
-	
 	def __getstate__(self):
 		return { 'contents' : self.contents }
 
 	def __setstate__(self, state):
-		self._changeHistory = None
+		self.__change_history__ = None
 		self.contents = state['contents']
 	
 	def __copy__(self):
@@ -62,17 +58,8 @@ class PageData (Trackable):
 		return T( deepcopy( self.contents, memo ) )
 	
 	
-	def getChangeHistory(self):
-		return self._changeHistory
-	
-	def setChangeHistory(self, history):
-		self._changeHistory = history
-	
-	def trackContents(self, history):
-		history.track( self.contents )
-	
-	def stopTrackingContents(self, history):
-		history.stopTracking( self.contents )
+	def __get_trackable_contents__(self):
+		return [ self.contents ]
 			
 	
 

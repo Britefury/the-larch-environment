@@ -252,7 +252,10 @@ def _pythonModuleContextMenuFactory(element, menu):
 
 
 
+def _pythonTargetContextMenuFactory(element, menu):
+	return True
 
+	
 def _setUnwrappedMethod(method, m):
 	m.__dispatch_unwrapped_method__ = method
 	return m
@@ -350,6 +353,8 @@ class Python25View (ObjectNodeDispatchView):
 		self._topLevel = editor.topLevelNodeEditListener()
 		self._exprOuter = PythonExpressionEditListener( grammar.tupleOrExpression() )
 		self._exprTopLevel = PythonExpressionTopLevelEditListener()
+		self._targetOuter = PythonTargetEditListener( grammar.targetListOrTargetItem() )
+		self._targetTopLevel = PythonTargetTopLevelEditListener()
 		
 		self._expressionFragmentEditor = editor.fragmentEditor( False, _pythonPrecedenceHandler, [ self._expr ] )
 		self._unparsedFragmentEditor = editor.fragmentEditor( False, [ self._expr ] )
@@ -381,6 +386,7 @@ class Python25View (ObjectNodeDispatchView):
 		s = s.withDropDest( _embeddedObject_dropDest )
 		s = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._makeSuiteEditListener( suite ), self._topLevel ], suite, s )
 		s = s.withContextMenuInteractor( _pythonModuleContextMenuFactory )
+		s = s.withCommands( PythonCommands.pythonTargetCommands )
 		s = s.withCommands( PythonCommands.pythonCommands )
 		return s
 
@@ -398,6 +404,7 @@ class Python25View (ObjectNodeDispatchView):
 		s = s.withDropDest( _embeddedObject_dropDest )
 		s = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._makeSuiteEditListener( suite ), self._topLevel ], suite, s )
 		s = s.withContextMenuInteractor( _pythonModuleContextMenuFactory )
+		s = s.withCommands( PythonCommands.pythonTargetCommands )
 		s = s.withCommands( PythonCommands.pythonCommands )
 		return s
 
@@ -417,8 +424,26 @@ class Python25View (ObjectNodeDispatchView):
 		e = e.withDropDest( _embeddedObject_dropDest )
 		e = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._exprOuter, self._exprTopLevel ],  model,  e )
 		e = e.withContextMenuInteractor( _pythonModuleContextMenuFactory )
+		e = e.withCommands( PythonCommands.pythonTargetCommands )
 		e = e.withCommands( PythonCommands.pythonCommands )
 		return e
+
+
+
+	@DMObjectNodeDispatchMethod( Schema.PythonTarget )
+	def PythonTarget(self, fragment, inheritedState, model, target):
+		if target is None:
+			# Empty document - create a single blank line so that there is something to edit
+			targetView = blankLine()
+			seg = targetView
+		else:
+			targetView = SREInnerFragment( target, PRECEDENCE_NONE, EditMode.DISPLAY )
+			seg = Segment( targetView )
+		t = Paragraph( [ seg ] ).alignHPack().alignVRefY()
+		t = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._targetOuter, self._targetTopLevel ],  model,  t )
+		t = t.withContextMenuInteractor( _pythonTargetContextMenuFactory )
+		t = t.withCommands( PythonCommands.pythonTargetCommands )
+		return t
 
 
 

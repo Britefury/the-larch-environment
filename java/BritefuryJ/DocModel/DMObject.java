@@ -9,8 +9,10 @@ package BritefuryJ.DocModel;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -721,21 +723,9 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, In
 	
 	
 	@Override
-	public void trackContents(ChangeHistory history)
+	public List<Object> getTrackableContents()
 	{
-		for (Object x: getFieldValuesImmutable())
-		{
-			history.track( x );
-		}
-	}
-
-	@Override
-	public void stopTrackingContents(ChangeHistory history)
-	{
-		for (Object x: getFieldValuesImmutable())
-		{
-			history.stopTracking( x );
-		}
+		return Arrays.asList( getFieldValuesImmutable() );
 	}
 	
 	

@@ -165,18 +165,13 @@ class _TrackedListWrapper (object):
 		self._prop._onChange( self._instance )
 	
 	
-	def trackContents(self, history):
-		for x in self._ls:
-			history.track( x )
-	
-	def stopTrackingContents(self, history):
-		for x in self._ls:
-			history.stopTracking( x )
+	def __get_trackable_contents__(self):
+		return self._ls
 
 
 
 class TrackedListProperty (object):
-	def __init__(self, attrName, changeHistoryAttrName, onChangeMethod=None):
+	def __init__(self, attrName, changeHistoryAttrName='__change_history__', onChangeMethod=None):
 		self._attrName = intern( attrName )
 		self._changeHistoryAttrName = intern( changeHistoryAttrName )
 		self._onChangeMethod = onChangeMethod

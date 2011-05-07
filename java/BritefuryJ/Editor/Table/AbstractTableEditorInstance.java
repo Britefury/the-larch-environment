@@ -89,13 +89,11 @@ public abstract class AbstractTableEditorInstance <ModelType>
 	private class TableEditorPres extends Pres
 	{
 		private Pres contents;
-		private ModelType model;
 		
 		
-		public TableEditorPres(Object contents, ModelType model)
+		public TableEditorPres(Object contents)
 		{
 			this.contents = Pres.coerce( contents );
-			this.model = model;
 		}
 
 		@Override
@@ -106,23 +104,24 @@ public abstract class AbstractTableEditorInstance <ModelType>
 			DPElement element = contents.present( ctx, style );
 			DPElement tableElement = element.bredthFirstSearchByType( TableElement.class );
 			tableElement.addElementInteractor( interactor );
-			tableElement.setFixedValue( model );
 			return element;
 		}
 	}
 	
 	
 	protected AbstractTableEditor<ModelType> editor;
+	protected ModelType model;
 	
 	
-	protected AbstractTableEditorInstance(AbstractTableEditor<ModelType> editor)
+	protected AbstractTableEditorInstance(AbstractTableEditor<ModelType> editor, ModelType model)
 	{
 		this.editor = editor;
+		this.model = model;
 	}
 	
 	
 	
-	protected abstract Pres presentTable(ModelType model);
+	protected abstract Pres presentTable();
 	
 	
 
@@ -130,8 +129,6 @@ public abstract class AbstractTableEditorInstance <ModelType>
 	{
 		if ( tableElement.isRealised() )
 		{
-			@SuppressWarnings("unchecked")
-			ModelType model = (ModelType)tableElement.getFixedValue();
 			return editor.getBlock( model, x0, y0, x1 + 1 - x0, y1 + 1 - y0 );
 		}
 		else
@@ -140,12 +137,11 @@ public abstract class AbstractTableEditorInstance <ModelType>
 		}
 	}
 	
-	protected Pres editTable(ModelType model)
+	protected Pres editTable()
 	{
-		Pres table = presentTable( model );
-		table = table.withFixedValue( model );
+		Pres table = presentTable();
 		Pres region = new Region( table, editor.clipboardHandler );
-		Pres t = new TableEditorPres( region, model );
+		Pres t = new TableEditorPres( region );
 		return t;
 	}
 
@@ -169,4 +165,7 @@ public abstract class AbstractTableEditorInstance <ModelType>
 	{
 		return y;
 	}
+	
+	protected abstract int getHeight();
+	protected abstract int getRowWidth(int row);
 }

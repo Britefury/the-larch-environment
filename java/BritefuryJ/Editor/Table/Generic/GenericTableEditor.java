@@ -56,15 +56,25 @@ public class GenericTableEditor extends AbstractTableEditor<GenericTableModelInt
 	}
 
 	@Override
-	protected AbstractTableEditorInstance<GenericTableModelInterface> createInstance()
+	protected AbstractTableEditorInstance<GenericTableModelInterface> createInstance(GenericTableModelInterface model)
 	{
-		return new GenericTableEditorInstance( this );
+		return new GenericTableEditorInstance( this, model );
 	}
 
 	@Override
 	protected Object[][] getBlock(GenericTableModelInterface model, int x, int y, int w, int h)
 	{
-		return model.getBlock( x, y, w, h );
+		if ( y < model.getHeight() )
+		{
+			// Ensure the the height of the block does not go beyond the last row
+			h = Math.min( h, model.getHeight() - y );
+			
+			return model.getBlock( x, y, w, h );
+		}
+		else
+		{
+			return new Object[0][];
+		}
 	}
 
 	@Override

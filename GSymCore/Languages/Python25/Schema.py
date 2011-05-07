@@ -229,6 +229,7 @@ TopLevel = schema.newClass( 'TopLevel', Node, [] )
 PythonModule = schema.newClass( 'PythonModule', TopLevel, [ 'suite' ] )
 PythonSuite = schema.newClass( 'PythonSuite', TopLevel, [ 'suite' ] )
 PythonExpression = schema.newClass( 'PythonExpression', TopLevel, [ 'expr' ] )
+PythonTarget = schema.newClass( 'PythonTarget', TopLevel, [ 'target' ] )
 
 
 

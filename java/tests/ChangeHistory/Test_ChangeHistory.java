@@ -6,6 +6,8 @@
 //##************************
 package tests.ChangeHistory;
 
+import java.util.List;
+
 import junit.framework.TestCase;
 import BritefuryJ.ChangeHistory.Change;
 import BritefuryJ.ChangeHistory.ChangeHistory;
@@ -161,13 +163,9 @@ public class Test_ChangeHistory extends TestCase
 
 		
 		@Override
-		public void trackContents(ChangeHistory history)
+		public List<Object> getTrackableContents()
 		{
-		}
-		
-		@Override
-		public void stopTrackingContents(ChangeHistory history)
-		{
+			return null;
 		}
 	}
 	

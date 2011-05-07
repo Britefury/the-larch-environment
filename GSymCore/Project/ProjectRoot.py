@@ -50,8 +50,8 @@ class ProjectRoot (ProjectContainer):
 		oldName = self._pythonPackageName
 		self._pythonPackageName = name
 		self._incr.onChanged()
-		if self._changeHistory is not None:
-			self._changeHistory.addChange( lambda: self.setPythonPackageName( name ), lambda: self.setPythonPackageName( oldName ), 'Project root set python package name' )
+		if self.__change_history__ is not None:
+			self.__change_history__.addChange( lambda: self.setPythonPackageName( name ), lambda: self.setPythonPackageName( oldName ), 'Project root set python package name' )
 	
 	
 	pythonPackageName = property( getPythonPackageName, setPythonPackageName )

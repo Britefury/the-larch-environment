@@ -838,6 +838,15 @@ class Python25CodeGenerator (object):
 		else:
 			return self( expr )
 
+	
+	# Target
+	@DMObjectNodeDispatchMethod( Schema.PythonTarget )
+	def PythonTarget(self, node, target):
+		if expr is None:
+			return 'None'
+		else:
+			return self( target )
+
 		
 
 _runtime_resourceMap_Name = '__gsym_resourceMap__'
@@ -1034,7 +1043,7 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 		sx = '{ py=GSymCore.Languages.Python25<2> : ' + sx + ' }'
 		data = DMIOReader.readFromString( sx )
 		
-		gen = Python25CodeGenerator()
+		gen = Python25CodeGenerator( '<test>' )
 		result = str( gen( data ) )
 		
 		if result != expected:
@@ -1394,7 +1403,7 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 
 
 	def test_IndentedBlock(self):
-		self._testGenSX( Python25CodeGenerator( False ), '(py IndentedBlock suite=[(py ExprStmt expr=(py Load name=b))])', '\tb\n' )
+		self._testGenSX( Python25CodeGenerator( '<test>', False ), '(py IndentedBlock suite=[(py ExprStmt expr=(py Load name=b))])', '\tb\n' )
 		self.assertRaises( Python25CodeGeneratorIndentationError, lambda: self._testSX( '(py IndentedBlock suite=[(py ExprStmt expr=(py Load name=b))])', '' ) )
 		
 

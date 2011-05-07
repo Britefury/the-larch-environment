@@ -11,23 +11,19 @@ from BritefuryJ.Incremental import IncrementalValueMonitor
 
 
 
-class ProjectNode (Trackable):
+class ProjectNode (object):
 	def __init__(self):
 		self._incr = IncrementalValueMonitor()
-		self._changeHistory = None
+		self.__change_history__ = None
 		self._parent = None
 	
-	
-	# Required due to inheriting Trackable
-	def __reduce__(self):
-		return self.__class__, (), self.__getstate__()
 	
 	def __getstate__(self):
 		return {}
 	
 	def __setstate__(self, state):
 		self._incr = IncrementalValueMonitor()
-		self._changeHistory = None
+		self.__change_history__ = None
 		self._parent = None
 	
 	
@@ -35,17 +31,8 @@ class ProjectNode (Trackable):
 		return self._parent
 
 	
-	def getChangeHistory(self):
-		return self._changeHistory
-	
-	def setChangeHistory(self, changeHistory):
-		self._changeHistory = changeHistory
-	
-	def trackContents(self, history):
-		pass
-	
-	def stopTrackingContents(self, history):
-		pass
+	def __get_trackable_contents__(self):
+		return None
 
 	
 	parent = property( getParent )

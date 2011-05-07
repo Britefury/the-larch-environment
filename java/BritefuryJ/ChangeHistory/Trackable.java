@@ -6,11 +6,13 @@
 //##************************
 package BritefuryJ.ChangeHistory;
 
-public interface Trackable extends HasChangeHistory
+import java.util.List;
+
+
+public interface Trackable
 {
-	//public void getChangeHistory();					// Defined in HasChangeHistory
+	public ChangeHistory getChangeHistory();
 	public void setChangeHistory(ChangeHistory h);
 	
-	public void trackContents(ChangeHistory history);
-	public void stopTrackingContents(ChangeHistory history);
+	public List<Object> getTrackableContents();			// Can return null.   Temporary - is read once - is not needed afterwards
 }

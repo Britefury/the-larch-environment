@@ -143,8 +143,7 @@ public abstract class AbstractTableEditor<ModelType>
 		{
 			TableBuffer buffer = (TableBuffer)data;
 
-			DPElement tableElem = (DPElement)target.table;
-			ModelType model = (ModelType)tableElem.getFixedValue();
+			ModelType model = (ModelType)target.editorInstance.model;
 			Object[][] subtable = buffer.contents;
 			
 			putBlock( model, target.x, target.y, subtable, (AbstractTableEditorInstance<ModelType>)target.editorInstance );
@@ -216,8 +215,7 @@ public abstract class AbstractTableEditor<ModelType>
 
 			
 			
-				DPElement tableElem = (DPElement)target.table;
-				ModelType model = (ModelType)tableElem.getFixedValue();
+				ModelType model = (ModelType)target.editorInstance.model;
 				String textBlock[][] = tableData.toArray( new String[0][] );
 				
 				Object[][] subtable = textBlockToValueBlock( target.x, target.y, textBlock );
@@ -240,8 +238,7 @@ public abstract class AbstractTableEditor<ModelType>
 		@Override
 		public boolean deleteSelection(TableSelection selection, Target target)
 		{
-			DPElement tableElem = (DPElement)selection.table;
-			ModelType model = (ModelType)tableElem.getFixedValue();
+			ModelType model = (ModelType)selection.editorInstance.model;
 
 			deleteBlock( model, selection.getX(), selection.getY(), selection.getWidth(), selection.getHeight(), (AbstractTableEditorInstance<ModelType>)selection.editorInstance );
 
@@ -313,8 +310,8 @@ public abstract class AbstractTableEditor<ModelType>
 				StyleSheet styleSheet = TableEditorStyle.tableStyle( style );
 				StyleValues used = TableEditorStyle.useTableAttrs( style );
 				
-				AbstractTableEditorInstance<ModelType> instance = createInstance();
-				Pres editor = instance.editTable( m );
+				AbstractTableEditorInstance<ModelType> instance = createInstance( m );
+				Pres editor = instance.editTable();
 				
 				return editor.present( ctx, used.withAttrs( styleSheet ) );
 			}
@@ -325,12 +322,10 @@ public abstract class AbstractTableEditor<ModelType>
 
 	protected abstract ModelType coerceModel(Object model);
 
-	protected abstract AbstractTableEditorInstance<ModelType> createInstance();
+	protected abstract AbstractTableEditorInstance<ModelType> createInstance(ModelType model);
 	
 	protected abstract Object[][] getBlock(ModelType model, int x, int y, int w, int h);
-
 	protected abstract void putBlock(ModelType model, int x, int y, Object[][] data, AbstractTableEditorInstance<ModelType> editorInstance);
-
 	protected abstract void deleteBlock(ModelType model, int x, int y, int w, int h, AbstractTableEditorInstance<ModelType> editorInstance);
 
 	protected Object[][] textBlockToValueBlock(int posX, int posY, String[][] textBlock)
