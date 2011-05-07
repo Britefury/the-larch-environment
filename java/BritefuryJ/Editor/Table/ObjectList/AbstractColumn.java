@@ -8,7 +8,7 @@ package BritefuryJ.Editor.Table.ObjectList;
 
 import org.python.core.Py;
 
-import BritefuryJ.Cell.TextToValue;
+import BritefuryJ.Utils.UnaryFn;
 
 public abstract class AbstractColumn
 {
@@ -17,7 +17,7 @@ public abstract class AbstractColumn
 	
 	
 	public abstract Object defaultValue();
-	public abstract Object textToValue(String text);
+	public abstract Object convertValue(Object x);
 	
 	
 	protected static AbstractColumn coerce(Object x)
@@ -37,14 +37,14 @@ public abstract class AbstractColumn
 	}
 	
 	
-	protected TextToValue createTextToValueFn()
+	protected UnaryFn createConversionFn()
 	{
-		TextToValue fn = new TextToValue()
+		UnaryFn fn = new UnaryFn()
 		{
 			@Override
-			public Object textToValue(String textValue)
+			public Object invoke(Object x)
 			{
-				return AbstractColumn.this.textToValue( textValue );
+				return AbstractColumn.this.convertValue( x );
 			}
 			
 		};

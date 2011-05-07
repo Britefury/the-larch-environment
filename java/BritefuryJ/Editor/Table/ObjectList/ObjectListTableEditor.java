@@ -335,7 +335,7 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 				Object x;
 				if ( i < columns.length )
 				{
-					x = columns[i].textToValue( cellText );
+					x = columns[i].convertValue( cellText );
 				}
 				else
 				{

@@ -17,7 +17,7 @@ public class ObjectListBlankCell extends AbstractBlankCell
 	
 	public ObjectListBlankCell(ObjectListTableEditorInstance editorInstance, AbstractColumn column)
 	{
-		super( PrimitiveCellEditPresenter.presentEditableText( "", column.createTextToValueFn() ) );
+		super( PrimitiveCellEditPresenter.presentEditableText( "", column.createConversionFn() ) );
 		this.editorInstance = editorInstance;
 		this.column = column;
 	}

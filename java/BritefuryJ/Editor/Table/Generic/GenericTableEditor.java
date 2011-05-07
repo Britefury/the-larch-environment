@@ -7,10 +7,10 @@
 package BritefuryJ.Editor.Table.Generic;
 
 import BritefuryJ.Cell.PrimitiveCellEditPresenter;
-import BritefuryJ.Cell.TextToValue;
 import BritefuryJ.Editor.Table.AbstractTableEditor;
 import BritefuryJ.Editor.Table.AbstractTableEditorInstance;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Utils.UnaryFn;
 
 public class GenericTableEditor extends AbstractTableEditor<GenericTableModelInterface>
 {
@@ -20,16 +20,16 @@ public class GenericTableEditor extends AbstractTableEditor<GenericTableModelInt
 	
 	
 	
-	public GenericTableEditor(boolean showEmptyRowAtBottom, boolean showEmptyColumnAtRight, TextToValue textToValue)
+	public GenericTableEditor(boolean showEmptyRowAtBottom, boolean showEmptyColumnAtRight, UnaryFn converValueFn)
 	{
 		this.showEmptyRowAtBottom = showEmptyRowAtBottom;
 		this.showEmptyColumnAtRight = showEmptyColumnAtRight;
-		this.blankPres = PrimitiveCellEditPresenter.presentEditableText( "", textToValue );
+		this.blankPres = PrimitiveCellEditPresenter.presentEditableText( "", converValueFn );
 	}
 	
 	public GenericTableEditor(boolean showEmptyRowAtBottom, boolean showEmptyColumnAtRight)
 	{
-		this( showEmptyRowAtBottom, showEmptyColumnAtRight, TextToValue.identity );
+		this( showEmptyRowAtBottom, showEmptyColumnAtRight, UnaryFn.identity );
 	}
 	
 	

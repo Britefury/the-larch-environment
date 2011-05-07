@@ -26,6 +26,7 @@ import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Region;
 import BritefuryJ.Pres.Primitive.Text;
 import BritefuryJ.StyleSheet.StyleSheet;
+import BritefuryJ.Utils.UnaryFn;
 
 public class PrimitiveCellEditPresenter
 {
@@ -275,7 +276,18 @@ public class PrimitiveCellEditPresenter
 	}
 
 
-	
+	public static Pres presentEditableText(String text, final UnaryFn conversionFn)
+	{
+		TextToValue textToValue = new TextToValue()
+		{
+			@Override
+			public Object textToValue(String textValue)
+			{
+				return conversionFn.invoke( textValue );
+			}
+		};
+		return presentEditableText( text, textToValue );
+	}
 	
 	private static final TextClipboardHandler clipboardHandler = new TextClipboardHandler()
 	{

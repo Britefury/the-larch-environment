@@ -14,15 +14,15 @@ import org.python.core.__builtin__;
 public class AttributeColumn extends AbstractColumn
 {
 	private PyString attrname;
-	private PyObject textToValue;
+	private PyObject convertValueFn;
 	private PyObject defaultValue, defaultValueCallable;
 	
 	
-	public AttributeColumn(PyString attrname, PyObject textToValue, PyObject defaultValue)
+	public AttributeColumn(PyString attrname, PyObject convertValueFn, PyObject defaultValue)
 	{
 		super();
 		this.attrname = __builtin__.intern( attrname );
-		this.textToValue = textToValue;
+		this.convertValueFn = convertValueFn;
 		if ( defaultValue.isCallable() )
 		{
 			this.defaultValueCallable = defaultValue;
@@ -68,15 +68,15 @@ public class AttributeColumn extends AbstractColumn
 	}
 
 	@Override
-	public Object textToValue(String text)
+	public Object convertValue(Object x)
 	{
-		if ( textToValue != null )
+		if ( convertValueFn != null )
 		{
-			return textToValue.__call__( Py.newString( text ) );
+			return convertValueFn.__call__( Py.java2py( x ) );
 		}
 		else
 		{
-			return text;
+			return x;
 		}
 	}
 }
