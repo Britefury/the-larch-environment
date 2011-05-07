@@ -16,16 +16,17 @@ from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.Pres.ObjectPres import *
 
 from GSymCore.Languages.Python25.PythonCommands import pythonCommands, makeInsertEmbeddedExpressionAction
-from GSymCore.Languages.Python25.Python25 import py25NewExpr
+from GSymCore.Languages.Python25.Python25 import EmbeddedPython25
 from GSymCore.Languages.Python25.PythonEditor.View import perspective as pyPerspective
 
 
 
 class EmbeddedDisplay (object):
 	def __init__(self):
-		self._expr = py25NewExpr()
+		self._expr = EmbeddedPython25.expression()
 		self._values = []
 		self._incr = IncrementalValueMonitor()
+		self.__change_history__ = None
 		
 		
 	def __getstate__(self):
@@ -35,6 +36,11 @@ class EmbeddedDisplay (object):
 		self._expr = state['expr']
 		self._values = []
 		self._incr = IncrementalValueMonitor()
+		self.__change_history__ = None
+	
+	
+	def __get_trackable_contents__(self):
+		return [ self._expr ]
 		
 		
 	def __py_value__(self, _globals, _locals, codeGen):

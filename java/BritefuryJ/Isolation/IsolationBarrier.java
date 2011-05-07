@@ -7,6 +7,8 @@
 package BritefuryJ.Isolation;
 
 import java.awt.Color;
+import java.util.Arrays;
+import java.util.List;
 
 import org.python.core.Py;
 import org.python.core.PyInteger;
@@ -14,14 +16,16 @@ import org.python.core.PyObject;
 import org.python.core.PyTuple;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.ChangeHistory.ChangeHistory;
+import BritefuryJ.ChangeHistory.Trackable;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
-import BritefuryJ.Pres.ObjectPres.ObjectPresStyle;
 import BritefuryJ.Pres.ObjectPres.ObjectBox;
+import BritefuryJ.Pres.ObjectPres.ObjectPresStyle;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class IsolationBarrier <ValueType> implements Presentable
+public class IsolationBarrier <ValueType> implements Presentable, Trackable
 {
 	protected static IsolationPicklerState isolationPicklerState;
 	protected static IsolationUnpicklerState isolationUnpicklerState;
@@ -30,6 +34,7 @@ public class IsolationBarrier <ValueType> implements Presentable
 	private ValueType value = null;
 	private transient IsolationUnpicklerState unpickler = null;
 	private int index = -1;
+	private ChangeHistory changeHistory = null;
 	
 	
 	public IsolationBarrier()
@@ -125,6 +130,10 @@ public class IsolationBarrier <ValueType> implements Presentable
 			value = (ValueType)unpickler.getIsolatedValue( index );
 			unpickler = null;
 			index = -1;
+			if ( changeHistory != null )
+			{
+				changeHistory.track( value );
+			}
 		}
 		return value;
 	}
@@ -136,6 +145,33 @@ public class IsolationBarrier <ValueType> implements Presentable
 	{
 		return style.applyTo( new ObjectBox( "ISOLATION BARRIER", Pres.coerceNonNull( getValue() ) ) );
 	}
+
+
+	@Override
+	public ChangeHistory getChangeHistory()
+	{
+		return changeHistory;
+	}
+
+	@Override
+	public void setChangeHistory(ChangeHistory h)
+	{
+		changeHistory = h;
+	}
+
+	@Override
+	public List<Object> getTrackableContents()
+	{
+		if ( index == -1 )
+		{
+			return Arrays.asList( new Object[] { value } );
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
 	
 	
 	private static final StyleSheet style = StyleSheet.instance.withAttr( ObjectPresStyle.objectBorderPaint, new Color( 0.25f, 0.0f, 0.5f ) );

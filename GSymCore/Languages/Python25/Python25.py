@@ -9,6 +9,7 @@ from GSymCore.Languages.Python25 import Schema
 from GSymCore.Languages.Python25.Python25Importer import importPy25File
 from GSymCore.Languages.Python25.PythonEditor.View import perspective as python25EditorPerspective
 from GSymCore.Languages.Python25.PythonEditor.Subject import Python25Subject
+from GSymCore.Languages.Python25.PythonEditor.Parser import Python25Grammar
 
 from GSymCore.Project.PageData import PageData, registerPageFactory, registerPageImporter
 
@@ -30,18 +31,23 @@ def py25NewTarget():
 
 class EmbeddedPython25 (object):
 	def __init__(self, model):
-		self._model = model
+		self.model = model
+		self.__change_history__ = None
 	
 	
 	def __getstate__(self):
-		return { 'model' : self._model }
+		return { 'model' : self.model }
 	
 	def __setstate__(self, state):
-		self._model = state['model']
+		self.model = state['model']
+	
+	
+	def __get_trackable_contents__(self):
+		return [ self.model ]
 	
 	
 	def __present__(self, fragment, inheritedState):
-		return python25EditorPerspective( self._model )
+		return python25EditorPerspective( self.model )
 
 
 	@staticmethod
@@ -57,10 +63,28 @@ class EmbeddedPython25 (object):
 		return EmbeddedPython25( py25NewExpr() )
 
 	@staticmethod
+	def expressionFromText(text):
+		parseResult = _grammar.tupleOrExpressionOrYieldExpression().parseStringChars( text )
+		if parseResult.isValid():
+			return EmbeddedPython25( Schema.PythonExpression( expr=parseResult.getValue() ) )
+		else:
+			return EmbeddedPython25( Schema.PythonExpression( expr=Schema.UNPARSED( value = [ text ] ) ) )
+
+	@staticmethod
 	def target():
 		return EmbeddedPython25( py25NewTarget() )
+	
+	@staticmethod
+	def targetFromText(text):
+		parseResult = _grammar.targetListOrTargetItem().parseStringChars( text )
+		if parseResult.isValid():
+			return EmbeddedPython25( Schema.PythonTarget( target=parseResult.getValue() ) )
+		else:
+			return EmbeddedPython25( Schema.PythonTarget( target=Schema.UNPARSED( value = [ text ] ) ) )
 
 
+
+_grammar = Python25Grammar()
 
 class Python25PageData (PageData):
 	def makeEmptyContents(self):
