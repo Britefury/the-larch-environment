@@ -39,3 +39,4 @@ def makeInsertEmbeddedStatementAction(valueFactory):
 			
 
 pythonCommands = CommandSetRegistry( 'GSymCore.Languages.Python25' )
+pythonTargetCommands = CommandSetRegistry( 'GSymCore.Languages.Python25.Target' )

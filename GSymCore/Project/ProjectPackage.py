@@ -45,8 +45,8 @@ class ProjectPackage (ProjectContainer):
 		oldName = self._name
 		self._name = name
 		self._incr.onChanged()
-		if self._changeHistory is not None:
-			self._changeHistory.addChange( lambda: self.setName( name ), lambda: self.setName( oldName ), 'Package set name' )
+		if self.__change_history__ is not None:
+			self.__change_history__.addChange( lambda: self.setName( name ), lambda: self.setName( oldName ), 'Package set name' )
 	
 	
 	name = property( getName, setName )

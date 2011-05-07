@@ -1244,13 +1244,13 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			return getElementPreview( transferable );
 		}
 		
-		private void attachElementPreview(TransferHandler.TransferSupport transfer, Point2 pos)
+		private void attachElementPreview(TransferHandler.TransferSupport transfer, Point2 pos, boolean success)
 		{
 			// Attach element previews
 			ElementPreview preview = getElementPreview( transfer );
 			if ( preview != null )
 			{
-				preview.attachTo( this, pos );
+				preview.attachTo( this, pos, success );
 			}
 		}
 		
@@ -1279,9 +1279,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			Point windowPos = transfer.getDropLocation().getDropPoint();
 			Point2 rootPos = new Point2( windowPos.x, windowPos.y );
 
-			// Attach element preview
-			attachElementPreview( transfer, rootPos );
-			
+			boolean success = false;
 			List<PointerInputElement.DndTarget> targets = PointerInputElement.getDndTargets( this, rootPos );
 			for (PointerInputElement.DndTarget target: targets)
 			{
@@ -1291,10 +1289,18 @@ public class PresentationComponent extends JComponent implements ComponentListen
 					Point2 targetPos = target.getElementSpacePos();
 
 					DndDropSwing drop = new DndDropSwing( targetElement, targetPos, transfer );
-					return targetElement.getDndHandler().canDrop( targetElement, drop );
+					if ( targetElement.getDndHandler().canDrop( targetElement, drop ) )
+					{
+						success = true;
+						break;
+					}
 				}
 			}
-			return false;
+
+			// Attach element preview
+			attachElementPreview( transfer, rootPos, success );
+			
+			return success;
 		}
 		
 		private boolean swingDndImportData(TransferHandler.TransferSupport transfer)

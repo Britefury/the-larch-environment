@@ -71,4 +71,57 @@ public class TableTarget extends Target
 	{
 		return new TableSelectionPoint( editorInstance, table, x, y );
 	}
+
+	
+	private void notifyMoved()
+	{
+		notifyListenersOfChange();
+		((DPElement)table).queueFullRedraw();
+	}
+	
+	@Override
+	public void moveLeft()
+	{
+		x = Math.max( x - 1, 0 );
+		notifyMoved();
+	}
+
+	@Override
+	public void moveRight()
+	{
+		x = Math.min( x + 1, editorInstance.getRowWidth( y ) - 1 );
+		notifyMoved();
+	}
+
+	@Override
+	public void moveUp()
+	{
+		y = Math.max( y - 1, 0 );
+		int w = editorInstance.getRowWidth( y );
+		x = Math.min( x, w - 1 );
+		notifyMoved();
+	}
+
+	@Override
+	public void moveDown()
+	{
+		y = Math.min( y + 1, editorInstance.getHeight() - 1 );
+		int w = editorInstance.getRowWidth( y );
+		x = Math.min( x, w - 1 );
+		notifyMoved();
+	}
+
+	@Override
+	public void moveToHome()
+	{
+		x = 0;
+		notifyMoved();
+	}
+
+	@Override
+	public void moveToEnd()
+	{
+		x = editorInstance.getRowWidth( y ) - 1;
+		notifyMoved();
+	}
 }

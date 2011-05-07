@@ -17,15 +17,15 @@ public class ObjectListTableEditorInstance extends AbstractTableEditorInstance<O
 {
 	private WeakValueIdentityHashMap<Object, ObjectListRow> rowMap = new WeakValueIdentityHashMap<Object, ObjectListRow>();
 	
-	protected ObjectListTableEditorInstance(AbstractTableEditor<ObjectListInterface> editor)
+	protected ObjectListTableEditorInstance(AbstractTableEditor<ObjectListInterface> editor, ObjectListInterface model)
 	{
-		super( editor );
+		super( editor, model );
 	}
 	
 	
 
 	@Override
-	protected Pres presentTable(ObjectListInterface model)
+	protected Pres presentTable()
 	{
 		ObjectListTableEditor listEditor = (ObjectListTableEditor)editor;
 		int width = listEditor.columns.length;
@@ -71,5 +71,20 @@ public class ObjectListTableEditorInstance extends AbstractTableEditorInstance<O
 			rowMap.put( modelRow, row );
 		}
 		return row;
+	}
+
+
+
+	@Override
+	protected int getHeight()
+	{
+		return model.size();
+	}
+
+	@Override
+	protected int getRowWidth(int row)
+	{
+		ObjectListTableEditor e = (ObjectListTableEditor)editor;
+		return e.columns.length;
 	}
 }

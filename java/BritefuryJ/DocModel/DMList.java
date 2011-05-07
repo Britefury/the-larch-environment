@@ -1148,21 +1148,9 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Increm
 	
 	
 	@Override
-	public void trackContents(ChangeHistory history)
+	public List<Object> getTrackableContents()
 	{
-		for (Object x: this)
-		{
-			history.track( x );
-		}
-	}
-
-	@Override
-	public void stopTrackingContents(ChangeHistory history)
-	{
-		for (Object x: this)
-		{
-			history.stopTracking( x );
-		}
+		return value;
 	}
 	
 	

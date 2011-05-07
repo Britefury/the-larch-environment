@@ -240,29 +240,39 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 	}
 
 	@Override
-	protected AbstractTableEditorInstance<ObjectListInterface> createInstance()
+	protected AbstractTableEditorInstance<ObjectListInterface> createInstance(ObjectListInterface model)
 	{
-		return new ObjectListTableEditorInstance( this );
+		return new ObjectListTableEditorInstance( this, model );
 	}
 
 	@Override
 	protected Object[][] getBlock(ObjectListInterface model, int x, int y, int w, int h)
 	{
-		Object block[][] = new Object[h][];
-		
-		for (int j = y, b = 0; b < h; j++, b++)
+		if ( y < model.size() )
 		{
-			Object blockRow[] = new Object[w];
-			Object modelRow = model.get( j );
+			// Ensure the the height of the block does not go beyond the last row
+			h = Math.min( h, model.size() - y );
 			
-			for (int i = x, a = 0; a < w; i++, a++)
+			Object block[][] = new Object[h][];
+			
+			for (int j = y, b = 0; b < h; j++, b++)
 			{
-				blockRow[a] = columns[i].get( modelRow );
+				Object blockRow[] = new Object[w];
+				Object modelRow = model.get( j );
+				
+				for (int i = x, a = 0; a < w; i++, a++)
+				{
+					blockRow[a] = columns[i].get( modelRow );
+				}
+				block[b] = blockRow;
 			}
-			block[b] = blockRow;
+			
+			return block;
 		}
-		
-		return block;
+		else
+		{
+			return new Object[0][];
+		}
 	}
 
 	@Override

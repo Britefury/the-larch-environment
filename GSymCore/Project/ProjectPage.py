@@ -47,8 +47,8 @@ class ProjectPage (ProjectNode):
 		oldName = self._name
 		self._name = name
 		self._incr.onChanged()
-		if self._changeHistory is not None:
-			self._changeHistory.addChange( lambda: self.setName( name ), lambda: self.setName( oldName ), 'Page set name' )
+		if self.__change_history__ is not None:
+			self.__change_history__.addChange( lambda: self.setName( name ), lambda: self.setName( oldName ), 'Page set name' )
 		
 		
 	def getData(self):
@@ -56,11 +56,8 @@ class ProjectPage (ProjectNode):
 		return self._data
 	
 	
-	def trackContents(self, history):
-		history.track( self.data )
-	
-	def stopTrackingContents(self, history):
-		history.stopTracking( self.data )
+	def __get_trackable_contents__(self):
+		return [ self.data ]
 
 	
 	

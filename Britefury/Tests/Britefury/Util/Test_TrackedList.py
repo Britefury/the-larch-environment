@@ -16,25 +16,18 @@ import random
 
 
 
-class Value (Trackable):
+class Value (object):
 	def __init__(self, x):
-		self._changeHistory = None
+		self.__change_history__ = None
 		self.x = x
 	
 	
-	def setChangeHistory(self, history):
-		self._changeHistory = history
-	
-	
-	def trackContents(self, history):
-		history.track( self.x )
-	
-	def stopTrackingContents(self, history):
-		history.stopTracking( self.x )
+	def __get_trackable_contents__(self):
+		return [ self.x ]
 		
 		
 	def isTracked(self):
-		return self._changeHistory is not None
+		return self.__change_history__ is not None
 		
 		
 	def __eq__(self, x):
@@ -50,24 +43,17 @@ class Value (Trackable):
 		return cmp( self.x, x.x )
 
 
-class Sequence (Trackable):
+class Sequence (object):
 	def __init__(self):
-		self._changeHistory = None
+		self.__change_history__ = None
 		self._xs_ = []
 	
 	
-	def setChangeHistory(self, history):
-		self._changeHistory = history
+	def __get_trackable_contents__(self):
+		return self.xs.__get_trackable_contents__()
 	
 	
-	def trackContents(self, history):
-		self.xs.trackContents( history )
-	
-	def stopTrackingContents(self, history):
-		self.xs.stopTrackingContents( history )
-	
-	
-	xs = TrackedListProperty( '_xs_', '_changeHistory' )
+	xs = TrackedListProperty( '_xs_' )
 
 
 

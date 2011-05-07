@@ -23,6 +23,43 @@ def py25NewSuite():
 def py25NewExpr():
 	return Schema.PythonExpression( expr=Schema.UNPARSED( value=[ '' ] ) )
 
+def py25NewTarget():
+	return Schema.PythonTarget( target=Schema.UNPARSED( value=[ '' ] ) )
+
+
+
+class EmbeddedPython25 (object):
+	def __init__(self, model):
+		self._model = model
+	
+	
+	def __getstate__(self):
+		return { 'model' : self._model }
+	
+	def __setstate__(self, state):
+		self._model = state['model']
+	
+	
+	def __present__(self, fragment, inheritedState):
+		return python25EditorPerspective( self._model )
+
+
+	@staticmethod
+	def module():
+		return EmbeddedPython25( py25NewModule() )
+
+	@staticmethod
+	def suite():
+		return EmbeddedPython25( py25NewSuite() )
+
+	@staticmethod
+	def expression():
+		return EmbeddedPython25( py25NewExpr() )
+
+	@staticmethod
+	def target():
+		return EmbeddedPython25( py25NewTarget() )
+
 
 
 class Python25PageData (PageData):

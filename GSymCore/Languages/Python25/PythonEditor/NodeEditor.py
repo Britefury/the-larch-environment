@@ -87,6 +87,34 @@ class PythonExpressionEditListener (ParsingEditListener):
 
 
 
+class PythonTargetEditListener (ParsingEditListener):
+	def getSyntaxRecognizingEditor(self):
+		return PythonSyntaxRecognizingEditor.instance
+
+	def getLogName(self):
+		return 'Top level target'
+	
+	
+	def handleEmptyValue(self, element, fragment, event, model):
+		model['target'] = Schema.UNPARSED( value=[ '' ] )
+		return HandleEditResult.HANDLED
+	
+	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
+		expr = model['target']
+		if parsed != expr:
+			model['target'] = parsed
+		return HandleEditResult.HANDLED
+		
+	def handleParseFailure(self, element, sourceElement, fragment, event, model, value):
+		if '\n' not in value:
+			values = value.getItemValues()
+			if values == []:
+				values = [ '' ]
+			model['target'] = Schema.UNPARSED( value=values )
+			return HandleEditResult.HANDLED
+		else:
+			return HandleEditResult.NOT_HANDLED
+
 
 
 class PythonExpressionNewLineEvent (object):
@@ -106,7 +134,8 @@ class PythonExpressionTopLevelEditListener (TopLevelEditListener):
 				element.postTreeEvent( PythonExpressionNewLineEvent( model ) )
 
 
-
+class PythonTargetTopLevelEditListener (PythonExpressionTopLevelEditListener):
+	pass
 
 
 

@@ -101,17 +101,14 @@ class ProjectContainer (ProjectNode):
 		return self._contentsMapUnit.getValue()
 	
 	
-	def trackContents(self, history):
-		self._contents.trackContents( history )
-	
-	def stopTrackingContents(self, history):
-		self._contents.stopTrackingContents( history )
+	def __get_trackable_contents__(self):
+		return self._contents.__get_trackable_contents__()
 	
 		
 	contentsMap = property( getContentsMap )
 
 	
-	_contents = TrackedListProperty( '_contents_', '_changeHistory', _onContentsChange )
+	_contents = TrackedListProperty( '_contents_', onChangeMethod=_onContentsChange )
 	
 	
 	

@@ -8,6 +8,11 @@ package BritefuryJ.ChangeHistory;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.List;
+
+import org.python.core.Py;
+import org.python.core.PyObject;
+import org.python.core.__builtin__;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
@@ -170,6 +175,51 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 			return new ObjectBox( "Command group", new Column( Pres.mapCoerce( commands ) ) );
 		}
 	}
+	
+	
+	
+	private static class PyTrackable implements Trackable
+	{
+		private static final PyObject __change_history__ = __builtin__.intern( Py.newString( "__change_history__" ) );
+		private static final PyObject __get_trackable_contents__ = __builtin__.intern( Py.newString( "__get_trackable_contents__" ) );
+		
+		
+		private PyObject x;
+		
+		
+		private PyTrackable(PyObject x)
+		{
+			this.x = x;
+		}
+		
+		
+		@Override
+		public ChangeHistory getChangeHistory()
+		{
+			return Py.tojava( __builtin__.getattr( x, __change_history__ ), ChangeHistory.class );
+		}
+
+		@Override
+		public void setChangeHistory(ChangeHistory h)
+		{
+			__builtin__.setattr( x, __change_history__, Py.java2py( h ) );
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public List<Object> getTrackableContents()
+		{
+			return Py.tojava( __builtin__.getattr( x, __get_trackable_contents__ ).__call__(), List.class );
+		}
+		
+		
+		protected static boolean isTrackable(PyObject x)
+		{
+			return __builtin__.hasattr( x, __change_history__ )  &&  __builtin__.hasattr( x, __get_trackable_contents__ );
+		}
+	}
+	
+
 	
 	
 	
@@ -364,7 +414,14 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 		if ( h == null )
 		{
 			t.setChangeHistory( this );
-			t.trackContents( this );
+			List<Object> contents = t.getTrackableContents();
+			if ( contents != null )
+			{
+				for (Object x: contents)
+				{
+					track( x );
+				}
+			}
 		}
 		else if ( h != this )
 		{
@@ -374,24 +431,33 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 
 	public void stopTracking(Trackable t)
 	{
-		t.stopTrackingContents( this );
+		List<Object> contents = t.getTrackableContents();
+		if ( contents != null )
+		{
+			for (Object x: contents)
+			{
+				stopTracking( x );
+			}
+		}
 		t.setChangeHistory( null );
 	}
 	
 	
 	public void track(Object x)
 	{
-		if ( x != null  &&  x instanceof Trackable )
+		Trackable t = asTrackable( x );
+		if ( t != null )
 		{
-			track( (Trackable)x );
+			track( t );
 		}
 	}
 
 	public void stopTracking(Object x)
 	{
-		if ( x != null  &&  x instanceof Trackable )
+		Trackable t = asTrackable( x );
+		if ( t != null )
 		{
-			stopTracking( (Trackable)x );
+			stopTracking( t );
 		}
 	}
 	
@@ -456,6 +522,25 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 	private void onModified()
 	{
 		presStateListeners = PresentationStateListenerList.onPresentationStateChanged( presStateListeners, this );
+	}
+	
+	
+	public static Trackable asTrackable(Object x)
+	{
+		if ( x instanceof Trackable )
+		{
+			return (Trackable)x;
+		}
+		else if ( x instanceof PyObject )
+		{
+			PyObject pyX = (PyObject)x;
+			if ( PyTrackable.isTrackable( pyX ) )
+			{
+				return new PyTrackable( pyX );
+			}
+		}
+
+		return null;
 	}
 
 
