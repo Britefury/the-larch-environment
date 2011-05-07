@@ -11,6 +11,11 @@ import org.python.core.PyType;
 
 public interface TextToValue
 {
+	Object textToValue(String textValue);
+
+	
+	
+	
 	public static class PyTypeTextToValue implements TextToValue
 	{
 		private PyType type;
@@ -29,5 +34,12 @@ public interface TextToValue
 	}
 
 	
-	Object textToValue(String textValue);
+	public static final TextToValue identity = new TextToValue()
+	{
+		@Override
+		public Object textToValue(String textValue)
+		{
+			return textValue;
+		}
+	};
 }

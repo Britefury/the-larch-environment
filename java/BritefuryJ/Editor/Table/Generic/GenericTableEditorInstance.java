@@ -42,10 +42,7 @@ public class GenericTableEditorInstance extends AbstractTableEditorInstance<Gene
 				{
 					cells[y][x] = new GenericTableCell( model, x, y );
 				}
-				for (int x = row.size(); x < numColumns; x++)
-				{
-					cells[y][x] = genericEditor.emptyCellFac.createEmptyCell();
-				}
+				cells[y][row.size()] = new GenericBlankTableCell( model, row.size(), y, genericEditor.blankPres );
 			}
 			else
 			{
@@ -62,7 +59,7 @@ public class GenericTableEditorInstance extends AbstractTableEditorInstance<Gene
 			Object lastRow[] = new Object[numColumns];
 			for (int x = 0; x < numColumns; x++)
 			{
-				lastRow[x] = genericEditor.emptyCellFac.createEmptyCell();
+				lastRow[x] = new GenericBlankTableCell( model, x, height, genericEditor.blankPres );
 			}
 			cells[height] = lastRow;
 		}

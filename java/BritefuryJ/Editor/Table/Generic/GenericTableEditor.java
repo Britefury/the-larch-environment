@@ -6,46 +6,33 @@
 //##************************
 package BritefuryJ.Editor.Table.Generic;
 
+import BritefuryJ.Cell.PrimitiveCellEditPresenter;
+import BritefuryJ.Cell.TextToValue;
 import BritefuryJ.Editor.Table.AbstractTableEditor;
 import BritefuryJ.Editor.Table.AbstractTableEditorInstance;
 import BritefuryJ.Pres.Pres;
-import BritefuryJ.Pres.Primitive.Text;
 
 public class GenericTableEditor extends AbstractTableEditor<GenericTableModelInterface>
 {
-	public interface EmptyCellFactory
-	{
-		Pres createEmptyCell();
-	}
-	
-	
-	private static final EmptyCellFactory emptyTextCellFactory = new EmptyCellFactory()
-	{
-		@Override
-		public Pres createEmptyCell()
-		{
-			return new Text( "" );
-		}
-	};
-	
-	
 	protected boolean showEmptyRowAtBottom, showEmptyColumnAtRight;
-	protected EmptyCellFactory emptyCellFac;
+	protected Pres blankPres;
 	
 	
 	
 	
-	public GenericTableEditor(boolean showEmptyRowAtBottom, boolean showEmptyColumnAtRight, EmptyCellFactory emptyCellFac)
+	public GenericTableEditor(boolean showEmptyRowAtBottom, boolean showEmptyColumnAtRight, TextToValue textToValue)
 	{
 		this.showEmptyRowAtBottom = showEmptyRowAtBottom;
 		this.showEmptyColumnAtRight = showEmptyColumnAtRight;
-		this.emptyCellFac = emptyCellFac;
+		this.blankPres = PrimitiveCellEditPresenter.presentEditableText( "", textToValue );
 	}
 	
 	public GenericTableEditor(boolean showEmptyRowAtBottom, boolean showEmptyColumnAtRight)
 	{
-		this( showEmptyRowAtBottom, showEmptyColumnAtRight, emptyTextCellFactory );
+		this( showEmptyRowAtBottom, showEmptyColumnAtRight, TextToValue.identity );
 	}
+	
+	
 	
 	
 	

@@ -40,10 +40,10 @@ public class ObjectListTableEditorInstance extends AbstractTableEditorInstance<O
 		
 		if ( listEditor.showEmptyRowAtBottom )
 		{
-			Pres lastRow[] = new Pres[width];
+			Object lastRow[] = new Object[width];
 			for (int i = 0; i < width; i++)
 			{
-				lastRow[i] = listEditor.emptyCellFac.createEmptyCell();
+				lastRow[i] = new ObjectListBlankCell( this, listEditor.columns[i] );
 			}
 			rows[numObjects] = new GridRow( lastRow );
 		}
@@ -86,5 +86,12 @@ public class ObjectListTableEditorInstance extends AbstractTableEditorInstance<O
 	{
 		ObjectListTableEditor e = (ObjectListTableEditor)editor;
 		return e.columns.length;
+	}
+	
+	
+	protected Object newRow()
+	{
+		ObjectListTableEditor e = (ObjectListTableEditor)editor;
+		return e.newRow( model );
 	}
 }
