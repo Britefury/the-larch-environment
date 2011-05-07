@@ -8,7 +8,7 @@
 from BritefuryJ.Command import CommandSetRegistry
 
 from GSymCore.Languages.Python25.PythonEditor.PythonEditOperations import insertSpecialFormAtCaret
-from GSymCore.Languages.Python25.Builder import embeddedExpression
+from GSymCore.Languages.Python25.Builder import embeddedExpression, embeddedStatement
 
 
 

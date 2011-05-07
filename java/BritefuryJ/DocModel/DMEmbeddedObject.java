@@ -6,7 +6,9 @@
 //##************************
 package BritefuryJ.DocModel;
 
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.python.core.Py;
@@ -15,12 +17,14 @@ import org.python.core.PyObject;
 import org.python.core.PyTuple;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.ChangeHistory.ChangeHistory;
+import BritefuryJ.ChangeHistory.Trackable;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.JythonInterface.Jython_copy;
 import BritefuryJ.Pres.Pres;
 
-public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterface, Presentable
+public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterface, Presentable, Trackable
 {
 	protected static class ChildrenIterator implements Iterator<Object>
 	{
@@ -64,6 +68,7 @@ public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterf
 
 
 	private PyObject value = null;
+	private ChangeHistory changeHistory = null;
 	
 	
 	public DMEmbeddedObject()
@@ -184,5 +189,25 @@ public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterf
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return DocModelPresenter.presentDMEmbeddedObject( this, fragment, inheritedState );
+	}
+
+	
+	
+	@Override
+	public ChangeHistory getChangeHistory()
+	{
+		return changeHistory;
+	}
+
+	@Override
+	public void setChangeHistory(ChangeHistory h)
+	{
+		changeHistory = h;
+	}
+
+	@Override
+	public List<Object> getTrackableContents()
+	{
+		return Arrays.asList( new Object[] { value } );
 	}
 }
