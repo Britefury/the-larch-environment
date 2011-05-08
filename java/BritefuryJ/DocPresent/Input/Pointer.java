@@ -51,6 +51,7 @@ public class Pointer extends PointerInterface
 	protected DndDropLocal dndDrop;
 	protected PresentationComponent component;
 	protected PriorityList<PointerInteractor> interactors = new PriorityList<PointerInteractor>();
+	protected boolean isWithinBoundsOfRoot = false;
 	
 	// Introduced as an optimisation -- elements become 'unrealised' VERY FREQUENTLY, so iterating through all interactors and notifying them is very inefficient.
 	// Keeping a map of listener lists allows certain interactors to register an interest in ONLY the elements that they want to know about.
@@ -199,11 +200,14 @@ public class Pointer extends PointerInterface
 
 	public void onRootElementReallocate()
 	{
-		for (PointerInteractor interactor: interactors)
+		if ( isWithinBoundsOfRoot )
 		{
-			if ( interactor.motion( this, new PointerMotionEvent( this, PointerMotionEvent.Action.MOTION ), null ) )
+			for (PointerInteractor interactor: interactors)
 			{
-				break;
+				if ( interactor.motion( this, new PointerMotionEvent( this, PointerMotionEvent.Action.MOTION ), null ) )
+				{
+					break;
+				}
 			}
 		}
 	}
@@ -283,6 +287,7 @@ public class Pointer extends PointerInterface
 
 	public void enter(Point2 pos)
 	{
+		isWithinBoundsOfRoot = true;
 		PointerMotionEvent event = new PointerMotionEvent( this, PointerMotionEvent.Action.ENTER );
 
 		for (PointerInteractor interactor: interactors)
@@ -305,6 +310,7 @@ public class Pointer extends PointerInterface
 				break;
 			}
 		}
+		isWithinBoundsOfRoot = false;
 	}
 
 	public boolean scroll(int scrollX, int scrollY)
