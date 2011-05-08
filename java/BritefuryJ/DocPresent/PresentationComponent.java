@@ -99,19 +99,19 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		private JWindow popupWindow;
 		private PresentationComponent popupComponent;
 		private PopupChain chain;
-		private boolean bOpen;
+		private boolean isOpen;
 		
 		private PresentationPopup(PopupChain popupChain, Window ownerWindow, PresentationComponent parentComponent, DPElement popupContents, int x, int y,
-				Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+				Corner popupAnchor, boolean closeOnLoseFocus, boolean requestFocus)
 		{
 			chain = popupChain;
 			chain.addPopup( this );
-			bOpen = true;
+			isOpen = true;
 			
 			
 			// Create the popup window
 			popupWindow = new JWindow( ownerWindow );
-			if ( bRequestFocus )
+			if ( requestFocus )
 			{
 				popupWindow.setAlwaysOnTop( true );
 				popupWindow.setFocusable( true );
@@ -134,7 +134,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 
 			
 			popupWindow.setVisible( true );
-			if ( bRequestFocus )
+			if ( requestFocus )
 			{
 				popupWindow.requestFocus();
 			}
@@ -149,7 +149,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				public void windowLostFocus(WindowEvent arg0)
 				{
 					// If the popup has no child
-					if ( bOpen )
+					if ( isOpen )
 					{
 						if ( !chain.popupHasChild( PresentationPopup.this ) )
 						{
@@ -159,7 +159,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				}
 			};
 			
-			if ( bCloseOnLoseFocus )
+			if ( closeOnLoseFocus )
 			{
 				popupWindow.addWindowFocusListener( focusListener );
 			}
@@ -168,7 +168,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		public void closePopup()
 		{
-			bOpen = false;
+			isOpen = false;
 			popupWindow.setVisible( false );
 		}
 	}
