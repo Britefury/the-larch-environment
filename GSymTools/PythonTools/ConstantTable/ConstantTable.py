@@ -173,12 +173,7 @@ _tableEditor = ObjectListTableEditor( [ _targetColumn, _valueColumn ], ConstantD
 
 
 def _newConstantTable():
-	t = ConstantTable()
-	a = ConstantDefinition()
-	a.target = EmbeddedPython25.targetFromText( 'a' )
-	a.value = EmbeddedPython25.expressionFromText( 'x/2' )
-	t.append( a )
-	return t
+	return ConstantTable()
 
 
 _ctCommand = Command( '&Python &Constant &Table', makeInsertEmbeddedStatementAction( _newConstantTable ) )

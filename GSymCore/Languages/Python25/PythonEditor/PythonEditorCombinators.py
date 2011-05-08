@@ -81,10 +81,12 @@ class PythonEditorStyle (object):
 	externalExprTitleStyle = InheritedAttributeNonNull( pythonEditor, 'externalExprTitleStyle', StyleSheet,
 	                                                    StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.5, 1.0 ) ).withAttr( Primitive.fontSize, 10 ) )
 
+	embeddedObjectBorderStyle = InheritedAttributeNonNull( pythonEditor, 'embeddedObjectBorderStyle', StyleSheet,
+	                                                     StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 2.0, 2.0, 4.0, 4.0, Color( 0.6, 0.65, 0.8 ), None ) ) )
 	embeddedObjectLineStyle = InheritedAttributeNonNull( pythonEditor, 'embeddedObjectLineStyle', StyleSheet,
 	                                                   StyleSheet.instance.withAttr( Primitive.shapePainter, FillPainter( Color( 0.1, 0.2, 0.3 ) ) ) )
-	embeddedObjectButtonStyle = InheritedAttributeNonNull( pythonEditor, 'embeddedObjectButtonStyle', StyleSheet,
-	                                                     StyleSheet.instance.withAttr( Primitive.background, FillPainter( Color( 0.85, 0.85, 0.85 ) ) ).withAttr( Primitive.hoverBackground, FillPainter( Color( 0.7, 0.7, 0.7 ) ) ) )
+	embeddedObjectExpansionLabelStyle = InheritedAttributeNonNull( pythonEditor, 'embeddedObjectExpansionLabelStyle', StyleSheet,
+	                                                     StyleSheet.instance.withAttr( Primitive.fontSize, 10 ) )
 
 
 	solidHighlightRounding = InheritedAttributeNonNull( pythonEditor, 'solidHighlightRounding', float, 3.0 )
@@ -568,9 +570,9 @@ def externalExpr(ctx, style, exprView, title, deleteButton):
 
 @PyPresCombinatorFn
 def embeddedObject(ctx, style, valueView):
-	externalExprBorderStyle = style.get( PythonEditorStyle.externalExprBorderStyle )
+	embeddedObjectBorderStyle = style.get( PythonEditorStyle.embeddedObjectBorderStyle )
 
-	box = externalExprBorderStyle.applyTo( Border( valueView.pad( 3.0, 3.0 ) ) ).pad( 1.0, 1.0 )
+	box = embeddedObjectBorderStyle.applyTo( Border( valueView.pad( 3.0, 3.0 ) ) ).pad( 1.0, 1.0 )
 
 	segment = Segment( box )
 	return segment.present( ctx, style )
@@ -581,20 +583,19 @@ def embeddedObject(ctx, style, valueView):
 def embeddedObjectMacro(ctx, style, valueView, modelView):
 	modelView = StyleSheet.instance.withAttr( Primitive.editable, False ).applyTo( modelView )
 
-	externalExprBorderStyle = style.get( PythonEditorStyle.externalExprBorderStyle )
+	embeddedObjectBorderStyle = style.get( PythonEditorStyle.embeddedObjectBorderStyle )
 	embeddedObjectLineStyle = style.get( PythonEditorStyle.embeddedObjectLineStyle )
-	embeddedObjectButtonStyle = style.get( PythonEditorStyle.embeddedObjectButtonStyle )
+	embeddedObjectExpansionLabelStyle = style.get( PythonEditorStyle.embeddedObjectExpansionLabelStyle )
 
-	hLine = embeddedObjectLineStyle.applyTo( Box( 1, 1 ).alignHExpand() ).pad( 8.0, 5.0 ).alignHExpand()
-	vLine = embeddedObjectLineStyle.applyTo( Box( 1, 1 ).alignVExpand() ).pad( 5.0, 8.0 ).alignVExpand()
-	expandButton = CustomExpander.expanderButton( embeddedObjectButtonStyle.applyTo( Image.systemIcon( 'expand_plus' ) ) )
-	contractButton = CustomExpander.expanderButton( embeddedObjectButtonStyle.applyTo( Image.systemIcon( 'expand_minus' ) ) )
+	hLine = embeddedObjectLineStyle.applyTo( Box( 1, 1 ).alignHExpand() ).pad( 8.0, 2.0 ).alignHExpand()
+	
+	expansionLabel = embeddedObjectExpansionLabelStyle.applyTo( Label( 'Expansion' ) )
+	
+	expander = DropDownExpander( expansionLabel, modelView )
+	
+	view = embeddedObjectBorderStyle.applyTo( Border( Column( [ valueView, expander ] ) ) )
 
-	contracted = externalExprBorderStyle.applyTo( Border( Row( [ valueView, vLine, expandButton.alignVBottom() ] ).pad( 3.0, 3.0 ) ) ).pad( 1.0, 1.0 )
-	expanded = externalExprBorderStyle.applyTo( Border( Column( [ Row( [ valueView, vLine, contractButton.alignVBottom() ] ), hLine, modelView ] ).pad( 3.0, 3.0 ) ) ).pad( 1.0, 1.0 )
-	expander = CustomExpander( contracted, expanded )
-
-	segment = Segment( expander )
+	segment = Segment( view )
 	return segment.present( ctx, style )
 
 
