@@ -161,18 +161,18 @@ public abstract class SpinEntry extends ControlPres
 		double arrowSize = style.get( Controls.spinEntryArrowSize, Double.class );
 		double hspacing = style.get( Controls.spinEntryHSpacing, Double.class );
 		
-		Pres upArrow = new Arrow( Arrow.Direction.UP, arrowSize );
+		Pres upArrow = new Arrow( Arrow.Direction.UP, arrowSize ).alignVBottom();
 		DPElement upArrowElement = arrowStyle.applyTo( upArrow ).present( ctx, style );
-		Pres downArrow = new Arrow( Arrow.Direction.DOWN, arrowSize );
+		Pres downArrow = new Arrow( Arrow.Direction.DOWN, arrowSize ).alignVTop();
 		DPElement downArrowElement = arrowStyle.applyTo( downArrow ).present( ctx, style );
-		Pres arrowsBox = arrowStyle.applyTo( new Column( new Object[] { upArrowElement, downArrowElement } ) );
+		Pres arrowsBox = arrowStyle.applyTo( new Column( new Object[] { upArrowElement, downArrowElement } ).alignVCentre() );
 		
 		SpinEntryControl.SpinEntryTextListener textListener = new SpinEntryControl.SpinEntryTextListener();
 		
 		TextEntry entry = new TextEntry( getInitialValueString(), textListener, getValidationPattern(), getValidationFailMessage() );
-		TextEntry.TextEntryControl entryControl = (TextEntryControl)entry.createControl( ctx, style.alignHExpand().alignVRefYExpand() );
+		TextEntry.TextEntryControl entryControl = (TextEntryControl)entry.createControl( ctx, style.alignHExpand().alignVRefY() );
 		
-		Pres row = StyleSheet.instance.withAttr( Primitive.rowSpacing, hspacing ).applyTo( new Row( new Object[] { entryControl.getElement(), arrowsBox.alignVCentre() } ) );
+		Pres row = StyleSheet.instance.withAttr( Primitive.rowSpacing, hspacing ).applyTo( new Row( new Object[] { entryControl.getElement(), arrowsBox } ) );
 		DPElement element = row.present( ctx, style );
 		
 		return createSpinEntryControl( ctx, style, element, entryControl, upArrowElement, downArrowElement, textListener );

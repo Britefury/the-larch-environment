@@ -33,9 +33,9 @@ public class Controls
 	
 	
 	public static final InheritedAttributeNonNull buttonBorder = new InheritedAttributeNonNull( controlsNamespace, "buttonBorder", AbstractBorder.class,
-			new SolidBorder( 1.0, 3.0, 10.0, 10.0, new Color( 0.55f, 0.525f, 0.5f ), new Color( 0.85f, 0.85f, 0.85f ) ) );
+			new SolidBorder( 2.0, 2.0, 10.0, 10.0, new Color( 0.55f, 0.65f, 0.75f ), new Color( 0.85f, 0.9f, 0.95f  ) ) );
 	public static final InheritedAttributeNonNull buttonHighlightBorder = new InheritedAttributeNonNull( controlsNamespace, "buttonHighlightBorder", AbstractBorder.class,
-			new SolidBorder( 1.0, 3.0, 10.0, 10.0, new Color( 0.0f, 0.5f, 0.5f ), new Color( 0.925f, 0.925f, 0.925f ) ) );
+			new SolidBorder( 2.0, 2.0, 10.0, 10.0, new Color( 0.65f, 0.75f, 0.85f ), new Color( 0.95f, 0.975f, 1.0f ) ) );
 	
 	
 	public static final InheritedAttributeNonNull hyperlinkAttrs = new InheritedAttributeNonNull( controlsNamespace, "hyperlinkAttrs", StyleSheet.class,
@@ -53,24 +53,24 @@ public class Controls
 
 	
 	public static final InheritedAttributeNonNull optionMenuBorder = new InheritedAttributeNonNull( controlsNamespace, "optionMenuBorder", AbstractBorder.class,
-			new SolidBorder( 1.0, 3.0, 5.0, 5.0, Color.BLACK, new Color( 0.9f, 0.95f, 0.9f ) ) );
+			new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.0f, 0.125f, 0.25f ), new Color( 0.9f, 0.925f, 0.95f ) ) );
 	public static final InheritedAttributeNonNull optionMenuHoverBorder = new InheritedAttributeNonNull( controlsNamespace, "optionMenuHoverBorder", AbstractBorder.class,
-			new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.0f, 0.3f, 0.0f ), new Color( 0.95f, 1.0f, 0.95f ) ) );
+			new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.0f, 0.0f, 0.3f ), new Color( 0.95f, 0.975f, 1.0f ) ) );
 	public static final InheritedAttributeNonNull optionMenuContentsSpacing = new InheritedAttributeNonNull( controlsNamespace, "optionMenuContentsSpacing", Double.class, 5.0 );
 	public static final InheritedAttributeNonNull optionMenuArrowSize = new InheritedAttributeNonNull( controlsNamespace, "optionMenuArrowSize", Double.class, 16.0 );
 	public static final InheritedAttributeNonNull optionMenuArrowPainter = new InheritedAttributeNonNull( controlsNamespace, "optionMenuArrowPainter", Painter.class,
-			new FilledOutlinePainter( new Color( 0.7f, 0.85f, 0.7f ), new Color( 0.0f, 0.25f, 0.0f ), new BasicStroke( 1.0f ) ) );
+			new FilledOutlinePainter( new Color( 0.7f, 0.8f, 0.9f ), new Color( 0.0f, 0.25f, 0.5f ), new BasicStroke( 1.0f ) ) );
 
 	
 	public static final InheritedAttributeNonNull dropDownExpanderHeaderContentsSpacing = new InheritedAttributeNonNull( controlsNamespace, "dropDownExpanderHeaderContentsSpacing", Double.class, 5.0 );
-	public static final InheritedAttributeNonNull dropDownExpanderHeaderArrowSize = new InheritedAttributeNonNull( controlsNamespace, "dropDownExpanderHeaderArrowSize", Double.class, 14.0 );
+	public static final InheritedAttributeNonNull dropDownExpanderHeaderArrowSize = new InheritedAttributeNonNull( controlsNamespace, "dropDownExpanderHeaderArrowSize", Double.class, 12.0 );
 	public static final InheritedAttributeNonNull dropDownExpanderHeaderArrowPainter = new InheritedAttributeNonNull( controlsNamespace, "dropDownExpanderHeaderArrowPainter", Painter.class,
-			new FilledOutlinePainter( new Color( 0.7f, 0.85f, 0.7f ), new Color( 0.0f, 0.25f, 0.0f ), new BasicStroke( 1.0f ) ) );
+			new FilledOutlinePainter( new Color( 0.7f, 0.8f, 0.9f ), new Color( 0.0f, 0.25f, 0.5f ), new BasicStroke( 1.0f ) ) );
 	public static final InheritedAttributeNonNull dropDownExpanderPadding = new InheritedAttributeNonNull( controlsNamespace, "dropDownExpanderPadding", Double.class, 21.0 );
 
 	
 	public static final InheritedAttributeNonNull textEntryBorder = new InheritedAttributeNonNull( controlsNamespace, "textEntryBorder", AbstractBorder.class,
-			new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.0f, 0.3f, 0.0f ), new Color( 0.9f, 0.95f, 0.9f ) ) );
+			new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.0f, 0.125f, 0.25f ), new Color( 0.9f, 0.925f, 0.95f  ) ) );
 	public static final InheritedAttributeNonNull textEntryInvalidBorder = new InheritedAttributeNonNull( controlsNamespace, "textEntryInvalidBorder", AbstractBorder.class,
 			new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.6f, 0.0f, 0.0f ), new Color( 1.0f, 0.85f, 0.85f ) ) );
 
@@ -82,17 +82,17 @@ public class Controls
 	public static final InheritedAttributeNonNull spinEntryArrowSize = new InheritedAttributeNonNull( controlsNamespace, "spinEntryArrowSize", Double.class, 16.0 );
 	public static final InheritedAttributeNonNull spinEntryArrowAttrs = new InheritedAttributeNonNull( controlsNamespace, "spinEntryArrowAttrs", StyleSheet.class,
 			StyleSheet.instance.withAttr( Primitive.columnSpacing, 2.0 ).
-			withAttr( Primitive.shapePainter, new FilledOutlinePainter( new Color( 0.7f, 0.85f, 0.7f ), new Color( 0.0f, 0.25f, 0.0f ), new BasicStroke( 1.0f ) ) ).
-			withAttr( Primitive.hoverShapePainter, new FilledOutlinePainter( new Color( 0.85f, 1.0f, 0.85f ), new Color( 0.0f, 0.45f, 0.0f ), new BasicStroke( 1.0f ) ) ) );
+			withAttr( Primitive.shapePainter, new FilledOutlinePainter( new Color( 0.7f, 0.8f, 0.9f ), new Color( 0.0f, 0.25f, 0.5f ), new BasicStroke( 1.0f ) ) ).
+			withAttr( Primitive.hoverShapePainter, new FilledOutlinePainter( new Color( 0.85f, 0.9f, 0.95f ), new Color( 0.0f, 0.5f, 0.75f ), new BasicStroke( 1.0f ) ) ) );
 	public static final InheritedAttributeNonNull spinEntryHSpacing = new InheritedAttributeNonNull( controlsNamespace, "spinEntryHSpacing", Double.class, 2.0 );
 	
 	
 	public static final InheritedAttributeNonNull scrollBarArrowPainter = new InheritedAttributeNonNull( controlsNamespace, "scrollBarArrowPainter", Painter.class,
-			new FilledOutlinePainter( new Color( 0.7f, 0.85f, 1.0f ), new Color( 0.0f, 0.5f, 1.0f ), new BasicStroke( 1.0f ) ) );
+			new FilledOutlinePainter( new Color( 0.7f, 0.8f, 0.9f ), new Color( 0.0f, 0.25f, 0.5f ), new BasicStroke( 1.0f ) ) );
 	public static final InheritedAttribute scrollBarArrowHoverPainter = new InheritedAttribute( controlsNamespace, "scrollBarArrowHoverPainter", Painter.class,
-			new FilledOutlinePainter( new Color( 0.85f, 0.925f, 1.0f ), new Color( 0.0f, 0.25f, 0.5f ), new BasicStroke( 1.0f ) ) );
+			new FilledOutlinePainter( new Color( 0.85f, 0.9f, 0.95f ), new Color( 0.0f, 0.5f, 0.75f ), new BasicStroke( 1.0f ) ) );
 	public static final InheritedAttributeNonNull scrollBarDragBoxPainter = new InheritedAttributeNonNull( controlsNamespace, "scrollBarDragBoxPainter", Painter.class,
-			new FilledOutlinePainter( new Color( 0.7f, 0.85f, 1.0f ), new Color( 0.0f, 0.5f, 1.0f ), new BasicStroke( 1.0f ) ) );
+			new FilledOutlinePainter( new Color( 0.7f, 0.8f, 0.9f ), new Color( 0.0f, 0.25f, 0.5f ), new BasicStroke( 1.0f ) ) );
 	public static final InheritedAttributeNonNull scrollBarDragBarBackgroundPainter = new InheritedAttributeNonNull( controlsNamespace, "scrollBarDragBarBackgroundPainter", Painter.class,
 			new FilledOutlinePainter( new Color( 0.9f, 0.9f, 0.9f ), new Color( 0.75f, 0.75f, 0.75f ), new BasicStroke( 1.0f ) ) );
 	public static final InheritedAttribute scrollBarDragBackgroundHoverPainter = new InheritedAttribute( controlsNamespace, "scrollBarDragBackgroundHoverPainter", Painter.class,
@@ -117,7 +117,7 @@ public class Controls
 	public static final InheritedAttributeNonNull menuItemSubmenuArrowSize = new InheritedAttributeNonNull( controlsNamespace, "menuItemSubmenuArrowSize", Double.class, 12.0 );
 	public static final InheritedAttributeNonNull menuItemSubmenuArrowSpacing = new InheritedAttributeNonNull( controlsNamespace, "menuItemSubmenuArrowSpacing", Double.class, 5.0 );
 	public static final InheritedAttributeNonNull menuItemSubmenuArrowPainter = new InheritedAttributeNonNull( controlsNamespace, "menuItemSubmenuArrowPainter", Painter.class,
-			new FilledOutlinePainter( new Color( 0.7f, 0.85f, 1.0f ), new Color( 0.0f, 0.5f, 1.0f ), new BasicStroke( 1.0f ) ) );
+			new FilledOutlinePainter( new Color( 0.7f, 0.8f, 0.9f ), new Color( 0.0f, 0.25f, 0.5f ), new BasicStroke( 1.0f ) ) );
 	
 	public static final InheritedAttributeNonNull popupMenuAttrs = new InheritedAttributeNonNull( controlsNamespace, "popupMenuAttrs", StyleSheet.class,
 			StyleSheet.instance.withAttr( Primitive.border, new SolidBorder( 1.0, 2.0, Color.black, null ) ).withAttr( Primitive.rowSpacing, 10.0 ) );

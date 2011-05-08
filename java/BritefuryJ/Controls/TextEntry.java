@@ -408,7 +408,7 @@ public class TextEntry extends ControlPres
 		Pres line = new Row( new Pres[] { new Segment( false, false, textElement ) } );
 		Pres region = new Region( line );
 		DPRegion regionElement = (DPRegion)region.present( ctx, style );
-		Pres outer = new Border( regionElement );
+		Pres outer = new Border( regionElement ).alignVRefY();
 		DPBorder outerElement = (DPBorder)outer.present( ctx, style );
 		
 		TextEntryControl control = new TextEntryControl( ctx, style, outerElement, regionElement, textElement, listener, validator, validBorder, invalidBorder );
