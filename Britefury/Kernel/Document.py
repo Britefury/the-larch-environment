@@ -164,7 +164,7 @@ class Document (ChangeHistoryListener):
 	def readFile(world, filename):
 		if os.path.exists( filename ):
 			try:
-				f = open( filename )
+				f = open( filename, 'rU' )
 				documentRoot = IsolationPickle.load( f )
 				f.close()
 
