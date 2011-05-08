@@ -142,6 +142,8 @@ class ConstantTable (object):
 			assign = Py.AssignStmt( targets=[ target ], value=value )
 			assigns.append( assign )
 		return Py.PythonSuite( suite=assigns )
+	
+	__py_hide_expansion__ = True
 		
 	
 	def __present__(self, fragment, inheritedState):

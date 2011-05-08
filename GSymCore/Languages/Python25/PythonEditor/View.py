@@ -971,28 +971,46 @@ class Python25View (ObjectNodeDispatchView):
 
 	#
 	#
-	# INLINE OBJECT
+	# EMBEDDED OBJECT
 	#
 	#
+	
 
+	@staticmethod
+	def _getExpansionFn(value):
+		try:
+			modelFn = value.__py_model__
+		except AttributeError:
+			return None
+		
+		try:
+			hideExpansion = value.__py_hide_expansion__
+		except AttributeError:
+			return modelFn
+		
+		if hideExpansion:
+			return None
+		else:
+			return modelFn
+	
+	
 	# Embedded object expression
 	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectExpr )
 	@SpecialFormExpression
 	def EmbeddedObjectExpr(self, fragment, inheritedState, model, embeddedValue):
 		value = embeddedValue.getValue()
 		valueView = ApplyPerspective( None, value )
-
-		try:
-			modelFn = value.__py_model__
-		except AttributeError:
+		expansionFn = self._getExpansionFn( value )
+		
+		if expansionFn is None:
 			# Standard view
 			view = embeddedObject( valueView )
 			return view.withContextMenuInteractor( _embeddedObjectExprContextMenuFactory )
 		else:
 			# Macro view
-			def createModelView():
-				return Pres.coerce( modelFn() )
-			view = embeddedObjectMacro( valueView, LazyPres( createModelView ) )
+			def createExpansionView():
+				return Pres.coerce( expansionFn() )
+			view = embeddedObjectMacro( valueView, LazyPres( createExpansionView ) )
 			return view.withContextMenuInteractor( _embeddedObjectExprContextMenuFactory )
 
 
@@ -1002,18 +1020,17 @@ class Python25View (ObjectNodeDispatchView):
 	def EmbeddedObjectStmt(self, fragment, inheritedState, model, embeddedValue):
 		value = embeddedValue.getValue()
 		valueView = ApplyPerspective( None, value )
+		expansionFn = self._getExpansionFn( value )
 
-		try:
-			modelFn = value.__py_model__
-		except AttributeError:
+		if expansionFn is None:
 			# Standard view
 			view = embeddedObject( valueView )
 			return view.withContextMenuInteractor( _embeddedObjectStmtContextMenuFactory )
 		else:
 			# Macro view
-			def createModelView():
-				return Pres.coerce( modelFn() )
-			view = embeddedObjectMacro( valueView, LazyPres( createModelView ) )
+			def createExpansionView():
+				return Pres.coerce( expansionFn() )
+			view = embeddedObjectMacro( valueView, LazyPres( createExpansionView ) )
 			return view.withContextMenuInteractor( _embeddedObjectStmtContextMenuFactory )
 
 
