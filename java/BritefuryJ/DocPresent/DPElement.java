@@ -3009,7 +3009,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 			DPElement model = (DPElement)fragment.getModel();
 
 			Pres p = inspect( model );
-			p.popupAtMousePosition( el, Corner.UPPER_LEFT, true, true );
+			p.popupAtMousePosition( el, Corner.TOP_LEFT, true, true );
 		}
 		
 		

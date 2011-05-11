@@ -16,6 +16,7 @@ import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
 import BritefuryJ.DocPresent.Interactor.KeyElementInteractor;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.Selection.SelectionManager;
+import BritefuryJ.DocPresent.Selection.SelectionPoint;
 import BritefuryJ.DocPresent.Target.Target;
 
 public class KeyboardTargetInteractor extends KeyboardInteractor
@@ -182,6 +183,8 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 			Target target = getTarget();
 			if ( target.isValid() )
 			{
+				SelectionPoint prevPoint = target.createSelectionPoint();
+				
 				if ( event.getKeyCode() == KeyEvent.VK_LEFT )
 				{
 					target.moveLeft();
@@ -210,7 +213,7 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 				root.setTarget( target );
 				if ( ( getKeyModifiers( event ) & Modifier.SHIFT ) != 0 )
 				{
-					getSelectionManager().dragSelection( target.createSelectionPoint() );
+					getSelectionManager().dragSelection( prevPoint, target.createSelectionPoint() );
 				}
 				else
 				{

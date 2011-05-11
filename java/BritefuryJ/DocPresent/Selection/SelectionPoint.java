@@ -9,5 +9,7 @@ package BritefuryJ.DocPresent.Selection;
 
 public abstract class SelectionPoint
 {
+	public abstract boolean isValid();
+	
 	public abstract Selection createSelectionTo(SelectionPoint point);
 }

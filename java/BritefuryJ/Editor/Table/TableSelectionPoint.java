@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.Editor.Table;
 
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.TableElement;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.Selection.SelectionPoint;
@@ -23,6 +24,13 @@ class TableSelectionPoint extends SelectionPoint
 		this.table = table;
 		this.x = x;
 		this.y = y;
+	}
+	
+	
+	@Override
+	public boolean isValid()
+	{
+		return ((DPElement)table).isRealised();
 	}
 	
 	

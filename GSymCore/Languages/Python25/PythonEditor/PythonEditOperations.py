@@ -323,9 +323,9 @@ class _InsertSpecialFormTreeEvent (TextEditEvent):
 		super( _InsertSpecialFormTreeEvent, self ).__init__( leaf )
 
 
-def insertSpecialFormAtCaret(caret, specialForm):
-	element = caret.getElement()
-	index = caret.getIndex()
+def insertSpecialFormAtMarker(marker, specialForm):
+	element = marker.getElement()
+	index = marker.getIndex()
 	assert isinstance( element, DPText )
 	
 	value = element.getStreamValue()
@@ -342,5 +342,6 @@ def insertSpecialFormAtCaret(caret, specialForm):
 	element.postTreeEvent( event )
 
 
-
+def insertSpecialFormAtCaret(caret, specialForm):
+	return insertSpecialFormAtMarker( caret.getMarker(), specialForm )
 

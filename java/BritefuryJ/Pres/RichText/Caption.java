@@ -6,12 +6,24 @@
 //##************************
 package BritefuryJ.Pres.RichText;
 
+import java.util.List;
+
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class Caption extends RichParagraph
 {
+	public Caption(Object contents[])
+	{
+		super( contents );
+	}
+	
+	public Caption(List<Object> contents)
+	{
+		super( contents );
+	}
+	
 	public Caption(String text)
 	{
 		super( text );

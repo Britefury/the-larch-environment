@@ -120,6 +120,10 @@ public class WeakValueIdentityHashMap <Key, Value> implements Map<Key, Value>
 			{
 				Value v = (Value)next.get();
 				next = fetchNext();
+				if ( v == null )
+				{
+					throw new RuntimeException( "WeakValueIdentityHashMap.valueIterator.next(): v is null" );
+				}
 				return v;
 			}
 			else
@@ -196,7 +200,12 @@ public class WeakValueIdentityHashMap <Key, Value> implements Map<Key, Value>
 			int i = 0;
 			for (WeakValue<Value, Key> w: ws)
 			{
-				xs[i++] = w.get();
+				Object v = w.get();
+				if ( v == null )
+				{
+					throw new RuntimeException( "WeakvalueIdentityHashMap.ValueCollection.toArray(): v is null" );
+				}
+				xs[i++] = v;
 			}
 			return xs;
 		}
@@ -214,7 +223,12 @@ public class WeakValueIdentityHashMap <Key, Value> implements Map<Key, Value>
 			int i = 0;
 			for (WeakValue<Value, Key> w: ws)
 			{
-				a[i++] = (T)w.get();
+				T v = (T)w.get();
+				if ( v == null )
+				{
+					throw new RuntimeException( "WeakvalueIdentityHashMap.ValueCollection.toArray(): v is null" );
+				}
+				a[i++] = v;
 			}
 			return a;
 		}
@@ -294,6 +308,7 @@ public class WeakValueIdentityHashMap <Key, Value> implements Map<Key, Value>
 		
 		private EntryIterator(Iterator<Map.Entry<Key, WeakValue<Value, Key>>> iter)
 		{
+			System.out.println( "WeakidentityHashMap.EntryIterator: implementation not finished - needs to skip dead entries" );
 			this.iter = iter;
 		}
 		

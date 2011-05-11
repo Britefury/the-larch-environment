@@ -21,6 +21,13 @@ public class TextSelectionPoint extends SelectionPoint
 	}
 	
 	
+	@Override
+	public boolean isValid()
+	{
+		return marker.isValid();
+	}
+	
+	@Override
 	public Selection createSelectionTo(SelectionPoint target)
 	{
 		if ( target instanceof TextSelectionPoint )

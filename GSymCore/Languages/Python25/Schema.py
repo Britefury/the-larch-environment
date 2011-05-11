@@ -309,8 +309,10 @@ def getEmbeddedObjectModelType(value):
 	except AttributeError:
 		modelType = Expr
 	else:
+		if callalble( modelType ):
+			modelType = modelType()
 		if isinstance( modelType, str )  or  isinstance( modelType, unicode ):
-			if modelType == 'stmt'  or  modelType == 'statement':
+			if modelType == 'stmt'  or  modelType == 'statement'  or  modelType == 'suite':
 				modelType = Stmt
 			elif modelType == 'expr'  or  modelType == 'expression':
 				modelType = Expr

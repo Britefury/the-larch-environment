@@ -11,23 +11,23 @@ import BritefuryJ.Math.Point2;
 
 public enum Corner
 {
-	UPPER_LEFT,
-	LOWER_LEFT,
-	UPPER_RIGHT,
-	LOWER_RIGHT;
+	TOP_LEFT,
+	BOTTOM_LEFT,
+	TOP_RIGHT,
+	BOTTOM_RIGHT;
 
 
 	public Point2 getBoxCorner(AABox2 box)
 	{
 		switch (this)
 		{
-			case UPPER_LEFT:
+			case TOP_LEFT:
 				return box.getLower();
-			case LOWER_LEFT:
+			case BOTTOM_LEFT:
 				return new Point2( box.getLowerX(), box.getUpperY() );
-			case UPPER_RIGHT:
+			case TOP_RIGHT:
 				return new Point2( box.getUpperX(), box.getLowerY() );
-			case LOWER_RIGHT:
+			case BOTTOM_RIGHT:
 				return box.getUpper();
 			default:
 				return box.getLower();

@@ -357,13 +357,13 @@ public abstract class Pres
 	public void popupToRightOf(DPElement element, PresentationContext ctx, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		DPElement popupElement = present( ctx, style );
-		popupElement.popup( element, Corner.UPPER_RIGHT, Corner.UPPER_LEFT, bCloseOnLoseFocus, bRequestFocus );
+		popupElement.popup( element, Corner.TOP_RIGHT, Corner.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
 	public void popupBelow(DPElement element, PresentationContext ctx, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		DPElement popupElement = present( ctx, style );
-		popupElement.popup( element, Corner.LOWER_LEFT, Corner.UPPER_LEFT, bCloseOnLoseFocus, bRequestFocus );
+		popupElement.popup( element, Corner.BOTTOM_LEFT, Corner.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
 	public void popupAtMousePosition(DPElement element, PresentationContext ctx, StyleValues style, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
@@ -430,22 +430,22 @@ public abstract class Pres
 	
 	public void popupToRightOf(DPElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		popup( element, Corner.UPPER_RIGHT, Corner.UPPER_LEFT, bCloseOnLoseFocus, bRequestFocus );
+		popup( element, Corner.TOP_RIGHT, Corner.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
 	public void popupToRightOf(DPElement element, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		popup( element, style, Corner.UPPER_RIGHT, Corner.UPPER_LEFT, bCloseOnLoseFocus, bRequestFocus );
+		popup( element, style, Corner.TOP_RIGHT, Corner.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
 	public void popupBelow(DPElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		popup( element, Corner.LOWER_LEFT, Corner.UPPER_LEFT, bCloseOnLoseFocus, bRequestFocus );
+		popup( element, Corner.BOTTOM_LEFT, Corner.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
 	public void popupBelow(DPElement element, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		popup( element, style, Corner.LOWER_LEFT, Corner.UPPER_LEFT, bCloseOnLoseFocus, bRequestFocus );
+		popup( element, style, Corner.BOTTOM_LEFT, Corner.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
 	public void popupOver(DPElement element, Point2 targetLocalPos, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
@@ -474,12 +474,12 @@ public abstract class Pres
 	
 	public void popupAtMousePosition(DPElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		popupAtMousePosition( element, Corner.UPPER_LEFT, bCloseOnLoseFocus, bRequestFocus );
+		popupAtMousePosition( element, Corner.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
 	public void popupAtMousePosition(DPElement element, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		popupAtMousePosition( element, style, Corner.UPPER_LEFT, bCloseOnLoseFocus, bRequestFocus );
+		popupAtMousePosition( element, style, Corner.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
 	
