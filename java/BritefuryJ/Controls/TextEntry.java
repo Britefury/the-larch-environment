@@ -339,7 +339,7 @@ public class TextEntry extends ControlPres
 				if ( failMessage != null )
 				{
 					Tooltip tooltip = new Tooltip( failMessage, 5.0 );
-					tooltip.popup( outerElement, Corner.UPPER_LEFT, Corner.LOWER_LEFT, ctx, style );
+					tooltip.popup( outerElement, Corner.TOP_LEFT, Corner.BOTTOM_LEFT, ctx, style );
 				}
 				return;
 			}

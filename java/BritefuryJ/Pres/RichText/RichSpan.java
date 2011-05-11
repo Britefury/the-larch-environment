@@ -6,32 +6,48 @@
 //##************************
 package BritefuryJ.Pres.RichText;
 
+import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.Pres.PresentationContext;
+import BritefuryJ.Pres.Primitive.Span;
+import BritefuryJ.Pres.Primitive.Text;
 import BritefuryJ.StyleSheet.StyleValues;
 
-public class Heading3 extends RichParagraph
+public class RichSpan extends AbstractRichText
 {
-	public Heading3(Object contents[])
+	public RichSpan(Object contents[])
 	{
 		super( contents );
 	}
 	
-	public Heading3(List<Object> contents)
+	public RichSpan(List<Object> contents)
 	{
 		super( contents );
 	}
 	
-	public Heading3(String text)
+	public RichSpan(String contents)
 	{
-		super( text );
+		super( contents );
 	}
-
+	
+	
+	
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		return presentParagraph( ctx, style.withAttrs( RichText.h3TextStyle( style ) ) );
+		List<Object> paragraphContents = null;
+		
+		if ( isEmpty() )
+		{
+			paragraphContents = Arrays.asList( new Object[] { new Text( "" ).alignHPack().alignVRefY() } );
+		}
+		else
+		{
+			paragraphContents = splitContents();
+		}
+		
+		return new Span( paragraphContents ).present( ctx, style );
 	}
 }

@@ -144,6 +144,8 @@ class ConstantTable (object):
 		return Py.PythonSuite( suite=assigns )
 	
 	__py_hide_expansion__ = True
+	
+	__py_model_type__ = 'stmt'
 		
 	
 	def __present__(self, fragment, inheritedState):

@@ -71,22 +71,22 @@ public abstract class PopupMenu extends Pres
 	
 	public void popupToRightOf(DPElement element, StyleValues style)
 	{
-		popup( element, style, Corner.UPPER_RIGHT, Corner.UPPER_LEFT );
+		popup( element, style, Corner.TOP_RIGHT, Corner.TOP_LEFT );
 	}
 	
 	public void popupToRightOf(DPElement element)
 	{
-		popup( element, Corner.UPPER_RIGHT, Corner.UPPER_LEFT );
+		popup( element, Corner.TOP_RIGHT, Corner.TOP_LEFT );
 	}
 	
 	public void popupBelow(DPElement element, StyleValues style)
 	{
-		popup( element, style, Corner.LOWER_LEFT, Corner.UPPER_LEFT );
+		popup( element, style, Corner.BOTTOM_LEFT, Corner.TOP_LEFT );
 	}
 	
 	public void popupBelow(DPElement element)
 	{
-		popup( element, Corner.LOWER_LEFT, Corner.UPPER_LEFT );
+		popup( element, Corner.BOTTOM_LEFT, Corner.TOP_LEFT );
 	}
 	
 	public void popupAtMousePosition(DPElement element, StyleValues style, Corner popupAnchor)
@@ -109,12 +109,12 @@ public abstract class PopupMenu extends Pres
 	
 	public void popupAtMousePosition(DPElement element, StyleValues style)
 	{
-		popupAtMousePosition( element, style, Corner.UPPER_LEFT );
+		popupAtMousePosition( element, style, Corner.TOP_LEFT );
 	}
 	
 	public void popupAtMousePosition(DPElement element)
 	{
-		popupAtMousePosition( element, Corner.UPPER_LEFT );
+		popupAtMousePosition( element, Corner.TOP_LEFT );
 	}
 
 	

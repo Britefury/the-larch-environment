@@ -160,9 +160,8 @@ def _onDrop_embeddedObject(element, pos, data, action):
 	def _displayModelException(e):
 		ApplyPerspective( None, Pres.coerce( e ) ).popupAtMousePosition( element, True, True )
 
-	rootElement = element.getRootElement()
-	caret = rootElement.getCaret()
-	if caret.isValid():
+	marker = element.getEditableMarkerClosestToLocalPoint( pos )
+	if marker.isValid():
 		model = data.getModel()
 		embeddedValue = DMNode.embedIsolated( model )
 		try:
@@ -172,10 +171,10 @@ def _onDrop_embeddedObject(element, pos, data, action):
 		else:
 			if modelType is Schema.Expr:
 				expr = Schema.EmbeddedObjectExpr( embeddedValue=embeddedValue )
-				insertSpecialFormAtCaret( caret, expr )
+				insertSpecialFormAtMarker( marker, expr )
 			elif modelType is Schema.Stmt:
 				stmt = Schema.EmbeddedObjectStmt( embeddedValue=embeddedValue )
-				insertSpecialFormAtCaret( caret, stmt )
+				insertSpecialFormAtMarker( marker, stmt )
 	return True
 
 

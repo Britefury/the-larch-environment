@@ -231,6 +231,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		m.set( this, position, bias );
 	}
 	
+	@Override
 	public void moveMarkerToStart(Marker m)
 	{
 		moveMarker( m, 0, Marker.Bias.START );
@@ -241,6 +242,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		moveMarker( m, Math.min( 1, getMarkerRange() ), Marker.Bias.START );
 	}
 	
+	@Override
 	public void moveMarkerToEnd(Marker m)
 	{
 		// We must ensure that an element with no content CANNOT have a marker given a bias of END, otherwise

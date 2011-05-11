@@ -6,14 +6,12 @@
 //##************************
 package BritefuryJ.Pres.RichText;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
-import BritefuryJ.Pres.Primitive.LineBreak;
 import BritefuryJ.Pres.Primitive.Paragraph;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Segment;
@@ -22,77 +20,36 @@ import BritefuryJ.Pres.Primitive.Text;
 import BritefuryJ.Pres.Primitive.Whitespace;
 import BritefuryJ.StyleSheet.StyleValues;
 
-abstract class RichParagraph extends Pres
+abstract class RichParagraph extends AbstractRichText
 {
-	private String text;
-	
-	
-	public RichParagraph(String text)
+	public RichParagraph(Object contents[])
 	{
-		this.text = text;
+		super( contents );
+	}
+	
+	public RichParagraph(List<Object> contents)
+	{
+		super( contents );
+	}
+	
+	public RichParagraph(String contents)
+	{
+		super( contents );
 	}
 	
 	
 	
-	private ArrayList<Object> textToWordsAndLineBreaks()
-	{
-		ArrayList<Object> elements = new ArrayList<Object>();
-
-		boolean bGotChars = false, bGotTrailingSpace = false;
-		int wordStartIndex = 0;
-		
-		for (int i = 0; i < text.length(); i++)
-		{
-			char c = text.charAt( i );
-			if ( c == ' ' )
-			{
-				if ( bGotChars )
-				{
-					bGotTrailingSpace = true;
-				}
-			}
-			else
-			{
-				if ( bGotTrailingSpace )
-				{
-					// Make text element for word
-					String word = text.substring( wordStartIndex, i );
-					elements.add( new Text( word ) );
-					elements.add( new LineBreak() );
-					
-					// Begin new word
-					bGotChars = bGotTrailingSpace = false;
-					wordStartIndex = i;
-				}
-				else
-				{
-					bGotChars = true;
-				}
-			}
-		}
-		
-		if ( wordStartIndex < text.length() )
-		{
-			String word = text.substring( wordStartIndex );
-			elements.add( new Text( word ) );
-			elements.add( new LineBreak() );
-		}
-		
-		return elements;
-	}
-	
-
 	protected DPElement presentParagraph(PresentationContext ctx, StyleValues style)
 	{
 		List<Object> paragraphContents = null;
 		
-		if ( text.equals( "" ) )
+		if ( isEmpty() )
 		{
 			paragraphContents = Arrays.asList( new Object[] { new Text( "" ).alignHPack().alignVRefY() } );
 		}
 		else
 		{
-			paragraphContents = textToWordsAndLineBreaks();
+			paragraphContents = splitContents();
 		}
 		
 		if ( Primitive.isEditable( style ) )

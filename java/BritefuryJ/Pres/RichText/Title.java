@@ -6,12 +6,24 @@
 //##************************
 package BritefuryJ.Pres.RichText;
 
+import java.util.List;
+
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class Title extends RichParagraph
 {
+	public Title(Object contents[])
+	{
+		super( contents );
+	}
+	
+	public Title(List<Object> contents)
+	{
+		super( contents );
+	}
+	
 	public Title(String text)
 	{
 		super( text );

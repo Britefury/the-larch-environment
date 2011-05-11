@@ -33,7 +33,7 @@ public class Controls
 	
 	
 	public static final InheritedAttributeNonNull buttonBorder = new InheritedAttributeNonNull( controlsNamespace, "buttonBorder", AbstractBorder.class,
-			new SolidBorder( 2.0, 2.0, 10.0, 10.0, new Color( 0.55f, 0.65f, 0.75f ), new Color( 0.85f, 0.9f, 0.95f  ) ) );
+			new SolidBorder( 2.0, 2.0, 10.0, 10.0, new Color( 0.45f, 0.55f, 0.65f ), new Color( 0.85f, 0.9f, 0.95f  ) ) );
 	public static final InheritedAttributeNonNull buttonHighlightBorder = new InheritedAttributeNonNull( controlsNamespace, "buttonHighlightBorder", AbstractBorder.class,
 			new SolidBorder( 2.0, 2.0, 10.0, 10.0, new Color( 0.65f, 0.75f, 0.85f ), new Color( 0.95f, 0.975f, 1.0f ) ) );
 	
