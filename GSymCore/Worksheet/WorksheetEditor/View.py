@@ -184,6 +184,18 @@ class WorksheetEditor (ObjectDispatchView):
 		w = w.withElementInteractor( TextNodeInteractor.instance )
 		w = StructuralItem( node.getModel(), w )
 		return w
+	
+	
+	@ObjectDispatchMethod( ViewSchema.TextSpanView )
+	def TextSpan(self, fragment, inheritedState, node):
+		text = node.getText()
+		styleAttrs = node.getStyleAttrs()
+		p = RichSpan( text )
+		p = EditableSequentialItem( [ TextNodeEditListener.instance, TextNodeEventListener.instance ],  p )
+		w = Span( [ HiddenContent( '' ).withFixedValue( node.partialModel() ), p ] )
+		w = w.withElementInteractor( TextNodeInteractor.instance )
+		w = StructuralItem( node.getModel(), w )
+		return w
 
 
 	

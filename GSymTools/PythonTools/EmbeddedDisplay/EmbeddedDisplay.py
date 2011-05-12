@@ -44,7 +44,7 @@ class EmbeddedDisplay (object):
 		
 		
 	def __py_value__(self, _globals, _locals, codeGen):
-		code = codeGen.compileForEvaluation( self._expr )
+		code = codeGen.compileForEvaluation( self._expr.model )
 		value = eval( code, _globals, _locals )
 		self._values.append( value )
 		self._incr.onChanged()
@@ -63,7 +63,8 @@ class EmbeddedDisplay (object):
 		
 		
 		self._incr.onAccess()
-		exprPres = pyPerspective.applyTo( self._expr )
+		#exprPres = pyPerspective.applyTo( self._expr )
+		exprPres = self._expr
 		
 		valuesPres = ObjectBox( 'Values', Column( [ value   for value in self._values ] ) )
 		
