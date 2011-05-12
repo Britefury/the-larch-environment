@@ -47,6 +47,10 @@ class _Projection (object):
 	def paragraph(self, worksheet, node):
 		return ParagraphView( worksheet, node )
 	
+	@DMObjectNodeDispatchMethod( Schema.TextSpan )
+	def textSpan(self, worksheet, node):
+		return TextSpanView( worksheet, node )
+	
 	@DMObjectNodeDispatchMethod( Schema.PythonCode )
 	def pythonCode(self, worksheet, node):
 		return PythonCodeView( worksheet, node )
@@ -217,6 +221,35 @@ class ParagraphView (NodeView):
 	@staticmethod
 	def newParagraphModel(text, style):
 		return Schema.Paragraph( text=text, style=style )
+		
+		
+		
+class TextSpanView (NodeView):
+	def __init__(self, worksheet, model):
+		super( TextSpanView, self ).__init__( worksheet, model )
+	
+		
+	def getText(self):
+		return self._model['text']
+	
+	def setText(self, text):
+		self._model['text'] = text
+		
+	
+	def getStyleAttrs(self):
+		return self._model['styleAttrs']
+	
+	def setStyleAttrs(self, styleAttrs):
+		self._model['styleAttrs'] = styleAttrs
+		
+		
+	def _refreshResults(self, module):
+		pass
+	
+	
+	@staticmethod
+	def newTextSpanModel(text, styleAttrs):
+		return Schema.TextSpan( text=text, styleAttrs=styleAttrs )
 		
 		
 		

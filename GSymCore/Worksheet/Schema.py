@@ -24,6 +24,9 @@ Body = schema.newClass( 'Body', WorksheetNode, [ 'contents' ] )
 Text = schema.newClass( 'Text', WorksheetNode, [ 'text' ] )
 Paragraph = schema.newClass( 'Paragraph', Text, [ 'style' ] )
 PartialParagraph = schema.newClass( 'PartialParagraph', WorksheetPartialNode, [ 'style' ] )
+TextSpan = schema.newClass( 'TextSpan', Text, [ 'styleAttrs' ] )
+
+StyleAttr = schema.newClass( 'StyleAttr', WorksheetNode, [ 'name', 'value' ] )
 
 
 PythonCode = schema.newClass( 'PythonCode', WorksheetNode, [ 'code', 'style' ] )
