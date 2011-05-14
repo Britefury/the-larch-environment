@@ -9,6 +9,7 @@ package BritefuryJ.Pres;
 import java.awt.datatransfer.DataFlavor;
 import java.util.List;
 
+import BritefuryJ.AttributeTable.AttributeBase;
 import BritefuryJ.Command.CommandSetSource;
 import BritefuryJ.DocPresent.Corner;
 import BritefuryJ.DocPresent.DPElement;
@@ -341,6 +342,17 @@ public abstract class Pres
 		return new SetDebugName( this, debugName );
 	}
 	
+	
+	
+	
+	//
+	// Style sheet from attribute methods
+	//
+	
+	public ApplyStyleSheetFromAttribute withStyleSheetFromAttr(AttributeBase attribute)
+	{
+		return new ApplyStyleSheetFromAttribute( attribute, this );
+	}
 	
 	
 	

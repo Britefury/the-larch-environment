@@ -30,14 +30,16 @@ public class TableEditorStyle
 	public static final InheritedAttributeNonNull tableAttrs = new InheritedAttributeNonNull( tableEditorNamespace, "tableAttrs", StyleSheet.class,
 			StyleSheet.instance.withAttr( Primitive.tableCellBoundaryPaint, new Color( 0.5f, 0.5f, 0.5f ) ).withAttr( Primitive.tableBorder, new SolidBorder() )
 			.withAttr( Primitive.tableColumnSpacing, 5.0 ).withAttr( Primitive.tableRowSpacing, 5.0 ) );
-	public static final InheritedAttribute headerPaint = new InheritedAttribute( tableEditorNamespace, "headerPaint", Paint.class, new Color( 0.8f, 0.8f, 0.8f ) );
+	public static final InheritedAttribute headerBackgroundPaint = new InheritedAttribute( tableEditorNamespace, "headerBackgroundPaint", Paint.class, new Color( 0.8f, 0.8f, 0.8f ) );
+	public static final InheritedAttributeNonNull headerAttrs = new InheritedAttributeNonNull( tableEditorNamespace, "headerAttrs", StyleSheet.class,
+			StyleSheet.instance.withAttr( Primitive.fontBold, true ) );
 
 
 
 	public static StyleSheet tableStyle(StyleValues style, boolean hasHeaderRow, boolean hasHeaderColumn)
 	{
-		Paint p = style.get( headerPaint, Paint.class );
-		return style.get( tableAttrs, StyleSheet.class ).withAttr( Primitive.tableBackgroundPainter, tableBackgroundPainter( p, hasHeaderRow, hasHeaderColumn ) );
+		Paint backgroundPaint = style.get( headerBackgroundPaint, Paint.class );
+		return style.get( tableAttrs, StyleSheet.class ).withAttr( Primitive.tableBackgroundPainter, tableBackgroundPainter( backgroundPaint, hasHeaderRow, hasHeaderColumn ) );
 	}
 	
 	public static StyleValues useTableAttrs(StyleValues style)
