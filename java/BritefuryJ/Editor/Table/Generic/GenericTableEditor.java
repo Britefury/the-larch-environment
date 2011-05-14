@@ -14,22 +14,20 @@ import BritefuryJ.Utils.UnaryFn;
 
 public class GenericTableEditor extends AbstractTableEditor<GenericTableModelInterface>
 {
-	protected boolean showEmptyRowAtBottom, showEmptyColumnAtRight;
 	protected Pres blankPres;
 	
 	
 	
 	
-	public GenericTableEditor(boolean showEmptyRowAtBottom, boolean showEmptyColumnAtRight, UnaryFn converValueFn)
+	public GenericTableEditor(boolean showLeftHeader, boolean showTopHeader, boolean growRight, boolean growDown, UnaryFn converValueFn)
 	{
-		this.showEmptyRowAtBottom = showEmptyRowAtBottom;
-		this.showEmptyColumnAtRight = showEmptyColumnAtRight;
+		super( showLeftHeader, showTopHeader, growRight, growDown );
 		this.blankPres = PrimitiveCellEditPresenter.presentEditableText( "", converValueFn );
 	}
 	
-	public GenericTableEditor(boolean showEmptyRowAtBottom, boolean showEmptyColumnAtRight)
+	public GenericTableEditor(boolean showLeftHeader, boolean showTopHeader, boolean growRight, boolean growDown)
 	{
-		this( showEmptyRowAtBottom, showEmptyColumnAtRight, UnaryFn.identity );
+		this( showLeftHeader, showTopHeader, growRight, growDown, UnaryFn.identity );
 	}
 	
 	
@@ -43,9 +41,9 @@ public class GenericTableEditor extends AbstractTableEditor<GenericTableModelInt
 	}
 
 	@Override
-	protected AbstractTableEditorInstance<GenericTableModelInterface> createInstance(GenericTableModelInterface model)
+	protected AbstractTableEditorInstance<GenericTableModelInterface> createInstance(GenericTableModelInterface model, boolean editable)
 	{
-		return new GenericTableEditorInstance( this, model );
+		return new GenericTableEditorInstance( this, model, editable );
 	}
 
 	@Override
@@ -74,21 +72,5 @@ public class GenericTableEditor extends AbstractTableEditor<GenericTableModelInt
 	protected void deleteBlock(GenericTableModelInterface model, int x, int y, int w, int h, AbstractTableEditorInstance<GenericTableModelInterface> editorInstance)
 	{
 		model.deleteBlock( x, y, w, h );
-	}
-	
-	
-	
-	
-	
-	@Override
-	protected boolean hasHeaderRow()
-	{
-		return true;
-	}
-
-	@Override
-	protected boolean hasHeaderColumn()
-	{
-		return true;
 	}
 }

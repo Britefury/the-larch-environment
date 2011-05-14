@@ -151,11 +151,12 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 
 	protected AbstractColumn columns[];
 	private RowFactory rowFactory;
-	protected boolean showEmptyRowAtBottom, rowsAreLive;
+	protected boolean rowsAreLive;
 
 	
-	public ObjectListTableEditor(List<Object> columns, RowFactory rowFactory, boolean showEmptyRowAtBottom, boolean rowsAreLive)
+	public ObjectListTableEditor(List<Object> columns, RowFactory rowFactory, boolean showLeftHeader, boolean showTopHeader, boolean growable, boolean rowsAreLive)
 	{
+		super( showLeftHeader, showTopHeader, false, growable );
 		this.columns = new AbstractColumn[columns.size()];
 		for (int i = 0; i < this.columns.length; i++)
 		{
@@ -163,20 +164,34 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 		}
 
 		this.rowFactory = rowFactory;
-		this.showEmptyRowAtBottom = showEmptyRowAtBottom;
 		this.rowsAreLive = rowsAreLive;
 	}
 	
-	
-	public ObjectListTableEditor(List<Object> columns, Class<?> rowClass, boolean showEmptyRowAtBottom, boolean rowsAreLive)
+	public ObjectListTableEditor(List<Object> columns, RowFactory rowFactory, boolean growable, boolean rowsAreLive)
 	{
-		this( columns, new ClassRowFactory( rowClass ), showEmptyRowAtBottom, rowsAreLive );
+		this( columns, rowFactory, true, true, growable, rowsAreLive );
 	}
 	
 	
-	public ObjectListTableEditor(List<Object> columns, PyType rowType, boolean showEmptyRowAtBottom, boolean rowsAreLive)
+	public ObjectListTableEditor(List<Object> columns, Class<?> rowClass, boolean showLeftHeader, boolean showTopHeader, boolean growable, boolean rowsAreLive)
 	{
-		this( columns, new PyTypeRowFactory( rowType ), showEmptyRowAtBottom, rowsAreLive );
+		this( columns, new ClassRowFactory( rowClass ), showLeftHeader, showTopHeader, growable, rowsAreLive );
+	}
+	
+	public ObjectListTableEditor(List<Object> columns, Class<?> rowClass, boolean growable, boolean rowsAreLive)
+	{
+		this( columns, rowClass, true, true, growable, rowsAreLive );
+	}
+	
+	
+	public ObjectListTableEditor(List<Object> columns, PyType rowType, boolean showLeftHeader, boolean showTopHeader, boolean growable, boolean rowsAreLive)
+	{
+		this( columns, new PyTypeRowFactory( rowType ), showLeftHeader, showTopHeader, growable, rowsAreLive );
+	}
+	
+	public ObjectListTableEditor(List<Object> columns, PyType rowType, boolean growable, boolean rowsAreLive)
+	{
+		this( columns, rowType, true, true, growable, rowsAreLive );
 	}
 	
 	
@@ -204,9 +219,9 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 	}
 
 	@Override
-	protected AbstractTableEditorInstance<ObjectListInterface> createInstance(ObjectListInterface model)
+	protected AbstractTableEditorInstance<ObjectListInterface> createInstance(ObjectListInterface model, boolean editable)
 	{
-		return new ObjectListTableEditorInstance( this, model );
+		return new ObjectListTableEditorInstance( this, model, editable );
 	}
 
 	@Override
@@ -346,21 +361,5 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 		}
 		
 		return destBlock;
-	}
-	
-	
-	
-	
-	
-	@Override
-	protected boolean hasHeaderRow()
-	{
-		return true;
-	}
-
-	@Override
-	protected boolean hasHeaderColumn()
-	{
-		return true;
 	}
 }

@@ -32,6 +32,7 @@ import BritefuryJ.Pres.Clipboard.SelectionEditorInterface;
 import BritefuryJ.Pres.Clipboard.SelectionExporter;
 import BritefuryJ.Pres.Clipboard.SelectionExporter.SelectionContentsFn;
 import BritefuryJ.Pres.Clipboard.TargetImporter;
+import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
 
@@ -250,10 +251,11 @@ public abstract class AbstractTableEditor<ModelType>
 
 	
 	protected ClipboardHandlerInterface clipboardHandler;
+	protected boolean hasLeftHeader, hasTopHeader, growRight, growDown;
 	
 	
 	
-	public AbstractTableEditor()
+	public AbstractTableEditor(boolean hasLeftHeader, boolean hasTopHeader, boolean growRight, boolean growDown)
 	{
 		DataFlavor textHtmlFlavor, textPlainFlavor;
 		try
@@ -286,6 +288,11 @@ public abstract class AbstractTableEditor<ModelType>
 		SelectionEditorInterface selectionEditors[] = new SelectionEditorInterface[] { selectionEditor };
 		
 		clipboardHandler = new ClipboardHandler( Arrays.asList( selectionExporters ), Arrays.asList( targetImporters ), Arrays.asList( selectionEditors ) );
+		
+		this.hasLeftHeader = hasLeftHeader;
+		this.hasTopHeader = hasTopHeader;
+		this.growRight = growRight;
+		this.growDown = growDown;
 	}
 
 	
@@ -307,10 +314,11 @@ public abstract class AbstractTableEditor<ModelType>
 			@Override
 			public DPElement present(PresentationContext ctx, StyleValues style)
 			{
-				StyleSheet styleSheet = TableEditorStyle.tableStyle( style, hasHeaderRow(), hasHeaderColumn() );
+				StyleSheet styleSheet = TableEditorStyle.tableStyle( style, hasTopHeader, hasLeftHeader );
 				StyleValues used = TableEditorStyle.useTableAttrs( style );
+				boolean editable = style.get( Primitive.editable, Boolean.class );
 				
-				AbstractTableEditorInstance<ModelType> instance = createInstance( m );
+				AbstractTableEditorInstance<ModelType> instance = createInstance( m, editable );
 				Pres editor = instance.editTable();
 				
 				return editor.present( ctx, used.withAttrs( styleSheet ) );
@@ -322,7 +330,7 @@ public abstract class AbstractTableEditor<ModelType>
 
 	protected abstract ModelType coerceModel(Object model);
 
-	protected abstract AbstractTableEditorInstance<ModelType> createInstance(ModelType model);
+	protected abstract AbstractTableEditorInstance<ModelType> createInstance(ModelType model, boolean editable);
 	
 	protected abstract Object[][] getBlock(ModelType model, int x, int y, int w, int h);
 	protected abstract void putBlock(ModelType model, int x, int y, Object[][] data, AbstractTableEditorInstance<ModelType> editorInstance);
@@ -331,16 +339,5 @@ public abstract class AbstractTableEditor<ModelType>
 	protected Object[][] textBlockToValueBlock(int posX, int posY, String[][] textBlock)
 	{
 		return textBlock;
-	}
-
-
-	protected boolean hasHeaderRow()
-	{
-		return false;
-	}
-	
-	protected boolean hasHeaderColumn()
-	{
-		return false;
 	}
 }

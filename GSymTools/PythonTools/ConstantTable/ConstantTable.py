@@ -172,7 +172,7 @@ def _defaultValue():
 _targetColumn = AttributeColumn( 'Name', 'target', _targetFromText, _defaultTarget )
 _valueColumn = AttributeColumn( 'Value', 'value', _valueFromText, _defaultValue )
 
-_tableEditor = ObjectListTableEditor( [ _targetColumn, _valueColumn ], ConstantDefinition, True, True )
+_tableEditor = ObjectListTableEditor( [ _targetColumn, _valueColumn ], ConstantDefinition, False, True, True, True )
 
 
 

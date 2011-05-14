@@ -19,9 +19,9 @@ public class ObjectListTableEditorInstance extends AbstractTableEditorInstance<O
 {
 	private WeakValueIdentityHashMap<Object, ObjectListRow> rowMap = new WeakValueIdentityHashMap<Object, ObjectListRow>();
 	
-	protected ObjectListTableEditorInstance(AbstractTableEditor<ObjectListInterface> editor, ObjectListInterface model)
+	protected ObjectListTableEditorInstance(AbstractTableEditor<ObjectListInterface> editor, ObjectListInterface model, boolean editable)
 	{
-		super( editor, model );
+		super( editor, model, editable );
 	}
 	
 	
@@ -33,72 +33,58 @@ public class ObjectListTableEditorInstance extends AbstractTableEditorInstance<O
 		int width = listEditor.columns.length;
 		
 		int numObjects = model.size();
-		int numRows = listEditor.showEmptyRowAtBottom  ?  numObjects + 2  :  numObjects + 1;
+		int numColumns = tableWToElementW( width );
+		int numRows = tableHToElementH( numObjects );
 		Object rows[] = new Object[numRows];
-		
-		Object firstRow[] = new Object[width+1];
-		firstRow[0] = new Label( "" );
-		for (int i = 0; i < width; i++)
+
+		if ( hasTopHeader() )
 		{
-			firstRow[i+1] = listEditor.columns[i].presentHeader();
+			Object firstRow[] = new Object[numColumns];
+			if ( hasLeftHeader() )
+			{
+				firstRow[0] = new Label( "" );
+			}
+			for (int i = 0; i < width; i++)
+			{
+				int ex = tableXToElementX( i );
+				firstRow[ex] = listEditor.columns[i].presentHeader();
+			}
+			rows[0] = new GridRow( firstRow );
 		}
-		rows[0] = new GridRow( firstRow );
 		
 		for (int j = 0; j < numObjects; j++)
 		{
 			ObjectListRow p = projectRow( model.get( j ) );
-			Pres title = new Label( String.valueOf( j ) ).withStyleSheetFromAttr( TableEditorStyle.headerAttrs );
-			rows[j+1] = new GridRow( new Object[] { title, p } );
+			int ey = tableYToElementY( j );
+			if ( hasLeftHeader() )
+			{
+				Pres title = new Label( String.valueOf( j ) ).withStyleSheetFromAttr( TableEditorStyle.headerAttrs );
+				rows[ey] = new GridRow( new Object[] { title, p } );
+			}
+			else
+			{
+				rows[ey] = new GridRow( new Object[] { p } );
+			}
 		}
 		
-		if ( listEditor.showEmptyRowAtBottom )
+		if ( canGrowDown() )
 		{
-			Object lastRow[] = new Object[width+1];
-			lastRow[0] = new Label( "" );
+			Object lastRow[] = new Object[numColumns];
+			if ( hasLeftHeader() )
+			{
+				lastRow[0] = new Label( "" );
+			}
 			for (int i = 0; i < width; i++)
 			{
-				lastRow[i+1] = new ObjectListBlankCell( this, listEditor.columns[i] );
+				int ex = tableXToElementX( i );
+				lastRow[ex] = new ObjectListBlankCell( this, listEditor.columns[i] );
 			}
-			rows[numObjects+1] = new GridRow( lastRow );
+			int ey = tableYToElementY( numObjects );
+			rows[ey] = new GridRow( lastRow );
 		}
 		
 		return new RGrid( rows );
 	}
-	
-	/*
-	 		int numObjects = model.size();
-		int numRows = listEditor.showEmptyRowAtBottom  ?  numObjects + 2  :  numObjects + 1;
-		Object rows[] = new Object[numRows];
-		
-		Object firstRow[] = new Object[width+1];
-		firstRow[0] = new Label( "" );
-		for (int i = 0; i < width; i++)
-		{
-			firstRow[i+1] = listEditor.columns[i].presentHeader();
-		}
-		rows[0] = new GridRow( firstRow );
-		
-		for (int j = 0; j < numObjects; j++)
-		{
-			ObjectListRow p = projectRow( model.get( j ) );
-			Pres title = headerStyle.applyTo( new Label( String.valueOf( j ) ) );
-			rows[j] = new GridRow( new Object[] { title, p } );
-		}
-		
-		if ( listEditor.showEmptyRowAtBottom )
-		{
-			Object lastRow[] = new Object[width+1];
-			lastRow[0] = new Label( "" );
-			for (int i = 0; i < width; i++)
-			{
-				lastRow[i+1] = new ObjectListBlankCell( this, listEditor.columns[i] );
-			}
-			rows[numObjects+1] = new GridRow( lastRow );
-		}
-		
-		return new RGrid( rows );
-
-	 */
 	
 	
 	
