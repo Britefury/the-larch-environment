@@ -9,6 +9,7 @@ package BritefuryJ.DefaultPerspective;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -719,7 +720,15 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 			
 			ByteArrayOutputStream buf = new ByteArrayOutputStream();
 			e.printStackTrace( new PrintStream( buf ) );
-			String stackTrace = e.toString();
+			String stackTrace;
+			try
+			{
+				stackTrace = buf.toString( "ISO-8859-1" );
+			}
+			catch (UnsupportedEncodingException e1)
+			{
+				stackTrace = e.toString();
+			}
 			String stackTraceLines[] = stackTrace.split( "\n" );
 			Pres stackTraceElements[] = new Pres[stackTraceLines.length];
 			

@@ -114,12 +114,14 @@ public abstract class AbstractTableEditorInstance <ModelType>
 	
 	protected AbstractTableEditor<ModelType> editor;
 	protected ModelType model;
+	protected boolean editable;
 	
 	
-	protected AbstractTableEditorInstance(AbstractTableEditor<ModelType> editor, ModelType model)
+	protected AbstractTableEditorInstance(AbstractTableEditor<ModelType> editor, ModelType model, boolean editable)
 	{
 		this.editor = editor;
 		this.model = model;
+		this.editable = editable;
 	}
 	
 	
@@ -149,36 +151,89 @@ public abstract class AbstractTableEditorInstance <ModelType>
 	}
 
 	
-	protected boolean hasHeaderRow()
-	{
-		return editor.hasHeaderRow();
-	}
-	
-	protected boolean hasHeaderColumn()
-	{
-		return editor.hasHeaderColumn();
-	}
-	
 	protected int tableXToElementX(int x)
 	{
-		return hasHeaderColumn()  ?  x + 1  :  x;
+		return editor.hasLeftHeader  ?  x + 1  :  x;
 	}
 	
 	protected int tableYToElementY(int y)
 	{
-		return hasHeaderRow()  ?  y + 1  :  y;
+		return editor.hasTopHeader  ?  y + 1  :  y;
 	}
 	
 	protected int elementXToTableX(int x)
 	{
-		return hasHeaderColumn()  ?  x - 1  :  x;
+		return editor.hasLeftHeader  ?  x - 1  :  x;
 	}
 	
 	protected int elementYToTableY(int y)
 	{
-		return hasHeaderRow()  ?  y - 1  :  y;
+		return editor.hasTopHeader  ?  y - 1  :  y;
 	}
 	
+	
+	protected boolean hasLeftHeader()
+	{
+		return editor.hasLeftHeader;
+	}
+	
+	protected boolean hasTopHeader()
+	{
+		return editor.hasTopHeader;
+	}
+	
+	
+	protected boolean canGrowRight()
+	{
+		return editor.growRight && editable;
+	}
+	
+	protected boolean canGrowDown()
+	{
+		return editor.growDown && editable;
+	}
+	
+	
+	protected int tableWToElementW(int w)
+	{
+		int elementW = w;
+		if ( editor.hasLeftHeader )
+		{
+			elementW++;
+		}
+		if ( editor.growRight  &&  editable )
+		{
+			elementW++;
+		}
+		return elementW;
+	}
+	
+	protected int tableHToElementH(int h)
+	{
+		int elementH = h;
+		if ( editor.hasTopHeader )
+		{
+			elementH++;
+		}
+		if ( editor.growDown  &&  editable )
+		{
+			elementH++;
+		}
+		return elementH;
+	}
+	
+	
+	protected int tableWToHeaderW(int w)
+	{
+		int headerW = w;
+		if ( editor.hasLeftHeader )
+		{
+			headerW++;
+		}
+		return headerW;
+	}
+	
+
 	protected abstract int getHeight();
 	protected abstract int getRowWidth(int row);
 	protected abstract int getMaxRowWidth();
