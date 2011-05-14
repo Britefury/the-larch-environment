@@ -10,7 +10,10 @@ import BritefuryJ.Editor.Table.AbstractTableEditor;
 import BritefuryJ.Editor.Table.AbstractTableEditorInstance;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.GridRow;
+import BritefuryJ.Pres.Primitive.Label;
+import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.RGrid;
+import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.Utils.WeakValueIdentityHashMap;
 
 public class ObjectListTableEditorInstance extends AbstractTableEditorInstance<ObjectListInterface>
@@ -31,27 +34,72 @@ public class ObjectListTableEditorInstance extends AbstractTableEditorInstance<O
 		int width = listEditor.columns.length;
 		
 		int numObjects = model.size();
-		int numRows = listEditor.showEmptyRowAtBottom  ?  numObjects + 1  :  numObjects;
+		int numRows = listEditor.showEmptyRowAtBottom  ?  numObjects + 2  :  numObjects + 1;
 		Object rows[] = new Object[numRows];
+		
+		Object firstRow[] = new Object[width+1];
+		firstRow[0] = new Label( "" );
+		for (int i = 0; i < width; i++)
+		{
+			firstRow[i+1] = listEditor.columns[i].presentHeader();
+		}
+		rows[0] = new GridRow( firstRow );
+		
 		for (int j = 0; j < numObjects; j++)
 		{
-			rows[j] = projectRow( model.get( j ) );
+			ObjectListRow p = projectRow( model.get( j ) );
+			Pres title = headerStyle.applyTo( new Label( String.valueOf( j ) ) );
+			rows[j+1] = new GridRow( new Object[] { title, p } );
 		}
 		
 		if ( listEditor.showEmptyRowAtBottom )
 		{
-			Object lastRow[] = new Object[width];
+			Object lastRow[] = new Object[width+1];
+			lastRow[0] = new Label( "" );
 			for (int i = 0; i < width; i++)
 			{
-				lastRow[i] = new ObjectListBlankCell( this, listEditor.columns[i] );
+				lastRow[i+1] = new ObjectListBlankCell( this, listEditor.columns[i] );
 			}
-			rows[numObjects] = new GridRow( lastRow );
+			rows[numObjects+1] = new GridRow( lastRow );
 		}
 		
 		return new RGrid( rows );
 	}
 	
-	
+	/*
+	 		int numObjects = model.size();
+		int numRows = listEditor.showEmptyRowAtBottom  ?  numObjects + 2  :  numObjects + 1;
+		Object rows[] = new Object[numRows];
+		
+		Object firstRow[] = new Object[width+1];
+		firstRow[0] = new Label( "" );
+		for (int i = 0; i < width; i++)
+		{
+			firstRow[i+1] = listEditor.columns[i].presentHeader();
+		}
+		rows[0] = new GridRow( firstRow );
+		
+		for (int j = 0; j < numObjects; j++)
+		{
+			ObjectListRow p = projectRow( model.get( j ) );
+			Pres title = headerStyle.applyTo( new Label( String.valueOf( j ) ) );
+			rows[j] = new GridRow( new Object[] { title, p } );
+		}
+		
+		if ( listEditor.showEmptyRowAtBottom )
+		{
+			Object lastRow[] = new Object[width+1];
+			lastRow[0] = new Label( "" );
+			for (int i = 0; i < width; i++)
+			{
+				lastRow[i+1] = new ObjectListBlankCell( this, listEditor.columns[i] );
+			}
+			rows[numObjects+1] = new GridRow( lastRow );
+		}
+		
+		return new RGrid( rows );
+
+	 */
 	
 	
 	
@@ -84,14 +132,25 @@ public class ObjectListTableEditorInstance extends AbstractTableEditorInstance<O
 	@Override
 	protected int getRowWidth(int row)
 	{
-		ObjectListTableEditor e = (ObjectListTableEditor)editor;
-		return e.columns.length;
+		return getMaxRowWidth();
 	}
 	
 	
+	@Override
+	protected int getMaxRowWidth()
+	{
+		ObjectListTableEditor e = (ObjectListTableEditor)editor;
+		return e.columns.length;
+	}
+
+
+
 	protected Object newRow()
 	{
 		ObjectListTableEditor e = (ObjectListTableEditor)editor;
 		return e.newRow( model );
 	}
+
+
+	private static final StyleSheet headerStyle = StyleSheet.instance.withAttr( Primitive.fontBold, true );
 }

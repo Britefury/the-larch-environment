@@ -161,7 +161,7 @@ def _onDrop_embeddedObject(element, pos, data, action):
 		ApplyPerspective( None, Pres.coerce( e ) ).popupAtMousePosition( element, True, True )
 
 	marker = element.getEditableMarkerClosestToLocalPoint( pos )
-	if marker.isValid():
+	if marker is not None  and  marker.isValid():
 		model = data.getModel()
 		embeddedValue = DMNode.embedIsolated( model )
 		try:

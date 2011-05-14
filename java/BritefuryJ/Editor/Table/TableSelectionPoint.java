@@ -43,6 +43,7 @@ class TableSelectionPoint extends SelectionPoint
 			if ( table == tablePoint.table  &&  editorInstance == tablePoint.editorInstance )
 			{
 				int xa = x, ya = y, xb = tablePoint.x, yb = tablePoint.y;
+				
 				return new TableSelection( editorInstance, table, Math.min( xa, xb ), Math.min( ya, yb ), Math.max( xa, xb ), Math.max( ya, yb ) );
 			}
 		}

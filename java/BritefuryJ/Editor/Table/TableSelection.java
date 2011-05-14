@@ -33,10 +33,23 @@ public class TableSelection extends Selection
 
 		this.editorInstance = editorInstance;
 		this.table = table;
-		this.x0 = x0;
-		this.y0 = y0;
-		this.x1 = x1;
-		this.y1 = y1;
+		
+		if ( x0 == -1 && x1 == -1 )
+		{
+			x0 = 0;
+			x1 = editorInstance.getMaxRowWidth() - 1;
+		}
+
+		if ( y0 == -1 && y1 == -1 )
+		{
+			y0 = 0;
+			y1 = editorInstance.getHeight() - 1;
+		}
+
+		this.x0 = Math.max( x0, 0 );
+		this.y0 = Math.max( y0, 0 );
+		this.x1 = Math.max( x1, 0 );
+		this.y1 = Math.max( y1, 0 );
 	}
 
 	@Override

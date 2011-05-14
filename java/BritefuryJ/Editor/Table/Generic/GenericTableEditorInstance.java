@@ -81,4 +81,11 @@ public class GenericTableEditorInstance extends AbstractTableEditorInstance<Gene
 	{
 		return model.getRow( row ).size();
 	}
+
+
+	@Override
+	protected int getMaxRowWidth()
+	{
+		return model.getWidth();
+	}
 }

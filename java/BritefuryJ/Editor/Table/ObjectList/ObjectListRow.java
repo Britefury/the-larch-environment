@@ -11,7 +11,7 @@ import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.Pres.Pres;
-import BritefuryJ.Pres.Primitive.GridRow;
+import BritefuryJ.Pres.Primitive.Span;
 
 class ObjectListRow implements Presentable
 {
@@ -45,6 +45,6 @@ class ObjectListRow implements Presentable
 			children[i] = new ObjectListCell( modelRow, editor.columns[i] );
 		}
 		
-		return new GridRow( children );
+		return new Span( children );
 	}
 }
