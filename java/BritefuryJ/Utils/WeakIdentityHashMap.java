@@ -19,12 +19,6 @@ import java.util.Set;
 
 public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 {
-	@SuppressWarnings("unchecked")
-	private static <Key, Value> Map.Entry<Key, Value> entry(Map.Entry<WeakIdKey, Value> e)
-	{
-		return new AbstractMap.SimpleImmutableEntry<Key, Value>( (Key)e.getKey().get(), e.getValue() );
-	}
-	
 	private static <Key, Value> Map.Entry<WeakIdKey, Value> weakEntry(Map.Entry<Key, Value> e)
 	{
 		return new AbstractMap.SimpleImmutableEntry<WeakIdKey, Value>( new WeakIdKey( e.getKey() ), e.getValue() );
@@ -33,63 +27,30 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 	
 	private class KeyIterator implements Iterator<Key>
 	{
-		private Iterator<WeakIdKey> iter;
-		private WeakIdKey next = null;
+		private Iterator<Map.Entry<Key, Value>> iter;
 		
-		private KeyIterator(Iterator<WeakIdKey> iter)
+		private KeyIterator(Iterator<Map.Entry<Key, Value>> iter)
 		{
 			this.iter = iter;
-			next = fetchNext();
 		}
 		
 		@Override
 		public boolean hasNext()
 		{
-			if ( next == null )
-			{
-				next = fetchNext();
-			}
-			return next != null;
+			return iter.hasNext();
 		}
 
-		@SuppressWarnings("unchecked")
 		@Override
 		public Key next()
 		{
-			if ( next != null )
-			{
-				Key k = (Key)next.get();
-				next = fetchNext();
-				if ( k == null )
-				{
-					throw new RuntimeException( "WeakIdentityHashMap.KeyIterator.next(): k is null" );
-				}
-				return k;
-			}
-			else
-			{
-				throw new NoSuchElementException();
-			}
+			Map.Entry<Key, Value> e = iter.next();
+			return e.getKey();
 		}
 
 		@Override
 		public void remove()
 		{
 			throw new UnsupportedOperationException();
-		}
-
-	
-		private WeakIdKey fetchNext()
-		{
-			while ( iter.hasNext() )
-			{
-				WeakIdKey w = iter.next();
-				if ( w.get() != null )
-				{
-					return w;
-				}
-			}
-			return null;
 		}
 	}
 	
@@ -106,47 +67,40 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 		public int size()
 		{
 			cleanup();
-			return set.size();
+			return WeakIdentityHashMap.this.size();
 		}
 
 		@Override
 		public boolean isEmpty()
 		{
 			cleanup();
-			return set.isEmpty();
+			return WeakIdentityHashMap.this.isEmpty();
 		}
 
 		@Override
 		public boolean contains(Object o)
 		{
 			cleanup();
-			return set.contains( new WeakIdKey( o ) );
+			return WeakIdentityHashMap.this.containsKey( o );
 		}
 
 		@Override
 		public Iterator<Key> iterator()
 		{
 			cleanup();
-			return new KeyIterator( set.iterator() );
+			return new KeyIterator( WeakIdentityHashMap.this.entrySet().iterator() );
 		}
 
 		@Override
 		public Object[] toArray()
 		{
 			cleanup();
-			WeakIdKey ws[] = set.toArray( new WeakIdKey[] {} );
-			Object xs[] = new Object[ws.length];
-			int i = 0;
-			for (WeakIdKey w: ws)
+			ArrayList<Object> keys = new ArrayList<Object>();
+			for (Map.Entry<Key, Value> e: WeakIdentityHashMap.this.entrySet())
 			{
-				Object k = w.get();
-				if ( k == null )
-				{
-					throw new RuntimeException( "WeakIdentityHashMap.KeySet.toArray(): k is null" );
-				}
-				xs[i++] = k;
+				keys.add( e.getKey() );
 			}
-			return xs;
+			return keys.toArray();
 		}
 
 		@SuppressWarnings("unchecked")
@@ -154,22 +108,12 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 		public <T> T[] toArray(T[] a)
 		{
 			cleanup();
-			WeakIdKey ws[] = set.toArray( new WeakIdKey[] {} );
-			if ( a.length != ws.length )
+			ArrayList<T> keys = new ArrayList<T>();
+			for (Map.Entry<Key, Value> e: WeakIdentityHashMap.this.entrySet())
 			{
-				a = (T[])new Object[ws.length];
+				keys.add( (T)e.getKey() );
 			}
-			int i = 0;
-			for (WeakIdKey w: ws)
-			{
-				T k = (T)w.get();
-				if ( k == null )
-				{
-					throw new RuntimeException( "WeakIdentityHashMap.KeySet.toArray(): k is null" );
-				}
-				a[i++] = k;
-			}
-			return a;
+			return keys.toArray( a );
 		}
 
 		@Override
@@ -191,7 +135,7 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 			cleanup();
 			for (Object x: c)
 			{
-				if ( !set.contains( new WeakIdKey( x ) ) )
+				if ( !contains( x ) )
 				{
 					return false;
 				}
@@ -233,41 +177,103 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 		public void clear()
 		{
 			cleanup();
-			set.clear();
+			WeakIdentityHashMap.this.clear();
 		}
 	}
 	
 	
 	
+	private static class Entry <Key, Value> implements Map.Entry<Key, Value>
+	{
+		private Map.Entry<WeakIdKey, Value> e;
+		private Key k;
+		
+		@SuppressWarnings("unchecked")
+		public Entry(Map.Entry<WeakIdKey, Value> e)
+		{
+			this.e = e;
+			this.k = (Key)e.getKey().get();
+		}
+
+		@Override
+		public Key getKey()
+		{
+			return k;
+		}
+
+		@Override
+		public Value getValue()
+		{
+			return e.getValue();
+		}
+
+		@Override
+		public Value setValue(Value value)
+		{
+			return e.setValue( value );
+		}
+	}
+	
 	private class EntryIterator implements Iterator<Map.Entry<Key, Value>>
 	{
 		private Iterator<Map.Entry<WeakIdKey, Value>> iter;
+		private Entry<Key, Value> next = null;
 		
 		private EntryIterator(Iterator<Map.Entry<WeakIdKey, Value>> iter)
 		{
-			System.out.println( "WeakidentityHashMap.EntryIterator: implementation not finished - needs to skip dead entries" );
 			this.iter = iter;
+			next = fetchNext();
 		}
 		
 		@Override
 		public boolean hasNext()
 		{
-			cleanup();
-			return iter.hasNext();
+			if ( next == null )
+			{
+				next = fetchNext();
+			}
+			return next != null;
 		}
 
 		@Override
 		public Map.Entry<Key, Value> next()
 		{
-			cleanup();
-			return entry( iter.next() );
+			if ( next != null )
+			{
+				Entry<Key, Value> e = next;
+				next = fetchNext();
+				if ( e.getKey() == null )
+				{
+					throw new RuntimeException( "WeakIdentityHashMap.EntryIterator.next(): e.getKey() is null" );
+				}
+				return e;
+			}
+			else
+			{
+				throw new NoSuchElementException();
+			}
 		}
 
 		@Override
 		public void remove()
 		{
-			cleanup();
-			iter.remove();
+			throw new UnsupportedOperationException();
+		}
+
+	
+		private Entry<Key, Value> fetchNext()
+		{
+			while ( iter.hasNext() )
+			{
+				Map.Entry<WeakIdKey, Value> e = iter.next();
+				@SuppressWarnings("unchecked")
+				Key k = (Key)e.getKey().get();
+				if ( k != null )
+				{
+					return new Entry<Key, Value>( e );
+				}
+			}
+			return null;
 		}
 	}
 	
@@ -284,14 +290,14 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 		public int size()
 		{
 			cleanup();
-			return set.size();
+			return WeakIdentityHashMap.this.size();
 		}
 
 		@Override
 		public boolean isEmpty()
 		{
 			cleanup();
-			return set.isEmpty();
+			return WeakIdentityHashMap.this.isEmpty();
 		}
 
 		@SuppressWarnings("unchecked")
@@ -313,15 +319,12 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 		public Object[] toArray()
 		{
 			cleanup();
-			@SuppressWarnings("unchecked")
-			Map.Entry<WeakIdKey, Value> ws[] = set.toArray( new Map.Entry[] {} );
-			Object xs[] = new Object[ws.length];
-			int i = 0;
-			for (Map.Entry<WeakIdKey, Value> w: ws)
+			ArrayList<Object> arr = new ArrayList<Object>();
+			for (Map.Entry<Key, Value> e: this)
 			{
-				xs[i++] = entry( w );
+				arr.add( e );
 			}
-			return xs;
+			return arr.toArray();
 		}
 
 		@SuppressWarnings("unchecked")
@@ -329,17 +332,12 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 		public <T> T[] toArray(T[] a)
 		{
 			cleanup();
-			Map.Entry<WeakIdKey, Value> ws[] = set.toArray( new Map.Entry[] {} );
-			if ( a.length != ws.length )
+			ArrayList<T> arr = new ArrayList<T>();
+			for (Map.Entry<Key, Value> e: this)
 			{
-				a = (T[])new Object[ws.length];
+				arr.add( (T)e );
 			}
-			int i = 0;
-			for (Map.Entry<WeakIdKey, Value> w: ws)
-			{
-				a[i++] = (T)entry( w );
-			}
-			return a;
+			return arr.toArray( a );
 		}
 
 		@Override
@@ -407,7 +405,7 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 		public void clear()
 		{
 			cleanup();
-			set.clear();
+			WeakIdentityHashMap.this.clear();
 		}
 	}
 	

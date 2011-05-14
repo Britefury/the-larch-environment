@@ -39,17 +39,20 @@ public abstract class AbstractTableEditorInstance <ModelType>
 				int tx = elementXToTableX( pos[0] );
 				int ty = elementYToTableY( pos[1] );
 				
+				int targetX = Math.max( tx, 0 );
+				int targetY = Math.max( ty, 0 );
+				
 				Target target = elem.getRootElement().getTarget();
 				if ( target instanceof TableTarget )
 				{
 					TableTarget tableTarget = (TableTarget)target;
-					if ( tx == tableTarget.x  &&  ty == tableTarget.y )
+					if ( targetX == tableTarget.x  &&  targetY == tableTarget.y )
 					{
 						return null;
 					}
 				}
 				
-				target = new TableTarget( AbstractTableEditorInstance.this, table, tx, ty );
+				target = new TableTarget( AbstractTableEditorInstance.this, table, targetX, targetY );
 				elem.getRootElement().setTarget( target );
 				
 				Marker marker = elem.getEditableMarkerClosestToLocalPoint( p );
@@ -146,26 +149,37 @@ public abstract class AbstractTableEditorInstance <ModelType>
 	}
 
 	
-	public int tableXToElementX(int x)
+	protected boolean hasHeaderRow()
 	{
-		return x;
+		return editor.hasHeaderRow();
 	}
 	
-	public int tableYToElementY(int y)
+	protected boolean hasHeaderColumn()
 	{
-		return y;
+		return editor.hasHeaderColumn();
 	}
 	
-	public int elementXToTableX(int x)
+	protected int tableXToElementX(int x)
 	{
-		return x;
+		return hasHeaderColumn()  ?  x + 1  :  x;
 	}
 	
-	public int elementYToTableY(int y)
+	protected int tableYToElementY(int y)
 	{
-		return y;
+		return hasHeaderRow()  ?  y + 1  :  y;
+	}
+	
+	protected int elementXToTableX(int x)
+	{
+		return hasHeaderColumn()  ?  x - 1  :  x;
+	}
+	
+	protected int elementYToTableY(int y)
+	{
+		return hasHeaderRow()  ?  y - 1  :  y;
 	}
 	
 	protected abstract int getHeight();
 	protected abstract int getRowWidth(int row);
+	protected abstract int getMaxRowWidth();
 }

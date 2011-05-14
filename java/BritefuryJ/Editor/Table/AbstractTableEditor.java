@@ -307,7 +307,7 @@ public abstract class AbstractTableEditor<ModelType>
 			@Override
 			public DPElement present(PresentationContext ctx, StyleValues style)
 			{
-				StyleSheet styleSheet = TableEditorStyle.tableStyle( style );
+				StyleSheet styleSheet = TableEditorStyle.tableStyle( style, hasHeaderRow(), hasHeaderColumn() );
 				StyleValues used = TableEditorStyle.useTableAttrs( style );
 				
 				AbstractTableEditorInstance<ModelType> instance = createInstance( m );
@@ -331,5 +331,16 @@ public abstract class AbstractTableEditor<ModelType>
 	protected Object[][] textBlockToValueBlock(int posX, int posY, String[][] textBlock)
 	{
 		return textBlock;
+	}
+
+
+	protected boolean hasHeaderRow()
+	{
+		return false;
+	}
+	
+	protected boolean hasHeaderColumn()
+	{
+		return false;
 	}
 }

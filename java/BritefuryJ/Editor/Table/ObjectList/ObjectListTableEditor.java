@@ -347,4 +347,20 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 		
 		return destBlock;
 	}
+	
+	
+	
+	
+	
+	@Override
+	protected boolean hasHeaderRow()
+	{
+		return true;
+	}
+
+	@Override
+	protected boolean hasHeaderColumn()
+	{
+		return true;
+	}
 }

@@ -20,6 +20,9 @@ public abstract class AbstractColumn
 	public abstract Object convertValue(Object x);
 	
 	
+	public abstract Object presentHeader();
+	
+	
 	protected static AbstractColumn coerce(Object x)
 	{
 		if ( x instanceof AbstractColumn )
@@ -28,7 +31,8 @@ public abstract class AbstractColumn
 		}
 		else if ( x instanceof String )
 		{
-			return new AttributeColumn( Py.newString( (String)x ) );
+			String sx = (String)x;
+			return new AttributeColumn( sx, Py.newString( sx ) );
 		}
 		else
 		{

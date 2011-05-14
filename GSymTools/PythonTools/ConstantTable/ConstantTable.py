@@ -169,8 +169,8 @@ def _defaultValue():
 	return EmbeddedPython25.expression()
 
 
-_targetColumn = AttributeColumn( 'target', _targetFromText, _defaultTarget )
-_valueColumn = AttributeColumn( 'value', _valueFromText, _defaultValue )
+_targetColumn = AttributeColumn( 'Name', 'target', _targetFromText, _defaultTarget )
+_valueColumn = AttributeColumn( 'Value', 'value', _valueFromText, _defaultValue )
 
 _tableEditor = ObjectListTableEditor( [ _targetColumn, _valueColumn ], ConstantDefinition, True, True )
 

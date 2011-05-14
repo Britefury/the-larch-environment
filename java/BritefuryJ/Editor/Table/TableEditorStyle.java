@@ -7,27 +7,37 @@
 package BritefuryJ.Editor.Table;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.geom.Path2D;
 
 import BritefuryJ.AttributeTable.AttributeNamespace;
+import BritefuryJ.AttributeTable.InheritedAttribute;
 import BritefuryJ.AttributeTable.InheritedAttributeNonNull;
+import BritefuryJ.DocPresent.TableBackgroundPainter;
+import BritefuryJ.DocPresent.TableElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
+import BritefuryJ.Utils.HashUtils;
+import BritefuryJ.Utils.WeakValueHashMap;
 
 public class TableEditorStyle
 {
 	public static final AttributeNamespace tableEditorNamespace = new AttributeNamespace( "tableEditor" );
 	
 	public static final InheritedAttributeNonNull tableAttrs = new InheritedAttributeNonNull( tableEditorNamespace, "tableAttrs", StyleSheet.class,
-			StyleSheet.instance.withAttr( Primitive.tableCellBoundaryPaint, Color.BLACK ).withAttr( Primitive.tableBorder, new SolidBorder() )
+			StyleSheet.instance.withAttr( Primitive.tableCellBoundaryPaint, new Color( 0.5f, 0.5f, 0.5f ) ).withAttr( Primitive.tableBorder, new SolidBorder() )
 			.withAttr( Primitive.tableColumnSpacing, 5.0 ).withAttr( Primitive.tableRowSpacing, 5.0 ) );
+	public static final InheritedAttribute headerPaint = new InheritedAttribute( tableEditorNamespace, "headerPaint", Paint.class, new Color( 0.8f, 0.8f, 0.8f ) );
 
 
 
-	public static StyleSheet tableStyle(StyleValues style)
+	public static StyleSheet tableStyle(StyleValues style, boolean hasHeaderRow, boolean hasHeaderColumn)
 	{
-		return style.get( tableAttrs, StyleSheet.class );
+		Paint p = style.get( headerPaint, Paint.class );
+		return style.get( tableAttrs, StyleSheet.class ).withAttr( Primitive.tableBackgroundPainter, tableBackgroundPainter( p, hasHeaderRow, hasHeaderColumn ) );
 	}
 	
 	public static StyleValues useTableAttrs(StyleValues style)
@@ -35,4 +45,133 @@ public class TableEditorStyle
 		return style.useAttr( tableAttrs );
 	}
 
+	
+	private static class TableBackgKey
+	{
+		private Paint headerPaint;
+		private boolean hasHeaderRow, hasHeaderColumn;
+		int hashCode;
+		
+		
+		public TableBackgKey(Paint headerPaint, boolean hasHeaderRow, boolean hasHeaderColumn)
+		{
+			this.headerPaint = headerPaint;
+			this.hasHeaderRow = hasHeaderRow;
+			this.hasHeaderColumn = hasHeaderColumn;
+			
+			this.hashCode = HashUtils.tripleHash( headerPaint.hashCode(), Boolean.valueOf( hasHeaderRow ).hashCode(), Boolean.valueOf( hasHeaderColumn ).hashCode() );
+		}
+		
+		
+		@Override
+		public int hashCode()
+		{
+			return hashCode;
+		}
+		
+		@Override
+		public boolean equals(Object x)
+		{
+			if ( this == x )
+			{
+				return true;
+			}
+			else if ( x instanceof TableBackgKey )
+			{
+				TableBackgKey tx = (TableBackgKey)x;
+				return headerPaint.equals( tx.headerPaint )  &&  hasHeaderRow == tx.hasHeaderRow  &&  hasHeaderColumn == tx.hasHeaderColumn;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+	
+	private static final WeakValueHashMap<TableBackgKey, TableBackgroundPainter> backgPainters = new WeakValueHashMap<TableBackgKey, TableBackgroundPainter>();
+	
+	private static TableBackgroundPainter tableBackgroundPainter(final Paint headerPaint, final boolean hasHeaderRow, final boolean hasHeaderColumn)
+	{
+		if ( headerPaint != null  &&  ( hasHeaderRow || hasHeaderColumn ) )
+		{
+			TableBackgKey key = new TableBackgKey( headerPaint, hasHeaderRow, hasHeaderColumn );
+			
+			TableBackgroundPainter tablePainter = backgPainters.get( key );
+			
+			if ( tablePainter == null )
+			{
+				tablePainter = new TableBackgroundPainter()
+				{
+					@Override
+					public void paintTableBackground(TableElement table, Graphics2D graphics)
+					{
+						Path2D.Double path = new Path2D.Double();
+
+						if ( hasHeaderRow  &&  hasHeaderColumn )
+						{
+							int numColumns = table.getNumColumns();
+							int numRows = table.getNumRows();
+							
+							double x1 = table.getColumnBoundaryX( 1 );
+							double x2 = table.getColumnBoundaryX( numColumns );
+							double y1 = table.getRowBoundaryY( 1 );
+							double y2 = table.getRowBoundaryY( numRows );
+							
+							path.moveTo( 0.0, 0.0 );
+							path.lineTo( x2, 0.0 );
+							path.lineTo( x2, y1 );
+							path.lineTo( x1, y1 );
+							path.lineTo( x1, y2 );
+							path.lineTo( 0.0, y2 );
+							path.closePath();
+						}
+						else if ( hasHeaderRow  &&  !hasHeaderColumn )
+						{
+							int numColumns = table.getNumColumns();
+							
+							double x1 = table.getColumnBoundaryX( numColumns );
+							double y1 = table.getRowBoundaryY( 1 );
+							
+							path.moveTo( 0.0, 0.0 );
+							path.lineTo( x1, 0.0 );
+							path.lineTo( x1, y1 );
+							path.lineTo( 0.0, y1 );
+							path.closePath();
+						}
+						else if ( !hasHeaderRow  &&  hasHeaderColumn )
+						{
+							int numRows = table.getNumRows();
+							
+							double x1 = table.getColumnBoundaryX( 1 );
+							double y1 = table.getRowBoundaryY( numRows );
+							
+							path.moveTo( 0.0, 0.0 );
+							path.lineTo( x1, 0.0 );
+							path.lineTo( x1, y1 );
+							path.lineTo( 0.0, y1 );
+							path.closePath();
+						}
+						else
+						{
+							throw new RuntimeException( "Invalid combination of hasHeaderRow and hasHeaderColumn flags" );
+						}
+						
+						Paint prevPaint = graphics.getPaint();
+						
+						graphics.setPaint( headerPaint );
+						graphics.fill( path );
+						graphics.setPaint( prevPaint );
+					}
+				};
+				
+				backgPainters.put( key, tablePainter );
+			}
+			
+			return tablePainter;
+		}
+		else
+		{
+			return null;
+		}
+	}
 }

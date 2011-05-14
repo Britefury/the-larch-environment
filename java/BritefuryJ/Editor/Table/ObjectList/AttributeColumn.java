@@ -11,18 +11,24 @@ import org.python.core.PyObject;
 import org.python.core.PyString;
 import org.python.core.__builtin__;
 
+import BritefuryJ.Pres.Primitive.Label;
+import BritefuryJ.Pres.Primitive.Primitive;
+import BritefuryJ.StyleSheet.StyleSheet;
+
 public class AttributeColumn extends AbstractColumn
 {
+	private String title;
 	private PyString attrname;
-	private PyObject convertValueFn;
+	private PyObject valueConstructorFn;
 	private PyObject defaultValue, defaultValueCallable;
 	
 	
-	public AttributeColumn(PyString attrname, PyObject convertValueFn, PyObject defaultValue)
+	public AttributeColumn(String title, PyString attrname, PyObject valueConstructorFn, PyObject defaultValue)
 	{
 		super();
+		this.title = title;
 		this.attrname = __builtin__.intern( attrname );
-		this.convertValueFn = convertValueFn;
+		this.valueConstructorFn = valueConstructorFn;
 		if ( defaultValue.isCallable() )
 		{
 			this.defaultValueCallable = defaultValue;
@@ -33,9 +39,9 @@ public class AttributeColumn extends AbstractColumn
 		}
 	}
 	
-	public AttributeColumn(PyString attrname)
+	public AttributeColumn(String title, PyString attrname)
 	{
-		this( attrname, null, Py.None );
+		this( title, attrname, null, Py.None );
 	}
 	
 	
@@ -70,13 +76,24 @@ public class AttributeColumn extends AbstractColumn
 	@Override
 	public Object convertValue(Object x)
 	{
-		if ( convertValueFn != null )
+		if ( valueConstructorFn != null )
 		{
-			return convertValueFn.__call__( Py.java2py( x ) );
+			return valueConstructorFn.__call__( Py.java2py( x ) );
 		}
 		else
 		{
 			return x;
 		}
 	}
+
+
+
+	@Override
+	public Object presentHeader()
+	{
+		return headerStyle.applyTo( new Label( title ) );
+	}
+	
+	
+	private static final StyleSheet headerStyle = StyleSheet.instance.withAttr( Primitive.fontBold, true );
 }
