@@ -75,4 +75,20 @@ public class GenericTableEditor extends AbstractTableEditor<GenericTableModelInt
 	{
 		model.deleteBlock( x, y, w, h );
 	}
+	
+	
+	
+	
+	
+	@Override
+	protected boolean hasHeaderRow()
+	{
+		return true;
+	}
+
+	@Override
+	protected boolean hasHeaderColumn()
+	{
+		return true;
+	}
 }

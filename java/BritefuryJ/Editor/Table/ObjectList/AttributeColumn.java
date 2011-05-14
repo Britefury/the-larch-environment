@@ -11,9 +11,8 @@ import org.python.core.PyObject;
 import org.python.core.PyString;
 import org.python.core.__builtin__;
 
+import BritefuryJ.Editor.Table.TableEditorStyle;
 import BritefuryJ.Pres.Primitive.Label;
-import BritefuryJ.Pres.Primitive.Primitive;
-import BritefuryJ.StyleSheet.StyleSheet;
 
 public class AttributeColumn extends AbstractColumn
 {
@@ -91,9 +90,6 @@ public class AttributeColumn extends AbstractColumn
 	@Override
 	public Object presentHeader()
 	{
-		return headerStyle.applyTo( new Label( title ) );
+		return new Label( title ).withStyleSheetFromAttr( TableEditorStyle.headerAttrs );
 	}
-	
-	
-	private static final StyleSheet headerStyle = StyleSheet.instance.withAttr( Primitive.fontBold, true );
 }

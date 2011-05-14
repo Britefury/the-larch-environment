@@ -8,12 +8,11 @@ package BritefuryJ.Editor.Table.ObjectList;
 
 import BritefuryJ.Editor.Table.AbstractTableEditor;
 import BritefuryJ.Editor.Table.AbstractTableEditorInstance;
+import BritefuryJ.Editor.Table.TableEditorStyle;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.GridRow;
 import BritefuryJ.Pres.Primitive.Label;
-import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.RGrid;
-import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.Utils.WeakValueIdentityHashMap;
 
 public class ObjectListTableEditorInstance extends AbstractTableEditorInstance<ObjectListInterface>
@@ -48,7 +47,7 @@ public class ObjectListTableEditorInstance extends AbstractTableEditorInstance<O
 		for (int j = 0; j < numObjects; j++)
 		{
 			ObjectListRow p = projectRow( model.get( j ) );
-			Pres title = headerStyle.applyTo( new Label( String.valueOf( j ) ) );
+			Pres title = new Label( String.valueOf( j ) ).withStyleSheetFromAttr( TableEditorStyle.headerAttrs );
 			rows[j+1] = new GridRow( new Object[] { title, p } );
 		}
 		
@@ -150,7 +149,4 @@ public class ObjectListTableEditorInstance extends AbstractTableEditorInstance<O
 		ObjectListTableEditor e = (ObjectListTableEditor)editor;
 		return e.newRow( model );
 	}
-
-
-	private static final StyleSheet headerStyle = StyleSheet.instance.withAttr( Primitive.fontBold, true );
 }
