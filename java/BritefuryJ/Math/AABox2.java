@@ -9,6 +9,11 @@ package BritefuryJ.Math;
 
 import java.io.Serializable;
 
+import org.python.core.Py;
+import org.python.core.PyDictionary;
+import org.python.core.PyObject;
+import org.python.core.PyTuple;
+
 
 public class AABox2 implements Serializable
 {
@@ -157,6 +162,52 @@ public class AABox2 implements Serializable
 	}
 	
 
+	public PyObject __getstate__()
+	{
+		return new PyTuple( Py.newFloat( lowerX ), Py.newFloat( lowerY ), Py.newFloat( upperX ), Py.newFloat( upperY ) );
+	}
+	
+	public void __setstate__(PyObject state)
+	{
+		if ( state instanceof PyTuple )
+		{
+			PyTuple tup = (PyTuple)state;
+			if ( tup.size() == 4 )
+			{
+				lowerX = tup.pyget( 0 ).asDouble();
+				lowerY = tup.pyget( 1 ).asDouble();
+				upperX = tup.pyget( 2 ).asDouble();
+				upperY = tup.pyget( 3 ).asDouble();
+			}
+			else
+			{
+				throw Py.TypeError( "State tuple must contain four items" );
+			}
+		}
+		else
+		{
+			throw Py.TypeError( "State must be a tuple" );
+		}
+	}
+	
+	public PyObject __reduce__()
+	{
+		return new PyTuple( Py.java2py( getClass() ), new PyTuple(), __getstate__() );
+	}
+	
+	
+	
+	public PyObject __copy__()
+	{
+		return Py.java2py( copy() );
+	}
+	
+	public PyObject __deepcopy__(PyDictionary memo)
+	{
+		return Py.java2py( copy() );
+	}
+	
+	
 	public String toString()
 	{
 		return "AABox2( " + lowerX + "," + lowerY + " -> " + upperX + "," + upperY + " )";

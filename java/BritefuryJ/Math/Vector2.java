@@ -11,6 +11,11 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.io.Serializable;
 
+import org.python.core.Py;
+import org.python.core.PyDictionary;
+import org.python.core.PyObject;
+import org.python.core.PyTuple;
+
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.IncrementalView.FragmentView;
@@ -136,6 +141,49 @@ public class Vector2 implements Presentable, Serializable
 		affine.transform( origin, origin );
 		affine.transform( v, v );
 		return new Vector2( v.x - origin.x, v.y - origin.y );
+	}
+	
+	
+	public PyObject __getstate__()
+	{
+		return new PyTuple( Py.newFloat( x ), Py.newFloat( y ) );
+	}
+	
+	public void __setstate__(PyObject state)
+	{
+		if ( state instanceof PyTuple )
+		{
+			PyTuple tup = (PyTuple)state;
+			if ( tup.size() == 2 )
+			{
+				x = tup.pyget( 0 ).asDouble();
+				y = tup.pyget( 1 ).asDouble();
+			}
+			else
+			{
+				throw Py.TypeError( "State tuple must contain two items" );
+			}
+		}
+		else
+		{
+			throw Py.TypeError( "State must be a tuple" );
+		}
+	}
+	
+	public PyObject __reduce__()
+	{
+		return new PyTuple( Py.java2py( getClass() ), new PyTuple(), __getstate__() );
+	}
+	
+	
+	public PyObject __copy__()
+	{
+		return Py.java2py( copy() );
+	}
+	
+	public PyObject __deepcopy__(PyDictionary memo)
+	{
+		return Py.java2py( copy() );
 	}
 	
 	
