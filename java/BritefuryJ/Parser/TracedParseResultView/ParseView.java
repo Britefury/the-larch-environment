@@ -42,7 +42,6 @@ public class ParseView
 		
 		
 		
-		@Override
 		public void drawBackground(DPElement element, Graphics2D graphics)
 		{
 			graphics.setColor( Color.black );
@@ -58,7 +57,6 @@ public class ParseView
 			}
 		}
 
-		@Override
 		public void draw(DPElement element, Graphics2D graphics)
 		{
 		}
@@ -136,7 +134,6 @@ public class ParseView
 	private DPElement viewBin;
 	private HashMap<TraceNode, NodeView> nodeTable;
 	private ArrayList<Edge> callEdges, memoEdges;
-	private NodeView root;
 	private NodeView selection;
 	private ParseViewListener listener;
 	
@@ -150,8 +147,8 @@ public class ParseView
 		nodeTable = new HashMap<TraceNode, NodeView>();
 		callEdges = new ArrayList<Edge>();
 		memoEdges = new ArrayList<Edge>();
-		
-		root = buildNodeView( result.getTraceNode() );
+
+		NodeView root = buildNodeView( result.getTraceNode() );
 		
 		root.registerEdges();
 		

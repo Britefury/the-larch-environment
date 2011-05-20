@@ -22,7 +22,7 @@ public abstract class AttributeBase
 		{
 			super( message );
 		}
-	};
+	}
 	
 
 	
@@ -40,7 +40,6 @@ public abstract class AttributeBase
 	
 	public static class AttributeNameComparator implements Comparator<AttributeBase>
 	{
-		@Override
 		public int compare(AttributeBase o1, AttributeBase o2)
 		{
 			return o1.getFullName().compareTo( o2.getFullName() );

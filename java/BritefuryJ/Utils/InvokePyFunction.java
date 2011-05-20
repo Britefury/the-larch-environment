@@ -27,6 +27,6 @@ public class InvokePyFunction
 			exc = Py.java2py( t );
 		}
 		
-		return new PyTuple( new PyObject[] { result, exc } );
+		return new PyTuple( result, exc );
 	}
 }

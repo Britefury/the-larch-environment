@@ -8,6 +8,7 @@ package tests.DocModel;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -89,6 +90,7 @@ public class Test_DMIOWriter extends TestCase
 		assertTrue( res.equals( expected ) );
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void writeAsStateTest(Object input, String expectedSX, Object expectedEmbedded[], PyObject expectedPyEmbedded[])
 	{
 		PyObject res = null;
@@ -109,10 +111,7 @@ public class Test_DMIOWriter extends TestCase
 		
 		PyList embAsPy = (PyList)tup.pyget( 1 );
 		PyList expEmbAsPy = new PyList();
-		for (Object e: expectedEmbedded)
-		{
-			expEmbAsPy.add( e );
-		}
+		Collections.addAll( expEmbAsPy, expectedEmbedded );
 		
 		PyList embPyAsPy = (PyList)tup.pyget( 2 );
 		PyList expEmbPyAsPy = new PyList();
@@ -189,7 +188,7 @@ public class Test_DMIOWriter extends TestCase
 		assertEquals( TestWriter.test_quoteString( "abcd\refgh" ), "\"abcd\\refgh\"" );
 		assertEquals( TestWriter.test_quoteString( "abcd\tefgh" ), "\"abcd\\tefgh\"" );
 		assertEquals( TestWriter.test_quoteString( "abcd\\efgh" ), "\"abcd\\\\efgh\"" );
-		assertEquals( TestWriter.test_quoteString( "abcd" + new Character( (char)0x1258 ).toString() + "efgh" ), "\"abcd\\x1258xefgh\"" );
+		assertEquals( TestWriter.test_quoteString( "abcd" + Character.toString( (char)0x1258 ) + "efgh" ), "\"abcd\\x1258xefgh\"" );
 	}
 	
 	
@@ -210,7 +209,7 @@ public class Test_DMIOWriter extends TestCase
 		writeTest( "abcd\tefgh", "\"abcd\\tefgh\"" );
 		writeTest( "abcd\\efgh", "\"abcd\\\\efgh\"" );
 		writeTest( "abc\\ndef", "\"abc\\\\ndef\"" );
-		writeTest( "abcd" + new Character( (char)0x1258 ).toString() + "efgh", "\"abcd\\x1258xefgh\"" );
+		writeTest( "abcd" + Character.toString( (char)0x1258 ) + "efgh", "\"abcd\\x1258xefgh\"" );
 	}
 	
 	

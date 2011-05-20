@@ -136,7 +136,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	private static class TreeExplorerViewFragmentFn implements ViewFragmentFunction
 	{
-		@Override
 		public Pres createViewFragment(Object x, FragmentView ctx, SimpleAttributeTable inheritedState)
 		{
 			DPElement element = (DPElement)x;
@@ -163,7 +162,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		}
 
 
-		@Override
 		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			return treeExplorerPerspective.applyTo( new InnerFragment( element ) ); 
@@ -1398,7 +1396,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	{
 		ElementFilter filter = new ElementFilter()
 		{
-			@Override
 			public boolean testElement(DPElement element)
 			{
 				return elementClass.isInstance( element );
@@ -1418,7 +1415,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	{
 		ElementFilter filter = new ElementFilter()
 		{
-			@Override
 			public boolean testElement(DPElement element)
 			{
 				return elementClass.isInstance( element );
@@ -2074,13 +2070,11 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 						private int index = nextIndex( 0 );
 						
 						
-						@Override
 						public boolean hasNext()
 						{
 							return index != -1;
 						}
 	
-						@Override
 						public AbstractElementInteractor next()
 						{
 							if ( index == -1 )
@@ -2095,7 +2089,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 							}
 						}
 	
-						@Override
 						public void remove()
 						{
 							throw new UnsupportedOperationException();
@@ -2736,7 +2729,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	{
 	}
 	
-	private static List<DPElement> emptyChildList = Arrays.asList( new DPElement[] {} );
+	private static List<DPElement> emptyChildList = Arrays.asList();
 	
 	public List<DPElement> getStreamValueChildren()
 	{
@@ -2945,12 +2938,10 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	private static ElementPainter explorerHeadHoverPainter = new ElementPainter()
 	{
-		@Override
 		public void drawBackground(DPElement element, Graphics2D graphics)
 		{
 		}
 
-		@Override
 		public void draw(DPElement element, Graphics2D graphics)
 		{
 			Paint paint = graphics.getPaint();
@@ -2972,7 +2963,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	private static HoverElementInteractor explorerHeaderHoverInteractor = new HoverElementInteractor()
 	{
-		@Override
 		public void pointerEnter(PointerInputElement element, PointerMotionEvent event)
 		{
 			DPElement el = (DPElement)element;
@@ -2982,7 +2972,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 			model.queueFullRedraw();
 		}
 
-		@Override
 		public void pointerLeave(PointerInputElement element, PointerMotionEvent event)
 		{
 			DPElement el = (DPElement)element;
@@ -2995,13 +2984,11 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 	private static PushElementInteractor explorerHeaderInspectInteractor = new PushElementInteractor()
 	{
-		@Override
 		public boolean buttonPress(PointerInputElement element, PointerButtonEvent event)
 		{
 			return event.getButton() == 1;
 		}
 
-		@Override
 		public void buttonRelease(PointerInputElement element, PointerButtonEvent event)
 		{
 			DPElement el = (DPElement)element;

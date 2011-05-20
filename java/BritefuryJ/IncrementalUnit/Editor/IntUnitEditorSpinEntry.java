@@ -15,7 +15,6 @@ public class IntUnitEditorSpinEntry extends LiteralUnitEditor
 	{
 		protected class Listener implements IntSpinEntry.IntSpinEntryListener
 		{
-			@Override
 			public void onSpinEntryValueChanged(IntSpinEntry.IntSpinEntryControl spinEntry, int value)
 			{
 				setCellValue( value );
@@ -48,7 +47,7 @@ public class IntUnitEditorSpinEntry extends LiteralUnitEditor
 				error( "not an integer number" );
 			}
 		}
-	};
+	}
 	
 	
 	private int min, max, stepSize, pageSize;

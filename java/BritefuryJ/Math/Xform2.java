@@ -13,7 +13,7 @@ import java.io.Serializable;
 
 import BritefuryJ.Utils.HashUtils;
 
-public class Xform2 implements Cloneable, Serializable
+public class Xform2 implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
@@ -39,27 +39,20 @@ public class Xform2 implements Cloneable, Serializable
 	public Xform2(Vector2 translation)
 	{
 		this.scale = 1.0;
-		this.translation = translation.clone();
+		this.translation = translation.copy();
 	}
 	
 	public Xform2(double scale, Vector2 translation)
 	{
 		this.scale = scale;
-		this.translation = translation.clone();
+		this.translation = translation.copy();
 	}
 	
 	
 	
-	public Xform2 clone()
+	public Xform2 copy()
 	{
-		try
-		{
-			return (Xform2)super.clone();
-		}
-		catch (CloneNotSupportedException e)
-		{
-			return null;
-		}
+		return new Xform2( scale, translation );
 	}
 	
 	

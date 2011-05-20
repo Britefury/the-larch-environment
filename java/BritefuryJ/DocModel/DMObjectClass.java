@@ -120,7 +120,7 @@ public class DMObjectClass extends DMNodeClass
 		fieldNameToIndex = new HashMap<String, Integer>();
 		for (int i = 0; i < allClassFields.length; i++)
 		{
-			fieldNameToIndex.put( allClassFields[i].getName(), new Integer( i ) );
+			fieldNameToIndex.put( allClassFields[i].getName(), i );
 		}
 		
 		schema.registerClass( name, this );
@@ -162,7 +162,7 @@ public class DMObjectClass extends DMNodeClass
 		Integer index = fieldNameToIndex.get( name );
 		if ( index != null )
 		{
-			return index.intValue();
+			return index;
 		}
 		else
 		{

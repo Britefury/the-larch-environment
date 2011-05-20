@@ -11,7 +11,7 @@ import org.python.util.PythonInterpreter;
 
 public class Main
 {
-	private static String scriptName = "gsym.py";
+	private static final String scriptName = "gsym.py";
 	
 	public static void main(String[] args) throws PyException
 	{

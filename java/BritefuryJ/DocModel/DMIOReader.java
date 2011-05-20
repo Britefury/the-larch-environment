@@ -114,7 +114,7 @@ public class DMIOReader extends DMIO
 	{
 		private SchemaRef schemaRef;
 		private String className;
-		private HashMap<String, Object> fieldValues = new HashMap<String, Object>();;
+		private HashMap<String, Object> fieldValues = new HashMap<String, Object>();
 		
 		private String currentFieldName = null;
 		
@@ -221,60 +221,56 @@ public class DMIOReader extends DMIO
 				else if ( c == '\\'  &&  pos < s.length()-1 )
 				{
 					char escapeCode = s.charAt( pos + 1 );
-					if ( escapeCode == 'n' )
+					switch ( escapeCode )
 					{
-						result.append( '\n' );
-						pos += 2;
-					}
-					else if ( escapeCode == 'r' )
-					{
-						result.append( '\r' );
-						pos += 2;
-					}
-					else if ( escapeCode == 't' )
-					{
-						result.append( '\t' );
-						pos += 2;
-					}
-					else if ( escapeCode == '\\' )
-					{
-						result.append( '\\' );
-						pos += 2;
-					}
-					else if ( escapeCode == 'x' )
-					{
-						StringBuilder hexString = new StringBuilder();
-						int hexIndex = pos + 2;
-						char h = '0';
-						while ( hexIndex < s.length() )
-						{
-							h = s.charAt( hexIndex );
-							if ( ( h >= '0' && h <= '9' )  ||  ( h >= 'A' && h <= 'F' )  ||  ( h >= 'a' && h <= 'f' ) )
+						case 'n':
+							result.append( '\n' );
+							pos += 2;
+							break;
+						case 'r':
+							result.append( '\r' );
+							pos += 2;
+							break;
+						case 't':
+							result.append( '\t' );
+							pos += 2;
+							break;
+						case '\\':
+							result.append( '\\' );
+							pos += 2;
+							break;
+						case 'x':
+							StringBuilder hexString = new StringBuilder();
+							int hexIndex = pos + 2;
+							char h = '0';
+							while ( hexIndex < s.length() )
 							{
-								hexString.append( h );
-								hexIndex++;
+								h = s.charAt( hexIndex );
+								if ( ( h >= '0' && h <= '9' ) || ( h >= 'A' && h <= 'F' ) || ( h >= 'a' && h <= 'f' ) )
+								{
+									hexString.append( h );
+									hexIndex++;
+								}
+								else
+								{
+									break;
+								}
+							}
+							if ( h == 'x' && hexString.length() > 0 )
+							{
+								// Found the terminating 'x' character
+								char hexChar = (char)Integer.valueOf( hexString.toString(), 16 ).intValue();
+								result.append( hexChar );
+								pos = hexIndex + 1;
 							}
 							else
 							{
-								break;
+								throw new InvalidEscapeSequenceException();
 							}
-						}
-						if ( h == 'x'  &&  hexString.length() > 0 )
-						{
-							// Found the terminating 'x' character
-							char hexChar = (char)Integer.valueOf( hexString.toString(), 16 ).intValue();
-							result.append( hexChar );
-							pos = hexIndex + 1;
-						}
-						else
-						{
+							break;
+						default:
+							// Did not recognise the escape sequence
 							throw new InvalidEscapeSequenceException();
-						}
-					}
-					else
-					{
-						// Did not recognise the escape sequence
-						throw new InvalidEscapeSequenceException();
 					}
 				}
 				else if ( c == '\"' )
@@ -831,7 +827,7 @@ public class DMIOReader extends DMIO
 			StringBuilder unclosedItemClasses = new StringBuilder();
 			for (Object item: stack)
 			{
-				unclosedItemClasses.append( item.getClass().getName() + "\n" );
+				unclosedItemClasses.append( item.getClass().getName() ).append( "\n" );
 			}
 			throw new ParseErrorException( pos, "Unclosed items:\n" + unclosedItemClasses.toString() );
 		}

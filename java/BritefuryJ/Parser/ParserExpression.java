@@ -63,9 +63,7 @@ public abstract class ParserExpression
 	public ParseResult parseNode(Object input, String junkRegex, ParseAction delegateAction)
 	{
 		ParserState state = new ParserState( junkRegex, delegateAction );
-		ParseResult result = handleNode( state, input );
-		
-		return result;
+		return handleNode( state, input );
 	}
 
 	public ParseResult parseNode(Object input, PyObject delegateAction)
@@ -98,9 +96,7 @@ public abstract class ParserExpression
 	{
 		ParserState state = new ParserState( junkRegex, delegateAction );
 		state.enableTrace();
-		TracedParseResult result = (TracedParseResult)handleNode( state, input );
-		
-		return result;
+		return (TracedParseResult)handleNode( state, input );
 	}
 
 	public TracedParseResult traceParseNode(Object input, PyObject delegateAction)
@@ -305,9 +301,7 @@ public abstract class ParserExpression
 	public ParseResult parseListItems(List<Object> input, String junkRegex, ParseAction delegateAction)
 	{
 		ParserState state = new ParserState( junkRegex, delegateAction );
-		ParseResult result = handleListItems( state, input, 0 );
-		
-		return result;
+		return handleListItems( state, input, 0 );
 	}
 
 	public ParseResult parseListItems(List<Object> input, PyObject delegateAction)
@@ -340,9 +334,7 @@ public abstract class ParserExpression
 	{
 		ParserState state = new ParserState( junkRegex, delegateAction );
 		state.enableTrace();
-		TracedParseResult result = (TracedParseResult)handleListItems( state, input, 0 );
-		
-		return result;
+		return (TracedParseResult)handleListItems( state, input, 0 );
 	}
 
 	public TracedParseResult traceParseListItems(List<Object> input, PyObject delegateAction)
@@ -487,8 +479,7 @@ public abstract class ParserExpression
 	
 	protected ParserExpression[] withSibling(ParserExpression sibling)
 	{
-		ParserExpression[] exprs = { this, sibling };
-		return exprs;
+		return new ParserExpression[] { this, sibling };
 	}
 
 

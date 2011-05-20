@@ -63,10 +63,9 @@ public abstract class Pres
 		{
 			return "Popup";
 		}
-	};
-	
-	
-	
+	}
+
+
 	public DPElement present()
 	{
 		return present( PresentationContext.defaultCtx, StyleValues.instance );

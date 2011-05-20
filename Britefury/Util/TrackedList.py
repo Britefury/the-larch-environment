@@ -7,7 +7,7 @@
 ##-*************************
 
 
-def _onSetContents(changeHistory, ls, oldContents, newContents, description):
+def onTrackedListSetContents(changeHistory, ls, oldContents, newContents, description):
 	if changeHistory is not None:
 		def execute():
 			ls._setContents( newContents )
@@ -20,38 +20,38 @@ def _onSetContents(changeHistory, ls, oldContents, newContents, description):
 			changeHistory.track( x )
 
 
-def _onAppend(changeHistory, ls, x, listAttrName):
+def onTrackedListAppend(changeHistory, ls, x, description):
 	if changeHistory is not None:
-		changeHistory.addChange( lambda: ls.append( x ), lambda: ls.__delitem__( -1 ), 'Tracked list \'%s\' append' % listAttrName )
+		changeHistory.addChange( lambda: ls.append( x ), lambda: ls.__delitem__( -1 ), description )
 		changeHistory.track( x )
 
-def _onExtend(changeHistory, ls, xs, listAttrName):
+def onTrackedListExtend(changeHistory, ls, xs, description):
 	if changeHistory is not None:
 		n = len( xs )
 		def _del():
 			del ls[-n:]
-		changeHistory.addChange( lambda: ls.extend( xs ), _del, 'Tracked list \'%s\' extend' % listAttrName )
+		changeHistory.addChange( lambda: ls.extend( xs ), _del, description )
 		for x in xs:
 			changeHistory.track( x )
 
-def _onInsert(changeHistory, ls, i, x, listAttrName):
+def onTrackedListInsert(changeHistory, ls, i, x, listAttrName):
 	if changeHistory is not None:
-		changeHistory.addChange( lambda: ls.insert( i, x ), lambda: ls.__delitem__( i ), 'Tracked list \'%s\' insert at %d' % ( listAttrName, i ) )
+		changeHistory.addChange( lambda: ls.insert( i, x ), lambda: ls.__delitem__( i ), description )
 		changeHistory.track( x )
 
-def _onPop(changeHistory, ls, x, listAttrName):
+def onTrackedListPop(changeHistory, ls, x, description):
 	if changeHistory is not None:
-		changeHistory.addChange( lambda: ls.pop(), lambda: ls.append( x ), 'Tracked list \'%s\' pop' % listAttrName )
+		changeHistory.addChange( lambda: ls.pop(), lambda: ls.append( x ), description )
 		changeHistory.stopTracking( x )
 
-def _onRemove(changeHistory, ls, i, x, listAttrName):
+def onTrackedListRemove(changeHistory, ls, i, x, description):
 	if changeHistory is not None:
-		changeHistory.addChange( lambda: ls.__delitem__( i ), lambda: ls.insert( i, x ), 'Tracked list \'%s\' remove' % listAttrName )
+		changeHistory.addChange( lambda: ls.__delitem__( i ), lambda: ls.insert( i, x ), description )
 		changeHistory.stopTracking( x )
 
-def _onReverse(changeHistory, ls, listAttrName):
+def onTrackedListReverse(changeHistory, ls, description):
 	if changeHistory is not None:
-		changeHistory.addChange( lambda: ls.reverse(), lambda: ls.reverse(), 'Tracked list \'%s\' reverse' % listAttrName )
+		changeHistory.addChange( lambda: ls.reverse(), lambda: ls.reverse(), description )
 
 
 class _TrackedListWrapper (object):
@@ -99,7 +99,7 @@ class _TrackedListWrapper (object):
 		oldContents = self._ls[:]
 		self._ls[index] = x
 		newContents = self._ls[:]
-		_onSetContents( ch, self, oldContents, newContents, 'Tracked list \'%s\' set item' % self._prop._attrName )
+		onTrackedListSetContents( ch, self, oldContents, newContents, 'Tracked list \'%s\' set item' % self._prop._attrName )
 		self._prop._onChange( self._instance )
 	
 	def __delitem__(self, index):
@@ -107,31 +107,31 @@ class _TrackedListWrapper (object):
 		oldContents = self._ls[:]
 		del self._ls[index]
 		newContents = self._ls[:]
-		_onSetContents( ch, self, oldContents, newContents, 'Tracked list \'%s\' del item' % self._prop._attrName )
+		onTrackedListSetContents( ch, self, oldContents, newContents, 'Tracked list \'%s\' del item' % self._prop._attrName )
 		self._prop._onChange( self._instance )
 		
 	def append(self, x):
 		ch = self._prop._getChangeHistory( self._instance )
 		self._ls.append( x )
-		_onAppend( ch, self, x, self._prop._attrName )
+		onTrackedListAppend( ch, self, x, 'Tracked list \'%s\' append' % self._prop._attrName )
 		self._prop._onChange( self._instance )
 
 	def extend(self, xs):
 		ch = self._prop._getChangeHistory( self._instance )
 		self._ls.extend( xs )
-		_onExtend( ch, self, xs, self._prop._attrName )
+		onTrackedListExtend( ch, self, xs, 'Tracked list \'%s\' extend' % self._prop._attrName )
 		self._prop._onChange( self._instance )
 	
 	def insert(self, i, x):
 		ch = self._prop._getChangeHistory( self._instance )
 		self._ls.insert( i, x )
-		_onInsert( ch, self, i, x, self._prop._attrName )
+		onTrackedListInsert( ch, self, i, x, 'Tracked list \'%s\' insert' % self._prop._attrName )
 		self._prop._onChange( self._instance )
 
 	def pop(self):
 		ch = self._prop._getChangeHistory( self._instance )
 		x = self._ls.pop()
-		_onPop( ch, self, x, self._prop._attrName )
+		onTrackedListPop( ch, self, x, 'Tracked list \'%s\' pop' % self._prop._attrName )
 		self._prop._onChange( self._instance )
 		return x
 		
@@ -140,13 +140,13 @@ class _TrackedListWrapper (object):
 		i = self._ls.index( x )
 		xFromList = self._ls[i]
 		del self._ls[i]
-		_onRemove( ch, self, i, xFromList, self._prop._attrName )
+		onTrackedListRemove( ch, self, i, xFromList, 'Tracked list \'%s\' remove' % self._prop._attrName )
 		self._prop._onChange( self._instance )
 		
 	def reverse(self):
 		ch = self._prop._getChangeHistory( self._instance )
 		self._ls.reverse()
-		_onReverse( ch, self, self._prop._attrName )
+		onTrackedListReverse( ch, self, 'Tracked list \'%s\' reverse' % self._prop._attrName )
 		self._prop._onChange( self._instance )
 	
 	def sort(self, cmp=None, key=None, reverse=None):
@@ -154,14 +154,14 @@ class _TrackedListWrapper (object):
 		oldContents = self._ls[:]
 		self._ls.sort( cmp, key, reverse )
 		newContents = self._ls[:]
-		_onSetContents( ch, self, oldContents, newContents, 'Tracked list \'%s\' sort' % self._prop._attrName )
+		onTrackedListSetContents( ch, self, oldContents, newContents, 'Tracked list \'%s\' sort' % self._prop._attrName )
 		self._prop._onChange( self._instance )
 	
 	def _setContents(self, xs):
 		ch = self._prop._getChangeHistory( self._instance )
 		oldContents = self._ls[:]
 		self._ls[:] = xs
-		_onSetContents( ch, self, oldContents, xs, 'Tracked list \'%s\' set contents' % self._prop._attrName )
+		onTrackedListSetContents( ch, self, oldContents, xs, 'Tracked list \'%s\' set contents' % self._prop._attrName )
 		self._prop._onChange( self._instance )
 	
 	

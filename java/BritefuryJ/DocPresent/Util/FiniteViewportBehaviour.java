@@ -51,12 +51,12 @@ public class FiniteViewportBehaviour implements Range.RangeListener
 	
 	public Xform2 getWorldToViewXform()
 	{
-		return worldToViewSpace.clone();
+		return worldToViewSpace.copy();
 	}
 	
 	public void setWorldToViewXform(Xform2 x)
 	{
-		worldToViewSpace = x.clone();
+		worldToViewSpace = x.copy();
 		onXformModified();
 	}
 	

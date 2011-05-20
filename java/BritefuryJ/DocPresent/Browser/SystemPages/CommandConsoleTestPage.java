@@ -102,7 +102,7 @@ public class CommandConsoleTestPage extends SystemPage
 		Command greenCmd = new Command( "&G&reen", new CommandContentChanger( colouredTextProxyRef, colouredText( greenText ) ) );
 		Command blueCmd = new Command( "&B&lue", new CommandContentChanger( colouredTextProxyRef, colouredText( blueText ) ) );
 		Command failCmd = new Command( "&Fail", new CommandFailAction() );
-		CommandSet cmds = new CommandSet( "test.TestCommandSet", Arrays.asList( new Command[] { blackCmd, redCmd, greenCmd, blueCmd, failCmd } ) );
+		CommandSet cmds = new CommandSet( "test.TestCommandSet", Arrays.asList( blackCmd, redCmd, greenCmd, blueCmd, failCmd ) );
 		Pres cmdText = new Text( "Place the caret within this text, and use the command console. 'bk', 're', 'gr', 'bl' and 'f' are the commands available." ).withCommands( cmds );
 		Pres colourBox = new Column( new Pres[] { colouredTextProxyRef, cmdText } );
 		

@@ -10,12 +10,12 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 
-public class DMPolymorphicMap <ValueType extends Object> implements Serializable
+public class DMPolymorphicMap <ValueType> implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
 
-	private static class Entry <ValueType extends Object>
+	private static class Entry <ValueType>
 	{
 		private ValueType value;
 		

@@ -81,7 +81,7 @@ public class DPStress2Test
 		DPText dot = new DPText( puncStyle, "." );
 		DPText attrName = new DPText( nameStyle, a );
 		DPSpan span = new DPSpan( ContainerStyleParams.defaultStyleParams );
-		span.setChildren( Arrays.asList( new DPElement[] { x, dot, attrName } ) );
+		span.setChildren( Arrays.asList( x, dot, attrName ) );
 		return span;
 	}
 	

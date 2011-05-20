@@ -709,20 +709,17 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, In
 	// Trackable interface
 	//
 	
-	@Override
 	public void setChangeHistory(ChangeHistory h)
 	{
 		changeHistory = h;
 	}
 	
-	@Override
 	public ChangeHistory getChangeHistory()
 	{
 		return changeHistory;
 	}
 	
 	
-	@Override
 	public List<Object> getTrackableContents()
 	{
 		return Arrays.asList( getFieldValuesImmutable() );

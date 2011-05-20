@@ -51,12 +51,9 @@ public class Browser
 	private static final String COMMAND_BACK = "back";
 	private static final String COMMAND_FORWARD = "forward";
 	private static final String COMMAND_RELOAD = "reload";
-	
 
-	
-	private JToolBar toolbar;
 
-	private JTextField locationField;
+    private JTextField locationField;
 	private JPanel panel;
 
 	private PresentationComponent presComponent;
@@ -87,12 +84,12 @@ public class Browser
 		actionMap.put( TransferHandler.getCutAction().getValue( Action.NAME ), TransferHandler.getCutAction() );
 		actionMap.put( TransferHandler.getCopyAction().getValue( Action.NAME ), TransferHandler.getCopyAction() );
 		actionMap.put( TransferHandler.getPasteAction().getValue( Action.NAME ), TransferHandler.getPasteAction() );
-		
 
-		toolbar = new JToolBar();
-		toolbar.setFloatable( false );
-		toolbar.setRollover( true );
-		initialiseToolbar( toolbar );
+
+        JToolBar toolbar = new JToolBar();
+		toolbar.setFloatable(false);
+		toolbar.setRollover(true);
+		initialiseToolbar(toolbar);
 		
 		
 		locationField = new JTextField( location.getLocationString() );
@@ -109,11 +106,11 @@ public class Browser
 		};
 		
 		locationField.addActionListener( locationActionListener );
-		toolbar.add( locationField );
+		toolbar.add(locationField);
 		
 		
 		JPanel header = new JPanel( new BorderLayout() );
-		header.add( toolbar, BorderLayout.PAGE_START );
+		header.add(toolbar, BorderLayout.PAGE_START );
 		
 		
 		panel = new JPanel( new BorderLayout() );

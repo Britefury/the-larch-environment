@@ -43,7 +43,7 @@ public abstract class AbstractDataExporter <SelectionContentsType> extends DataE
 	{
 		if ( canExport( selectionContents ) )
 		{
-			return Arrays.asList( new DataFlavor[] { getDataFlavor() } );
+			return Arrays.asList( getDataFlavor() );
 		}
 		else
 		{

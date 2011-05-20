@@ -74,7 +74,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	
 	@SuppressWarnings("unchecked")
 	private List<? extends DataExporterInterface<StreamValue>> dataExporters = (List<? extends DataExporterInterface<StreamValue>>)
-			Arrays.asList( new DataExporterInterface[] { streamExporter, stringExporter } );
+			Arrays.asList( streamExporter, stringExporter );
 	private AbstractSelectionExporter<StreamValue, TextSelection> exporter =
 		new AbstractSelectionExporter<StreamValue, TextSelection>( TextSelection.class, AbstractSelectionExporter.COPY_OR_MOVE, dataExporters )
 	{
@@ -109,7 +109,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 			{
 				if ( target instanceof Caret )
 				{
-					deleteSelection( selection, (Caret)target );
+					deleteSelection( selection, target );
 				}
 			}
 		}
@@ -121,12 +121,14 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	
 	private AbstractDataImporter<Caret> streamImporter = new AbstractDataImporter<Caret>()
 	{
+		@Override
 		protected boolean canImportFlavor(DataFlavor flavor)
 		{
 			return flavor.equals( dataFlavorForClass( sequentialEditor.getSelectionBufferType() ) );
 		}
-		
-		protected boolean importData(Caret caret, Selection selection, Object data)
+
+		@Override
+		protected boolean importCheckedData(Caret caret, Selection selection, Object data)
 		{
 			SequentialBuffer buffer = (SequentialBuffer)data;
 			if ( !canImportFromClipboardHandler( buffer.clipboardHandler ) )
@@ -140,12 +142,14 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	
 	private AbstractDataImporter<Caret> stringImporter = new AbstractDataImporter<Caret>()
 	{
+		@Override
 		protected boolean canImportFlavor(DataFlavor flavor)
 		{
 			return flavor.equals( DataFlavor.stringFlavor );
 		}
 		
-		protected boolean importData(Caret caret, Selection selection, Object data)
+		@Override
+		protected boolean importCheckedData(Caret caret, Selection selection, Object data)
 		{
 			return paste( caret, selection, data );
 		}
@@ -154,7 +158,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	
 	@SuppressWarnings("unchecked")
 	private List<? extends DataImporterInterface<Caret>> dataImporters = (List<? extends DataImporterInterface<Caret>>)
-			Arrays.asList( new DataImporterInterface[] { streamImporter, stringImporter } );
+			Arrays.asList( streamImporter, stringImporter );
 	private TargetImporter<Caret> importer = new TargetImporter<Caret>( Caret.class, dataImporters );
 	
 	
@@ -199,7 +203,6 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	
 	private FragmentViewFilter editLevelFragmentFilter = new FragmentViewFilter()
 	{
-		@Override
 		public boolean testFragmentView(FragmentView fragment)
 		{
 			return isEditLevelFragmentView( fragment );
@@ -209,7 +212,6 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	
 	private FragmentViewFilter commonRootEditLevelFragmentFilter = new FragmentViewFilter()
 	{
-		@Override
 		public boolean testFragmentView(FragmentView fragment)
 		{
 			return isCommonRootEditLevelFragmentView( fragment );
@@ -439,7 +441,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 			caret.moveToStartOfNextItem();
 			// Post a tree event
 			insertionPointElement.postTreeEvent( event );
-		};
+		}
 	}
 	
 	

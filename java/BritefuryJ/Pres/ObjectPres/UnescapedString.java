@@ -43,17 +43,17 @@ public abstract class UnescapedString extends Pres
 			Pres escapeItem = null;
 
 			// Process a list of known escape sequences
-			if ( c == '\r' )
+			switch ( c )
 			{
-				escapeItem = escapeStyle.applyTo( new StaticText( "\\r" ) );
-			}
-			else if ( c == '\t' )
-			{
-				escapeItem = escapeStyle.applyTo( new StaticText( "\\t" ) );
-			}
-			else if ( c == '\n' )
-			{
-				escapeItem = escapeStyle.applyTo( new StaticText( "\\n" ) );
+				case '\r':
+					escapeItem = escapeStyle.applyTo( new StaticText( "\\r" ) );
+					break;
+				case '\t':
+					escapeItem = escapeStyle.applyTo( new StaticText( "\\t" ) );
+					break;
+				case '\n':
+					escapeItem = escapeStyle.applyTo( new StaticText( "\\n" ) );
+					break;
 			}
 			
 			if ( escapeItem != null )

@@ -60,10 +60,10 @@ public class Test_IncrementalTreeNodeTableWithDuplicates extends Test_Incrementa
 		assertTrue( table.containsKey( dc ) );
 		assertTrue( table.containsKey( dd ) );
 		
-		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { ia } ), table.get( da ) );
-		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { ib } ), table.get( db ) );
-		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { ic } ), table.get( dc ) );
-		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { id1, id2 } ), table.get( dd ) );
+		assertNodeSetsEqual( Arrays.asList( ia ), table.get( da ) );
+		assertNodeSetsEqual( Arrays.asList( ib ), table.get( db ) );
+		assertNodeSetsEqual( Arrays.asList( ic ), table.get( dc ) );
+		assertNodeSetsEqual( Arrays.asList( id1, id2 ), table.get( dd ) );
 	}
 	
 	public void testUnref()
@@ -87,9 +87,9 @@ public class Test_IncrementalTreeNodeTableWithDuplicates extends Test_Incrementa
 		assertTrue( table.containsKey( dd ) );
 
 		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] {} ), table.get( da ) );
-		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { ib } ), table.get( db ) );
-		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { ic } ), table.get( dc ) );
-		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { id2 } ), table.get( dd ) );
+		assertNodeSetsEqual( Arrays.asList( ib ), table.get( db ) );
+		assertNodeSetsEqual( Arrays.asList( ic ), table.get( dc ) );
+		assertNodeSetsEqual( Arrays.asList( id2 ), table.get( dd ) );
 	}
 
 	
@@ -115,10 +115,10 @@ public class Test_IncrementalTreeNodeTableWithDuplicates extends Test_Incrementa
 		assertTrue( table.containsKey( dc ) );
 		assertTrue( table.containsKey( dd ) );
 
-		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { ia } ), table.get( da ) );
-		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { ib } ), table.get( db ) );
-		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { ic } ), table.get( dc ) );
-		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { id2, id1 } ), table.get( dd ) );
+		assertNodeSetsEqual( Arrays.asList( ia ), table.get( da ) );
+		assertNodeSetsEqual( Arrays.asList( ib ), table.get( db ) );
+		assertNodeSetsEqual( Arrays.asList( ic ), table.get( dc ) );
+		assertNodeSetsEqual( Arrays.asList( id2, id1 ), table.get( dd ) );
 	}
 
 
@@ -141,9 +141,9 @@ public class Test_IncrementalTreeNodeTableWithDuplicates extends Test_Incrementa
 		assertTrue( table.containsKey( dc ) );
 		assertFalse( table.containsKey( dd ) );
 
-		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { ia } ), table.get( da ) );
-		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { ib } ), table.get( db ) );
-		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { ic } ), table.get( dc ) );
+		assertNodeSetsEqual( Arrays.asList( ia ), table.get( da ) );
+		assertNodeSetsEqual( Arrays.asList( ib ), table.get( db ) );
+		assertNodeSetsEqual( Arrays.asList( ic ), table.get( dc ) );
 		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] {} ), table.get( dd ) );
 		
 		
@@ -153,7 +153,7 @@ public class Test_IncrementalTreeNodeTableWithDuplicates extends Test_Incrementa
 		assertSame( val, id2 );
 		assertSame( val.getModel(), dd );
 		
-		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { id2 } ), table.get( dd ) );
+		assertNodeSetsEqual( Arrays.asList( id2 ), table.get( dd ) );
 		assertTrue( table.containsKey( dd ) );
 		assertEquals( table.size(), 4 );
 		

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.Selection.Selection;
 
-class SelectionContentsTransferable<SelectionContentsType extends Object, SelectionType extends Selection> implements Transferable
+class SelectionContentsTransferable<SelectionContentsType, SelectionType extends Selection> implements Transferable
 {
 	protected final AbstractSelectionExporter<SelectionContentsType, SelectionType> selectionExporter;
 	protected SelectionContentsType selectionContents;
@@ -33,19 +33,16 @@ class SelectionContentsTransferable<SelectionContentsType extends Object, Select
 	}
 	
 	
-	@Override
 	public DataFlavor[] getTransferDataFlavors()
 	{
-		return flavors.toArray( new DataFlavor[] {} );
+		return flavors.toArray( new DataFlavor[flavors.size()] );
 	}
 
-	@Override
 	public boolean isDataFlavorSupported(DataFlavor flavor)
 	{
 		return flavors.contains( flavor );
 	}
 
-	@Override
 	public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException
 	{
 		for (DataExporterInterface<SelectionContentsType> exporter: selectionExporter.getExporters())

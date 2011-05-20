@@ -493,9 +493,9 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 	//
 	//
 	
-	private static int FLAG_LINEBREAK = 0x1  *  ElementAlignment._ELEMENTALIGN_END;
-	private static int FLAG_PARAGRAPH_INDENT = 0x2  *  ElementAlignment._ELEMENTALIGN_END;
-	private static int FLAG_PARAGRAPH_DEDENT = 0x4  *  ElementAlignment._ELEMENTALIGN_END;
+	private static final int FLAG_LINEBREAK = 0x1  *  ElementAlignment._ELEMENTALIGN_END;
+	private static final int FLAG_PARAGRAPH_INDENT = 0x2  *  ElementAlignment._ELEMENTALIGN_END;
+	private static final int FLAG_PARAGRAPH_DEDENT = 0x4  *  ElementAlignment._ELEMENTALIGN_END;
 
 	protected int req_flags = 0;
 	protected int req_lineBreakCost;

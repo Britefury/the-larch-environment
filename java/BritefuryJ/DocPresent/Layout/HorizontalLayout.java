@@ -69,9 +69,8 @@ public class HorizontalLayout
 			
 			if ( v == VAlignment.REFY  ||  v == VAlignment.REFY_EXPAND )
 			{
-				double childRefY = child.getReqRefY();
-				double childHeightAboveRef = childRefY;
-				double childHeightBelowRef = childHeight - childRefY;
+				double childHeightAboveRef = child.getReqRefY();
+				double childHeightBelowRef = childHeight - childHeightAboveRef;
 				double childHeightBelowRefAndSpacing = childHeightBelowRef + child.getReqVSpacing();
 				
 				rowHeight = Math.max( rowHeight, childHeight );

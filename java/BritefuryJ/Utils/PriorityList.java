@@ -105,13 +105,11 @@ public class PriorityList <T> implements Iterable<T>, Serializable
 			int index = grab != null  ?  -1  :  0;
 			
 			
-			@Override
 			public boolean hasNext()
 			{
 				return index < size();
 			}
 
-			@Override
 			public T next()
 			{
 				if ( index == -1 )
@@ -146,7 +144,6 @@ public class PriorityList <T> implements Iterable<T>, Serializable
 				return index;
 			}
 			
-			@Override
 			public void remove()
 			{
 				throw new UnsupportedOperationException();

@@ -70,15 +70,15 @@ public class ProxyAndSpanTestPage extends SystemPage
 	}
 	
 	
-	private static String paragraphText = "The document presentation system, called DocPresent, provides a paragraph flow layout element. Line break elements give the paragraph element the "
+	private static final String paragraphText = "The document presentation system, called DocPresent, provides a paragraph flow layout element. Line break elements give the paragraph element the "
 		+ "opportunity to end lines in order to fit them in the given horizontal space. Lines are arranged vertically.";
-	private static String spanParaText = "The DocPresent span element incorporates its children into the children of the parent sequence element - paragraphs, horizontal or vertical boxes, or other span elements "
+	private static final String spanParaText = "The DocPresent span element incorporates its children into the children of the parent sequence element - paragraphs, horizontal or vertical boxes, or other span elements "
 		+ "which are in turn incorporated into parent elements until an element is reached that provides a specififc layout.";
-	private static String spanContentText = "These elements reside within a span.";
-	private static String spanInProxyContentText = "These elements reside within a span, within a proxy.";
-	private static String spanSecondaryText = "These are replacement elements that reside within a span.";
-	private static String proxySecondaryText = "These are replacement elements that reside within a span, within a proxy.";
-	private static String spanParaPostText = "These elements are members of the paragraph after the span.";
+	private static final String spanContentText = "These elements reside within a span.";
+	private static final String spanInProxyContentText = "These elements reside within a span, within a proxy.";
+	private static final String spanSecondaryText = "These are replacement elements that reside within a span.";
+	private static final String proxySecondaryText = "These are replacement elements that reside within a span, within a proxy.";
+	private static final String spanParaPostText = "These elements are members of the paragraph after the span.";
 	
 	
 

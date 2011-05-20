@@ -158,7 +158,7 @@ public class IncrementalTreeNodeTableWithDuplicates extends IncrementalTreeNodeT
 		}
 		else
 		{
-			return Arrays.asList( new IncrementalTreeNode[] {} );
+			return Arrays.asList();
 		}
 	}
 	

@@ -23,38 +23,36 @@ public abstract class AbstractDataImporter<TargetType extends Target> extends Da
 	//
 	//
 	
-	protected boolean canImport(TargetType target, Selection selection, Object data)
+	protected boolean canImportChecked(TargetType target, Selection selection, Object data)
 	{
 		return true;
 	}
 	
-	abstract protected boolean importData(TargetType target, Selection selection, Object data);
+	abstract protected boolean importCheckedData(TargetType target, Selection selection, Object data);
 
 	
 	
 	
-	@SuppressWarnings("unchecked")
 	@Override
-	protected boolean canImport(Target target, Selection selection, DataTransfer dataTransfer, DataFlavor flavor) throws UnsupportedFlavorException, IOException
+	protected boolean canImport(TargetType target, Selection selection, DataTransfer dataTransfer, DataFlavor flavor) throws UnsupportedFlavorException, IOException
 	{
 		if ( canImportFlavor( flavor ) )
 		{
-			return canImport( (TargetType)target, selection, dataTransfer.getTransferData( flavor ) );
+			return canImportChecked( (TargetType)target, selection, dataTransfer.getTransferData( flavor ) );
 		}
 
 		return false;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	protected boolean importData(Target target, Selection selection, DataTransfer dataTransfer, DataFlavor flavor) throws UnsupportedFlavorException, IOException
+	protected boolean importData(TargetType target, Selection selection, DataTransfer dataTransfer, DataFlavor flavor) throws UnsupportedFlavorException, IOException
 	{
 		if ( canImportFlavor( flavor ) )
 		{
 			Object data = dataTransfer.getTransferData( flavor );
-			if ( canImport( (TargetType)target, selection, data ) )
+			if ( canImportChecked( (TargetType)target, selection, data ) )
 			{
-				return importData( (TargetType)target, selection, data );
+				return importCheckedData( (TargetType)target, selection, data );
 			}
 		}
 		return false;

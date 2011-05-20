@@ -45,7 +45,6 @@ public abstract class AbstractColumn
 	{
 		UnaryFn fn = new UnaryFn()
 		{
-			@Override
 			public Object invoke(Object x)
 			{
 				return AbstractColumn.this.convertValue( x );

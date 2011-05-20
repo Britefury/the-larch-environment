@@ -38,7 +38,7 @@ import BritefuryJ.DocPresent.PageController;
 
 public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, PageController
 {
-	private static int MAX_TITLE_LENGTH = 16;
+	private static final int MAX_TITLE_LENGTH = 16;
 	
 	private static class TabComponent extends JPanel
 	{

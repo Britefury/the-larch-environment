@@ -23,7 +23,7 @@ import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.Utils.HashUtils;
 
 
-public class Point2 implements Cloneable, Presentable, Serializable
+public class Point2 implements Presentable, Serializable
 {
 	private static final long serialVersionUID = 1L;
 
@@ -49,16 +49,9 @@ public class Point2 implements Cloneable, Presentable, Serializable
 	}
 	
 	
-	public Point2 clone()
+	public Point2 copy()
 	{
-		try
-		{
-			return (Point2)super.clone();
-		}
-		catch (CloneNotSupportedException e)
-		{
-			return null;
-		}
+		return new Point2( x, y );
 	}
 	
 	
@@ -144,7 +137,6 @@ public class Point2 implements Cloneable, Presentable, Serializable
 
 	
 	
-	@Override
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return new Row( new Pres[] { delimStyle.applyTo( new Label( "(" ) ).alignVCentre(),

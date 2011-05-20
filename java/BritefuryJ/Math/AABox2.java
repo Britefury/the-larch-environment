@@ -10,7 +10,7 @@ package BritefuryJ.Math;
 import java.io.Serializable;
 
 
-public class AABox2 implements Cloneable, Serializable
+public class AABox2 implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
@@ -148,6 +148,12 @@ public class AABox2 implements Cloneable, Serializable
 	public double getHeight()
 	{
 		return upperY - lowerY;
+	}
+
+
+	public AABox2 copy()
+	{
+		return new AABox2( lowerX, lowerY, upperX, upperY );
 	}
 	
 

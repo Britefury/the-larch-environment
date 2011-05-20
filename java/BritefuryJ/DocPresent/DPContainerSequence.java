@@ -240,7 +240,7 @@ abstract public class DPContainerSequence extends DPContainer
 	{
 		HashSet<DPElement> oldEntrySet = new HashSet<DPElement>( registeredChildren );
 		
-		DPElement[] oldChildArray = registeredChildren.toArray( new DPElement[0] );
+		DPElement[] oldChildArray = registeredChildren.toArray( new DPElement[registeredChildren.size()] );
 		DPElement[] newChildEntriesArray = (DPElement[])JythonSlice.arraySetSlice( oldChildArray, slice, items );
 		
 		HashSet<DPElement> newEntrySet = new HashSet<DPElement>( registeredChildren );
@@ -285,7 +285,7 @@ abstract public class DPContainerSequence extends DPContainer
 	
 	public void __delitem__(PySlice slice)
 	{
-		DPElement[] in = registeredChildren.toArray( new DPElement[] {} );
+		DPElement[] in = registeredChildren.toArray( new DPElement[registeredChildren.size()] );
 		
 		DPElement[] removedArray = (DPElement[])JythonSlice.arrayGetSlice( in, slice );
 		

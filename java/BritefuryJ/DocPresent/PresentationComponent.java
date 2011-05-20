@@ -439,8 +439,8 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		protected ArrayList<Runnable> waitingImmediateEvents;			// only initialised when non-empty; otherwise null
 
 		
-		private ArrayList<ElementPreview> elementPreviews = new ArrayList<ElementPreview>();;
-		
+		private ArrayList<ElementPreview> elementPreviews = new ArrayList<ElementPreview>();
+
 		protected PresentationComponent metaElementComponent;
 		
 			
@@ -471,7 +471,6 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			
 			TargetListener caretTargetListener = new TargetListener()
 			{
-				@Override
 				public void targetChanged(Target t)
 				{
 					caretChanged( (Caret)t );
@@ -1208,7 +1207,6 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		}
 		
 		
-		@Override
 		public void dndInitiateDrag(DndDropLocal drop, MouseEvent mouseEvent, int requestedAction)
 		{
 			PresentationComponent.PresAreaTransferHandler xferHandler = getDndTransferHandler();

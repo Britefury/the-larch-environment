@@ -523,7 +523,7 @@ public class ParagraphLayout
 		}
 
 		
-		return lines.toArray( new Line[0] );
+		return lines.toArray( new Line[lines.size()] );
 	}
 
 

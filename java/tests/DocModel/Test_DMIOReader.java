@@ -7,10 +7,7 @@
 package tests.DocModel;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import junit.framework.TestCase;
 
@@ -53,7 +50,6 @@ public class Test_DMIOReader extends TestCase
 		B7 = schemaBv7.newClass( "B", new String[] { "x", "z" } );
 		b1ReaderForV7 = new DMObjectReader()
 		{
-			@Override
 			public DMObject readObject(Map<String, Object> fieldValues)
 			{
 				DMObject instance = B7.newInstance();
@@ -64,7 +60,6 @@ public class Test_DMIOReader extends TestCase
 		};
 		b4ReaderForV7 = new DMObjectReader()
 		{
-			@Override
 			public DMObject readObject(Map<String, Object> fieldValues)
 			{
 				DMObject instance = B7.newInstance();
@@ -151,13 +146,11 @@ public class Test_DMIOReader extends TestCase
 	}
 
 
+	@SuppressWarnings("unchecked")
 	public void readStateTest(String input, Object embedded[], PyObject embeddedPy[], Object expected)
 	{
 		PyList embAsPy = new PyList();
-		for (Object e: embedded)
-		{
-			embAsPy.add( e );
-		}
+		Collections.addAll( embAsPy, embedded );
 		
 		PyList embPyAsPy = new PyList();
 		for (PyObject e: embeddedPy)
@@ -247,7 +240,7 @@ public class Test_DMIOReader extends TestCase
 		f.add( "f" );
 		f.add( g );
 		f.add( "There" );
-		f.add( new Character( (char)Integer.valueOf( "0107", 16 ).intValue() ).toString() );
+		f.add( Character.toString( (char)Integer.valueOf( "0107", 16 ).intValue() ) );
 
 		readTest( "[f [g [h 1 2L 3.0] \"Hi\"] \"There\" \"\\x0107x\"]", f );
 	}
@@ -268,7 +261,7 @@ public class Test_DMIOReader extends TestCase
 	public void testReadObjectInListInObject()
 	{
 		DMObject a = A.newInstance( new Object[] { "0", "1" } );
-		List<Object> b = Arrays.asList( new Object[] { a, "xyz" } );
+		List<Object> b = Arrays.asList( a, "xyz" );
 		DMObject c = A.newInstance( new Object[] { b, "1" } );
 		readTest( "{m=test.DocModel.Test_DMIOReader.schemaA : (m A x=[(m A x=0 y=1) xyz] y=1)}", c );
 	}

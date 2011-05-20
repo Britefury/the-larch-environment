@@ -17,7 +17,7 @@ import BritefuryJ.Utils.StringDiff;
 
 public class NodeElementChangeListenerDiff implements IncrementalView.NodeElementChangeListener
 {
-	private static int DIFF_THRESHHOLD = 65536;
+	private static final int DIFF_THRESHHOLD = 65536;
 	
 	
 	private FragmentView caretNode;

@@ -34,7 +34,7 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 		{
 			try
 			{
-				constructor = cls.getConstructor( new Class<?>[] {} );
+				constructor = cls.getConstructor();
 			}
 			catch (NoSuchMethodException e)
 			{
@@ -47,7 +47,7 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 		{
 			try
 			{
-				return constructor.newInstance( new Object[] {} );
+				return constructor.newInstance();
 			}
 			catch (Throwable t)
 			{

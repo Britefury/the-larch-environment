@@ -25,7 +25,7 @@ public class PointerState
 	{
 		this.pointer = pointer;
 		
-		localPos = pointer.getLocalPos().clone();
+		localPos = pointer.getLocalPos().copy();
 
 		modifiers = pointer.getModifiers();
 	}

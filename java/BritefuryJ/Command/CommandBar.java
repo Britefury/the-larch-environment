@@ -28,11 +28,7 @@ public class CommandBar
 		@Override
 		public boolean keyPressed(Keyboard keyboard, KeyEvent event)
 		{
-			if ( event.getKeyCode() == KeyEvent.VK_ESCAPE )
-			{
-				return true;
-			}
-			return false;
+			return event.getKeyCode() == KeyEvent.VK_ESCAPE;
 		}
 
 		@Override
@@ -60,11 +56,7 @@ public class CommandBar
 		@Override
 		public boolean keyPressed(Keyboard keyboard, KeyEvent event)
 		{
-			if ( event.getKeyCode() == KeyEvent.VK_ESCAPE )
-			{
-				return true;
-			}
-			return false;
+			return event.getKeyCode() == KeyEvent.VK_ESCAPE;
 		}
 
 		@Override
@@ -89,7 +81,6 @@ public class CommandBar
 	
 	private CommandConsoleListener consoleListener = new CommandConsoleListener()
 	{
-		@Override
 		public void finished(AbstractCommandConsole commandConsole)
 		{
 			presentation.grabFocus();
@@ -100,7 +91,7 @@ public class CommandBar
 
 	
 	private PresentationComponent presentation;
-	private JPanel commandBarBorder, commandBarArea;
+	private JPanel commandBarArea;
 	
 	private IncrementalViewInComponent view;
 	
@@ -117,9 +108,9 @@ public class CommandBar
 
 		
 		view = new IncrementalViewInComponent( console.getSubject(), console.getBrowserContext(), null, pageController );
-	
-		
-		commandBarBorder = new JPanel( new BorderLayout() );
+
+
+		JPanel commandBarBorder = new JPanel( new BorderLayout() );
 		commandBarBorder.add( view.getComponent(), BorderLayout.CENTER );
 		commandBarBorder.setBorder( BorderFactory.createLineBorder( new Color( 0.65f, 0.65f, 0.65f ), 1 ) );
 		

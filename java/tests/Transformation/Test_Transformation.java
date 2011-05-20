@@ -49,7 +49,7 @@ public class Test_Transformation extends TestCase
 				DMObject dx = (DMObject)x;
 				if ( dx.getDMObjectClass() == StringNode )
 				{
-					return StringNode.newInstance( new Object[] { (String)dx.get( "s" ) + "jk", innerNodeXform.apply( dx.get( "n" ), innerNodeXform ) } );
+					return StringNode.newInstance( new Object[] { dx.get( "s" ) + "jk", innerNodeXform.apply( dx.get( "n" ), innerNodeXform ) } );
 				}
 				else
 				{
@@ -65,7 +65,7 @@ public class Test_Transformation extends TestCase
 				DMObject dx = (DMObject)x;
 				if ( dx.getDMObjectClass() == StringNode )
 				{
-					return StringNode.newInstance( new Object[] { (String)dx.get( "s" ) + "pq", innerNodeXform.apply( dx.get( "n" ), innerNodeXform ) } );
+					return StringNode.newInstance( new Object[] { dx.get( "s" ) + "pq", innerNodeXform.apply( dx.get( "n" ), innerNodeXform ) } );
 				}
 				else
 				{

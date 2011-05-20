@@ -71,7 +71,7 @@ public class Test_DefaultIdentityTransformationFunction extends TestCase
 		DMObjectClass B = m.newClass( "B", new String[] { "p", "q" } );
 		
 		DMObject a0 = A.newInstance( new Object[] { "a", "b" } );
-		DMObject b0 = B.newInstance( new Object[] { "c", Arrays.asList( new Object[] { "d", a0 } ) } );
+		DMObject b0 = B.newInstance( new Object[] { "c", Arrays.asList( "d", a0 ) } );
 		
 		DefaultIdentityTransformationFunction identity = new DefaultIdentityTransformationFunction();
 		DMObject b0x = (DMObject)identity.apply( b0, xform );

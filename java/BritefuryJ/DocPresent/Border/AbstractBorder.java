@@ -57,7 +57,6 @@ public abstract class AbstractBorder implements Presentable
 	}
 	
 
-	@Override
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return new ObjectBox( getClass().getName(), StyleSheet.instance.withAttr( Primitive.border, this ).applyTo( new Border( presentationSwatch() ) ) );

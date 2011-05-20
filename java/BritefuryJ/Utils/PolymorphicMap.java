@@ -15,12 +15,12 @@ import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
 
-public class PolymorphicMap <ValueType extends Object> implements Serializable
+public class PolymorphicMap <ValueType> implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
 
-	private static class Entry <ValueType extends Object>
+	private static class Entry <ValueType>
 	{
 		private ValueType value;
 		

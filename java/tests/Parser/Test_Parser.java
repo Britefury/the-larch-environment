@@ -9,10 +9,7 @@ package tests.Parser;
 import java.awt.Color;
 import java.awt.LinearGradientPaint;
 import java.awt.Paint;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMSchema;
@@ -85,10 +82,7 @@ public class Test_Parser extends ParserTestCase
 		for (int i = 0; i < a.length; i++)
 		{
 			ArrayList<Object> v2 = new ArrayList<Object>();
-			for (int j = 0; j < a[i].length; j++)
-			{
-				v2.add( a[i][j] );
-			}
+			Collections.addAll( v2, a[i] );
 			v.add( v2 );
 		}
 		

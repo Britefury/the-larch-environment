@@ -93,82 +93,69 @@ class DependencyTable <KeyType>
 
 		
 		
-		@Override
 		public boolean add(KeyType arg0)
 		{
 			throw new UnsupportedOperationException();
 		}
 
-		@Override
 		public boolean addAll(Collection<? extends KeyType> arg0)
 		{
 			throw new UnsupportedOperationException();
 		}
 
-		@Override
 		public void clear()
 		{
 			throw new UnsupportedOperationException();
 		}
 
-		@Override
 		public boolean contains(Object x)
 		{
 			return value.contains( x );
 		}
 
-		@Override
 		public boolean containsAll(Collection<?> xs)
 		{
 			return value.containsAll( xs );
 		}
 
-		@Override
 		public boolean isEmpty()
 		{
 			return value.isEmpty();
 		}
 
-		@Override
 		public Iterator<KeyType> iterator()
 		{
 			return value.iterator();
 		}
 
-		@Override
 		public boolean remove(Object arg0)
 		{
 			throw new UnsupportedOperationException();
 		}
 
-		@Override
 		public boolean removeAll(Collection<?> arg0)
 		{
 			throw new UnsupportedOperationException();
 		}
 
-		@Override
 		public boolean retainAll(Collection<?> arg0)
 		{
 			throw new UnsupportedOperationException();
 		}
 
-		@Override
 		public int size()
 		{
 			return value.size();
 		}
 
-		@Override
 		public Object[] toArray()
 		{
 			return value.toArray();
 		}
 
-		@Override
-		public <T> T[] toArray(T[] arg0)
+		public <T> T[] toArray(T[] a)
 		{
-			return value.toArray( arg0 );
+			return value.toArray( a );
 		}
 	}
 	

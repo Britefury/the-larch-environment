@@ -216,7 +216,7 @@ public class DPImage extends DPContentLeaf
 		
 		if ( root != null )
 		{
-			boolean bUseHover = testFlag( FLAG_HOVER )  ?  hoverImage != null  :  false;
+			boolean bUseHover = testFlag( FLAG_HOVER ) && hoverImage != null;
 			
 			Image img = bUseHover  ?  hoverImage  :  image;
 			double sX = bUseHover  ?  hoverImageScaleX  :  imageScaleX;

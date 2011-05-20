@@ -25,7 +25,6 @@ public abstract class AbstractTableEditorInstance <ModelType>
 {
 	private class TargetInteractor implements TargetElementInteractor
 	{
-		@Override
 		public SelectionPoint targetDragBegin(PointerInputElement element, PointerButtonEvent event)
 		{
 			if ( event.getButton() == 1 )
@@ -67,12 +66,10 @@ public abstract class AbstractTableEditorInstance <ModelType>
 			return null;
 		}
 
-		@Override
 		public void targetDragEnd(PointerInputElement element, PointerButtonEvent event, Point2 dragStartPos, int dragButton)
 		{
 		}
 
-		@Override
 		public SelectionPoint targetDragMotion(PointerInputElement element, PointerMotionEvent event, Point2 dragStartPos, int dragButton)
 		{
 			Point2 p = event.getLocalPointerPos();
@@ -146,8 +143,7 @@ public abstract class AbstractTableEditorInstance <ModelType>
 	{
 		Pres table = presentTable();
 		Pres region = new Region( table, editor.clipboardHandler );
-		Pres t = new TableEditorPres( region );
-		return t;
+		return new TableEditorPres( region );
 	}
 
 	

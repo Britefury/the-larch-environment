@@ -33,13 +33,11 @@ public class DropDownExpander extends Expander
 		}
 		
 		
-		@Override
 		public boolean testClickEvent(PointerInputElement element, AbstractPointerButtonEvent event)
 		{
 			return event.getButton() == 1;
 		}
 
-		@Override
 		public boolean buttonClicked(PointerInputElement element, PointerButtonClickedEvent event)
 		{
 			control.toggle();
@@ -94,12 +92,10 @@ public class DropDownExpander extends Expander
 		StyleSheet headerStyle = StyleSheet.instance.withAttr( Primitive.rowSpacing, style.get( Controls.dropDownExpanderHeaderContentsSpacing, Double.class ) );
 		
 		Pres expandedHeader = headerStyle.applyTo( new Row( new Pres[] { expandedArrow.alignHPack().alignVCentre(), header.alignHExpand() } ) ).withElementInteractor( headerInteractor );
-		Pres contractedHeader = headerStyle.applyTo( new Row( new Pres[] { contractedArrow.alignHPack().alignVCentre(), header.alignHExpand() } ) ).withElementInteractor( headerInteractor );
-		
-		
 		Pres expanded = new Column( new Pres[] { expandedHeader, contents.padX( padding ) } );
-		Pres contracted = contractedHeader;
-		
+
+		Pres contracted = headerStyle.applyTo( new Row( new Pres[] { contractedArrow.alignHPack().alignVCentre(), header.alignHExpand() } ) ).withElementInteractor( headerInteractor );
+
 		Pres expander = new Bin( initialState  ?  expanded  :  contracted );
 		DPBin expanderElement = (DPBin)expander.present( ctx, usedStyle );
 		

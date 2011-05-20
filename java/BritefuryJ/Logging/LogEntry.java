@@ -34,16 +34,16 @@ public class LogEntry implements Presentable
 		{
 			super( message );
 		}
-	};
-	
-	
+	}
+
+
 	public enum Layout
 	{
 		HORIZONTAL,
 		VERTICAL
-	};
-	
-	
+	}
+
+
 	public static class Item
 	{
 		private String name;

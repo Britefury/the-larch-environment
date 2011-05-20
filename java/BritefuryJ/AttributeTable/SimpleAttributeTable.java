@@ -357,7 +357,7 @@ public class SimpleAttributeTable implements Presentable
 	protected static Pres presentAttributeMap(FragmentView ctx, SimpleAttributeTable inheritedState, HashMap<String, Object> values)
 	{
 		Set<String> nameSet = values.keySet();
-		String names[] = nameSet.toArray( new String[0] );
+		String names[] = nameSet.toArray( new String[nameSet.size()] );
 		Arrays.sort( names );
 		Pres children[][] = new Pres[names.length+1][];
 		
@@ -372,7 +372,6 @@ public class SimpleAttributeTable implements Presentable
 		return attrTableStyle.applyTo( new Table( children ) );
 	}
 	
-	@Override
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		Pres valueField = new VerticalField( "Attributes:", presentAttributeMap( fragment, inheritedState, values ) );

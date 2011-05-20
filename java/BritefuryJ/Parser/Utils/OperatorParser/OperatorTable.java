@@ -88,7 +88,7 @@ public class OperatorTable
 		{
 			public Object invoke(Object input, int begin, int end, Object left, Object right)
 			{
-				return Arrays.asList( new Object[] { '*', left, right } );
+				return Arrays.asList( '*', left, right );
 			}
 		};
 
@@ -96,7 +96,7 @@ public class OperatorTable
 		{
 			public Object invoke(Object input, int begin, int end, Object x)
 			{
-				return Arrays.asList( new Object[] { '!', x } );
+				return Arrays.asList( '!', x );
 			}
 		};
 		
@@ -106,7 +106,7 @@ public class OperatorTable
 		
 		InfixRightLevel l0 = new InfixRightLevel( new BinaryOperator[] { mul } );
 		//PrefixLevel l1 = new PrefixLevel( Arrays.asList( new UnaryOperator[] { inv } ) );
-		SuffixLevel l1 = new SuffixLevel( Arrays.asList( new UnaryOperator[] { inv } ) );
+		SuffixLevel l1 = new SuffixLevel( Arrays.asList( inv ) );
 		
 		OperatorTable t = new OperatorTable( new OperatorLevel[] { l0, l1 }, Tokens.identifier );
 		List<ParserExpression> parsers = t.buildParsers();

@@ -50,9 +50,9 @@ public class StringUnitEditorTextEntry extends LiteralUnitEditor
 				error( "not a string" );
 			}
 		}
-	};
-	
-	
+	}
+
+
 	public StringUnitEditorTextEntry(LiteralUnit cell)
 	{
 		super( cell );

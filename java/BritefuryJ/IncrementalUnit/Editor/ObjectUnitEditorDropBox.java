@@ -21,7 +21,6 @@ public class ObjectUnitEditorDropBox extends LiteralUnitEditor
 	{
 		protected class Listener implements ObjectDndHandler.DropFn
 		{
-			@Override
 			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
 			{
 				setCellValue( ((FragmentView.FragmentModel)data).getModel() );
@@ -49,9 +48,9 @@ public class ObjectUnitEditorDropBox extends LiteralUnitEditor
 			p = p.withDropDest( FragmentView.FragmentModel.class, new Listener() );
 			setPres( p );
 		}
-	};
-	
-	
+	}
+
+
 	public ObjectUnitEditorDropBox(LiteralUnit cell)
 	{
 		super( cell );

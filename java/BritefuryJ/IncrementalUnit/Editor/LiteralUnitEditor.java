@@ -60,7 +60,6 @@ public abstract class LiteralUnitEditor implements Presentable, IncrementalMonit
 			{
 				Runnable run = new Runnable()
 				{
-					@Override
 					public void run()
 					{
 						refreshEditor();
@@ -77,9 +76,9 @@ public abstract class LiteralUnitEditor implements Presentable, IncrementalMonit
 			cell.setLiteralValue( value );
 			bSettingCellValue = false;
 		}
-	};
-	
-	
+	}
+
+
 	protected LiteralUnit cell;
 	protected WeakHashMap<Editor, Object> editors = new WeakHashMap<Editor, Object>();
 	
@@ -94,7 +93,7 @@ public abstract class LiteralUnitEditor implements Presentable, IncrementalMonit
 	protected abstract Editor createEditor();
 	
 
-	protected <V extends Object> V getCellValue(Class<V> valueClass)
+	protected <V> V getCellValue(Class<V> valueClass)
 	{
 		Object v = cell.getLiteralValue();
 		
@@ -116,7 +115,7 @@ public abstract class LiteralUnitEditor implements Presentable, IncrementalMonit
 		return typedV;
 	}
 	
-	protected <V extends Object> V getCellValueNonNull(Class<V> valueClass, V defaultValue)
+	protected <V> V getCellValueNonNull(Class<V> valueClass, V defaultValue)
 	{
 		Object v = cell.getLiteralValue();
 		
@@ -140,14 +139,12 @@ public abstract class LiteralUnitEditor implements Presentable, IncrementalMonit
 	
 
 	
-	@Override
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return createEditor().getPres();
 	}
 
 
-	@Override
 	public void onIncrementalMonitorChanged(IncrementalMonitor inc)
 	{
 		for (Editor editor: editors.keySet())

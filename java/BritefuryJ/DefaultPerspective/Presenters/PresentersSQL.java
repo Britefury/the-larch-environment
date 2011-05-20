@@ -98,10 +98,8 @@ public class PresentersSQL extends ObjectPresenterRegistry
 			}
 		}
 		
-		Object tableCells[][] = cells.toArray( new Object[0][] );
-		Pres table = resultStyle.applyTo( new Table( tableCells ) );
-		
-		return table;
+		Object tableCells[][] = cells.toArray( new Object[cells.size()][] );
+		return resultStyle.applyTo( new Table( tableCells ) );
 	}
 	
 	

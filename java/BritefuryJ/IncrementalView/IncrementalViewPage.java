@@ -27,8 +27,6 @@ import BritefuryJ.Projection.Subject;
 
 public class IncrementalViewPage extends BrowserPage
 {
-	private Pres pres;
-	private Hyperlink logLink;
 	private Pres pagePres;
 	private String title;
 	private ChangeHistory changeHistory;
@@ -39,7 +37,6 @@ public class IncrementalViewPage extends BrowserPage
 	
 	public IncrementalViewPage(Pres pres, String title, final ProjectiveBrowserContext browserContext, ChangeHistory changeHistory, BrowserIncrementalView view, Subject subject)
 	{
-		this.pres = pres;
 		this.title = title;
 		this.changeHistory = changeHistory;
 		this.view = view;
@@ -47,7 +44,6 @@ public class IncrementalViewPage extends BrowserPage
 		
 		Hyperlink.LinkListener listener = new Hyperlink.LinkListener()
 		{
-			@Override
 			public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonClickedEvent event)
 			{
 				Log log = getLog();
@@ -57,10 +53,10 @@ public class IncrementalViewPage extends BrowserPage
 				link.getElement().getRootElement().getPageController().openLocation( location, PageController.OpenOperation.OPEN_IN_NEW_WINDOW );
 			}
 		};
-		
-		logLink = new Hyperlink( "Page log", listener );
+
+		Hyperlink logLink = new Hyperlink( "Page log", listener );
 //		pagePres = new Column( new Object[] { this.element.alignHExpand(), logLink.pad( 10, 10 ).alignHRight() } );
-		pagePres = new Column( new Object[] { this.pres.alignHExpand().alignVExpand(), logLink.pad( 10, 10 ).alignHRight().alignVRefY() } );
+		pagePres = new Column( new Object[] { pres.alignHExpand().alignVExpand(), logLink.pad( 10, 10 ).alignHRight().alignVRefY() } );
 	}
 	
 	

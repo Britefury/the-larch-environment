@@ -34,20 +34,20 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 			this.iter = iter;
 		}
 		
-		@Override
+		
 		public boolean hasNext()
 		{
 			return iter.hasNext();
 		}
 
-		@Override
+		
 		public Key next()
 		{
 			Map.Entry<Key, Value> e = iter.next();
 			return e.getKey();
 		}
 
-		@Override
+		
 		public void remove()
 		{
 			throw new UnsupportedOperationException();
@@ -63,35 +63,35 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 			this.set = set;
 		}
 
-		@Override
+		
 		public int size()
 		{
 			cleanup();
 			return WeakIdentityHashMap.this.size();
 		}
 
-		@Override
+		
 		public boolean isEmpty()
 		{
 			cleanup();
 			return WeakIdentityHashMap.this.isEmpty();
 		}
 
-		@Override
+		
 		public boolean contains(Object o)
 		{
 			cleanup();
 			return WeakIdentityHashMap.this.containsKey( o );
 		}
 
-		@Override
+		
 		public Iterator<Key> iterator()
 		{
 			cleanup();
 			return new KeyIterator( WeakIdentityHashMap.this.entrySet().iterator() );
 		}
 
-		@Override
+		
 		public Object[] toArray()
 		{
 			cleanup();
@@ -104,7 +104,7 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 		}
 
 		@SuppressWarnings("unchecked")
-		@Override
+		
 		public <T> T[] toArray(T[] a)
 		{
 			cleanup();
@@ -116,20 +116,20 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 			return keys.toArray( a );
 		}
 
-		@Override
+		
 		public boolean add(Key e)
 		{
 			throw new UnsupportedOperationException();
 		}
 
-		@Override
+		
 		public boolean remove(Object o)
 		{
 			cleanup();
 			return set.remove( new WeakIdKey( o ) );
 		}
 
-		@Override
+		
 		public boolean containsAll(Collection<?> c)
 		{
 			cleanup();
@@ -143,13 +143,13 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 			return true;
 		}
 
-		@Override
+		
 		public boolean addAll(Collection<? extends Key> c)
 		{
 			throw new UnsupportedOperationException();
 		}
 
-		@Override
+		
 		public boolean retainAll(Collection<?> c)
 		{
 			cleanup();
@@ -161,7 +161,7 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 			return set.retainAll( xs );
 		}
 
-		@Override
+		
 		public boolean removeAll(Collection<?> c)
 		{
 			cleanup();
@@ -173,7 +173,7 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 			return set.removeAll( xs );
 		}
 
-		@Override
+		
 		public void clear()
 		{
 			cleanup();
@@ -195,19 +195,19 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 			this.k = (Key)e.getKey().get();
 		}
 
-		@Override
+		
 		public Key getKey()
 		{
 			return k;
 		}
 
-		@Override
+		
 		public Value getValue()
 		{
 			return e.getValue();
 		}
 
-		@Override
+		
 		public Value setValue(Value value)
 		{
 			return e.setValue( value );
@@ -225,7 +225,7 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 			next = fetchNext();
 		}
 		
-		@Override
+		
 		public boolean hasNext()
 		{
 			if ( next == null )
@@ -235,7 +235,7 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 			return next != null;
 		}
 
-		@Override
+		
 		public Map.Entry<Key, Value> next()
 		{
 			if ( next != null )
@@ -254,7 +254,7 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 			}
 		}
 
-		@Override
+		
 		public void remove()
 		{
 			throw new UnsupportedOperationException();
@@ -286,14 +286,14 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 			this.set = set;
 		}
 
-		@Override
+		
 		public int size()
 		{
 			cleanup();
 			return WeakIdentityHashMap.this.size();
 		}
 
-		@Override
+		
 		public boolean isEmpty()
 		{
 			cleanup();
@@ -301,21 +301,21 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 		}
 
 		@SuppressWarnings("unchecked")
-		@Override
+		
 		public boolean contains(Object o)
 		{
 			cleanup();
 			return set.contains( weakEntry( (Map.Entry<Key, Value>)o ) );
 		}
 
-		@Override
+		
 		public Iterator<Map.Entry<Key, Value>> iterator()
 		{
 			cleanup();
 			return new EntryIterator( set.iterator() );
 		}
 
-		@Override
+		
 		public Object[] toArray()
 		{
 			cleanup();
@@ -328,7 +328,7 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 		}
 
 		@SuppressWarnings("unchecked")
-		@Override
+		
 		public <T> T[] toArray(T[] a)
 		{
 			cleanup();
@@ -340,14 +340,14 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 			return arr.toArray( a );
 		}
 
-		@Override
+		
 		public boolean add(Map.Entry<Key, Value> e)
 		{
 			throw new UnsupportedOperationException();
 		}
 
 		@SuppressWarnings("unchecked")
-		@Override
+		
 		public boolean remove(Object o)
 		{
 			cleanup();
@@ -355,7 +355,7 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 		}
 
 		@SuppressWarnings("unchecked")
-		@Override
+		
 		public boolean containsAll(Collection<?> c)
 		{
 			cleanup();
@@ -369,14 +369,14 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 			return true;
 		}
 
-		@Override
+		
 		public boolean addAll(Collection<? extends Map.Entry<Key, Value>> c)
 		{
 			throw new UnsupportedOperationException();
 		}
 
 		@SuppressWarnings("unchecked")
-		@Override
+		
 		public boolean retainAll(Collection<?> c)
 		{
 			cleanup();
@@ -389,7 +389,7 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 		}
 
 		@SuppressWarnings("unchecked")
-		@Override
+		
 		public boolean removeAll(Collection<?> c)
 		{
 			cleanup();
@@ -401,7 +401,7 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 			return set.removeAll( xs );
 		}
 
-		@Override
+		
 		public void clear()
 		{
 			cleanup();
@@ -415,63 +415,63 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 	
 	
 
-	@Override
+	
 	public void clear()
 	{
 		cleanup();
 		map.clear();
 	}
 
-	@Override
+	
 	public boolean containsKey(Object key)
 	{
 		cleanup();
 		return map.containsKey( new WeakIdKey( key ) );
 	}
 
-	@Override
+	
 	public boolean containsValue(Object value)
 	{
 		cleanup();
 		return map.containsValue( value );
 	}
 
-	@Override
+	
 	public Set<Map.Entry<Key, Value>> entrySet()
 	{
 		cleanup();
 		return new EntrySet( map.entrySet() );
 	}
 
-	@Override
+	
 	public Value get(Object key)
 	{
 		cleanup();
 		return map.get( new WeakIdKey( key ) );
 	}
 
-	@Override
+	
 	public boolean isEmpty()
 	{
 		cleanup();
 		return map.isEmpty();
 	}
 
-	@Override
+	
 	public Set<Key> keySet()
 	{
 		cleanup();
 		return new KeySet( map.keySet() );
 	}
 
-	@Override
+	
 	public Value put(Key key, Value value)
 	{
 		cleanup();
 		return map.put( new WeakIdKey( key, refQueue ), value );
 	}
 
-	@Override
+	
 	public void putAll(Map<? extends Key, ? extends Value> m)
 	{
 		cleanup();
@@ -481,21 +481,21 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 		}
 	}
 
-	@Override
+	
 	public Value remove(Object key)
 	{
 		cleanup();
 		return map.remove( new WeakIdKey( key ) );
 	}
 	
-	@Override
+	
 	public int size()
 	{
 		cleanup();
 		return map.size();
 	}
 
-	@Override
+	
 	public Collection<Value> values()
 	{
 		cleanup();
@@ -504,7 +504,7 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 
 	
 	
-	@Override
+	
 	public boolean equals(Object x)
 	{
 		if ( x == this )
@@ -523,7 +523,7 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 		}
 	}
 	
-	@Override
+	
 	public int hashCode()
 	{
 		return map.hashCode();

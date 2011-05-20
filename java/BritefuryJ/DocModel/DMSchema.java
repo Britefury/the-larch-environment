@@ -114,7 +114,7 @@ public class DMSchema
 		
 		public void registerReader(DMObjectReader reader, int version)
 		{
-			int index = Arrays.binarySearch( versions.toArray( new Integer[0] ), version );
+			int index = Arrays.binarySearch( versions.toArray( new Integer[versions.size()] ), version );
 			if ( index >= 0 )
 			{
 				readers.set( index, reader );
@@ -172,7 +172,7 @@ public class DMSchema
 		
 		private ReaderWrapper createReaderWrapperForVersion(int version)
 		{
-			int index = Arrays.binarySearch( versions.toArray( new Integer[0] ), version );
+			int index = Arrays.binarySearch( versions.toArray( new Integer[versions.size()] ), version );
 			if ( index >= 0 )
 			{
 				return new ReaderWrapper( readers.get( index ) );

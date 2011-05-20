@@ -36,8 +36,7 @@ public class ObjectViewLocationTable
 			objectToLocation.put( x, key );
 			locationToObject.put( key, new WeakReference<Object>( x ) );
 		}
-		String location = "." + key;
-		return location;
+		return "." + key;
 	}
 	
 	public Object __resolve__(PyString key)
