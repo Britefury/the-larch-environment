@@ -98,7 +98,7 @@ def _isChildOf(node, package):
 
 
 def _performDrop(data, action, newParent, index):
-	changeHistory = newParent.getChangeHistory()
+	changeHistory = newParent.__change_history__
 	changeHistory.freeze()
 	source = copy.deepcopy( data.source )   if action == ObjectDndHandler.COPY   else data.source
 
