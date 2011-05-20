@@ -36,7 +36,7 @@ public class AttributeNamespace
 		{
 			super( message );
 		}
-	};
+	}
 	
 	
 	private String name;

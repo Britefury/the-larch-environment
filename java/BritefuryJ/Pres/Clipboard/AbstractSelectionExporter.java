@@ -15,7 +15,7 @@ import javax.swing.TransferHandler;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.Target.Target;
 
-abstract public class AbstractSelectionExporter <SelectionContentsType extends Object, SelectionType extends Selection>
+abstract public class AbstractSelectionExporter <SelectionContentsType, SelectionType extends Selection>
 {
 	public static int COPY = TransferHandler.COPY;
 	public static int COPY_OR_MOVE = TransferHandler.COPY_OR_MOVE;
@@ -108,6 +108,6 @@ abstract public class AbstractSelectionExporter <SelectionContentsType extends O
 		
 		SelectionContentsTransferable<SelectionContentsType, SelectionType> t = (SelectionContentsTransferable<SelectionContentsType, SelectionType>)transferable;
 		
-		exportDone( (SelectionType)selection, target, (SelectionContentsType)t.selectionContents, action );
+		exportDone( (SelectionType)selection, target, t.selectionContents, action );
 	}
 }

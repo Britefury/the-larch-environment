@@ -7,7 +7,6 @@
 package BritefuryJ.Controls;
 
 import java.awt.Paint;
-import java.util.WeakHashMap;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.Pres.Pres;
@@ -92,7 +91,6 @@ public class Checkbox extends ControlPres
 	private Pres child;
 	private CheckboxListener listener;
 	private boolean initialState;
-	private WeakHashMap<DPElement, Object> elements = new WeakHashMap<DPElement, Object>();
 
 	
 	public Checkbox(Object child, boolean initialState, CheckboxListener listener)
@@ -129,7 +127,6 @@ public class Checkbox extends ControlPres
 		
 		Pres bin = new Bin( rowElement );
 		DPElement element = bin.present( ctx, style );
-		elements.put( element, null );
 		element.setFixedValue( initialState );
 		return new CheckboxControl( ctx, style, element, rowElement, checkElement, initialState, listener, checkForeground );
 	}

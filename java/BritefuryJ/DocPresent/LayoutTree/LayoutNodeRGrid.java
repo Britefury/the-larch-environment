@@ -73,7 +73,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 			if ( child instanceof DPGridRow )
 			{
 				DPGridRow row = (DPGridRow)child;
-				((LayoutNodeGridRow)row.getLayoutNode()).getRequisitionBox().setRequisitionX( layoutReqBox );
+				row.getLayoutNode().getRequisitionBox().setRequisitionX( layoutReqBox );
 			}
 		}
 

@@ -60,7 +60,7 @@ public class DMObjectOutputStream
 			stream.writeBoolean( true );
 			stream.writeObject( modName );
 			stream.writeObject( schema.getLocation() );
-			stream.writeObject( (Integer)schema.getVersion() );
+			stream.writeObject( schema.getVersion() );
 		}
 		else
 		{

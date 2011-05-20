@@ -49,9 +49,9 @@ public class RealUnitEditorSpinEntry extends LiteralUnitEditor
 				error( "not a string" );
 			}
 		}
-	};
-	
-	
+	}
+
+
 	private double min, max, stepSize, pageSize;
 	
 	

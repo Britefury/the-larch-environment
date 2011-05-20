@@ -34,7 +34,7 @@ public class EditableStructuralItem extends Pres
 	public EditableStructuralItem(SequentialEditor editor, List<TreeEventListener> editListeners, Object value, Object child)
 	{
 		this.editor = editor;
-		this.editListeners = editListeners.toArray( new TreeEventListener[] {} );
+		this.editListeners = editListeners.toArray( new TreeEventListener[editListeners.size()] );
 		this.value = value;
 		this.child = coerceNonNull( child );
 	}

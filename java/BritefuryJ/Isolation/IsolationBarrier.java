@@ -140,26 +140,22 @@ public class IsolationBarrier <ValueType> implements Presentable, Trackable
 	
 	
 	
-	@Override
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return style.applyTo( new ObjectBox( "ISOLATION BARRIER", Pres.coerceNonNull( getValue() ) ) );
 	}
 
 
-	@Override
 	public ChangeHistory getChangeHistory()
 	{
 		return changeHistory;
 	}
 
-	@Override
 	public void setChangeHistory(ChangeHistory h)
 	{
 		changeHistory = h;
 	}
 
-	@Override
 	public List<Object> getTrackableContents()
 	{
 		if ( index == -1 )

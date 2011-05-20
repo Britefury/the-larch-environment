@@ -13,7 +13,7 @@ import BritefuryJ.Utils.PriorityList;
 
 public class Keyboard
 {
-	private static int TARGET_INTERACTOR_PRIORITY = -100;
+	private static final int TARGET_INTERACTOR_PRIORITY = -100;
 
 	
 	

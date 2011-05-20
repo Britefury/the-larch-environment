@@ -51,7 +51,7 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 		{
 			if ( refedNode != null )
 			{
-				return Arrays.asList( new IncrementalTreeNode[] { refedNode } );
+				return Arrays.asList( refedNode );
 			}
 			return new ArrayList<IncrementalTreeNode>();
 		}
@@ -147,7 +147,7 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 		}
 		else
 		{
-			return Arrays.asList( new IncrementalTreeNode[] {} );
+			return Arrays.asList();
 		}
 	}
 	

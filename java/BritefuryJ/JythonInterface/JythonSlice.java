@@ -251,7 +251,7 @@ public class JythonSlice
 	
 	
 	    
-	public static final int sliceLength(int start, int stop, long step)
+	public static int sliceLength(int start, int stop, long step)
 	{
 		// Based on Jython PySequence source code
 		long result;

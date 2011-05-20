@@ -95,7 +95,6 @@ public class PrimitiveCellEditPresenter
 	
 	private static final TextToValue textToChar = new TextToValue()
 	{
-		@Override
 		public Object textToValue(String textValue)
 		{
 			if ( textValue.length() == 1 )
@@ -108,7 +107,6 @@ public class PrimitiveCellEditPresenter
 	
 	private static final TextToValue textToString = new TextToValue()
 	{
-		@Override
 		public Object textToValue(String textValue)
 		{
 			return textValue;
@@ -117,7 +115,6 @@ public class PrimitiveCellEditPresenter
 	
 	private static final TextToValue textToByte = new TextToValue()
 	{
-		@Override
 		public Object textToValue(String textValue)
 		{
 			try
@@ -134,7 +131,6 @@ public class PrimitiveCellEditPresenter
 	
 	private static final TextToValue textToShort = new TextToValue()
 	{
-		@Override
 		public Object textToValue(String textValue)
 		{
 			try
@@ -151,7 +147,6 @@ public class PrimitiveCellEditPresenter
 	
 	private static final TextToValue textToInt = new TextToValue()
 	{
-		@Override
 		public Object textToValue(String textValue)
 		{
 			try
@@ -168,7 +163,6 @@ public class PrimitiveCellEditPresenter
 	
 	private static final TextToValue textToLong = new TextToValue()
 	{
-		@Override
 		public Object textToValue(String textValue)
 		{
 			try
@@ -185,7 +179,6 @@ public class PrimitiveCellEditPresenter
 	
 	private static final TextToValue textToBigInteger = new TextToValue()
 	{
-		@Override
 		public Object textToValue(String textValue)
 		{
 			try
@@ -202,7 +195,6 @@ public class PrimitiveCellEditPresenter
 	
 	private static final TextToValue textToBigDecimal = new TextToValue()
 	{
-		@Override
 		public Object textToValue(String textValue)
 		{
 			try
@@ -219,7 +211,6 @@ public class PrimitiveCellEditPresenter
 	
 	private static final TextToValue textToDouble = new TextToValue()
 	{
-		@Override
 		public Object textToValue(String textValue)
 		{
 			try
@@ -236,7 +227,6 @@ public class PrimitiveCellEditPresenter
 	
 	private static final TextToValue textToBoolean = new TextToValue()
 	{
-		@Override
 		public Object textToValue(String textValue)
 		{
 			String t = textValue.toLowerCase();
@@ -261,8 +251,7 @@ public class PrimitiveCellEditPresenter
 		TreeEventListener listener = cachedTreeEventListenerFor( textToValue );
 		Pres textPres = new Text( text );
 		textPres = textPres.withTreeEventListener( listener );
-		Region r = new Region( textPres, clipboardHandler );
-		return r;
+		return new Region( textPres, clipboardHandler );
 	}
 
 
@@ -271,8 +260,7 @@ public class PrimitiveCellEditPresenter
 		TreeEventListener listener = treeEventListenerFor( textToValue );
 		Pres textPres = new Text( text );
 		textPres = textPres.withTreeEventListener( listener );
-		Region r = new Region( textPres, clipboardHandler );
-		return r;
+		return new Region( textPres, clipboardHandler );
 	}
 
 
@@ -280,7 +268,6 @@ public class PrimitiveCellEditPresenter
 	{
 		TextToValue textToValue = new TextToValue()
 		{
-			@Override
 			public Object textToValue(String textValue)
 			{
 				return conversionFn.invoke( textValue );
@@ -342,7 +329,6 @@ public class PrimitiveCellEditPresenter
 	{
 		TreeEventListener listener = new TreeEventListener()
 		{
-			@Override
 			public boolean onTreeEvent(DPElement element, DPElement sourceElement, Object event)
 			{
 				if ( event instanceof TextEditEvent )

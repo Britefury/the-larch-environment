@@ -57,7 +57,7 @@ public class CanvasTestPage extends SystemPage
 	
 	protected DndHandler dndSource(int index)
 	{
-		final Integer dragData = new Integer( index );
+		final Integer dragData = index;
 		ObjectDndHandler.SourceDataFn sourceDataFn = new ObjectDndHandler.SourceDataFn()
 		{
 			public Object createSourceData(PointerInputElement sourceElement, int aspect)
@@ -66,8 +66,7 @@ public class CanvasTestPage extends SystemPage
 			}
 		};
 		
-		ObjectDndHandler sourceDndHandler = ObjectDndHandler.instance.withDragSource( new ObjectDndHandler.DragSource( Integer.class, DndHandler.ASPECT_NORMAL, sourceDataFn ) );
-		return sourceDndHandler;
+		return ObjectDndHandler.instance.withDragSource( new ObjectDndHandler.DragSource( Integer.class, DndHandler.ASPECT_NORMAL, sourceDataFn ) );
 	}
 	
 	
@@ -76,21 +75,21 @@ public class CanvasTestPage extends SystemPage
 	{
 		DrawingNode shape = ShapeNode.rectangle( -4.0, 0.0, 8.0, 20.0 );
 		DrawingNode tick = shape.fillPaint( new Color( 144, 155, 196 ) ).hoverHighlight( shape.fillPaint( new Color( 255, 0, 0 ) ) ).enableDnd( dndSource( index ) );
-		return new GroupNode( new DrawingNode[] { tick, new TextNode( new Integer( index ).toString() ).translate( 0.0, -20.0 ) } ).translate( 0.0, -220.0 );
+		return new GroupNode( new DrawingNode[] { tick, new TextNode( Integer.toString( index ) ).translate( 0.0, -20.0 ) } ).translate( 0.0, -220.0 );
 	}
 	
 	protected DrawingNode create5MinuteTick(int index)
 	{
 		DrawingNode shape = ShapeNode.rectangle( -5.0, 0.0, 10.0, 30.0 );
 		DrawingNode tick = shape.fillPaint( new Color( 142, 184, 196 ) ).hoverHighlight( shape.fillPaint( new Color( 255, 0, 0 ) ) ).enableDnd( dndSource( index ) );
-		return new GroupNode( new DrawingNode[] { tick, new TextNode( new Integer( index ).toString() ).translate( 0.0, -20.0 ) } ).translate( 0.0, -220.0 );
+		return new GroupNode( new DrawingNode[] { tick, new TextNode( Integer.toString( index ) ).translate( 0.0, -20.0 ) } ).translate( 0.0, -220.0 );
 	}
 	
 	protected DrawingNode create15MinuteTick(int index)
 	{
 		DrawingNode shape = ShapeNode.rectangle( -6.0, 0.0, 12.0, 48.0 );
 		DrawingNode tick = shape.fillPaint( new Color( 155, 185, 171 ) ).hoverHighlight( shape.fillPaint( new Color( 255, 0, 0 ) ) ).enableDnd( dndSource( index ) );
-		return new GroupNode( new DrawingNode[] { tick, new TextNode( new Integer( index ).toString() ).translate( 0.0, -20.0 ) } ).translate( 0.0, -220.0 );
+		return new GroupNode( new DrawingNode[] { tick, new TextNode( Integer.toString( index ) ).translate( 0.0, -20.0 ) } ).translate( 0.0, -220.0 );
 	}
 	
 	protected DrawingNode createTicks4Minutes(int index)

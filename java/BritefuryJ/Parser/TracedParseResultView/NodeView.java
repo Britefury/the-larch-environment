@@ -78,13 +78,11 @@ public class NodeView
 		
 		
 		
-		@Override
 		public boolean testClickEvent(PointerInputElement element, AbstractPointerButtonEvent event)
 		{
 			return event.getButton() == 1;
 		}
 		
-		@Override
 		public boolean buttonClicked(PointerInputElement element, PointerButtonClickedEvent event)
 		{
 			nodeView.onClicked();
@@ -93,14 +91,12 @@ public class NodeView
 
 
 		
-		@Override
 		public void pointerEnter(PointerInputElement element, PointerMotionEvent event)
 		{
 			bHighlight = true;
 			((DPElement)element).queueFullRedraw();
 		}
 
-		@Override
 		public void pointerLeave(PointerInputElement element, PointerMotionEvent event)
 		{
 			bHighlight = false;
@@ -109,7 +105,6 @@ public class NodeView
 
 
 		
-		@Override
 		public void drawBackground(DPElement element, Graphics2D graphics)
 		{
 			Color backgroundColour = bHighlight  ?  new Color( 0.7f, 0.85f, 1.0f )  :  Color.white;
@@ -118,7 +113,6 @@ public class NodeView
 			graphics.fill( new Rectangle2D.Double( 0.0, 0.0, element.getWidth(), element.getHeight() ) );
 		}
 		
-		@Override
 		public void draw(DPElement element, Graphics2D graphics)
 		{
 		}
@@ -167,7 +161,7 @@ public class NodeView
 			childElements.add( childView.getElement() );
 		}
 		
-		Pres childrenColumn = styleSheet.withAttr( Primitive.columnSpacing, 9.0 ).applyTo( new Column( childElements.toArray( new DPElement[0] ) ).padY( 3.0 ) );
+		Pres childrenColumn = styleSheet.withAttr( Primitive.columnSpacing, 9.0 ).applyTo( new Column( childElements.toArray( new DPElement[childElements.size()] ) ).padY( 3.0 ) );
 		
 		mainElement = styleSheet.withAttr( Primitive.rowSpacing, 80.0 ).applyTo( new Row( new Object[] { nodeElement, childrenColumn.alignVCentre() } ) ).present();
 	}

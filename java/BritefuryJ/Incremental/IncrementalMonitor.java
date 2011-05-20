@@ -93,7 +93,7 @@ public abstract class IncrementalMonitor
 	
 	public boolean hasListeners()
 	{
-		return listeners != null  ?  !listeners.isEmpty()  :  false;
+		return listeners != null && !listeners.isEmpty();
 	}
 
 	
@@ -116,7 +116,7 @@ public abstract class IncrementalMonitor
 	
 	public boolean hasOutgoingDependencies()
 	{
-		return outgoingDependencies != null  ?  !outgoingDependencies.isEmpty()  :  false;
+		return outgoingDependencies != null && !outgoingDependencies.isEmpty();
 	}
 	
 	

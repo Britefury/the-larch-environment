@@ -22,7 +22,7 @@ import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.Utils.HashUtils;
 
-public class Vector2 implements Cloneable, Presentable, Serializable
+public class Vector2 implements Presentable, Serializable
 {
 	private static final long serialVersionUID = 1L;
 
@@ -42,16 +42,9 @@ public class Vector2 implements Cloneable, Presentable, Serializable
 	}
 	
 	
-	public Vector2 clone()
+	public Vector2 copy()
 	{
-		try
-		{
-			return (Vector2)super.clone();
-		}
-		catch (CloneNotSupportedException e)
-		{
-			return null;
-		}
+		return new Vector2( x, y );
 	}
 	
 	
@@ -153,7 +146,6 @@ public class Vector2 implements Cloneable, Presentable, Serializable
 
 	
 	
-	@Override
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return new Row( new Pres[] { delimStyle.applyTo( new Label( "[" ) ).alignVCentre(),

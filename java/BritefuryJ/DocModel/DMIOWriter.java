@@ -217,11 +217,11 @@ public class DMIOWriter extends DMIO
 		}
 		else if ( content instanceof PyString )
 		{
-			writeString( builder, ((PyString)content).toString() );
+			writeString( builder, content.toString() );
 		}
 		else if ( content instanceof PyUnicode )
 		{
-			writeString( builder, ((PyUnicode)content).toString() );
+			writeString( builder, content.toString() );
 		}
 		else if ( content instanceof List )
 		{
@@ -297,8 +297,7 @@ public class DMIOWriter extends DMIO
 			{
 				embedded.add( e );
 			}
-			PyTuple state = new PyTuple( Py.newString( s ), embedded, writer.embeddedPyValues );
-			return state;
+			return new PyTuple( Py.newString( s ), embedded, writer.embeddedPyValues );
 		}
 		else
 		{
@@ -326,27 +325,25 @@ public class DMIOWriter extends DMIO
 
 	protected static void escape(StringBuilder builder, char c)
 	{
-		if ( c == '\\' )
+		switch ( c )
 		{
-			builder.append( "\\\\" );
-		}
-		else if ( c == '\n' )
-		{
-			builder.append( "\\n" );
-		}
-		else if ( c == '\r' )
-		{
-			builder.append( "\\r" );
-		}
-		else if ( c == '\t' )
-		{
-			builder.append( "\\t" );
-		}
-		else
-		{
-			builder.append(  "\\x" );
-                        builder.append(  Integer.toString( (int)c, 16 ) );
-                        builder.append(  "x" );
+			case '\\':
+				builder.append( "\\\\" );
+				break;
+			case '\n':
+				builder.append( "\\n" );
+				break;
+			case '\r':
+				builder.append( "\\r" );
+				break;
+			case '\t':
+				builder.append( "\\t" );
+				break;
+			default:
+				builder.append( "\\x" );
+				builder.append( Integer.toString( (int)c, 16 ) );
+				builder.append( "x" );
+				break;
 		}
 	}
 	

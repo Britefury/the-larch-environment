@@ -168,24 +168,23 @@ class IsolationPicklerState
 			// If an isolated value is in the list of root objects, create an entry in the roof refs table
 			prev = pushPicklerState();
 			PyList isolatedRootRefs = new PyList();
-			for (int i = 0; i < isolatedObjects.size(); i++)
+			for (PyObject isolatedObject : isolatedObjects)
 			{
 				// Create stream for detecting references
 				cStringIO.StringIO stream = new cStringIO.StringIO();
 				cPickle.Pickler pickler = new cPickle.Pickler( stream, 0 );
 				pickler.persistent_id = gatherRefsPersistentId;
-				
-				PyObject x = isolatedObjects.get( i );
-				long key = Py.id( x );
-	
+
+				long key = Py.id( isolatedObject );
+
 				if ( rootTags.contains( key ) )
 				{
-					isolatedRootRefs.append( new PyTuple( Py.newInteger( key ), x ) );
+					isolatedRootRefs.append( new PyTuple( Py.newInteger( key ), isolatedObject ) );
 				}
 				else
 				{
 					currentIsolatedObjTag[0] = key;
-					pickler.dump( x );
+					pickler.dump( isolatedObject );
 				}
 			}
 			popPicklerState( prev );

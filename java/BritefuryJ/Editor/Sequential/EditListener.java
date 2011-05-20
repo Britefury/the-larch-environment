@@ -20,7 +20,7 @@ public abstract class EditListener implements TreeEventListener
 		NO_CHANGE,
 		NOT_HANDLED,
 		PASS_TO_PARENT
-	};
+	}
 	
 	
 	protected abstract SequentialEditor getSequentialEditor();
@@ -41,7 +41,6 @@ public abstract class EditListener implements TreeEventListener
 	
 	
 	
-	@Override
 	public boolean onTreeEvent(DPElement element, DPElement sourceElement, Object event)
 	{
 		if ( event instanceof EditEvent )

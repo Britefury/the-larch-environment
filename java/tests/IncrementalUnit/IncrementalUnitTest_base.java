@@ -34,11 +34,11 @@ public abstract class IncrementalUnitTest_base extends TestCase
 		
 		if ( value == null )
 		{
-			value = new Integer( 1 );
+			value = 1;
 		}
 		else
 		{
-			value = new Integer( value.intValue() + 1 );
+			value = value.intValue() + 1;
 		}
 		
 		sigs.put( name, value );

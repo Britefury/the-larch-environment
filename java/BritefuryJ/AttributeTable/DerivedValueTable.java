@@ -8,7 +8,7 @@ package BritefuryJ.AttributeTable;
 
 import java.util.WeakHashMap;
 
-public abstract class DerivedValueTable <V extends Object>
+public abstract class DerivedValueTable <V>
 {
 	private AttributeNamespace namespace;
 	private WeakHashMap<AttributeTable, Object[]> values = new WeakHashMap<AttributeTable, Object[]>();

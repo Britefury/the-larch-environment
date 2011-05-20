@@ -91,7 +91,7 @@ public class ClipboardHandler extends ClipboardHandlerInterface
 	{
 		SelectionEditorInterface selectionEditor = getSelectionEditorForSelection( selection );
 		
-		return selectionEditor != null  ?  selectionEditor.deleteSelection( selection, target )  :  false;
+		return selectionEditor != null && selectionEditor.deleteSelection( selection, target );
 	}
 
 	@Override
@@ -99,7 +99,7 @@ public class ClipboardHandler extends ClipboardHandlerInterface
 	{
 		SelectionEditorInterface selectionEditor = getSelectionEditorForSelection( selection );
 		
-		return selectionEditor != null  ?  selectionEditor.replaceSelectionWithText( selection, target, replacement )  :  false;
+		return selectionEditor != null && selectionEditor.replaceSelectionWithText( selection, target, replacement );
 	}
 
 	@Override

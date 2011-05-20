@@ -28,19 +28,16 @@ public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterf
 {
 	protected static class ChildrenIterator implements Iterator<Object>
 	{
-		@Override
 		public boolean hasNext()
 		{
 			return false;
 		}
 
-		@Override
 		public Object next()
 		{
 			throw new NoSuchElementException();
 		}
 
-		@Override
 		public void remove()
 		{
 			throw new UnsupportedOperationException();
@@ -51,7 +48,6 @@ public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterf
 	{
 		private static ChildrenIterator iter = new ChildrenIterator();
 		
-		@Override
 		public Iterator<Object> iterator()
 		{
 			return iter;
@@ -185,7 +181,6 @@ public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterf
 
 	
 	
-	@Override
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return DocModelPresenter.presentDMEmbeddedObject( this, fragment, inheritedState );
@@ -193,19 +188,16 @@ public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterf
 
 	
 	
-	@Override
 	public ChangeHistory getChangeHistory()
 	{
 		return changeHistory;
 	}
 
-	@Override
 	public void setChangeHistory(ChangeHistory h)
 	{
 		changeHistory = h;
 	}
 
-	@Override
 	public List<Object> getTrackableContents()
 	{
 		return Arrays.asList( new Object[] { value } );

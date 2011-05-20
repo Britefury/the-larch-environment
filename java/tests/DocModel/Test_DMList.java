@@ -130,11 +130,11 @@ public class Test_DMList extends Test_DMNode_base
 		Unit yCell = new Unit();
 		yCell.setEvaluator( eval );
 		
-		assertEquals( yCell.getValue(), new Integer( 3 ) );
+		assertEquals( yCell.getValue(), 3 );
 		
 		xs.add( "xyz" );
 
-		assertEquals( yCell.getValue(), new Integer( 4 ) );
+		assertEquals( yCell.getValue(), 4 );
 	}
 	
 	

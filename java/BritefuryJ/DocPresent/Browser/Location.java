@@ -42,7 +42,6 @@ public class Location implements Presentable
 		}
 
 
-		@Override
 		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			// TODO: Check for infinitely recursive nesting

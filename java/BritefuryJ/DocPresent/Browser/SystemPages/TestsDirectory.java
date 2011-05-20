@@ -8,6 +8,7 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.DocPresent.Border.SolidBorder;
@@ -133,11 +134,8 @@ public class TestsDirectory extends BrowserPage
 		
 		Pres heading = new Heading4( title ).pad( 30.0, 30.0, 5.0, 15.0 );
 		testBoxChildren.add( heading );
-		
-		for (Hyperlink link: links)
-		{
-			testBoxChildren.add( link );
-		}
+
+		Collections.addAll( testBoxChildren, links );
 		
 		return outlineStyle.applyTo( new Border( new Column( testBoxChildren ).alignVRefY() ) );
 	}

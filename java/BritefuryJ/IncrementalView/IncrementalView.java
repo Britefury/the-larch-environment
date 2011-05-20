@@ -281,8 +281,7 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	private SimpleAttributeTable subjectContext;
 	private ChangeHistory changeHistory;
 	private Subject subject;
-	
-	private RootPres rootPres;
+
 	private Pres viewPres;
 	
 	protected Log log;
@@ -322,8 +321,8 @@ public class IncrementalView extends IncrementalTree implements Presentable
 		
 		
 		setElementChangeListener( new NodeElementChangeListenerDiff() );
-		
-		rootPres = new RootPres();
+
+		RootPres rootPres = new RootPres();
 		viewPres = new Column( new Pres[] { new Region( rootPres, getRootPerspective().getClipboardHandler() ) } );
 	}
 	
@@ -700,7 +699,6 @@ public class IncrementalView extends IncrementalTree implements Presentable
 
 
 
-	@Override
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		Pres title = titleStyle.applyTo( new Label( "View" ) );

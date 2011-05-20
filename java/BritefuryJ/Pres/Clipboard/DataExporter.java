@@ -62,7 +62,7 @@ public class DataExporter<SelectionContentsType> extends DataExporterInterface<S
 	{
 		if ( canExportFn == null  ||  canExportFn.canExport( selectionContents ) )
 		{
-			return Arrays.asList( new DataFlavor[] { flavor } );
+			return Arrays.asList( flavor );
 		}
 		else
 		{

@@ -26,13 +26,12 @@ public class Arrow extends Pres
 		Point2 b = new Point2( arrowRadius * Math.sin( Math.toRadians( 120.0 ) ), arrowRadius * Math.cos( Math.toRadians( 120.0 ) ) );
 		Point2 c = new Point2( arrowRadius * Math.sin( Math.toRadians( 240.0 ) ), arrowRadius * Math.cos( Math.toRadians( 240.0 ) ) );
 		
-		Path2D.Double arrowShape = DPShape.filletedPath( new Point2[] { a, b, c }, true, filletSize );
+		Path2D.Double down = DPShape.filletedPath( new Point2[] { a, b, c }, true, filletSize );
 		//Path2D.Double arrowShape = DPShape.path( new Point2[] { a, b, c }, true );
 		
-		Path2D.Double down = arrowShape;
-		Path2D.Double up = (Path2D.Double)arrowShape.clone();
-		Path2D.Double right = (Path2D.Double)arrowShape.clone();
-		Path2D.Double left = (Path2D.Double)arrowShape.clone();
+		Path2D.Double up = (Path2D.Double)down.clone();
+		Path2D.Double right = (Path2D.Double)down.clone();
+		Path2D.Double left = (Path2D.Double)down.clone();
 		
 		right.transform( AffineTransform.getQuadrantRotateInstance( 3 ) );
 		up.transform( AffineTransform.getQuadrantRotateInstance( 2 ) );

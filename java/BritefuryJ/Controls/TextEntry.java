@@ -110,13 +110,11 @@ public class TextEntry extends ControlPres
 			}
 			
 			
-			@Override
 			public boolean keyPressed(DPElement element, KeyEvent event)
 			{
 				return event.getKeyCode() == KeyEvent.VK_ENTER  ||  event.getKeyCode() == KeyEvent.VK_ESCAPE;
 			}
 	
-			@Override
 			public boolean keyReleased(DPElement element, KeyEvent event)
 			{
 				if ( event.getKeyCode() == KeyEvent.VK_ENTER )
@@ -132,14 +130,12 @@ public class TextEntry extends ControlPres
 				return false;
 			}
 	
-			@Override
 			public boolean keyTyped(DPElement element, KeyEvent event)
 			{
 				return event.getKeyChar() == KeyEvent.VK_ENTER  ||  event.getKeyChar() == KeyEvent.VK_ESCAPE;
 			}
 			
 			
-			@Override
 			public void elementRealised(DPElement element)
 			{
 				if ( bGrabCaretOnRealise )
@@ -155,7 +151,6 @@ public class TextEntry extends ControlPres
 				}
 			}
 
-			@Override
 			public void elementUnrealised(DPElement element)
 			{
 			}
@@ -164,7 +159,6 @@ public class TextEntry extends ControlPres
 		
 		private class TextEntryTreeEventListener implements TreeEventListener
 		{
-			@Override
 			public boolean onTreeEvent(DPElement element, DPElement sourceElement, Object event)
 			{
 				if ( event instanceof TextEditEventInsert )
@@ -356,7 +350,7 @@ public class TextEntry extends ControlPres
 		
 		private void validate(String text)
 		{
-			boolean bValid = validator != null  ?  validator.validateText( this, text )  :  true;
+			boolean bValid = validator == null || validator.validateText( this, text );
 			outerElement.setBorder( bValid  ?  validBorder  :  invalidBorder );
 		}
 	}

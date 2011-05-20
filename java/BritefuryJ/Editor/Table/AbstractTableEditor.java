@@ -55,7 +55,6 @@ public abstract class AbstractTableEditor<ModelType>
 
 	private final ExportFn<Object[][]> exportBuffer = new ExportFn<Object[][]>()
 	{
-		@Override
 		public Object export(Object[][] selectionContents)
 		{
 			return new TableBuffer( AbstractTableEditor.this, selectionContents );
@@ -64,7 +63,6 @@ public abstract class AbstractTableEditor<ModelType>
 	
 	private final ExportFn<Object[][]> exportTextHtml = new ExportFn<Object[][]>()
 	{
-		@Override
 		public Object export(Object[][] selectionContents)
 		{
 			StringBuilder b = new StringBuilder();
@@ -94,7 +92,6 @@ public abstract class AbstractTableEditor<ModelType>
 	
 	private final ExportFn<Object[][]> exportTextPlain = new ExportFn<Object[][]>()
 	{
-		@Override
 		public Object export(Object[][] selectionContents)
 		{
 			StringBuilder b = new StringBuilder();
@@ -118,7 +115,6 @@ public abstract class AbstractTableEditor<ModelType>
 	
 	private final SelectionContentsFn<Object[][], TableSelection> selectionContents = new SelectionContentsFn<Object[][], TableSelection>()
 	{
-		@Override
 		public Object[][] getSelectionContents(TableSelection selection)
 		{
 			return selection.getSelectedData();
@@ -128,7 +124,6 @@ public abstract class AbstractTableEditor<ModelType>
 	
 	private final DataImporter.CanImportFn<TableTarget> canImportBuffer = new DataImporter.CanImportFn<TableTarget>()
 	{
-		@Override
 		public boolean canImport(TableTarget target, Selection selection, Object data)
 		{
 			TableBuffer buffer = (TableBuffer)data;
@@ -139,7 +134,6 @@ public abstract class AbstractTableEditor<ModelType>
 	private final DataImporter.ImportDataFn<TableTarget> importBufferData = new DataImporter.ImportDataFn<TableTarget>()
 	{
 		@SuppressWarnings("unchecked")
-		@Override
 		public boolean importData(TableTarget target, Selection selection, Object data)
 		{
 			TableBuffer buffer = (TableBuffer)data;
@@ -155,7 +149,6 @@ public abstract class AbstractTableEditor<ModelType>
 	
 	private final DataImporter.CanImportFlavorFn canImportHtmlFlavor = new DataImporter.CanImportFlavorFn()
 	{
-		@Override
 		public boolean canImportFlavor(DataFlavor flavor)
 		{
 			return flavor.getMimeType().startsWith( "text/html;" )  &&  flavor.getRepresentationClass() == String.class;
@@ -165,7 +158,6 @@ public abstract class AbstractTableEditor<ModelType>
 	private final DataImporter.ImportDataFn<TableTarget> importHtmlData = new DataImporter.ImportDataFn<TableTarget>()
 	{
 		@SuppressWarnings("unchecked")
-		@Override
 		public boolean importData(TableTarget target, Selection selection, Object data)
 		{
 			String htmlText = (String)data;
@@ -208,7 +200,7 @@ public abstract class AbstractTableEditor<ModelType>
 						}
 						// Done reading TD elements
 						
-						tableData.add( rowData.toArray( new String[0] ) );
+						tableData.add( rowData.toArray( new String[rowData.size()] ) );
 
 						rowPos = tr.getEnd();
 					}
@@ -217,7 +209,7 @@ public abstract class AbstractTableEditor<ModelType>
 			
 			
 				ModelType model = (ModelType)target.editorInstance.model;
-				String textBlock[][] = tableData.toArray( new String[0][] );
+				String textBlock[][] = tableData.toArray( new String[tableData.size()][] );
 				
 				Object[][] subtable = textBlockToValueBlock( target.x, target.y, textBlock );
 				
@@ -236,7 +228,6 @@ public abstract class AbstractTableEditor<ModelType>
 	private final SelectionEditor.DeleteSelectionFn<TableSelection> deleteSelection = new SelectionEditor.DeleteSelectionFn<TableSelection>()
 	{
 		@SuppressWarnings("unchecked")
-		@Override
 		public boolean deleteSelection(TableSelection selection, Target target)
 		{
 			ModelType model = (ModelType)selection.editorInstance.model;

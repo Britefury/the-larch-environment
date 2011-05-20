@@ -14,13 +14,13 @@ public class LiteralIncrementalUnitTest extends IncrementalUnitTest_base
 {
 	public void testLiteral()
 	{
-		LiteralUnit cell = new LiteralUnit( new Integer( 1 ) );
+		LiteralUnit cell = new LiteralUnit( 1 );
 	
-		assertEquals( cell.getValue(), new Integer( 1 ) );
+		assertEquals( cell.getValue(), 1 );
 		
 		cell.setLiteralValue( new Integer( 20 ) );
 	
-		assertEquals( cell.getValue(), new Integer( 20 ) );
+		assertEquals( cell.getValue(), 20 );
 	}
 
 
@@ -29,7 +29,7 @@ public class LiteralIncrementalUnitTest extends IncrementalUnitTest_base
 	{
 		assertEquals( getSignalCount( "changed" ), 0 );
 		
-		LiteralUnit cell = new LiteralUnit( new Integer( 1 ) );
+		LiteralUnit cell = new LiteralUnit( 1 );
 		
 		cell.addListener( makeListener( "" ) );
 		

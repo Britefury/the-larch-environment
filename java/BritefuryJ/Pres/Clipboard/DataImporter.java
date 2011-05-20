@@ -66,15 +66,15 @@ public class DataImporter <TargetType extends Target> extends AbstractDataImport
 	}
 
 	@Override
-	protected boolean canImport(TargetType target, Selection selection, Object data)
+	protected boolean canImportChecked(TargetType target, Selection selection, Object data)
 	{
-		return canImportFn == null  ||  canImportFn.canImport( (TargetType)target, selection, data );
+		return canImportFn == null  ||  canImportFn.canImport( target, selection, data );
 	}
 
 	@Override
-	protected boolean importData(TargetType target, Selection selection, Object data)
+	protected boolean importCheckedData(TargetType target, Selection selection, Object data)
 	{
-		return importDataFn.importData( (TargetType)target, selection, data );
+		return importDataFn.importData( target, selection, data );
 	}
 	
 	
@@ -84,7 +84,6 @@ public class DataImporter <TargetType extends Target> extends AbstractDataImport
 		final DataFlavor localFlavor = new LocalDataFlavor( type );
 		CanImportFlavorFn test = new CanImportFlavorFn()
 		{
-			@Override
 			public boolean canImportFlavor(DataFlavor flavor)
 			{
 				return flavor.equals( localFlavor );

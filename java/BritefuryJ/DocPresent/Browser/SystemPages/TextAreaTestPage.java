@@ -116,7 +116,7 @@ public class TextAreaTestPage extends SystemPage
 
 	
 	
-	private String testString = "This is a test of the capabilities of the text area control.\nA text area is a mult-line text editor.\nThe text is in the form of lines separated by newline characters.\n";
+	private static final String testString = "This is a test of the capabilities of the text area control.\nA text area is a mult-line text editor.\nThe text is in the form of lines separated by newline characters.\n";
 
 	
 	

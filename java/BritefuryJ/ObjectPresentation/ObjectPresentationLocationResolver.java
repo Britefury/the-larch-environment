@@ -75,10 +75,12 @@ public class ObjectPresentationLocationResolver
 					perspectiveName = className + i;
 				}
 				perspectiveTable.put( perspectiveName, perspective );
+				perspectiveNameTable.put( perspective, perspectiveName );
 			}
 			else
 			{
 				perspectiveTable.put( perspectiveName, perspective );
+				perspectiveNameTable.put( perspective, perspectiveName );
 			}
 		}
 		

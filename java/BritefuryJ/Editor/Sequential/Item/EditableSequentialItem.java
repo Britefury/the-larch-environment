@@ -28,7 +28,7 @@ public class EditableSequentialItem extends Pres
 
 	public EditableSequentialItem(List<TreeEventListener> editListeners, Object child)
 	{
-		this.editListeners = editListeners.toArray( new TreeEventListener[] {} );
+		this.editListeners = editListeners.toArray( new TreeEventListener[editListeners.size()] );
 		this.child = coerceNonNull( child );
 	}
 

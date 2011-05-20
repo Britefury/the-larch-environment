@@ -28,18 +28,18 @@ class ScrollBarHelper
 	{
 		HORIZONTAL,
 		VERTICAL
-	};
-	
-	
+	}
+
+
 	protected static class ScrollBarArrowInteractor implements PushElementInteractor
 	{
 		public enum Direction
 		{
 			INCREASE,
 			DECREASE
-		};
-		
-		
+		}
+
+
 		private Direction direction;
 		private Range range;
 		

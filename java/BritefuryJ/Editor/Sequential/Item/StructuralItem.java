@@ -37,7 +37,7 @@ public class StructuralItem extends Pres
 
 	public StructuralItem(List<TreeEventListener> editListeners, Object value, Object child)
 	{
-		this.editListeners = editListeners.toArray( new TreeEventListener[] {} );
+		this.editListeners = editListeners.toArray( new TreeEventListener[editListeners.size()] );
 		this.value = value;
 		this.child = coerceNonNull( child );
 	}

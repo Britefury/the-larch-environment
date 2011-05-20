@@ -33,7 +33,7 @@ public class TestCase_JythonSlice extends TestCase
 		
 		for (int i = start, j = 0; i < stop; i++, j++)
 		{
-			result[j] = new Integer( i );
+			result[j] = i;
 		}
 		
 		return result;
@@ -46,7 +46,7 @@ public class TestCase_JythonSlice extends TestCase
 		
 		for (int i = 0; i < in.length; i++)
 		{
-			result[i] = new Integer( in[i] );
+			result[i] = in[i];
 		}
 		
 		return result;

@@ -184,5 +184,5 @@ public class Range implements IncrementalOwner, Presentable
 	
 	
 	private final static StyleSheet numValueStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.25f ) );
-};
+}
 

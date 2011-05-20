@@ -29,7 +29,7 @@ public class GroupNode extends DrawingNode
 	public GroupNode(List<DrawingNode> children)
 	{
 		super();
-		this.children = children.toArray( new DrawingNode[0] );
+		this.children = children.toArray( new DrawingNode[children.size()] );
 		parentSpaceBox = new AABox2();
 	}
 

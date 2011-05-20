@@ -320,7 +320,6 @@ public class ProjectiveBrowserContext
 		}
 		
 		
-		@Override
 		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			StyleSheet titleStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 24 );
@@ -330,8 +329,7 @@ public class ProjectiveBrowserContext
 			Pres loc = contentsStyle.applyTo( new StaticText( location ) );
 			Pres exc = Pres.coerceNonNull( exception );
 			Pres body = new Body( new Pres[] { errorTitle.alignHCentre(), loc.alignHCentre(), exc.alignHCentre() } );
-			Pres page = new Page( new Pres[] { body } );
-			return page;
+			return new Page( new Pres[] { body } );
 		}
 	}
 
@@ -346,7 +344,6 @@ public class ProjectiveBrowserContext
 		}
 		
 		
-		@Override
 		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			StyleSheet titleStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 24 );
@@ -357,8 +354,7 @@ public class ProjectiveBrowserContext
 			Pres loc = contentsStyle.applyTo( new StaticText( location ) );
 			Pres validSyntax = validSyntaxStyle.applyTo( new Label( "Valid syntax: dot separated identifiers" ) );
 			Pres body = new Body( new Pres[] { errorTitle.alignHCentre(), loc.alignHCentre(), validSyntax.alignHCentre() } );
-			Pres page = new Page( new Pres[] { body } );
-			return page;
+			return new Page( new Pres[] { body } );
 		}
 	}
 }

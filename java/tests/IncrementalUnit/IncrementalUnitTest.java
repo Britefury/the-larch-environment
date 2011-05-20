@@ -18,11 +18,11 @@ public class IncrementalUnitTest extends IncrementalUnitTest_base
 		
 		cell.setLiteralValue( new Integer( 1 ) );
 	
-		assertEquals( cell.getValue(), new Integer( 1 ) );
+		assertEquals( cell.getValue(), 1 );
 		
 		cell.setLiteralValue( new Integer( 20 ) );
 	
-		assertEquals( cell.getValue(), new Integer( 20 ) );
+		assertEquals( cell.getValue(), 20 );
 	}
 
 
@@ -34,12 +34,12 @@ public class IncrementalUnitTest extends IncrementalUnitTest_base
 		Unit cell = new Unit();
 		
 		cell.setLiteralValue( new Integer( 1 ) );
-		assertEquals( cell.getValue(), new Integer( 1 ) );
+		assertEquals( cell.getValue(), 1 );
 		
 		cell.addListener( makeListener( "" ) );
 		
 		cell.setLiteralValue( new Integer( 20 ) );
-		assertEquals( cell.getValue(), new Integer( 20 ) );
+		assertEquals( cell.getValue(), 20 );
 		
 		assertEquals( getSignalCount( "changed" ), 1 );
 	}
@@ -52,7 +52,7 @@ public class IncrementalUnitTest extends IncrementalUnitTest_base
 		{
 			public Object evaluate()
 			{
-				return new Integer( 20 );
+				return 20;
 			}
 		};
 		
@@ -62,12 +62,12 @@ public class IncrementalUnitTest extends IncrementalUnitTest_base
 		Unit cell = new Unit();
 
 		cell.setLiteralValue( new Integer( 1 ) );
-		assertEquals( cell.getValue(), new Integer( 1 ) );
+		assertEquals( cell.getValue(), 1 );
 		
 		cell.addListener( makeListener( "" ) );
 		
 		cell.setEvaluator( evaluator );
-		assertEquals( cell.getValue(), new Integer( 20 ) );
+		assertEquals( cell.getValue(), 20 );
 		
 		assertEquals( getSignalCount( "changed" ), 1 );
 	}
@@ -82,7 +82,7 @@ public class IncrementalUnitTest extends IncrementalUnitTest_base
 		{
 			public Object evaluate()
 			{
-				return new Integer( ((Integer)cell1.getValue()).intValue() * 3 );
+				return ( (Integer)cell1.getValue() ).intValue() * 3;
 			}
 		};
 		
@@ -90,13 +90,13 @@ public class IncrementalUnitTest extends IncrementalUnitTest_base
 		cell1.setLiteralValue( new Integer( 1 ) );
 		cell2.setEvaluator( evaluator );
 		
-		assertEquals( cell1.getValue(), new Integer( 1 ) );
-		assertEquals( cell2.getValue(), new Integer( 3 ) );
+		assertEquals( cell1.getValue(), 1 );
+		assertEquals( cell2.getValue(), 3 );
 		
 		cell1.setLiteralValue( new Integer( 12 ) );
 
-		assertEquals( cell1.getValue(), new Integer( 12 ) );
-		assertEquals( cell2.getValue(), new Integer( 36 ) );
+		assertEquals( cell1.getValue(), 12 );
+		assertEquals( cell2.getValue(), 36 );
 	}
 	
 	
@@ -111,7 +111,7 @@ public class IncrementalUnitTest extends IncrementalUnitTest_base
 			public Object evaluate()
 			{
 				callCount[0]++;
-				return new Integer( ((Integer)cell1.getValue()).intValue() * 3 );
+				return ( (Integer)cell1.getValue() ).intValue() * 3;
 			}
 		};
 		
@@ -121,17 +121,17 @@ public class IncrementalUnitTest extends IncrementalUnitTest_base
 		cell2.setEvaluator( evaluator );
 		
 		assertEquals( callCount[0], 0 );
-		assertEquals( cell1.getValue(), new Integer( 1 ) );
-		assertEquals( cell2.getValue(), new Integer( 3 ) );
+		assertEquals( cell1.getValue(), 1 );
+		assertEquals( cell2.getValue(), 3 );
 		assertEquals( callCount[0], 1 );
-		assertEquals( cell2.getValue(), new Integer( 3 ) );
+		assertEquals( cell2.getValue(), 3 );
 		assertEquals( callCount[0], 1 );
 		
 		cell1.setLiteralValue( new Integer( 12 ) );
 
-		assertEquals( cell2.getValue(), new Integer( 36 ) );
+		assertEquals( cell2.getValue(), 36 );
 		assertEquals( callCount[0], 2 );
-		assertEquals( cell2.getValue(), new Integer( 36 ) );
+		assertEquals( cell2.getValue(), 36 );
 		assertEquals( callCount[0], 2 );
 	}
 
@@ -150,7 +150,7 @@ public class IncrementalUnitTest extends IncrementalUnitTest_base
 		{
 			public Object evaluate()
 			{
-				return new Integer( ((Integer)cell1.getValue()).intValue() * 3 );
+				return ( (Integer)cell1.getValue() ).intValue() * 3;
 			}
 		};
 		
@@ -158,7 +158,7 @@ public class IncrementalUnitTest extends IncrementalUnitTest_base
 		{
 			public Object evaluate()
 			{
-				return new Integer( ((Integer)cell2.getValue()).intValue() * 2 );
+				return ( (Integer)cell2.getValue() ).intValue() * 2;
 			}
 		};
 		
@@ -170,26 +170,26 @@ public class IncrementalUnitTest extends IncrementalUnitTest_base
 		cell1.addListener( makeListener( "1" ) );
 		cell3.addListener( makeListener( "3" ) );
 		
-		assertEquals( cell1.getValue(), new Integer( 1 ) );
-		assertEquals( cell2.getValue(), new Integer( 3 ) );
-		assertEquals( cell3.getValue(), new Integer( 6 ) );
+		assertEquals( cell1.getValue(), 1 );
+		assertEquals( cell2.getValue(), 3 );
+		assertEquals( cell3.getValue(), 6 );
 
 		assertEquals( getSignalCount( "1changed" ), 0 );
 		assertEquals( getSignalCount( "3changed" ), 0 );
 
 		cell1.setLiteralValue( new Integer( 12 ) );
 
-		assertEquals( cell1.getValue(), new Integer( 12 ) );
-		assertEquals( cell2.getValue(), new Integer( 36 ) );
-		assertEquals( cell3.getValue(), new Integer( 72 ) );
+		assertEquals( cell1.getValue(), 12 );
+		assertEquals( cell2.getValue(), 36 );
+		assertEquals( cell3.getValue(), 72 );
 		assertEquals( getSignalCount( "1changed" ), 1 );
 		assertEquals( getSignalCount( "3changed" ), 1 );
 
 		cell3.setEvaluator( evaluator3 );
 
-		assertEquals( cell1.getValue(), new Integer( 12 ) );
-		assertEquals( cell2.getValue(), new Integer( 36 ) );
-		assertEquals( cell3.getValue(), new Integer( 72 ) );
+		assertEquals( cell1.getValue(), 12 );
+		assertEquals( cell2.getValue(), 36 );
+		assertEquals( cell3.getValue(), 72 );
 		assertEquals( getSignalCount( "1changed" ), 1 );
 		assertEquals( getSignalCount( "3changed" ), 2 );
 	}

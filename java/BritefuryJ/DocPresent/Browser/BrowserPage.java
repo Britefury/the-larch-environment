@@ -38,6 +38,6 @@ public abstract class BrowserPage
 
 	public List<BoundCommandSet> getBoundCommandSets()
 	{
-		return Arrays.asList( new BoundCommandSet[] {} );
+		return Arrays.asList();
 	}
 }

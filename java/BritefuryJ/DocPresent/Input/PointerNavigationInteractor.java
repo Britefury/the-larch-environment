@@ -7,6 +7,7 @@
 package BritefuryJ.DocPresent.Input;
 
 import java.awt.geom.AffineTransform;
+import java.util.Iterator;
 import java.util.Stack;
 
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
@@ -58,8 +59,8 @@ public class PointerNavigationInteractor extends AbstractPointerDragInteractor
 			{
 				Point2 pos = pointer.getLocalPos();
 				navigationButton = event.getButton();
-				navigationDragStartPos = pos.clone();
-				navigationDragCurrentPos = pos.clone();
+				navigationDragStartPos = pos.copy();
+				navigationDragCurrentPos = pos.copy();
 				bNavigationDragInProgress = true;
 				handleNavigationGestureBegin( pointer, event );
 			}
@@ -90,7 +91,7 @@ public class PointerNavigationInteractor extends AbstractPointerDragInteractor
 		{
 			Point2 pos = event.getPointer().getLocalPos();
 			Vector2 delta = pos.sub( navigationDragCurrentPos );
-			navigationDragCurrentPos = pos.clone();
+			navigationDragCurrentPos = pos.copy();
 			
 			PointerNavigationEvent navEvent = null;
 			
@@ -195,9 +196,10 @@ public class PointerNavigationInteractor extends AbstractPointerDragInteractor
 			Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( NavigationElementInteractor.class );
 			if ( interactors != null )
 			{
-				for (AbstractElementInteractor interactor: interactors )
+				Iterator<AbstractElementInteractor> iter = interactors.iterator();
+				if ( iter.hasNext() )
 				{
-					NavigationElementInteractor navInt = (NavigationElementInteractor)interactor;
+					NavigationElementInteractor navInt = (NavigationElementInteractor)iter.next();
 					navInt.navigationGesture( element, elementSpaceEvent );
 					return;
 				}

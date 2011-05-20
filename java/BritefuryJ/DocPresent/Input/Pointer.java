@@ -32,15 +32,15 @@ public class Pointer extends PointerInterface
 	}
 	
 	
-	private static int TARGET_CLICK_INTERACTOR_PRIORITY = -2000;
-	private static int NAVIGATION_INTERACTOR_PRIORITY = -1000;
-	private static int CONTEXTMENU_INTERACTOR_PRIORITY = -500;
-	private static int DND_INTERACTOR_PRIORITY = -400;
-	private static int PRESSANDHOLD_INTERACTOR_PRIORITY = 0;
-	private static int CLICK_INTERACTOR_PRIORITY = 0;
-	private static int DRAG_INTERACTOR_PRIORITY = 50;
-	private static int MOTION_INTERACTOR_PRIORITY = 100;
-	private static int TARGET_DRAG_INTERACTOR_PRIORITY = 1000;
+	private static final int TARGET_CLICK_INTERACTOR_PRIORITY = -2000;
+	private static final int NAVIGATION_INTERACTOR_PRIORITY = -1000;
+	private static final int CONTEXTMENU_INTERACTOR_PRIORITY = -500;
+	private static final int DND_INTERACTOR_PRIORITY = -400;
+	private static final int PRESSANDHOLD_INTERACTOR_PRIORITY = 0;
+	private static final int CLICK_INTERACTOR_PRIORITY = 0;
+	private static final int DRAG_INTERACTOR_PRIORITY = 50;
+	private static final int MOTION_INTERACTOR_PRIORITY = 100;
+	private static final int TARGET_DRAG_INTERACTOR_PRIORITY = 1000;
 	
 	
 	

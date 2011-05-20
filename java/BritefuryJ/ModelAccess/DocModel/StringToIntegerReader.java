@@ -27,7 +27,6 @@ public class StringToIntegerReader extends DMModelReader
 	
 	
 	
-	@Override
 	public Object readFromModel(Object model)
 	{
 		Object value = innerReader.readFromModel( model );

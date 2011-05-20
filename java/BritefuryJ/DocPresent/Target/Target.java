@@ -15,10 +15,9 @@ import BritefuryJ.DocPresent.Selection.SelectionPoint;
 
 public abstract class Target
 {
-	private ArrayList<TargetListener> listeners = new ArrayList<TargetListener>();;
+	private ArrayList<TargetListener> listeners = new ArrayList<TargetListener>();
 
-	
-	
+
 	public abstract void draw(Graphics2D graphics);
 	
 	

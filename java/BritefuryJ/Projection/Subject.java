@@ -69,7 +69,7 @@ public abstract class Subject
 		}
 		else
 		{
-			return Arrays.asList( new BoundCommandSet[] {} );
+			return Arrays.asList();
 		}
 	}
 }

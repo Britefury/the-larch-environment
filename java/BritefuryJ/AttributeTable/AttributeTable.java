@@ -196,7 +196,7 @@ public class AttributeTable implements Presentable
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <V extends Object> V get(AttributeBase attribute, Class<V> valueClass)
+	public <V> V get(AttributeBase attribute, Class<V> valueClass)
 	{
 		if ( !values.containsKey( attribute ) )
 		{
@@ -207,7 +207,7 @@ public class AttributeTable implements Presentable
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <V extends Object> V getRequired(AttributeBase attribute, Class<V> valueClass)
+	public <V> V getRequired(AttributeBase attribute, Class<V> valueClass)
 	{
 		if ( !values.containsKey( attribute ) )
 		{
@@ -386,7 +386,7 @@ public class AttributeTable implements Presentable
 	protected static Pres presentAttributeMap(FragmentView fragment, SimpleAttributeTable inheritedState, HashMap<AttributeBase, Object> values)
 	{
 		Set<AttributeBase> attributeSet = values.keySet();
-		AttributeBase attributes[] = attributeSet.toArray( new AttributeBase[0] );
+		AttributeBase attributes[] = attributeSet.toArray( new AttributeBase[attributeSet.size()] );
 		Arrays.sort( attributes, new AttributeBase.AttributeNameComparator() );
 		Pres children[][] = new Pres[attributes.length+1][];
 		
@@ -403,7 +403,7 @@ public class AttributeTable implements Presentable
 		return attrTableStyle.applyTo( new Table( children ) );
 	}
 	
-	@Override
+
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		Pres valueField = new VerticalField( "Attributes:", presentAttributeMap( fragment, inheritedState, values ) );

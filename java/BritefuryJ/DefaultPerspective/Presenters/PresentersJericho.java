@@ -72,7 +72,7 @@ public class PresentersJericho extends ObjectPresenterRegistry
 				headerElements.add( new Label( " " ) );
 				headerElements.add( new ParagraphIndentMarker() );
 				boolean first = true;
-				for (Attribute attr: element.getAttributes())
+				for (Attribute attr: attrs)
 				{
 					if ( !first )
 					{

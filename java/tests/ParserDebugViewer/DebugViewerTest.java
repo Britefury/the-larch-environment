@@ -35,7 +35,7 @@ public class DebugViewerTest
 			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
 			{
 				List<Object> v = (List<Object>)value;
-				return Arrays.asList( new Object[] { "arrayAccess", v.get( 0 ), v.get( 2 ) } );
+				return Arrays.asList( "arrayAccess", v.get( 0 ), v.get( 2 ) );
 			}
 		};
 		
@@ -45,7 +45,7 @@ public class DebugViewerTest
 			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
 			{
 				List<Object> v = (List<Object>)value;
-				return Arrays.asList( new Object[] { "fieldAccess", v.get( 0 ), v.get( 2 ) } );
+				return Arrays.asList( "fieldAccess", v.get( 0 ), v.get( 2 ) );
 			}
 		};
 		
@@ -55,7 +55,7 @@ public class DebugViewerTest
 			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
 			{
 				List<Object> v = (List<Object>)value;
-				return Arrays.asList( new Object[] { "methodInvoke", v.get( 0 ), v.get( 2 ) } );
+				return Arrays.asList( "methodInvoke", v.get( 0 ), v.get( 2 ) );
 			}
 		};
 		
@@ -65,7 +65,7 @@ public class DebugViewerTest
 			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
 			{
 				List<Object> v = (List<Object>)value;
-				return Arrays.asList( new Object[] { "methodInvoke", v.get( 0 ) } );
+				return Arrays.asList( "methodInvoke", v.get( 0 ) );
 			}
 		};
 		

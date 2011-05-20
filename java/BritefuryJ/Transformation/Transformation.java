@@ -56,7 +56,7 @@ public class Transformation
 			else
 			{
 				Object nodeCopy = identity.apply( node, this );
-				if ( stack.get( stack.size() - 1 ).booleanValue() )
+				if ( stack.get( stack.size() - 1 ) )
 				{
 					// Inner node was transformed; need to use a copy of @node
 					stack.remove( stack.size() - 1 );
