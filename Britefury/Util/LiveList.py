@@ -5,6 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
+from copy import deepcopy
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
@@ -50,11 +51,13 @@ class LiveList (object):
 	
 	def __copy__(self):
 		self._incr.onAccess()
-		return LiveList( self._items )
+		t = type( self )
+		return t( self._items )
 	
 	def __deepcopy__(self, memo):
 		self._incr.onAccess()
-		return LiveList( deepcopy( self._items, memo ) )
+		t = type( self )
+		return t( deepcopy( self._items, memo ) )
 	
 	
 	def __get_trackable_contents__(self):

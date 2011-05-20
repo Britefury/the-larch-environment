@@ -162,19 +162,34 @@ def _onDrop_embeddedObject(element, pos, data, action):
 
 	marker = element.getEditableMarkerClosestToLocalPoint( pos )
 	if marker is not None  and  marker.isValid():
-		model = data.getModel()
-		embeddedValue = DMNode.embedIsolated( model )
-		try:
-			modelType = Schema.getEmbeddedObjectModelType( model )
-		except Exception, e:
-			_displayModelException( e )
-		else:
-			if modelType is Schema.Expr:
-				expr = Schema.EmbeddedObjectExpr( embeddedValue=embeddedValue )
-				insertSpecialFormAtMarker( marker, expr )
-			elif modelType is Schema.Stmt:
-				stmt = Schema.EmbeddedObjectStmt( embeddedValue=embeddedValue )
-				insertSpecialFormAtMarker( marker, stmt )
+		def _performInsertion(model):
+			embeddedValue = DMNode.embedIsolated( model )
+			try:
+				modelType = Schema.getEmbeddedObjectModelType( model )
+			except Exception, e:
+				_displayModelException( e )
+			else:
+				if modelType is Schema.Expr:
+					expr = Schema.EmbeddedObjectExpr( embeddedValue=embeddedValue )
+					insertSpecialFormAtMarker( marker, expr )
+				elif modelType is Schema.Stmt:
+					stmt = Schema.EmbeddedObjectStmt( embeddedValue=embeddedValue )
+					insertSpecialFormAtMarker( marker, stmt )
+		
+		# Display a context menu
+		def _onDropByCopy(control):
+			if marker.isValid():
+				model = data.getModel()
+				_performInsertion( deepcopy( model ) )
+		
+		def _onDropByRef(control):
+			if marker.isValid():
+				model = data.getModel()
+				_performInsertion( model )
+
+		menu = VPopupMenu( [ MenuItem.menuItemWithLabel( 'Copy', _onDropByCopy ),
+		                     MenuItem.menuItemWithLabel( 'Reference', _onDropByRef ) ] )
+		menu.popupAtMousePosition( marker.getElement() )
 	return True
 
 
