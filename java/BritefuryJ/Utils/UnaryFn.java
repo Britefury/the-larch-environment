@@ -6,33 +6,12 @@
 //##************************
 package BritefuryJ.Utils;
 
-import org.python.core.Py;
-import org.python.core.PyType;
 
 public interface UnaryFn
 {
 	Object invoke(Object x);
 
 	
-	
-	
-	public static class PyTypeTextToValue implements UnaryFn
-	{
-		private PyType type;
-		
-		public PyTypeTextToValue(PyType type)
-		{
-			this.type = type;
-		}
-		
-		
-		@Override
-		public Object invoke(Object x)
-		{
-			return Py.tojava( type.__call__( Py.java2py( x ) ), Object.class );
-		}
-	}
-
 	
 	public static final UnaryFn identity = new UnaryFn()
 	{

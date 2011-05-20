@@ -91,6 +91,15 @@ public class PrimitiveCellEditPresenter
 	
 	
 	
+	public static abstract class TextToValue implements UnaryFn
+	{
+		public Object invoke(Object x)
+		{
+			return textToValue( (String)x );
+		}
+		
+		public abstract Object textToValue(String textValue);
+	}
 	
 	
 	private static final TextToValue textToChar = new TextToValue()
@@ -246,7 +255,7 @@ public class PrimitiveCellEditPresenter
 	
 	
 	
-	private static Pres presentEditableTextWithCachedListener(String text, TextToValue textToValue)
+	private static Pres presentEditableTextWithCachedListener(String text, UnaryFn textToValue)
 	{
 		TreeEventListener listener = cachedTreeEventListenerFor( textToValue );
 		Pres textPres = new Text( text );
@@ -255,7 +264,7 @@ public class PrimitiveCellEditPresenter
 	}
 
 
-	public static Pres presentEditableText(String text, TextToValue textToValue)
+	public static Pres presentEditableText(String text, UnaryFn textToValue)
 	{
 		TreeEventListener listener = treeEventListenerFor( textToValue );
 		Pres textPres = new Text( text );
@@ -264,18 +273,6 @@ public class PrimitiveCellEditPresenter
 	}
 
 
-	public static Pres presentEditableText(String text, final UnaryFn conversionFn)
-	{
-		TextToValue textToValue = new TextToValue()
-		{
-			public Object textToValue(String textValue)
-			{
-				return conversionFn.invoke( textValue );
-			}
-		};
-		return presentEditableText( text, textToValue );
-	}
-	
 	private static final TextClipboardHandler clipboardHandler = new TextClipboardHandler()
 	{
 		@Override
@@ -309,9 +306,9 @@ public class PrimitiveCellEditPresenter
 	
 	
 	
-	private static final IdentityHashMap<TextToValue, TreeEventListener> textCellTreeEventListeners = new IdentityHashMap<TextToValue, TreeEventListener>();
+	private static final IdentityHashMap<UnaryFn, TreeEventListener> textCellTreeEventListeners = new IdentityHashMap<UnaryFn, TreeEventListener>();
 	
-	private static TreeEventListener cachedTreeEventListenerFor(final TextToValue textToValue)
+	private static TreeEventListener cachedTreeEventListenerFor(final UnaryFn textToValue)
 	{
 		TreeEventListener listener = textCellTreeEventListeners.get( textToValue );
 		
@@ -325,7 +322,7 @@ public class PrimitiveCellEditPresenter
 	}
 	
 	
-	private static TreeEventListener treeEventListenerFor(final TextToValue textToValue)
+	private static TreeEventListener treeEventListenerFor(final UnaryFn textToValue)
 	{
 		TreeEventListener listener = new TreeEventListener()
 		{
@@ -334,7 +331,7 @@ public class PrimitiveCellEditPresenter
 				if ( event instanceof TextEditEvent )
 				{
 					String textValue = element.getTextRepresentation();
-					Object value = textToValue.textToValue( textValue );
+					Object value = textToValue.invoke( textValue );
 					if ( value != null )
 					{
 						CellSetValueEvent cellEvent = new CellSetValueEvent( value );
