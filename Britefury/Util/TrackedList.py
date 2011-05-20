@@ -9,15 +9,17 @@
 
 def onTrackedListSetContents(changeHistory, ls, oldContents, newContents, description):
 	if changeHistory is not None:
-		def execute():
-			ls._setContents( newContents )
-		def unexecute():
-			ls._setContents( oldContents )
 		for x in oldContents:
 			changeHistory.stopTracking( x )
-		changeHistory.addChange( execute, unexecute, description )
+		changeHistory.addChange( lambda: ls._setContents( newContents ), lambda: ls._setContents( oldContents ), description )
 		for x in newContents:
 			changeHistory.track( x )
+
+def onTrackedListSetItem(changeHistory, ls, i, oldX, x, description):
+	if changeHistory is not None:
+		changeHistory.stopTracking( oldX )
+		changeHistory.addChange( lambda: ls.__setitem__( i, x ), lambda: ls.__setitem__( i, oldX ), description )
+		changeHistory.track( x )
 
 
 def onTrackedListAppend(changeHistory, ls, x, description):
@@ -34,7 +36,7 @@ def onTrackedListExtend(changeHistory, ls, xs, description):
 		for x in xs:
 			changeHistory.track( x )
 
-def onTrackedListInsert(changeHistory, ls, i, x, listAttrName):
+def onTrackedListInsert(changeHistory, ls, i, x, description):
 	if changeHistory is not None:
 		changeHistory.addChange( lambda: ls.insert( i, x ), lambda: ls.__delitem__( i ), description )
 		changeHistory.track( x )
@@ -96,10 +98,15 @@ class _TrackedListWrapper (object):
 	
 	def __setitem__(self, index, x):
 		ch = self._prop._getChangeHistory( self._instance )
-		oldContents = self._ls[:]
-		self._ls[index] = x
-		newContents = self._ls[:]
-		onTrackedListSetContents( ch, self, oldContents, newContents, 'Tracked list \'%s\' set item' % self._prop._attrName )
+		if isinstance( index, int )  or  isinstance( index, long ):
+			oldX = self._ls[index]
+			self._ls[index] = x
+			onTrackedListSetItem( ch, self, index, oldX, x, 'Tracked list \'%s\' set item' % self._prop._attrName )
+		else:
+			oldContents = self._ls[:]
+			self._ls[index] = x
+			newContents = self._ls[:]
+			onTrackedListSetContents( ch, self, oldContents, newContents, 'Tracked list \'%s\' set item' % self._prop._attrName )
 		self._prop._onChange( self._instance )
 	
 	def __delitem__(self, index):

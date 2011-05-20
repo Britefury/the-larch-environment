@@ -104,10 +104,15 @@ class LiveList (object):
 		return self._items.count( x )
 	
 	def __setitem__(self, index, x):
-		oldContents = self._items[:]
-		self._items[index] = x
-		newContents = self._items[:]
-		onTrackedListSetContents( self.__change_history__, self, oldContents, newContents, 'Live list set item' )
+		if isinstance( index, int )  or  isinstance( index, long ):
+			oldX = self._items[index]
+			self._items[index] = x
+			onTrackedListSetItem( self.__change_history__, self, index, oldX, x, 'Live list set item' )
+		else:
+			oldContents = self._items[:]
+			self._items[index] = x
+			newContents = self._items[:]
+			onTrackedListSetContents( self.__change_history__, self, oldContents, newContents, 'Live list set item' )
 		self._incr.onChanged()
 	
 	def __delitem__(self, index):
