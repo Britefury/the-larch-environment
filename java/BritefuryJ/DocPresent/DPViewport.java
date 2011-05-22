@@ -83,11 +83,14 @@ public class DPViewport extends DPContainer implements FiniteViewportBehaviour.F
 		
 		layoutNode = new LayoutNodeViewport( this );
 		this.state = state;
-		Xform2 x = state.getValueAsType( Xform2.class );
+		Xform2 x = state != null  ?  state.getValueAsType( Xform2.class )  :  null;
 		if ( x == null )
 		{
 			x = new Xform2();
-			state.setValue( x );
+			if ( state != null )
+			{
+				state.setValue( x );
+			}
 		}
 
 		viewportBehaviour = new FiniteViewportBehaviour( this, xRange, yRange, x );
@@ -348,7 +351,10 @@ public class DPViewport extends DPContainer implements FiniteViewportBehaviour.F
 	@Override
 	public void onFiniteViewportXformModified()
 	{
-		state.setValue( viewportBehaviour.getWorldToViewXform() );
+		if ( state != null )
+		{
+			state.setValue( viewportBehaviour.getWorldToViewXform() );
+		}
 		queueFullRedraw();
 	}
 

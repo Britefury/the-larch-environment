@@ -8,6 +8,8 @@ package BritefuryJ.Pres.Primitive;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.StringReader;
+import java.net.URI;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPImage;
@@ -15,6 +17,9 @@ import BritefuryJ.DocPresent.StyleParams.ContentLeafStyleParams;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
+
+import com.kitfox.svg.SVGCache;
+import com.kitfox.svg.SVGDiagram;
 
 public class Image extends Pres
 {
@@ -82,6 +87,65 @@ public class Image extends Pres
 			}
 		};
 	}
+	
+
+	
+	public Image(final SVGDiagram image, final double imageWidth, final double imageHeight)
+	{
+		imageFactory = new ImageFactory()
+		{
+			public DPImage create(ContentLeafStyleParams styleParams)
+			{
+				return new DPImage( styleParams, "", image, null, imageWidth, imageHeight );
+			}
+		};
+	}
+	
+	public Image(final SVGDiagram image, final SVGDiagram hoverImage, final double imageWidth, final double imageHeight)
+	{
+		imageFactory = new ImageFactory()
+		{
+			public DPImage create(ContentLeafStyleParams styleParams)
+			{
+				return new DPImage( styleParams, "", image, hoverImage, imageWidth, imageHeight );
+			}
+		};
+	}
+	
+	public Image(final SVGDiagram image, final SVGDiagram hoverImage, final double imageWidth)
+	{
+		imageFactory = new ImageFactory()
+		{
+			public DPImage create(ContentLeafStyleParams styleParams)
+			{
+				return new DPImage( styleParams, "", image, hoverImage, imageWidth );
+			}
+		};
+	}
+	
+	public Image(final SVGDiagram image)
+	{
+		imageFactory = new ImageFactory()
+		{
+			public DPImage create(ContentLeafStyleParams styleParams)
+			{
+				return new DPImage( styleParams, "", image, null );
+			}
+		};
+	}
+	
+	public Image(final SVGDiagram image, final SVGDiagram hoverImage)
+	{
+		imageFactory = new ImageFactory()
+		{
+			public DPImage create(ContentLeafStyleParams styleParams)
+			{
+				return new DPImage( styleParams, "", image, hoverImage );
+			}
+		};
+	}
+	
+
 	
 	public Image(final File imageFile, final double imageWidth, final double imageHeight)
 	{
@@ -220,6 +284,45 @@ public class Image extends Pres
 		return new Image( "icons/" + iconName + ".png" );
 	}
 
+
+	
+	public static Image svgFromSource(final String image, final double imageWidth, final double imageHeight)
+	{
+		return new Image( srcToSVG( image ), imageWidth, imageHeight );
+	}
+	
+	public static Image svgFromSource(final String image, final String hoverImage, final double imageWidth, final double imageHeight)
+	{
+		return new Image( srcToSVG( image ), srcToSVG( hoverImage ), imageWidth, imageHeight );
+	}
+	
+	public static Image svgFromSource(final String image, final String hoverImage, final double imageWidth)
+	{
+		return new Image( srcToSVG( image ), srcToSVG( hoverImage ), imageWidth );
+	}
+	
+	public static Image svgFromSource(final String image)
+	{
+		return new Image( srcToSVG( image ) );
+	}
+	
+	public static Image svgFromSource(final String image, final String hoverImage)
+	{
+		return new Image( srcToSVG( image ), srcToSVG( hoverImage ) );
+	}
+	
+	
+	private static SVGDiagram srcToSVG(String source)
+	{
+		StringReader reader = new StringReader( source );
+		URI uri = SVGCache.getSVGUniverse().loadSVG( reader, "temp" );
+		return SVGCache.getSVGUniverse().getDiagram( uri );
+	}
+	
+
+	
+	
+	
 	
 	
 	@Override

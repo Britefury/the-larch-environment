@@ -7,7 +7,9 @@
 ##-*************************
 import os
 
-import ConfigParser
+from BritefuryJ.Isolation import IsolationPickle
+
+from Britefury.Config import Configuration
 
 
 _userConfigDirName = '.larch'
@@ -28,4 +30,38 @@ def makeSettingsDir():
 def userConfigFilePath(filename):
 	return os.path.join( _userConfigDirPath, filename )
 
+
+
+def loadUserConfig(filename):
+	config = None
+	path = userConfigFilePath( filename )
 	
+	if os.path.exists( path ):
+		try:
+			f = open( path, 'r' )
+		except IOError:
+			print 'Could not open config file \'%s\' for reading' % path
+			return
+
+		try:
+			config = IsolationPickle.load( f )
+		except EOFError:
+			print 'Could not read config file \'%s\' - EOF' % path
+		finally:
+			f.close()
+	
+	return config
+
+
+def saveUserConfig(filename, config):
+	if config is not None:
+		makeSettingsDir()
+		path = userConfigFilePath( filename )
+		try:
+			f = open( path, 'w+' )
+		except IOError:
+			print 'Could not open user config file \'%s\' for writing' % path
+			return
+	
+		IsolationPickle.dump( config, f )
+		f.close()

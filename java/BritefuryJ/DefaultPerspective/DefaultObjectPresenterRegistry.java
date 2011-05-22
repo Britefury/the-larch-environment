@@ -46,6 +46,7 @@ import BritefuryJ.DefaultPerspective.Presenters.PresentersAWT;
 import BritefuryJ.DefaultPerspective.Presenters.PresentersConcurrency;
 import BritefuryJ.DefaultPerspective.Presenters.PresentersJericho;
 import BritefuryJ.DefaultPerspective.Presenters.PresentersSQL;
+import BritefuryJ.DefaultPerspective.Presenters.PresentersSVG;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.ObjectPresentation.ObjectPresentationPerspective;
 import BritefuryJ.ObjectPresentation.ObjectPresenter;
@@ -77,6 +78,7 @@ import BritefuryJ.StyleSheet.StyleSheet;
 public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 {
 	private PresentersAWT awt = new PresentersAWT();
+	private PresentersSVG svg = new PresentersSVG();
 	private PresentersSQL sql = new PresentersSQL();
 	private PresentersConcurrency concurrency = new PresentersConcurrency();
 	private PresentersJericho jericho = new PresentersJericho();
@@ -125,6 +127,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 		super.registerPerspective( perspective );
 		
 		awt.registerPerspective( perspective );
+		svg.registerPerspective( perspective );
 		sql.registerPerspective( perspective );
 		concurrency.registerPerspective( perspective );
 		jericho.registerPerspective( perspective );

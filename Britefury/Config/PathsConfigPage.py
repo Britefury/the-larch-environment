@@ -19,17 +19,15 @@ from BritefuryJ.Pres import *
 from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.Pres.RichText import *
 from BritefuryJ.StyleSheet import *
-from BritefuryJ.Isolation import IsolationPickle
 
-from Britefury.Config.UserConfig import makeSettingsDir, userConfigFilePath
 from Britefury.Config import Configuration
+from Britefury.Config.UserConfig import loadUserConfig, saveUserConfig
 from Britefury.Config.ConfigurationPage import ConfigurationPage
 
 
 
 
 _pathsConfigFilename = 'paths'
-_pathsConfigPath = userConfigFilePath( _pathsConfigFilename )
 
 
 
@@ -104,9 +102,9 @@ class PathsConfigurationPage (ConfigurationPage):
 
 	def __present_contents__(self, fragment, inheritedState):
 		self._incr.onAccess()
-		plutinPathsPres = self.pathsSection( 'Plugin Paths', self._pluginPaths )
-		plutinRootPathsPres = self.pathsSection( 'Plugin Root Paths', self._pluginRootPaths )
-		return Body( [ plutinPathsPres, plutinRootPathsPres ] )
+		pluginPathsPres = self.pathsSection( 'Plugin Paths', self._pluginPaths )
+		pluginRootPathsPres = self.pathsSection( 'Plugin Root Paths', self._pluginRootPaths )
+		return Body( [ pluginPathsPres, pluginRootPathsPres ] )
 	
 	
 	pluginPaths = property( getPluginPaths, None )
@@ -117,38 +115,11 @@ class PathsConfigurationPage (ConfigurationPage):
 
 	
 def _loadPathsConfig():
-	config = None
-	
-	if os.path.exists( _pathsConfigPath ):
-		try:
-			f = open( _pathsConfigPath, 'r' )
-		except IOError:
-			print 'Could not open paths config file for reading'
-			return
-
-		try:
-			config = IsolationPickle.load( f )
-		except EOFError:
-			print 'Could not read paths config file - EOF'
-		finally:
-			f.close()
-	
-	return config
+	return loadUserConfig( _pathsConfigFilename )
 
 
 def savePathsConfig():
-	global _pathsConfig
-	
-	if _pathsConfig is not None:
-		makeSettingsDir()
-		try:
-			f = open( _pathsConfigPath, 'w+' )
-		except IOError:
-			print 'Could not open user config file for writing'
-			return
-	
-		IsolationPickle.dump( _pathsConfig, f )
-		f.close()
+	saveUserConfig( _pathsConfigFilename, _pathsConfig )
 
 			
 
