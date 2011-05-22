@@ -5,9 +5,17 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
-import sys
-import os
+from BritefuryJ.GraphViz import GraphViz
 
-sys.path.append( os.path.join( os.getcwd(), 'bin' ) )
-sys.path.append( os.path.join( os.getcwd(), 'extlibs', 'jericho-html-3.2.jar' ) )
-sys.path.append( os.path.join( os.getcwd(), 'extlibs', 'svgSalamander.jar' ) )
+from Britefury.Config import PathsConfigPage, GraphVizConfigPage
+
+
+def appInit():
+	PathsConfigPage.initPathsConfig()
+	GraphVizConfigPage.initGraphVizConfig()
+
+	
+def appShutdown():
+	PathsConfigPage.savePathsConfig()
+	GraphVizConfigPage.saveGraphVizConfig()
+	GraphViz.shutdown()

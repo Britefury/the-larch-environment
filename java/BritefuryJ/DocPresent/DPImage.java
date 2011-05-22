@@ -9,7 +9,6 @@ package BritefuryJ.DocPresent;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
@@ -23,34 +22,145 @@ import javax.imageio.ImageIO;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeImage;
 import BritefuryJ.DocPresent.StyleParams.ContentLeafStyleParams;
 
+import com.kitfox.svg.SVGCache;
+import com.kitfox.svg.SVGDiagram;
+import com.kitfox.svg.SVGException;
+
 public class DPImage extends DPContentLeaf
 {
+	private static abstract class AbstractImg
+	{
+		public abstract double getWidth();
+		public abstract double getHeight();
+		public abstract void draw(Graphics2D graphics, double scaleX, double scaleY, PresentationComponent.RootElement root); 
+	}
+	
+	
+	private static class BufferedImageImg extends AbstractImg
+	{
+		private BufferedImage image;
+		
+		public BufferedImageImg(BufferedImage image)
+		{
+			this.image = image;
+		}
+		
+		public double getWidth()
+		{
+			return image.getWidth();
+		}
+		
+		public double getHeight()
+		{
+			return image.getHeight();
+		}
+		
+		public void draw(Graphics2D graphics, double scaleX, double scaleY, PresentationComponent.RootElement root)
+		{
+			if ( scaleX == 1.0  &&  scaleY == 1.0 )
+			{
+				graphics.drawImage( image, 0, 0, root.getImageObserver() );
+			}
+			else
+			{
+				AffineTransform xform = new AffineTransform();
+				xform.setToScale( scaleX, scaleY );
+				graphics.drawImage( image, xform, root.getImageObserver() );
+			}
+		}
+	}
+	
+	
+	private static class SVGImg extends AbstractImg
+	{
+		private SVGDiagram svg;
+		
+		public SVGImg(SVGDiagram svg)
+		{
+			this.svg = svg;
+		}
+		
+		public double getWidth()
+		{
+			return svg.getWidth();
+		}
+		
+		public double getHeight()
+		{
+			return svg.getHeight();
+		}
+		
+		public void draw(Graphics2D graphics, double scaleX, double scaleY, PresentationComponent.RootElement root)
+		{
+			AffineTransform prevXform = graphics.getTransform();
+			
+			graphics.scale( scaleX, scaleY );
+			
+			try
+			{
+				svg.render( graphics );
+			}
+			catch (SVGException e)
+			{
+				throw new RuntimeException( e );
+			}
+			
+			graphics.setTransform( prevXform );
+		}
+	}
+	
+	
+	
+	
 	private double imageScaleX, imageScaleY;
 	private double hoverImageScaleX, hoverImageScaleY;
-	private BufferedImage image, hoverImage;
+	private AbstractImg image, hoverImage;
 	
 	
 	public DPImage(ContentLeafStyleParams styleParams, String textRepresentation, BufferedImage image, BufferedImage hoverImage, double imageWidth, double imageHeight)
 	{
 		super( styleParams, textRepresentation );
 		
-		initImage( image, hoverImage, imageWidth, imageHeight );
+		initImage( img( image ), img( hoverImage ), imageWidth, imageHeight );
 	}
 	
 	public DPImage(ContentLeafStyleParams styleParams, String textRepresentation, BufferedImage image, BufferedImage hoverImage, double imageWidth)
 	{
 		super( styleParams, textRepresentation );
 		
-		initImage( image, hoverImage, imageWidth );
+		initImage( img( image ), img( hoverImage ), imageWidth );
 	}
 	
 	public DPImage(ContentLeafStyleParams styleParams, String textRepresentation, BufferedImage image, BufferedImage hoverImage)
 	{
 		super( styleParams, textRepresentation );
 		
-		initImage( image, hoverImage );
+		initImage( img( image ), img( hoverImage ) );
 	}
 	
+
+	public DPImage(ContentLeafStyleParams styleParams, String textRepresentation, SVGDiagram image, SVGDiagram hoverImage, double imageWidth, double imageHeight)
+	{
+		super( styleParams, textRepresentation );
+		
+		initImage( img( image ), img( hoverImage ), imageWidth, imageHeight );
+	}
+	
+	public DPImage(ContentLeafStyleParams styleParams, String textRepresentation, SVGDiagram image, SVGDiagram hoverImage, double imageWidth)
+	{
+		super( styleParams, textRepresentation );
+		
+		initImage( img( image ), img( hoverImage ), imageWidth );
+	}
+	
+	public DPImage(ContentLeafStyleParams styleParams, String textRepresentation, SVGDiagram image, SVGDiagram hoverImage)
+	{
+		super( styleParams, textRepresentation );
+		
+		initImage( img( image ), img( hoverImage ) );
+	}
+	
+
 	public DPImage(ContentLeafStyleParams styleParams, String textRepresentation, File imageFile, File hoverImageFile, double imageWidth, double imageHeight)
 	{
 		super( styleParams, textRepresentation );
@@ -123,7 +233,7 @@ public class DPImage extends DPContentLeaf
 	//
 	//
 	
-	private void initImage(BufferedImage image, BufferedImage hoverImage, double imageWidth, double imageHeight)
+	private void initImage(AbstractImg image, AbstractImg hoverImage, double imageWidth, double imageHeight)
 	{
 		this.image = image;
 		imageScaleX = imageWidth / (double)image.getWidth();
@@ -139,7 +249,7 @@ public class DPImage extends DPContentLeaf
 		layoutNode = new LayoutNodeImage( this );
 	}
 	
-	private void initImage(BufferedImage image, BufferedImage hoverImage, double imageWidth)
+	private void initImage(AbstractImg image, AbstractImg hoverImage, double imageWidth)
 	{
 		this.image = image;
 		imageScaleX = imageScaleY = imageWidth / (double)image.getWidth();
@@ -153,7 +263,7 @@ public class DPImage extends DPContentLeaf
 		layoutNode = new LayoutNodeImage( this );
 	}
 	
-	private void initImage(BufferedImage image, BufferedImage hoverImage)
+	private void initImage(AbstractImg image, AbstractImg hoverImage)
 	{
 		this.image = image;
 		imageScaleX = imageScaleY = 1.0;
@@ -168,15 +278,26 @@ public class DPImage extends DPContentLeaf
 		layoutNode = new LayoutNodeImage( this );
 	}
 	
-	private BufferedImage readImageFile(File file)
+
+	private AbstractImg readImageFile(File file)
 	{
 		try
 		{
-			return ImageIO.read( file );
+			if ( file.getName().toLowerCase().endsWith( ".svg" ) )
+			{
+				// Load as SVG
+				SVGDiagram diagram = SVGCache.getSVGUniverse().getDiagram( file.toURI() );
+				return img( diagram );
+			}
+			else
+			{
+				// Load as buffered image
+				return img( ImageIO.read( file ) );
+			}
 		}
 		catch (IOException e)
 		{
-			return getBadImage();
+			return img( getBadImage() );
 		}
 	}
 	
@@ -218,24 +339,25 @@ public class DPImage extends DPContentLeaf
 		{
 			boolean bUseHover = testFlag( FLAG_HOVER ) && hoverImage != null;
 			
-			Image img = bUseHover  ?  hoverImage  :  image;
+			AbstractImg img = bUseHover  ?  hoverImage  :  image;
 			double sX = bUseHover  ?  hoverImageScaleX  :  imageScaleX;
 			double sY = bUseHover  ?  hoverImageScaleY  :  imageScaleY;
 
-			
-			if ( sX == 1.0  &&  sY == 1.0 )
-			{
-				graphics.drawImage( img, 0, 0, root.getImageObserver() );
-			}
-			else
-			{
-				AffineTransform xform = new AffineTransform();
-				xform.setToScale( sX, sY );
-				graphics.drawImage( img, xform, root.getImageObserver() );
-			}
+			img.draw( graphics, sX, sY, root );
 		}
 	}
 	
+	
+	
+	private static BufferedImageImg img(BufferedImage img)
+	{
+		return img != null  ?  new BufferedImageImg( img )  :  null;
+	}
+	
+	private static SVGImg img(SVGDiagram img)
+	{
+		return img != null  ?  new SVGImg( img )  :  null;
+	}
 	
 	
 	
