@@ -8,12 +8,16 @@
 from javax.swing import JOptionPane, JFileChooser
 from javax.swing.filechooser import FileNameExtensionFilter
 
+from java.awt import Color
+
 import os
 import sys
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from BritefuryJ.Controls import Hyperlink
+
+from BritefuryJ.DocPresent.Border import *
 
 from BritefuryJ.Pres import *
 from BritefuryJ.Pres.Primitive import *
@@ -83,10 +87,12 @@ class GraphVizConfigurationPage (ConfigurationPage):
 		if self._graphVizDir is not None  and  os.path.isdir( self._graphVizDir ):
 			dotPath = self._checkedToolPath( 'dot' )
 			neatoPath = self._checkedToolPath( 'neato' )
-			smyrnaPath = self._checkedToolPath( 'smyrna' )
-			leftyPath = self._checkedToolPath( 'lefty' )
-			dottyPath = self._checkedToolPath( 'dotty' )
-			self._config = GraphVizConfiguration( dotPath, neatoPath, smyrnaPath, leftyPath, dottyPath )
+			twopiPath = self._checkedToolPath( 'twopi' )
+			circoPath = self._checkedToolPath( 'circo' )
+			fdpPath = self._checkedToolPath( 'fdp' )
+			sfdpPath = self._checkedToolPath( 'sfdp' )
+			osagePath = self._checkedToolPath( 'osage' )
+			self._config = GraphVizConfiguration( dotPath, neatoPath, twopiPath, circoPath, fdpPath, sfdpPath, osagePath )
 			GraphVizConfiguration.setInstance( self._config )
 		else:
 			self._config = None
@@ -122,20 +128,26 @@ class GraphVizConfigurationPage (ConfigurationPage):
 		
 		dirLabel = Label( self._graphVizDir )   if self._graphVizDir is not None   else   self._notSetStyle.applyTo( Label( '<Not set>' ) )
 						
-		setLink = Hyperlink( 'SET', _onSet )
+		setLink = Hyperlink( 'CHANGE', _onSet )
 		controls = setLink.pad( 10.0, 5.0 )
-		return Row( [ dirLabel, Spacer( 25.0, 0.0 ), setLink ] )
+		return self._dirBorderStyle.applyTo( Border( Row( [ dirLabel, Spacer( 25.0, 0.0 ), setLink ] ) ) )
 	
+	
+	def _toolLabel(self, name):
+		return self._configTableToolNameStyle.applyTo( Label( name ) )
 	
 	def _presentConfig(self):
 		if self._config is not None:
 			rows = []
-			rows.append( [ Label( 'Dot' ), Label( self._config.getDotPath() ) ] )
-			rows.append( [ Label( 'Neato' ), Label( self._config.getNeatoPath() ) ] )
-			rows.append( [ Label( 'SMYRNA' ), Label( self._config.getSmyrnaPath() ) ] )
-			rows.append( [ Label( 'Lefty' ), Label( self._config.getLeftyPath() ) ] )
-			rows.append( [ Label( 'Dotty' ), Label( self._config.getDottyPath() ) ] )
-			return self._configTableStyle.applyTo( Table( rows ) ).pad( 5.0, 5.0 )
+			rows.append( [ self._configTableHeadingStyle.applyTo( Label( 'Tool' ) ), self._configTableHeadingStyle.applyTo( Label( 'Path' ) ) ] )
+			rows.append( [ self._toolLabel( 'dot' ), Label( self._config.getDotPath() ) ] )
+			rows.append( [ self._toolLabel( 'neato' ), Label( self._config.getNeatoPath() ) ] )
+			rows.append( [ self._toolLabel( 'twopi' ), Label( self._config.getTwopiPath() ) ] )
+			rows.append( [ self._toolLabel( 'circo' ), Label( self._config.getCircoPath() ) ] )
+			rows.append( [ self._toolLabel( 'fdp' ), Label( self._config.getFdpPath() ) ] )
+			rows.append( [ self._toolLabel( 'sfdp' ), Label( self._config.getSfdpPath() ) ] )
+			rows.append( [ self._toolLabel( 'osage' ), Label( self._config.getOsagePath() ) ] )
+			return self._configTableStyle.applyTo( Table( rows ) ).pad( 15.0, 5.0 )
 	
 	
 	def section(self, title, contents):
@@ -156,8 +168,11 @@ class GraphVizConfigurationPage (ConfigurationPage):
 	
 	
 	_sectionStyle = StyleSheet.instance.withAttr( Primitive.columnSpacing, 1.0 )
+	_dirBorderStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 1.0, 0.85, 0.0 ), Color( 1.0, 1.0, 0.85 ) ) )
 	_notSetStyle = StyleSheet.instance.withAttr( Primitive.fontItalic, True )
 	_configTableStyle = StyleSheet.instance.withAttr( Primitive.tableColumnSpacing, 10.0 )
+	_configTableHeadingStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.0, 0.5 ) ).withAttr( Primitive.fontBold, True )
+	_configTableToolNameStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.25, 0.5 ) )
 	
 
 	
