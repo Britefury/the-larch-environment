@@ -8,20 +8,22 @@ package BritefuryJ.GraphViz;
 
 public class Configuration
 {
-	private String dotPath, neatoPath, smyrnaPath, leftyPath, dottyPath;
+	private String dotPath, neatoPath, twopiPath, circoPath, fdpPath, sfdpPath, osagePath;
 	
 	
 	protected static Configuration instance;
 	
 	
 	
-	public Configuration(String dotPath, String neatoPath, String smyrnaPath, String leftyPath, String dottyPath)
+	public Configuration(String dotPath, String neatoPath, String twopiPath, String circoPath, String fdpPath, String sfdpPath, String osagePath)
 	{
 		this.dotPath = dotPath;
 		this.neatoPath = neatoPath;
-		this.smyrnaPath = smyrnaPath;
-		this.leftyPath = leftyPath;
-		this.dottyPath = dottyPath;
+		this.twopiPath = twopiPath;
+		this.circoPath = circoPath;
+		this.fdpPath = fdpPath;
+		this.sfdpPath = sfdpPath;
+		this.osagePath = osagePath;
 	}
 	
 	
@@ -35,19 +37,29 @@ public class Configuration
 		return neatoPath;
 	}
 	
-	public String getSmyrnaPath()
+	public String getTwopiPath()
 	{
-		return smyrnaPath;
+		return twopiPath;
 	}
 	
-	public String getLeftyPath()
+	public String getCircoPath()
 	{
-		return leftyPath;
+		return circoPath;
 	}
 	
-	public String getDottyPath()
+	public String getFdpPath()
 	{
-		return dottyPath;
+		return fdpPath;
+	}
+
+	public String getSfdpPath()
+	{
+		return sfdpPath;
+	}
+
+	public String getOsagePath()
+	{
+		return osagePath;
 	}
 
 

@@ -11,10 +11,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URI;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.ObjectPres.ErrorBox;
@@ -24,30 +20,9 @@ import com.kitfox.svg.SVGCache;
 import com.kitfox.svg.SVGDiagram;
 import com.kitfox.svg.SVGUniverse;
 
-public class GraphViz
+public class GraphVizBlocking
 {
-	private static ExecutorService _threadPool;
-	
-	
-	
-	public static void shutdown()
-	{
-		if ( _threadPool != null )
-		{
-			_threadPool.shutdown();
-		}
-	}
-	
-	public static void shutdownNow()
-	{
-		if ( _threadPool != null )
-		{
-			_threadPool.shutdownNow();
-		}
-	}
-	
-	
-	public static Future<Pres> dot(final String src)
+	public static Pres dot(final String src)
 	{
 		if ( Configuration.instance != null )
 		{
@@ -62,7 +37,7 @@ public class GraphViz
 	}
 	
 	
-	public static Future<Pres> neato(final String src)
+	public static Pres neato(final String src)
 	{
 		if ( Configuration.instance != null )
 		{
@@ -77,7 +52,7 @@ public class GraphViz
 	}
 	
 	
-	public static Future<Pres> twopi(final String src)
+	public static Pres twopi(final String src)
 	{
 		if ( Configuration.instance != null )
 		{
@@ -92,7 +67,7 @@ public class GraphViz
 	}
 	
 	
-	public static Future<Pres> circo(final String src)
+	public static Pres circo(final String src)
 	{
 		if ( Configuration.instance != null )
 		{
@@ -107,7 +82,7 @@ public class GraphViz
 	}
 	
 	
-	public static Future<Pres> fdp(final String src)
+	public static Pres fdp(final String src)
 	{
 		if ( Configuration.instance != null )
 		{
@@ -122,7 +97,7 @@ public class GraphViz
 	}
 	
 	
-	public static Future<Pres> sfdp(final String src)
+	public static Pres sfdp(final String src)
 	{
 		if ( Configuration.instance != null )
 		{
@@ -137,7 +112,7 @@ public class GraphViz
 	}
 	
 	
-	public static Future<Pres> osage(final String src)
+	public static Pres osage(final String src)
 	{
 		if ( Configuration.instance != null )
 		{
@@ -153,71 +128,40 @@ public class GraphViz
 	
 	
 	
-	private static Future<Pres> graphViz(final String executablePath, final String src)
+	private static Pres graphViz(final String executablePath, final String src)
 	{
-		Callable<Pres> task = new Callable<Pres>()
+		Process proc;
+		try
 		{
-			public Pres call()
-			{
-				Process proc;
-				try
-				{
-					proc = Runtime.getRuntime().exec( new String[] { executablePath, "-Tsvg" } );
-				}
-				catch (IOException e)
-				{
-					return new ErrorBox( "GraphViz: Error while executing GraphViz tool", e );
-				}
-				
-				
-				OutputStream outStream = proc.getOutputStream();
-				PrintWriter writer = new PrintWriter( outStream );
-				writer.print( src );
-				writer.flush();
-				writer.close();
-				
-				InputStream inStream = proc.getInputStream();
-				
-				SVGUniverse universe = SVGCache.getSVGUniverse();
-				SVGDiagram diagram = null;
-
-				synchronized ( universe )
-				{
-					URI diagramURI;
-					try
-					{
-						diagramURI = universe.loadSVG( inStream, "dot_output" );
-					}
-					catch (IOException e)
-					{
-						return new ErrorBox( "GraphViz: Error while getting URI for SVG", e );
-					}
-					
-					diagram = universe.getDiagram( diagramURI );
-				}
-				
-				return new Image( diagram );
-			}
-		};
-		
-		
-		return spawn( task );
-	}
-	
-	
-	
-
-	private static <V> Future<V> spawn(Callable<V> task)
-	{
-		return getThreadPool().submit( task );
-	}
-	
-	private static ExecutorService getThreadPool()
-	{
-		if ( _threadPool == null )
-		{
-			_threadPool = Executors.newSingleThreadScheduledExecutor();
+			proc = Runtime.getRuntime().exec( new String[] { executablePath, "-Tsvg" } );
 		}
-		return _threadPool;
+		catch (IOException e)
+		{
+			return new ErrorBox( "GraphViz: Error while executing GraphViz tool", e );
+		}
+		
+		
+		OutputStream outStream = proc.getOutputStream();
+		PrintWriter writer = new PrintWriter( outStream );
+		writer.print( src );
+		writer.flush();
+		writer.close();
+		
+		InputStream inStream = proc.getInputStream();
+		
+		SVGUniverse universe = SVGCache.getSVGUniverse();
+		URI diagramURI;
+		try
+		{
+			diagramURI = universe.loadSVG( inStream, "dot_output" );
+		}
+		catch (IOException e)
+		{
+			return new ErrorBox( "GraphViz: Error while getting URI for SVG", e );
+		}
+		
+		SVGDiagram diagram = universe.getDiagram( diagramURI );
+		
+		return new Image( diagram );
 	}
 }
