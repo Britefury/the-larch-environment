@@ -604,17 +604,17 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	public double getWidthInParentSpace()
 	{
-		return layoutNode != null  ?  layoutNode.getWidthInParentSpace()  :  ( parent != null  ?  parent.getWidthInParentSpace()  :  0.0 );
+		return layoutNode != null  ?  layoutNode.getWidthInParentSpace()  :  ( parent != null  ?  parent.getWidth()  :  0.0 );
 	}
 	
 	public double getHeightInParentSpace()
 	{
-		return layoutNode != null  ?  layoutNode.getHeightInParentSpace()  :  ( parent != null  ?  parent.getHeightInParentSpace()  :  0.0 );
+		return layoutNode != null  ?  layoutNode.getHeightInParentSpace()  :  ( parent != null  ?  parent.getHeight()  :  0.0 );
 	}
 	
 	public Vector2 getSizeInParentSpace()
 	{
-		return layoutNode != null  ?  layoutNode.getSizeInParentSpace()  :  ( parent != null  ?  parent.getSizeInParentSpace()  :  new Vector2());
+		return layoutNode != null  ?  layoutNode.getSizeInParentSpace()  :  ( parent != null  ?  parent.getSize()  :  new Vector2());
 	}
 	
 	protected AABox2 getVisibleBoxInLocalSpace()

@@ -11,7 +11,6 @@ import java.util.Map;
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.IncrementalView.FragmentView;
-import BritefuryJ.Parser.TracedParseResultView.ParseView;
 import BritefuryJ.ParserHelpers.TraceNode;
 import BritefuryJ.ParserHelpers.TracedParseResultInterface;
 import BritefuryJ.Pres.InnerFragment;
@@ -46,7 +45,7 @@ public class TracedParseResult extends ParseResult implements Presentable
 		@Override
 		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
-			return ParseView.presentTracedParseResult( this, fragment, inheritedState );
+			return TraceGraphViewer.traceView( this, fragment.persistentState( "viewport" ) );
 		}
 	}
 
@@ -86,13 +85,13 @@ public class TracedParseResult extends ParseResult implements Presentable
 			
 			Pres valueView = new InnerFragment( getValue() );
 			Pres value = parseResultStyle.applyTo( new VerticalField( "Value:", valueView ) );
-			Pres trace = parseResultStyle.applyTo( new VerticalField( "Trace:", ParseView.presentTracedParseResult( this.trace, fragment, inheritedState ) ) );
+			Pres trace = parseResultStyle.applyTo( new VerticalField( "Trace:", TraceGraphViewer.traceView( this.trace, fragment.persistentState( "viewport" ) ) ) );
 			fields = new Pres[] { status, range, value, trace.alignHExpand().alignVExpand() };
 		}
 		else
 		{
 			Pres status = parseResultStyle.applyTo( new HorizontalField( "Status:", failStyle.applyTo( new StaticText( "Fail" ) ) ) );
-			Pres trace = parseResultStyle.applyTo( new VerticalField( "Trace:", ParseView.presentTracedParseResult( this.trace, fragment, inheritedState ) ) );
+			Pres trace = parseResultStyle.applyTo( new VerticalField( "Trace:", TraceGraphViewer.traceView( this.trace, fragment.persistentState( "viewport" ) ) ) );
 			fields = new Pres[] { status, trace.alignHExpand().alignVExpand() };
 		}
 		
