@@ -133,11 +133,12 @@ public class TraceGraphViewer
 	
 	private void node(StringBuilder dot, String name, TraceNode data)
 	{
-		String nodeColour = data.getResult().isValid()  ?  "black"  :  "red";
-		
 		dot.append( "\t\"" ).append( name ).append( "\"" ).append( " [\n" );
 		label( dot.append( "\t\tlabel = \"" ), data ).append( "\"\n" );
-		dot.append( "\t\tcolor = \"" ).append( nodeColour ).append( "\"\n" );
+		if ( !data.getResult().isValid() )
+		{
+			dot.append( "\t\tcolor = red\n" );
+		}
 		dot.append( "\t];\n" );
 		
 		
