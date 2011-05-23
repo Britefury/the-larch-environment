@@ -315,7 +315,7 @@ public class Image extends Pres
 	private static SVGDiagram srcToSVG(String source)
 	{
 		StringReader reader = new StringReader( source );
-		URI uri = SVGCache.getSVGUniverse().loadSVG( reader, "temp" );
+		URI uri = SVGCache.getSVGUniverse().loadSVG( reader, "svgImage", true );
 		return SVGCache.getSVGUniverse().getDiagram( uri );
 	}
 	

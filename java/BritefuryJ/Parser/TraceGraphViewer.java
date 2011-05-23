@@ -135,9 +135,23 @@ public class TraceGraphViewer
 	{
 		dot.append( "\t\"" ).append( name ).append( "\"" ).append( " [\n" );
 		label( dot.append( "\t\tlabel = \"" ), data ).append( "\"\n" );
-		if ( !data.getResult().isValid() )
+		if ( data.getExpression() instanceof Production )
 		{
-			dot.append( "\t\tcolor = red\n" );
+			if ( data.getResult().isValid() )
+			{
+				dot.append( "\t\tcolor = \"#00a000\"\n" );
+			}
+			else
+			{
+				dot.append( "\t\tcolor = \"#e000e0\"\n" );
+			}
+		}
+		else
+		{
+			if ( !data.getResult().isValid() )
+			{
+				dot.append( "\t\tcolor = red\n" );
+			}
 		}
 		dot.append( "\t];\n" );
 		
@@ -205,6 +219,7 @@ public class TraceGraphViewer
 		dot.append( "digraph g {\n" );
 		dot.append( "\tgraph [ rankdir=LR  ordering=out ];\n" );
 		dot.append( "\tnode [ fontsize=11  shape=record ];\n" );
+		dot.append( "\tedge [ dir=back ];\n" );
 		dot.append( "\n" );
 	}
 	

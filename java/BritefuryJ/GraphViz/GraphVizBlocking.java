@@ -153,7 +153,7 @@ public class GraphVizBlocking
 		URI diagramURI;
 		try
 		{
-			diagramURI = universe.loadSVG( inStream, "dot_output" );
+			diagramURI = universe.loadSVG( inStream, "dot_output", true );
 		}
 		catch (IOException e)
 		{

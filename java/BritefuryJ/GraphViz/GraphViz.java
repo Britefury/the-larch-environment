@@ -195,7 +195,7 @@ public class GraphViz
 					URI diagramURI;
 					try
 					{
-						diagramURI = universe.loadSVG( inStream, "dot_output" );
+						diagramURI = universe.loadSVG( inStream, "dot_output", true );
 					}
 					catch (IOException e)
 					{
