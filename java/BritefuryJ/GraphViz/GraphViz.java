@@ -177,6 +177,15 @@ public class GraphViz
 				writer.close();
 				
 				InputStream inStream = proc.getInputStream();
+				InputStream errStream = proc.getErrorStream();
+				try
+				{
+					errStream.close();
+				}
+				catch (IOException e)
+				{
+					return new ErrorBox( "GraphViz: Error while closing error stream", e );
+				}
 				
 				SVGUniverse universe = SVGCache.getSVGUniverse();
 				SVGDiagram diagram = null;
