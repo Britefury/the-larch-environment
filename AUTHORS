@@ -2,16 +2,15 @@ AUTHORS
 =======
 
 
-The gCell distribution includes the following libraries:
+The Larch Environment distribution includes the following libraries:
 
-greenlet		Found in cpp/extlibs/greenlet			By Armin Rigo, Christian Tismer, et al				http://codespeak.net/py/current/doc/home.html
-piemenu		Found in Britefury/extlibs/piemenu		By Don Hopkins								http://www.donhopkins.com/
-json			Found in Britefury/extlibs/json			By Patrick D. Logan							http://www.json.org
-
+Jericho			Found in extlibs						By Martin Jericho			http://jericho.htmlparser.net
+svgSalamander	Found in extlibs						By Mark McKay				http://http://svgsalamander.java.net/
 
 
-The gSym application was written by Geoffrey French (MrMeanie / Britefury).
-gSym is (C)copyright Geoffrey French 2006-2008.
+
+The Larch Environment was written by Geoffrey French (MrMeanie / Britefury).
+Larch is (C)copyright Geoffrey French 2006-2011.
 
 
 
