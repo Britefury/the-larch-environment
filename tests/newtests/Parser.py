@@ -13,7 +13,7 @@ from Britefury.Parser.GrammarUtils.Tokens import identifier, decimalInteger, hex
 from Britefury.Parser.GrammarUtils.SeparatedList import separatedList, delimitedSeparatedList
 from Britefury.Parser.GrammarUtils.Operators import Prefix, Suffix, InfixLeft, InfixRight, buildOperatorParserWithAllLevels
 
-from GSymCore.Languages.Python25.Keywords import *
+from LarchCore.Languages.Python25.Keywords import *
 
 
 

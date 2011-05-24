@@ -14,7 +14,7 @@ from Britefury.Config.PathsConfigPage import getPathsConfig
 
 
 
-_localPluginDirectories = [ 'GSymCore', 'GSymTools' ]
+_localPluginDirectories = [ 'LarchCore', 'LarchTools' ]
 
 
 def _splitPath(path):
@@ -42,7 +42,7 @@ def _getUserPluginRootPaths():
 def _loadPluginsInDir(plugins, pluginDir):
 	for dirpath, dirnames, filenames in os.walk( pluginDir ):
 		for filename in filenames:
-			if filename == 'gsymplugin.py':
+			if filename == 'larchplugin.py':
 				fn, ext = os.path.splitext( filename )
 
 				pluginName = _pathToDottedName( dirpath )

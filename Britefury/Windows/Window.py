@@ -39,8 +39,6 @@ from Britefury.Util.Abstract import abstractmethod
 from Britefury.Kernel.World import World
 from Britefury.Kernel.Document import Document
 
-from GSymCore.GSymApp import GSymApp
-
 
 
 _bProfile = True
