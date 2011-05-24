@@ -323,7 +323,11 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 	{
 		int x = getColumnForLocalPoint( localPos );
 		int y = getRowForLocalPoint( localPos );
-		DPElement child = getChildCoveringCell( x, y );
+		DPElement child = null;
+		if ( x != -1  &&  y != -1 )
+		{
+			child = getChildCoveringCell( x, y );
+		}
 		if ( child != null )
 		{
 			return getLeafClosestToLocalPointFromChild( child, localPos, filter );
