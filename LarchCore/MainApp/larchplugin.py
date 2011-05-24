@@ -5,10 +5,10 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from LarchCore.GSymApp import GSymApp
+from LarchCore.MainApp import MainApp
 
 
 
 def initPlugin(plugin, world):
-	world.setAppStateSubject( plugin, GSymApp.newAppStateSubject( world ) )
+	world.setAppStateSubject( plugin, MainApp.newAppStateSubject( world ) )
 
