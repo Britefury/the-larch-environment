@@ -41,9 +41,8 @@ from BritefuryJ.Pres.RichText import *
 
 from BritefuryJ.Projection import Perspective, Subject
 
-from LarchCore.GSymApp import Application
-#from LarchCore.GSymApp.GSymAppViewer.GSymAppViewerCombinators import appState, appDocument, appConsole
-from LarchCore.GSymApp import DocumentManagement
+from LarchCore.MainApp import Application
+from LarchCore.MainApp import DocumentManagement
 
 from LarchCore.PythonConsole import Console
 
@@ -166,7 +165,7 @@ class AppView (ObjectDispatchView):
 		configurationLink = Hyperlink( 'CONFIGURATION PAGE', Location( 'config' ) )
 		linkHeader = LinkHeaderBar( [ configurationLink, systemLink ] )
 		
-		title = TitleBar( 'gSym' )
+		title = TitleBar( 'The Larch Environment' )
 		
 		newLink = Hyperlink( 'NEW', _onNewDoc )
 		openLink = Hyperlink( 'OPEN', _onOpenDoc )

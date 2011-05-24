@@ -11,7 +11,7 @@ from BritefuryJ.Projection import Subject
 
 from BritefuryJ.Command import CommandName, Command, CommandSet
 
-from LarchCore.GSymApp import DocumentManagement
+from LarchCore.MainApp import DocumentManagement
 
 from LarchCore.Project.ProjectPage import ProjectPage
 from LarchCore.Project.ProjectPackage import ProjectPackage

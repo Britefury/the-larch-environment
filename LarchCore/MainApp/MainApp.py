@@ -7,16 +7,16 @@
 ##-*************************
 from BritefuryJ.DocPresent.Browser import Location
 
-from LarchCore.GSymApp.GSymAppViewer.View import perspective as gSymAppViewerPerspective
-from LarchCore.GSymApp.GSymAppViewer.Subject import GSymAppSubject
-from LarchCore.GSymApp import Application
+from LarchCore.MainApp.MainAppViewer.View import perspective as mainAppViewerPerspective
+from LarchCore.MainApp.MainAppViewer.Subject import MainAppSubject
+from LarchCore.MainApp import Application
 
 
 def newAppState():
 	return Application.AppState()
 
 def newAppStateSubject(world):
-	return GSymAppSubject( newAppState(), world, Location( 'main' ) )
+	return MainAppSubject( newAppState(), world, Location( 'main' ) )
 
 
 

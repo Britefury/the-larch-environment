@@ -16,7 +16,7 @@ from Britefury.Kernel.Document import Document
 
 from LarchCore.PythonConsole import Console
 
-from LarchCore.GSymApp.GSymAppViewer.View import perspective
+from LarchCore.MainApp.MainAppViewer.View import perspective
 
 
 
@@ -49,9 +49,9 @@ class _DocumentListSubject (object):
 		raise AttributeError, 'no document at %s'  %  ( location, )
 		
 
-class GSymAppSubject (Subject):
+class MainAppSubject (Subject):
 	def __init__(self, appState, world, rootLocation):
-		super( GSymAppSubject, self ).__init__( None )
+		super( MainAppSubject, self ).__init__( None )
 		self._appState = appState
 		self._world = world
 		self._rootLocation = rootLocation
@@ -66,7 +66,7 @@ class GSymAppSubject (Subject):
 		return perspective
 	
 	def getTitle(self):
-		return 'gSym'
+		return 'Larch'
 	
 	def getSubjectContext(self):
 		return SimpleAttributeTable.instance.withAttrs( world=self._world, document=None, docLocation=None, location=self._rootLocation )
