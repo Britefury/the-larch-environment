@@ -17,15 +17,6 @@ _internalSchemas = {}
 
 
 		
-#
-#
-#
-# GSYM World
-#
-#
-#
-
-
 def _get_attr(x, attrName, default=None):
 	try:
 		return getattr( x, attrName )

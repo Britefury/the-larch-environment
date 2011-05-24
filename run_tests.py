@@ -15,10 +15,10 @@ import Britefury.Tests.Britefury.Dispatch.TestObjectMethodDispatch
 import Britefury.Tests.Britefury.Dispatch.TestDMObjectNodeMethodDispatch
 import Britefury.Tests.Britefury.Util.Test_TrackedList
 #import Britefury.Tests.Britefury.AttributeVisitor.TestAttributeVisitor
-import GSymCore.Languages.Python25.CodeGenerator
-import GSymCore.Languages.Python25.Python25Importer
-import GSymCore.Languages.Python25.PythonEditor.Parser
-import GSymCore.Languages.Java.JavaEditor.Parser
+import LarchCore.Languages.Python25.CodeGenerator
+import LarchCore.Languages.Python25.Python25Importer
+import LarchCore.Languages.Python25.PythonEditor.Parser
+import LarchCore.Languages.Java.JavaEditor.Parser
 
 
 testModules = [ Britefury.Tests.BritefuryJ.Parser.Utils.Operators,
@@ -28,10 +28,10 @@ testModules = [ Britefury.Tests.BritefuryJ.Parser.Utils.Operators,
 		Britefury.Tests.Britefury.Dispatch.TestDMObjectNodeMethodDispatch,
 		Britefury.Tests.Britefury.Util.Test_TrackedList,
 		#Britefury.Tests.Britefury.AttributeVisitor.TestAttributeVisitor,
-		GSymCore.Languages.Python25.CodeGenerator,
-		GSymCore.Languages.Python25.Python25Importer,
-		GSymCore.Languages.Python25.PythonEditor.Parser,
-		GSymCore.Languages.Java.JavaEditor.Parser
+		LarchCore.Languages.Python25.CodeGenerator,
+		LarchCore.Languages.Python25.Python25Importer,
+		LarchCore.Languages.Python25.PythonEditor.Parser,
+		LarchCore.Languages.Java.JavaEditor.Parser
 		]
 
 

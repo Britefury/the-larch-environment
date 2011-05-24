@@ -16,9 +16,9 @@ from Britefury.Kernel.View.EditOperations import replace, append, prepend, inser
 from Britefury.Kernel.View.UnparsedText import UnparsedText
 
 
-from GSymCore.Languages.Python25 import Parser
-from GSymCore.Languages.Python25.Styles import *
-from GSymCore.Languages.Python25.Keywords import *
+from LarchCore.Languages.Python25 import Parser
+from LarchCore.Languages.Python25.Styles import *
+from LarchCore.Languages.Python25.Keywords import *
 
 
 

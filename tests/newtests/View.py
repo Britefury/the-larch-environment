@@ -20,9 +20,9 @@ from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent import *
 
 
-from GSymCore.Languages.Python25 import Parser
-from GSymCore.Languages.Python25.Styles import *
-from GSymCore.Languages.Python25.Keywords import *
+from LarchCore.Languages.Python25 import Parser
+from LarchCore.Languages.Python25.Styles import *
+from LarchCore.Languages.Python25.Keywords import *
 
 
 
