@@ -6,14 +6,14 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import BritefuryJ.DocPresent.StreamValue.StreamValueVisitor;
+import BritefuryJ.DocPresent.StreamValue.SequentialStreamValueVisitor;
 
 public abstract class EditEvent
 {
-	private StreamValueVisitor streamValueVisitor = new StreamValueVisitor();
+	private SequentialStreamValueVisitor streamValueVisitor = new SequentialStreamValueVisitor();
 	
 	
-	public StreamValueVisitor getStreamValueVisitor()
+	public SequentialStreamValueVisitor getStreamValueVisitor()
 	{
 		return streamValueVisitor;
 	}

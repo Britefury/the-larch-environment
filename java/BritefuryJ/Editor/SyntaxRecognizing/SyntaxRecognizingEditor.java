@@ -16,13 +16,13 @@ import BritefuryJ.DocPresent.EditEvent;
 import BritefuryJ.DocPresent.TreeEventListener;
 import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
-import BritefuryJ.Editor.Sequential.SequentialEditor;
+import BritefuryJ.Editor.Sequential.SequentialStreamEditor;
 import BritefuryJ.Editor.SyntaxRecognizing.Precedence.PrecedenceHandler;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Utils.HashUtils;
 
-public abstract class SyntaxRecognizingEditor extends SequentialEditor
+public abstract class SyntaxRecognizingEditor extends SequentialStreamEditor
 {
 	public static interface CommitFn
 	{

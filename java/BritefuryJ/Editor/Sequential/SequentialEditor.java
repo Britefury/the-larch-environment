@@ -10,8 +10,8 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.EditEvent;
 import BritefuryJ.DocPresent.TextEditEvent;
 import BritefuryJ.DocPresent.TreeEventListener;
-import BritefuryJ.DocPresent.StreamValue.StreamValue;
-import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
+import BritefuryJ.DocPresent.Marker.Marker;
+import BritefuryJ.DocPresent.Selection.TextSelection;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Primitive.Region;
 
@@ -119,12 +119,11 @@ public abstract class SequentialEditor
 		return true;
 	}
 
-	protected String filterTextForImport(String text)
-	{
-		return text;
-	}
+	protected abstract Object textToSequentialForImport(String text);
+	protected abstract boolean canConvertSequentialToTextForExport(Object sequential);
+	protected abstract String sequentialToTextForExport(Object sequential);
 
-	protected SequentialBuffer createSelectionBuffer(StreamValue stream)
+	protected SequentialBuffer createSelectionBuffer(Object stream)
 	{
 		return new SequentialBuffer( stream, clipboardHandler );
 	}
@@ -139,24 +138,12 @@ public abstract class SequentialEditor
 		return editor == this;
 	}
 	
-	public abstract Object copyStructuralValue(Object x);
-
-	public StreamValue joinStreamsForInsertion(FragmentView subtreeRootFragment, StreamValue before, StreamValue insertion, StreamValue after)
-	{
-		StreamValueBuilder builder = new StreamValueBuilder();
-		builder.extend( before );
-		builder.extend( insertion );
-		builder.extend( after );
-		return builder.stream();
-	}
 	
-	public StreamValue joinStreamsForDeletion(FragmentView subtreeRootFragment, StreamValue before, StreamValue after)
-	{
-		StreamValueBuilder builder = new StreamValueBuilder();
-		builder.extend( before );
-		builder.extend( after );
-		return builder.stream();
-	}
+	
+	public abstract Object getSequentialContentInSelection(TextSelection selection);
+	public abstract Object spliceForInsertion(FragmentView subtreeRootFragment, DPElement subtreeRootFragmentElement, Marker prefixEnd, Marker suffixStart, Object insertedContent);
+	public abstract Object spliceForDeletion(FragmentView subtreeRootFragment, DPElement subtreeRootFragmentElement, Marker selectionStart, Marker selectionEnd);
+
 
 
 	protected SelectionEditTreeEvent createSelectionEditTreeEvent(DPElement sourceElement)
