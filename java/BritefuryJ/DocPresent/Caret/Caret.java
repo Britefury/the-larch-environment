@@ -78,6 +78,13 @@ public class Caret extends Target implements MarkerListener
 	
 	
 	@Override
+	public boolean isEditable()
+	{
+		return isValid()  &&  marker.getElement().isEditable();
+	}
+	
+	
+	@Override
 	public SelectionPoint createSelectionPoint()
 	{
 		if ( isValid() )

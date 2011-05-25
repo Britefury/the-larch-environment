@@ -7,7 +7,7 @@
 package BritefuryJ.DocPresent;
 
 import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
-import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
+import BritefuryJ.DocPresent.StyleParams.RegionStyleParams;
 
 public class DPRegion extends DPProxy
 {
@@ -49,6 +49,13 @@ public class DPRegion extends DPProxy
 
 	
 	
+	public static final int FLAG_EDITABLE = FLAGS_PROXY_END * 0x1;
+	public static final int FLAG_SELECTABLE = FLAGS_PROXY_END * 0x2;
+	
+	
+	protected final static int FLAGS_REGION_END = FLAGS_PROXY_END * 0x4;
+
+	
 	private ClipboardHandlerInterface clipboardHandler;
 
 	
@@ -56,12 +63,15 @@ public class DPRegion extends DPProxy
 	
 	public DPRegion()
 	{
-		this( ContainerStyleParams.defaultStyleParams );
+		this( RegionStyleParams.defaultStyleParams );
 	}
 
-	public DPRegion(ContainerStyleParams styleParams)
+	public DPRegion(RegionStyleParams styleParams)
 	{
-		super(styleParams);
+		super( styleParams );
+	
+		setFlagValue( FLAG_EDITABLE, styleParams.getEditable() );
+		setFlagValue( FLAG_SELECTABLE, styleParams.getSelectable() );
 	}
 	
 	protected DPRegion(DPRegion element)
@@ -69,6 +79,9 @@ public class DPRegion extends DPProxy
 		super( element );
 		
 		clipboardHandler = element.clipboardHandler;
+
+		setFlagValue( FLAG_EDITABLE, element.testFlag( FLAG_EDITABLE ) );
+		setFlagValue( FLAG_SELECTABLE, element.testFlag( FLAG_SELECTABLE ) );
 	}
 	
 	
@@ -112,6 +125,60 @@ public class DPRegion extends DPProxy
 	{
 		return this;
 	}
+	
+	
+	
+	
+	
+	//
+	//
+	// EDITABILITY METHODS
+	//
+	//
+	
+	public void setEditable()
+	{
+		setFlag( FLAG_EDITABLE );
+	}
+	
+	public void setNonEditable()
+	{
+		clearFlag( FLAG_EDITABLE );
+	}
+	
+	public boolean isEditable()
+	{
+		return testFlag( FLAG_EDITABLE );
+	}
+	
+	
+	
+	
+	//
+	//
+	// SELECTABILITY METHODS
+	//
+	//
+	
+	public void setSelectable()
+	{
+		setFlag( FLAG_SELECTABLE );
+	}
+	
+	public void setUnselectable()
+	{
+		clearFlag( FLAG_SELECTABLE );
+	}
+	
+	public boolean isSelectable()
+	{
+		return testFlag( FLAG_SELECTABLE );
+	}
+	
+	
+	
+	
+	
 	
 	
 	
