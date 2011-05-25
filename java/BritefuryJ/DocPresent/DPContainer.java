@@ -916,7 +916,7 @@ public abstract class DPContainer extends DPElement
 	//
 	//
 	
-	public List<DPElement> getStreamValueChildren()
+	public List<DPElement> getChildrenInSequentialOrder()
 	{
 		return getInternalChildren();
 	}

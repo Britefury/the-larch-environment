@@ -20,7 +20,7 @@ import BritefuryJ.DocPresent.Browser.BrowserPage;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
-import BritefuryJ.DocPresent.StreamValue.StreamValueVisitor;
+import BritefuryJ.DocPresent.StreamValue.SequentialStreamValueVisitor;
 import BritefuryJ.DocPresent.Target.Target;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.ObjectPresentation.PresentationStateListenerList;
@@ -78,7 +78,7 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 		@Override
 		public boolean onTreeEvent(DPElement element, DPElement sourceElement, Object event)
 		{
-			StreamValueVisitor visitor = new StreamValueVisitor();
+			SequentialStreamValueVisitor visitor = new SequentialStreamValueVisitor();
 			StreamValue value = visitor.getStreamValue( element );
 			onEdit( value );
 			return true;

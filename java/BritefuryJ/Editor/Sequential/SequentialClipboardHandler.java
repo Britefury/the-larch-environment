@@ -16,8 +16,6 @@ import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.Selection.TextSelection;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
-import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
-import BritefuryJ.DocPresent.StreamValue.StreamValueVisitor;
 import BritefuryJ.DocPresent.Target.Target;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.IncrementalView.FragmentViewFilter;
@@ -32,7 +30,7 @@ import BritefuryJ.Pres.Clipboard.TargetImporter;
 
 public class SequentialClipboardHandler extends ClipboardHandler
 {
-	private AbstractDataExporter<StreamValue> streamExporter = new AbstractDataExporter<StreamValue>()
+	private AbstractDataExporter<Object> sequentialExporter = new AbstractDataExporter<Object>()
 	{
 		@Override
 		protected DataFlavor getDataFlavor()
@@ -41,15 +39,15 @@ public class SequentialClipboardHandler extends ClipboardHandler
 		}
 
 		@Override
-		protected Object export(StreamValue selectionContents)
+		protected Object export(Object selectionContents)
 		{
-			return createSelectionBuffer( selectionContents );
+			return sequentialEditor.createSelectionBuffer( selectionContents );
 		}
 		
 	};
 
 	
-	private AbstractDataExporter<StreamValue> stringExporter = new AbstractDataExporter<StreamValue>()
+	private AbstractDataExporter<Object> stringExporter = new AbstractDataExporter<Object>()
 	{
 		@Override
 		protected DataFlavor getDataFlavor()
@@ -58,52 +56,34 @@ public class SequentialClipboardHandler extends ClipboardHandler
 		}
 
 		@Override
-		protected Object export(StreamValue selectionContents)
+		protected Object export(Object selectionContents)
 		{
-			return selectionContents.textualValue();
+			return sequentialEditor.sequentialToTextForExport( selectionContents );
 		}
 
 		@Override
-		protected boolean canExport(StreamValue selectionContents)
+		protected boolean canExport(Object selectionContents)
 		{
-			return selectionContents.isTextual();
+			return sequentialEditor.canConvertSequentialToTextForExport( selectionContents );
 		}
 	};
 
 	
 	
 	@SuppressWarnings("unchecked")
-	private List<? extends DataExporterInterface<StreamValue>> dataExporters = (List<? extends DataExporterInterface<StreamValue>>)
-			Arrays.asList( streamExporter, stringExporter );
-	private AbstractSelectionExporter<StreamValue, TextSelection> exporter =
-		new AbstractSelectionExporter<StreamValue, TextSelection>( TextSelection.class, AbstractSelectionExporter.COPY_OR_MOVE, dataExporters )
+	private List<? extends DataExporterInterface<Object>> dataExporters = (List<? extends DataExporterInterface<Object>>)
+			Arrays.asList( sequentialExporter, stringExporter );
+	private AbstractSelectionExporter<Object, TextSelection> exporter =
+		new AbstractSelectionExporter<Object, TextSelection>( TextSelection.class, AbstractSelectionExporter.COPY_OR_MOVE, dataExporters )
 	{
 		@Override
-		protected StreamValue getSelectionContents(TextSelection selection)
+		protected Object getSelectionContents(TextSelection selection)
 		{
-			StreamValueVisitor visitor = new StreamValueVisitor();
-			StreamValue stream = visitor.getStreamValueInTextSelection( selection );
-			
-			StreamValueBuilder builder = new StreamValueBuilder();
-			for (StreamValue.Item item: stream.getItems())
-			{
-				if ( item instanceof StreamValue.StructuralItem )
-				{
-					StreamValue.StructuralItem structuralItem = (StreamValue.StructuralItem)item;
-					builder.appendStructuralValue( copyStructuralValue( structuralItem.getStructuralValue() ) );
-				}
-				else if ( item instanceof StreamValue.TextItem )
-				{
-					StreamValue.TextItem textItem = (StreamValue.TextItem)item;
-					builder.appendTextValue( textItem.getTextValue() );
-				}
-			}
-			
-			return builder.stream();
+			return sequentialEditor.getSequentialContentInSelection( selection );
 		}
 		
 		@Override
-		protected void exportDone(TextSelection selection, Target target, StreamValue selectionContents, int action)
+		protected void exportDone(TextSelection selection, Target target, Object selectionContents, int action)
 		{
 			if ( action == AbstractSelectionExporter.MOVE )
 			{
@@ -131,12 +111,12 @@ public class SequentialClipboardHandler extends ClipboardHandler
 		protected boolean importCheckedData(Caret caret, Selection selection, Object data)
 		{
 			SequentialBuffer buffer = (SequentialBuffer)data;
-			if ( !canImportFromClipboardHandler( buffer.clipboardHandler ) )
+			if ( !sequentialEditor.canImportFromSequentialEditor( buffer.clipboardHandler.sequentialEditor ) )
 			{
 				return false;
 			}
 			
-			return paste( caret, selection, buffer.stream );
+			return paste( caret, selection, buffer.sequential );
 		}
 	};
 	
@@ -151,7 +131,11 @@ public class SequentialClipboardHandler extends ClipboardHandler
 		@Override
 		protected boolean importCheckedData(Caret caret, Selection selection, Object data)
 		{
-			return paste( caret, selection, data );
+			if ( data instanceof String )
+			{
+				return paste( caret, selection, sequentialEditor.textToSequentialForImport( ((String)data) ) );
+			}
+			return false;
 		}
 	};
 	
@@ -177,7 +161,8 @@ public class SequentialClipboardHandler extends ClipboardHandler
 		{
 			if ( target instanceof Caret )
 			{
-				replaceSelection( selection, (Caret)target, replacement );
+				Object sequentialReplacement = sequentialEditor.textToSequentialForImport( replacement );
+				replaceSelection( selection, (Caret)target, sequentialReplacement );
 				return true;
 			}
 			return false;
@@ -236,13 +221,13 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	
 	
 	
-	public SequentialEditor getSequentialEditor()
+	protected SequentialEditor getSequentialEditor()
 	{
 		return sequentialEditor;
 	}
 	
 	
-	protected boolean isCommonRootEditLevelFragmentView(FragmentView fragment)
+	private boolean isCommonRootEditLevelFragmentView(FragmentView fragment)
 	{
 		return isEditLevelFragmentView( fragment );
 	}
@@ -250,66 +235,13 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	
 	
 	
-	//
-	//
-	// OVERRIDE THESE METHODS
-	//
-	//
-	
-	public StreamValue joinStreamsForInsertion(FragmentView subtreeRootFragment, StreamValue before, StreamValue insertion, StreamValue after)
-	{
-		return sequentialEditor.joinStreamsForInsertion( subtreeRootFragment, before, insertion, after );
-	}
-	
-	public StreamValue joinStreamsForDeletion(FragmentView subtreeRootFragment, StreamValue before, StreamValue after)
-	{
-		return sequentialEditor.joinStreamsForDeletion( subtreeRootFragment, before, after );
-	}
-	
-	
-	
-	
-	
-	protected boolean isEditLevelFragmentView(FragmentView fragment)
+	private boolean isEditLevelFragmentView(FragmentView fragment)
 	{
 		return sequentialEditor.isClipboardEditLevelFragmentView( fragment );
 	}
 	
 	
-	protected SequentialBuffer createSelectionBuffer(StreamValue stream)
-	{
-		return sequentialEditor.createSelectionBuffer( stream );
-	}
 	
-	protected String filterTextForImport(String text)
-	{
-		return sequentialEditor.filterTextForImport( text );
-	}
-	
-
-	
-	public boolean canImportFromClipboardHandler(SequentialClipboardHandler clipboardHandler)
-	{
-		return sequentialEditor.canImportFromSequentialEditor( clipboardHandler.sequentialEditor );
-	}
-	
-	
-	public Object copyStructuralValue(Object x)
-	{
-		return sequentialEditor.copyStructuralValue( x );
-	}
-	
-	public SelectionEditTreeEvent createSelectionEditTreeEvent(DPElement sourceElement)
-	{
-		return sequentialEditor.createSelectionEditTreeEvent( sourceElement );
-	}
-
-
-
-
-
-
-
 
 	private void replaceSelection(Selection selection, Caret caret, Object replacement)
 	{
@@ -340,33 +272,18 @@ public class SequentialClipboardHandler extends ClipboardHandler
 			
 			if ( replacement != null )
 			{
-				StreamValue replacementStream = null;
-				if ( replacement instanceof StreamValue )
-				{
-					replacementStream = (StreamValue)replacement;
-				}
-				else if ( replacement instanceof String )
-				{
-					StreamValueBuilder builder = new StreamValueBuilder();
-					builder.appendTextValue( (String)replacement );
-					replacementStream = builder.stream();
-				}
+				StreamValue replacementStream = (StreamValue)replacement;
 				
 				
 				if ( replacementStream != null )
 				{
-					// Get the item streams for the root element content, before and after the selected region
-					StreamValueVisitor visitor = new StreamValueVisitor();
-					StreamValue before = visitor.getStreamValueFromStartToMarker( editRootFragmentElement, startMarker );
-					StreamValue after = visitor.getStreamValueFromMarkerToEnd( editRootFragmentElement, endMarker );
-					
-					// Join
-					StreamValue joinedStream = joinStreamsForInsertion( editRootFragment, before, replacementStream, after );
+					// Splice the content before the selection, the inserted content, and the content after the selection
+					Object spliced = sequentialEditor.spliceForInsertion( editRootFragment, editRootFragmentElement, startMarker, endMarker, replacementStream );
 					
 					// Create the event
-					SelectionEditTreeEvent event = createSelectionEditTreeEvent( editRootFragmentElement );
-					// Store the joined stream in the structural value of the root element
-					event.getStreamValueVisitor().setElementFixedValue( editRootFragmentElement, joinedStream );
+					SelectionEditTreeEvent event = sequentialEditor.createSelectionEditTreeEvent( editRootFragmentElement );
+					// Store the spliced content in the structural value of the root element
+					event.getStreamValueVisitor().setElementFixedValue( editRootFragmentElement, spliced );
 					// Take a copy of the end marker
 					Marker end = endMarker.copy();
 					// Clear the selection
@@ -379,17 +296,13 @@ public class SequentialClipboardHandler extends ClipboardHandler
 			}
 			else
 			{
-				// Get the item streams for the root element content, before and after the selected region
-				StreamValueVisitor visitor = new StreamValueVisitor();
-				StreamValue before = visitor.getStreamValueFromStartToMarker( editRootFragmentElement, startMarker );
-				StreamValue after = visitor.getStreamValueFromMarkerToEnd( editRootFragmentElement, endMarker );
-				
-				StreamValue joinedStream = joinStreamsForDeletion( editRootFragment, before, after );
-				
+				// Splice the content around the selection
+				Object spliced = sequentialEditor.spliceForDeletion( editRootFragment, editRootFragmentElement, startMarker, endMarker );
+
 				// Create the event
-				SelectionEditTreeEvent event = createSelectionEditTreeEvent( editRootFragmentElement );
+				SelectionEditTreeEvent event = sequentialEditor.createSelectionEditTreeEvent( editRootFragmentElement );
 				// Store the joined stream in the structural value of the root element
-				event.getStreamValueVisitor().setElementFixedValue( editRootFragmentElement, joinedStream );
+				event.getStreamValueVisitor().setElementFixedValue( editRootFragmentElement, spliced );
 				// Take a copy of the end marker
 				Marker end = endMarker.copy();
 				// Clear the selection
@@ -406,19 +319,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 
 	private void insertAtCaret(Caret caret, Object data)
 	{
-		StreamValue stream = null;
-		
-		
-		if ( data instanceof StreamValue )
-		{
-			stream = (StreamValue)data;
-		}
-		else if ( data instanceof String )
-		{
-			StreamValueBuilder builder = new StreamValueBuilder();
-			builder.appendTextValue( (String)data );
-			stream = builder.stream();
-		}
+		StreamValue stream = (StreamValue)data;
 		
 			
 		if ( stream != null )
@@ -427,16 +328,12 @@ public class SequentialClipboardHandler extends ClipboardHandler
 			FragmentView insertionPointFragment = FragmentView.getEnclosingFragment( caretMarker.getElement(), editLevelFragmentFilter );
 			DPElement insertionPointElement = insertionPointFragment.getFragmentContentElement();
 			
-			// Get the item streams for the root element content, before and after the selected region
-			StreamValueVisitor visitor = new StreamValueVisitor();
-			StreamValue before = visitor.getStreamValueFromStartToMarker( insertionPointElement, caretMarker );
-			StreamValue after = visitor.getStreamValueFromMarkerToEnd( insertionPointElement, caretMarker );
+			// Splice the content before the insertion point, the inserted content, and the content after the insertion point
+			Object spliced = sequentialEditor.spliceForInsertion( insertionPointFragment, insertionPointElement, caretMarker, caretMarker, stream );
 			
-			StreamValue joinedStream = joinStreamsForInsertion( insertionPointFragment, before, stream, after );
-			
-			// Store the joined stream in the structural value of the root element
-			SelectionEditTreeEvent event = createSelectionEditTreeEvent( insertionPointElement );
-			event.getStreamValueVisitor().setElementFixedValue( insertionPointElement, joinedStream );
+			// Store the spliced content in the structural value of the root element
+			SelectionEditTreeEvent event = sequentialEditor.createSelectionEditTreeEvent( insertionPointElement );
+			event.getStreamValueVisitor().setElementFixedValue( insertionPointElement, spliced );
 			// Move the caret to the start of the next item, to ensure that it is placed *after* the inserted content, once the insertion is done.
 			caret.moveToStartOfNextItem();
 			// Post a tree event

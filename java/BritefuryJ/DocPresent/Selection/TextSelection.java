@@ -112,7 +112,8 @@ public class TextSelection extends Selection implements MarkerListener
 	@Override
 	public boolean isEditable()
 	{
-		return getRegion().isEditable();
+		DPRegion region = getRegion();
+		return region != null  &&  region.isEditable();
 	}
 
 	

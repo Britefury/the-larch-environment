@@ -7,30 +7,18 @@
 package BritefuryJ.Editor.Sequential;
 
 import BritefuryJ.DocPresent.Clipboard.LocalDataFlavor;
-import BritefuryJ.DocPresent.StreamValue.StreamValue;
 
 public class SequentialBuffer
 {
 	public static final LocalDataFlavor dataFlavor = new LocalDataFlavor( SequentialBuffer.class );
 	
-	protected StreamValue stream;
+	protected Object sequential;
 	protected SequentialClipboardHandler clipboardHandler;
 	
 	
-	public SequentialBuffer(StreamValue stream, SequentialClipboardHandler clipboardHandler)
+	public SequentialBuffer(Object sequential, SequentialClipboardHandler clipboardHandler)
 	{
-		this.stream = stream;
+		this.sequential = sequential;
 		this.clipboardHandler = clipboardHandler;
-	}
-	
-	
-	protected boolean isTextual()
-	{
-		return stream.isTextual();
-	}
-	
-	protected String getTextualValue()
-	{
-		return stream.textualValue();
 	}
 }

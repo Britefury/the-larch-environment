@@ -69,7 +69,7 @@ import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Painter.Painter;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
-import BritefuryJ.DocPresent.StreamValue.StreamValueVisitor;
+import BritefuryJ.DocPresent.StreamValue.SequentialStreamValueVisitor;
 import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.IncrementalView.ViewFragmentFunction;
@@ -2721,6 +2721,21 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	//
 	//
+	// SEQUENTIAL VISIT METHODS
+	//
+	//
+	
+	private static List<DPElement> emptyChildList = Arrays.asList();
+	
+	public List<DPElement> getChildrenInSequentialOrder()
+	{
+		return emptyChildList;
+	}
+	
+	
+
+	//
+	//
 	// STREAM VALUE METHODS
 	//
 	//
@@ -2729,22 +2744,13 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	{
 	}
 	
-	private static List<DPElement> emptyChildList = Arrays.asList();
-	
-	public List<DPElement> getStreamValueChildren()
-	{
-		return emptyChildList;
-	}
-	
-	
-
 	public StreamValue getStreamValue()
 	{
-		StreamValueVisitor visitor = new StreamValueVisitor();
+		SequentialStreamValueVisitor visitor = new SequentialStreamValueVisitor();
 		return getStreamValue( visitor );
 	}
 	
-	public StreamValue getStreamValue(StreamValueVisitor visitor)
+	public StreamValue getStreamValue(SequentialStreamValueVisitor visitor)
 	{
 		return visitor.getStreamValue( this );
 	}

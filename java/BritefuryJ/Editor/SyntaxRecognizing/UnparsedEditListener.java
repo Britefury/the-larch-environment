@@ -9,7 +9,7 @@ package BritefuryJ.Editor.SyntaxRecognizing;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.EditEvent;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
-import BritefuryJ.DocPresent.StreamValue.StreamValueVisitor;
+import BritefuryJ.DocPresent.StreamValue.SequentialStreamValueVisitor;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Logging.LogEntry;
@@ -80,7 +80,7 @@ public abstract class UnparsedEditListener extends SRStreamEditListener
 			{
 				DPElement sourceFragmentElement = sourceFragment.getFragmentContentElement();
 				Object sourceModel = sourceFragment.getModel();
-				StreamValueVisitor visitor = event.getStreamValueVisitor();
+				SequentialStreamValueVisitor visitor = event.getStreamValueVisitor();
 				StreamValue sourceValue = visitor.getStreamValue( sourceFragmentElement );
 				
 				if ( value.isEmpty()  ||  isValueEmpty( sourceFragmentElement, sourceElement, sourceFragment, event, sourceModel, sourceValue ) )

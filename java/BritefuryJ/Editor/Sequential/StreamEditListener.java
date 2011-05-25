@@ -9,7 +9,7 @@ package BritefuryJ.Editor.Sequential;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.EditEvent;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
-import BritefuryJ.DocPresent.StreamValue.StreamValueVisitor;
+import BritefuryJ.DocPresent.StreamValue.SequentialStreamValueVisitor;
 import BritefuryJ.IncrementalView.FragmentView;
 
 public abstract class StreamEditListener extends EditListener
@@ -21,7 +21,7 @@ public abstract class StreamEditListener extends EditListener
 	@Override
 	protected HandleEditResult handleEditEvent(DPElement element, DPElement sourceElement, EditEvent editEvent)
 	{
-		StreamValueVisitor visitor = editEvent.getStreamValueVisitor();
+		SequentialStreamValueVisitor visitor = editEvent.getStreamValueVisitor();
 		
 		StreamValue value = visitor.getStreamValue( element );
 		FragmentView fragment = (FragmentView)element.getFragmentContext();
