@@ -64,7 +64,7 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 			else
 			{
 				Selection selection = getSelection();
-				if ( selection != null )
+				if ( selection != null  &&  selection.isEditable() )
 				{
 					if ( event.getKeyCode() == KeyEvent.VK_BACK_SPACE  ||  event.getKeyCode() == KeyEvent.VK_DELETE )
 					{
@@ -141,7 +141,7 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 			else if ( !bCtrl  &&  !bAlt)
 			{
 				Selection selection = getSelection();
-				if ( selection != null )
+				if ( selection != null  &&  selection.isEditable() )
 				{
 					if ( !Character.isISOControl( event.getKeyChar() )  ||  event.getKeyChar() == '\n' )
 					{

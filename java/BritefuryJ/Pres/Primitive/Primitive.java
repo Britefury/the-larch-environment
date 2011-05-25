@@ -33,6 +33,7 @@ import BritefuryJ.DocPresent.StyleParams.FractionStyleParams;
 import BritefuryJ.DocPresent.StyleParams.GridRowStyleParams;
 import BritefuryJ.DocPresent.StyleParams.MathRootStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ParagraphStyleParams;
+import BritefuryJ.DocPresent.StyleParams.RegionStyleParams;
 import BritefuryJ.DocPresent.StyleParams.RowStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ScriptStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ShapeStyleParams;
@@ -318,6 +319,31 @@ public class Primitive
 		return style.useAttr( hAlign ).useAttr( vAlign ).useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
 				.useAttr( paragraphSpacing ).useAttr( paragraphLineSpacing ).useAttr( paragraphIndentation );
 	}
+
+	
+	
+	protected static DerivedValueTable<RegionStyleParams> regionParams = new DerivedValueTable<RegionStyleParams>( primitiveNamespace )
+	{
+		protected RegionStyleParams evaluate(AttributeTable attribs)
+		{
+			return new RegionStyleParams(
+					attribs.get( hAlign, HAlignment.class ),
+					attribs.get( vAlign, VAlignment.class ),
+					attribs.get( background, Painter.class ),
+					attribs.get( hoverBackground, Painter.class ),
+					attribs.get( cursor, Cursor.class ),
+					attribs.get( editable, Boolean.class ),
+					attribs.get( selectable, Boolean.class ));
+		}
+	};
+	
+	protected static DerivedValueTable<StyleValues> useRegionParams = new DerivedValueTable<StyleValues>( primitiveNamespace )
+	{
+		protected StyleValues evaluate(AttributeTable style)
+		{
+			return (StyleValues)style.useAttr( hAlign ).useAttr( vAlign ).useAttr( background ).useAttr( hoverBackground ).useAttr( cursor ).useAttr( editable ).useAttr( selectable );
+		}
+	};
 
 	
 	

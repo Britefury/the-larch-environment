@@ -7,7 +7,6 @@
 package BritefuryJ.DocPresent;
 
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -450,9 +449,6 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		protected PageController pageController = null;
 		
 		
-		private Timer timer;
-
-		
 		private Log log;
 
 		
@@ -493,17 +489,6 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			keyboard = new Keyboard( this );
 
 			caretMoveToStartQueued = false;
-	
-		
-		
-			ActionListener onTimer = new ActionListener()
-			{
-				public void actionPerformed(ActionEvent arg0)
-				{
-					onTimerTick();
-				}
-			};
-			timer = new Timer( 50, onTimer );
 		}
 		
 		
@@ -1001,8 +986,27 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		private void drawTarget(Graphics2D graphics)
 		{
-			Target t = getTarget();
-			t.draw( graphics );
+			final Target t = getTarget();
+			if ( t != null  &&  t.isValid()  &&  t.isAnimated() )
+			{
+				t.draw( graphics );
+
+				// Repeat
+				ActionListener onTimer = new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						if ( t != null  &&  t.isValid()  &&  t.isAnimated() )
+						{
+							t.getElement().queueFullRedraw();
+						}
+					}
+				};
+				
+				Timer timer = new Timer( 40, onTimer );
+				timer.setRepeats( false );
+				timer.start();
+			}
 		}
 		
 		
@@ -1185,7 +1189,6 @@ public class PresentationComponent extends JComponent implements ComponentListen
 
 		protected void realiseEvent()
 		{
-			initTimers();
 			handleRealise();
 			emitImmediateEvents();
 		}
@@ -1195,37 +1198,10 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		{
 			handleUnrealise( this );
 			emitImmediateEvents();
-			shutdownTimers();
 		}
 		
 		
 		
-		//
-		//
-		// TIMERS
-		//
-		//
-		
-		private void initTimers()
-		{
-			timer.start();
-		}
-		
-		private void shutdownTimers()
-		{
-			timer.stop();
-		}
-		
-		private void onTimerTick()
-		{
-			Target t = getTarget();
-			if ( t != null  &&  t.isValid()  &&  t.isAnimated() )
-			{
-				t.getElement().queueFullRedraw();
-			}
-		}
-		
-
 
 		//
 		//
@@ -1887,29 +1863,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 
 	public void hierarchyChanged(HierarchyEvent e)
 	{
-		// Determine if @this is visible
-		Container c = this;
-		boolean visible = true;
-		while ( c != null )
-		{
-			if ( !c.isVisible() )
-			{
-				visible = false;
-				break;
-			}
-			
-			c = c.getParent();
-		}
-		
-		// Send the appropriate event
-		if ( visible )
-		{
-			sendRealiseEvents();
-		}
-		else
-		{
-			sendUnrealiseEvents();
-		}
+		sendRealiseEvents();
 	}
 	
 	

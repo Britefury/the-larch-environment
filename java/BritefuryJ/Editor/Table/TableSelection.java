@@ -58,7 +58,14 @@ public class TableSelection extends Selection
 		DPElement tableElement = (DPElement)table;
 		return tableElement.getRegion();
 	}
+	
+	@Override
+	public boolean isEditable()
+	{
+		return getRegion().isEditable();
+	}
 
+	
 	@Override
 	public void draw(Graphics2D graphics)
 	{

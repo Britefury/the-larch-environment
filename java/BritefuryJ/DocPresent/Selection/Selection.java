@@ -29,6 +29,9 @@ public abstract class Selection
 	abstract public DPRegion getRegion();
 	
 	
+	public abstract boolean isEditable();
+
+	
 	public void onPresentationTreeStructureChanged()
 	{
 	}
@@ -45,7 +48,7 @@ public abstract class Selection
 	}
 	
 	
-
+	
 	public void addSelectionListener(SelectionListener listener)
 	{
 		if ( listeners == null )

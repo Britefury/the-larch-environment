@@ -34,6 +34,10 @@ public abstract class Target
 	}
 	
 	
+	public abstract boolean isEditable();
+	
+	
+	
 	public abstract SelectionPoint createSelectionPoint();
 	
 	

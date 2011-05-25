@@ -17,6 +17,10 @@ import BritefuryJ.Math.Point2;
 
 public class DPProxy extends DPContainer
 {
+	protected final static int FLAGS_PROXY_END = FLAGS_CONTAINER_END * 0x4;
+
+	
+	
 	public DPProxy()
 	{
 		this( ContainerStyleParams.defaultStyleParams );

@@ -65,6 +65,12 @@ public class TableTarget extends Target
 	{
 		return (DPElement)table;
 	}
+	
+	@Override
+	public boolean isEditable()
+	{
+		return getElement().getRegion().isEditable();
+	}
 
 	@Override
 	public SelectionPoint createSelectionPoint()

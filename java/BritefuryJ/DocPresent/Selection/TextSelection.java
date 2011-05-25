@@ -109,6 +109,12 @@ public class TextSelection extends Selection implements MarkerListener
 	}
 	
 	
+	@Override
+	public boolean isEditable()
+	{
+		return getRegion().isEditable();
+	}
+
 	
 	public void onPresentationTreeStructureChanged()
 	{

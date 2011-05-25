@@ -35,8 +35,8 @@ public class Region extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPElement childElement = child.present( ctx, style );
-		DPRegion element = new DPRegion();
+		DPElement childElement = child.present( ctx, Primitive.useRegionParams.get( style ) );
+		DPRegion element = new DPRegion( Primitive.regionParams.get( style ) );
 		element.setChild( childElement );
 		if ( clipboardHandler != null )
 		{
