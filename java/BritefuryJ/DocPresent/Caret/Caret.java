@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent.Caret;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.event.KeyEvent;
 
 import BritefuryJ.DocPresent.DPContentLeaf;
@@ -18,13 +19,17 @@ import BritefuryJ.DocPresent.DPSegment;
 import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Marker.MarkerListener;
-import BritefuryJ.DocPresent.Selection.TextSelectionPoint;
 import BritefuryJ.DocPresent.Selection.SelectionPoint;
+import BritefuryJ.DocPresent.Selection.TextSelectionPoint;
 import BritefuryJ.DocPresent.Target.Target;
 import BritefuryJ.Math.Point2;
+import BritefuryJ.Utils.AnimUtils;
 
 public class Caret extends Target implements MarkerListener
 {
+	private static final double BLINK_TIME = 0.5;
+	
+	
 	protected Marker marker;
 	protected DPElement grabElement = null;
 	
@@ -46,12 +51,21 @@ public class Caret extends Target implements MarkerListener
 			
 			if ( element != null )
 			{
-				Color prevColour = graphics.getColor();
-				graphics.setColor( Color.blue );
+				double time = System.nanoTime() * 1.0e-9;
+				double alpha = AnimUtils.scurveSeesaw( time, BLINK_TIME );
+				
+				Paint prevPaint = graphics.getPaint();
+				graphics.setPaint( new Color( 0.0f, 0.0f, 1.0f, (float)alpha ) );
 				element.drawCaret( graphics, this );
-				graphics.setColor( prevColour );
+				graphics.setPaint( prevPaint );
 			}
 		}
+	}
+	
+	@Override
+	public boolean isAnimated()
+	{
+		return true;
 	}
 	
 	
