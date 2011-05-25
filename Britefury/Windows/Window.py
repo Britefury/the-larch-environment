@@ -228,7 +228,7 @@ class Window (object):
 				pass
 			
 
-		self._frame = JFrame( 'The Larch Environment' )
+		self._frame = JFrame( 'Larch' )
 		self._frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
 		
 		self._frame.setJMenuBar( menuBar )

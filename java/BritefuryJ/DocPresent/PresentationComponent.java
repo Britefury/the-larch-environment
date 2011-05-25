@@ -7,6 +7,7 @@
 package BritefuryJ.DocPresent;
 
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -17,6 +18,8 @@ import java.awt.RenderingHints;
 import java.awt.Window;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.FocusEvent;
@@ -42,6 +45,7 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.TransferHandler;
 
 import BritefuryJ.DocPresent.Caret.Caret;
@@ -107,7 +111,6 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			chain = popupChain;
 			chain.addPopup( this );
 			isOpen = true;
-			
 			
 			// Create the popup window
 			popupWindow = new JWindow( ownerWindow );
@@ -447,6 +450,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		protected PageController pageController = null;
 		
 		
+		private Timer timer;
+
+		
 		private Log log;
 
 		
@@ -487,6 +493,17 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			keyboard = new Keyboard( this );
 
 			caretMoveToStartQueued = false;
+	
+		
+		
+			ActionListener onTimer = new ActionListener()
+			{
+				public void actionPerformed(ActionEvent arg0)
+				{
+					onTimerTick();
+				}
+			};
+			timer = new Timer( 50, onTimer );
 		}
 		
 		
@@ -965,8 +982,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			
 			// Draw
 			handleDrawBackground( graphics, new AABox2( topLeftRootSpace, bottomRightRootSpace) );
-			drawSelection( graphics );
+			//drawSelection( graphics );
 			handleDraw( graphics, new AABox2( topLeftRootSpace, bottomRightRootSpace) );
+			drawSelection( graphics );
 			//graphics.setTransform( transform );
 			if ( hasComponentFocus )
 			{
@@ -1167,6 +1185,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 
 		protected void realiseEvent()
 		{
+			initTimers();
 			handleRealise();
 			emitImmediateEvents();
 		}
@@ -1176,6 +1195,34 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		{
 			handleUnrealise( this );
 			emitImmediateEvents();
+			shutdownTimers();
+		}
+		
+		
+		
+		//
+		//
+		// TIMERS
+		//
+		//
+		
+		private void initTimers()
+		{
+			timer.start();
+		}
+		
+		private void shutdownTimers()
+		{
+			timer.stop();
+		}
+		
+		private void onTimerTick()
+		{
+			Target t = getTarget();
+			if ( t != null  &&  t.isValid()  &&  t.isAnimated() )
+			{
+				t.getElement().queueFullRedraw();
+			}
 		}
 		
 
@@ -1840,7 +1887,29 @@ public class PresentationComponent extends JComponent implements ComponentListen
 
 	public void hierarchyChanged(HierarchyEvent e)
 	{
-		sendRealiseEvents();
+		// Determine if @this is visible
+		Container c = this;
+		boolean visible = true;
+		while ( c != null )
+		{
+			if ( !c.isVisible() )
+			{
+				visible = false;
+				break;
+			}
+			
+			c = c.getParent();
+		}
+		
+		// Send the appropriate event
+		if ( visible )
+		{
+			sendRealiseEvents();
+		}
+		else
+		{
+			sendUnrealiseEvents();
+		}
 	}
 	
 	

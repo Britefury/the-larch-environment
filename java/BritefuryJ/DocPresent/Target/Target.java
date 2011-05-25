@@ -20,6 +20,11 @@ public abstract class Target
 
 	public abstract void draw(Graphics2D graphics);
 	
+	public boolean isAnimated()
+	{
+		return false;
+	}
+	
 	
 	public abstract DPElement getElement();
 	

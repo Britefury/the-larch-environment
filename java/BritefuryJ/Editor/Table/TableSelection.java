@@ -79,9 +79,10 @@ public class TableSelection extends Selection
 			Shape shape = new Rectangle2D.Double( rx0, ry0, rx1 - rx0, ry1 - ry0 );
 			Paint prevPaint = graphics.getPaint();
 			Stroke prevStroke = graphics.getStroke();
-			graphics.setPaint( new Color( 0.875f, 0.9f, 0.925f ) );
+			//graphics.setPaint( new Color( 0.5f, 0.6f, 0.7f, 0.25f ) );
+			graphics.setPaint( new Color( 0.75f, 0.8f, 0.85f, 0.25f ) );
 			graphics.fill( shape );
-			graphics.setPaint( new Color( 0.0f, 0.0f, 1.0f ) );
+			graphics.setPaint( new Color( 0.0f, 0.0f, 1.0f, 0.65f ) );
 			graphics.setStroke( new BasicStroke( 2.0f ) );
 			graphics.draw( shape );
 			graphics.setPaint( prevPaint );
