@@ -52,7 +52,7 @@ public class DPText extends DPContentLeafEditable
 
 		this.text = text;
 		
-		visual = TextVisual.getTextVisual( this.text, styleParams.getFont(), false, false, styleParams.getMixedSizeCaps() );
+		visual = TextVisual.getTextVisual( this.text, styleParams.getFont(), styleParams.getUnderline(), styleParams.getStrikethrough(), styleParams.getMixedSizeCaps() );
 		
 		layoutNode = new LayoutNodeText( this );
 	}
@@ -114,7 +114,7 @@ public class DPText extends DPContentLeafEditable
 	{
 		TextStyleParams textStyleParams = (TextStyleParams) styleParams;
 
-		TextVisual v = TextVisual.getTextVisual( text, textStyleParams.getFont(), false, false, textStyleParams.getMixedSizeCaps() );
+		TextVisual v = TextVisual.getTextVisual( text, textStyleParams.getFont(), textStyleParams.getUnderline(), textStyleParams.getStrikethrough(), textStyleParams.getMixedSizeCaps() );
 		if ( v != visual )
 		{
 			visual = v;

@@ -15,7 +15,6 @@ import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.Selection.TextSelection;
-import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.Target.Target;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.IncrementalView.FragmentViewFilter;
@@ -272,27 +271,21 @@ public class SequentialClipboardHandler extends ClipboardHandler
 			
 			if ( replacement != null )
 			{
-				StreamValue replacementStream = (StreamValue)replacement;
+				// Splice the content before the selection, the inserted content, and the content after the selection
+				Object spliced = sequentialEditor.spliceForInsertion( editRootFragment, editRootFragmentElement, startMarker, endMarker, replacement );
 				
-				
-				if ( replacementStream != null )
-				{
-					// Splice the content before the selection, the inserted content, and the content after the selection
-					Object spliced = sequentialEditor.spliceForInsertion( editRootFragment, editRootFragmentElement, startMarker, endMarker, replacementStream );
-					
-					// Create the event
-					SelectionEditTreeEvent event = sequentialEditor.createSelectionEditTreeEvent( editRootFragmentElement );
-					// Store the spliced content in the structural value of the root element
-					event.getStreamValueVisitor().setElementFixedValue( editRootFragmentElement, spliced );
-					// Take a copy of the end marker
-					Marker end = endMarker.copy();
-					// Clear the selection
-					ts.clear();
-					// Move the caret to the end
-					caret.moveTo( end );
-					// Post a tree event
-					editRootFragmentElement.postTreeEvent( event );
-				}
+				// Create the event
+				SelectionEditTreeEvent event = sequentialEditor.createSelectionEditTreeEvent( editRootFragmentElement );
+				// Store the spliced content in the structural value of the root element
+				event.getStreamValueVisitor().setElementFixedValue( editRootFragmentElement, spliced );
+				// Take a copy of the end marker
+				Marker end = endMarker.copy();
+				// Clear the selection
+				ts.clear();
+				// Move the caret to the end
+				caret.moveTo( end );
+				// Post a tree event
+				editRootFragmentElement.postTreeEvent( event );
 			}
 			else
 			{
@@ -319,17 +312,14 @@ public class SequentialClipboardHandler extends ClipboardHandler
 
 	private void insertAtCaret(Caret caret, Object data)
 	{
-		StreamValue stream = (StreamValue)data;
-		
-			
-		if ( stream != null )
+		if ( data != null )
 		{
 			Marker caretMarker = caret.getMarker();
 			FragmentView insertionPointFragment = FragmentView.getEnclosingFragment( caretMarker.getElement(), editLevelFragmentFilter );
 			DPElement insertionPointElement = insertionPointFragment.getFragmentContentElement();
 			
 			// Splice the content before the insertion point, the inserted content, and the content after the insertion point
-			Object spliced = sequentialEditor.spliceForInsertion( insertionPointFragment, insertionPointElement, caretMarker, caretMarker, stream );
+			Object spliced = sequentialEditor.spliceForInsertion( insertionPointFragment, insertionPointElement, caretMarker, caretMarker, data );
 			
 			// Store the spliced content in the structural value of the root element
 			SelectionEditTreeEvent event = sequentialEditor.createSelectionEditTreeEvent( insertionPointElement );
