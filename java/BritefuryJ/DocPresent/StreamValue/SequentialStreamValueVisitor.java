@@ -7,8 +7,8 @@
 package BritefuryJ.DocPresent.StreamValue;
 
 import java.util.HashMap;
-import java.util.List;
 
+import BritefuryJ.DocPresent.DPContentLeafEditable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementValueFunction;
 
@@ -219,6 +219,66 @@ public class SequentialStreamValueVisitor extends AbstractStreamValueVisitor
 				}
 			}
 		}
+		
+		
+		protected static boolean shouldVisitChildrenOfElement(ElementModification mod, DPElement element)
+		{
+			if ( mod != null )
+			{
+				int f = mod.flags & FLAG_FIXEDVALUE_MASK;
+				
+				if ( f == FIXEDVALUE_VALUE )
+				{
+					// We have a fixed value - no need to visit children
+					return false;
+				}
+				else if ( f == FIXEDVALUE_IDENTITY )
+				{
+					// We leave the fixed value as it is
+					if ( element.hasFixedValue() )
+					{
+						// We have a fixed value - no need to visit children
+						return false;
+					}
+				}
+				else if ( f == FIXEDVALUE_IGNORE )
+				{
+					// We are ignoring any fixed value - next test
+				}
+				else
+				{
+					throw new RuntimeException( "Invalid fixed value mode" );
+				}
+			}
+			else
+			{
+				// No element modification
+				if ( element.hasFixedValue() )
+				{
+					// We have a fixed value - no need to visit children
+					return false;
+				}
+			}
+			
+			
+			// Try value function
+			if ( mod == null  ||  !mod.testFlag( FLAG_IGNORE_VALUE_FUNCTION ) )
+			{
+				// We have no modification
+				// or
+				// we are NOT ignoring any value function present
+				ElementValueFunction fn = element.getValueFunction();  
+				if ( fn != null )
+				{
+					// We have a function to compute the element value - no need to visit children
+					return false;
+				}
+			}
+			
+			
+			// We need to visit child elements
+			return true;
+		}
 	}
 	
 	
@@ -361,26 +421,33 @@ public class SequentialStreamValueVisitor extends AbstractStreamValueVisitor
 	
 
 	@Override
-	protected List<DPElement> inOrderVisitElement(StreamValueBuilder builder, DPElement e)
+	protected void inOrderVisitElement(StreamValueBuilder builder, DPElement e)
 	{
 		ElementModification mod = getElementModification( e );
-		if ( ElementModification.addFixedValue( mod, builder, e ) )
+		if ( !ElementModification.addFixedValue( mod, builder, e ) )
 		{
-			// Fixed value added
-			return null;
+			if ( !ElementModification.addElementFunctionResult( mod, builder, e ) )
+			{
+				e.addToStreamValue( builder );
+			}
+		}
+	}
+
+	protected void inOrderVisitPartialContentLeafEditable(StreamValueBuilder builder, DPContentLeafEditable e, int startIndex, int endIndex)
+	{
+		builder.appendTextValue( e.getTextRepresentation().substring( startIndex, endIndex ) );
+	}
+	
+	public boolean shouldVisitChildrenOfElement(DPElement e, boolean completeVisit)
+	{
+		if ( completeVisit )
+		{
+			ElementModification mod = getElementModification( e );
+			return ElementModification.shouldVisitChildrenOfElement( mod, e );
 		}
 		else
 		{
-			if ( ElementModification.addElementFunctionResult( mod, builder, e ) )
-			{
-				// Result of evaluating element function added
-				return null;
-			}
-			else
-			{
-				e.addToStreamValue( builder );
-				return e.getChildrenInSequentialOrder();
-			}
+			return true;
 		}
 	}
 }

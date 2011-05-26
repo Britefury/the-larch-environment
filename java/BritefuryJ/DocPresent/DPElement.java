@@ -1160,8 +1160,8 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 			}
 			element = element.getParent();
 		}
-
-		return null;
+		
+		throw new RuntimeException( "Element not within subtree" );
 	}
 	
 	public ArrayList<DPElement> getElementPathToSubtreeRoot(DPContainer subtreeRoot)
@@ -1179,7 +1179,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 			element = element.getParent();
 		}
 
-		return null;
+		throw new RuntimeException( "Element not within subtree" );
 	}
 	
 	
