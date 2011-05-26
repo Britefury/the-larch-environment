@@ -47,7 +47,7 @@ public abstract class SequentialStreamEditor extends SequentialEditor
 	
 	// Override the following methods in SequentialEditor to support StreamValue objects
 
-	public Object getSequentialContentInSelection(TextSelection selection)
+	public Object getSequentialContentInSelection(FragmentView subtreeRootFragment, DPElement subtreeRootFragmentElement, TextSelection selection)
 	{
 		SequentialStreamValueVisitor visitor = new SequentialStreamValueVisitor();
 		StreamValue stream = visitor.getStreamValueInTextSelection( selection );

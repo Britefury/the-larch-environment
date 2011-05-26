@@ -140,7 +140,7 @@ public abstract class SequentialEditor
 	
 	
 	
-	public abstract Object getSequentialContentInSelection(TextSelection selection);
+	public abstract Object getSequentialContentInSelection(FragmentView subtreeRootFragment, DPElement subtreeRootFragmentElement, TextSelection selection);
 	public abstract Object spliceForInsertion(FragmentView subtreeRootFragment, DPElement subtreeRootFragmentElement, Marker prefixEnd, Marker suffixStart, Object insertedContent);
 	public abstract Object spliceForDeletion(FragmentView subtreeRootFragment, DPElement subtreeRootFragmentElement, Marker selectionStart, Marker selectionEnd);
 

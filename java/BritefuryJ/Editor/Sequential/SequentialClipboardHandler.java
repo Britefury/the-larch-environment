@@ -78,7 +78,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 		@Override
 		protected Object getSelectionContents(TextSelection selection)
 		{
-			return sequentialEditor.getSequentialContentInSelection( selection );
+			return getSequentialContentInSelection( selection );
 		}
 		
 		@Override
@@ -241,6 +241,12 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	
 	
 	
+	private Object getSequentialContentInSelection(TextSelection selection)
+	{
+		DPElement root = selection.getCommonRoot();
+		FragmentView fragment = FragmentView.getEnclosingFragment( root, editLevelFragmentFilter );
+		return sequentialEditor.getSequentialContentInSelection( fragment, fragment.getFragmentContentElement(), selection );
+	}
 
 	private void replaceSelection(Selection selection, Caret caret, Object replacement)
 	{
