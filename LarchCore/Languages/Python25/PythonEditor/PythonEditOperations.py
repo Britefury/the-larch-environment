@@ -25,6 +25,7 @@ from BritefuryJ.DocModel import DMList, DMObject, DMObjectInterface, DMNode
 
 
 from BritefuryJ.DocPresent.StyleParams import *
+from BritefuryJ.DocPresent.Selection import TextSelection
 from BritefuryJ.DocPresent import *
 
 from BritefuryJ.DocPresent.StreamValue import StreamValueBuilder, StreamValue
@@ -53,8 +54,14 @@ class NotImplementedError (Exception):
 #
 #
 
+def isExpr(node):
+	return isinstance( node, DMObjectInterface )  and  ( node.isInstanceOf( Schema.Expr )  or  node.isInstanceOf( Schema.UNPARSED ) )
+
+def isValidExpr(node):
+	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Schema.Expr )
+
 def isStmt(node):
-	return isinstance( node, DMObjectInterface )  and  ( node.isInstanceOf( Schema.Stmt )  or  node.isInstanceOf( Schema.UNPARSED ) )
+	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Schema.Stmt )
 
 def isCompoundStmt(node):
 	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Schema.CompoundStmt )
@@ -344,4 +351,58 @@ def insertSpecialFormAtMarker(marker, specialForm):
 
 def insertSpecialFormAtCaret(caret, specialForm):
 	return insertSpecialFormAtMarker( caret.getMarker(), specialForm )
+
+
+
+def _getSelectedNode(selection, modelTestFn):
+	"""
+	selection - a TextSelection
+	modelTestFn - function(node) -> True or False
+	
+	returns
+		first node containing @selection that passes modelTestFn
+		or
+		None
+	"""
+	if isinstance( selection, TextSelection ):
+		commonRoot = selection.getCommonRoot()
+		if commonRoot is not None:
+			fragment = commonRoot.getFragmentContext()
+		
+			while fragment is not None:
+				model = fragment.model
+				if modelTestFn( model ):
+					return model
+				if isTopLevel( model ):
+					return False
+	return None
+
+
+
+
+def getSelectedExpression(selection):
+	"""
+	selection - a TextSelection
+	
+	returns
+		expression that contains selection
+		or
+		None
+	"""
+	return _getSelectedNode( selection, isExpr )
+
+
+
+
+def getSelectedStatement(selection):
+	"""
+	selection - a TextSelection
+	
+	returns
+		statement that contains selection
+		or
+		None
+	"""
+	return _getSelectedNode( selection, isStmt )
+
 
