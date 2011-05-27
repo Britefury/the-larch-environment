@@ -12,11 +12,25 @@ import BritefuryJ.DocPresent.TextEditEvent;
 import BritefuryJ.DocPresent.TreeEventListener;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.TextSelection;
+import BritefuryJ.DocPresent.StreamValue.StreamValue;
+import BritefuryJ.Editor.Sequential.EditListener.HandleEditResult;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Primitive.Region;
 
 public abstract class SequentialEditor
 {
+	public static interface HandleEditEventFn
+	{
+		EditListener.HandleEditResult handleEditEvent(DPElement element, DPElement sourceElement, EditEvent event);
+	}
+	
+	public static interface HandleStreamValueFn
+	{
+		HandleEditResult handleValue(DPElement element, DPElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value);
+	}
+	
+	
+	
 	protected class ClearStructuralValueListener implements TreeEventListener
 	{
 		@Override
@@ -39,6 +53,64 @@ public abstract class SequentialEditor
 			return false;
 		}
 	}
+	
+	
+	
+	
+	
+	
+	protected class _EditListener extends EditListener
+	{
+		private HandleEditEventFn handleEditEventFn;
+		
+		
+		protected _EditListener(HandleEditEventFn handleEditEventFn)
+		{
+			this.handleEditEventFn = handleEditEventFn;
+		}
+		
+
+		@Override
+		protected SequentialEditor getSequentialEditor()
+		{
+			return SequentialEditor.this;
+		}
+
+		@Override
+		protected HandleEditResult handleEditEvent(DPElement element, DPElement sourceElement, EditEvent event)
+		{
+			return handleEditEventFn.handleEditEvent( element, sourceElement, event );
+		}
+	}
+	
+	
+	
+	
+	protected class _StreamEditListener extends StreamEditListener
+	{
+		private HandleStreamValueFn handleStreamValueFn;
+		
+		
+		protected _StreamEditListener(HandleStreamValueFn handleStreamValueFn)
+		{
+			this.handleStreamValueFn = handleStreamValueFn;
+		}
+		
+
+		@Override
+		protected SequentialEditor getSequentialEditor()
+		{
+			return SequentialEditor.this;
+		}
+
+		@Override
+		protected HandleEditResult handleValue(DPElement element, DPElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
+		{
+			return handleStreamValueFn.handleValue( element, sourceElement, fragment, event, model, value );
+		}
+	}
+	
+	
 	
 	
 	protected ClearStructuralValueListener clearListener = new ClearStructuralValueListener();
@@ -82,6 +154,18 @@ public abstract class SequentialEditor
 	{
 		SequentialClipboardHandler clipboardHandler = (SequentialClipboardHandler)element.getRegion().getClipboardHandler();
 		return clipboardHandler.getSequentialEditor();
+	}
+	
+	
+	
+	public EditListener editListener(HandleEditEventFn handleEditEventFn)
+	{
+		return new _EditListener( handleEditEventFn );
+	}
+	
+	public StreamEditListener streamEditListener(HandleStreamValueFn handleStreamValueFn)
+	{
+		return new _StreamEditListener( handleStreamValueFn );
 	}
 	
 	
