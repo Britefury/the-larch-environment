@@ -200,7 +200,12 @@ def _embeddedObjectExprContextMenuFactory(element, menu):
 	model = fragment.getModel()
 
 	def _onDelete(item):
-		pyReplaceNode( model, Schema.Load( name='None' ) )
+		value = model['embeddedValue'].getValue()
+		try:
+			replacement = value.__py_replacement__()
+		except AttributeError:
+			replacement = Schema.Load( name='None' )
+		pyReplaceNode( model, replacement )
 
 	menu.add( MenuItem.menuItemWithLabel( 'Delete embedded object', _onDelete ) )
 
@@ -212,7 +217,12 @@ def _embeddedObjectStmtContextMenuFactory(element, menu):
 	model = fragment.getModel()
 
 	def _onDelete(item):
-		pyReplaceNode( model, Schema.BlankLine() )
+		value = model['embeddedValue'].getValue()
+		try:
+			replacement = value.__py_replacement__()
+		except AttributeError:
+			replacement = Schema.BlankLine()
+		pyReplaceNode( model, replacement )
 
 	menu.add( MenuItem.menuItemWithLabel( 'Delete embedded object', _onDelete ) )
 

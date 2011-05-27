@@ -22,7 +22,7 @@ from BritefuryJ.Editor.Table.ObjectList import AttributeColumn, ObjectListTableE
 from Britefury.Util.TrackedList import TrackedListProperty
 
 import LarchCore.Languages.Python25.Schema as Py
-from LarchCore.Languages.Python25.PythonCommands import pythonCommands, makeInsertEmbeddedStatementAction
+from LarchCore.Languages.Python25.PythonCommands import pythonCommands, makeInsertEmbeddedStatementAtCaretAction
 from LarchCore.Languages.Python25.Python25 import EmbeddedPython25
 from LarchCore.Languages.Python25.PythonEditor.View import perspective as pyPerspective
 
@@ -134,7 +134,7 @@ class ConstantTable (object):
 		self._incr.onChanged()
 		
 		
-	def __py_model__(self):
+	def __py_execmodel__(self):
 		assigns = []
 		for definition in self._definitions_:
 			target = definition.target.model['target']
@@ -145,7 +145,6 @@ class ConstantTable (object):
 	
 	__py_hide_expansion__ = True
 	
-	__py_model_type__ = 'stmt'
 		
 	
 	def __present__(self, fragment, inheritedState):
@@ -176,11 +175,11 @@ _tableEditor = ObjectListTableEditor( [ _targetColumn, _valueColumn ], ConstantD
 
 
 
-def _newConstantTable():
+def _newConstantTableAtCaret(caret):
 	return ConstantTable()
 
 
-_ctCommand = Command( '&Python &Constant &Table', makeInsertEmbeddedStatementAction( _newConstantTable ) )
+_ctCommand = Command( '&Python &Constant &Table', makeInsertEmbeddedStatementAtCaretAction( _newConstantTableAtCaret ) )
 
 _ctCommands = CommandSet( 'LarchTools.PythonTools.ConstantTable', [ _ctCommand ] )
 

@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
+from copy import deepcopy
+
 from BritefuryJ.Command import *
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
@@ -15,8 +17,9 @@ from BritefuryJ.Pres import *
 from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.Pres.ObjectPres import *
 
-from LarchCore.Languages.Python25.PythonCommands import pythonCommands, makeInsertEmbeddedExpressionAction
+from LarchCore.Languages.Python25.PythonCommands import pythonCommands, makeInsertEmbeddedExpressionAtCaretAction, makeWrapSelectionInEmbeddedExpressionAction, chainActions
 from LarchCore.Languages.Python25.Python25 import EmbeddedPython25
+from LarchCore.Languages.Python25.PythonEditor.PythonEditOperations import getSelectedExpression, pyReplaceNode
 from LarchCore.Languages.Python25.PythonEditor.View import perspective as pyPerspective
 
 
@@ -24,6 +27,7 @@ from LarchCore.Languages.Python25.PythonEditor.View import perspective as pyPers
 class EmbeddedDisplay (object):
 	def __init__(self):
 		self._expr = EmbeddedPython25.expression()
+		self._code = None
 		self._values = []
 		self._incr = IncrementalValueMonitor()
 		self.__change_history__ = None
@@ -43,11 +47,16 @@ class EmbeddedDisplay (object):
 		return [ self._expr ]
 		
 		
-	def __py_value__(self, _globals, _locals, codeGen):
-		code = codeGen.compileForEvaluation( self._expr.model )
-		value = eval( code, _globals, _locals )
+	def __py_compile_visit__(self, codeGen):
+		self._code = codeGen.compileForEvaluation( self._expr.model )
+	
+	def __py_eval__(self, _globals, _locals, codeGen):
+		value = eval( self._code, _globals, _locals )
 		self._values.append( value )
 		self._incr.onChanged()
+	
+	def __py_replacement__(self):
+		return deepcopy( self._expr.model['expr'] )
 		
 	
 	def __present__(self, fragment, inheritedState):
@@ -74,11 +83,17 @@ class EmbeddedDisplay (object):
 
 
 
-def _newEmbeddedDisplay():
+def _newEmbeddedDisplayAtCaret(caret):
 	return EmbeddedDisplay()
 
+def _newEmbeddedDisplayAtSelection(expr, selection):
+	d = EmbeddedDisplay()
+	d._expr.model['expr'] = deepcopy( expr )
+	return d
 
-_edCommand = Command( '&Embedded &Display', makeInsertEmbeddedExpressionAction( _newEmbeddedDisplay ) )
+
+_edCommand = Command( '&Embedded &Display', chainActions( makeWrapSelectionInEmbeddedExpressionAction( _newEmbeddedDisplayAtSelection ),
+                                                          makeInsertEmbeddedExpressionAtCaretAction( _newEmbeddedDisplayAtCaret ) ) )
 
 _edCommands = CommandSet( 'LarchTools.PythonTools.EmbeddedDisplay', [ _edCommand ] )
 

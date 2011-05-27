@@ -304,22 +304,12 @@ schema.registerReader( 'InlineObjectStmt', 3, _readInlineObjectStmt_v3 )
 
 
 def getEmbeddedObjectModelType(value):
-	try:
-		modelType = value.__py_model_type__
-	except AttributeError:
-		modelType = Expr
+	if hasattr( value, '__py_execmodel__' )  or  hasattr( value, '__py_exec__' )  or  ( hasattr( '__py_localnames__' ) and hasattr( '__py_localvalues__' ) ):
+		# Statement methods
+		return Stmt
+	elif hasattr( value, '__py_evalmodel__' )  or  hasattr( value, '__py_eval__' ):
+		# Expression methods
+		return Expr
 	else:
-		if callalble( modelType ):
-			modelType = modelType()
-		if isinstance( modelType, str )  or  isinstance( modelType, unicode ):
-			if modelType == 'stmt'  or  modelType == 'statement'  or  modelType == 'suite':
-				modelType = Stmt
-			elif modelType == 'expr'  or  modelType == 'expression':
-				modelType = Expr
-			else:
-				raise TypeError, '__py_model_type__ should be \'stmt\', \'statement\', \'expr\', or \'expression\''
-	if not isinstance( modelType, DMObjectClass ):
-		raise TypeError, '__py_model_type__ should be a string, or a Python node class'
-	if modelType is not Expr  and  modelType is not Stmt:
-		raise TypeError, '__py_model_type__ should be Expr or Stmt'
-	return modelType
+		# Fallback - use as value
+		return Expr

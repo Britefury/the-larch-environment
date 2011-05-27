@@ -42,7 +42,7 @@ def _getUserPluginRootPaths():
 def _loadPluginsInDir(plugins, pluginDir):
 	for dirpath, dirnames, filenames in os.walk( pluginDir ):
 		for filename in filenames:
-			if filename == 'larchplugin.py':
+			if filename == 'larchplugin.py'  or  filename == 'larchplugin.class':
 				fn, ext = os.path.splitext( filename )
 
 				pluginName = _pathToDottedName( dirpath )
@@ -59,6 +59,8 @@ def _loadPluginsInDir(plugins, pluginDir):
 				initPluginFn = getattr( mod, 'initPlugin' )
 
 				plugins.append( Plugin( pluginName, initPluginFn ) )
+				
+				break
 
 				
 

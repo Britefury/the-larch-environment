@@ -851,7 +851,6 @@ class Python25CodeGenerator (object):
 
 _runtime_resourceMap_Name = '__larch_resourceMap__'
 _runtime_astMap_Name = '__larch_astMap__'
-_runtime_revAstMap_Name = '__larch_revAstMap__'
 _runtime_DMList_Name = '__larch_DMList__'
 
 
@@ -871,13 +870,11 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 			self._astMap = []
 			setattr( module, _runtime_astMap_Name, self._astMap )
 		
-		try:
-			self._revAstMap = getattr( module, _runtime_revAstMap_Name )
-		except AttributeError:
-			self._revAstMap = {}
-			setattr( module, _runtime_revAstMap_Name, self._revAstMap )
-			
 		setattr( module, _runtime_DMList_Name, DMList )
+		
+		self._resourceValueIdToIndex = {}
+		for i, x in enumerate( self._resourceMap ):
+			self._resourceValueIdToIndex[id(x)] = i
 			
 			
 			
@@ -947,30 +944,47 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 		return self( value )
 		
 		
-		
+	
 	# Embedded object expression
 	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectExpr )
 	def EmbeddedObjectExpr(self, node, embeddedValue):
 		value = embeddedValue.getValue()
+	
 		
+		# Try to use the __py_compile_visit__ method
 		try:
-			modelFn = value.__py_model__
+			visitFn = value.__py_compile_visit__
 		except AttributeError:
-			try:
-				valueFn = value.__py_value__
-			except AttributeError:
-				# Use the object itself as the value
-				return self._resource( value )
-			else:
-				valueFnSource = self._resource( valueFn )
-				selfSource = self._resource( self )
-				return valueFnSource + '( globals(), locals(), ' + selfSource + ' )'
+			pass
+		else:
+			# Got a 'visit' function - invoke to allow object to initialise resources, etc
+			visitFn( self )
+			
+		
+		# Try to use the __py_evalmodel__ method
+		try:
+			modelFn = value.__py_evalmodel__
+		except AttributeError:
+			pass
 		else:
 			# Got a 'model' function - invoke to create AST nodes, then convert them to code
 			model = modelFn()
 			return self( model )
 		
 		
+		# Try to use the __py_eval__ method
+		try:
+			evalFn = value.__py_eval__
+		except AttributeError:
+			pass
+		else:
+			evalFnSource = self._resource( evalFn )
+			selfSource = self._resource( self )
+			return evalFnSource + '( globals(), locals(), ' + selfSource + ' )'
+		
+		
+		# Use the object as a value
+		return self._resource( value )
 		
 	
 	
@@ -978,35 +992,74 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectStmt )
 	def EmbeddedObjectStmt(self, node, embeddedValue):
 		value = embeddedValue.getValue()
+	
 		
+		# Try to use the __py_compile_visit__ method
 		try:
-			modelFn = value.__py_model__
+			visitFn = value.__py_compile_visit__
 		except AttributeError:
-			try:
-				attrNamesFn = value.__py_attrnames__
-				attrValuesFn = value.__py_attrvalues__
-			except AttributeError:
-				# Get the object as a value
-				return Line( self._resource( value ),   node )
-			else:
-				# Get the attribute name list
-				names = attrNamesFn()
-				selfSource = self._resource( self )
-				valuesCallSource = self._resource( attrValuesFn ) + '( globals(), locals(), ' + selfSource + ' )'
-				if isinstance( names, str )  or  isinstance( names, unicode ):
-					return Line( names + ' = ' + valuesCallSource,   node )
-				else:
-					return Line( ', '.join( names ) + ',' + ' = ' + valuesCallSource,   node )
+			pass
+		else:
+			# Got a 'visit' function - invoke to allow object to initialise resources, etc
+			visitFn( self )
+		
+		
+		# Try to use the __py_execmodel__ method
+		try:
+			modelFn = value.__py_execmodel__
+		except AttributeError:
+			pass
 		else:
 			# Got a 'model' function - invoke to create AST nodes, then convert them to code
 			model = modelFn()
 			return Line( self( model ),   node )
+
+		
+		# Try to use the __py_exec__ method
+		try:
+			execFn = value.__py_exec__
+		except AttributeError:
+			pass
+		else:
+			execFnSource = self._resource( execFn )
+			selfSource = self._resource( self )
+			return execFnSource + '( globals(), locals(), ' + selfSource + ' )'
+
+			
+		# Try to use the __py_localnames__ and __py_localvalues__ method pair
+		try:
+			attrNamesFn = value.__py_localnames__
+			attrValuesFn = value.__py_localvalues__
+		except AttributeError:
+			pass
+		else:
+			# Get the attribute name list
+			names = attrNamesFn()
+			selfSource = self._resource( self )
+			valuesCallSource = self._resource( attrValuesFn ) + '( globals(), locals(), ' + selfSource + ' )'
+			if isinstance( names, str )  or  isinstance( names, unicode ):
+				return Line( names + ' = ' + valuesCallSource,   node )
+			else:
+				return Line( ', '.join( names ) + ',' + ' = ' + valuesCallSource,   node )
+
+		
+		# Get the object as a value
+		return Line( self._resource( value ),   node )
+			
 	
-		
-		
+	
+	def _resourceIndex(self, resourceValue):
+		rscId = id( resourceValue )
+		try:
+			index = self._resourceValueIdToIndex[rscId]
+		except KeyError:
+			index = len( self._resourceMap )
+			self._resourceMap.append( resourceValue )
+			self._resourceValueIdToIndex[rscId] = index
+		return index
+	
 	def _resource(self, resourceValue):
-		index = len( self._resourceMap )
-		self._resourceMap.append( resourceValue )
+		index = self._resourceIndex( resourceValue )
 		return _runtime_resourceMap_Name + '[%d]'  %  ( index, )
 		
 		
