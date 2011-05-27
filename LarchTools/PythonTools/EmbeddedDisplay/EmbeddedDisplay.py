@@ -54,6 +54,7 @@ class EmbeddedDisplay (object):
 		value = eval( self._code, _globals, _locals )
 		self._values.append( value )
 		self._incr.onChanged()
+		return value
 	
 	def __py_replacement__(self):
 		return deepcopy( self._expr.model['expr'] )
@@ -75,7 +76,7 @@ class EmbeddedDisplay (object):
 		#exprPres = pyPerspective.applyTo( self._expr )
 		exprPres = self._expr
 		
-		valuesPres = ObjectBox( 'Values', Column( [ value   for value in self._values ] ) )
+		valuesPres = ObjectBox( 'Values', Column( [ Paragraph( [ value ] )   for value in self._values ] ) )
 		
 		contents = Column( [ exprPres, valuesPres ] )
 		return ObjectBox( 'Embedded display', contents ).withContextMenuInteractor( _embeddedDisplayMenu )
