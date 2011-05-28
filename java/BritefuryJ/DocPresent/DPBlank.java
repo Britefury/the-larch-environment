@@ -11,25 +11,40 @@ import java.util.ArrayList;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
 
-public abstract class DPEmpty extends DPElement
+public class DPBlank extends DPElement
 {
-	public DPEmpty()
+	public DPBlank()
 	{
 		super();
 	}
 	
-	public DPEmpty(ElementStyleParams styleParams)
+	public DPBlank(ElementStyleParams styleParams)
 	{
 		super(styleParams);
 	}
 	
 	
-	protected DPEmpty(DPEmpty element)
+	protected DPBlank(DPBlank element)
 	{
 		super( element );
 	}
 	
 	
+	
+	
+	//
+	//
+	// Presentation tree cloning
+	//
+	//
+	
+	public DPElement clonePresentationSubtree()
+	{
+		DPBlank clone = new DPBlank( this );
+		clone.clonePostConstuct( this );
+		return clone;
+	}
+
 	
 	
 	

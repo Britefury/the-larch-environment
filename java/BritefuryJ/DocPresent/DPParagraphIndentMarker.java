@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeParagraphIndentMarker;
 import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
 
-public class DPParagraphIndentMarker extends DPEmpty
+public class DPParagraphIndentMarker extends DPBlank
 {
 	public DPParagraphIndentMarker()
 	{

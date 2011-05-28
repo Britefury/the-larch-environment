@@ -7,13 +7,13 @@
 package BritefuryJ.DocPresent.LayoutTree;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPEmpty;
+import BritefuryJ.DocPresent.DPBlank;
 import BritefuryJ.DocPresent.ElementFilter;
 import BritefuryJ.Math.Point2;
 
 public abstract class LayoutNodeEmpty extends LeafLayoutNode
 {
-	public LayoutNodeEmpty(DPEmpty element)
+	public LayoutNodeEmpty(DPBlank element)
 	{
 		super( element );
 	}

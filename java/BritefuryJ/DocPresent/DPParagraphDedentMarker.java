@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeParagraphDedentMarker;
 import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
 
-public class DPParagraphDedentMarker extends DPEmpty
+public class DPParagraphDedentMarker extends DPBlank
 {
 	public DPParagraphDedentMarker()
 	{
