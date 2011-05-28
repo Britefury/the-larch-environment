@@ -11,7 +11,7 @@ import java.util.List;
 import BritefuryJ.Editor.Table.AbstractTableEditorInstance;
 import BritefuryJ.Editor.Table.TableEditorStyle;
 import BritefuryJ.Pres.Pres;
-import BritefuryJ.Pres.Primitive.HiddenContent;
+import BritefuryJ.Pres.Primitive.Blank;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Table;
 
@@ -40,7 +40,7 @@ public class GenericTableEditorInstance extends AbstractTableEditorInstance<Gene
 			Object firstRow[] = new Object[headerColumns];
 			if ( hasLeftHeader() )
 			{
-				firstRow[0] = new HiddenContent( "" );
+				firstRow[0] = new Blank();
 			}
 			for (int x = 0; x < width; x++)
 			{
@@ -92,7 +92,7 @@ public class GenericTableEditorInstance extends AbstractTableEditorInstance<Gene
 			Object lastRow[] = new Object[numColumns];
 			if ( hasLeftHeader() )
 			{
-				lastRow[0] = new HiddenContent( "" );
+				lastRow[0] = new Blank();
 			}
 			for (int x = 0; x < width; x++)
 			{

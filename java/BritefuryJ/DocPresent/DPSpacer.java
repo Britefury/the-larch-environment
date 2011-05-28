@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeSpacer;
 import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
 
-public class DPSpacer extends DPEmpty
+public class DPSpacer extends DPBlank
 {
 	private double minWidth, minHeight;
 	

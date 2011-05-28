@@ -26,9 +26,9 @@ import javax.swing.TransferHandler;
 
 import BritefuryJ.ChangeHistory.ChangeHistoryController;
 import BritefuryJ.ChangeHistory.ChangeHistoryListener;
+import BritefuryJ.Command.AbstractCommandConsole;
 import BritefuryJ.Command.CommandBar;
 import BritefuryJ.Command.CommandConsoleFactory;
-import BritefuryJ.Command.AbstractCommandConsole;
 import BritefuryJ.Controls.ScrolledViewport;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.PageController;
@@ -37,7 +37,7 @@ import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
-import BritefuryJ.Pres.Primitive.HiddenContent;
+import BritefuryJ.Pres.Primitive.Blank;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class Browser
@@ -74,7 +74,7 @@ public class Browser
 		this.resolver = resolver;
 		history = new BrowserHistory( location );
 		
-		viewport = makeViewport( new HiddenContent( "" ), history.getCurrentState().getViewportState() );
+		viewport = makeViewport( new Blank(), history.getCurrentState().getViewportState() );
 		
 		presComponent = new PresentationComponent();
 		presComponent.setPageController( pageController );

@@ -143,7 +143,7 @@ class WorksheetViewer (ObjectDispatchView):
 					executionResultView = minimalExecutionResultBox( stdout, executionResult.getStdErr(), exc, result, True, True )
 			
 			if node.isResultMinimal():
-				return executionResultView.alignHExpand()   if executionResultView is not None   else HiddenContent( '' )
+				return executionResultView.alignHExpand()   if executionResultView is not None   else Blank()
 			else:
 				boxContents = []
 				if node.isCodeVisible():
@@ -154,7 +154,7 @@ class WorksheetViewer (ObjectDispatchView):
 				
 				return _pythonCodeEditorBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
 		else:
-			return HiddenContent( '' )
+			return Blank()
 
 
 	

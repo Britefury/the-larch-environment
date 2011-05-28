@@ -129,7 +129,7 @@ class ConsoleView (ObjectDispatchView):
 				
 			def _finish(entry):
 				caret.moveTo( marker )
-				dropPromptUnit.setLiteralValue( HiddenContent( '' ) )
+				dropPromptUnit.setLiteralValue( Blank() )
 			
 			dropPrompt = _dropPrompt( _VarNameEntryListener() )
 			rootElement = element.getRootElement()
@@ -164,7 +164,7 @@ class ConsoleView (ObjectDispatchView):
 			element.ensureVisible()
 		m = m.withCustomElementAction( _ensureCurrentModuleVisible )
 		
-		dropPromptUnit = LiteralUnit( HiddenContent( '' ) )
+		dropPromptUnit = LiteralUnit( Blank() )
 		dropPromptView = dropPromptUnit.defaultPerspectiveValuePresInFragment()
 		
 		if len( blocks ) > 0:
