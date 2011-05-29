@@ -304,7 +304,7 @@ schema.registerReader( 'InlineObjectStmt', 3, _readInlineObjectStmt_v3 )
 
 
 def getEmbeddedObjectModelType(value):
-	if hasattr( value, '__py_execmodel__' )  or  hasattr( value, '__py_exec__' )  or  ( hasattr( '__py_localnames__' ) and hasattr( '__py_localvalues__' ) ):
+	if hasattr( value, '__py_execmodel__' )  or  hasattr( value, '__py_exec__' )  or  ( hasattr( value, '__py_localnames__' ) and hasattr( value, '__py_localvalues__' ) ):
 		# Statement methods
 		return Stmt
 	elif hasattr( value, '__py_evalmodel__' )  or  hasattr( value, '__py_eval__' ):
