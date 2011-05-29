@@ -8,7 +8,7 @@ package BritefuryJ.DocPresent.LayoutTree;
 
 import BritefuryJ.DocPresent.DPSpacer;
 
-public class LayoutNodeSpacer extends LayoutNodeEmpty
+public class LayoutNodeSpacer extends LayoutNodeBlank
 {
 	public LayoutNodeSpacer(DPSpacer element)
 	{

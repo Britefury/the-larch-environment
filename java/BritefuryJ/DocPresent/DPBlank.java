@@ -8,6 +8,7 @@ package BritefuryJ.DocPresent;
 
 import java.util.ArrayList;
 
+import BritefuryJ.DocPresent.LayoutTree.LayoutNodeBlank;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
 
@@ -21,12 +22,16 @@ public class DPBlank extends DPElement
 	public DPBlank(ElementStyleParams styleParams)
 	{
 		super(styleParams);
+
+		layoutNode = new LayoutNodeBlank( this );
 	}
 	
 	
 	protected DPBlank(DPBlank element)
 	{
 		super( element );
+
+		layoutNode = new LayoutNodeBlank( this );
 	}
 	
 	
