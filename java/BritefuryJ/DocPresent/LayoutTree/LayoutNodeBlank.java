@@ -6,14 +6,14 @@
 //##************************
 package BritefuryJ.DocPresent.LayoutTree;
 
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPBlank;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementFilter;
 import BritefuryJ.Math.Point2;
 
-public abstract class LayoutNodeEmpty extends LeafLayoutNode
+public class LayoutNodeBlank extends LeafLayoutNode
 {
-	public LayoutNodeEmpty(DPBlank element)
+	public LayoutNodeBlank(DPBlank element)
 	{
 		super( element );
 	}
@@ -22,10 +22,12 @@ public abstract class LayoutNodeEmpty extends LeafLayoutNode
 
 	protected void updateRequisitionX()
 	{
+		layoutReqBox.setRequisitionX( 0.0, 0.0 );
 	}
 
 	protected void updateRequisitionY()
 	{
+		layoutReqBox.setRequisitionY( 0.0, 0.0 );
 	}
 	
 
