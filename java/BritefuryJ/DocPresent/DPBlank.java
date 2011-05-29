@@ -17,6 +17,8 @@ public class DPBlank extends DPElement
 	public DPBlank()
 	{
 		super();
+
+		layoutNode = new LayoutNodeBlank( this );
 	}
 	
 	public DPBlank(ElementStyleParams styleParams)
