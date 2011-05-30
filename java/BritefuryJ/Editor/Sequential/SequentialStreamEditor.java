@@ -58,7 +58,7 @@ public abstract class SequentialStreamEditor extends SequentialEditor
 			if ( item instanceof StreamValue.StructuralItem )
 			{
 				StreamValue.StructuralItem structuralItem = (StreamValue.StructuralItem)item;
-				builder.appendStructuralValue( copyStructuralValue( structuralItem.getStructuralValue() ) );
+				builder.appendStructuralValue( copyStructuralValue( structuralItem.getValue() ) );
 			}
 			else if ( item instanceof StreamValue.TextItem )
 			{

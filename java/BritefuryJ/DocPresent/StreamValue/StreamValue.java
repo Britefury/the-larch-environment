@@ -189,7 +189,7 @@ public class StreamValue implements Presentable
 		}
 		
 		
-		public Object getStructuralValue()
+		public Object getValue()
 		{
 			return structuralValue;
 		}

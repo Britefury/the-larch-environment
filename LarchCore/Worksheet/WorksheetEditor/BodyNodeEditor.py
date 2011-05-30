@@ -67,7 +67,7 @@ class BodyNodeEditListener (StreamEditListener):
 
 		for item in value.getItems():
 			if item.isStructural():
-				x = item.getStructuralValue()
+				x = item.getValue()
 				if x.isInstanceOf( Schema.WorksheetNode ):
 					_addPartial()
 					xs.append( x )
@@ -77,7 +77,7 @@ class BodyNodeEditListener (StreamEditListener):
 				else:
 					raise TypeError
 			else:
-				_partialText( item.getTextValue() )
+				_partialText( item.getValue() )
 		
 		_addPartial()
 		
