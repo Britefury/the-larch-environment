@@ -8,7 +8,7 @@ package BritefuryJ.Editor.Table.ObjectList;
 
 import org.python.core.Py;
 
-import BritefuryJ.Utils.UnaryFn;
+import BritefuryJ.Util.UnaryFn;
 
 public abstract class AbstractColumn
 {

@@ -16,7 +16,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPSegment;
 import BritefuryJ.DocPresent.DPElement.IsNotInSubtreeException;
 import BritefuryJ.DocPresent.ElementFilter;
-import BritefuryJ.Utils.HashUtils;
+import BritefuryJ.Util.HashUtils;
 
 public class Marker
 {

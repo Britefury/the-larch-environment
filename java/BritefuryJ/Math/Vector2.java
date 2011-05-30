@@ -25,7 +25,7 @@ import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.StyleSheet.StyleSheet;
-import BritefuryJ.Utils.HashUtils;
+import BritefuryJ.Util.HashUtils;
 
 public class Vector2 implements Presentable, Serializable
 {

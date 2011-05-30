@@ -48,7 +48,6 @@ from BritefuryJ.ModelAccess.DocModel import *
 
 
 from LarchCore.Languages.Python25 import Schema
-from LarchCore.Languages.Python25 import ExternalExpression
 from LarchCore.Languages.Python25 import PythonCommands
 
 
@@ -236,15 +235,6 @@ def _pythonModuleContextMenuFactory(element, menu):
 
 	extExprItems = []
 
-	def _makeExtExprFn(factory):
-		def _onMenuItem(item):
-			caret = rootElement.getCaret()
-			if caret.isValid():
-				expr = factory()
-				pyExpr = Schema.ExternalExpr( expr=expr )
-				_insertSpecialForm( caret, pyExpr )
-		return _onMenuItem
-
 	def _onQuoteExpr(item):
 		caret = rootElement.getCaret()
 		if caret.isValid():
@@ -264,14 +254,10 @@ def _pythonModuleContextMenuFactory(element, menu):
 			_insertSpecialForm( caret, pyExpr )
 
 
-	extExprItems = [ MenuItem.menuItemWithLabel( labelText, _makeExtExprFn( factory ) )   for labelText, factory in ExternalExpression.getExternalExpressionFactories() ]
-	extExprMenu = VPopupMenu( extExprItems )
-
 	menu.add( MenuItem.menuItemWithLabel( 'Quote expression', _onQuoteExpr ) )
 	menu.add( MenuItem.menuItemWithLabel( 'Quote suite', _onQuoteSuite ) )
 	menu.add( MenuItem.menuItemWithLabel( 'Unquote', _onUnquote ) )
 
-	menu.add( MenuItem.menuItemWithLabel( 'Insert expression', extExprMenu, MenuItem.SubmenuPopupDirection.RIGHT ) )
 	return True
 
 
@@ -401,7 +387,7 @@ class Python25View (ObjectNodeDispatchView):
 	@DMObjectNodeDispatchMethod( Schema.PythonModule )
 	def PythonModule(self, fragment, inheritedState, model, suite):
 		if len( suite ) == 0:
-			# Empty document - create a single blank line so that there is something to edit
+			# Empty module - create a single blank line so that there is something to edit
 			lineViews = [ statementLine( blankLine() ) ]
 		else:
 			lineViews = SREInnerFragment.map( suite, PRECEDENCE_NONE, EditMode.EDIT )
@@ -419,7 +405,7 @@ class Python25View (ObjectNodeDispatchView):
 	@DMObjectNodeDispatchMethod( Schema.PythonSuite )
 	def PythonSuite(self, fragment, inheritedState, model, suite):
 		if len( suite ) == 0:
-			# Empty document - create a single blank line so that there is something to edit
+			# Empty suite - create a single blank line so that there is something to edit
 			lineViews = [ statementLine( blankLine() ) ]
 		else:
 			lineViews = SREInnerFragment.map( suite, PRECEDENCE_NONE, EditMode.EDIT )
@@ -963,33 +949,6 @@ class Python25View (ObjectNodeDispatchView):
 
 		return unquote( valueView, 'UNQUOTE', PythonSyntaxRecognizingEditor.instance )
 
-
-
-	#
-	#
-	# EXTERNAL EXPRESSION
-	#
-	#
-
-	# External expression
-	@DMObjectNodeDispatchMethod( Schema.ExternalExpr )
-	@SpecialFormExpression
-	def ExternalExpr(self, fragment, inheritedState, model, expr):
-		if isinstance( expr, DMObject ):
-			schema = expr.getDMObjectClass().getSchema()
-			presenter, title = ExternalExpression.getExternalExpressionPresenterAndTitle( schema )
-			exprView = presenter( expr )
-		else:
-			exprView = Label( '<expr>' )
-			title = 'ext'
-
-		def _onDeleteButton(button, event):
-			pyReplaceNode( model, Schema.Load( name='None' ) )
-
-
-		deleteButton = Button( Image.systemIcon( 'delete_tiny' ), _onDeleteButton )
-
-		return externalExpr( exprView, title, deleteButton )
 
 
 

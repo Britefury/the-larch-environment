@@ -13,7 +13,7 @@ import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.GridRow;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.RGrid;
-import BritefuryJ.Utils.WeakValueIdentityHashMap;
+import BritefuryJ.Util.WeakValueIdentityHashMap;
 
 public class ObjectListTableEditorInstance extends AbstractTableEditorInstance<ObjectListInterface>
 {

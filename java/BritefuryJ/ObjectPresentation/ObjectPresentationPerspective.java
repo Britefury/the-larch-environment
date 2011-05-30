@@ -17,7 +17,7 @@ import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Projection.AbstractPerspective;
-import BritefuryJ.Utils.PolymorphicMap;
+import BritefuryJ.Util.PolymorphicMap;
 
 public abstract class ObjectPresentationPerspective extends AbstractPerspective
 {

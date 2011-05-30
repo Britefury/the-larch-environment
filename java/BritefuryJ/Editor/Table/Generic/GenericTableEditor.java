@@ -10,7 +10,7 @@ import BritefuryJ.Cell.PrimitiveCellEditPresenter;
 import BritefuryJ.Editor.Table.AbstractTableEditor;
 import BritefuryJ.Editor.Table.AbstractTableEditorInstance;
 import BritefuryJ.Pres.Pres;
-import BritefuryJ.Utils.UnaryFn;
+import BritefuryJ.Util.UnaryFn;
 
 public class GenericTableEditor extends AbstractTableEditor<GenericTableModelInterface>
 {

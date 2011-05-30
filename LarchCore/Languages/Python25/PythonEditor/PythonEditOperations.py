@@ -96,9 +96,11 @@ def isTopLevelFragment(fragment):
 
 
 
+
+
 #
 #
-# DOM / CONTEXT NAVIGATION
+# PRESENTATION TREE / FRAGMENT NAVIGATION
 #
 #
 
@@ -354,6 +356,40 @@ def insertSpecialFormAtCaret(caret, specialForm):
 
 
 
+
+
+#
+#
+# SELECTION / TARGET ACQUISITION
+#
+#
+
+
+def _getNodeAtMarker(marker, modelTestFn):
+	"""
+	marker - a Marker
+	modelTestFn - function(node) -> True or False
+	
+	returns
+		first node containing @marker that passes modelTestFn
+		or
+		None
+	"""
+	if marker.isValid():
+		element = marker.getElement()
+		fragment = element.getFragmentContext()
+		
+		while fragment is not None:
+			model = fragment.model
+			if modelTestFn( model ):
+				return model
+			if isTopLevel( model ):
+				return False
+	return None
+
+
+
+
 def _getSelectedNode(selection, modelTestFn):
 	"""
 	selection - a TextSelection
@@ -380,6 +416,32 @@ def _getSelectedNode(selection, modelTestFn):
 
 
 
+def getExpressionAtMarker(marker):
+	"""
+	marker - a Marker
+	
+	returns
+		expression that contains marker
+		or
+		None
+	"""
+	return _getNodeAtMarker( marker, isExpr )
+
+
+def getStatementAtMarker(marker):
+	"""
+	marker - a Marker
+	
+	returns
+		expression that contains marker
+		or
+		None
+	"""
+	return _getNodeAtMarker( marker, isStmt )
+	
+
+
+
 def getSelectedExpression(selection):
 	"""
 	selection - a TextSelection
@@ -390,8 +452,6 @@ def getSelectedExpression(selection):
 		None
 	"""
 	return _getSelectedNode( selection, isExpr )
-
-
 
 
 def getSelectedStatement(selection):

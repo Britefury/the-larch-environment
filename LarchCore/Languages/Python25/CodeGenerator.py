@@ -12,7 +12,6 @@ from BritefuryJ.DocModel import DMObject, DMList, DMEmbeddedObject, DMEmbeddedIs
 from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod, dmObjectNodeMethodDispatch
 
 from LarchCore.Languages.Python25 import Schema
-from LarchCore.Languages.Python25 import ExternalExpression
 from LarchCore.Languages.Python25.PythonEditor.Precedence import *
 
 
@@ -538,19 +537,6 @@ class Python25CodeGenerator (object):
 	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectStmt )
 	def EmbeddedObjectStmt (self, node, embeddedValue):
 		raise ValueError, 'Python25CodeGenerator does not support embedded object statements; a Python25ModuleCodeGenerator must be used'
-		
-	
-	
-	# External expression
-	@DMObjectNodeDispatchMethod( Schema.ExternalExpr )
-	def ExternalExpr(self, node, expr):
-		if isinstance( expr, DMObject ):
-			schema = expr.getDMObjectClass().getSchema()
-			codeGenFac = ExternalExpression.getExternalExpressionCodeGeneratorFactory( schema )
-			codeGen = codeGenFac( self )
-			return codeGen( expr )
-		else:
-			return 'None'
 		
 	
 	

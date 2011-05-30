@@ -13,7 +13,7 @@ import java.util.List;
 import BritefuryJ.ChangeHistory.Change;
 import BritefuryJ.ChangeHistory.ChangeHistory;
 
-class DMListCommandTracker
+class DMList_changes
 {
 	private static class AddCommand extends Change
 	{

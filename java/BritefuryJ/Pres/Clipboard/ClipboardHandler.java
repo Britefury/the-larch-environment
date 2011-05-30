@@ -13,7 +13,7 @@ import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.DocPresent.Clipboard.DataTransfer;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.Target.Target;
-import BritefuryJ.Utils.PolymorphicMap;
+import BritefuryJ.Util.PolymorphicMap;
 
 public class ClipboardHandler extends ClipboardHandlerInterface
 {

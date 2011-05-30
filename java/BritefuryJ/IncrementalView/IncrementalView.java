@@ -38,9 +38,9 @@ import BritefuryJ.Projection.ProjectiveBrowserContext;
 import BritefuryJ.Projection.Subject;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
-import BritefuryJ.Utils.HashUtils;
-import BritefuryJ.Utils.WeakIdentityHashMap;
-import BritefuryJ.Utils.Profile.ProfileTimer;
+import BritefuryJ.Util.HashUtils;
+import BritefuryJ.Util.WeakIdentityHashMap;
+import BritefuryJ.Util.Profile.ProfileTimer;
 
 public class IncrementalView extends IncrementalTree implements Presentable
 {

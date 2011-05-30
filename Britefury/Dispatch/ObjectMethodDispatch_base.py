@@ -9,7 +9,7 @@ import copy
 
 from BritefuryJ.Dispatch import ObjectDispatchPyMethodInvoker
 
-from BritefuryJ.Utils import PolymorphicMap
+from BritefuryJ.Util import PolymorphicMap
 
 import inspect
 

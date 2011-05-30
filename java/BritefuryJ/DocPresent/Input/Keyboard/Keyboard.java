@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent.Input.Keyboard;
 import java.awt.event.KeyEvent;
 
 import BritefuryJ.DocPresent.PresentationComponent;
-import BritefuryJ.Utils.PriorityList;
+import BritefuryJ.Util.PriorityList;
 
 public class Keyboard
 {

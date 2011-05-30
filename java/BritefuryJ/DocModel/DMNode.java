@@ -268,7 +268,7 @@ public abstract class DMNode
 
 	
 	
-	protected ArrayList<WeakReference<DMNode>> parents;
+	private ArrayList<WeakReference<DMNode>> parents;
 	
 	
 	public DMNode()
@@ -362,14 +362,12 @@ public abstract class DMNode
 	
 	protected void addParent(DMNode p)
 	{
-		boolean bCleaned = false;
 		for (int i = parents.size() - 1; i >= 0; i--)
 		{
 			Object x = parents.get( i ).get();
 			if ( x == null )
 			{
 				parents.remove( i );
-				bCleaned = true;
 			}
 			else if ( p == x )
 			{
@@ -377,38 +375,27 @@ public abstract class DMNode
 			}
 		}
 		parents.add( new WeakReference<DMNode>( p ) );
-		onParentListModified();
-		if ( bCleaned )
-		{
-			onParentListCleaned();
-		}
 	}
 	
 	protected void removeParent(DMNode p)
 	{
-		boolean bCleaned = false, bRemoved = false;
+		boolean bRemoved = false;
 		for (int i = parents.size() - 1; i >= 0; i--)
 		{
 			Object x = parents.get( i ).get();
 			if ( x == null )
 			{
 				parents.remove( i );
-				bCleaned = true;
 			}
 			else if ( p == x )
 			{
 				parents.remove( i );
-				onParentListModified();
 				bRemoved = true;
 			}
 		}
 		if ( !bRemoved )
 		{
 			throw new NodeNotAChildException();
-		}
-		if ( bCleaned )
-		{
-			onParentListCleaned();
 		}
 	}
 	
@@ -426,19 +413,24 @@ public abstract class DMNode
 		return p;
 	}
 	
+	public int getNumValidParents()
+	{
+		int numParents = 0;
+		for (WeakReference<DMNode> ref: parents)
+		{
+			DMNode node = ref.get();
+			if ( node != null )
+			{
+				numParents++;
+			}
+		}
+		return numParents;
+	}
+	
 	public ParentListAccessor getParentsLive()
 	{
 		return new ParentListAccessor( this );
 	}
-	
-	protected void onParentListModified()
-	{
-	}
-	
-	protected void onParentListCleaned()
-	{
-	}
-	
 	
 	public abstract Iterable<Object> getChildren();
 	

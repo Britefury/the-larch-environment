@@ -132,7 +132,6 @@ nodePrecedence[Schema.AndTest] = PRECEDENCE_AND
 nodePrecedence[Schema.OrTest] = PRECEDENCE_OR
 nodePrecedence[Schema.LambdaExpr] = PRECEDENCE_LAMBDAEXPR
 nodePrecedence[Schema.ConditionalExpr] = PRECEDENCE_CONDITIONAL
-nodePrecedence[Schema.ExternalExpr] = PRECEDENCE_EXTERNALEXPR
 
 nodePrecedence[Schema.EmbeddedObjectExpr] = PRECEDENCE_EMBEDDEDOBJECTEXPR
 nodePrecedence[Schema.EmbeddedObjectStmt] = PRECEDENCE_STMT

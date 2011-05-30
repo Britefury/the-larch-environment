@@ -31,7 +31,7 @@ import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.JythonInterface.JythonIndex;
 import BritefuryJ.JythonInterface.JythonSlice;
 import BritefuryJ.Pres.Pres;
-import BritefuryJ.Utils.HashUtils;
+import BritefuryJ.Util.HashUtils;
 
 public class DMList extends DMNode implements DMListInterface, Trackable, IncrementalOwner, Presentable
 {
@@ -446,7 +446,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Increm
 		}
 		boolean bResult = value.add( x );
 		incr.onChanged();
-		DMListCommandTracker.onAdd( changeHistory, this, x );
+		DMList_changes.onAdd( changeHistory, this, x );
 		return bResult;
 	}
 	
@@ -459,7 +459,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Increm
 		}
 		value.add( index, x );
 		incr.onChanged();
-		DMListCommandTracker.onInsert( changeHistory, this, index, x );
+		DMList_changes.onInsert( changeHistory, this, index, x );
 	}
 	
 	public boolean addAll(Collection<?> xs)
@@ -478,7 +478,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Increm
 		
 		value.addAll( cxs );
 		incr.onChanged();
-		DMListCommandTracker.onAddAll( changeHistory, this, cxs );
+		DMList_changes.onAddAll( changeHistory, this, cxs );
 		return true;
 	}
 	
@@ -498,7 +498,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Increm
 		
 		value.addAll( index, cxs );
 		incr.onChanged();
-		DMListCommandTracker.onInsertAll( changeHistory, this, index, cxs );
+		DMList_changes.onInsertAll( changeHistory, this, index, cxs );
 		return true;
 	}
 	
@@ -517,7 +517,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Increm
 				((DMNode)x).removeParent( this );
 			}
 		}
-		DMListCommandTracker.onClear( changeHistory, this, copy );
+		DMList_changes.onClear( changeHistory, this, copy );
 	}
 	
 	
@@ -635,7 +635,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Increm
 			((DMNode)x).removeParent( this );
 		}
 		incr.onChanged();
-		DMListCommandTracker.onRemove( changeHistory, this, i, x );
+		DMList_changes.onRemove( changeHistory, this, i, x );
 		return x;
 	}
 	
@@ -650,7 +650,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Increm
 				((DMNode)x).removeParent( this );
 			}
 			incr.onChanged();
-			DMListCommandTracker.onRemove( changeHistory, this, i, x );
+			DMList_changes.onRemove( changeHistory, this, i, x );
 		}
 		return i != -1;
 	}
@@ -681,7 +681,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Increm
 			}
 		}
 		incr.onChanged();
-		DMListCommandTracker.onSet( changeHistory, this, index, oldX, x );
+		DMList_changes.onSet( changeHistory, this, index, oldX, x );
 		return oldX;
 	}
 	
@@ -796,7 +796,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Increm
 			}
 		}
 		incr.onChanged();
-		DMListCommandTracker.onSetContents( changeHistory, this, oldContents, result );
+		DMList_changes.onSetContents( changeHistory, this, oldContents, result );
 	}
 	
 	public void __delitem__(int i)
@@ -830,7 +830,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Increm
 			}
 		}
 		incr.onChanged();
-		DMListCommandTracker.onSetContents( changeHistory, this, oldContents, result );
+		DMList_changes.onSetContents( changeHistory, this, oldContents, result );
 	}
 	
 	public Object pop()
@@ -1040,7 +1040,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Increm
 		}
 		incr.onChanged();
 	
-		DMListCommandTracker.onRemoveLast( changeHistory, this, removedValues );
+		DMList_changes.onRemoveLast( changeHistory, this, removedValues );
 	}
 
 
@@ -1059,7 +1059,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Increm
 		}
 		incr.onChanged();
 		
-		DMListCommandTracker.onRemoveRange( changeHistory, this, start, removedValues );
+		DMList_changes.onRemoveRange( changeHistory, this, start, removedValues );
 	}
 
 
@@ -1104,7 +1104,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Increm
 		}
 		incr.onChanged();
 	
-		DMListCommandTracker.onSetContents( changeHistory, this, oldContents, newContents );
+		DMList_changes.onSetContents( changeHistory, this, oldContents, newContents );
 	}
 
 

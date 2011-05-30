@@ -30,7 +30,7 @@ import java.util.Map;
 
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.Math.Point2;
-import BritefuryJ.Utils.HashUtils;
+import BritefuryJ.Util.HashUtils;
 
 
 

@@ -23,7 +23,7 @@ import BritefuryJ.DocPresent.Selection.SelectionPoint;
 import BritefuryJ.DocPresent.Selection.TextSelectionPoint;
 import BritefuryJ.DocPresent.Target.Target;
 import BritefuryJ.Math.Point2;
-import BritefuryJ.Utils.AnimUtils;
+import BritefuryJ.Util.AnimUtils;
 
 public class Caret extends Target implements MarkerListener
 {
