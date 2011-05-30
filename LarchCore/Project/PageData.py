@@ -14,6 +14,8 @@ from javax.swing import JFileChooser
 from javax.swing.filechooser import FileNameExtensionFilter
 
 
+from BritefuryJ.DocModel import DMNode
+
 from BritefuryJ.Controls import *
 from BritefuryJ.ChangeHistory import Trackable
 
@@ -30,11 +32,16 @@ class PageData (object):
 			self.contents = self.makeEmptyContents()
 		else:
 			self.contents = contents
+		self._contentsPostInit( self.contents )
 	
 			
 	@abstractmethod
 	def makeEmptyContents(self):
 		pass
+	
+	def _contentsPostInit(self, contents):
+		if isinstance( contents, DMNode ):
+			contents.realiseAsRoot()
 
 	
 	@abstractmethod
@@ -48,6 +55,7 @@ class PageData (object):
 	def __setstate__(self, state):
 		self.__change_history__ = None
 		self.contents = state['contents']
+		self._contentsPostInit( self.contents )
 	
 	def __copy__(self):
 		T = type( self )

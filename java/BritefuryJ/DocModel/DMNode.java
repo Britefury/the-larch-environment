@@ -6,10 +6,6 @@
 //##************************
 package BritefuryJ.DocModel;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import org.python.core.Py;
@@ -55,207 +51,6 @@ public abstract class DMNode
 	}
 	
 	
-	public static class ParentListIterator implements Iterator<DMNode>
-	{
-		Iterator<WeakReference<DMNode>> iter;
-		
-		private ParentListIterator(Iterator<WeakReference<DMNode>> iter)
-		{
-			this.iter = iter;
-		}
-		
-		
-		public boolean hasNext()
-		{
-			return iter.hasNext();
-		}
-
-		public DMNode next()
-		{
-			return iter.next().get();
-		}
-
-		public void remove()
-		{
-			throw new UnsupportedOperationException();
-		}
-	}
-	
-	
-	public static class ParentListAccessor implements Collection<DMNode>
-	{
-		private DMNode node;
-		
-		
-		
-		private ParentListAccessor(DMNode node)
-		{
-			this.node = node;
-		}
-		
-		
-		
-		public boolean add(DMNode e)
-		{
-			throw new UnsupportedOperationException();
-		}
-
-		public boolean addAll(Collection<? extends DMNode> c)
-		{
-			throw new UnsupportedOperationException();
-		}
-
-		public void clear()
-		{
-			throw new UnsupportedOperationException();
-		}
-
-		public boolean contains(Object o)
-		{
-			for (WeakReference<DMNode> ref: node.parents)
-			{
-				if ( o == ref.get() )
-				{
-					return true;
-				}
-			}
-			return false;
-		}
-
-		public boolean containsAll(Collection<?> c)
-		{
-			for (Object x: c)
-			{
-				if ( !contains( x ) )
-				{
-					return false;
-				}
-			}
-			return true;
-		}
-		
-		public boolean isEmpty()
-		{
-			return node.parents.isEmpty();
-		}
-
-		public Iterator<DMNode> iterator()
-		{
-			return new ParentListIterator( node.parents.iterator() );
-		}
-
-		public boolean remove(Object o)
-		{
-			throw new UnsupportedOperationException();
-		}
-
-		public boolean removeAll(Collection<?> c)
-		{
-			throw new UnsupportedOperationException();
-		}
-
-		public boolean retainAll(Collection<?> c)
-		{
-			throw new UnsupportedOperationException();
-		}
-
-		public int size()
-		{
-			return node.parents.size();
-		}
-
-		public Object[] toArray()
-		{
-			Object p[] = new Object[node.parents.size()];
-			int i = 0;
-			for (WeakReference<DMNode> ref: node.parents)
-			{
-				p[i++] = ref.get();
-			}
-			return p;
-		}
-
-		@SuppressWarnings("unchecked")
-		public <T> T[] toArray(T[] a)
-		{
-			if ( a.length != node.parents.size() )
-			{
-				a = (T[])new Object[node.parents.size()];
-			}
-			int i = 0;
-			for (WeakReference<DMNode> ref: node.parents)
-			{
-				a[i++] = (T)ref.get();
-			}
-			return a;
-		}
-	
-	
-	
-		public int __len__()
-		{
-			return node.parents.size();
-		}
-		
-		public int count(Object x)
-		{
-			return contains( x )  ?  1  :  0;
-		}
-		
-		
-		
-		public ArrayList<DMNode> getValidParents()
-		{
-			ArrayList<DMNode> p = new ArrayList<DMNode>();
-			for (WeakReference<DMNode> ref: node.parents)
-			{
-				DMNode node = ref.get();
-				if ( node != null )
-				{
-					p.add( node );
-				}
-			}
-			return p;
-		}
-		
-		
-		
-		@SuppressWarnings("unchecked")
-		public boolean equals(Object x)
-		{
-			if ( x == this )
-			{
-				return true;
-			}
-
-			if ( x instanceof Collection<?> )
-			{
-				Collection<DMNode> cx = (Collection<DMNode>)x;
-				
-				if ( size() == cx.size() )
-				{
-					for (DMNode p: cx)
-					{
-						if ( !contains( p ) )
-						{
-							return false;
-						}
-					}
-					return true;
-				}
-				else
-				{
-					return false;
-				}
-			}
-			
-			return false;
-		}
-	}
-	
-	
-	
-	
 	public static class NodeAlreadyAChildException extends RuntimeException
 	{
 		private static final long serialVersionUID = 1L;
@@ -268,12 +63,11 @@ public abstract class DMNode
 
 	
 	
-	private ArrayList<WeakReference<DMNode>> parents;
+	private DMNode parent;
 	
 	
 	public DMNode()
 	{
-		parents = new ArrayList<WeakReference<DMNode>>();
 	}
 	
 	
@@ -360,77 +154,75 @@ public abstract class DMNode
 	public abstract DMNodeClass getDMNodeClass();
 	
 	
-	protected void addParent(DMNode p)
+	protected void notifyAddChild(Object c)
 	{
-		for (int i = parents.size() - 1; i >= 0; i--)
+		if ( isRealised()  &&  c instanceof DMNode )
 		{
-			Object x = parents.get( i ).get();
-			if ( x == null )
-			{
-				parents.remove( i );
-			}
-			else if ( p == x )
-			{
-				throw new NodeAlreadyAChildException();
-			}
-		}
-		parents.add( new WeakReference<DMNode>( p ) );
-	}
-	
-	protected void removeParent(DMNode p)
-	{
-		boolean bRemoved = false;
-		for (int i = parents.size() - 1; i >= 0; i--)
-		{
-			Object x = parents.get( i ).get();
-			if ( x == null )
-			{
-				parents.remove( i );
-			}
-			else if ( p == x )
-			{
-				parents.remove( i );
-				bRemoved = true;
-			}
-		}
-		if ( !bRemoved )
-		{
-			throw new NodeNotAChildException();
+			((DMNode)c).realiseSubtree( this );
 		}
 	}
 	
-	public ArrayList<DMNode> getValidParents()
+	protected void notifyRemoveChild(Object c)
 	{
-		ArrayList<DMNode> p = new ArrayList<DMNode>();
-		for (WeakReference<DMNode> ref: parents)
+		if ( isRealised()  &&  c instanceof DMNode )
 		{
-			DMNode node = ref.get();
-			if ( node != null )
-			{
-				p.add( node );
-			}
+			((DMNode)c).unrealiseSubtree( this );
 		}
-		return p;
 	}
 	
-	public int getNumValidParents()
+	private void realiseSubtree(DMNode p)
 	{
-		int numParents = 0;
-		for (WeakReference<DMNode> ref: parents)
+		if ( parent != p )
 		{
-			DMNode node = ref.get();
-			if ( node != null )
+			parent = p;
+			for (Object child: getChildren())
 			{
-				numParents++;
+				if ( child instanceof DMNode )
+				{
+					((DMNode)child).realiseSubtree( this );
+				}
 			}
 		}
-		return numParents;
 	}
 	
-	public ParentListAccessor getParentsLive()
+	private void unrealiseSubtree(DMNode p)
 	{
-		return new ParentListAccessor( this );
+		if ( parent == p )
+		{
+			parent = null;
+			for (Object child: getChildren())
+			{
+				if ( child instanceof DMNode )
+				{
+					((DMNode)child).unrealiseSubtree( this );
+				}
+			}
+		}
 	}
+	
+	
+	public boolean isRealised()
+	{
+		return parent != null;
+	}
+	
+
+	public void realiseAsRoot()
+	{
+		if ( !isRealised() )
+		{
+			realiseSubtree( this );
+		}
+	}
+	
+	
+	
+	public DMNode getParent()
+	{
+		// Handle the case where @this has been realised as a root
+		return parent == this  ?  null  :  parent;
+	}
+	
 	
 	public abstract Iterable<Object> getChildren();
 	

@@ -93,7 +93,7 @@ class PythonSyntaxRecognizingEditor (SyntaxRecognizingEditor):
 		viewContext = fragment.getView()
 		selection = viewContext.getSelection()
 		
-		if selection is None  or  not isinstance( selection, TextSelection ):
+		if selection is None  or  not isinstance( selection, TextSelection )  or  not selection.isValid():
 			self._indentLine( element, fragment, node )
 		else:
 			startMarker = selection.getStartMarker()
@@ -114,7 +114,7 @@ class PythonSyntaxRecognizingEditor (SyntaxRecognizingEditor):
 		viewContext = fragment.getView()
 		selection = viewContext.getSelection()
 		
-		if selection is None  or  not isinstance( selection, TextSelection ):
+		if selection is None  or  not isinstance( selection, TextSelection )  or  not selection.isValid():
 			self._dedentLine( element, fragment, node )
 		else:
 			startMarker = selection.getStartMarker()
@@ -143,8 +143,8 @@ class PythonSyntaxRecognizingEditor (SyntaxRecognizingEditor):
 	
 	
 	def _dedentLine(self, element, fragment, node):
-		suite = node.getValidParents()[0]
-		suiteParent = suite.getValidParents()[0]
+		suite = node.getParent()
+		suiteParent = suite.getParent()
 		if not suiteParent.isInstanceOf( Schema.PythonModule ):
 			# This statement is not in the root node
 			event = PythonDedentTreeEvent()

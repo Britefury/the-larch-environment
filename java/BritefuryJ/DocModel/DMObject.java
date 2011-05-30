@@ -70,10 +70,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, In
 		for (int i = 0; i < numToCopy; i++)
 		{
 			Object x = coerce( values[i] );
-			if ( x instanceof DMNode )
-			{
-				((DMNode)x).addParent( this );
-			}
+			notifyAddChild( x );
 			fieldData[i] = coerce( x );
 		}
 	}
@@ -88,10 +85,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, In
 		for (int i = 0; i < numToCopy; i++)
 		{
 			Object x = coerce( Py.tojava( values[i], Object.class ) );
-			if ( x instanceof DMNode )
-			{
-				((DMNode)x).addParent( this );
-			}
+			notifyAddChild( x );
 			fieldData[i] = x;
 		}
 	}
@@ -114,10 +108,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, In
 			else
 			{
 				Object x = coerce( values[i] );
-				if ( x instanceof DMNode )
-				{
-					((DMNode)x).addParent( this );
-				}
+				notifyAddChild( x );
 				fieldData[index] = x;
 			}
 		}
@@ -141,10 +132,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, In
 			else
 			{
 				Object x = coerce( Py.tojava( values[i], Object.class ) );
-				if ( x instanceof DMNode )
-				{
-					((DMNode)x).addParent( this );
-				}
+				notifyAddChild( x );
 				fieldData[index] = x;
 			}
 		}
@@ -159,10 +147,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, In
 		for (int i = 0; i < fieldData.length; i++)
 		{
 			Object x = coerce( obj.get( i ) );
-			if ( x instanceof DMNode )
-			{
-				((DMNode)x).addParent( this );
-			}
+			notifyAddChild( x );
 			fieldData[i] = x;
 		}
 	}
@@ -177,10 +162,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, In
 		for (int i = 0; i < numToCopy; i++)
 		{
 			Object x = coerce( Py.tojava( values[i+1], Object.class ) );
-			if ( x instanceof DMNode )
-			{
-				((DMNode)x).addParent( this );
-			}
+			notifyAddChild( x );
 			fieldData[i] = x;
 		}
 	}
@@ -214,10 +196,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, In
 				else
 				{
 					Object x = coerce( Py.tojava( values[i+1], Object.class ) );
-					if ( x instanceof DMNode )
-					{
-						((DMNode)x).addParent( this );
-					}
+					notifyAddChild( x );
 					fieldData[index] = x;
 				}
 			}
@@ -240,10 +219,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, In
 			else
 			{
 				Object x = coerce( entry.getValue() );
-				if ( x instanceof DMNode )
-				{
-					((DMNode)x).addParent( this );
-				}
+				notifyAddChild( x );
 				fieldData[index] = x;
 			}
 		}
@@ -279,10 +255,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, In
 			else
 			{
 				Object x = coerce( Py.tojava( (PyObject)entry.getValue(), Object.class ) );
-				if ( x instanceof DMNode )
-				{
-					((DMNode)x).addParent( this );
-				}
+				notifyAddChild( x );
 				fieldData[index] = x;
 			}
 		}
@@ -375,14 +348,8 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, In
 		fieldData[index] = x;
 		if ( oldX != x )
 		{
-			if ( oldX instanceof DMNode )
-			{
-				((DMNode)oldX).removeParent( this );
-			}
-			if ( x instanceof DMNode )
-			{
-				((DMNode)x).addParent( this );
-			}
+			notifyAddChild( x );
+			notifyRemoveChild( oldX );
 		}
 		incr.onChanged();
 		DMObject_changes.onSet( changeHistory, this, index, oldX, x );
@@ -445,14 +412,8 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, In
 				Object x = coerce( e.getValue() );
 				if ( oldX != x )
 				{
-					if ( oldX instanceof DMNode )
-					{
-						((DMNode)oldX).removeParent( this );
-					}
-					if ( x instanceof DMNode )
-					{
-						((DMNode)x).addParent( this );
-					}
+					notifyAddChild( x );
+					notifyRemoveChild( oldX );
 				}
 				indices[i] = index;
 				oldContents[i] = oldX;
@@ -478,14 +439,8 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, In
 			Object x = coerce( xs[i] );
 			if ( oldX != x )
 			{
-				if ( oldX instanceof DMNode )
-				{
-					((DMNode)oldX).removeParent( this );
-				}
-				if ( x instanceof DMNode )
-				{
-					((DMNode)x).addParent( this );
-				}
+				notifyAddChild( x );
+				notifyRemoveChild( oldX );
 			}
 			oldContents[i] = fieldData[index];
 			newContents[i] = x;
@@ -524,19 +479,13 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, In
 		}
 		System.arraycopy( data, 0, fieldData, 0, data.length );
 		
-		for (Object x: oldFieldData)
-		{
-			if ( x instanceof DMNode )
-			{
-				((DMNode)x).removeParent( this );
-			}
-		}
 		for (Object x: data)
 		{
-			if ( x instanceof DMNode )
-			{
-				((DMNode)x).addParent( this );
-			}
+			notifyAddChild( x );
+		}
+		for (Object x: oldFieldData)
+		{
+			notifyRemoveChild( x );
 		}
 		DMObjectClass oldClass = objClass;
 		objClass = cls;

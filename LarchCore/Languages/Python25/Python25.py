@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2010.
 ##-*************************
+from copy import deepcopy
+
 from LarchCore.Languages.Python25 import Schema
 from LarchCore.Languages.Python25.Python25Importer import importPy25File
 from LarchCore.Languages.Python25.PythonEditor.View import perspective as python25EditorPerspective
@@ -33,6 +35,7 @@ class EmbeddedPython25 (object):
 	def __init__(self, model):
 		self.model = model
 		self.__change_history__ = None
+		self.model.realiseAsRoot()
 	
 	
 	def __getstate__(self):
@@ -40,6 +43,14 @@ class EmbeddedPython25 (object):
 	
 	def __setstate__(self, state):
 		self.model = state['model']
+		self.model.realiseAsRoot()
+		
+	
+	def __copy__(self):
+		return EmbeddedPython25( self.model )
+	
+	def __deepcopy__(self, memo):
+		return EmbeddedPython25( deepcopy( self.model, memo ) )
 	
 	
 	def __get_trackable_contents__(self):
@@ -92,7 +103,8 @@ class Python25PageData (PageData):
 	
 	def __new_subject__(self, document, enclosingSubject, location, title):
 		return Python25Subject( document, self.contents, enclosingSubject, location, title )
-	
+
+
 def _py25ImportPage(filename):
 	content = importPy25File( filename )
 	return Python25PageData( content )	
