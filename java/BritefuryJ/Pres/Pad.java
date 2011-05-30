@@ -15,7 +15,7 @@ import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleValues;
-import BritefuryJ.Utils.HashUtils;
+import BritefuryJ.Util.HashUtils;
 
 public class Pad extends Pres
 {

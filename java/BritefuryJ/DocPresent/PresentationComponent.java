@@ -75,7 +75,7 @@ import BritefuryJ.Logging.LogEntry;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
-import BritefuryJ.Utils.WeakIdentityHashMap;
+import BritefuryJ.Util.WeakIdentityHashMap;
 
 public class PresentationComponent extends JComponent implements ComponentListener, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, HierarchyListener, FocusListener
 {

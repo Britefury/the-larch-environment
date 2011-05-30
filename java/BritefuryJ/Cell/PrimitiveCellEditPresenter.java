@@ -26,7 +26,7 @@ import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Region;
 import BritefuryJ.Pres.Primitive.Text;
 import BritefuryJ.StyleSheet.StyleSheet;
-import BritefuryJ.Utils.UnaryFn;
+import BritefuryJ.Util.UnaryFn;
 
 public class PrimitiveCellEditPresenter
 {

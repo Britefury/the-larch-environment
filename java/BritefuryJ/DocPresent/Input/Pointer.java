@@ -20,7 +20,7 @@ import BritefuryJ.DocPresent.Event.PointerEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
 import BritefuryJ.Math.Point2;
-import BritefuryJ.Utils.PriorityList;
+import BritefuryJ.Util.PriorityList;
 
 
 

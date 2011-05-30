@@ -15,7 +15,7 @@ import org.python.core.PyTuple;
 import org.python.core.PyType;
 import org.python.core.__builtin__;
 
-import BritefuryJ.Utils.PolymorphicMap;
+import BritefuryJ.Util.PolymorphicMap;
 
 public class ObjectPyMethodDispatch
 {

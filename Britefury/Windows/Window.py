@@ -21,8 +21,6 @@ from java.beans import PropertyChangeListener
 
 from BritefuryJ.ChangeHistory import ChangeHistory, ChangeHistoryListener
 
-from BritefuryJ.Utils.Profile import ProfileTimer
-
 from BritefuryJ.DocModel import DMIOReader, DMIOWriter, DMNode
 
 from BritefuryJ.DocPresent import *

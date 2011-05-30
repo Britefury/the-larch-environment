@@ -21,7 +21,7 @@ import BritefuryJ.Math.Point2;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleSheet;
-import BritefuryJ.Utils.WeakIdentityHashMap;
+import BritefuryJ.Util.WeakIdentityHashMap;
 
 public abstract class DPContentLeafEditable extends DPContentLeaf
 {

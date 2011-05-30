@@ -18,7 +18,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementPreview;
 import BritefuryJ.DocPresent.Clipboard.LocalDataFlavor;
 import BritefuryJ.Math.Point2;
-import BritefuryJ.Utils.HashUtils;
+import BritefuryJ.Util.HashUtils;
 
 
 public class ObjectDndHandler extends DndHandler

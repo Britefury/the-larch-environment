@@ -4,60 +4,50 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.Utils;
+package BritefuryJ.Util;
 
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 
-class WeakValue <Value, Key> extends WeakReference<Value>
+class WeakIdKey extends WeakReference<Object>
 {
-	protected Key key;
+	private int hashCode;
 	
 	
-	public WeakValue(Value val)
+	public WeakIdKey(Object key)
 	{
-		super( val );
-		this.key = null;
+		super( key );
+		this.hashCode = System.identityHashCode( key );
 	}
 	
-	public WeakValue(Value val, Key key)
+	public WeakIdKey(Object key, ReferenceQueue<Object> queue)
 	{
-		super( val );
-		this.key = key;
-	}
-	
-	public WeakValue(Value val, ReferenceQueue<Value> refQueue, Key key)
-	{
-		super( val, refQueue );
-		this.key = key;
+		super( key, queue );
+		this.hashCode = System.identityHashCode( key );
 	}
 	
 	
-	@SuppressWarnings("unchecked")
-	@Override
 	public boolean equals(Object x)
 	{
 		if ( x == this )
 		{
 			return true;
 		}
-		else if ( x instanceof Reference )
+		
+		if ( x instanceof Reference )
 		{
-			Value v = get();
-			return v.equals( ((Reference<Value>)x).get() );
+			Reference<?> r = (Reference<?>)x;
+			return get() == r.get();
 		}
 		else
 		{
-			Value v = get();
-			return v.equals( x );
+			return get() == x;
 		}
 	}
 	
-	@Override
 	public int hashCode()
 	{
-		Value v = get();
-		return v != null  ?  v.hashCode()  :  0;
+		return hashCode;
 	}
 }

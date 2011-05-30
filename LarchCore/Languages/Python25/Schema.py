@@ -128,10 +128,6 @@ Quote = schema.newClass( 'Quote', Expr, [ 'value' ] )
 Unquote = schema.newClass( 'Unquote', Expr, [ 'value' ] )
 
 
-# Special externally provided expression
-ExternalExpr = schema.newClass( 'ExternalExpr', Expr, [ 'expr' ] )
-
-
 #
 # Simple statements
 #
@@ -237,6 +233,27 @@ PythonTarget = schema.newClass( 'PythonTarget', TopLevel, [ 'target' ] )
 
 #
 #
+# Embedded object utilities
+#
+#
+
+def getEmbeddedObjectModelType(value):
+	if hasattr( value, '__py_execmodel__' )  or  hasattr( value, '__py_exec__' )  or  ( hasattr( value, '__py_localnames__' ) and hasattr( value, '__py_localvalues__' ) ):
+		# Statement methods
+		return Stmt
+	elif hasattr( value, '__py_evalmodel__' )  or  hasattr( value, '__py_eval__' ):
+		# Expression methods
+		return Expr
+	else:
+		# Fallback - use as value
+		return Expr
+
+
+
+
+
+#
+#
 # Version 1 backwards compatibility
 #
 #
@@ -297,19 +314,3 @@ def _readInlineObjectStmt_v3(fieldValues):
 
 schema.registerReader( 'InlineObjectExpr', 3, _readInlineObjectExpr_v3 )
 schema.registerReader( 'InlineObjectStmt', 3, _readInlineObjectStmt_v3 )
-
-
-
-
-
-
-def getEmbeddedObjectModelType(value):
-	if hasattr( value, '__py_execmodel__' )  or  hasattr( value, '__py_exec__' )  or  ( hasattr( value, '__py_localnames__' ) and hasattr( value, '__py_localvalues__' ) ):
-		# Statement methods
-		return Stmt
-	elif hasattr( value, '__py_evalmodel__' )  or  hasattr( value, '__py_eval__' ):
-		# Expression methods
-		return Expr
-	else:
-		# Fallback - use as value
-		return Expr

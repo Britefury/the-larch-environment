@@ -4,8 +4,9 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.Utils;
+package BritefuryJ.Util;
 
+import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -16,27 +17,19 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-public class WeakValueHashMap <Key, Value> implements Map<Key, Value>
+public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 {
-	private static <Key, Value> Map.Entry<Key, WeakValue<Value, Key>> weakEntry(Map.Entry<Key, Value> e)
+	private static <Key, Value> Map.Entry<WeakIdKey, Value> weakEntry(Map.Entry<Key, Value> e)
 	{
-		return new AbstractMap.SimpleImmutableEntry<Key, WeakValue<Value, Key>>( e.getKey(), new WeakValue<Value, Key>( e.getValue(), e.getKey() ) );
+		return new AbstractMap.SimpleImmutableEntry<WeakIdKey, Value>( new WeakIdKey( e.getKey() ), e.getValue() );
 	}
 	
 	
-	private static <Key, Value> WeakValue<Value, Key> weakValue(Value v)
-	{
-		return new WeakValue<Value, Key>( v );
-	}
-	
-	
-	
-	
-	private class ValueIterator implements Iterator<Value>
+	private class KeyIterator implements Iterator<Key>
 	{
 		private Iterator<Map.Entry<Key, Value>> iter;
 		
-		private ValueIterator(Iterator<Map.Entry<Key, Value>> iter)
+		private KeyIterator(Iterator<Map.Entry<Key, Value>> iter)
 		{
 			this.iter = iter;
 		}
@@ -48,9 +41,10 @@ public class WeakValueHashMap <Key, Value> implements Map<Key, Value>
 		}
 
 		
-		public Value next()
+		public Key next()
 		{
-			return iter.next().getValue();
+			Map.Entry<Key, Value> e = iter.next();
+			return e.getKey();
 		}
 
 		
@@ -60,53 +54,53 @@ public class WeakValueHashMap <Key, Value> implements Map<Key, Value>
 		}
 	}
 	
-	private class ValueCollection implements Collection<Value>
+	private class KeySet implements Set<Key>
 	{
-		private Collection<WeakValue<Value, Key>> col;
+		private Set<WeakIdKey> set;
 		
-		private ValueCollection(Collection<WeakValue<Value, Key>> col)
+		private KeySet(Set<WeakIdKey> set)
 		{
-			this.col = col;
+			this.set = set;
 		}
 
 		
 		public int size()
 		{
 			cleanup();
-			return WeakValueHashMap.this.size();
+			return WeakIdentityHashMap.this.size();
 		}
 
 		
 		public boolean isEmpty()
 		{
 			cleanup();
-			return WeakValueHashMap.this.isEmpty();
+			return WeakIdentityHashMap.this.isEmpty();
 		}
 
 		
 		public boolean contains(Object o)
 		{
 			cleanup();
-			return col.contains( weakValue( o ) );
+			return WeakIdentityHashMap.this.containsKey( o );
 		}
 
 		
-		public Iterator<Value> iterator()
+		public Iterator<Key> iterator()
 		{
 			cleanup();
-			return new ValueIterator( WeakValueHashMap.this.entrySet().iterator() );
+			return new KeyIterator( WeakIdentityHashMap.this.entrySet().iterator() );
 		}
 
 		
 		public Object[] toArray()
 		{
 			cleanup();
-			ArrayList<Object> values = new ArrayList<Object>();
-			for (Map.Entry<Key, Value> e: WeakValueHashMap.this.entrySet())
+			ArrayList<Object> keys = new ArrayList<Object>();
+			for (Map.Entry<Key, Value> e: WeakIdentityHashMap.this.entrySet())
 			{
-				values.add( e.getValue() );
+				keys.add( e.getKey() );
 			}
-			return values.toArray();
+			return keys.toArray();
 		}
 
 		@SuppressWarnings("unchecked")
@@ -114,16 +108,16 @@ public class WeakValueHashMap <Key, Value> implements Map<Key, Value>
 		public <T> T[] toArray(T[] a)
 		{
 			cleanup();
-			ArrayList<T> values = new ArrayList<T>();
-			for (Map.Entry<Key, Value> e: WeakValueHashMap.this.entrySet())
+			ArrayList<T> keys = new ArrayList<T>();
+			for (Map.Entry<Key, Value> e: WeakIdentityHashMap.this.entrySet())
 			{
-				values.add( (T)e.getValue() );
+				keys.add( (T)e.getKey() );
 			}
-			return values.toArray( a );
+			return keys.toArray( a );
 		}
 
 		
-		public boolean add(Value v)
+		public boolean add(Key e)
 		{
 			throw new UnsupportedOperationException();
 		}
@@ -132,7 +126,7 @@ public class WeakValueHashMap <Key, Value> implements Map<Key, Value>
 		public boolean remove(Object o)
 		{
 			cleanup();
-			return col.remove( weakValue( o ) );
+			return set.remove( new WeakIdKey( o ) );
 		}
 
 		
@@ -141,7 +135,7 @@ public class WeakValueHashMap <Key, Value> implements Map<Key, Value>
 			cleanup();
 			for (Object x: c)
 			{
-				if ( !col.contains( weakValue( x ) ) )
+				if ( !contains( x ) )
 				{
 					return false;
 				}
@@ -150,42 +144,40 @@ public class WeakValueHashMap <Key, Value> implements Map<Key, Value>
 		}
 
 		
-		public boolean addAll(Collection<? extends Value> c)
+		public boolean addAll(Collection<? extends Key> c)
 		{
 			throw new UnsupportedOperationException();
 		}
 
-		@SuppressWarnings("unchecked")
 		
 		public boolean retainAll(Collection<?> c)
 		{
 			cleanup();
-			ArrayList<WeakValue<Value, Key>> xs = new ArrayList<WeakValue<Value, Key>>(); 
+			ArrayList<WeakIdKey> xs = new ArrayList<WeakIdKey>(); 
 			for (Object x: c)
 			{
-				xs.add( (WeakValue<Value, Key>)weakValue( x ) );
+				xs.add( new WeakIdKey( x ) );
 			}
-			return col.retainAll( xs );
+			return set.retainAll( xs );
 		}
 
-		@SuppressWarnings("unchecked")
 		
 		public boolean removeAll(Collection<?> c)
 		{
 			cleanup();
-			ArrayList<WeakValue<Value, Key>> xs = new ArrayList<WeakValue<Value, Key>>(); 
+			ArrayList<WeakIdKey> xs = new ArrayList<WeakIdKey>(); 
 			for (Object x: c)
 			{
-				xs.add( (WeakValue<Value, Key>)weakValue( x ) );
+				xs.add( new WeakIdKey( x ) );
 			}
-			return col.removeAll( xs );
+			return set.removeAll( xs );
 		}
 
 		
 		public void clear()
 		{
 			cleanup();
-			WeakValueHashMap.this.clear();
+			WeakIdentityHashMap.this.clear();
 		}
 	}
 	
@@ -193,43 +185,41 @@ public class WeakValueHashMap <Key, Value> implements Map<Key, Value>
 	
 	private static class Entry <Key, Value> implements Map.Entry<Key, Value>
 	{
-		private Map.Entry<Key, WeakValue<Value, Key>> e;
-		private Value v;
+		private Map.Entry<WeakIdKey, Value> e;
+		private Key k;
 		
-		public Entry(Map.Entry<Key, WeakValue<Value, Key>> e)
+		@SuppressWarnings("unchecked")
+		public Entry(Map.Entry<WeakIdKey, Value> e)
 		{
 			this.e = e;
-			this.v = e.getValue().get();
+			this.k = (Key)e.getKey().get();
 		}
 
 		
 		public Key getKey()
 		{
-			return e.getKey();
+			return k;
 		}
 
 		
 		public Value getValue()
 		{
-			return v;
+			return e.getValue();
 		}
 
 		
 		public Value setValue(Value value)
 		{
-			this.v = value;
-			WeakValue<Value, Key> w = new WeakValue<Value, Key>( value );
-			w = e.setValue( w );
-			return w.get();
+			return e.setValue( value );
 		}
 	}
 	
 	private class EntryIterator implements Iterator<Map.Entry<Key, Value>>
 	{
-		private Iterator<Map.Entry<Key, WeakValue<Value, Key>>> iter;
+		private Iterator<Map.Entry<WeakIdKey, Value>> iter;
 		private Entry<Key, Value> next = null;
 		
-		private EntryIterator(Iterator<Map.Entry<Key, WeakValue<Value, Key>>> iter)
+		private EntryIterator(Iterator<Map.Entry<WeakIdKey, Value>> iter)
 		{
 			this.iter = iter;
 			next = fetchNext();
@@ -270,14 +260,15 @@ public class WeakValueHashMap <Key, Value> implements Map<Key, Value>
 			throw new UnsupportedOperationException();
 		}
 
-		
+	
 		private Entry<Key, Value> fetchNext()
 		{
 			while ( iter.hasNext() )
 			{
-				Map.Entry<Key, WeakValue<Value, Key>> e = iter.next();
-				Value v = e.getValue().get();
-				if ( v != null )
+				Map.Entry<WeakIdKey, Value> e = iter.next();
+				@SuppressWarnings("unchecked")
+				Key k = (Key)e.getKey().get();
+				if ( k != null )
 				{
 					return new Entry<Key, Value>( e );
 				}
@@ -288,9 +279,9 @@ public class WeakValueHashMap <Key, Value> implements Map<Key, Value>
 	
 	private class EntrySet implements Set<Map.Entry<Key, Value>>
 	{
-		private Set<Map.Entry<Key, WeakValue<Value, Key>>> set;
+		private Set<Map.Entry<WeakIdKey, Value>> set;
 		
-		private EntrySet(Set<Map.Entry<Key, WeakValue<Value, Key>>> set)
+		private EntrySet(Set<Map.Entry<WeakIdKey, Value>> set)
 		{
 			this.set = set;
 		}
@@ -299,14 +290,14 @@ public class WeakValueHashMap <Key, Value> implements Map<Key, Value>
 		public int size()
 		{
 			cleanup();
-			return WeakValueHashMap.this.size();
+			return WeakIdentityHashMap.this.size();
 		}
 
 		
 		public boolean isEmpty()
 		{
 			cleanup();
-			return WeakValueHashMap.this.isEmpty();
+			return WeakIdentityHashMap.this.isEmpty();
 		}
 
 		@SuppressWarnings("unchecked")
@@ -389,7 +380,7 @@ public class WeakValueHashMap <Key, Value> implements Map<Key, Value>
 		public boolean retainAll(Collection<?> c)
 		{
 			cleanup();
-			ArrayList<Map.Entry<Key, WeakValue<Value, Key>>> xs = new ArrayList<Map.Entry<Key, WeakValue<Value, Key>>>(); 
+			ArrayList<Map.Entry<WeakIdKey, Value>> xs = new ArrayList<Map.Entry<WeakIdKey, Value>>(); 
 			for (Object x: c)
 			{
 				xs.add( weakEntry( (Map.Entry<Key, Value>)x ));
@@ -402,7 +393,7 @@ public class WeakValueHashMap <Key, Value> implements Map<Key, Value>
 		public boolean removeAll(Collection<?> c)
 		{
 			cleanup();
-			ArrayList<Map.Entry<Key, WeakValue<Value, Key>>> xs = new ArrayList<Map.Entry<Key, WeakValue<Value, Key>>>(); 
+			ArrayList<Map.Entry<WeakIdKey, Value>> xs = new ArrayList<Map.Entry<WeakIdKey, Value>>(); 
 			for (Object x: c)
 			{
 				xs.add( weakEntry( (Map.Entry<Key, Value>)x ));
@@ -414,13 +405,13 @@ public class WeakValueHashMap <Key, Value> implements Map<Key, Value>
 		public void clear()
 		{
 			cleanup();
-			WeakValueHashMap.this.clear();
+			WeakIdentityHashMap.this.clear();
 		}
 	}
 	
 	
-	private ReferenceQueue<Value> refQueue = new ReferenceQueue<Value>();
-	private HashMap<Key, WeakValue<Value, Key>> map = new HashMap<Key, WeakValue<Value, Key>>();
+	private ReferenceQueue<Object> refQueue = new ReferenceQueue<Object>();
+	private HashMap<WeakIdKey, Value> map = new HashMap<WeakIdKey, Value>();
 	
 	
 
@@ -435,14 +426,14 @@ public class WeakValueHashMap <Key, Value> implements Map<Key, Value>
 	public boolean containsKey(Object key)
 	{
 		cleanup();
-		return map.containsKey( key );
+		return map.containsKey( new WeakIdKey( key ) );
 	}
 
 	
 	public boolean containsValue(Object value)
 	{
 		cleanup();
-		return map.containsValue( weakValue( value ) );
+		return map.containsValue( value );
 	}
 
 	
@@ -456,8 +447,7 @@ public class WeakValueHashMap <Key, Value> implements Map<Key, Value>
 	public Value get(Object key)
 	{
 		cleanup();
-		WeakValue<Value, Key> w = map.get( key );
-		return w != null  ?  w.get()  :  null;
+		return map.get( new WeakIdKey( key ) );
 	}
 
 	
@@ -471,15 +461,14 @@ public class WeakValueHashMap <Key, Value> implements Map<Key, Value>
 	public Set<Key> keySet()
 	{
 		cleanup();
-		return map.keySet();
+		return new KeySet( map.keySet() );
 	}
 
 	
 	public Value put(Key key, Value value)
 	{
 		cleanup();
-		WeakValue<Value, Key> w = map.put( key, new WeakValue<Value, Key>( value, refQueue, key ) );
-		return w != null  ?  w.get()  :  null;
+		return map.put( new WeakIdKey( key, refQueue ), value );
 	}
 
 	
@@ -488,8 +477,7 @@ public class WeakValueHashMap <Key, Value> implements Map<Key, Value>
 		cleanup();
 		for (Map.Entry<? extends Key, ? extends Value> e: m.entrySet())
 		{
-			Key key = e.getKey();
-			map.put( key, new WeakValue<Value, Key>( e.getValue(), refQueue, key ) );
+			map.put( new WeakIdKey( e.getKey(), refQueue ), e.getValue() );
 		}
 	}
 
@@ -497,8 +485,7 @@ public class WeakValueHashMap <Key, Value> implements Map<Key, Value>
 	public Value remove(Object key)
 	{
 		cleanup();
-		WeakValue<Value, Key> w = map.remove( key );
-		return w != null  ?  w.get()  :  null;
+		return map.remove( new WeakIdKey( key ) );
 	}
 	
 	
@@ -512,7 +499,7 @@ public class WeakValueHashMap <Key, Value> implements Map<Key, Value>
 	public Collection<Value> values()
 	{
 		cleanup();
-		return new ValueCollection( map.values() );
+		return map.values();
 	}
 
 	
@@ -524,10 +511,10 @@ public class WeakValueHashMap <Key, Value> implements Map<Key, Value>
 		{
 			return true;
 		}
-		else if ( x instanceof WeakValueHashMap )
+		else if ( x instanceof WeakIdentityHashMap )
 		{
 			@SuppressWarnings("unchecked")
-			WeakValueHashMap<Key, Value> w = (WeakValueHashMap<Key, Value>)x;
+			WeakIdentityHashMap<Key, Value> w = (WeakIdentityHashMap<Key, Value>)x;
 			return map.equals( w.map );
 		}
 		else
@@ -544,16 +531,15 @@ public class WeakValueHashMap <Key, Value> implements Map<Key, Value>
 
 	
 	
-	@SuppressWarnings("unchecked")
 	private void cleanup()
 	{
-		WeakValue<Value, Key> r;
+		Reference<?> k;
 		
-		r = (WeakValue<Value, Key>)refQueue.poll();
-		while ( r != null )
+		k = refQueue.poll();
+		while ( k != null )
 		{
-			remove( r.key );
-			r = (WeakValue<Value, Key>)refQueue.poll();
+			map.remove( k );
+			k = refQueue.poll();
 		}
 	}
 }

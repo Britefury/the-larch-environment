@@ -211,20 +211,6 @@ def applyPythonParens(expr, precedence, numParens, inheritedState):
 
 #
 #
-# Suites, blank lines
-#
-#
-
-def suiteView(statements):
-	return Column( statements )
-
-
-def blankLine():
-	return Text( '' )
-
-
-#
-#
 # Unparsed
 #
 #
@@ -904,6 +890,20 @@ def commentStmt(comment):
 	return ApplyStyleSheetFromAttribute( PythonEditorStyle.commentStyle, Text( '#' + comment ) )
 
 
+
+
+#
+#
+# Suites, blank lines
+#
+#
+
+def suiteView(statements):
+	return Column( statements )
+
+
+def blankLine():
+	return Text( '' )
 
 
 #

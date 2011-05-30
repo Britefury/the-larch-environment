@@ -13,7 +13,7 @@ import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Marker.Marker.Bias;
-import BritefuryJ.Utils.StringDiff;
+import BritefuryJ.Util.StringDiff;
 
 public class NodeElementChangeListenerDiff implements IncrementalView.NodeElementChangeListener
 {

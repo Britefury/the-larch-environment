@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
 import BritefuryJ.ParserHelpers.TraceNode;
-import BritefuryJ.Utils.HashUtils;
+import BritefuryJ.Util.HashUtils;
 
 
 public class ParserState

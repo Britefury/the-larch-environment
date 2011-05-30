@@ -20,8 +20,8 @@ import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
-import BritefuryJ.Utils.HashUtils;
-import BritefuryJ.Utils.WeakValueHashMap;
+import BritefuryJ.Util.HashUtils;
+import BritefuryJ.Util.WeakValueHashMap;
 
 public class TableEditorStyle
 {

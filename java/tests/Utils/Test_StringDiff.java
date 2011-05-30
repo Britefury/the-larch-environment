@@ -11,9 +11,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import junit.framework.TestCase;
-import BritefuryJ.Utils.StringDiff;
-import BritefuryJ.Utils.StringDiff.Operation;
-import BritefuryJ.Utils.StringDiff.Operation.OpCode;
+import BritefuryJ.Util.StringDiff;
+import BritefuryJ.Util.StringDiff.Operation;
+import BritefuryJ.Util.StringDiff.Operation.OpCode;
 
 public class Test_StringDiff extends TestCase
 {

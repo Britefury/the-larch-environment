@@ -414,7 +414,7 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 		if ( h == null )
 		{
 			t.setChangeHistory( this );
-			List<Object> contents = t.getTrackableContents();
+			Iterable<Object> contents = t.getTrackableContents();
 			if ( contents != null )
 			{
 				for (Object x: contents)
@@ -431,7 +431,7 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 
 	public void stopTracking(Trackable t)
 	{
-		List<Object> contents = t.getTrackableContents();
+		Iterable<Object> contents = t.getTrackableContents();
 		if ( contents != null )
 		{
 			for (Object x: contents)

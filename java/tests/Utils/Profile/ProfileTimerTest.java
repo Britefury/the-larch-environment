@@ -7,7 +7,7 @@
 package tests.Utils.Profile;
 
 import junit.framework.TestCase;
-import BritefuryJ.Utils.Profile.ProfileTimer;
+import BritefuryJ.Util.Profile.ProfileTimer;
 
 public class ProfileTimerTest extends TestCase
 {

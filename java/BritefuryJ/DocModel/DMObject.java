@@ -31,7 +31,7 @@ import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.Incremental.IncrementalValueMonitor;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
-import BritefuryJ.Utils.HashUtils;
+import BritefuryJ.Util.HashUtils;
 
 public class DMObject extends DMNode implements DMObjectInterface, Trackable, IncrementalOwner, Presentable
 {
@@ -385,7 +385,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, In
 			}
 		}
 		incr.onChanged();
-		DMObjectCommandTracker.onSet( changeHistory, this, index, oldX, x );
+		DMObject_changes.onSet( changeHistory, this, index, oldX, x );
 	}
 	
 	public void set(String key, Object x)
@@ -462,7 +462,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, In
 			}
 		}
 		incr.onChanged();
-		DMObjectCommandTracker.onUpdate( changeHistory, this, indices, oldContents, newContents );
+		DMObject_changes.onUpdate( changeHistory, this, indices, oldContents, newContents );
 	}
 
 	protected void update(int indices[], Object xs[])
@@ -492,7 +492,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, In
 			fieldData[index] = x;
 		}
 		incr.onChanged();
-		DMObjectCommandTracker.onUpdate( changeHistory, this, indices, oldContents, newContents );
+		DMObject_changes.onUpdate( changeHistory, this, indices, oldContents, newContents );
 	}
 
 	
@@ -541,7 +541,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, In
 		DMObjectClass oldClass = objClass;
 		objClass = cls;
 		incr.onChanged();
-		DMObjectCommandTracker.onBecome( changeHistory, this, oldClass, oldFieldData, cls, newData );
+		DMObject_changes.onBecome( changeHistory, this, oldClass, oldFieldData, cls, newData );
 	}
 
 	

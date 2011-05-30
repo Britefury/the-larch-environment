@@ -20,7 +20,7 @@ import BritefuryJ.Editor.Sequential.SequentialStreamEditor;
 import BritefuryJ.Editor.SyntaxRecognizing.Precedence.PrecedenceHandler;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Parser.ParserExpression;
-import BritefuryJ.Utils.HashUtils;
+import BritefuryJ.Util.HashUtils;
 
 public abstract class SyntaxRecognizingEditor extends SequentialStreamEditor
 {

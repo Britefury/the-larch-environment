@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.Utils;
+package BritefuryJ.Util;
 
 import org.python.core.Py;
 import org.python.core.PyObject;

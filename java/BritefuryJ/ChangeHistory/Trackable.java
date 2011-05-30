@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.ChangeHistory;
 
-import java.util.List;
 
 
 public interface Trackable
@@ -14,5 +13,5 @@ public interface Trackable
 	public ChangeHistory getChangeHistory();
 	public void setChangeHistory(ChangeHistory h);
 	
-	public List<Object> getTrackableContents();			// Can return null.   Temporary - is read once - is not needed afterwards
+	public Iterable<Object> getTrackableContents();			// Can return null.   Temporary - is read once - is not needed afterwards
 }

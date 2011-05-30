@@ -9,7 +9,7 @@ package BritefuryJ.DocModel;
 import BritefuryJ.ChangeHistory.Change;
 import BritefuryJ.ChangeHistory.ChangeHistory;
 
-public class DMObjectCommandTracker
+public class DMObject_changes
 {
 	private static class SetCommand extends Change
 	{
