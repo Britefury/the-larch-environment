@@ -49,12 +49,12 @@ def _textLines(text, textStyleAttribute):
 
 def _streamItem(item, textStyleAttribute, bUseDefaultPerspectiveForResult):
 	if item.isStructural():
-		resultView = InnerFragment( item.getStructuralValue() )
+		resultView = InnerFragment( item.getValue() )
 		if bUseDefaultPerspectiveForResult:
 			resultView = ApplyPerspective.defaultPerspective( resultView )
 		return resultView
 	else:
-		return _textLines( item.getTextValue(), textStyleAttribute )
+		return _textLines( item.getValue(), textStyleAttribute )
 
 def _streamLines(labelText, stream, textStyleAttribute, bUseDefaultPerspectiveForResult):
 	label = ApplyStyleSheetFromAttribute( ExecutionStyle.labelStyle, StaticText( labelText ) )

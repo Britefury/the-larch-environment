@@ -93,6 +93,12 @@ public class StreamValueBuilder
                 this.items.addAll( Arrays.asList( items ) );
 	}
 	
+	public StreamValueBuilder(Iterable<Object> values)
+	{
+		items = new ArrayList<Item>();
+		extend( values );
+	}
+	
 	
 	public void appendTextValue(String text)
 	{
@@ -157,6 +163,14 @@ public class StreamValueBuilder
 			{
 				appendStructuralValue( ((StreamValue.StructuralItem)item).structuralValue );
 			}
+		}
+	}
+	
+	public void extend(Iterable<Object> values)
+	{
+		for (Object value: values)
+		{
+			append( value );
 		}
 	}
 	

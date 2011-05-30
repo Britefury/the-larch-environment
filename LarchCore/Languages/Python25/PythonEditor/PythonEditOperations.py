@@ -203,8 +203,8 @@ def getMinDepthOfStream(itemStream):
 	depth = 0
 	minDepth = 0
 	for item in itemStream.getItems():
-		if isinstance( item, StreamValue.StructuralItem ):
-			v = item.getStructuralValue()
+		if item.isStructural():
+			v = item.getValue()
 			if v.isInstanceOf( Schema.Indent ):
 				depth += 1
 				minDepth = min( minDepth, depth )
@@ -217,8 +217,8 @@ def getMinDepthOfStream(itemStream):
 def getDepthOffsetOfStream(itemStream):
 	depth = 0
 	for item in itemStream.getItems():
-		if isinstance( item, StreamValue.StructuralItem ):
-			v = item.getStructuralValue()
+		if item.isStructural():
+			v = item.getValue()
 			if v.isInstanceOf( Schema.Indent ):
 				depth += 1
 			elif v.isInstanceOf( Schema.Dedent ):
@@ -260,8 +260,8 @@ def _extendStreamWithoutDedents(builder, itemStream, startDepth):
 	depth = startDepth
 	indentsToSkip = 0
 	for item in itemStream.getItems():
-		if isinstance( item, StreamValue.StructuralItem ):
-			v = item.getStructuralValue()
+		if item.isStructural():
+			v = item.getValue()
 			if v.isInstanceOf( Schema.Indent ):
 				if indentsToSkip > 0:
 					indentsToSkip -= 1
