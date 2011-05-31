@@ -9,7 +9,7 @@ from BritefuryJ.Command import CommandSetRegistry
 
 from BritefuryJ.DocPresent.Selection import TextSelection
 
-from LarchCore.Languages.Python25.PythonEditor.PythonEditOperations import insertSpecialFormAtCaret, pyReplaceNode, getSelectedExpression, getSelectedStatement
+from LarchCore.Languages.Python25.PythonEditor.PythonEditOperations import insertSpecialFormAtCaret, pyReplaceNode, pyReplaceStatementRangeWithStatement, getSelectedExpression, getSelectedStatement, getSelectedStatementRange
 from LarchCore.Languages.Python25.Builder import embeddedExpression, embeddedStatement
 
 
@@ -89,7 +89,35 @@ def makeWrapSelectionInEmbeddedStatementAction(valueAtSelectionFactory):
 	"""
 	valueAtSelectionFactory - function( selected_node, selection )  ->  value
 	"""
-	return _makeWrapSelectionInEmbeddedObjectAction( getSelectedStatement, valueAtSelectionFactory, embeddedExpression )
+	return _makeWrapSelectionInEmbeddedObjectAction( getSelectedStatement, valueAtSelectionFactory, embeddedStatement )
+
+
+
+def makeWrapSelectedStatementRangeInEmbeddedObjectAction(valueAtSelectionFactory):
+	"""
+	valueAtSelectionFactory - function( statements, selection )  ->  value
+	embedFn - function( value )  ->  AST node
+	"""
+	def _action(context):
+		element = context
+		rootElement = element.getRootElement()
+		
+		selection = rootElement.getSelection()
+		if isinstance( selection, TextSelection )  and  selection.isValid()  and  selection.isEditable():
+			stmtRange = getSelectedStatementRange( selection )
+			if stmtRange is not None:
+				suite, i, j = stmtRange
+				value = valueAtSelectionFactory( suite[i:j], selection )
+				if value is not None:
+					specialForm = embeddedStatement( value )
+					pyReplaceStatementRangeWithStatement( suite, i, j, specialForm )
+					return True
+	
+		return False
+	
+	return _action
+
+			
 
 
 

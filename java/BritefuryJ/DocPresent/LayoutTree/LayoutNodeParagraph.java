@@ -17,6 +17,7 @@ import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
 import BritefuryJ.DocPresent.Layout.ParagraphLayout;
+import BritefuryJ.DocPresent.Layout.ParagraphLayout.Line;
 import BritefuryJ.DocPresent.StyleParams.ParagraphStyleParams;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
@@ -182,72 +183,72 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 		{
 			DPElement child = getLineChildClosestToLocalPoint( line, localPos );
 			
-			DPElement c = getLeafClosestToLocalPointFromChild( child, localPos, filter );
-			
-			if ( c != null )
+			if ( child != null )
 			{
-				return c;
-			}
-			
-			int index = 0;
-			for (DPElement w: leaves)
-			{
-				if ( w == child )
-				{
-					break;
-				}
-				index++;
-			}
-			if ( index == leaves.length )
-			{
-				throw new RuntimeException( "This shouldn't have happened" );
-			}
-			
-			DPElement next = null;
-			for (int j = index + 1; j < leaves.length; j++)
-			{
-				next = getLeafClosestToLocalPointFromChild( leaves[j], localPos, filter );
-				if ( next != null )
-				{
-					break;
-				}
-			}
-
-			DPElement prev = null;
-			for (int j = index - 1; j >= 0; j--)
-			{
-				prev = getLeafClosestToLocalPointFromChild( leaves[j], localPos, filter );
-				if ( prev != null )
-				{
-					break;
-				}
-			}
-	
-			
-			if ( prev == null  &&  next == null )
-			{
-				return null;
-			}
-			else if ( prev == null  &&  next != null )
-			{
-				return next;
-			}
-			else if ( prev != null  &&  next == null )
-			{
-				return prev;
-			}
-			else
-			{
-				double distToPrev = localPos.x - ( prev.getPositionInParentSpaceX() + prev.getWidthInParentSpace() );
-				double distToNext = next.getPositionInParentSpaceX() - localPos.x;
+				DPElement c = getLeafClosestToLocalPointFromChild( child, localPos, filter );
 				
-				return distToPrev > distToNext  ?  prev  :  next;
+				if ( c != null )
+				{
+					return c;
+				}
+				
+				int index = 0;
+				for (DPElement w: leaves)
+				{
+					if ( w == child )
+					{
+						break;
+					}
+					index++;
+				}
+				if ( index == leaves.length )
+				{
+					throw new RuntimeException( "Could not find child in leaves list - this shouldn't have happened" );
+				}
+				
+				DPElement next = null;
+				for (int j = index + 1; j < leaves.length; j++)
+				{
+					next = getLeafClosestToLocalPointFromChild( leaves[j], localPos, filter );
+					if ( next != null )
+					{
+						break;
+					}
+				}
+	
+				DPElement prev = null;
+				for (int j = index - 1; j >= 0; j--)
+				{
+					prev = getLeafClosestToLocalPointFromChild( leaves[j], localPos, filter );
+					if ( prev != null )
+					{
+						break;
+					}
+				}
+		
+				
+				if ( prev == null  &&  next == null )
+				{
+					return null;
+				}
+				else if ( prev == null  &&  next != null )
+				{
+					return next;
+				}
+				else if ( prev != null  &&  next == null )
+				{
+					return prev;
+				}
+				else
+				{
+					double distToPrev = localPos.x - ( prev.getPositionInParentSpaceX() + prev.getWidthInParentSpace() );
+					double distToNext = next.getPositionInParentSpaceX() - localPos.x;
+					
+					return distToPrev > distToNext  ?  prev  :  next;
+				}
 			}
 		}
-		else
-		{
-			return null;
-		}
+		return null;
 	}
 	
 

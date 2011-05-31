@@ -11,6 +11,8 @@ from java.lang import Throwable
 
 from java.awt.event import KeyEvent
 
+from java.util import List
+
 from BritefuryJ.Parser import ParserExpression
 
 from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod
@@ -200,11 +202,15 @@ def _embeddedObjectExprContextMenuFactory(element, menu):
 
 	def _onDelete(item):
 		value = model['embeddedValue'].getValue()
+		
 		try:
 			replacement = value.__py_replacement__()
 		except AttributeError:
-			replacement = Schema.Load( name='None' )
-		pyReplaceNode( model, replacement )
+			pass
+		else:
+			pyReplaceNode( model, replacement )
+			
+		pyReplaceNode( model, Schema.Load( name='None' ) )
 
 	menu.add( MenuItem.menuItemWithLabel( 'Delete embedded object', _onDelete ) )
 
@@ -217,11 +223,18 @@ def _embeddedObjectStmtContextMenuFactory(element, menu):
 
 	def _onDelete(item):
 		value = model['embeddedValue'].getValue()
+		
 		try:
 			replacement = value.__py_replacement__()
 		except AttributeError:
-			replacement = Schema.BlankLine()
-		pyReplaceNode( model, replacement )
+			pass
+		else:
+			if isinstance( replacement, list )  or  isinstance( replacement, tuple )  or  isinstance( replacement, List ):
+				pyReplaceStatementWithStatementRange( model, replacement )
+			else:
+				pyReplaceNode( model, replacement )
+			
+		pyReplaceNode( model, Schema.BlankLine() )
 
 	menu.add( MenuItem.menuItemWithLabel( 'Delete embedded object', _onDelete ) )
 

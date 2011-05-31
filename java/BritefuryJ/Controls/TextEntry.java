@@ -74,12 +74,12 @@ public class TextEntry extends ControlPres
 		}
 	}
 	
-	private static class RegexTextEntryValidator extends TextEntryValidator
+	public static class RegexTextEntryValidator extends TextEntryValidator
 	{
 		private Pattern pattern;
 		private String failMessage;
 		
-		private RegexTextEntryValidator(Pattern pattern, String failMessage)
+		public RegexTextEntryValidator(Pattern pattern, String failMessage)
 		{
 			this.pattern = pattern;
 			this.failMessage = failMessage;
