@@ -190,13 +190,12 @@ class EmbeddedSuiteDisplay (object):
 		
 		
 		self._incr.onAccess()
-		#exprPres = pyPerspective.applyTo( self._expr )
-		exprPres = self._expr
+		suitePres = self._suite
 		
-		valuesPres = ObjectBox( 'Values', Column( [ Paragraph( [ value ] )   for value in self._values ] ) )
+		valuesPres = TabbedBox( [ [ Label( 'Table' ), Blank() ], [ Label( 'Trace' ), Blank() ] ], None )
 		
-		contents = Column( [ exprPres, valuesPres ] )
-		return ObjectBox( 'Embedded display', contents ).withContextMenuInteractor( _embeddedDisplayMenu ).withCommands( _nvCommands )
+		contents = Column( [ suitePres, valuesPres ] )
+		return ObjectBox( 'Embedded suite display', contents ).withContextMenuInteractor( _embeddedDisplayMenu ).withCommands( _nvCommands )
 
 
 
