@@ -1036,6 +1036,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		protected void mouseDownEvent(int button, Point2 windowPos, int buttonModifiers, int keyModifiers)
 		{
+			// Ensure layout is up to date so that event handling will work correctly
+			performAllocation();
+
 			component.grabFocus();
 			rootSpaceMouse.setLocalPos( windowPos );
 			rootSpaceMouse.setButtonModifiers( buttonModifiers );
@@ -1048,6 +1051,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		protected void mouseUpEvent(int button, Point2 windowPos, int buttonModifiers, int keyModifiers)
 		{
+			// Ensure layout is up to date so that event handling will work correctly
+			performAllocation();
+
 			rootSpaceMouse.setLocalPos( windowPos );
 			rootSpaceMouse.setButtonModifiers( buttonModifiers );
 			rootSpaceMouse.setKeyModifiers( keyModifiers );
@@ -1062,6 +1068,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		protected void mouseClicked(int button, int clickCount, Point2 windowPos, int buttonModifiers)
 		{
+			// Ensure layout is up to date so that event handling will work correctly
+			performAllocation();
+
 			rootSpaceMouse.setLocalPos( windowPos );
 			rootSpaceMouse.setButtonModifiers( buttonModifiers );
 			
@@ -1072,6 +1081,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		protected void mouseMotionEvent(Point2 windowPos, int buttonModifiers, int keyModifiers, MouseEvent mouseEvent)
 		{
+			// Ensure layout is up to date so that event handling will work correctly
+			performAllocation();
+
 			rootSpaceMouse.setLocalPos( windowPos );
 			rootSpaceMouse.setButtonModifiers( buttonModifiers );
 			rootSpaceMouse.setKeyModifiers( keyModifiers );
@@ -1083,6 +1095,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 
 		protected void mouseDragEvent(Point2 windowPos, int buttonModifiers, int keyModifiers, MouseEvent mouseEvent)
 		{
+			// Ensure layout is up to date so that event handling will work correctly
+			performAllocation();
+
 			rootSpaceMouse.setLocalPos( windowPos );
 			rootSpaceMouse.setButtonModifiers( buttonModifiers );
 			rootSpaceMouse.setKeyModifiers( keyModifiers );
@@ -1097,6 +1112,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		protected void mouseEnterEvent(Point2 windowPos, int buttonModifiers, int keyModifiers)
 		{
+			// Ensure layout is up to date so that event handling will work correctly
+			performAllocation();
+
 			rootSpaceMouse.setLocalPos( windowPos );
 			rootSpaceMouse.setButtonModifiers( buttonModifiers );
 			rootSpaceMouse.setKeyModifiers( keyModifiers );
@@ -1108,6 +1126,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 
 		protected void mouseLeaveEvent(Point2 windowPos, int buttonModifiers, int keyModifiers)
 		{
+			// Ensure layout is up to date so that event handling will work correctly
+			performAllocation();
+
 			rootSpaceMouse.setLocalPos( windowPos );
 			rootSpaceMouse.setButtonModifiers( buttonModifiers );
 			rootSpaceMouse.setKeyModifiers( keyModifiers );
@@ -1120,6 +1141,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 
 		protected void mouseWheelEvent(Point2 windowPos, int wheelClicks, int unitsToScroll, int buttonModifiers)
 		{
+			// Ensure layout is up to date so that event handling will work correctly
+			performAllocation();
+
 			rootSpaceMouse.setLocalPos( windowPos );
 			rootSpaceMouse.setButtonModifiers( buttonModifiers );
 			
@@ -1132,6 +1156,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		protected boolean keyPressEvent(KeyEvent event, int keyModifiers)
 		{
+			// Ensure layout is up to date so that event handling will work correctly
+			performAllocation();
+
 			rootSpaceMouse.setKeyModifiers( keyModifiers );
 
 			boolean bHandled = false;
@@ -1149,6 +1176,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		protected boolean keyReleaseEvent(KeyEvent event, int keyModifiers)
 		{
+			// Ensure layout is up to date so that event handling will work correctly
+			performAllocation();
+
 			rootSpaceMouse.setKeyModifiers( keyModifiers );
 
 			boolean bHandled = false;
@@ -1168,6 +1198,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		protected boolean keyTypedEvent(KeyEvent event, int keyModifiers)
 		{
+			// Ensure layout is up to date so that event handling will work correctly
+			performAllocation();
+
 			rootSpaceMouse.setKeyModifiers( keyModifiers );
 
 			boolean bHandled = false;
@@ -1232,6 +1265,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		public void dndInitiateDrag(DndDropLocal drop, MouseEvent mouseEvent, int requestedAction)
 		{
+			// Ensure layout is up to date so that event handling will work correctly
+			performAllocation();
+
 			PresentationComponent.PresAreaTransferHandler xferHandler = getDndTransferHandler();
 			xferHandler.initiateExportDnd( drop );
 			xferHandler.exportAsDrag( component, mouseEvent, requestedAction );
@@ -1297,6 +1333,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		private boolean swingDndCanImport(TransferHandler.TransferSupport transfer)
 		{
+			// Ensure layout is up to date so that event handling will work correctly
+			performAllocation();
+
 			Point windowPos = transfer.getDropLocation().getDropPoint();
 			Point2 rootPos = new Point2( windowPos.x, windowPos.y );
 
@@ -1326,6 +1365,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		private boolean swingDndImportData(TransferHandler.TransferSupport transfer)
 		{
+			// Ensure layout is up to date so that event handling will work correctly
+			performAllocation();
+
 			Point windowPos = transfer.getDropLocation().getDropPoint();
 			Point2 rootPos = new Point2( windowPos.x, windowPos.y );
 

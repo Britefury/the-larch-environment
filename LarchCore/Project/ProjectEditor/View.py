@@ -241,25 +241,10 @@ class ProjectView (ObjectDispatchView):
 
 
 		# Python package name
-		class _PythonPackageNameListener (TextEntry.TextEntryListener):
-			def onAccept(self, textEntry, text):
+		class _PythonPackageNameListener (EditableLabel.EditableLabelListener):
+			def onTextChanged(self, editableLabel, text):
 				project.pythonPackageName = text
 
-			def onCancel(self, textEntry, originalText):
-				pythonPackageUnit.setLiteralValue( pythonPackageNameLabelBox )
-
-
-		class _PythonPackageNameInteractor (ClickElementInteractor):
-			def testClickEvent(self, element, event):
-				return event.getButton() == 1
-
-			def buttonClicked(self, element, event):
-				n = project.pythonPackageName
-				n = n   if n is not None   else 'Untitled'
-				textEntry = TextEntry( n, _PythonPackageNameListener(), _pythonPackageNameRegex, 'Please enter a valid dotted identifier' )
-				textEntry.grabCaretOnRealise()
-				pythonPackageUnit.setLiteralValue( textEntry )
-				return True
 
 
 		# Project index
@@ -307,17 +292,13 @@ class ProjectView (ObjectDispatchView):
 
 		# Python package name
 		pythonPackageNamePrompt = Label( 'Root Python package name: ' )
+		notSet = _pythonPackageNameNotSetStyle.applyTo( Label( '<not set>' ) )
+		pythonPackageNameLabel = EditableLabel( project.pythonPackageName, notSet, _PythonPackageNameListener(), _pythonPackageNameRegex, 'Please enter a valid dotted identifier' )
 		if project.pythonPackageName is None:
-			pythonPackageNameLabel = _itemHoverHighlightStyle.applyTo( _pythonPackageNameNotSetStyle.applyTo( Label( '<not set>' ) ) )
-			pythonPackageNameLabel = pythonPackageNameLabel.withElementInteractor( _PythonPackageNameInteractor() )
 			comment = _pythonPackageNameNotSetCommentStyle.applyTo( Label( '(pages will not be importable until this is set)' ) )
-			pythonPackageNameLabelBox = Row( [ pythonPackageNameLabel, Spacer( 25.0, 0.0 ), comment ] )
+			pythonPackageNameBox = Row( [ pythonPackageNamePrompt, pythonPackageNameLabel, Spacer( 25.0, 0.0 ), comment ] )
 		else:
-			pythonPackageNameLabel = _itemHoverHighlightStyle.applyTo( _pythonPackageNameStyle.applyTo( Label( project.pythonPackageName ) ) )
-			pythonPackageNameLabel = pythonPackageNameLabel.withElementInteractor( _PythonPackageNameInteractor() )
-			pythonPackageNameLabelBox = Row( [ pythonPackageNameLabel ] )
-		pythonPackageUnit = LiteralUnit( pythonPackageNameLabelBox )
-		pythonPackageNameBox = Row( [ pythonPackageNamePrompt, pythonPackageUnit.defaultPerspectiveValuePresInFragment() ] )
+			pythonPackageNameBox = Row( [ pythonPackageNamePrompt, pythonPackageNameLabel ] )
 		
 		
 		# Clear imported modules

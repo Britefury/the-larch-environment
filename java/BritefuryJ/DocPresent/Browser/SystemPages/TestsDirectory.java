@@ -80,6 +80,7 @@ public class TestsDirectory extends BrowserPage
 	public static final ButtonTestPage button = new ButtonTestPage();
 	public static final CheckboxTestPage checkbox = new CheckboxTestPage();
 	public static final CommandConsoleTestPage commandConsole = new CommandConsoleTestPage();
+	public static final EditableLabelTestPage editableLabel = new EditableLabelTestPage();
 	public static final ExpanderTestPage expander = new ExpanderTestPage();
 	public static final HyperlinkTestPage hyperlink = new HyperlinkTestPage();
 	public static final OptionMenuTestPage optionMenu = new OptionMenuTestPage();
@@ -87,6 +88,7 @@ public class TestsDirectory extends BrowserPage
 	public static final ScrollBarTestPage scrollBar = new ScrollBarTestPage();
 	public static final ScrolledViewportTestPage scrolledViewport = new ScrolledViewportTestPage();
 	public static final SpinEntryTestPage spinEntry = new SpinEntryTestPage();
+	public static final TabbedBoxTestPage tabbedBox = new TabbedBoxTestPage();
 	public static final TextAreaTestPage textArea = new TextAreaTestPage();
 	public static final TextEntryTestPage textEntry = new TextEntryTestPage();
 	
@@ -94,6 +96,7 @@ public class TestsDirectory extends BrowserPage
 		new Hyperlink( "Button", new Location( "system.tests.button" ) ),
 		new Hyperlink( "Check box", new Location( "system.tests.checkbox" ) ),
 		new Hyperlink( "Command console", new Location( "system.tests.commandConsole" ) ),
+		new Hyperlink( "Editable label", new Location( "system.tests.editableLabel" ) ),
 		new Hyperlink( "Expander", new Location( "system.tests.expander" ) ),
 		new Hyperlink( "Hyperlink", new Location( "system.tests.hyperlink" ) ),
 		new Hyperlink( "Option menu", new Location( "system.tests.optionMenu" ) ),
@@ -101,6 +104,7 @@ public class TestsDirectory extends BrowserPage
 		new Hyperlink( "Scroll bar", new Location( "system.tests.scrollBar" ) ),
 		new Hyperlink( "Scrolled viewport", new Location( "system.tests.scrolledViewport" ) ),
 		new Hyperlink( "Spin entry", new Location( "system.tests.spinEntry" ) ),
+		new Hyperlink( "Tabbed box", new Location( "system.tests.tabbedBox" ) ),
 		new Hyperlink( "Text area", new Location( "system.tests.textArea" ) ),
 		new Hyperlink( "Text entry", new Location( "system.tests.textEntry" ) ),
 	};

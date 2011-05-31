@@ -166,6 +166,17 @@ def pyForceNodeRefresh(data):
 def pyReplaceNode(data, replacement):
 	data.become( replacement )
 
+def pyReplaceStatementWithStatementRange(stmt, replacement):
+	suite = stmt.getParent()
+	if isinstance( suite, DMList ):
+		index = suite.indexOfById( stmt )
+		suite[index:index+1] = replacement
+	else:
+		raise TypeError, 'statement must be contained within a suite (a DMList)'
+	
+def pyReplaceStatementRangeWithStatement(suite, i, j, replacement):
+	suite[i:j] = [ replacement ]
+	
 def modifySuiteMinimisingChanges(target, modified):
 	commonPrefixLen = 0
 	for i, (t, m) in enumerate( zip( target, modified ) ):
@@ -371,6 +382,49 @@ def _getNodeAtMarker(marker, modelTestFn):
 	modelTestFn - function(node) -> True or False
 	
 	returns
+		the node that contains marker, if it passes modelTestFn
+		or
+		None
+	"""
+	if marker.isValid():
+		element = marker.getElement()
+		fragment = element.getFragmentContext()
+		model = fragment.model
+		if modelTestFn( model ):
+			return model
+	return None
+
+
+
+
+def _getSelectedNode(selection, modelTestFn):
+	"""
+	selection - a TextSelection
+	modelTestFn - function(node) -> True or False
+	
+	returns
+		the node that contains @selection, if it passes modelTestFn
+		or
+		None
+	"""
+	if isinstance( selection, TextSelection ):
+		commonRoot = selection.getCommonRoot()
+		if commonRoot is not None:
+			fragment = commonRoot.getFragmentContext()
+			model = fragment.model
+			if modelTestFn( model ):
+				return model
+	return None
+
+
+
+
+def _findNodeAtMarker(marker, modelTestFn):
+	"""
+	marker - a Marker
+	modelTestFn - function(node) -> True or False
+	
+	returns
 		first node containing @marker that passes modelTestFn
 		or
 		None
@@ -390,7 +444,7 @@ def _getNodeAtMarker(marker, modelTestFn):
 
 
 
-def _getSelectedNode(selection, modelTestFn):
+def _findSelectedNode(selection, modelTestFn):
 	"""
 	selection - a TextSelection
 	modelTestFn - function(node) -> True or False
@@ -437,7 +491,7 @@ def getStatementAtMarker(marker):
 		or
 		None
 	"""
-	return _getNodeAtMarker( marker, isStmt )
+	return _findNodeAtMarker( marker, isStmt )
 	
 
 
@@ -463,6 +517,30 @@ def getSelectedStatement(selection):
 		or
 		None
 	"""
-	return _getSelectedNode( selection, isStmt )
+	return _findSelectedNode( selection, isStmt )
 
 
+
+def getSelectedStatementRange(selection):
+	"""
+	selection - a TextSelection
+	Note that the statements under the start and end points of the selection must reside within the same suite
+	
+	returns
+		(suite, i, j)
+			suite - the suite that contains @selection
+			i, j - the start and end indices of the range  -  suite[i:j]
+	"""
+	if seleciton.isValid():
+		startStmt = getStatementAtMarker( selection.getStartMarker() )
+		endStmt = getStatementAtMarker( selection.getStartMarker() )
+		suite = startStmt.getParent()
+		if suite is endStmt.getParent():
+			i = suite.indexOfById( startStmt )
+			j = suite.indexOfById( endStmt ) + 1
+			return suite, i, j
+	return None
+
+
+
+	
