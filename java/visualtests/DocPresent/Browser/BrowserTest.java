@@ -25,9 +25,9 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 
+import BritefuryJ.Command.AbstractCommandConsole;
 import BritefuryJ.Command.CommandConsole;
 import BritefuryJ.Command.CommandConsoleFactory;
-import BritefuryJ.Command.AbstractCommandConsole;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Browser.Browser;

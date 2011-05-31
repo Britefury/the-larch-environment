@@ -63,9 +63,9 @@ public class TabbedBoxTestPage extends SystemPage
 
 	protected Pres createContents()
 	{
-		Pres one = new Label( "Ellipse" );
-		Pres two = new Label( "Rounded rectangle" );
-		Pres three = new Label( "Circle" );
+		Pres one = new Label( "One" );
+		Pres two = new Label( "Two" );
+		Pres three = new Label( "Three" );
 		Pres oneContents = Shape.ellipse( 0.0, 0.0, 200.0, 100.0 );
 		Pres twoContents = Shape.roundRectangle( 0.0, 0.0, 200.0, 100.0, 20.0, 20.0 );
 		Pres threeContents = Shape.ellipse( 0.0, 0.0, 200.0, 200.0 );

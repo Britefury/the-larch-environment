@@ -17,7 +17,6 @@ import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
 import BritefuryJ.DocPresent.Layout.ParagraphLayout;
-import BritefuryJ.DocPresent.Layout.ParagraphLayout.Line;
 import BritefuryJ.DocPresent.StyleParams.ParagraphStyleParams;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
