@@ -439,6 +439,7 @@ def _findNodeAtMarker(marker, modelTestFn):
 				return model
 			if isTopLevel( model ):
 				return False
+			fragment = fragment.getParent()
 	return None
 
 
@@ -465,6 +466,7 @@ def _findSelectedNode(selection, modelTestFn):
 					return model
 				if isTopLevel( model ):
 					return False
+				fragment = fragment.getParent()
 	return None
 
 
@@ -531,9 +533,9 @@ def getSelectedStatementRange(selection):
 			suite - the suite that contains @selection
 			i, j - the start and end indices of the range  -  suite[i:j]
 	"""
-	if seleciton.isValid():
+	if selection.isValid():
 		startStmt = getStatementAtMarker( selection.getStartMarker() )
-		endStmt = getStatementAtMarker( selection.getStartMarker() )
+		endStmt = getStatementAtMarker( selection.getEndMarker() )
 		suite = startStmt.getParent()
 		if suite is endStmt.getParent():
 			i = suite.indexOfById( startStmt )

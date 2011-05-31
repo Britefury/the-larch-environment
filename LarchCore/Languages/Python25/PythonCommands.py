@@ -107,7 +107,7 @@ def makeWrapSelectedStatementRangeInEmbeddedObjectAction(valueAtSelectionFactory
 			stmtRange = getSelectedStatementRange( selection )
 			if stmtRange is not None:
 				suite, i, j = stmtRange
-				value = valueAtSelectionFactory( suite[i:j], selection )
+				value = valueAtSelectionFactory( list( suite[i:j] ), selection )
 				if value is not None:
 					specialForm = embeddedStatement( value )
 					pyReplaceStatementRangeWithStatement( suite, i, j, specialForm )

@@ -86,11 +86,14 @@ public class TabbedBox extends ControlPres
 			{
 				currentTab = tab;
 				
-				Pres contents = tabContents[currentTab];
-				contentsElement.setChild( contents.present( ctx, style ).layoutWrap( style.get( Primitive.hAlign, HAlignment.class ), style.get( Primitive.vAlign, VAlignment.class ) ) );
-				if ( listener != null )
+				if ( tabContents.length > 0 )
 				{
-					listener.onTab( this, currentTab );
+					Pres contents = tabContents[currentTab];
+					contentsElement.setChild( contents.present( ctx, style ).layoutWrap( style.get( Primitive.hAlign, HAlignment.class ), style.get( Primitive.vAlign, VAlignment.class ) ) );
+					if ( listener != null )
+					{
+						listener.onTab( this, currentTab );
+					}
 				}
 			}
 		}
@@ -174,7 +177,7 @@ public class TabbedBox extends ControlPres
 			DPRow header = (DPRow)element;
 			
 			List<DPElement> children = header.getChildren();
-			DPElement selectedChild = children.get( control.currentTab + 1 );
+			DPElement selectedChild = children.size() > 2  ?  children.get( control.currentTab + 1 )  :  null;
 			
 			// Path is going counter clock-wise
 			Path2D.Double headerShape = new Path2D.Double();
@@ -185,8 +188,11 @@ public class TabbedBox extends ControlPres
 			headerShape.append( new Arc2D.Double( 0.0, 0.0, rounding * 2.0, rounding * 2.0, 90.0, 90.0, Arc2D.OPEN ), true );
 			// Point at the bottom left
 			headerShape.lineTo( 0.0, size.y );
-			// Child
-			addChildPath( headerShape, selectedChild, size, false );
+			// Selected child
+			if ( selectedChild!= null )
+			{
+				addChildPath( headerShape, selectedChild, size, false );
+			}
 			// Point at bottom right
 			headerShape.lineTo( size.x, size.y );
 			
@@ -295,6 +301,11 @@ public class TabbedBox extends ControlPres
 		this.tabs = tabs;
 		this.initialTab = initialTab;
 		this.listener = listener;
+	}
+
+	public TabbedBox(Pres tabs[][], TabbedBoxListener listener)
+	{
+		this( tabs, 0, listener );
 	}
 
 
