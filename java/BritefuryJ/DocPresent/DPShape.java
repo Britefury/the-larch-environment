@@ -207,7 +207,7 @@ public class DPShape extends DPContentLeaf
 	}
 
 	
-	private static Point2[] filletCorner(Point2 a, Point2 b, Point2 c, double filletSize)
+	public static Point2[] filletCorner(Point2 a, Point2 b, Point2 c, double filletSize)
 	{
 		Vector2 u = a.sub( b ).getNormalised(), v = c.sub( b ).getNormalised();
 		return new Point2[] { b.add( u.mul( filletSize ) ), b, b.add( v.mul( filletSize ) ) };

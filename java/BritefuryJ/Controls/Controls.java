@@ -67,6 +67,21 @@ public class Controls
 	public static final InheritedAttributeNonNull dropDownExpanderHeaderArrowPainter = new InheritedAttributeNonNull( controlsNamespace, "dropDownExpanderHeaderArrowPainter", Painter.class,
 			new FilledOutlinePainter( new Color( 0.7f, 0.8f, 0.9f ), new Color( 0.0f, 0.25f, 0.5f ), new BasicStroke( 1.0f ) ) );
 	public static final InheritedAttributeNonNull dropDownExpanderPadding = new InheritedAttributeNonNull( controlsNamespace, "dropDownExpanderPadding", Double.class, 21.0 );
+	
+	
+	public static final InheritedAttributeNonNull tabbedBoxRounding = new InheritedAttributeNonNull( controlsNamespace, "tabbedBoxRounding", Double.class, 5.0 );
+	public static final InheritedAttributeNonNull tabbedBoxContentsPadding = new InheritedAttributeNonNull( controlsNamespace, "tabbedBoxContentsPadding", Double.class, 5.0 );
+	public static final InheritedAttributeNonNull tabbedBoxTabPadding = new InheritedAttributeNonNull( controlsNamespace, "tabbedBoxTabPadding", Double.class, 6.0 );
+	public static final InheritedAttributeNonNull tabbedBoxHeaderSpacing = new InheritedAttributeNonNull( controlsNamespace, "tabbedBoxHeaderSpacing", Double.class, 5.0 );
+	public static final InheritedAttributeNonNull tabbedBoxHeaderTabRounding = new InheritedAttributeNonNull( controlsNamespace, "tabbedBoxHeaderTabRounding", Double.class, 3.0 );
+	public static final InheritedAttributeNonNull tabbedBoxHeaderFillPaint = new InheritedAttributeNonNull( controlsNamespace, "tabbedBoxHeaderFillPaint", Paint.class,
+			new Color( 0.7f, 0.8f, 0.9f ) );
+	public static final InheritedAttributeNonNull tabbedBoxHeaderOutlinePaint = new InheritedAttributeNonNull( controlsNamespace, "tabbedBoxHeaderOutlinePaint", Paint.class,
+			new Color( 0.0f, 0.25f, 0.5f ) );
+	public static final InheritedAttributeNonNull tabbedBoxHeaderInactiveTabFillPaint = new InheritedAttributeNonNull( controlsNamespace, "tabbedBoxHeaderInactiveTabFillPaint", Paint.class,
+			new Color( 0.85f, 0.9f, 0.95f ) );
+	public static final InheritedAttributeNonNull tabbedBoxHeaderInactiveTabOutlinePaint = new InheritedAttributeNonNull( controlsNamespace, "tabbedBoxHeaderInactiveTabOutlinePaint", Paint.class,
+			new Color( 0.0f, 0.5f, 1.0f ) );
 
 	
 	public static final InheritedAttributeNonNull textEntryBorder = new InheritedAttributeNonNull( controlsNamespace, "textEntryBorder", AbstractBorder.class,
