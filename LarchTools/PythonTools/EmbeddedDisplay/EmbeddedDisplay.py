@@ -14,8 +14,12 @@ from copy import deepcopy
 from BritefuryJ.Command import *
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
+from BritefuryJ.IncrementalUnit import LiteralUnit
 
 from BritefuryJ.Controls import *
+
+from BritefuryJ.DocPresent.Interactor import *
+from BritefuryJ.DocPresent.Painter import *
 
 from BritefuryJ.Pres import *
 from BritefuryJ.Pres.Primitive import *
@@ -95,13 +99,123 @@ class EmbeddedDisplay (object):
 
 
 	
+class _TableSchema (object):
+	def __init__(self):
+		self._namedValues = []
+		self._namedValueToindex = {}
+		
+	def registerNamedValue(self, namedValue):
+		index = len( self._namedValues )
+		self._namedValues.append( namedValue )
+		self._namedValueToindex[namedValue] = index
+
+
+class _TableView (object):
+	def __init__(self, schema):
+		self._incr = IncrementalValueMonitor()
+		self._schema = schema
+		self._tableEditor = GenericTableEditor( [ v._name   for v in schema._namedValues ], True, True, False, False )
+		self._tableContent = GenericTableModel( lambda: '', lambda x: x )
+		self._tableRow = None
+	
+	
+	def begin(self):
+		self._tableRow = self._tableRow + 1   if self._tableRow is not None   else   0
+	
+	def end(self):
+		self._incr.onChanged()
+
+	
+	def logValue(self, namedValue, value):
+		index = self._schema._namedValueToindex[namedValue]
+		self._tableContent.set( index, self._tableRow, value )
+	
+	
+	def __present__(self, fragment, inheritedState):
+		self._incr.onAccess()
+		return self._tableEditor.editTable( self._tableContent )   if self._tableEditor is not None   else   Blank()
+
+
+
+	
+class _FrameValues (object):
+	def __init__(self):
+		self._values = []
+	
+	
+	def logValue(self, namedValue, value):
+		self._values.append( ( namedValue, value ) )
+	
+	
+	def __present__(self, fragment, inheritedState):
+		fields = [ VerticalField( namedValue._name, value )   for namedValue, value in self._values ]
+		return ObjectBorder( Column( fields ) )
+	
+
+	
+class _FrameInteractor (PushElementInteractor):
+	def __init__(self, values, valuesUnit):
+		self._values = values
+		self._valuesUnit = valuesUnit
+	
+	def buttonPress(self, element, event):
+		return event.getButton() == 1
+	
+	def buttonRelease(self, element, event):
+		self._valuesUnit.setLiteralValue( self._values )
+	
+
 class _Frame (object):
 	def __init__(self):
-		self.values = []
+		self.values = _FrameValues()
 		self.childFrames = []
+	
+	def _presentFrameSubtree(self, valuesUnit):
+		interactor = _FrameInteractor( self.values, valuesUnit )
+		tab = self._tabFrameStyle.applyTo( Box( 15.0, 5.0 ).withElementInteractor( interactor ) ).pad( 2.0, 2.0 ).alignVExpand()
+		return Row( [ tab, Column( [ x._presentFrameSubtree( valuesUnit )   for x in self.childFrames ] ) ] )
 
+	_tabFrameStyle = StyleSheet.instance.withAttr( Primitive.shapePainter, FilledOutlinePainter( Color( 0.85, 0.9, 0.85 ), Color( 0.6, 0.8, 0.6 ) ) ). \
+	               withAttr( Primitive.hoverShapePainter, FilledOutlinePainter( Color( 0.6, 0.8, 0.6 ), Color( 0.0, 0.5, 0.0 ) ) )
+	
+	
+	
+class _TreeView (object):
+	def __init__(self):
+		self._rootFrames = []
+		self._currentFrame = None
 
 		
+	def begin(self):
+		# Open a new frame
+		prevFrame = self._currentFrame
+		
+		self._currentFrame = _Frame()
+		if prevFrame is not None:
+			prevFrame.childFrames.append( self._currentFrame )
+		else:
+			self._rootFrames.append( self._currentFrame )
+		
+		return prevFrame
+
+			
+	def end(self, state):
+		prevFrame = state
+		self._currentFrame = prevFrame
+	
+	
+	def logValue(self, namedValue, value):
+		if self._currentFrame is not None:
+			self._currentFrame.values.logValue( namedValue, value )
+	
+	
+	def __present__(self, fragment, inheritedState):
+		valuesUnit = LiteralUnit( Blank() )
+		tree = Column( [ x._presentFrameSubtree( valuesUnit )   for x in self._rootFrames ] )
+		return Column( [ tree, Spacer( 0.0, 10.0 ), valuesUnit.valuePresInFragment() ] )
+
+
+
 class EmbeddedSuiteDisplay (object):
 	def __init__(self):
 		self._suite = EmbeddedPython25.suite()
@@ -109,9 +223,10 @@ class EmbeddedSuiteDisplay (object):
 		self._incr = IncrementalValueMonitor()
 		self.__change_history__ = None
 		
-		self._tableEditor = None
-		self._initNamedValues()
-		self._initExecutionLog()
+		self._tableSchema = None
+		self._tableView = None
+		
+		self._treeView = None
 		
 		
 	def __getstate__(self):
@@ -123,52 +238,46 @@ class EmbeddedSuiteDisplay (object):
 		self._incr = IncrementalValueMonitor()
 		self.__change_history__ = None
 		
-		self._tableEditor = None
-		self._initNamedValues()
-		self._initExecutionLog()
+		self._tableSchema = None
+		self._tableView = None
+		
+		self._treeView = None
 	
 	
 	def __get_trackable_contents__(self):
 		return [ self._suite ]
 		
 		
+	def _initTableSchema(self):
+		self._tableSchema = _TableSchema()
 	
-	def _initNamedValues(self):
-		self._namedValues = []
-		self._namedValueToindex = {}
+	def _initTableView(self):
+		self._tableView = _TableView( self._tableSchema )
+		self._incr.onChanged()
 	
-	def _initTable(self):
-		self._tableEditor = GenericTableEditor( [ v._name   for v in self._namedValues ], True, True, False, False )
+	
+	def _initTreeView(self):
+		self._treeView = _TreeView()
+		self._incr.onChanged()
+	
 	
 	def _registerNamedValue(self, namedValue):
-		self._namedValues.append( namedValue )
-		self._namedValueToindex[namedValue] = len( self._namedValues ) - 1
+		self._tableSchema.registerNamedValue( namedValue )
 	
-	
-		
-	def _initExecutionLog(self):
-		self._tableContent = GenericTableModel( lambda: '', lambda x: x )
-		self._tableRow = None
-
-		self._rootFrames = []
-		self._currentFrame = None
-		
-		self._incr.onChanged()
 	
 		
 	def _logValue(self, namedValue, value):
-		index = self._namedValueToindex[namedValue]
-		self._tableContent.set( index, self._tableRow, value )
-		
-		if self._currentFrame is not None:
-			self._currentFrame.values.append( ( namedValue, value ) )
+		self._tableView.logValue( namedValue, value )
+		self._treeView.logValue( namedValue, value )
 
-	
+		
+	def _clear(self):
+		self._initTableView()
+		self._initTreeView()
 
 		
 	def __py_compile_visit__(self, codeGen):
-		self._initNamedValues()
-		self._initExecutionLog()
+		self._initTableSchema()
 		
 		prevSuite = NamedValue._currentSuite
 		NamedValue._currentSuite = self
@@ -177,24 +286,19 @@ class EmbeddedSuiteDisplay (object):
 		
 		NamedValue._currentSuite = prevSuite
 		
-		self._initTable()
+		self._initTableView()
+		self._initTreeView()
 	
 		
 	def __py_exec__(self, _globals, _locals, codeGen):
-		# Open a new frame
-		prevFrame = self._currentFrame
-		self._tableRow = self._tableRow + 1   if self._tableRow is not None   else   0
-		
-		self._currentFrame = _Frame()
-		if prevFrame is not None:
-			prevFrame.childFrames.append( self._currentFrame )
-		else:
-			self._rootFrames.append( self._currentFrame )
-		
+		self._tableView.begin()
+		treeState = self._treeView.begin()
+
 		exec self._code in _globals, _locals
 		
-		self._currentFrame = prevFrame
-		self._incr.onChanged()
+		self._treeView.end( treeState )
+		
+		self._tableView.end()
 		
 	
 	def __py_replacement__(self):
@@ -204,7 +308,7 @@ class EmbeddedSuiteDisplay (object):
 	def __present__(self, fragment, inheritedState):
 		def _embeddedDisplayMenu(element, menu):
 			def _onClear(item):
-				self._initExecutionLog()
+				self._clear()
 			
 			menu.add( MenuItem.menuItemWithLabel( 'Clear collected values', _onClear ) )
 			
@@ -216,8 +320,12 @@ class EmbeddedSuiteDisplay (object):
 		suitePres = self._suite
 		
 		tableLabel = Label( 'Table' )
-		tablePres = self._tableEditor.editTable( self._tableContent )   if self._tableEditor is not None   else   Blank()
-		valuesPres = TabbedBox( [ [ Label( 'Table' ), tablePres ], [ Label( 'Tree' ), Blank() ] ], None )
+		tablePres = self._tableView   if self._tableView is not None   else   Blank()
+
+		treeLabel = Label( 'Tree' )
+		treePres = self._treeView   if self._treeView is not None   else   Blank()
+
+		valuesPres = TabbedBox( [ [ tableLabel, tablePres ], [ treeLabel, treePres ] ], None )
 		
 		contents = Column( [ suitePres, valuesPres ] )
 		return ObjectBox( 'Embedded suite display', contents ).withContextMenuInteractor( _embeddedDisplayMenu ).withCommands( _nvCommands )

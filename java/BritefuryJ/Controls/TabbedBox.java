@@ -294,16 +294,24 @@ public class TabbedBox extends ControlPres
 	private TabbedBoxListener listener;
 
 	
-	public TabbedBox(Pres tabs[][], int initialTab, TabbedBoxListener listener)
+	public TabbedBox(Object tabs[][], int initialTab, TabbedBoxListener listener)
 	{
 		super();
 
-		this.tabs = tabs;
+		this.tabs = new Pres[tabs.length][];
+		int i = 0;
+		for (Object tab[]: tabs)
+		{
+			this.tabs[i] = new Pres[2];
+			this.tabs[i][0] = Pres.coerce( tab[0] );
+			this.tabs[i][1] = Pres.coerce( tab[1] );
+			i++;
+		}
 		this.initialTab = initialTab;
 		this.listener = listener;
 	}
 
-	public TabbedBox(Pres tabs[][], TabbedBoxListener listener)
+	public TabbedBox(Object tabs[][], TabbedBoxListener listener)
 	{
 		this( tabs, 0, listener );
 	}
