@@ -348,8 +348,9 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, In
 		fieldData[index] = x;
 		if ( oldX != x )
 		{
-			notifyAddChild( x );
 			notifyRemoveChild( oldX );
+			notifyAddChild( x );
+			updateChildParentage( oldX );
 		}
 		incr.onChanged();
 		DMObject_changes.onSet( changeHistory, this, index, oldX, x );
@@ -412,8 +413,9 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, In
 				Object x = coerce( e.getValue() );
 				if ( oldX != x )
 				{
-					notifyAddChild( x );
 					notifyRemoveChild( oldX );
+					notifyAddChild( x );
+					updateChildParentage( oldX );
 				}
 				indices[i] = index;
 				oldContents[i] = oldX;
@@ -439,8 +441,9 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, In
 			Object x = coerce( xs[i] );
 			if ( oldX != x )
 			{
-				notifyAddChild( x );
 				notifyRemoveChild( oldX );
+				notifyAddChild( x );
+				updateChildParentage( oldX );
 			}
 			oldContents[i] = fieldData[index];
 			newContents[i] = x;
@@ -479,13 +482,17 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, In
 		}
 		System.arraycopy( data, 0, fieldData, 0, data.length );
 		
+		for (Object x: oldFieldData)
+		{
+			notifyRemoveChild( x );
+		}
 		for (Object x: data)
 		{
 			notifyAddChild( x );
 		}
 		for (Object x: oldFieldData)
 		{
-			notifyRemoveChild( x );
+			updateChildParentage( x );
 		}
 		DMObjectClass oldClass = objClass;
 		objClass = cls;

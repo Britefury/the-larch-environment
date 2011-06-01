@@ -63,7 +63,7 @@ public abstract class SequentialStreamEditor extends SequentialEditor
 			else if ( item instanceof StreamValue.TextItem )
 			{
 				StreamValue.TextItem textItem = (StreamValue.TextItem)item;
-				builder.appendTextValue( textItem.getTextValue() );
+				builder.appendTextValue( textItem.getValue() );
 			}
 		}
 		

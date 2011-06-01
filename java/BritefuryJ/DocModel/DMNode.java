@@ -154,6 +154,17 @@ public abstract class DMNode
 	public abstract DMNodeClass getDMNodeClass();
 	
 	
+	// Notify of child removals first
+	protected void notifyRemoveChild(Object c)
+	{
+		if ( isRealised()  &&  c instanceof DMNode )
+		{
+			// Set @c's parent to null. The next step, notifyAddChild() will set it back to this again, if the child is re-added
+			((DMNode)c).parent = null;
+		}
+	}
+	
+	// Notify of child additions second
 	protected void notifyAddChild(Object c)
 	{
 		if ( isRealised()  &&  c instanceof DMNode )
@@ -162,11 +173,18 @@ public abstract class DMNode
 		}
 	}
 	
-	protected void notifyRemoveChild(Object c)
+	protected void updateChildParentage(Object c)
 	{
 		if ( isRealised()  &&  c instanceof DMNode )
 		{
-			((DMNode)c).unrealiseSubtree( this );
+			DMNode child = (DMNode)c;
+			if ( child.parent == null )
+			{
+				// @child's parent has been set to null by notifyRemoveChild, and has not been re-added
+				// We must set the parent back to this again, so that unrealiseSubtree() will unrealise the sub-tree
+				child.parent = this;
+				child.unrealiseSubtree( this );
+			}
 		}
 	}
 	

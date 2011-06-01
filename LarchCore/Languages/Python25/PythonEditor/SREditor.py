@@ -145,8 +145,8 @@ class PythonSyntaxRecognizingEditor (SyntaxRecognizingEditor):
 	def _dedentLine(self, element, fragment, node):
 		suite = node.getParent()
 		suiteParent = suite.getParent()
-		if not suiteParent.isInstanceOf( Schema.PythonModule ):
-			# This statement is not in the root node
+		if not isTopLevel( suiteParent ):
+			# This statement is not within a top-level node
 			event = PythonDedentTreeEvent()
 			visitor = event.getStreamValueVisitor()
 			visitor.setElementPrefix( element, Schema.Dedent() )

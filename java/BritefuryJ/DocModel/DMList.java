@@ -498,6 +498,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Increm
 		for (Object x: copy)
 		{
 			notifyRemoveChild( x );
+			updateChildParentage( x );
 		}
 		DMList_changes.onClear( changeHistory, this, copy );
 	}
@@ -613,6 +614,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Increm
 	{
 		Object x = value.remove( i );
 		notifyRemoveChild( x );
+		updateChildParentage( x );
 		incr.onChanged();
 		DMList_changes.onRemove( changeHistory, this, i, x );
 		return x;
@@ -625,6 +627,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Increm
 		{
 			value.remove( i );
 			notifyRemoveChild( x );
+			updateChildParentage( x );
 			incr.onChanged();
 			DMList_changes.onRemove( changeHistory, this, i, x );
 		}
@@ -647,8 +650,9 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Increm
 		Object oldX = value.set( index, x );
 		if ( oldX != x )
 		{
-			notifyAddChild( x );
 			notifyRemoveChild( oldX );
+			notifyAddChild( x );
+			updateChildParentage( oldX );
 		}
 		incr.onChanged();
 		DMList_changes.onSet( changeHistory, this, index, oldX, x );
@@ -751,13 +755,17 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Increm
 
 		value.clear();
 		value.addAll( Arrays.asList( result ) );
+		for (Object x: oldContents)
+		{
+			notifyRemoveChild( x );
+		}
 		for (Object x: value)
 		{
 			notifyAddChild( x );
 		}
 		for (Object x: oldContents)
 		{
-			notifyRemoveChild( x );
+			updateChildParentage( x );
 		}
 		incr.onChanged();
 		DMList_changes.onSetContents( changeHistory, this, oldContents, result );
@@ -779,13 +787,17 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Increm
 
 		value.clear();
 		value.addAll( Arrays.asList( result ) );
+		for (Object x: oldContents)
+		{
+			notifyRemoveChild( x );
+		}
 		for (Object x: value)
 		{
 			notifyAddChild( x );
 		}
 		for (Object x: oldContents)
 		{
-			notifyRemoveChild( x );
+			updateChildParentage( x );
 		}
 		incr.onChanged();
 		DMList_changes.onSetContents( changeHistory, this, oldContents, result );
@@ -991,6 +1003,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Increm
 		{
 			Object x = value.get( j );
 			notifyRemoveChild( x );
+			updateChildParentage( x );
 			value.remove( j );
 		}
 		incr.onChanged();
@@ -1007,6 +1020,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Increm
 		{
 			Object x = value.get( start );
 			notifyRemoveChild( x );
+			updateChildParentage( x );
 			value.remove( start );
 		}
 		incr.onChanged();
@@ -1040,13 +1054,17 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Increm
 
 		value.clear();
 		value.addAll( Arrays.asList( xs ) );
+		for (Object x: oldContents)
+		{
+			notifyRemoveChild( x );
+		}
 		for (Object x: value)
 		{
 			notifyAddChild( x );
 		}
 		for (Object x: oldContents)
 		{
-			notifyRemoveChild( x );
+			updateChildParentage( x );
 		}
 		incr.onChanged();
 	
