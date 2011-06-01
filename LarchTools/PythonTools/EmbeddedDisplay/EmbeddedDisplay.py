@@ -117,12 +117,17 @@ class _TableView (object):
 		self._tableEditor = GenericTableEditor( [ v._name   for v in schema._namedValues ], True, True, False, False )
 		self._tableContent = GenericTableModel( lambda: '', lambda x: x )
 		self._tableRow = None
+		self._numTableRows = None
 	
 	
 	def begin(self):
-		self._tableRow = self._tableRow + 1   if self._tableRow is not None   else   0
+		state = self._tableRow
+		self._numTableRows = self._numTableRows + 1   if self._numTableRows is not None   else   0
+		self._tableRow = self._numTableRows
+		return state
 	
-	def end(self):
+	def end(self, state):
+		self._tableRow = state
 		self._incr.onChanged()
 
 	
@@ -291,14 +296,13 @@ class EmbeddedSuiteDisplay (object):
 	
 		
 	def __py_exec__(self, _globals, _locals, codeGen):
-		self._tableView.begin()
+		tableState = self._tableView.begin()
 		treeState = self._treeView.begin()
 
 		exec self._code in _globals, _locals
 		
 		self._treeView.end( treeState )
-		
-		self._tableView.end()
+		self._tableView.end( tableState )
 		
 	
 	def __py_replacement__(self):
@@ -319,13 +323,13 @@ class EmbeddedSuiteDisplay (object):
 		self._incr.onAccess()
 		suitePres = self._suite
 		
-		tableLabel = Label( 'Table' )
-		tablePres = self._tableView   if self._tableView is not None   else   Blank()
-
 		treeLabel = Label( 'Tree' )
 		treePres = self._treeView   if self._treeView is not None   else   Blank()
 
-		valuesPres = TabbedBox( [ [ tableLabel, tablePres ], [ treeLabel, treePres ] ], None )
+		tableLabel = Label( 'Table' )
+		tablePres = self._tableView   if self._tableView is not None   else   Blank()
+
+		valuesPres = TabbedBox( [ [ treeLabel, treePres ],  [ tableLabel, tablePres ] ], None )
 		
 		contents = Column( [ suitePres, valuesPres ] )
 		return ObjectBox( 'Embedded suite display', contents ).withContextMenuInteractor( _embeddedDisplayMenu ).withCommands( _nvCommands )

@@ -197,7 +197,7 @@ public class Vector2 implements Presentable, Serializable
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return new Row( new Pres[] { delimStyle.applyTo( new Label( "[" ) ).alignVCentre(),
-				vectorStyle.applyTo( new Column( new Pres[] { new Label( String.valueOf( x ) ), new Label( String.valueOf( x ) ) } ) ),
+				vectorStyle.applyTo( new Column( new Pres[] { new Label( String.valueOf( x ) ), new Label( String.valueOf( y ) ) } ) ),
 				delimStyle.applyTo( new Label( "]" ) ).alignVCentre() } );
 	}
 	

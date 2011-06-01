@@ -85,26 +85,55 @@ public class AABox2 implements Serializable
 	
 	public void addPoint(double x, double y)
 	{
-		lowerX = Math.min( lowerX, x );
-		lowerY = Math.min( lowerY, y );
-		upperX = Math.max( upperX, x );
-		upperY = Math.max( upperY, y );
+		if ( isEmpty() )
+		{
+			lowerX = upperX = x;
+			lowerY = upperY = y;
+		}
+		else
+		{
+			lowerX = Math.min( lowerX, x );
+			lowerY = Math.min( lowerY, y );
+			upperX = Math.max( upperX, x );
+			upperY = Math.max( upperY, y );
+		}
 	}
 	
 	public void addPoint(Point2 p)
 	{
-		lowerX = Math.min( lowerX, p.x );
-		lowerY = Math.min( lowerY, p.y );
-		upperX = Math.max( upperX, p.x );
-		upperY = Math.max( upperY, p.y );
+		if ( isEmpty() )
+		{
+			lowerX = upperX = p.x;
+			lowerY = upperY = p.y;
+		}
+		else
+		{
+			lowerX = Math.min( lowerX, p.x );
+			lowerY = Math.min( lowerY, p.y );
+			upperX = Math.max( upperX, p.x );
+			upperY = Math.max( upperY, p.y );
+		}
 	}
 	
 	public void addBox(AABox2 b)
 	{
-		lowerX = Math.min( lowerX, b.lowerX );
-		lowerY = Math.min( lowerY, b.lowerY );
-		upperX = Math.max( upperX, b.upperX );
-		upperY = Math.max( upperY, b.upperY );
+		if ( !b.isEmpty() )
+		{
+			if ( isEmpty() )
+			{
+				lowerX = b.lowerX;
+				lowerY = b.lowerY;
+				upperX = b.upperX;
+				upperY = b.upperY;
+			}
+			else
+			{
+				lowerX = Math.min( lowerX, b.lowerX );
+				lowerY = Math.min( lowerY, b.lowerY );
+				upperX = Math.max( upperX, b.upperX );
+				upperY = Math.max( upperY, b.upperY );
+			}
+		}
 	}
 	
 	
