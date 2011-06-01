@@ -38,6 +38,7 @@ public class GenericTableEditorInstance extends AbstractTableEditorInstance<Gene
 		if ( hasTopHeader() )
 		{
 			Object firstRow[] = new Object[headerColumns];
+			String columnTitles[] = genericEditor.columnTitles;
 			if ( hasLeftHeader() )
 			{
 				firstRow[0] = new Blank();
@@ -45,7 +46,8 @@ public class GenericTableEditorInstance extends AbstractTableEditorInstance<Gene
 			for (int x = 0; x < width; x++)
 			{
 				int ex = tableXToElementX( x );
-				firstRow[ex] = new Label( String.valueOf( x ) ).withStyleSheetFromAttr( TableEditorStyle.headerAttrs );
+				String title = columnTitles != null  &&  x < columnTitles.length   ?   genericEditor.columnTitles[x]  :  String.valueOf( x );
+				firstRow[ex] = new Label( title ).withStyleSheetFromAttr( TableEditorStyle.headerAttrs );
 			}
 			cells[0] = firstRow;
 		}

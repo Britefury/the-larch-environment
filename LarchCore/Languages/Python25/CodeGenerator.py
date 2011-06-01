@@ -1009,7 +1009,7 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 		else:
 			execFnSource = self._resource( execFn )
 			selfSource = self._resource( self )
-			return execFnSource + '( globals(), locals(), ' + selfSource + ' )'
+			return Line( execFnSource + '( globals(), locals(), ' + selfSource + ' )',  node )
 
 			
 		# Try to use the __py_localnames__ and __py_localvalues__ method pair

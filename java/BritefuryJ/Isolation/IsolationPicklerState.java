@@ -110,7 +110,7 @@ class IsolationPicklerState
 		
 		
 		
-		if ( isolatedObjects.size() == 0 )
+		if ( isolatedObjects.isEmpty() )
 		{
 			// No isolated objects - we are done
 			rootPickler.dump( Py.False );
@@ -168,8 +168,13 @@ class IsolationPicklerState
 			// If an isolated value is in the list of root objects, create an entry in the roof refs table
 			prev = pushPicklerState();
 			PyList isolatedRootRefs = new PyList();
-			for (PyObject isolatedObject : isolatedObjects)
+			// NOTE: we MUST iterate by index here  -  the pickling process will want to add new elements to @isolatedObjects
+			// WHILE we are iterating over it, in the case of nested isolated objects. If we iterate using an iterator, we get a
+			// concurrent modification exception.
+			for (int i = 0; i < isolatedObjects.size(); i++)
 			{
+				PyObject isolatedObject = isolatedObjects.get( i );
+				
 				// Create stream for detecting references
 				cStringIO.StringIO stream = new cStringIO.StringIO();
 				cPickle.Pickler pickler = new cPickle.Pickler( stream, 0 );

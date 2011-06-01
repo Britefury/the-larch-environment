@@ -15,19 +15,32 @@ import BritefuryJ.Util.UnaryFn;
 public class GenericTableEditor extends AbstractTableEditor<GenericTableModelInterface>
 {
 	protected Pres blankPres;
+	protected String columnTitles[];
 	
 	
 	
-	
-	public GenericTableEditor(boolean showLeftHeader, boolean showTopHeader, boolean growRight, boolean growDown, UnaryFn converValueFn)
+	public GenericTableEditor(String columnTitles[], boolean showLeftHeader, boolean showTopHeader, boolean growRight, boolean growDown, UnaryFn convertValueFn)
 	{
 		super( showLeftHeader, showTopHeader, growRight, growDown );
-		this.blankPres = PrimitiveCellEditPresenter.presentEditableText( "", converValueFn );
+		this.columnTitles = columnTitles;
+		this.blankPres = PrimitiveCellEditPresenter.presentEditableText( "", convertValueFn );
+	}
+	
+	public GenericTableEditor(String columnTitles[], boolean showLeftHeader, boolean showTopHeader, boolean growRight, boolean growDown)
+	{
+		this( columnTitles, showLeftHeader, showTopHeader, growRight, growDown, UnaryFn.identity );
+	}
+	
+	
+	
+	public GenericTableEditor(boolean showLeftHeader, boolean showTopHeader, boolean growRight, boolean growDown, UnaryFn convertValueFn)
+	{
+		this( null, showLeftHeader, showTopHeader, growRight, growDown, convertValueFn );
 	}
 	
 	public GenericTableEditor(boolean showLeftHeader, boolean showTopHeader, boolean growRight, boolean growDown)
 	{
-		this( showLeftHeader, showTopHeader, growRight, growDown, UnaryFn.identity );
+		this( null, showLeftHeader, showTopHeader, growRight, growDown );
 	}
 	
 	

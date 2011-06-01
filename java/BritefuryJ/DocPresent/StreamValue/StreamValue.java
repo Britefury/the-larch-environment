@@ -111,7 +111,7 @@ public class StreamValue implements Presentable
 		}
 		
 		
-		public String getTextValue()
+		public String getValue()
 		{
 			return textValue;
 		}

@@ -21,11 +21,14 @@ from BritefuryJ.Pres import *
 from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.Pres.ObjectPres import *
 
+from BritefuryJ.Editor.Table.Generic import *
+
 from BritefuryJ.StyleSheet import *
 
 from LarchCore.Languages.Python25.PythonCommands import pythonCommands, makeInsertEmbeddedExpressionAtCaretAction, makeWrapSelectionInEmbeddedExpressionAction,	\
 	makeWrapSelectedStatementRangeInEmbeddedObjectAction, chainActions
 from LarchCore.Languages.Python25.Python25 import EmbeddedPython25
+from LarchCore.Languages.Python25 import Schema
 from LarchCore.Languages.Python25.PythonEditor.PythonEditOperations import getSelectedExpression, pyReplaceNode
 from LarchCore.Languages.Python25.PythonEditor.View import perspective as pyPerspective
 
@@ -106,10 +109,9 @@ class EmbeddedSuiteDisplay (object):
 		self._incr = IncrementalValueMonitor()
 		self.__change_history__ = None
 		
-		self._namedValues = []
-		self._rootFrames = []
-		self._currentFrame = None
-#		self._sequentialFrames = 
+		self._tableEditor = None
+		self._initNamedValues()
+		self._initExecutionLog()
 		
 		
 	def __getstate__(self):
@@ -121,36 +123,67 @@ class EmbeddedSuiteDisplay (object):
 		self._incr = IncrementalValueMonitor()
 		self.__change_history__ = None
 		
-		self._namedValues = []
-		self._rootFrames = []
-		self._currentFrame = None
+		self._tableEditor = None
+		self._initNamedValues()
+		self._initExecutionLog()
 	
 	
 	def __get_trackable_contents__(self):
 		return [ self._suite ]
 		
 		
-	def _clearNamedValues(self):
+	
+	def _initNamedValues(self):
 		self._namedValues = []
+		self._namedValueToindex = {}
+	
+	def _initTable(self):
+		self._tableEditor = GenericTableEditor( [ v._name   for v in self._namedValues ], True, True, False, False )
 	
 	def _registerNamedValue(self, namedValue):
 		self._namedValues.append( namedValue )
+		self._namedValueToindex[namedValue] = len( self._namedValues ) - 1
 	
 	
+		
+	def _initExecutionLog(self):
+		self._tableContent = GenericTableModel( lambda: '', lambda x: x )
+		self._tableRow = None
+
+		self._rootFrames = []
+		self._currentFrame = None
+		
+		self._incr.onChanged()
+	
+		
+	def _logValue(self, namedValue, value):
+		index = self._namedValueToindex[namedValue]
+		self._tableContent.set( index, self._tableRow, value )
+		
+		if self._currentFrame is not None:
+			self._currentFrame.values.append( ( namedValue, value ) )
+
+	
+
+		
 	def __py_compile_visit__(self, codeGen):
-		self._clearNamedValues()
+		self._initNamedValues()
+		self._initExecutionLog()
 		
 		prevSuite = NamedValue._currentSuite
 		NamedValue._currentSuite = self
 		
-		self._code = codeGen.compileForEvaluation( self._suite.model )
+		self._code = codeGen.compileForExecution( self._suite.model )
 		
 		NamedValue._currentSuite = prevSuite
+		
+		self._initTable()
 	
 		
 	def __py_exec__(self, _globals, _locals, codeGen):
 		# Open a new frame
 		prevFrame = self._currentFrame
+		self._tableRow = self._tableRow + 1   if self._tableRow is not None   else   0
 		
 		self._currentFrame = _Frame()
 		if prevFrame is not None:
@@ -168,20 +201,10 @@ class EmbeddedSuiteDisplay (object):
 		return deepcopy( self._suite.model['suite'] )
 		
 	
-	def _logValue(self, namedValue, value):
-		if self._currentFrame is not None:
-			self._currentFrame.values.append( namedValue, value )
-
-	def _clear(self):
-		self._rootFrames = []
-		self._currentFrame = None
-		self._incr.onChanged()
-	
-	
 	def __present__(self, fragment, inheritedState):
 		def _embeddedDisplayMenu(element, menu):
 			def _onClear(item):
-				self._clear()
+				self._initExecutionLog()
 			
 			menu.add( MenuItem.menuItemWithLabel( 'Clear collected values', _onClear ) )
 			
@@ -192,7 +215,9 @@ class EmbeddedSuiteDisplay (object):
 		self._incr.onAccess()
 		suitePres = self._suite
 		
-		valuesPres = TabbedBox( [ [ Label( 'Table' ), Blank() ], [ Label( 'Trace' ), Blank() ] ], None )
+		tableLabel = Label( 'Table' )
+		tablePres = self._tableEditor.editTable( self._tableContent )   if self._tableEditor is not None   else   Blank()
+		valuesPres = TabbedBox( [ [ Label( 'Table' ), tablePres ], [ Label( 'Tree' ), Blank() ] ], None )
 		
 		contents = Column( [ suitePres, valuesPres ] )
 		return ObjectBox( 'Embedded suite display', contents ).withContextMenuInteractor( _embeddedDisplayMenu ).withCommands( _nvCommands )
@@ -206,6 +231,7 @@ class NamedValue (object):
 	def __init__(self):
 		self._name = 'value'
 		self._expr = EmbeddedPython25.expression()
+		self._suite = None
 		self._code = None
 		self._incr = IncrementalValueMonitor()
 		self.__change_history__ = None
@@ -217,6 +243,7 @@ class NamedValue (object):
 	def __setstate__(self, state):
 		self._name = state['name']
 		self._expr = state['expr']
+		self._suite = None
 		self._code = None
 		self._incr = IncrementalValueMonitor()
 		self.__change_history__ = None
@@ -228,14 +255,15 @@ class NamedValue (object):
 		
 	def __py_compile_visit__(self, codeGen):
 		self._code = codeGen.compileForEvaluation( self._expr.model )
-		if self._currentSuite is not None:
-			self._currentSuite._registerNamedValue( self )
+		self._suite = self._currentSuite
+		if self._suite is not None:
+			self._suite._registerNamedValue( self )
 	
 	
 	def __py_eval__(self, _globals, _locals, codeGen):
 		value = eval( self._code, _globals, _locals )
-		if self._currentSuite is not None:
-			self._currentSuite._logValue( self, value )
+		if self._suite is not None:
+			self._suite._logValue( self, value )
 		return value
 	
 	def __py_replacement__(self):
@@ -251,12 +279,10 @@ class NamedValue (object):
 			
 
 		namePres = EditableLabel( self._name, self._nameNotSetStyle( Label( '<not set>' ) ), _setName, Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*' ), 'Please enter a valid identifier' )
-		nameLabel = Label( 'Name: ' )
-		name = Row( [ nameLabel, namePres ] )
 		
 		exprPres = self._expr
 		
-		contents = Column( [ name, exprPres ] )
+		contents = Row( [ namePres, Label( ': ' ), exprPres ] )
 		return ObjectBox( 'Named value', contents )
 		
 	_nameNotSetStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.5, 0.0, 0.0 ) ).withAttr( Primitive.fontItalic, True )
@@ -269,6 +295,8 @@ def _newNamedValueAtCaret(caret):
 def _newNamedValueAtSelection(expr, selection):
 	d = NamedValue()
 	d._expr.model['expr'] = deepcopy( expr )
+	if expr.isInstanceOf( Schema.Load ):
+		d._name = expr['name']
 	return d
 
 _exprNamedValueAtCaret = makeInsertEmbeddedExpressionAtCaretAction( _newNamedValueAtCaret )
