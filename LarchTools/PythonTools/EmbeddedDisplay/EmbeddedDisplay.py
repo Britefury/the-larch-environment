@@ -159,16 +159,35 @@ class _FrameValues (object):
 
 	
 class _FrameInteractor (PushElementInteractor):
-	def __init__(self, values, valuesUnit):
-		self._values = values
+	def __init__(self, frame, valuesUnit):
+		self._frame = frame
 		self._valuesUnit = valuesUnit
 	
 	def buttonPress(self, element, event):
 		return event.getButton() == 1
 	
 	def buttonRelease(self, element, event):
-		self._valuesUnit.setLiteralValue( self._values )
+		self._valuesUnit.setLiteralValue( self._frame.values )
 	
+
+class _FrameBox (object):
+	def __init__(self, frame, valuesUnit):
+		self._frame = frame
+		self._valuesUnit = valuesUnit
+
+	def __present__(self, fragment, inheritedState):
+		interactor = _FrameInteractor( self._frame, self._valuesUnit )
+		box = Box( 15.0, 5.0 ).withElementInteractor( interactor )
+		if self._valuesUnit.getValue() is self._frame.values:
+			return self._selectedTabFrameStyle.applyTo( box )
+		else:
+			return self._tabFrameStyle.applyTo( box )
+
+	_tabFrameStyle = StyleSheet.instance.withAttr( Primitive.shapePainter, FilledOutlinePainter( Color( 0.85, 0.9, 0.85 ), Color( 0.6, 0.8, 0.6 ) ) ). \
+	               withAttr( Primitive.hoverShapePainter, FilledOutlinePainter( Color( 0.6, 0.8, 0.6 ), Color( 0.0, 0.5, 0.0 ) ) )
+	_selectedTabFrameStyle = StyleSheet.instance.withAttr( Primitive.shapePainter, FilledOutlinePainter( Color( 1.0, 1.0, 0.85 ), Color( 1.0, 0.8, 0.0 ) ) ). \
+	               withAttr( Primitive.hoverShapePainter, FilledOutlinePainter( Color( 1.0, 1.0, 0.6 ), Color( 1.0, 0.5, 0.0 ) ) )
+
 
 class _Frame (object):
 	def __init__(self):
@@ -176,12 +195,9 @@ class _Frame (object):
 		self.childFrames = []
 	
 	def _presentFrameSubtree(self, valuesUnit):
-		interactor = _FrameInteractor( self.values, valuesUnit )
-		tab = self._tabFrameStyle.applyTo( Box( 15.0, 5.0 ).withElementInteractor( interactor ) ).pad( 2.0, 2.0 ).alignVExpand()
+		frameBox = _FrameBox( self, valuesUnit )
+		tab = Pres.coerce( frameBox ).pad( 2.0, 2.0 ).alignVExpand()
 		return Row( [ tab, Column( [ x._presentFrameSubtree( valuesUnit )   for x in self.childFrames ] ) ] )
-
-	_tabFrameStyle = StyleSheet.instance.withAttr( Primitive.shapePainter, FilledOutlinePainter( Color( 0.85, 0.9, 0.85 ), Color( 0.6, 0.8, 0.6 ) ) ). \
-	               withAttr( Primitive.hoverShapePainter, FilledOutlinePainter( Color( 0.6, 0.8, 0.6 ), Color( 0.0, 0.5, 0.0 ) ) )
 	
 	
 	

@@ -531,13 +531,13 @@ class Python25View (ObjectNodeDispatchView):
 			if format == 'decimal':
 				valueString = '%d'  %  int( value )
 			elif format == 'hex':
-				valueString = '%x'  %  int( value, 16 )
+				valueString = '0x%x'  %  int( value, 16 )
 			fmt = None
 		elif numType == 'long':
 			if format == 'decimal':
 				valueString = '%d'  %  long( value )
 			elif format == 'hex':
-				valueString = '%x'  %  long( value, 16 )
+				valueString = '0x%x'  %  long( value, 16 )
 			fmt = 'L'
 
 		return intLiteral( fmt, valueString )

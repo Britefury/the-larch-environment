@@ -7,10 +7,10 @@
 ##-*************************
 from copy import deepcopy
 
-from BritefuryJ.Editor.Sequential import SequentialEditor
+from BritefuryJ.Editor.Sequential import SequentialStreamEditor
 
 
-class WorksheetSequentialEditor (SequentialEditor):
+class WorksheetSequentialEditor (SequentialStreamEditor):
 	def getName(self):
 		return 'WsEdit'
 	
