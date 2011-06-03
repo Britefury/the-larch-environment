@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent.StreamValue;
 
-import java.util.HashMap;
+import java.util.IdentityHashMap;
 
 import BritefuryJ.DocPresent.DPContentLeafEditable;
 import BritefuryJ.DocPresent.DPElement;
@@ -282,7 +282,7 @@ public class SequentialStreamValueVisitor extends AbstractStreamValueVisitor
 	}
 	
 	
-	protected HashMap<DPElement, ElementModification> modifications;
+	protected IdentityHashMap<DPElement, ElementModification> modifications;
 	
 	
 	
@@ -388,7 +388,7 @@ public class SequentialStreamValueVisitor extends AbstractStreamValueVisitor
 	{
 		if ( modifications == null )
 		{
-			modifications = new HashMap<DPElement, ElementModification>();
+			modifications = new IdentityHashMap<DPElement, ElementModification>();
 		}
 		
 		ElementModification mod = modifications.get( element );

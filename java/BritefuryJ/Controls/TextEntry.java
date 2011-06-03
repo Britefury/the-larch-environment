@@ -35,7 +35,6 @@ import BritefuryJ.Pres.Primitive.Region;
 import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Pres.Primitive.Segment;
 import BritefuryJ.Pres.Primitive.Text;
-import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class TextEntry extends ControlPres
@@ -243,7 +242,7 @@ public class TextEntry extends ControlPres
 	
 	
 		
-		protected TextEntryControl(PresentationContext ctx, StyleValues style, DPBorder outerElement, DPRegion frame, DPText textElement, TextEntryListener listener, TextEntryValidator validator,
+		protected TextEntryControl(PresentationContext ctx, StyleValues style, DPBorder outerElement, DPRegion region, DPText textElement, TextEntryListener listener, TextEntryValidator validator,
 				BritefuryJ.DocPresent.Border.AbstractBorder validBorder, BritefuryJ.DocPresent.Border.AbstractBorder invalidBorder)
 		{
 			super( ctx, style );
@@ -262,7 +261,7 @@ public class TextEntry extends ControlPres
 			
 			outerElement.setValueFunction( new ValueFn() );
 			
-			frame.setClipboardHandler( new TextEntryClipboardHandler() );
+			region.setClipboardHandler( new TextEntryClipboardHandler() );
 			
 			validate( originalText );
 		}
@@ -395,10 +394,12 @@ public class TextEntry extends ControlPres
 	@Override
 	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
+		style = style.withAttr( Primitive.editable, true );
+
 		BritefuryJ.DocPresent.Border.AbstractBorder validBorder = style.get( Controls.textEntryBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class ); 
 		BritefuryJ.DocPresent.Border.AbstractBorder invalidBorder = style.get( Controls.textEntryInvalidBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class );
 		
-		DPText textElement = (DPText)StyleSheet.instance.withAttr( Primitive.editable, true ).applyTo( new Text( initialText ) ).present( ctx, style );
+		DPText textElement = (DPText)new Text( initialText ).present( ctx, style );
 		Pres line = new Row( new Pres[] { new Segment( false, false, textElement ) } );
 		Pres region = new Region( line );
 		DPRegion regionElement = (DPRegion)region.present( ctx, style );
