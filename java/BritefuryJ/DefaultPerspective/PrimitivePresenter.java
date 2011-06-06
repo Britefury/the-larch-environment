@@ -13,11 +13,18 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
+import org.python.core.Py;
+import org.python.core.PyBoolean;
 import org.python.core.PyDictionary;
+import org.python.core.PyFloat;
+import org.python.core.PyInteger;
 import org.python.core.PyList;
+import org.python.core.PyLong;
 import org.python.core.PyObject;
+import org.python.core.PyString;
 import org.python.core.PyStringMap;
 import org.python.core.PyTuple;
+import org.python.core.PyUnicode;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Controls.DropDownExpander;
@@ -38,7 +45,19 @@ import BritefuryJ.StyleSheet.StyleSheet;
 
 public class PrimitivePresenter
 {
-	public static Pres presentChar(char c, FragmentView fragment, SimpleAttributeTable inheritedState)
+	public static Pres presentBoolean(boolean b)
+	{
+		if ( b )
+		{
+			return booleanStyle.applyTo( new StaticText( "True" ) );
+		}
+		else
+		{
+			return booleanStyle.applyTo( new StaticText( "False" ) );
+		}
+	}
+	
+	public static Pres presentChar(char c)
 	{
 		String str = Character.toString( c );
 		return new Row( new Pres[] {
@@ -47,7 +66,7 @@ public class PrimitivePresenter
 				punctuationStyle.applyTo( new StaticText(  "'" ) ) } );
 	}
 	
-	public static Pres presentString(String text, FragmentView fragment, SimpleAttributeTable inheritedState)
+	public static Pres presentString(String text)
 	{
 		String textLines[] = text.split( "\n" );
 		if ( textLines.length == 1 )
@@ -81,48 +100,48 @@ public class PrimitivePresenter
 		}
 	}
 
-	public static Pres presentByte(byte b, FragmentView fragment, SimpleAttributeTable inheritedState)
+	public static Pres presentByte(byte b)
 	{
 		return integerStyle.applyTo( new StaticText( Integer.toHexString( ((int)b) & 0xff ) ) );
 	}
 	
 	
-	public static Pres presentShort(short x, FragmentView fragment, SimpleAttributeTable inheritedState)
+	public static Pres presentShort(short x)
 	{
 		return integerStyle.applyTo( new StaticText( Short.toString( x ) ) );
 	}
 	
-	public static Pres presentInt(int x, FragmentView fragment, SimpleAttributeTable inheritedState)
+	public static Pres presentInt(int x)
 	{
 		return integerStyle.applyTo( new StaticText( Integer.toString( x ) ) );
 	}
 	
-	public static Pres presentLong(long x, FragmentView fragment, SimpleAttributeTable inheritedState)
+	public static Pres presentLong(long x)
 	{
 		return integerStyle.applyTo( new StaticText( Long.toString( x ) ) );
 	}
 	
-	public static Pres presentBigInteger(BigInteger x, FragmentView fragment, SimpleAttributeTable inheritedState)
+	public static Pres presentBigInteger(BigInteger x)
 	{
 		return integerStyle.applyTo( new StaticText( x.toString() + "L" ) );
 	}
 	
-	public static Pres presentBigDecimal(BigDecimal x, FragmentView fragment, SimpleAttributeTable inheritedState)
+	public static Pres presentBigDecimal(BigDecimal x)
 	{
 		return integerStyle.applyTo( new StaticText( x.toString() + "LD" ) );
 	}
 	
-	public static Pres presentDouble(double x, FragmentView fragment, SimpleAttributeTable inheritedState)
+	public static Pres presentFloat(float x)
 	{
-		String asText = Double.toString( x );
+		String asText = Float.toString( x );
 		
 		if ( asText.contains( "e" ) )
 		{
-			return presentSIDouble( asText, asText.indexOf( "e" ) );
+			return presentSIReal( asText, asText.indexOf( "e" ) );
 		}
 		else if ( asText.contains( "E" ) )
 		{
-			return presentSIDouble( asText, asText.indexOf( "E" ) );
+			return presentSIReal( asText, asText.indexOf( "E" ) );
 		}
 		else
 		{
@@ -130,7 +149,25 @@ public class PrimitivePresenter
 		}
 	}
 	
-	public static Pres presentSIDouble(String textValue, int expIndex)
+	public static Pres presentDouble(double x)
+	{
+		String asText = Double.toString( x );
+		
+		if ( asText.contains( "e" ) )
+		{
+			return presentSIReal( asText, asText.indexOf( "e" ) );
+		}
+		else if ( asText.contains( "E" ) )
+		{
+			return presentSIReal( asText, asText.indexOf( "E" ) );
+		}
+		else
+		{
+			return floatStyle.applyTo( new StaticText( asText ) );
+		}
+	}
+	
+	public static Pres presentSIReal(String textValue, int expIndex)
 	{
 		Pres mantissa = floatStyle.applyTo( new StaticText( textValue.substring( 0, expIndex ) + "*10" ) );
 		Pres exponent = floatStyle.applyTo( new StaticText( textValue.substring( expIndex + 1, textValue.length() ) ) );
@@ -147,15 +184,152 @@ public class PrimitivePresenter
 		return nullStyle.applyTo( new StaticText( "None" ) );
 	}
 	
-	public static Pres presentBoolean(boolean b, FragmentView fragment, SimpleAttributeTable inheritedState)
+	
+	public static boolean isSmallString(String str)
 	{
-		if ( b )
+		return !str.contains( "\n" )  ||  str.length() < 128;
+	}
+	
+	
+	public static boolean isSmallPrimitive(Object x)
+	{
+		if ( x == null  ||  x instanceof Boolean  ||  x instanceof Character  ||
+			x instanceof Byte  ||  x instanceof Short  ||  x instanceof Integer  ||  x instanceof Long  ||  x instanceof Float  ||  x instanceof Double )
 		{
-			return booleanStyle.applyTo( new StaticText( "True" ) );
+			return true;
+		}
+		else if ( x instanceof String )
+		{
+			return isSmallString( (String)x );
 		}
 		else
 		{
-			return booleanStyle.applyTo( new StaticText( "False" ) );
+			return false;
+		}
+	}
+	
+	public static boolean isPrimitive(Object x)
+	{
+		return x == null  ||  x instanceof Boolean  ||  x instanceof Character  ||  x instanceof String  ||
+			x instanceof Byte  ||  x instanceof Short  ||  x instanceof Integer  ||  x instanceof Long  ||  x instanceof Float  ||  x instanceof Double  ||
+			x instanceof BigInteger  ||  x instanceof BigDecimal;
+	}
+	
+	
+	public static Pres presentPrimitive(Object x)
+	{
+		if ( x == null )
+		{
+			return presentNull();
+		}
+		else if ( x instanceof Boolean )
+		{
+			return presentBoolean( (Boolean)x );
+		}
+		else if ( x instanceof Character )
+		{
+			return presentChar( (Character)x );
+		}
+		else if ( x instanceof String )
+		{
+			return presentString( (String)x );
+		}
+		else if ( x instanceof String )
+		{
+			return presentString( (String)x );
+		}
+		else if ( x instanceof Byte )
+		{
+			return presentByte( (Byte)x );
+		}
+		else if ( x instanceof Short )
+		{
+			return presentShort( (Short)x );
+		}
+		else if ( x instanceof Integer )
+		{
+			return presentInt( (Integer)x );
+		}
+		else if ( x instanceof Long )
+		{
+			return presentLong( (Long)x );
+		}
+		else if ( x instanceof Float )
+		{
+			return presentFloat( (Float)x );
+		}
+		else if ( x instanceof Double )
+		{
+			return presentDouble( (Double)x );
+		}
+		else if ( x instanceof BigInteger )
+		{
+			return presentBigInteger( (BigInteger)x );
+		}
+		else if ( x instanceof BigDecimal )
+		{
+			return presentBigDecimal( (BigDecimal)x );
+		}
+		else
+		{
+			throw new RuntimeException( "Object is not a primitive" );
+		}
+	}
+	
+	
+	
+	public static boolean isSmallPrimitivePy(PyObject x)
+	{
+		if ( x == null  ||  x instanceof PyBoolean  ||  x instanceof PyInteger  ||  x instanceof PyFloat )
+		{
+			return true;
+		}
+		else if ( x instanceof PyString  ||  x instanceof PyUnicode )
+		{
+			return isSmallString( x.asString() );
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	public static boolean isPrimitivePy(PyObject x)
+	{
+		return x == null  ||  x instanceof PyBoolean  ||  x instanceof PyString  ||  x instanceof PyUnicode  ||
+			x instanceof PyInteger  ||  x instanceof PyLong  ||  x instanceof PyFloat;
+	}
+	
+	
+	public static Pres presentPrimitivePy(PyObject x)
+	{
+		if ( x == Py.None )
+		{
+			return presentNone();
+		}
+		else if ( x instanceof PyBoolean )
+		{
+			return presentBoolean( ((PyBoolean)x).getBooleanValue() );
+		}
+		else if ( x instanceof PyString  ||  x instanceof PyUnicode )
+		{
+			return presentString( x.asString() );
+		}
+		else if ( x instanceof PyInteger )
+		{
+			return presentInt( x.asInt() );
+		}
+		else if ( x instanceof PyLong )
+		{
+			return presentBigInteger( ((PyLong)x).getValue() );
+		}
+		else if ( x instanceof PyFloat )
+		{
+			return presentDouble( x.asDouble() );
+		}
+		else
+		{
+			throw new RuntimeException( "Python object is not a primitive" );
 		}
 	}
 	
@@ -188,24 +362,54 @@ public class PrimitivePresenter
 		Class<?> cls = x.getClass();
 		for (Field field: cls.getFields())
 		{
-			Pres header = new Row( new Pres[] {
-					presentJavaClassName( field.getType(), typeNameStyle ),
-					space,
-					getAccessNameStyle( field.getModifiers() ).applyTo( new Label( field.getName() ) ) } );
-			Pres value;
+			boolean isSmall = false;
+			Object value = null;
+			Pres valuePres = null;
 			try
 			{
-				value = new InnerFragment( field.get( x ) );
+				value = field.get( x );
 			}
-			catch (IllegalArgumentException e)
+			catch (IllegalArgumentException e1)
 			{
-				value = errorStyle.applyTo( new Label( "<Illegal argument>" ) );
+				valuePres = errorStyle.applyTo( new Label( "<Illegal argument>" ) );
+				isSmall = true;
 			}
-			catch (IllegalAccessException e)
+			catch (IllegalAccessException e1)
 			{
-				value = errorStyle.applyTo( new Label( "<Cannot access>" ) );
+				valuePres = errorStyle.applyTo( new Label( "<Cannot access>" ) );
+				isSmall = true;
 			}
-			fields.add( new Column( new Pres[] { header, value.padX( 45.0, 0.0 ) } ) );
+			
+			if ( valuePres == null )
+			{
+				// No exception thrown while getting field value
+				if ( isPrimitive( value ) )
+				{
+					isSmall = isSmallPrimitive( value );
+					valuePres = presentPrimitive( value );
+				}
+				else
+				{
+					valuePres = new InnerFragment( value );
+				}
+			}
+			if ( isSmall )
+			{
+				fields.add( new Row( new Pres[] {
+						presentJavaClassName( field.getType(), typeNameStyle ),
+						space,
+						getAccessNameStyle( field.getModifiers() ).applyTo( new Label( field.getName() ) ),
+						space,
+						valuePres } ) );
+			}
+			else
+			{
+				Pres header = new Row( new Pres[] {
+						presentJavaClassName( field.getType(), typeNameStyle ),
+						space,
+						getAccessNameStyle( field.getModifiers() ).applyTo( new Label( field.getName() ) ) } );
+				fields.add( new Column( new Pres[] { header, valuePres.padX( 45.0, 0.0 ) } ) );
+			}
 		}
 		if ( fields.size() > 0 )
 		{
@@ -260,8 +464,28 @@ public class PrimitivePresenter
 				}
 				
 				Pres namePres = attributeNameStyle.applyTo( new Label( name ) );
-				Pres valueView = new InnerFragment( value ).padX( 15.0, 0.0 );
-				attributes.add( new Column( new Pres[] { namePres, valueView } ) );
+				Pres valuePres = null;
+				boolean isSmall = false;
+				
+				if ( isPrimitivePy( value ) )
+				{
+					isSmall = isSmallPrimitivePy( value );
+					valuePres = presentPrimitivePy( value );
+				}
+				else
+				{
+					valuePres = new InnerFragment( value );
+					isSmall = false;
+				}
+				
+				if ( isSmall )
+				{
+					attributes.add( new Row( new Pres[] { namePres, space, valuePres } ) );
+				}
+				else
+				{
+					attributes.add( new Column( new Pres[] { namePres, valuePres.padX( 15.0, 0.0 ) } ) );
+				}
 			}
 		}
 		

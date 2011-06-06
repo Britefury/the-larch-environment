@@ -136,7 +136,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 	{
 		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
-			return PrimitivePresenter.presentBoolean( (Boolean)x, fragment, inheritedState );
+			return PrimitivePresenter.presentBoolean( (Boolean)x );
 		}
 	};
 	
@@ -144,7 +144,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 	{
 		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
-			return PrimitivePresenter.presentByte( (Byte)x, fragment, inheritedState );
+			return PrimitivePresenter.presentByte( (Byte)x );
 		}
 	};
 	
@@ -152,7 +152,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 	{
 		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
-			return PrimitivePresenter.presentChar( (Character)x, fragment, inheritedState );
+			return PrimitivePresenter.presentChar( (Character)x );
 		}
 	};
 	
@@ -160,7 +160,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 	{
 		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
-			return PrimitivePresenter.presentShort( (Short)x, fragment, inheritedState );
+			return PrimitivePresenter.presentShort( (Short)x );
 		}
 	};
 	
@@ -168,7 +168,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 	{
 		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
-			return PrimitivePresenter.presentInt( (Integer)x, fragment, inheritedState );
+			return PrimitivePresenter.presentInt( (Integer)x );
 		}
 	};
 	
@@ -176,7 +176,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 	{
 		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
-			return PrimitivePresenter.presentLong( (Long)x, fragment, inheritedState );
+			return PrimitivePresenter.presentLong( (Long)x );
 		}
 	};
 	
@@ -184,7 +184,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 	{
 		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
-			return PrimitivePresenter.presentBigInteger( (BigInteger)x, fragment, inheritedState );
+			return PrimitivePresenter.presentBigInteger( (BigInteger)x );
 		}
 	};
 	
@@ -192,7 +192,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 	{
 		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
-			return PrimitivePresenter.presentBigDecimal( (BigDecimal)x, fragment, inheritedState );
+			return PrimitivePresenter.presentBigDecimal( (BigDecimal)x );
 		}
 	};
 	
@@ -200,7 +200,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 	{
 		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
-			return PrimitivePresenter.presentDouble( ((Float)x).doubleValue(), fragment, inheritedState );
+			return PrimitivePresenter.presentFloat( ((Float)x).floatValue() );
 		}
 	};
 	
@@ -208,7 +208,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 	{
 		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
-			return PrimitivePresenter.presentDouble( (Double)x, fragment, inheritedState );
+			return PrimitivePresenter.presentDouble( (Double)x );
 		}
 	};
 	
@@ -216,7 +216,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 	{
 		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
-			return PrimitivePresenter.presentString( (String)x, fragment, inheritedState );
+			return PrimitivePresenter.presentString( (String)x );
 		}
 	};
 	
@@ -228,7 +228,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 		public Pres presentObject(PyObject x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			PyInteger value = (PyInteger)x;
-			return PrimitivePresenter.presentInt( value.getValue(), fragment, inheritedState );
+			return PrimitivePresenter.presentInt( value.getValue() );
 		}
 	};
 	
@@ -237,7 +237,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 		public Pres presentObject(PyObject x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			PyFloat value = (PyFloat)x;
-			return PrimitivePresenter.presentDouble( value.getValue(), fragment, inheritedState );
+			return PrimitivePresenter.presentDouble( value.getValue() );
 		}
 	};
 	
@@ -246,7 +246,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 		public Pres presentObject(PyObject x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			PyBoolean value = (PyBoolean)x;
-			return PrimitivePresenter.presentBoolean( value.getBooleanValue(), fragment, inheritedState );
+			return PrimitivePresenter.presentBoolean( value.getBooleanValue() );
 		}
 	};
 	
@@ -1086,6 +1086,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 	
 	private static final StyleSheet punctuationStyle = staticStyle.withAttr( Primitive.foreground, Color.blue );
 	private static final StyleSheet delimStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.1f, 0.3f, 0.4f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, 14 );
+	private static final StyleSheet setDelimStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.4f, 0.3f, 0.1f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, 14 );
 	private static final StyleSheet sectionHeadingStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontFace, "Serif" );
 	
 	
@@ -1094,7 +1095,6 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 	
 	private static final StyleSheet javaKeywordStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSmallCaps, true );
 	private static final StyleSheet pythonKeywordStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSmallCaps, true );
-	private static final StyleSheet typeKeywordStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.3f, 0.5f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSmallCaps, true );
 	
 	private static final StyleSheet classPunctuationStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
 	
@@ -1125,10 +1125,10 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 	private static final Pres closeParen = delimStyle.applyTo( new StaticText( ")" ) );
 	private static final Pres openBrace = delimStyle.applyTo( new StaticText( "{" ) );
 	private static final Pres closeBrace = delimStyle.applyTo( new StaticText( "}" ) );
+	private static final Pres setOpenBrace = setDelimStyle.applyTo( new StaticText( "{" ) );
+	private static final Pres setCloseBrace = setDelimStyle.applyTo( new StaticText( "}" ) );
 	private static final Pres openChevronBracket = delimStyle.applyTo( new Label( "<[" ) );
 	private static final Pres closeChevronBracket = delimStyle.applyTo( new Label( "]>" ) );
-	private static final Pres setOpenDelim = new Row( new Pres[] { typeKeywordStyle.applyTo( new StaticText( "Set", "set" ) ),  delimStyle.applyTo( new StaticText( "(" ) ) } );
-	private static final Pres setCloseDelim = delimStyle.applyTo( new StaticText( ")" ) );
 	
 
 	public static Pres arrayView(List<Object> children)
@@ -1148,7 +1148,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 	
 	private static Pres setView(List<Object> children)
 	{
-		return new SpanSequenceView( children, setOpenDelim, setCloseDelim, comma, space, TrailingSeparator.NEVER );
+		return new SpanSequenceView( children, setOpenBrace, setCloseBrace, comma, space, TrailingSeparator.NEVER );
 	}
 	
 	private static Pres mapView(List<Object> children)
