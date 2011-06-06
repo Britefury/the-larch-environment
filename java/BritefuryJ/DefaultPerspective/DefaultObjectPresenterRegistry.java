@@ -63,14 +63,13 @@ import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.LineBreak;
 import BritefuryJ.Pres.Primitive.Paragraph;
-import BritefuryJ.Pres.Primitive.ParagraphDedentMarker;
-import BritefuryJ.Pres.Primitive.ParagraphIndentMarker;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Pres.Primitive.Span;
 import BritefuryJ.Pres.Primitive.StaticText;
 import BritefuryJ.Pres.Primitive.Whitespace;
 import BritefuryJ.Pres.RichText.NormalText;
+import BritefuryJ.Pres.Sequence.Sequence;
 import BritefuryJ.Pres.Sequence.SpanSequenceView;
 import BritefuryJ.Pres.Sequence.TrailingSeparator;
 import BritefuryJ.StyleSheet.StyleSheet;
@@ -286,7 +285,6 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 		{
 			headerItems.add( staticStyle.applyTo( new StaticText( " " ) ) );
 			headerItems.add( classPunctuationStyle.applyTo( new StaticText( "(" ) ) );
-			headerItems.add( new ParagraphIndentMarker() );
 			Object baseNames[] = new Object[bases.getArray().length];
 			int index = 0;
 			for (PyObject base: bases.getArray())
@@ -294,8 +292,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 				PyType baseType = (PyType)base;
 				baseNames[index++] = classNameStyle.applyTo( new StaticText( baseType.getName() ) );
 			}
-			headerItems.add( commaSeparatedListView( Arrays.asList( baseNames ) ) );
-			headerItems.add( new ParagraphDedentMarker() );
+			headerItems.add( matchIndentStyle.applyTo( commaSeparatedListView( Arrays.asList( baseNames ) ) ) );
 			headerItems.add( classPunctuationStyle.applyTo( new StaticText( ")" ) ) );
 		}
 		
@@ -1116,6 +1113,9 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 	private static final StyleSheet fnVarArgStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.25f ) );
 
 
+	private static final StyleSheet matchIndentStyle = staticStyle.withAttr( Sequence.matchOuterIndentation, true );
+
+	
 	private static final Pres comma = punctuationStyle.applyTo( new StaticText( "," ) );
 	private static final Pres space = staticStyle.applyTo( new StaticText( " " ) );
 	private static final Pres mapSpace = staticStyle.applyTo( new Whitespace( " ", 25.0 ) );

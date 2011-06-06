@@ -27,8 +27,7 @@ import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.LineBreak;
 import BritefuryJ.Pres.Primitive.LineBreakCostSpan;
 import BritefuryJ.Pres.Primitive.Paragraph;
-import BritefuryJ.Pres.Primitive.ParagraphDedentMarker;
-import BritefuryJ.Pres.Primitive.ParagraphIndentMarker;
+import BritefuryJ.Pres.Primitive.ParagraphIndentMatchSpan;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleSheet;
 
@@ -64,27 +63,27 @@ public class PresentersJericho extends ObjectPresenterRegistry
 			Element element = (Element)x;
 			
 			Pres tag = tagStyle.applyTo( new Label( element.getName() ) );
-			List<Pres> headerElements = new ArrayList<Pres>();
+			List<Object> headerElements = new ArrayList<Object>();
 			headerElements.add( tag );
 			Attributes attrs = element.getAttributes();
 			if ( attrs != null )
 			{
 				headerElements.add( new Label( " " ) );
-				headerElements.add( new ParagraphIndentMarker() );
+				List<Object> attrElements = new ArrayList<Object>();
 				boolean first = true;
 				for (Attribute attr: attrs)
 				{
 					if ( !first )
 					{
-						headerElements.add( new Label( " " ) );
-						headerElements.add( new LineBreak() );
+						attrElements.add( new Label( " " ) );
+						attrElements.add( new LineBreak() );
 					}
-					presentAttribute( headerElements, attr, fragment, inheritedState );
+					presentAttribute( attrElements, attr, fragment, inheritedState );
 					first = false;
 				}
-				headerElements.add( new ParagraphDedentMarker() );
+				headerElements.add( new ParagraphIndentMatchSpan( attrElements ) );
 			}
-			Pres header = new Paragraph( headerElements.toArray() );
+			Pres header = new Paragraph( headerElements );
 			
 			List<Element> children = element.getChildElements();
 			Pres childPres = new Column( children.toArray() );
@@ -96,7 +95,7 @@ public class PresentersJericho extends ObjectPresenterRegistry
 	
 	private static final Pattern whitespacePattern = Pattern.compile( "[ ]+" );
 	
-	private static void presentAttribute(List<Pres> p, Attribute attr, FragmentView fragment, SimpleAttributeTable inheritedState)
+	private static void presentAttribute(List<Object> p, Attribute attr, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		Pres name = attrNameStyle.applyTo( new Label( attr.getKey() ) );
 		Pres eq = attrPunctuationStyle.applyTo( new Label( "=" ) );

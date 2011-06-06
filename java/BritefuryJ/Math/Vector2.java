@@ -105,6 +105,11 @@ public class Vector2 implements Presentable, Serializable
 		return x * v.x  +  y * v.y;
 	}
 	
+	public double cross(Vector2 v)
+	{
+		return x * v.y  -  y * v.x;
+	}
+	
 	public Vector2 negate()
 	{
 		return new Vector2( -x, -y );

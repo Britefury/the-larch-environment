@@ -15,7 +15,7 @@ public class Sequence
 	
 	
 	public static final InheritedAttributeNonNull addLineBreaks = new InheritedAttributeNonNull( sequenceNamespace, "addLineBreaks", Boolean.class, true );
-	public static final InheritedAttributeNonNull addParagraphIndentMarkers = new InheritedAttributeNonNull( sequenceNamespace, "addParagraphIndentMarkers", Boolean.class, true );
+	public static final InheritedAttributeNonNull matchOuterIndentation = new InheritedAttributeNonNull( sequenceNamespace, "matchOuterIndentation", Boolean.class, true );
 	public static final InheritedAttributeNonNull addLineBreakCost = new InheritedAttributeNonNull( sequenceNamespace, "addLineBreakCost", Boolean.class, true );
 	public static final InheritedAttributeNonNull indentation = new InheritedAttributeNonNull( sequenceNamespace, "indentation", Double.class, 30.0 );
 }
