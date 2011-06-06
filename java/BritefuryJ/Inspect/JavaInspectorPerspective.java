@@ -24,7 +24,15 @@ public class JavaInspectorPerspective extends AbstractPerspective
 	@Override
 	protected Pres presentModel(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		Pres result = new ObjectBox( x.getClass().getName(), PrimitivePresenter.presentJavaObjectInspector( x, fragment, inheritedState ) );
+		Pres result;
+		if ( PrimitivePresenter.isPrimitive( x ) )
+		{
+			result = PrimitivePresenter.presentPrimitive( x );
+		}
+		else
+		{
+			result = new ObjectBox( x.getClass().getName(), PrimitivePresenter.presentJavaObjectInspector( x, fragment, inheritedState ) );
+		}
 		
 		result.setDebugName( x.getClass().getName() );
 		return result;

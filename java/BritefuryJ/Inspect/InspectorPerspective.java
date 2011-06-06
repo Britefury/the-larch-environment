@@ -35,8 +35,15 @@ public class InspectorPerspective extends AbstractPerspective
 			// @x is a Python object - if it offers a __present__ method, use that
 			PyObject pyX = (PyObject)x;
 			
-			PyType typeX = pyX.getType();
-			result = new ObjectBox( typeX.getName(), PrimitivePresenter.presentPythonObjectInspector( pyX, fragment, inheritedState ) );
+			if ( PrimitivePresenter.isPrimitivePy( pyX ) )
+			{
+				result = PrimitivePresenter.presentPrimitivePy( pyX );
+			}
+			else
+			{
+				PyType typeX = pyX.getType();
+				result = new ObjectBox( typeX.getName(), PrimitivePresenter.presentPythonObjectInspector( pyX, fragment, inheritedState ) );
+			}
 
 			result.setDebugName( pyX.getType().getName() );
 			return result;
