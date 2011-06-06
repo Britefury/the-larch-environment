@@ -14,8 +14,7 @@ import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.LineBreak;
 import BritefuryJ.Pres.Primitive.Paragraph;
-import BritefuryJ.Pres.Primitive.ParagraphDedentMarker;
-import BritefuryJ.Pres.Primitive.ParagraphIndentMarker;
+import BritefuryJ.Pres.Primitive.ParagraphIndentMatchSpan;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class ParagraphSequenceView extends AbstractSequenceView
@@ -34,19 +33,35 @@ public class ParagraphSequenceView extends AbstractSequenceView
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		boolean bAddParagraphIndentMarkers = style.get( Sequence.addParagraphIndentMarkers, Boolean.class );
+		boolean bAddParagraphIndentMarkers = style.get( Sequence.matchOuterIndentation, Boolean.class );
 		
-		ArrayList<Object> childElems = new ArrayList<Object>();
-		childElems.ensureCapacity( children.length + 2 );
-		
-		if ( beginDelim != null )
+		int factor = 1;
+		if ( separator != null )
 		{
-			childElems.add( beginDelim );
+			factor++;
 		}
-		
+		if ( spacing != null )
+		{
+			factor++;
+		}
+		ArrayList<Object> childElems = new ArrayList<Object>();
+		ArrayList<Object> paragraphElems = null;
+		childElems.ensureCapacity( ( children.length - 1 ) * factor + 4 );
+
 		if ( bAddParagraphIndentMarkers )
 		{
-			childElems.add( new ParagraphIndentMarker() );
+			paragraphElems = new ArrayList<Object>();
+			if ( beginDelim != null )
+			{
+				paragraphElems.add( beginDelim );
+			}
+		}
+		else
+		{
+			if ( beginDelim != null )
+			{
+				childElems.add( beginDelim );
+			}
 		}
 		
 		if ( children.length > 0 )
@@ -75,16 +90,23 @@ public class ParagraphSequenceView extends AbstractSequenceView
 
 		if ( bAddParagraphIndentMarkers )
 		{
-			childElems.add( new ParagraphDedentMarker() );
+			paragraphElems.add( new ParagraphIndentMatchSpan( childElems ) );
+			if ( endDelim != null )
+			{
+				paragraphElems.add( endDelim );
+			}
 		}
-		
-		if ( endDelim != null )
+		else
 		{
-			childElems.add( endDelim );
+			if ( endDelim != null )
+			{
+				childElems.add( endDelim );
+			}
+			paragraphElems = childElems;
 		}
 		
 		
-		return new Paragraph( childElems ).present( ctx, style );
+		return new Paragraph( paragraphElems ).present( ctx, style );
 	}
 
 }

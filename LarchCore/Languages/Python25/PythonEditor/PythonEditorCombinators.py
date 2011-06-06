@@ -64,7 +64,7 @@ class PythonEditorStyle (object):
 	                                              .withAttr( Primitive.foreground, Color.black ).withAttr( Primitive.textSquiggleUnderlinePaint, Color.red ) )
 
 	sequenceStyle = InheritedAttributeNonNull( pythonEditor, 'sequenceStyle', StyleSheet,
-	                                           StyleSheet.instance.withAttr( Sequence.addLineBreaks, True ).withAttr( Sequence.addParagraphIndentMarkers, True ).withAttr( Sequence.addLineBreakCost, True ) )
+	                                           StyleSheet.instance.withAttr( Sequence.addLineBreaks, True ).withAttr( Sequence.matchOuterIndentation, True ).withAttr( Sequence.addLineBreakCost, True ) )
 
 	quoteBorderStyle = InheritedAttributeNonNull( pythonEditor, 'quoteBorderStyle', StyleSheet,
 	                                              StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.5, 0.3, 0.7 ), None ) ) )
@@ -408,16 +408,16 @@ def call(target, args, bArgsTrailingSeparator):
 	argElements = []
 	if len( args ) > 0:
 		argElements.append( _space )
-		argElements.append( ParagraphIndentMarker() )
+		argSpanElements = []
 		for a in args[:-1]:
-			argElements.append( a )
-			argElements.append( _comma )
-			argElements.append( _space )
-			argElements.append( _lineBreak )
-		argElements.append( args[-1] )
+			argSpanElements.append( a )
+			argSpanElements.append( _comma )
+			argSpanElements.append( _space )
+			argSpanElements.append( _lineBreak )
+		argSpanElements.append( args[-1] )
 		if bArgsTrailingSeparator:
-			argElements.append( _comma )
-		argElements.append( ParagraphDedentMarker() )
+			argSpanElements.append( _comma )
+		argElements.append( ParagraphIndentMatchSpan( argSpanElements ) )
 		argElements.append( _space )
 	return LineBreakCostSpan( [ target, _openParen ]  +  argElements  +  [ _closeParen ] )
 
@@ -478,7 +478,6 @@ def kwParamList(name):
 def lambdaExpr(params, bParamsTrailingSeparator, expr):
 	elements = []
 	if len( params ) > 0:
-		elements.append( ParagraphIndentMarker() )
 		for p in params[:-1]:
 			elements.append( p )
 			elements.append( _comma )
@@ -489,10 +488,8 @@ def lambdaExpr(params, bParamsTrailingSeparator, expr):
 			elements.append( _comma )
 			elements.append( _space )
 			elements.append( _lineBreak )
-		elements.append( ParagraphDedentMarker() )
 
-	return LineBreakCostSpan( [ _keyword( 'lambda' ),  _space ]  +  elements  +  \
-	                          [ _colon,  _space, _lineBreak, expr ] )
+	return LineBreakCostSpan( [ _keyword( 'lambda' ),  _space, ParagraphIndentMatchSpan( elements ), _colon,  _space, _lineBreak, expr ] )
 
 
 @PyPresCombinatorFn
@@ -674,24 +671,22 @@ def moduleContentImportAs(name, asName):
 
 
 def importStmt(modules):
-	moduleElements = [ ParagraphIndentMarker() ]
+	moduleElements = []
 	if len( modules ) > 0:
 		for m in modules[:-1]:
 			moduleElements.extend( [ m,  _comma,  _space,  _lineBreak ] )
 		moduleElements.append( modules[-1] )
-	moduleElements.append( ParagraphDedentMarker() )
-	return Span( [ _keyword( 'import' ), _space ]  +  moduleElements )
+	return Span( [ _keyword( 'import' ), _space, ParagraphIndentMatchSpan( moduleElements ) ] )
 
 
 def fromImportStmt(module, imports):
-	importElements = [ ParagraphIndentMarker() ]
+	importElements = []
 	if len( imports ) > 0:
 		for i in imports[:-1]:
 			importElements.extend( [ i,  _comma,  _space,  _lineBreak ] )
 		importElements.append( imports[-1] )
-	importElements.append( ParagraphDedentMarker() )
 	return Span( [ _keyword( 'from' ), _space, module, _space,
-	               _keyword( 'import' ), _space ]  +  importElements )
+	               _keyword( 'import' ), _space, ParagraphIndentMatchSpan( importElements ) ] )
 
 
 def fromImportAllStmt(module):
@@ -828,13 +823,13 @@ def defStmtHeader(name, params, bParamsTrailingSeparator):
 
 	elements = [ _keyword( 'def' ),  _space,  nameView,  _openParen ]
 	if len( params ) > 0:
-		elements.append( ParagraphIndentMarker() )
+		paramElems = []
 		for p in params[:-1]:
-			elements.extend( [ p,  _comma,  _space ] )
-		elements.append( params[-1] )
+			paramElems.extend( [ p,  _comma,  _space ] )
+		paramElems.append( params[-1] )
 		if bParamsTrailingSeparator:
-			elements.extend( [ _comma,  _space ] )
-		elements.append( ParagraphDedentMarker() )
+			paramElems.extend( [ _comma,  _space ] )
+		elements.append( ParagraphIndentMatchSpan( paramElems ) )
 
 	elements.extend( [ _closeParen,  _colon ] )
 	return Span( elements )

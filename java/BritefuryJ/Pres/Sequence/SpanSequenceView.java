@@ -14,8 +14,7 @@ import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.LineBreak;
 import BritefuryJ.Pres.Primitive.LineBreakCostSpan;
-import BritefuryJ.Pres.Primitive.ParagraphDedentMarker;
-import BritefuryJ.Pres.Primitive.ParagraphIndentMarker;
+import BritefuryJ.Pres.Primitive.ParagraphIndentMatchSpan;
 import BritefuryJ.Pres.Primitive.Span;
 import BritefuryJ.StyleSheet.StyleValues;
 
@@ -36,20 +35,40 @@ public class SpanSequenceView extends AbstractSequenceView
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
 		boolean bAddLineBreaks = style.get( Sequence.addLineBreaks, Boolean.class );
-		boolean bAddParagraphIndentMarkers = style.get( Sequence.addParagraphIndentMarkers, Boolean.class );
+		boolean bAddParagraphIndentMarkers = style.get( Sequence.matchOuterIndentation, Boolean.class );
 		boolean bAddLineBreakCost = style.get( Sequence.addLineBreakCost, Boolean.class );
 		
-		ArrayList<Object> childElems = new ArrayList<Object>();
-		childElems.ensureCapacity( children.length + 2 );
-		
-		if ( beginDelim != null )
+		int factor = 1;
+		if ( separator != null )
 		{
-			childElems.add( beginDelim );
+			factor++;
 		}
-		
+		if ( spacing != null )
+		{
+			factor++;
+		}
+		if ( bAddLineBreaks )
+		{
+			factor++;
+		}
+		ArrayList<Object> childElems = new ArrayList<Object>();
+		ArrayList<Object> spanElems = null;
+		childElems.ensureCapacity( ( children.length - 1 ) * factor + 4 );
+
 		if ( bAddParagraphIndentMarkers )
 		{
-			childElems.add( new ParagraphIndentMarker() );
+			spanElems = new ArrayList<Object>();
+			if ( beginDelim != null )
+			{
+				spanElems.add( beginDelim );
+			}
+		}
+		else
+		{
+			if ( beginDelim != null )
+			{
+				childElems.add( beginDelim );
+			}
 		}
 		
 		if ( children.length > 0 )
@@ -81,21 +100,29 @@ public class SpanSequenceView extends AbstractSequenceView
 
 		if ( bAddParagraphIndentMarkers )
 		{
-			childElems.add( new ParagraphDedentMarker() );
-		}
-		
-		if ( endDelim != null )
-		{
-			childElems.add( endDelim );
-		}
-		
-		if ( bAddLineBreakCost )
-		{
-			return new LineBreakCostSpan( childElems ).present( ctx, style );
+			spanElems.add( new ParagraphIndentMatchSpan( childElems ) );
+			if ( endDelim != null )
+			{
+				spanElems.add( endDelim );
+			}
 		}
 		else
 		{
-			return new Span( childElems ).present( ctx, style );
+			if ( endDelim != null )
+			{
+				childElems.add( endDelim );
+			}
+			spanElems = childElems;
+		}
+
+		
+		if ( bAddLineBreakCost )
+		{
+			return new LineBreakCostSpan( spanElems ).present( ctx, style );
+		}
+		else
+		{
+			return new Span( spanElems ).present( ctx, style );
 		}
 	}
 }
