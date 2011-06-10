@@ -12,6 +12,7 @@ import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.ObjectPres.ObjectBox;
+import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Projection.AbstractPerspective;
 
 public class JavaInspectorPerspective extends AbstractPerspective
@@ -31,14 +32,24 @@ public class JavaInspectorPerspective extends AbstractPerspective
 		}
 		else
 		{
-			result = new ObjectBox( x.getClass().getName(), PrimitivePresenter.presentJavaObjectInspector( x, fragment, inheritedState ) );
+			Class<?> cls = x.getClass();
+			if ( cls.isArray() )
+			{
+				Class<?> comp = cls.getComponentType();
+				Object arr[] = (Object[])x;
+				result = new ObjectBox( comp.getName() + "[]", new Column( Pres.mapCoerceNonNull( arr ) ) );
+			}
+			else
+			{
+				result = new ObjectBox( cls.getName(), Inspector.presentJavaObjectInspector( x, fragment, inheritedState ) );
+			}
 		}
 		
 		result.setDebugName( x.getClass().getName() );
 		return result;
 	}
-
-
+	
+	
 	@Override
 	public ClipboardHandlerInterface getClipboardHandler()
 	{

@@ -1722,6 +1722,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	}
 	
 	
+	@Override
 	public void paint(Graphics g)
 	{
 		Graphics2D g2;
@@ -1734,8 +1735,8 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			throw new CannotGetGraphics2DException();
 		}
 
-		RenderingHints aa = new RenderingHints( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		RenderingHints taa = new RenderingHints( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		RenderingHints aa = new RenderingHints( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
+		RenderingHints taa = new RenderingHints( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON );
 		g2.addRenderingHints( aa );
 		g2.addRenderingHints( taa );
 		rootElement.exposeEvent( g2, new Rectangle2D.Double( 0.0, 0.0, (double)getWidth(), (double)getHeight()) );

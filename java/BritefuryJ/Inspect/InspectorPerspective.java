@@ -42,7 +42,7 @@ public class InspectorPerspective extends AbstractPerspective
 			else
 			{
 				PyType typeX = pyX.getType();
-				result = new ObjectBox( typeX.getName(), PrimitivePresenter.presentPythonObjectInspector( pyX, fragment, inheritedState ) );
+				result = new ObjectBox( typeX.getName(), Inspector.presentPythonObjectInspector( pyX, fragment, inheritedState ) );
 			}
 
 			result.setDebugName( pyX.getType().getName() );

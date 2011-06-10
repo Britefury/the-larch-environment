@@ -48,6 +48,7 @@ import BritefuryJ.DefaultPerspective.Presenters.PresentersJericho;
 import BritefuryJ.DefaultPerspective.Presenters.PresentersSQL;
 import BritefuryJ.DefaultPerspective.Presenters.PresentersSVG;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.Inspect.Inspector;
 import BritefuryJ.ObjectPresentation.ObjectPresentationPerspective;
 import BritefuryJ.ObjectPresentation.ObjectPresenter;
 import BritefuryJ.ObjectPresentation.ObjectPresenterRegistry;
@@ -958,16 +959,26 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 	
 	private static Pres presentFieldDeclaration(Field field)
 	{
-		ArrayList<Object> words = new ArrayList<Object>();
-		
-		// type
-		words.add( PrimitivePresenter.presentJavaClassName( field.getType(), typeNameStyle ) );
-		words.add( space );
-		words.add( new LineBreak() );
-		// name
-		words.add( PrimitivePresenter.getAccessNameStyle( field.getModifiers() ).applyTo( new Label( field.getName() ) ) );
-		
-		return new Paragraph( words );
+		if ( Modifier.isStatic( field.getModifiers() ) )
+		{
+			return Inspector.presentJavaFieldWithValue( null, field );
+		}
+		else
+		{
+			ArrayList<Object> words = new ArrayList<Object>();
+			
+			// modifiers
+			int modifiers = field.getModifiers();
+			words.add( PrimitivePresenter.getModifierKeywords( modifiers ) );
+			// type
+			words.add( PrimitivePresenter.presentJavaClassName( field.getType(), typeNameStyle ) );
+			words.add( space );
+			words.add( new LineBreak() );
+			// name
+			words.add( PrimitivePresenter.getAccessNameStyle( modifiers ).applyTo( new Label( field.getName() ) ) );
+			
+			return new Paragraph( words );
+		}
 	}
 
 	public static final ObjectPresenter presenter_Field = new ObjectPresenter()
@@ -986,8 +997,11 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 	{
 		ArrayList<Object> words = new ArrayList<Object>();
 		
+		// modifiers
+		int modifiers = constructor.getModifiers();
+		words.add( PrimitivePresenter.getModifierKeywords( modifiers ) );
 		// type
-		words.add( PrimitivePresenter.presentJavaClassName( constructor.getDeclaringClass(), PrimitivePresenter.getAccessNameStyle( constructor.getModifiers() ) ) );
+		words.add( PrimitivePresenter.presentJavaClassName( constructor.getDeclaringClass(), PrimitivePresenter.getAccessNameStyle( modifiers ) ) );
 		// open paren
 		words.add( delimStyle.applyTo( new Label( "(" ) ) );
 		Class<?> paramTypes[] = constructor.getParameterTypes(); 
@@ -1033,12 +1047,15 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 	{
 		ArrayList<Object> words = new ArrayList<Object>();
 		
+		// modifiers
+		int modifiers = method.getModifiers();
+		words.add( PrimitivePresenter.getModifierKeywords( modifiers ) );
 		// return type
 		words.add( PrimitivePresenter.presentJavaClassName( method.getReturnType(), typeNameStyle ) );
 		words.add( space );
 		words.add( new LineBreak() );
 		// name
-		words.add( PrimitivePresenter.getAccessNameStyle( method.getModifiers() ).applyTo( new Label( method.getName() ) ) );
+		words.add( PrimitivePresenter.getAccessNameStyle( modifiers ).applyTo( new Label( method.getName() ) ) );
 		// open paren
 		words.add( delimStyle.applyTo( new Label( "(" ) ) );
 		Class<?> paramTypes[] = method.getParameterTypes(); 
