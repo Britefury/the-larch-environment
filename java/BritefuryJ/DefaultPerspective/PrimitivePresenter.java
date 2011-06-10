@@ -7,7 +7,6 @@
 package BritefuryJ.DefaultPerspective;
 
 import java.awt.Color;
-import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -15,22 +14,14 @@ import java.util.ArrayList;
 
 import org.python.core.Py;
 import org.python.core.PyBoolean;
-import org.python.core.PyDictionary;
 import org.python.core.PyFloat;
 import org.python.core.PyInteger;
-import org.python.core.PyList;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyString;
-import org.python.core.PyStringMap;
-import org.python.core.PyTuple;
 import org.python.core.PyUnicode;
 
-import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.Controls.DropDownExpander;
 import BritefuryJ.DocPresent.Painter.FillPainter;
-import BritefuryJ.IncrementalView.FragmentView;
-import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.ObjectPres.UnescapedStringAsSpan;
 import BritefuryJ.Pres.Primitive.Column;
@@ -347,161 +338,6 @@ public class PrimitivePresenter
 	}
 	
 	
-	public static Pres presentJavaObjectInspector(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
-	{
-		Pres asString = presentObjectAsString( x );
-
-		ArrayList<Object> contents = new ArrayList<Object>();
-		
-		// Type
-		Pres type = new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Type" ) ), new InnerFragment( x.getClass() ) );
-		contents.add( type );
-		
-		
-		ArrayList<Object> fields = new ArrayList<Object>();
-		Class<?> cls = x.getClass();
-		for (Field field: cls.getFields())
-		{
-			boolean isSmall = false;
-			Object value = null;
-			Pres valuePres = null;
-			try
-			{
-				value = field.get( x );
-			}
-			catch (IllegalArgumentException e1)
-			{
-				valuePres = errorStyle.applyTo( new Label( "<Illegal argument>" ) );
-				isSmall = true;
-			}
-			catch (IllegalAccessException e1)
-			{
-				valuePres = errorStyle.applyTo( new Label( "<Cannot access>" ) );
-				isSmall = true;
-			}
-			
-			if ( valuePres == null )
-			{
-				// No exception thrown while getting field value
-				if ( isPrimitive( value ) )
-				{
-					isSmall = isSmallPrimitive( value );
-					valuePres = presentPrimitive( value );
-				}
-				else
-				{
-					valuePres = new InnerFragment( value );
-				}
-			}
-			if ( isSmall )
-			{
-				fields.add( new Row( new Pres[] {
-						presentJavaClassName( field.getType(), typeNameStyle ),
-						space,
-						getAccessNameStyle( field.getModifiers() ).applyTo( new Label( field.getName() ) ),
-						space,
-						valuePres } ) );
-			}
-			else
-			{
-				Pres header = new Row( new Pres[] {
-						presentJavaClassName( field.getType(), typeNameStyle ),
-						space,
-						getAccessNameStyle( field.getModifiers() ).applyTo( new Label( field.getName() ) ) } );
-				fields.add( new Column( new Pres[] { header, valuePres.padX( 45.0, 0.0 ) } ) );
-			}
-		}
-		if ( fields.size() > 0 )
-		{
-			contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Fields" ) ), new Column( fields ) ) );
-		}
-		
-		Pres inspector = new Column( contents );
-		return new DropDownExpander( asString, inspector );
-	}
-	
-	public static Pres presentPythonObjectInspector(PyObject x, FragmentView fragment, SimpleAttributeTable inheritedState)
-	{
-		Pres asString = presentObjectAsString( x );
-
-		ArrayList<Object> contents = new ArrayList<Object>();
-		
-		// Type
-		Pres type = new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Type" ) ), new InnerFragment( x.getType() ) );
-		contents.add( type );
-		
-		
-		// Attributes
-		ArrayList<Object> attributes = new ArrayList<Object>();
-		PyObject dict = x.fastGetDict();
-		if ( dict != null )
-		{
-			PyList dictItems;
-			if ( dict instanceof PyDictionary )
-			{
-				dictItems = ((PyDictionary)dict).items();
-			}
-			else if ( dict instanceof PyStringMap )
-			{
-				dictItems = ((PyStringMap)dict).items();
-			}
-			else
-			{
-				throw new RuntimeException( "Expected a PyDictionary or a PyStringMap when acquiring __dict__ from a PyObject" );
-			}
-			
-			
-			for (Object dictItem: dictItems)
-			{
-				PyTuple pair = (PyTuple)dictItem;
-				PyObject key = pair.getArray()[0];
-				PyObject value = pair.getArray()[1];
-				String name = key.toString();
-				
-				if ( name.equals( "__dict__" ) )
-				{
-					break;
-				}
-				
-				Pres namePres = attributeNameStyle.applyTo( new Label( name ) );
-				Pres valuePres = null;
-				boolean isSmall = false;
-				
-				if ( isPrimitivePy( value ) )
-				{
-					isSmall = isSmallPrimitivePy( value );
-					valuePres = presentPrimitivePy( value );
-				}
-				else
-				{
-					valuePres = new InnerFragment( value );
-					isSmall = false;
-				}
-				
-				if ( isSmall )
-				{
-					attributes.add( new Row( new Pres[] { namePres, space, valuePres } ) );
-				}
-				else
-				{
-					attributes.add( new Column( new Pres[] { namePres, valuePres.padX( 15.0, 0.0 ) } ) );
-				}
-			}
-		}
-		
-		if ( attributes.size() > 0 )
-		{
-			contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Attributes" ) ),   new Column( attributes ) ) );
-		}
-		
-		
-		Pres inspector = new Column( contents );
-		return new DropDownExpander( asString, inspector );
-	}
-	
-	
-	
-	
 	public static StyleSheet getAccessNameStyle(int modifiers)
 	{
 		if ( Modifier.isPrivate( modifiers ) )
@@ -520,6 +356,52 @@ public class PrimitivePresenter
 		{
 			return defaultNameStyle;
 		}
+	}
+	
+	public static Pres getModifierKeywords(int modifiers)
+	{
+		ArrayList<Object> mods = new ArrayList<Object>();
+		if ( Modifier.isAbstract( modifiers ) )
+		{
+			mods.add( modifierStyle.applyTo( new Label( "abstract" ) ) );
+			mods.add( space );
+		}
+		if ( Modifier.isFinal( modifiers ) )
+		{
+			mods.add( modifierStyle.applyTo( new Label( "final" ) ) );
+			mods.add( space );
+		}
+		if ( Modifier.isNative( modifiers ) )
+		{
+			mods.add( modifierStyle.applyTo( new Label( "native" ) ) );
+			mods.add( space );
+		}
+		if ( Modifier.isStatic( modifiers ) )
+		{
+			mods.add( modifierStyle.applyTo( new Label( "static" ) ) );
+			mods.add( space );
+		}
+		if ( Modifier.isStrict( modifiers ) )
+		{
+			mods.add( modifierStyle.applyTo( new Label( "strict" ) ) );
+			mods.add( space );
+		}
+		if ( Modifier.isSynchronized( modifiers ) )
+		{
+			mods.add( modifierStyle.applyTo( new Label( "synchronized" ) ) );
+			mods.add( space );
+		}
+		if ( Modifier.isTransient( modifiers ) )
+		{
+			mods.add( modifierStyle.applyTo( new Label( "transient" ) ) );
+			mods.add( space );
+		}
+		if ( Modifier.isVolatile( modifiers ) )
+		{
+			mods.add( modifierStyle.applyTo( new Label( "volatile" ) ) );
+			mods.add( space );
+		}
+		return new Span( mods );
 	}
 	
 	
@@ -552,18 +434,14 @@ public class PrimitivePresenter
 	private static final StyleSheet labelStyle = StyleSheet.instance.withAttr( Primitive.editable, false ).withAttr( Primitive.selectable, false );
 	
 	
-	private static final StyleSheet sectionHeadingStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontFace, "Serif" );
-	private static final StyleSheet attributeNameStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.25f ) );
-
 	private static final StyleSheet typePunctuationStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
-	private static final StyleSheet typeNameStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.4f ) );
 
 	private static final StyleSheet privateNameStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.0f ) );
 	private static final StyleSheet protectedNameStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.35f, 0.35f, 0.0f ) );
 	private static final StyleSheet publicNameStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
 	private static final StyleSheet defaultNameStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.35f, 0.35f, 0.15f ) );
-
-	private static final StyleSheet errorStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.0f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontFace, "Serif" );
+	
+	private static final StyleSheet modifierStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.1f, 0.15f, 0.35f ) );
 
 	private static final Pres space = staticStyle.applyTo( new StaticText( " " ) );
 }
