@@ -89,7 +89,8 @@ public class StreamValue implements Presentable
 		public Item subItemFrom(int start, int atPos)
 		{
 			int offset = start - this.start;
-			return new TextItem( textValue.substring( offset ), atPos, atPos + textValue.length() - offset );
+			String text = textValue.substring( offset );
+			return new TextItem( text, atPos, atPos + text.length() );
 		}
 		
 		public Item subItemTo(int end, int atPos)
@@ -102,7 +103,8 @@ public class StreamValue implements Presentable
 		{
 			int offset = start - this.start;
 			end -= this.start;
-			return new TextItem( textValue.substring( offset, end ), atPos, atPos + end - offset );
+			String text = textValue.substring( offset, end );
+			return new TextItem( text, atPos, atPos + text.length() );
 		}
 		
 		public Item copyAt(int atPos)
@@ -255,7 +257,7 @@ public class StreamValue implements Presentable
 	}
 	
 	
-	public boolean startsWithString(String s)
+	public boolean startsWith(String s)
 	{
 		if ( items.length > 0  &&  items[0] instanceof TextItem )
 		{
@@ -268,12 +270,38 @@ public class StreamValue implements Presentable
 		}
 	}
 	
-	public boolean endsWithString(String s)
+	public boolean startsWith(Object x)
+	{
+		if ( items.length > 0  &&  items[0] instanceof StructuralItem )
+		{
+			StructuralItem i = (StructuralItem)items[0];
+			return x.equals( i.structuralValue );
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	public boolean endsWith(String s)
 	{
 		if ( items.length > 0  &&  items[items.length-1] instanceof TextItem )
 		{
 			TextItem i = (TextItem)items[items.length-1];
 			return i.textValue.endsWith( s );
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	public boolean endsWith(Object x)
+	{
+		if ( items.length > 0  &&  items[items.length-1] instanceof StructuralItem )
+		{
+			StructuralItem i = (StructuralItem)items[items.length-1];
+			return x.equals( i.structuralValue );
 		}
 		else
 		{
@@ -382,17 +410,37 @@ public class StreamValue implements Presentable
 		return false;
 	}
 	
-	public int indexOf(String sub)
+	
+	public int indexOf(String sub, int start, int end)
 	{
-		int n = 0;
-		for (Item item: items)
+		int s = start == -1  ?  0  :  itemIndexAt( start );
+		int e = end == -1  ?  items.length - 1  :  itemIndexAt( end );
+		int n = start == -1  ?  0  :  items[s].start;
+		for (int i = s; i <= e; i++)
 		{
+			Item item = items[i];
 			if ( item instanceof TextItem )
 			{
-				int i = ((TextItem)item).textValue.indexOf( sub );
-				if ( i != -1 )
+				int j;
+				// Check if we are in the item that contains @start
+				if ( i == s )
 				{
-					return i + n;
+					// We must ensure that we only look for occurrences after @start - not for occurrences anywhere in the item
+					j = ((TextItem)item).textValue.indexOf( sub, start - item.start );
+				}
+				else
+				{
+					j = ((TextItem)item).textValue.indexOf( sub );
+				}
+				
+				if ( j != -1 )
+				{
+					// Found something
+					// Ensure that we have not yet reached @end
+					if ( end == -1  ||  (j+n+sub.length()) <= end )
+					{
+						return j + n;
+					}
 				}
 			}
 			
@@ -401,22 +449,50 @@ public class StreamValue implements Presentable
 		return -1;
 	}
 	
-	public int indexOf(Object sub)
+	public int indexOf(String sub, int start)
 	{
-		int n = 0;
-		for (Item item: items)
+		return indexOf( sub, start, -1 );
+	}
+	
+	public int indexOf(String sub)
+	{
+		return indexOf( sub, -1, -1 );
+	}
+	
+	public int indexOf(Object sub, int start, int end)
+	{
+		int s = start == -1  ?  0  :  itemIndexAt( start );
+		int e = end == -1  ?  items.length - 1  :  itemIndexAt( end );
+		int n = start == -1  ?  0  :  items[s].start;
+		for (int i = s; i <= e; i++)
 		{
+			Item item = items[i];
 			if ( item instanceof StructuralItem )
 			{
-				if ( sub == ((StructuralItem)item).structuralValue )
+				if ( sub.equals( ((StructuralItem)item).structuralValue ) )
 				{
-					return n;
+					// Found something
+					// Ensure that we have not yet reached @end
+					if ( end == -1  ||  (n+1) <= end )
+					{
+						return n;
+					}
 				}
 			}
 			
 			n += item.getLength();
 		}
 		return -1;
+	}
+	
+	public int indexOf(Object sub, int start)
+	{
+		return indexOf( sub, start, -1 );
+	}
+	
+	public int indexOf(Object sub)
+	{
+		return indexOf( sub, -1, -1 );
 	}
 	
 	public boolean __contains__(String sub)
@@ -485,33 +561,81 @@ public class StreamValue implements Presentable
 			
 			Item subItems[];
 			
-			if ( stop > items[stopIndex].start )
+			if ( startIndex == stopIndex )
 			{
-				subItems = new Item[stopIndex+1-startIndex];
+				subItems = new Item[] { items[startIndex].subItem( start, stop, 0 ) };
 			}
 			else
 			{
-				subItems = new Item[stopIndex-startIndex];
-			}
-			
-			int pos = 0;
-			subItems[0] = items[startIndex].subItemFrom( start, 0 );
-			pos = subItems[0].stop;
-			
-			for (int i = startIndex + 1; i < stopIndex; i++)
-			{
-				Item subItem = items[i].copyAt( pos );
-				subItems[i-startIndex] = subItem;
-				pos = subItem.stop;
-			}
-			
-			if ( stop > items[stopIndex].start )
-			{
-				subItems[stopIndex-startIndex] = items[stopIndex].subItemTo( stop, pos );
+				if ( stop > items[stopIndex].start )
+				{
+					subItems = new Item[stopIndex+1-startIndex];
+				}
+				else
+				{
+					subItems = new Item[stopIndex-startIndex];
+				}
+				
+				int pos = 0;
+				subItems[0] = items[startIndex].subItemFrom( start, 0 );
+				pos = subItems[0].stop;
+				
+				for (int i = startIndex + 1; i < stopIndex; i++)
+				{
+					Item subItem = items[i].copyAt( pos );
+					subItems[i-startIndex] = subItem;
+					pos = subItem.stop;
+				}
+				
+				if ( stop > items[stopIndex].start )
+				{
+					subItems[stopIndex-startIndex] = items[stopIndex].subItemTo( stop, pos );
+				}
 			}
 			
 			return new StreamValue( subItems );
 		}
+	}
+	
+	
+	public StreamValue[] split(String sub)
+	{
+		ArrayList<StreamValue> streams = new ArrayList<StreamValue>();
+		
+		int subLength = sub.length();
+		int pos = 0;
+		int index = indexOf( sub );
+		
+		while ( index != -1 )
+		{
+			streams.add( subStream( pos, index ) );
+			pos = index + subLength;
+			index = indexOf( sub, pos );
+		}
+		
+		streams.add( subStream( pos, length ) );
+		
+		return streams.toArray( new StreamValue[streams.size()] );
+	}
+	
+	
+	public StreamValue[] split(Object sub)
+	{
+		ArrayList<StreamValue> streams = new ArrayList<StreamValue>();
+		
+		int pos = 0;
+		int index = indexOf( sub );
+		
+		while ( index != -1 )
+		{
+			streams.add( subStream( pos, index ) );
+			pos = index + 1;
+			index = indexOf( sub, pos );
+		}
+		
+		streams.add( subStream( pos, length ) );
+		
+		return streams.toArray( new StreamValue[streams.size()] );
 	}
 	
 	
@@ -576,15 +700,7 @@ public class StreamValue implements Presentable
 			
 			if ( length == sx.length  &&  items.length == sx.items.length )
 			{
-				for (int i = 0; i < items.length; i++)
-				{
-					if ( !items[i].equals( sx.items[i] ) )
-					{
-						return false;
-					}
-				}
-				
-				return true;
+				return Arrays.equals( items, sx.items );
 			}
 		}
 		else if ( x instanceof String )
