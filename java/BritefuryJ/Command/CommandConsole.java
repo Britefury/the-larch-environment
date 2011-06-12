@@ -7,6 +7,8 @@
 package BritefuryJ.Command;
 
 import java.awt.Color;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.ChangeHistory.ChangeHistory;
@@ -19,8 +21,8 @@ import BritefuryJ.DocPresent.TreeEventListener;
 import BritefuryJ.DocPresent.Browser.BrowserPage;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
-import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.SequentialStreamValueVisitor;
+import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.Target.Target;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.ObjectPresentation.PresentationStateListenerList;
@@ -37,6 +39,9 @@ import BritefuryJ.StyleSheet.StyleSheet;
 
 public class CommandConsole extends AbstractCommandConsole implements Presentable
 {
+	private static Pattern commandNamePattern = Pattern.compile( "\\S+" );
+	
+	
 	private class CommandConsoleSubject extends Subject
 	{
 		public CommandConsoleSubject()
@@ -117,7 +122,7 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 		private BoundCommand cmd;
 		
 		
-		public CommandContents(BoundCommand cmd)
+		public CommandContents(BoundCommand cmd, String params)
 		{
 			this.cmd = cmd;
 		}
@@ -279,19 +284,28 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 				}
 				else
 				{
-					BoundCommand cmd = getTargetCommand( text );
+					Matcher matcher = commandNamePattern.matcher( text );
 					
-					if ( cmd == null )
+					contents = null;
+					
+					if ( matcher.lookingAt() )
 					{
-						cmd = getPageCommand( text );
+						String name = matcher.group();
+
+						BoundCommand cmd = getTargetCommand( name );
+						
+						if ( cmd == null )
+						{
+							cmd = getPageCommand( name );
+						}
+						
+						if ( cmd != null )
+						{
+							contents = new CommandContents( cmd, text.substring( name.length() ) );
+						}
 					}
-	
-				
-					if ( cmd != null )
-					{
-						contents = new CommandContents( cmd );
-					}
-					else
+					
+					if ( contents == null )
 					{
 						contents = new UnreckognisedContents( text );
 					}
@@ -307,7 +321,10 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 	}
 
 
-	private BoundCommand getTargetCommand(String text)
+	//
+	// Find a command with the specified name, that is accessible at the current target (e.g. caret) 
+	//
+	private BoundCommand getTargetCommand(String name)
 	{
 		Target target = presentation.getRootElement().getTarget();
 		if ( target.isValid() )
@@ -317,7 +334,7 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 			
 			for (BoundCommandSet commands: commandSets)
 			{
-				BoundCommand c = commands.getCommand( text );
+				BoundCommand c = commands.getCommand( name );
 				if ( c != null )
 				{
 					return c;
@@ -329,6 +346,9 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 	}
 	
 	
+	//
+	// Find a command with the specified name, that is accessible in the current page
+	//
 	private BoundCommand getPageCommand(String text)
 	{
 		if ( page != null )
