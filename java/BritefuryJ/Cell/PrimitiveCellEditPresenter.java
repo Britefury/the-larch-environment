@@ -334,8 +334,7 @@ public class PrimitiveCellEditPresenter
 					Object value = textToValue.invoke( textValue );
 					if ( value != null )
 					{
-						CellSetValueEvent cellEvent = new CellSetValueEvent( value );
-						return element.postTreeEvent( cellEvent );
+						CellEditPerspective.notifySetCellValue( element, value );
 					}
 				}
 				return false;

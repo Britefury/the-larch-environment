@@ -11,6 +11,7 @@ import java.util.Arrays;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.DefaultObjectPresenterRegistry;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.EditPerspective.EditPerspective;
 import BritefuryJ.IncrementalView.FragmentView;
@@ -59,6 +60,14 @@ public class CellEditPerspective extends ObjectPresentationPerspective
 	public ClipboardHandlerInterface getClipboardHandler()
 	{
 		return null;
+	}
+	
+	
+	
+	public static void notifySetCellValue(DPElement cellElement, Object value)
+	{
+		CellSetValueEvent cellEvent = new CellSetValueEvent( value );
+		cellElement.postTreeEvent( cellEvent );
 	}
 
 

@@ -16,7 +16,7 @@ import BritefuryJ.Pres.Primitive.Span;
 class ObjectListRow implements Presentable
 {
 	private ObjectListTableEditor editor;
-	private Object modelRow;
+	protected Object modelRow;
 	private PresentationStateListenerList listeners = null;
 	
 	
@@ -32,6 +32,15 @@ class ObjectListRow implements Presentable
 	{
 		listeners = PresentationStateListenerList.onPresentationStateChanged( listeners, this );
 	}
+	
+	
+	protected void onCellChanged(ObjectListCell cell)
+	{
+		if ( !editor.rowsAreLive )
+		{
+			onChanged();
+		}
+	}
 
 
 	@Override
@@ -42,7 +51,7 @@ class ObjectListRow implements Presentable
 		Object children[] = new Object[editor.columns.length];
 		for (int i = 0; i < editor.columns.length; i++)
 		{
-			children[i] = new ObjectListCell( modelRow, editor.columns[i] );
+			children[i] = new ObjectListCell( this, editor.columns[i] );
 		}
 		
 		return new Span( children );
