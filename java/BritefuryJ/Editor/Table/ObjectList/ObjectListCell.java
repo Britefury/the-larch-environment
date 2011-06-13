@@ -6,17 +6,17 @@
 //##************************
 package BritefuryJ.Editor.Table.ObjectList;
 
-import BritefuryJ.Cell.AbstractCell;
+import BritefuryJ.Editor.Table.AbstractTableCell;
 
-public class ObjectListCell extends AbstractCell
+public class ObjectListCell extends AbstractTableCell
 {
-	protected Object modelRow;
+	protected ObjectListRow row;
 	protected AbstractColumn column;
 	
 	
-	public ObjectListCell(Object modelRow, AbstractColumn column)
+	public ObjectListCell(ObjectListRow row, AbstractColumn column)
 	{
-		this.modelRow = modelRow;
+		this.row = row;
 		this.column = column;
 	}
 	
@@ -24,12 +24,13 @@ public class ObjectListCell extends AbstractCell
 	@Override
 	public Object getValue()
 	{
-		return column.get( modelRow );
+		return column.get( row.modelRow );
 	}
 	
 	@Override
 	public void setValue(Object value)
 	{
-		column.set( modelRow, value );
+		column.set( row.modelRow, value );
+		row.onCellChanged( this );
 	}
 }

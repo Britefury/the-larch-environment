@@ -168,7 +168,9 @@ public class Table extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		StyleValues childStyle = Primitive.useTableParams( style );		
+		StyleValues childStyle = Primitive.useTableParams( style );
+		HAlignment childHAlign = childStyle.get( Primitive.hAlign, HAlignment.class );
+		VAlignment childVAlign = childStyle.get( Primitive.vAlign, VAlignment.class );
 		DPTable table = new DPTable( Primitive.tableParams.get( style ) );
 		if ( childCells != null )
 		{
@@ -181,8 +183,7 @@ public class Table extends Pres
 				for (int x = 0; x < row.length; x++)
 				{
 					TableCell cell = row[x];
-					elemRow[x] = cell != null  ?  new DPTable.TableCell( cell.child.present( ctx, childStyle ).layoutWrap( childStyle.get( Primitive.hAlign, HAlignment.class ),
-							childStyle.get( Primitive.vAlign, VAlignment.class ) ),cell.colSpan, cell.rowSpan )  :  null;  
+					elemRow[x] = cell != null  ?  new DPTable.TableCell( cell.child.present( ctx, childStyle ).layoutWrap( childHAlign, childVAlign ), cell.colSpan, cell.rowSpan )  :  null;  
 				}
 			}
 			table.setCells( elemCells );

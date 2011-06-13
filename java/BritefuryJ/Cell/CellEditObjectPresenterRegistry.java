@@ -15,6 +15,7 @@ import org.python.core.PyInteger;
 import org.python.core.PyObject;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.Cell.Presenters.PresentersAWT;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.ObjectPresentation.ObjectPresentationPerspective;
 import BritefuryJ.ObjectPresentation.ObjectPresenter;
@@ -24,6 +25,9 @@ import BritefuryJ.Pres.Pres;
 
 public class CellEditObjectPresenterRegistry extends ObjectPresenterRegistry
 {
+	private PresentersAWT awt = new PresentersAWT();
+
+	
 	private CellEditObjectPresenterRegistry()
 	{
 		registerJavaObjectPresenter( Character.class, presenter_Character );
@@ -47,6 +51,8 @@ public class CellEditObjectPresenterRegistry extends ObjectPresenterRegistry
 	public void registerPerspective(ObjectPresentationPerspective perspective)
 	{
 		super.registerPerspective( perspective );
+	
+		awt.registerPerspective( perspective );
 	}
 
 

@@ -7,7 +7,11 @@
 ##-*************************
 import sys
 import os
+from Britefury import javacopiers
 
 sys.path.append( os.path.join( os.getcwd(), 'bin' ) )
 sys.path.append( os.path.join( os.getcwd(), 'extlibs', 'jericho-html-3.2.jar' ) )
 sys.path.append( os.path.join( os.getcwd(), 'extlibs', 'svgSalamander.jar' ) )
+
+
+javacopiers.install_java_copiers()
