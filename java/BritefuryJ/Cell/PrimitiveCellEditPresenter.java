@@ -9,22 +9,11 @@ package BritefuryJ.Cell;
 import java.awt.Color;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.IdentityHashMap;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.TextEditEvent;
-import BritefuryJ.DocPresent.TreeEventListener;
-import BritefuryJ.DocPresent.Caret.Caret;
-import BritefuryJ.DocPresent.Clipboard.TextClipboardHandler;
-import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.Selection.TextSelection;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Primitive;
-import BritefuryJ.Pres.Primitive.Region;
-import BritefuryJ.Pres.Primitive.Text;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.Util.UnaryFn;
 
@@ -33,59 +22,59 @@ public class PrimitiveCellEditPresenter
 	public static Pres presentChar(char c, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		String str = Character.toString( c );
-		return charStyle.applyTo( presentEditableTextWithCachedListener( str, textToChar ) );
+		return charStyle.applyTo( EditableTextCell.textCellWithCachedListener( str, textToChar ) );
 	}
 	
 	public static Pres presentString(String text, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return stringStyle.applyTo( presentEditableTextWithCachedListener( text, textToString ) );
+		return stringStyle.applyTo( EditableTextCell.textCellWithCachedListener( text, textToString ) );
 	}
 
 	public static Pres presentByte(byte b, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return integerStyle.applyTo( presentEditableTextWithCachedListener( Integer.toHexString( ((int)b) & 0xff ), textToByte ) );
+		return integerStyle.applyTo( EditableTextCell.textCellWithCachedListener( Integer.toHexString( ((int)b) & 0xff ), textToByte ) );
 	}
 	
 	
 	public static Pres presentShort(short x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return integerStyle.applyTo( presentEditableTextWithCachedListener( Short.toString( x ), textToShort ) );
+		return integerStyle.applyTo( EditableTextCell.textCellWithCachedListener( Short.toString( x ), textToShort ) );
 	}
 	
 	public static Pres presentInt(int x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return integerStyle.applyTo( presentEditableTextWithCachedListener( Integer.toString( x ), textToInt ) );
+		return integerStyle.applyTo( EditableTextCell.textCellWithCachedListener( Integer.toString( x ), textToInt ) );
 	}
 	
 	public static Pres presentLong(long x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return integerStyle.applyTo( presentEditableTextWithCachedListener( Long.toString( x ), textToLong ) );
+		return integerStyle.applyTo( EditableTextCell.textCellWithCachedListener( Long.toString( x ), textToLong ) );
 	}
 	
 	public static Pres presentBigInteger(BigInteger x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return integerStyle.applyTo( presentEditableTextWithCachedListener( x.toString(), textToBigInteger ) );
+		return integerStyle.applyTo( EditableTextCell.textCellWithCachedListener( x.toString(), textToBigInteger ) );
 	}
 	
 	public static Pres presentBigDecimal(BigDecimal x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return integerStyle.applyTo( presentEditableTextWithCachedListener( x.toString(), textToBigDecimal ) );
+		return integerStyle.applyTo( EditableTextCell.textCellWithCachedListener( x.toString(), textToBigDecimal ) );
 	}
 	
 	public static Pres presentDouble(double x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return floatStyle.applyTo( presentEditableTextWithCachedListener( Double.toString( x ), textToDouble ) );
+		return floatStyle.applyTo( EditableTextCell.textCellWithCachedListener( Double.toString( x ), textToDouble ) );
 	}
 	
 	public static Pres presentBoolean(boolean b, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		if ( b )
 		{
-			return booleanStyle.applyTo( presentEditableTextWithCachedListener( "True", textToBoolean ) );
+			return booleanStyle.applyTo( EditableTextCell.textCellWithCachedListener( "True", textToBoolean ) );
 		}
 		else
 		{
-			return booleanStyle.applyTo( presentEditableTextWithCachedListener( "False", textToBoolean ) );
+			return booleanStyle.applyTo( EditableTextCell.textCellWithCachedListener( "False", textToBoolean ) );
 		}
 	}
 	
@@ -252,97 +241,6 @@ public class PrimitiveCellEditPresenter
 			return null;
 		}
 	};
-	
-	
-	
-	private static Pres presentEditableTextWithCachedListener(String text, UnaryFn textToValue)
-	{
-		TreeEventListener listener = cachedTreeEventListenerFor( textToValue );
-		Pres textPres = new Text( text );
-		textPres = textPres.withTreeEventListener( listener );
-		return new Region( textPres, clipboardHandler );
-	}
-
-
-	public static Pres presentEditableText(String text, UnaryFn textToValue)
-	{
-		TreeEventListener listener = treeEventListenerFor( textToValue );
-		Pres textPres = new Text( text );
-		textPres = textPres.withTreeEventListener( listener );
-		return new Region( textPres, clipboardHandler );
-	}
-
-
-	private static final TextClipboardHandler clipboardHandler = new TextClipboardHandler()
-	{
-		@Override
-		protected void deleteText(TextSelection selection, Caret caret)
-		{
-			DPText textElement = (DPText)selection.getStartMarker().getElement();
-			textElement.removeText( selection.getStartMarker(), selection.getEndMarker() );
-		}
-
-		@Override
-		protected void insertText(Marker marker, String text)
-		{
-			DPText textElement = (DPText)marker.getElement();
-			textElement.insertText( marker, text );
-		}
-		
-		@Override
-		protected void replaceText(TextSelection selection, Caret caret, String replacement)
-		{
-			DPText textElement = (DPText)selection.getStartMarker().getElement();
-			textElement.replaceText( selection.getStartMarker(), selection.getEndMarker(), replacement );
-		}
-		
-		@Override
-		protected String getText(TextSelection selection)
-		{
-			DPText textElement = (DPText)selection.getStartMarker().getElement();
-			return textElement.getTextRepresentationBetweenMarkers( selection.getStartMarker(), selection.getEndMarker() );
-		}
-	};
-	
-	
-	
-	private static final IdentityHashMap<UnaryFn, TreeEventListener> textCellTreeEventListeners = new IdentityHashMap<UnaryFn, TreeEventListener>();
-	
-	private static TreeEventListener cachedTreeEventListenerFor(final UnaryFn textToValue)
-	{
-		TreeEventListener listener = textCellTreeEventListeners.get( textToValue );
-		
-		if ( listener == null )
-		{
-			listener = treeEventListenerFor( textToValue );
-			textCellTreeEventListeners.put( textToValue, listener );
-		}
-		
-		return listener;
-	}
-	
-	
-	private static TreeEventListener treeEventListenerFor(final UnaryFn textToValue)
-	{
-		TreeEventListener listener = new TreeEventListener()
-		{
-			public boolean onTreeEvent(DPElement element, DPElement sourceElement, Object event)
-			{
-				if ( event instanceof TextEditEvent )
-				{
-					String textValue = element.getTextRepresentation();
-					Object value = textToValue.invoke( textValue );
-					if ( value != null )
-					{
-						CellEditPerspective.notifySetCellValue( element, value );
-					}
-				}
-				return false;
-			}
-		};
-		
-		return listener;
-	}
 	
 	
 	
