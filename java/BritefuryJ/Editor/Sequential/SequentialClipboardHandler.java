@@ -253,63 +253,67 @@ public class SequentialClipboardHandler extends ClipboardHandler
 		if ( selection instanceof TextSelection )
 		{
 			TextSelection ts = (TextSelection)selection;
-			Marker startMarker = ts.getStartMarker();
-			Marker endMarker = ts.getEndMarker();
 			
-			// Get the edit-level fragments that contain the start and end markers
-			FragmentView startFragment = FragmentView.getEnclosingFragment( startMarker.getElement(), editLevelFragmentFilter );
-			FragmentView endFragment = FragmentView.getEnclosingFragment( endMarker.getElement(), editLevelFragmentFilter );
-			
-			// Determine the 
-			FragmentView editRootFragment = null;
-			DPElement editRootFragmentElement = null;
-			if ( startFragment == endFragment )
+			if ( ts.isValid()  &&  ts.isEditable() )
 			{
-				editRootFragment = startFragment;
-			}
-			else
-			{
-				// Get the common root edit-level fragment, and its content element
-				editRootFragment = FragmentView.getCommonRootFragment( startFragment, endFragment, commonRootEditLevelFragmentFilter );
-			}
-			editRootFragmentElement = editRootFragment.getFragmentContentElement();
-
-			
-			if ( replacement != null )
-			{
-				// Splice the content before the selection, the inserted content, and the content after the selection
-				Object spliced = sequentialEditor.spliceForInsertion( editRootFragment, editRootFragmentElement, startMarker, endMarker, replacement );
+				Marker startMarker = ts.getStartMarker();
+				Marker endMarker = ts.getEndMarker();
 				
-				// Create the event
-				SelectionEditTreeEvent event = sequentialEditor.createSelectionEditTreeEvent( editRootFragmentElement );
-				// Store the spliced content in the structural value of the root element
-				event.getStreamValueVisitor().setElementFixedValue( editRootFragmentElement, spliced );
-				// Take a copy of the end marker
-				Marker end = endMarker.copy();
-				// Clear the selection
-				ts.clear();
-				// Move the caret to the end
-				caret.moveTo( end );
-				// Post a tree event
-				editRootFragmentElement.postTreeEvent( event );
-			}
-			else
-			{
-				// Splice the content around the selection
-				Object spliced = sequentialEditor.spliceForDeletion( editRootFragment, editRootFragmentElement, startMarker, endMarker );
-
-				// Create the event
-				SelectionEditTreeEvent event = sequentialEditor.createSelectionEditTreeEvent( editRootFragmentElement );
-				// Store the joined stream in the structural value of the root element
-				event.getStreamValueVisitor().setElementFixedValue( editRootFragmentElement, spliced );
-				// Take a copy of the end marker
-				Marker end = endMarker.copy();
-				// Clear the selection
-				ts.clear();
-				// Move the caret to the end
-				caret.moveTo( end );
-				// Post a tree event
-				editRootFragmentElement.postTreeEvent( event );
+				// Get the edit-level fragments that contain the start and end markers
+				FragmentView startFragment = FragmentView.getEnclosingFragment( startMarker.getElement(), editLevelFragmentFilter );
+				FragmentView endFragment = FragmentView.getEnclosingFragment( endMarker.getElement(), editLevelFragmentFilter );
+				
+				// Determine the 
+				FragmentView editRootFragment = null;
+				DPElement editRootFragmentElement = null;
+				if ( startFragment == endFragment )
+				{
+					editRootFragment = startFragment;
+				}
+				else
+				{
+					// Get the common root edit-level fragment, and its content element
+					editRootFragment = FragmentView.getCommonRootFragment( startFragment, endFragment, commonRootEditLevelFragmentFilter );
+				}
+				editRootFragmentElement = editRootFragment.getFragmentContentElement();
+	
+				
+				if ( replacement != null )
+				{
+					// Splice the content before the selection, the inserted content, and the content after the selection
+					Object spliced = sequentialEditor.spliceForInsertion( editRootFragment, editRootFragmentElement, startMarker, endMarker, replacement );
+					
+					// Create the event
+					SelectionEditTreeEvent event = sequentialEditor.createSelectionEditTreeEvent( editRootFragmentElement );
+					// Store the spliced content in the structural value of the root element
+					event.getStreamValueVisitor().setElementFixedValue( editRootFragmentElement, spliced );
+					// Take a copy of the end marker
+					Marker end = endMarker.copy();
+					// Clear the selection
+					ts.clear();
+					// Move the caret to the end
+					caret.moveTo( end );
+					// Post a tree event
+					editRootFragmentElement.postTreeEvent( event );
+				}
+				else
+				{
+					// Splice the content around the selection
+					Object spliced = sequentialEditor.spliceForDeletion( editRootFragment, editRootFragmentElement, startMarker, endMarker );
+	
+					// Create the event
+					SelectionEditTreeEvent event = sequentialEditor.createSelectionEditTreeEvent( editRootFragmentElement );
+					// Store the joined stream in the structural value of the root element
+					event.getStreamValueVisitor().setElementFixedValue( editRootFragmentElement, spliced );
+					// Take a copy of the end marker
+					Marker end = endMarker.copy();
+					// Clear the selection
+					ts.clear();
+					// Move the caret to the end
+					caret.moveTo( end );
+					// Post a tree event
+					editRootFragmentElement.postTreeEvent( event );
+				}
 			}
 		}
 	}
