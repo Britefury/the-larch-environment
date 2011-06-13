@@ -7,7 +7,7 @@
 package BritefuryJ.Editor.Table.ObjectList;
 
 import BritefuryJ.Cell.AbstractBlankCell;
-import BritefuryJ.Cell.PrimitiveCellEditPresenter;
+import BritefuryJ.Cell.EditableTextCell;
 
 public class ObjectListBlankCell extends AbstractBlankCell
 {
@@ -17,7 +17,7 @@ public class ObjectListBlankCell extends AbstractBlankCell
 	
 	public ObjectListBlankCell(ObjectListTableEditorInstance editorInstance, AbstractColumn column)
 	{
-		super( PrimitiveCellEditPresenter.presentEditableText( "", column.createConversionFn() ) );
+		super( EditableTextCell.textCell( "", column.createConversionFn() ) );
 		this.editorInstance = editorInstance;
 		this.column = column;
 	}

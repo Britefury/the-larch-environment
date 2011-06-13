@@ -64,10 +64,10 @@ public class CellEditPerspective extends ObjectPresentationPerspective
 	
 	
 	
-	public static void notifySetCellValue(DPElement cellElement, Object value)
+	public static boolean notifySetCellValue(DPElement cellElement, Object value)
 	{
 		CellSetValueEvent cellEvent = new CellSetValueEvent( value );
-		cellElement.postTreeEvent( cellEvent );
+		return cellElement.postTreeEvent( cellEvent );
 	}
 
 

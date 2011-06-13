@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Editor.Table.Generic;
 
-import BritefuryJ.Cell.PrimitiveCellEditPresenter;
+import BritefuryJ.Cell.EditableTextCell;
 import BritefuryJ.Editor.Table.AbstractTableEditor;
 import BritefuryJ.Editor.Table.AbstractTableEditorInstance;
 import BritefuryJ.Pres.Pres;
@@ -23,7 +23,7 @@ public class GenericTableEditor extends AbstractTableEditor<GenericTableModelInt
 	{
 		super( showLeftHeader, showTopHeader, growRight, growDown );
 		this.columnTitles = columnTitles;
-		this.blankPres = PrimitiveCellEditPresenter.presentEditableText( "", convertValueFn );
+		this.blankPres = EditableTextCell.textCell( "", convertValueFn );
 	}
 	
 	public GenericTableEditor(String columnTitles[], boolean showLeftHeader, boolean showTopHeader, boolean growRight, boolean growDown)
