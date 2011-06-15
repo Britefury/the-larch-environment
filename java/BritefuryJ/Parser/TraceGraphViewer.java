@@ -29,6 +29,9 @@ public class TraceGraphViewer
 {
 	static final int MAX_STRING_LENGTH = 64;
 	
+	static final double ASPECT_RATIO = 16.0 / 9.0;
+	
+	
 	private IdentityHashMap<TraceNode, String> nodeToName = new IdentityHashMap<TraceNode, String>();
 	
 	
@@ -247,7 +250,7 @@ public class TraceGraphViewer
 		String dot = traceGraphDot( result );
 		
 		Object view = GraphViz.dot( dot );
-		Pres viewport = new AspectRatioScrolledViewport( view, 0.0, 1.333, viewportState );
+		Pres viewport = new AspectRatioScrolledViewport( view, 0.0, ASPECT_RATIO, viewportState );
 		return viewportBorderStyle.applyTo( new Border( viewport ) ).alignHExpand().alignVExpand();
 	}
 

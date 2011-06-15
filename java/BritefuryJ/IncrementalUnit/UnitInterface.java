@@ -11,25 +11,24 @@ package BritefuryJ.IncrementalUnit;
 import java.awt.Color;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DefaultPerspective.PrimitivePresenter;
 import BritefuryJ.DefaultPerspective.Presentable;
+import BritefuryJ.DefaultPerspective.PrimitivePresenter;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
-import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.ApplyPerspective;
 import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.ObjectPres.ErrorBox;
-import BritefuryJ.Pres.ObjectPres.ObjectPresStyle;
 import BritefuryJ.Pres.ObjectPres.ObjectBox;
+import BritefuryJ.Pres.ObjectPres.ObjectPresStyle;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
 
 
 
-public abstract class UnitInterface implements IncrementalOwner, Presentable
+public abstract class UnitInterface implements Presentable
 {
 	public static class ValuePres extends Pres
 	{

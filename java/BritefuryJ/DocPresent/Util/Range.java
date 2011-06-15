@@ -11,7 +11,6 @@ import java.util.ArrayList;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.Pres.Pres;
@@ -23,7 +22,7 @@ import BritefuryJ.Pres.Primitive.StaticText;
 import BritefuryJ.StyleSheet.StyleSheet;
 
 
-public class Range implements IncrementalOwner, Presentable
+public class Range implements Presentable
 {
 	public interface RangeListener
 	{

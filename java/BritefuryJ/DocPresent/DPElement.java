@@ -3044,7 +3044,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	{
 		ArrayList<Object> elements = new ArrayList<Object>();
 		createDebugPresentationHeaderContents( elements );
-		Pres box = metaHeaderRowStyle.applyTo( new Row( elements ) );
+		Pres box = metaHeaderRowStyle.applyTo( new Row( elements ).alignHPack() );
 		Border border = new Border( box );
 		return getDebugPresentationHeaderBorderStyle().applyTo( border.withElementInteractor( explorerHeaderHoverInteractor ).withElementInteractor( explorerHeaderInspectInteractor ) );
 	}

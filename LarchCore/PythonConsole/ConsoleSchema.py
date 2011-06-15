@@ -13,7 +13,7 @@ from copy import copy, deepcopy
 
 from Britefury import LoadBuiltins
 
-from BritefuryJ.Incremental import IncrementalOwner, IncrementalValueMonitor
+from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from LarchCore.Languages.Python25 import Python25
 from LarchCore.Languages.Python25 import CodeGenerator
@@ -21,7 +21,7 @@ from LarchCore.Languages.Python25 import Schema as PySchema
 from LarchCore.Languages.Python25.Execution import Execution
 
 
-class Console (IncrementalOwner):
+class Console (object):
 	class Output (object):
 		def __init__(self):
 			self._builder = None
@@ -108,7 +108,7 @@ class Console (IncrementalOwner):
 		
 		
 	
-class ConsoleBlock (IncrementalOwner):
+class ConsoleBlock (object):
 	def __init__(self, pythonModule, execResult):
 		self._incr = IncrementalValueMonitor( self )
 		
