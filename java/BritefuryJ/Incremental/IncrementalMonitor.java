@@ -20,7 +20,7 @@ public abstract class IncrementalMonitor
 	
 	
 	
-	protected IncrementalOwner owner;
+	protected Object owner;
 	protected IncrementalState incrementalState;
 	protected WeakHashMap<IncrementalFunctionMonitor, Object> outgoingDependencies;
 	protected ArrayList<WeakReference<IncrementalMonitorListener>> listeners;
@@ -34,7 +34,7 @@ public abstract class IncrementalMonitor
 		this( null );
 	}
 	
-	public IncrementalMonitor(IncrementalOwner owner)
+	public IncrementalMonitor(Object owner)
 	{
 		this.owner = owner;
 		incrementalState = IncrementalState.UNINITIALISED;
@@ -97,7 +97,7 @@ public abstract class IncrementalMonitor
 	}
 
 	
-	public IncrementalOwner getOwner()
+	public Object getOwner()
 	{
 		return owner;
 	}

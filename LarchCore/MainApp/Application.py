@@ -9,13 +9,13 @@ from copy import copy
 
 from BritefuryJ.DocPresent.Browser import Location
 
-from BritefuryJ.Incremental import IncrementalOwner, IncrementalValueMonitor
+from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from LarchCore.PythonConsole import ConsoleSchema
 
 
 
-class AppState (IncrementalOwner):
+class AppState (object):
 	def __init__(self):
 		self._incr = IncrementalValueMonitor( self )
 		
@@ -57,7 +57,7 @@ class AppState (IncrementalOwner):
 	
 		
 	
-class AppDocument (IncrementalOwner):
+class AppDocument (object):
 	def __init__(self, doc, relativeLocation):
 		self._incr = IncrementalValueMonitor( self )
 		
@@ -84,7 +84,7 @@ class AppDocument (IncrementalOwner):
 		
 	
 
-class AppConsole (IncrementalOwner):
+class AppConsole (object):
 	def __init__(self, index):
 		self._incr = IncrementalValueMonitor( self )
 		

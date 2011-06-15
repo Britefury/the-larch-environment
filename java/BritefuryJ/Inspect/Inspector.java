@@ -11,6 +11,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 
+import org.python.core.Py;
 import org.python.core.PyDictionary;
 import org.python.core.PyList;
 import org.python.core.PyObject;
@@ -183,8 +184,9 @@ public class Inspector
 			contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Fields" ) ), new Column( fields ) ) );
 		}
 		
-		Pres inspector = new Column( contents );
-		return new DropDownExpander( asString, inspector );
+		contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "toString" ) ), asString ) );
+		
+		return new Column( contents );
 	}
 	
 	public static Pres presentPythonObjectInspector(PyObject x, FragmentView fragment, SimpleAttributeTable inheritedState)
@@ -241,7 +243,7 @@ public class Inspector
 				}
 				else
 				{
-					valuePres = new InnerFragment( value );
+					valuePres = new InnerFragment( Py.tojava( value, Object.class ) );
 					isSmall = false;
 				}
 				
@@ -261,9 +263,9 @@ public class Inspector
 			contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Attributes" ) ),   new Column( attributes ) ) );
 		}
 		
+		contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "__str__" ) ), asString ) );
 		
-		Pres inspector = new Column( contents );
-		return new DropDownExpander( asString, inspector );
+		return new Column( contents );
 	}
 	
 	

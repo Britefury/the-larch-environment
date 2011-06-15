@@ -14,7 +14,7 @@ public class IncrementalValueMonitor extends IncrementalMonitor
 		this( null );
 	}
 	
-	public IncrementalValueMonitor(IncrementalOwner owner)
+	public IncrementalValueMonitor(Object owner)
 	{
 		super( owner );
 	}

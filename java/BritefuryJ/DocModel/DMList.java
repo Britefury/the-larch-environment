@@ -25,7 +25,6 @@ import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.ChangeHistory.ChangeHistory;
 import BritefuryJ.ChangeHistory.Trackable;
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.Incremental.IncrementalValueMonitor;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.JythonInterface.JythonIndex;
@@ -33,7 +32,7 @@ import BritefuryJ.JythonInterface.JythonSlice;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Util.HashUtils;
 
-public class DMList extends DMNode implements DMListInterface, Trackable, IncrementalOwner, Presentable
+public class DMList extends DMNode implements DMListInterface, Trackable, Presentable
 {
 	private static final long serialVersionUID = 1L;
 	

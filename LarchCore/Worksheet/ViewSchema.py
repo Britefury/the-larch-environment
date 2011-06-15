@@ -9,7 +9,7 @@ from weakref import WeakValueDictionary
 
 import imp
 
-from BritefuryJ.Incremental import IncrementalOwner, IncrementalValueMonitor
+from BritefuryJ.Incremental import IncrementalValueMonitor
 from BritefuryJ.IncrementalUnit import Unit
 
 from BritefuryJ.Pres import InnerFragment
@@ -253,7 +253,7 @@ class TextSpanView (NodeView):
 		
 		
 		
-class PythonCodeView (IncrementalOwner, NodeView):
+class PythonCodeView (NodeView):
 	STYLE_MINIMAL_RESULT = 0
 	STYLE_RESULT = 1
 	STYLE_CODE_AND_RESULT = 2
@@ -348,7 +348,7 @@ class PythonCodeView (IncrementalOwner, NodeView):
 
 	
 	
-class QuoteLocationView (IncrementalOwner, NodeView):
+class QuoteLocationView (NodeView):
 	STYLE_MINIMAL = 0
 	STYLE_NORMAL = 1
 	

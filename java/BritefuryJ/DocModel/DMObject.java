@@ -27,13 +27,12 @@ import BritefuryJ.ChangeHistory.ChangeHistory;
 import BritefuryJ.ChangeHistory.Trackable;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.DocModel.DMObjectClass.UnknownFieldNameException;
-import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.Incremental.IncrementalValueMonitor;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Util.HashUtils;
 
-public class DMObject extends DMNode implements DMObjectInterface, Trackable, IncrementalOwner, Presentable
+public class DMObject extends DMNode implements DMObjectInterface, Trackable, Presentable
 {
 	private static final long serialVersionUID = 1L;
 

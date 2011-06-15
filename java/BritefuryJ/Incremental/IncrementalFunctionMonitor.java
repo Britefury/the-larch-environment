@@ -31,7 +31,7 @@ public class IncrementalFunctionMonitor extends IncrementalMonitor
 		this( null );
 	}
 
-	public IncrementalFunctionMonitor(IncrementalOwner owner)
+	public IncrementalFunctionMonitor(Object owner)
 	{
 		super( owner );
 		

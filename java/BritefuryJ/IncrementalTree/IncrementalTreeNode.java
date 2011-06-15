@@ -10,10 +10,9 @@ import java.util.Iterator;
 
 import BritefuryJ.Incremental.IncrementalFunctionMonitor;
 import BritefuryJ.Incremental.IncrementalMonitor;
-import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
 
-public abstract class IncrementalTreeNode implements IncrementalMonitorListener, IncrementalOwner
+public abstract class IncrementalTreeNode implements IncrementalMonitorListener
 {
 	public static class CannotChangeDocNodeException extends Exception
 	{
