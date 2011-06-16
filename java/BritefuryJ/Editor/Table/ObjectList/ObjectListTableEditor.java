@@ -335,7 +335,7 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 
 
 	@Override
-	protected Object[][] textBlockToValueBlock(int posX, int posY, String[][] textBlock)
+	protected Object[][] importBlock(int posX, int posY, String[][] textBlock)
 	{
 		Object destBlock[][] = new Object[textBlock.length][];
 		for (int b = 0; b < textBlock.length; b++)
@@ -350,11 +350,40 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 				Object x;
 				if ( i < columns.length )
 				{
-					x = columns[i].convertValue( cellText );
+					x = columns[i].importValue( cellText );
 				}
 				else
 				{
 					x = cellText;
+				}
+				destRow[a] = x;
+			}
+		}
+		
+		return destBlock;
+	}
+
+	@Override
+	protected String[][] exportBlock(int posX, int posY, Object[][] valueBlock)
+	{
+		String destBlock[][] = new String[valueBlock.length][];
+		for (int b = 0; b < valueBlock.length; b++)
+		{
+			Object[] srcRow = valueBlock[b];
+			String[] destRow = new String[srcRow.length];
+			destBlock[b] = destRow;
+			
+			for (int a = 0, i = posX; a < srcRow.length; a++, i++)
+			{
+				Object cell = srcRow[a];
+				String x;
+				if ( i < columns.length )
+				{
+					x = columns[i].exportValue( cell );
+				}
+				else
+				{
+					x = cell.toString();
 				}
 				destRow[a] = x;
 			}

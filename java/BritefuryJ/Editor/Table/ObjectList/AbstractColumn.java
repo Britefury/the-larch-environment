@@ -17,7 +17,8 @@ public abstract class AbstractColumn
 	
 	
 	public abstract Object defaultValue();
-	public abstract Object convertValue(Object x);
+	public abstract Object importValue(Object x);
+	public abstract String exportValue(Object x);
 	
 	
 	public abstract Object presentHeader();
@@ -41,13 +42,13 @@ public abstract class AbstractColumn
 	}
 	
 	
-	protected UnaryFn createConversionFn()
+	protected UnaryFn createImportFn()
 	{
 		UnaryFn fn = new UnaryFn()
 		{
 			public Object invoke(Object x)
 			{
-				return AbstractColumn.this.convertValue( x );
+				return AbstractColumn.this.importValue( x );
 			}
 			
 		};

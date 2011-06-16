@@ -14,8 +14,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.Clipboard.LocalDataFlavor;
+import BritefuryJ.DocPresent.Selection.Selection;
 
-public abstract class AbstractDataExporter <SelectionContentsType> extends DataExporterInterface<SelectionContentsType>
+public abstract class AbstractDataExporter <SelectionContentsType, SelectionType extends Selection> extends DataExporterInterface<SelectionContentsType, SelectionType>
 {
 	static ArrayList<DataFlavor> emptyFlavorList = new ArrayList<DataFlavor>();
 	
@@ -51,7 +52,7 @@ public abstract class AbstractDataExporter <SelectionContentsType> extends DataE
 		}
 	}
 
-	protected Object getTransferData(SelectionContentsType selectionContents, DataFlavor flavor) throws UnsupportedFlavorException, IOException
+	protected Object getTransferData(SelectionContentsType selectionContents, SelectionType selection, DataFlavor flavor) throws UnsupportedFlavorException, IOException
 	{
 		if ( canExport( selectionContents ) )
 		{

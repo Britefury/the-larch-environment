@@ -14,43 +14,44 @@ import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.Clipboard.LocalDataFlavor;
+import BritefuryJ.DocPresent.Selection.Selection;
 
-public class DataExporter<SelectionContentsType> extends DataExporterInterface<SelectionContentsType>
+public class DataExporter<SelectionContentsType, SelectionType extends Selection> extends DataExporterInterface<SelectionContentsType, SelectionType>
 {
 	public interface CanExportFn <SelectionContentsType>
 	{
 		public boolean canExport(SelectionContentsType selectionContents);
 	}
 	
-	public interface ExportFn <SelectionContentsType>
+	public interface ExportFn <SelectionContentsType, SelectionType extends Selection>
 	{
-		public Object export(SelectionContentsType selectionContents);
+		public Object export(SelectionContentsType selectionContents, SelectionType selection);
 	}
 	
 	
 	
 	private DataFlavor flavor;
 	private CanExportFn<SelectionContentsType> canExportFn;
-	private ExportFn<SelectionContentsType> exportFn;
+	private ExportFn<SelectionContentsType, SelectionType> exportFn;
 	
-	public DataExporter(DataFlavor flavor, ExportFn<SelectionContentsType> exportFn, CanExportFn<SelectionContentsType> canExportFn)
+	public DataExporter(DataFlavor flavor, ExportFn<SelectionContentsType, SelectionType> exportFn, CanExportFn<SelectionContentsType> canExportFn)
 	{
 		this.flavor = flavor;
 		this.exportFn = exportFn;
 		this.canExportFn = canExportFn;
 	}
 	
-	public DataExporter(DataFlavor flavor, ExportFn<SelectionContentsType> exportFn)
+	public DataExporter(DataFlavor flavor, ExportFn<SelectionContentsType, SelectionType> exportFn)
 	{
 		this( flavor, exportFn, null );
 	}
 	
-	public DataExporter(Class<?> type, ExportFn<SelectionContentsType> exportFn, CanExportFn<SelectionContentsType> canExportFn)
+	public DataExporter(Class<?> type, ExportFn<SelectionContentsType, SelectionType> exportFn, CanExportFn<SelectionContentsType> canExportFn)
 	{
 		this( new LocalDataFlavor( type ), exportFn, canExportFn );
 	}
 	
-	public DataExporter(Class<?> type, ExportFn<SelectionContentsType> exportFn)
+	public DataExporter(Class<?> type, ExportFn<SelectionContentsType, SelectionType> exportFn)
 	{
 		this( new LocalDataFlavor( type ), exportFn );
 	}
@@ -70,13 +71,13 @@ public class DataExporter<SelectionContentsType> extends DataExporterInterface<S
 		}
 	}
 
-	protected Object getTransferData(SelectionContentsType selectionContents, DataFlavor flavor) throws UnsupportedFlavorException, IOException
+	protected Object getTransferData(SelectionContentsType selectionContents, SelectionType selection, DataFlavor flavor) throws UnsupportedFlavorException, IOException
 	{
 		if ( canExportFn == null  ||  canExportFn.canExport( selectionContents ) )
 		{
 			if ( flavor.equals( this.flavor ) )
 			{
-				return exportFn.export( selectionContents );
+				return exportFn.export( selectionContents, selection );
 			}
 		}
 		
@@ -85,13 +86,15 @@ public class DataExporter<SelectionContentsType> extends DataExporterInterface<S
 	
 	
 	
-	public static <SelectionContentsType> DataExporter<SelectionContentsType> stringExporter(ExportFn<SelectionContentsType> exportFn, CanExportFn<SelectionContentsType> canExportFn)
+	public static <SelectionContentsType, SelectionType extends Selection> DataExporter<SelectionContentsType, SelectionType>
+			stringExporter(ExportFn<SelectionContentsType, SelectionType> exportFn, CanExportFn<SelectionContentsType> canExportFn)
 	{
-		return new DataExporter<SelectionContentsType>( DataFlavor.stringFlavor, exportFn, canExportFn );
+		return new DataExporter<SelectionContentsType, SelectionType>( DataFlavor.stringFlavor, exportFn, canExportFn );
 	}
 
-	public static <SelectionContentsType> DataExporter<SelectionContentsType> stringExporter(ExportFn<SelectionContentsType> exportFn)
+	public static <SelectionContentsType, SelectionType extends Selection> DataExporter<SelectionContentsType, SelectionType>
+			stringExporter(ExportFn<SelectionContentsType, SelectionType> exportFn)
 	{
-		return new DataExporter<SelectionContentsType>( DataFlavor.stringFlavor, exportFn );
+		return new DataExporter<SelectionContentsType, SelectionType>( DataFlavor.stringFlavor, exportFn );
 	}
 }

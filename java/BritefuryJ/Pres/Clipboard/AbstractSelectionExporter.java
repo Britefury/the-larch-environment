@@ -26,24 +26,24 @@ abstract public class AbstractSelectionExporter <SelectionContentsType, Selectio
 	
 	private Class<? extends Selection> selectionClass;
 	private int actions;
-	private ArrayList<DataExporterInterface<SelectionContentsType>> exporters = new ArrayList<DataExporterInterface<SelectionContentsType>>();
+	private ArrayList<DataExporterInterface<SelectionContentsType, SelectionType>> exporters = new ArrayList<DataExporterInterface<SelectionContentsType, SelectionType>>();
 	
 	
-	public AbstractSelectionExporter(Class<? extends Selection> selectionClass, int actions, List<? extends DataExporterInterface<SelectionContentsType>> exporters)
+	public AbstractSelectionExporter(Class<? extends Selection> selectionClass, int actions, List<? extends DataExporterInterface<SelectionContentsType, SelectionType>> exporters)
 	{
 		this.selectionClass = selectionClass;
 		this.actions = actions;
 		this.exporters.addAll( exporters );
 	}
 	
-	public AbstractSelectionExporter(Class<? extends Selection> selectionClass, List<? extends DataExporterInterface<SelectionContentsType>> exporters)
+	public AbstractSelectionExporter(Class<? extends Selection> selectionClass, List<? extends DataExporterInterface<SelectionContentsType, SelectionType>> exporters)
 	{
 		this( selectionClass, COPY_OR_MOVE, exporters );
 	}
 	
 	
 	
-	public List<DataExporterInterface<SelectionContentsType>> getExporters()
+	public List<DataExporterInterface<SelectionContentsType, SelectionType>> getExporters()
 	{
 		return exporters;
 	}
@@ -95,7 +95,10 @@ abstract public class AbstractSelectionExporter <SelectionContentsType, Selectio
 		@SuppressWarnings("unchecked")
 		SelectionContentsType contents = getSelectionContents( (SelectionType)selection );
 		
-		return new SelectionContentsTransferable<SelectionContentsType, SelectionType>( this, contents );
+		@SuppressWarnings("unchecked")
+		SelectionContentsTransferable<SelectionContentsType, SelectionType> xfer = new SelectionContentsTransferable<SelectionContentsType, SelectionType>( this, contents, (SelectionType)selection );
+		
+		return xfer;
 	}
 
 	@SuppressWarnings("unchecked")

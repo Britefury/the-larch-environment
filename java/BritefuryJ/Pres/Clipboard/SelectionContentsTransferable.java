@@ -18,15 +18,17 @@ class SelectionContentsTransferable<SelectionContentsType, SelectionType extends
 {
 	protected final AbstractSelectionExporter<SelectionContentsType, SelectionType> selectionExporter;
 	protected SelectionContentsType selectionContents;
+	protected SelectionType selection;
 	private ArrayList<DataFlavor> flavors = new ArrayList<DataFlavor>();
 	
 	
-	protected SelectionContentsTransferable(AbstractSelectionExporter<SelectionContentsType, SelectionType> selectionExporter, SelectionContentsType selectionContents)
+	protected SelectionContentsTransferable(AbstractSelectionExporter<SelectionContentsType, SelectionType> selectionExporter, SelectionContentsType selectionContents, SelectionType selection)
 	{
 		this.selectionExporter = selectionExporter;
 		this.selectionContents = selectionContents;
+		this.selection = selection;
 		
-		for (DataExporterInterface<SelectionContentsType> exporter: selectionExporter.getExporters())
+		for (DataExporterInterface<SelectionContentsType, SelectionType> exporter: selectionExporter.getExporters())
 		{
 			flavors.addAll( exporter.getTransferDataFlavors( selectionContents ) );
 		}
@@ -45,11 +47,11 @@ class SelectionContentsTransferable<SelectionContentsType, SelectionType extends
 
 	public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException
 	{
-		for (DataExporterInterface<SelectionContentsType> exporter: selectionExporter.getExporters())
+		for (DataExporterInterface<SelectionContentsType, SelectionType> exporter: selectionExporter.getExporters())
 		{
 			if ( exporter.getTransferDataFlavors( selectionContents ).contains( flavor ) )
 			{
-				return exporter.getTransferData( selectionContents, flavor );
+				return exporter.getTransferData( selectionContents, selection, flavor );
 			}
 		}
 		
