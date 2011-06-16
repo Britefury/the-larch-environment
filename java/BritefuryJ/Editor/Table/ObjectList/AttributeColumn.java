@@ -18,16 +18,17 @@ public class AttributeColumn extends AbstractColumn
 {
 	private String title;
 	private PyString attrname;
-	private PyObject valueConstructorFn;
+	private PyObject valueConstructorFn, valueExportFn;
 	private PyObject defaultValue, defaultValueCallable;
 	
 	
-	public AttributeColumn(String title, PyString attrname, PyObject valueConstructorFn, PyObject defaultValue)
+	public AttributeColumn(String title, PyString attrname, PyObject valueConstructorFn, PyObject valueExportFn, PyObject defaultValue)
 	{
 		super();
 		this.title = title;
 		this.attrname = __builtin__.intern( attrname );
 		this.valueConstructorFn = valueConstructorFn;
+		this.valueExportFn = valueExportFn;
 		if ( defaultValue.isCallable() )
 		{
 			this.defaultValueCallable = defaultValue;
@@ -38,9 +39,14 @@ public class AttributeColumn extends AbstractColumn
 		}
 	}
 	
+	public AttributeColumn(String title, PyString attrname, PyObject valueConstructorFn, PyObject defaultValue)
+	{
+		this( title, attrname, valueConstructorFn, null, defaultValue );
+	}
+	
 	public AttributeColumn(String title, PyString attrname)
 	{
-		this( title, attrname, null, Py.None );
+		this( title, attrname, null, null, Py.None );
 	}
 	
 	
@@ -62,7 +68,7 @@ public class AttributeColumn extends AbstractColumn
 	@Override
 	public Object defaultValue()
 	{
-		if ( defaultValueCallable != null )
+		if ( defaultValueCallable != null  &&  defaultValueCallable != Py.None )
 		{
 			return defaultValueCallable.__call__();
 		}
@@ -73,15 +79,28 @@ public class AttributeColumn extends AbstractColumn
 	}
 
 	@Override
-	public Object convertValue(Object x)
+	public Object importValue(Object x)
 	{
-		if ( valueConstructorFn != null )
+		if ( valueConstructorFn != null  &&  valueConstructorFn != Py.None )
 		{
 			return valueConstructorFn.__call__( Py.java2py( x ) );
 		}
 		else
 		{
 			return x;
+		}
+	}
+
+	@Override
+	public String exportValue(Object x)
+	{
+		if ( valueExportFn != null  &&  valueExportFn != Py.None )
+		{
+			return valueExportFn.__call__( Py.java2py( x ) ).toString();
+		}
+		else
+		{
+			return x.toString();
 		}
 	}
 

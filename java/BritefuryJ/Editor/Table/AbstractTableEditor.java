@@ -53,18 +53,20 @@ public abstract class AbstractTableEditor<ModelType>
 
 
 
-	private final ExportFn<Object[][]> exportBuffer = new ExportFn<Object[][]>()
+	private final ExportFn<Object[][], TableSelection> exportBuffer = new ExportFn<Object[][], TableSelection>()
 	{
-		public Object export(Object[][] selectionContents)
+		public Object export(Object[][] selectionContents, TableSelection selection)
 		{
 			return new TableBuffer( AbstractTableEditor.this, selectionContents );
 		}
 	};
 	
-	private final ExportFn<Object[][]> exportTextHtml = new ExportFn<Object[][]>()
+	private final ExportFn<Object[][], TableSelection> exportTextHtml = new ExportFn<Object[][], TableSelection>()
 	{
-		public Object export(Object[][] selectionContents)
+		public Object export(Object[][] selectionContents, TableSelection selection)
 		{
+			String[][] exported = exportBlock( selection.getX(), selection.getY(), selectionContents );
+			
 			StringBuilder b = new StringBuilder();
 			b.append( "<html>\n" );
 			b.append( "\t<head>\n" );
@@ -72,13 +74,13 @@ public abstract class AbstractTableEditor<ModelType>
 			b.append( "\t</head>\n" );
 			b.append( "\t<body>\n" );
 			b.append( "\t\t<table>\n" );
-			for (Object row[]: selectionContents)
+			for (String row[]: exported)
 			{
 				b.append( "\t\t\t<tr>\n" );
-				for (Object cell: row)
+				for (String cell: row)
 				{
 					b.append( "\t\t\t\t<td>" );
-					b.append( cell.toString() );
+					b.append( cell );
 					b.append( "</td>\n" );
 				}
 				b.append( "\t\t\t</tr>\n" );
@@ -90,21 +92,23 @@ public abstract class AbstractTableEditor<ModelType>
 		}
 	};
 	
-	private final ExportFn<Object[][]> exportTextPlain = new ExportFn<Object[][]>()
+	private final ExportFn<Object[][], TableSelection> exportTextPlain = new ExportFn<Object[][], TableSelection>()
 	{
-		public Object export(Object[][] selectionContents)
+		public Object export(Object[][] selectionContents, TableSelection selection)
 		{
+			String[][] exported = exportBlock( selection.getX(), selection.getY(), selectionContents );
+			
 			StringBuilder b = new StringBuilder();
-			for (Object row[]: selectionContents)
+			for (String row[]: exported)
 			{
 				boolean first = true;
-				for (Object cell: row)
+				for (String cell: row)
 				{
 					if ( !first )
 					{
 						b.append( "\t" );
 					}
-					b.append( cell.toString() );
+					b.append( cell );
 					first = false;
 				}
 				b.append( "\n" );
@@ -211,7 +215,7 @@ public abstract class AbstractTableEditor<ModelType>
 				ModelType model = (ModelType)target.editorInstance.model;
 				String textBlock[][] = tableData.toArray( new String[tableData.size()][] );
 				
-				Object[][] subtable = textBlockToValueBlock( target.x, target.y, textBlock );
+				Object[][] subtable = importBlock( target.x, target.y, textBlock );
 				
 				putBlock( model, target.x, target.y, subtable, (AbstractTableEditorInstance<ModelType>)target.editorInstance );
 
@@ -259,11 +263,11 @@ public abstract class AbstractTableEditor<ModelType>
 			throw new RuntimeException( e );
 		}
 	
-		DataExporter<Object[][]> bufferExporter = new DataExporter<Object[][]>( TableBuffer.class, exportBuffer );
-		DataExporter<Object[][]> textHtmlExporter = new DataExporter<Object[][]>( textHtmlFlavor, exportTextHtml );
-		DataExporter<Object[][]> textPlainExporter = new DataExporter<Object[][]>( textPlainFlavor, exportTextPlain );
+		DataExporter<Object[][], TableSelection> bufferExporter = new DataExporter<Object[][], TableSelection>( TableBuffer.class, exportBuffer );
+		DataExporter<Object[][], TableSelection> textHtmlExporter = new DataExporter<Object[][], TableSelection>( textHtmlFlavor, exportTextHtml );
+		DataExporter<Object[][], TableSelection> textPlainExporter = new DataExporter<Object[][], TableSelection>( textPlainFlavor, exportTextPlain );
 		@SuppressWarnings("unchecked")
-		DataExporterInterface<Object[][]> exporters[] = new DataExporterInterface[] { bufferExporter, textHtmlExporter, textPlainExporter };
+		DataExporterInterface<Object[][], TableSelection> exporters[] = new DataExporterInterface[] { bufferExporter, textHtmlExporter, textPlainExporter };
 		SelectionExporter<Object[][], TableSelection> selectionExporter = new SelectionExporter<Object[][], TableSelection>( TableSelection.class, SelectionExporter.COPY, selectionContents,
 				Arrays.asList( exporters ) );
 		AbstractSelectionExporter<?, ?> selectionExporters[] = new AbstractSelectionExporter[] { selectionExporter };
@@ -327,8 +331,26 @@ public abstract class AbstractTableEditor<ModelType>
 	protected abstract void putBlock(ModelType model, int x, int y, Object[][] data, AbstractTableEditorInstance<ModelType> editorInstance);
 	protected abstract void deleteBlock(ModelType model, int x, int y, int w, int h, AbstractTableEditorInstance<ModelType> editorInstance);
 
-	protected Object[][] textBlockToValueBlock(int posX, int posY, String[][] textBlock)
+	protected Object[][] importBlock(int posX, int posY, String[][] textBlock)
 	{
 		return textBlock;
+	}
+
+	protected String[][] exportBlock(int posX, int posY, Object[][] valueBlock)
+	{
+		String destBlock[][] = new String[valueBlock.length][];
+		for (int b = 0; b < valueBlock.length; b++)
+		{
+			Object[] srcRow = valueBlock[b];
+			String[] destRow = new String[srcRow.length];
+			destBlock[b] = destRow;
+			
+			for (int a = 0, i = posX; a < srcRow.length; a++, i++)
+			{
+				destRow[a] = srcRow[a].toString();
+			}
+		}
+		
+		return destBlock;
 	}
 }

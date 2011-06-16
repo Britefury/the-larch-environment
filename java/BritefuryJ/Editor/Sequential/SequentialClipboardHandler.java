@@ -29,7 +29,7 @@ import BritefuryJ.Pres.Clipboard.TargetImporter;
 
 public class SequentialClipboardHandler extends ClipboardHandler
 {
-	private AbstractDataExporter<Object> sequentialExporter = new AbstractDataExporter<Object>()
+	private AbstractDataExporter<Object, TextSelection> sequentialExporter = new AbstractDataExporter<Object, TextSelection>()
 	{
 		@Override
 		protected DataFlavor getDataFlavor()
@@ -46,7 +46,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	};
 
 	
-	private AbstractDataExporter<Object> stringExporter = new AbstractDataExporter<Object>()
+	private AbstractDataExporter<Object, TextSelection> stringExporter = new AbstractDataExporter<Object, TextSelection>()
 	{
 		@Override
 		protected DataFlavor getDataFlavor()
@@ -70,7 +70,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	
 	
 	@SuppressWarnings("unchecked")
-	private List<? extends DataExporterInterface<Object>> dataExporters = (List<? extends DataExporterInterface<Object>>)
+	private List<? extends DataExporterInterface<Object, TextSelection>> dataExporters = (List<? extends DataExporterInterface<Object, TextSelection>>)
 			Arrays.asList( sequentialExporter, stringExporter );
 	private AbstractSelectionExporter<Object, TextSelection> exporter =
 		new AbstractSelectionExporter<Object, TextSelection>( TextSelection.class, AbstractSelectionExporter.COPY_OR_MOVE, dataExporters )

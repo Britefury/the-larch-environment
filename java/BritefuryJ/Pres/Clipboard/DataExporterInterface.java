@@ -11,8 +11,10 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.List;
 
-public abstract class DataExporterInterface <SelectionContentsType>
+import BritefuryJ.DocPresent.Selection.Selection;
+
+public abstract class DataExporterInterface <SelectionContentsType, SelectionType extends Selection>
 {
 	abstract protected List<DataFlavor> getTransferDataFlavors(SelectionContentsType selectionContents);
-	abstract protected Object getTransferData(SelectionContentsType selectionContents, DataFlavor flavor) throws UnsupportedFlavorException, IOException;
+	abstract protected Object getTransferData(SelectionContentsType selectionContents, SelectionType selection, DataFlavor flavor) throws UnsupportedFlavorException, IOException;
 }
