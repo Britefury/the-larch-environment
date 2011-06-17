@@ -26,24 +26,24 @@ abstract public class AbstractSelectionExporter <SelectionContentsType, Selectio
 	
 	private Class<? extends Selection> selectionClass;
 	private int actions;
-	private ArrayList<DataExporterInterface<SelectionContentsType, SelectionType>> exporters = new ArrayList<DataExporterInterface<SelectionContentsType, SelectionType>>();
+	private ArrayList<DataExporterInterface<SelectionContentsType>> exporters = new ArrayList<DataExporterInterface<SelectionContentsType>>();
 	
 	
-	public AbstractSelectionExporter(Class<? extends Selection> selectionClass, int actions, List<? extends DataExporterInterface<SelectionContentsType, SelectionType>> exporters)
+	public AbstractSelectionExporter(Class<? extends Selection> selectionClass, int actions, List<? extends DataExporterInterface<SelectionContentsType>> exporters)
 	{
 		this.selectionClass = selectionClass;
 		this.actions = actions;
 		this.exporters.addAll( exporters );
 	}
 	
-	public AbstractSelectionExporter(Class<? extends Selection> selectionClass, List<? extends DataExporterInterface<SelectionContentsType, SelectionType>> exporters)
+	public AbstractSelectionExporter(Class<? extends Selection> selectionClass, List<? extends DataExporterInterface<SelectionContentsType>> exporters)
 	{
 		this( selectionClass, COPY_OR_MOVE, exporters );
 	}
 	
 	
 	
-	public List<DataExporterInterface<SelectionContentsType, SelectionType>> getExporters()
+	public List<DataExporterInterface<SelectionContentsType>> getExporters()
 	{
 		return exporters;
 	}
