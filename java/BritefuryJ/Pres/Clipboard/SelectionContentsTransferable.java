@@ -18,7 +18,6 @@ class SelectionContentsTransferable<SelectionContentsType, SelectionType extends
 {
 	protected final AbstractSelectionExporter<SelectionContentsType, SelectionType> selectionExporter;
 	protected SelectionContentsType selectionContents;
-	protected SelectionType selection;
 	private ArrayList<DataFlavor> flavors = new ArrayList<DataFlavor>();
 	
 	
@@ -26,9 +25,8 @@ class SelectionContentsTransferable<SelectionContentsType, SelectionType extends
 	{
 		this.selectionExporter = selectionExporter;
 		this.selectionContents = selectionContents;
-		this.selection = selection;
 		
-		for (DataExporterInterface<SelectionContentsType, SelectionType> exporter: selectionExporter.getExporters())
+		for (DataExporterInterface<SelectionContentsType> exporter: selectionExporter.getExporters())
 		{
 			flavors.addAll( exporter.getTransferDataFlavors( selectionContents ) );
 		}
@@ -47,11 +45,11 @@ class SelectionContentsTransferable<SelectionContentsType, SelectionType extends
 
 	public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException
 	{
-		for (DataExporterInterface<SelectionContentsType, SelectionType> exporter: selectionExporter.getExporters())
+		for (DataExporterInterface<SelectionContentsType> exporter: selectionExporter.getExporters())
 		{
 			if ( exporter.getTransferDataFlavors( selectionContents ).contains( flavor ) )
 			{
-				return exporter.getTransferData( selectionContents, selection, flavor );
+				return exporter.getTransferData( selectionContents, flavor );
 			}
 		}
 		

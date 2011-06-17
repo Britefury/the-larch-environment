@@ -30,7 +30,7 @@ public class SelectionExporter <SelectionContentsType, SelectionType extends Sel
 	
 	
 	public SelectionExporter(Class<? extends Selection> selectionClass, int actions, SelectionContentsFn<SelectionContentsType, SelectionType> selectionContentsFn,
-			ExportDoneFn<SelectionContentsType, SelectionType> exportDoneFn, List<? extends DataExporterInterface<SelectionContentsType, SelectionType>> exporters)
+			ExportDoneFn<SelectionContentsType, SelectionType> exportDoneFn, List<? extends DataExporterInterface<SelectionContentsType>> exporters)
 	{
 		super( selectionClass, actions, exporters );
 		this.selectionContentsFn = selectionContentsFn;
@@ -38,19 +38,19 @@ public class SelectionExporter <SelectionContentsType, SelectionType extends Sel
 	}
 
 	public SelectionExporter(Class<? extends Selection> selectionClass, int actions, SelectionContentsFn<SelectionContentsType, SelectionType> selectionContentsFn,
-			List<DataExporterInterface<SelectionContentsType, SelectionType>> exporters)
+			List<DataExporterInterface<SelectionContentsType>> exporters)
 	{
 		this( selectionClass, actions, selectionContentsFn, null, exporters );
 	}
 
 	public SelectionExporter(Class<? extends Selection> selectionClass, SelectionContentsFn<SelectionContentsType, SelectionType> selectionContentsFn,
-			ExportDoneFn<SelectionContentsType, SelectionType> exportDoneFn, List<? extends DataExporterInterface<SelectionContentsType, SelectionType>> exporters)
+			ExportDoneFn<SelectionContentsType, SelectionType> exportDoneFn, List<? extends DataExporterInterface<SelectionContentsType>> exporters)
 	{
 		this( selectionClass, COPY_OR_MOVE, selectionContentsFn, exportDoneFn, exporters );
 	}
 	
 	public SelectionExporter(Class<? extends Selection> selectionClass, SelectionContentsFn<SelectionContentsType, SelectionType> selectionContentsFn,
-			List<? extends DataExporterInterface<SelectionContentsType, SelectionType>> exporters)
+			List<? extends DataExporterInterface<SelectionContentsType>> exporters)
 	{
 		this( selectionClass, COPY_OR_MOVE, selectionContentsFn, null, exporters );
 	}
