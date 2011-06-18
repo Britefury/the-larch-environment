@@ -74,7 +74,10 @@ public class Checkbox extends ControlPres
 				
 				element.setFixedValue( state );
 				
-				listener.onCheckboxToggled( this, state );
+				if ( listener != null )
+				{
+					listener.onCheckboxToggled( this, state );
+				}
 			}
 		}
 
