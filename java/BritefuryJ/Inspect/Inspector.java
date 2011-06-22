@@ -145,9 +145,9 @@ public class Inspector
 					if ( valuePres == null )
 					{
 						// No exception thrown while getting field value
-						if ( PrimitivePresenter.isPrimitive( value ) )
+						if ( PrimitivePresenter.isSmallPrimitive( value ) )
 						{
-							isSmall = PrimitivePresenter.isSmallPrimitive( value );
+							isSmall = true;
 							valuePres = PrimitivePresenter.presentPrimitive( value );
 						}
 						else
@@ -236,9 +236,9 @@ public class Inspector
 				Pres valuePres = null;
 				boolean isSmall = false;
 				
-				if ( PrimitivePresenter.isPrimitivePy( value ) )
+				if ( PrimitivePresenter.isSmallPrimitivePy( value ) )
 				{
-					isSmall = PrimitivePresenter.isSmallPrimitivePy( value );
+					isSmall = true;
 					valuePres = PrimitivePresenter.presentPrimitivePy( value );
 				}
 				else

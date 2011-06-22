@@ -11,27 +11,37 @@ import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.python.core.Py;
 import org.python.core.PyBoolean;
+import org.python.core.PyDictionary;
 import org.python.core.PyFloat;
 import org.python.core.PyInteger;
+import org.python.core.PyList;
 import org.python.core.PyLong;
 import org.python.core.PyObject;
+import org.python.core.PySet;
 import org.python.core.PyString;
+import org.python.core.PyTuple;
 import org.python.core.PyUnicode;
 
 import BritefuryJ.DocPresent.Painter.FillPainter;
+import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.ObjectPres.UnescapedStringAsSpan;
 import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Label;
+import BritefuryJ.Pres.Primitive.Paragraph;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Pres.Primitive.Script;
 import BritefuryJ.Pres.Primitive.Span;
 import BritefuryJ.Pres.Primitive.StaticText;
+import BritefuryJ.Pres.Primitive.Whitespace;
 import BritefuryJ.Pres.RichText.NormalText;
+import BritefuryJ.Pres.Sequence.TrailingSeparator;
+import BritefuryJ.Pres.Sequence.VerticalSequenceView;
 import BritefuryJ.StyleSheet.StyleSheet;
 
 public class PrimitivePresenter
@@ -174,12 +184,70 @@ public class PrimitivePresenter
 	{
 		return nullStyle.applyTo( new StaticText( "None" ) );
 	}
+
+	
+	
+	public static Pres presentPyList(PyList x)
+	{
+		ArrayList<Object> itemViews = new ArrayList<Object>();
+		for (PyObject item: x.asIterable())
+		{
+			itemViews.add( new InnerFragment( item ) );
+		}
+		
+		return listView( itemViews );
+	}
+	
+	public static Pres presentPyTuple(PyTuple x)
+	{
+		ArrayList<Object> itemViews = new ArrayList<Object>();
+		for (PyObject item: x.asIterable())
+		{
+			itemViews.add( new InnerFragment( item ) );
+		}
+		
+		return tupleView( itemViews );
+	}
+	
+	public static Pres presentPySet(PySet x)
+	{
+		ArrayList<Object> itemViews = new ArrayList<Object>();
+		for (PyObject item: x.asIterable())
+		{
+			itemViews.add( new InnerFragment( item ) );
+		}
+		
+		return setView( itemViews );
+	}
+	
+	public static Pres presentPyDictionary(PyDictionary x)
+	{
+		ArrayList<Object> itemViews = new ArrayList<Object>();
+		for (PyObject pair: x.items().asIterable())
+		{
+			PyTuple tuple = (PyTuple)pair;
+			PyObject key = tuple.pyget( 0 );
+			PyObject value = tuple.pyget( 1 );
+			Pres lineElems[] = { new InnerFragment( key ),
+					staticStyle.applyTo( new Whitespace( " ", 10.0 ) ),
+					delimStyle.applyTo( new StaticText( ":" ) ),
+					staticStyle.applyTo( new Whitespace( " ", 10.0 ) ),
+					new InnerFragment( value ) };
+			itemViews.add( new Paragraph( lineElems ) );
+		}
+		
+		return dictView( itemViews );
+	}
+
+	
+	
 	
 	
 	public static boolean isSmallString(String str)
 	{
 		return !str.contains( "\n" )  ||  str.length() < 128;
 	}
+
 	
 	
 	public static boolean isSmallPrimitive(Object x)
@@ -288,7 +356,7 @@ public class PrimitivePresenter
 	public static boolean isPrimitivePy(PyObject x)
 	{
 		return x == null  ||  x instanceof PyBoolean  ||  x instanceof PyString  ||  x instanceof PyUnicode  ||
-			x instanceof PyInteger  ||  x instanceof PyLong  ||  x instanceof PyFloat;
+			x instanceof PyInteger  ||  x instanceof PyLong  ||  x instanceof PyFloat  ||  x instanceof PyList  ||  x instanceof PyTuple  ||  x instanceof PySet  ||  x instanceof PyDictionary;
 	}
 	
 	
@@ -317,6 +385,22 @@ public class PrimitivePresenter
 		else if ( x instanceof PyFloat )
 		{
 			return presentDouble( x.asDouble() );
+		}
+		else if ( x instanceof PyList )
+		{
+			return presentPyList( (PyList)x );
+		}
+		else if ( x instanceof PyTuple )
+		{
+			return presentPyTuple( (PyTuple)x );
+		}
+		else if ( x instanceof PySet )
+		{
+			return presentPySet( (PySet)x );
+		}
+		else if ( x instanceof PyDictionary )
+		{
+			return presentPyDictionary( (PyDictionary)x );
 		}
 		else
 		{
@@ -420,6 +504,28 @@ public class PrimitivePresenter
 	}
 	
 	
+	private static Pres listView(List<Object> children)
+	{
+		return new VerticalSequenceView( children, openBracket, closeBracket, comma, space, TrailingSeparator.NEVER );
+	}
+	
+	private static Pres tupleView(List<Object> children)
+	{
+		return new VerticalSequenceView( children, openParen, closeParen, comma, space, TrailingSeparator.ONE_ELEMENT );
+	}
+	
+	private static Pres setView(List<Object> children)
+	{
+		return new VerticalSequenceView( children, setOpenBrace, setCloseBrace, comma, space, TrailingSeparator.NEVER );
+	}
+	
+	private static Pres dictView(List<Object> children)
+	{
+		return new VerticalSequenceView( children, openBrace, closeBrace, comma, mapSpace, TrailingSeparator.NEVER );
+	}
+	
+
+	
 	private static final StyleSheet punctuationStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color.blue );
 	private static final StyleSheet charStyle = StyleSheet.instance; 
 	private static final StyleSheet multiLineStringStyle = StyleSheet.instance.withAttr( Primitive.background, new FillPainter( new Color( 1.0f, 1.0f, 0.75f ) ) );
@@ -443,5 +549,18 @@ public class PrimitivePresenter
 	
 	private static final StyleSheet modifierStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.1f, 0.15f, 0.35f ) );
 
+	private static final StyleSheet delimStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.1f, 0.3f, 0.4f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, 14 );
+	private static final StyleSheet setDelimStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.4f, 0.3f, 0.1f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, 14 );
+
 	private static final Pres space = staticStyle.applyTo( new StaticText( " " ) );
+	private static final Pres comma = punctuationStyle.applyTo( new StaticText( "," ) );
+	private static final Pres mapSpace = staticStyle.applyTo( new Whitespace( " ", 25.0 ) );
+	private static final Pres openBracket = delimStyle.applyTo( new StaticText( "[" ) );
+	private static final Pres closeBracket = delimStyle.applyTo( new StaticText( "]" ) );
+	private static final Pres openParen = delimStyle.applyTo( new StaticText( "(" ) );
+	private static final Pres closeParen = delimStyle.applyTo( new StaticText( ")" ) );
+	private static final Pres openBrace = delimStyle.applyTo( new StaticText( "{" ) );
+	private static final Pres closeBrace = delimStyle.applyTo( new StaticText( "}" ) );
+	private static final Pres setOpenBrace = setDelimStyle.applyTo( new StaticText( "{" ) );
+	private static final Pres setCloseBrace = setDelimStyle.applyTo( new StaticText( "}" ) );
 }

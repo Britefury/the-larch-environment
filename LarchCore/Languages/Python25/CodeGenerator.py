@@ -856,6 +856,11 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 			self._astMap = []
 			setattr( module, _runtime_astMap_Name, self._astMap )
 		
+		# Needed by _getIndexForAstClass
+		self._revAstMap = {}
+		for i, cls in enumerate( self._astMap ):
+			self._revAstMap[cls] = i
+		
 		setattr( module, _runtime_DMList_Name, DMList )
 		
 		self._resourceValueIdToIndex = {}
