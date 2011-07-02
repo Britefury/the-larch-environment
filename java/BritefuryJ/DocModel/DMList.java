@@ -34,8 +34,6 @@ import BritefuryJ.Util.HashUtils;
 
 public class DMList extends DMNode implements DMListInterface, Trackable, Presentable
 {
-	private static final long serialVersionUID = 1L;
-	
 	protected static DMNodeClass listNodeClass = new DMNodeClass( "DMList" );
 	
 	

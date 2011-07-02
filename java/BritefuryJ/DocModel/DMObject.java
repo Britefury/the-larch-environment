@@ -34,9 +34,6 @@ import BritefuryJ.Util.HashUtils;
 
 public class DMObject extends DMNode implements DMObjectInterface, Trackable, Presentable
 {
-	private static final long serialVersionUID = 1L;
-
-	
 	private IncrementalValueMonitor incr;
 	private DMObjectClass objClass;
 	private Object fieldData[];
