@@ -59,8 +59,6 @@ public class DMEmbeddedIsolatedObject extends DMNode implements DMEmbeddedPyObje
 
 	
 	
-	private static final long serialVersionUID = 1L;
-	
 	protected static DMNodeClass embeddedIsolatedObjectNodeClass = new DMNodeClass( "DMEmbeddedIsolatedObject" );
 
 

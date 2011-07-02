@@ -343,7 +343,7 @@ public abstract class AbstractTableEditor<ModelType>
 			String[] destRow = new String[srcRow.length];
 			destBlock[b] = destRow;
 			
-			for (int a = 0, i = posX; a < srcRow.length; a++, i++)
+			for (int a = 0; a < srcRow.length; a++)
 			{
 				destRow[a] = srcRow[a].toString();
 			}

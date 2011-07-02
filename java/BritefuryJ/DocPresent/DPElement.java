@@ -50,13 +50,14 @@ import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.DndHandler;
+import BritefuryJ.DocPresent.Input.Modifier;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
 import BritefuryJ.DocPresent.Interactor.CaretCrossingElementInteractor;
 import BritefuryJ.DocPresent.Interactor.ContextMenuElementInteractor;
-import BritefuryJ.DocPresent.Interactor.HoverElementInteractor;
+import BritefuryJ.DocPresent.Interactor.MotionElementInteractor;
 import BritefuryJ.DocPresent.Interactor.PushElementInteractor;
 import BritefuryJ.DocPresent.Interactor.RealiseElementInteractor;
 import BritefuryJ.DocPresent.Layout.ElementAlignment;
@@ -67,9 +68,9 @@ import BritefuryJ.DocPresent.LayoutTree.ArrangedSequenceLayoutNode;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNode;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Painter.Painter;
+import BritefuryJ.DocPresent.StreamValue.SequentialStreamValueVisitor;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
-import BritefuryJ.DocPresent.StreamValue.SequentialStreamValueVisitor;
 import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.IncrementalView.ViewFragmentFunction;
@@ -1711,6 +1712,13 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		}
 	}
 	
+	
+	public void drawToGraphics(Graphics2D graphics, AABox2 areaBox)
+	{
+		handleDrawBackground( graphics, areaBox );
+		handleDraw( graphics, areaBox );
+	}
+	
 
 	
 	
@@ -2967,24 +2975,61 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		}
 	};
 	
-	private static HoverElementInteractor explorerHeaderHoverInteractor = new HoverElementInteractor()
+	
+	
+	private static void activateExplorerHighlight(PointerInputElement explorerElement)
+	{
+		DPElement el = (DPElement)explorerElement;
+		FragmentView fragment = (FragmentView)el.getFragmentContext();
+		DPElement model = (DPElement)fragment.getModel();
+		model.addPainter( explorerHeadHoverPainter );
+		model.queueFullRedraw();
+	}
+	
+	private static void deactivateExplorerHighlight(PointerInputElement explorerElement)
+	{
+		DPElement el = (DPElement)explorerElement;
+		FragmentView fragment = (FragmentView)el.getFragmentContext();
+		DPElement model = (DPElement)fragment.getModel();
+		model.removePainter( explorerHeadHoverPainter );
+		model.queueFullRedraw();
+	}
+	
+	
+	
+	private static MotionElementInteractor explorerHeaderHoverInteractor = new MotionElementInteractor()
 	{
 		public void pointerEnter(PointerInputElement element, PointerMotionEvent event)
 		{
-			DPElement el = (DPElement)element;
-			FragmentView fragment = (FragmentView)el.getFragmentContext();
-			DPElement model = (DPElement)fragment.getModel();
-			model.addPainter( explorerHeadHoverPainter );
-			model.queueFullRedraw();
+			if ( ( event.getModifiers() & Modifier.KEYS_MASK )  == 0 )
+			{
+				activateExplorerHighlight( element );
+			}
 		}
 
 		public void pointerLeave(PointerInputElement element, PointerMotionEvent event)
 		{
-			DPElement el = (DPElement)element;
-			FragmentView fragment = (FragmentView)el.getFragmentContext();
-			DPElement model = (DPElement)fragment.getModel();
-			model.removePainter( explorerHeadHoverPainter );
-			model.queueFullRedraw();
+			deactivateExplorerHighlight( element );
+		}
+		
+		@Override
+		public void pointerMotion(PointerInputElement element, PointerMotionEvent event)
+		{
+			// Suppress highlight if any modifier keys are pressed - this is helpful for capturing an element for SVG rendering. 
+			if ( ( event.getModifiers() & Modifier.KEYS_MASK )  != 0 )
+			{
+				deactivateExplorerHighlight( element );
+			}
+		}
+
+		@Override
+		public void pointerLeaveIntoChild(PointerInputElement element, PointerMotionEvent event)
+		{
+		}
+
+		@Override
+		public void pointerEnterFromChild(PointerInputElement element, PointerMotionEvent event)
+		{
 		}
 	};
 

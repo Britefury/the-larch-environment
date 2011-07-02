@@ -204,13 +204,11 @@ public class StringDiff
 			OperationLinked curRow[] = new OperationLinked[a.length()+1];
 			
 			// Initialise first row
-			int cost = 0;
 			prevRow[0] = null;
 			OperationLinked prevNode = prevRow[0];
 			for (int i = 1; i <= a.length(); i++)
 			{
 				// Moving right through the graph; consuming chars from @a, not consuming chars from @b; DELETE chars from @a
-				cost += deleteCost( a.charAt( i - 1 ) );
 				OperationLinked node = OperationLinked.deleteChar( a, b, i, 0, deleteCost( a.charAt( i - 1 ) ), prevNode );
 				prevRow[i] = node;
 				prevNode = node;
