@@ -69,8 +69,9 @@ public class PrimitivePresenter
 	
 	public static Pres presentString(String text)
 	{
-		String textLines[] = text.split( "\n" );
-		if ( textLines.length == 1 )
+		int pos = 0;
+		int newLinePos = text.indexOf( '\n' );
+		if ( newLinePos == -1 )
 		{
 			ArrayList<Object> lineContent = new ArrayList<Object>();
 			lineContent.add( punctuationStyle.applyTo( new StaticText(  "\"" ) ) );
@@ -81,22 +82,31 @@ public class PrimitivePresenter
 		else
 		{
 			ArrayList<Object> lines = new ArrayList<Object>();
-			int index = 0;
-			for (String line: textLines)
+			boolean firstLine = true;
+			while ( newLinePos != -1 )
 			{
+				String line = text.substring( pos, newLinePos + 1 );
 				ArrayList<Object> lineContent = new ArrayList<Object>();
-				if ( index == 0 )
+
+				if ( firstLine )
 				{
 					lineContent.add( punctuationStyle.applyTo( new StaticText(  "\"" ) ) );
 				}
+				
 				lineContent.add( new UnescapedStringAsSpan( line ) );
-				if ( index == textLines.length - 1 )
-				{
-					lineContent.add( punctuationStyle.applyTo( new StaticText(  "\"" ) ) );
-				}
 				lines.add( new Row( lineContent ) );
-				index++;
+				
+				firstLine = false;
+				pos = newLinePos + 1;
+				newLinePos = text.indexOf( '\n', pos );
 			}
+		
+			String lastLine = text.substring( pos );
+			ArrayList<Object> lastLineContent = new ArrayList<Object>();
+			lastLineContent.add( new UnescapedStringAsSpan( lastLine ) );
+			lastLineContent.add( punctuationStyle.applyTo( new StaticText(  "\"" ) ) );
+			lines.add( new Row( lastLineContent ) );
+			
 			return multiLineStringStyle.applyTo( new Column( lines ) );
 		}
 	}
@@ -527,6 +537,7 @@ public class PrimitivePresenter
 
 	
 	private static final StyleSheet punctuationStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color.blue );
+
 	private static final StyleSheet charStyle = StyleSheet.instance; 
 	private static final StyleSheet multiLineStringStyle = StyleSheet.instance.withAttr( Primitive.background, new FillPainter( new Color( 1.0f, 1.0f, 0.75f ) ) );
 	private static final StyleSheet integerStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.5f ) );
