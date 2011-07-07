@@ -31,15 +31,14 @@ public class ParagraphLayout
 	{
 		public LReqBoxInterface breakBox;
 		public int indexInChildList;
-		public double xAtBreak, xAfterBreak;
+		public double xAfterBreak;
 		public IndentationEntry lineIndentation;
 		
 		
-		public BreakEntry(LReqBoxInterface child, int indexInChildList, double xAtBreak, double xAfterBreak, IndentationEntry lineIndentation)
+		public BreakEntry(LReqBoxInterface child, int indexInChildList, double xAfterBreak, IndentationEntry lineIndentation)
 		{
 			this.breakBox = child;
 			this.indexInChildList = indexInChildList;
-			this.xAtBreak = xAtBreak;
 			this.xAfterBreak = xAfterBreak;
 			this.lineIndentation = lineIndentation;
 		}
@@ -340,8 +339,6 @@ public class ParagraphLayout
 				}
 			}
 			
-			double lineXAtChildStart = lineX;
-			
 			// Accumulate width, advance, and x
 			lineWidth = lineX + child.getReqPrefWidth();
 			lineAdvance = lineX + child.getReqPrefHAdvance();
@@ -350,7 +347,7 @@ public class ParagraphLayout
 			// Keep track of the best and most recent line break boxes
 			if ( child.isReqLineBreak() )
 			{
-				BreakEntry entry = new BreakEntry( child, i, lineXAtChildStart, lineX, indentationStack.lastElement() );
+				BreakEntry entry = new BreakEntry( child, i, lineX, indentationStack.lastElement() );
 				if ( bestLineBreak == null  ||  child.getReqLineBreakCost() <= bestLineBreak.breakBox.getReqLineBreakCost() )
 				{
 					bestLineBreak = entry;
@@ -473,9 +470,7 @@ public class ParagraphLayout
 				{
 					BreakEntry entry = lineBreaks.get( j );
 					
-					entry.xAtBreak -= xAfterLineBreak;
 					entry.xAfterBreak -= xAfterLineBreak;
-					entry.xAtBreak += nextLineIndentation;
 					entry.xAfterBreak += nextLineIndentation;
 					
 					IndentationEntry breakIndentation = entry.lineIndentation;

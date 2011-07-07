@@ -204,13 +204,15 @@ def _embeddedObjectExprContextMenuFactory(element, menu):
 		value = model['embeddedValue'].getValue()
 		
 		try:
-			replacement = value.__py_replacement__()
+			replacementFn = value.__py_replacement__
 		except AttributeError:
-			pass
-		else:
+			replacementFn = None
+		
+		if replacementFn is not None:
+			replacement = replacementFn()
 			pyReplaceNode( model, replacement )
-			
-		pyReplaceNode( model, Schema.Load( name='None' ) )
+		else:
+			pyReplaceNode( model, Schema.Load( name='None' ) )
 
 	menu.add( MenuItem.menuItemWithLabel( 'Delete embedded object', _onDelete ) )
 
@@ -225,16 +227,18 @@ def _embeddedObjectStmtContextMenuFactory(element, menu):
 		value = model['embeddedValue'].getValue()
 		
 		try:
-			replacement = value.__py_replacement__()
+			replacementFn = value.__py_replacement__
 		except AttributeError:
-			pass
-		else:
+			replacementFn = None
+			
+		if replacementFn is not None:
+			replacement = replacementFn()
 			if isinstance( replacement, list )  or  isinstance( replacement, tuple )  or  isinstance( replacement, List ):
 				pyReplaceStatementWithStatementRange( model, replacement )
 			else:
 				pyReplaceNode( model, replacement )
-			
-		pyReplaceNode( model, Schema.BlankLine() )
+		else:
+			pyReplaceNode( model, Schema.BlankLine() )
 
 	menu.add( MenuItem.menuItemWithLabel( 'Delete embedded object', _onDelete ) )
 
