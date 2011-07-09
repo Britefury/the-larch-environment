@@ -39,7 +39,7 @@ from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.Pres.RichText import *
 
 from BritefuryJ.Projection import Perspective, Subject
-from BritefuryJ.IncrementalView import FragmentView
+from BritefuryJ.IncrementalView import FragmentView, FragmentData
 
 
 from LarchCore.Languages.Python25 import Python25
@@ -153,7 +153,7 @@ class ConsoleView (ObjectDispatchView):
 		banner = _bannerBorder.surround( bannerText )
 		
 		
-		dropDest = ObjectDndHandler.DropDest( FragmentView.FragmentModel, _onDrop )
+		dropDest = ObjectDndHandler.DropDest( FragmentData, _onDrop )
 
 		currentModule = Span( [ currentModule ] )
 		currentModule = currentModule.withElementInteractor( CurrentModuleInteractor( node ) )

@@ -42,24 +42,6 @@ import BritefuryJ.StyleSheet.StyleValues;
 
 public class FragmentView extends IncrementalTreeNode implements FragmentContext, PresentationStateListener, Presentable
 {
-	public static class FragmentModel
-	{
-		private Object model;
-		
-		
-		public FragmentModel(Object model)
-		{
-			this.model = model;
-		}
-		
-		
-		public Object getModel()
-		{
-			return model;
-		}
-	}
-	
-	
 	private static final ObjectDndHandler.SourceDataFn fragmentDragSourceFn = new ObjectDndHandler.SourceDataFn()
 	{
 		@Override
@@ -67,12 +49,12 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 		{
 			DPElement element = (DPElement)sourceElement;
 			FragmentView ctx = (FragmentView)element.getFragmentContext();
-			return new FragmentModel( ctx.getModel() );
+			return new FragmentData( ctx.getModel(), ctx.getFragmentContentElement() );
 		}
 	};
 	
 
-	private static final ObjectDndHandler.DragSource fragmentDragSource = new ObjectDndHandler.DragSource( FragmentModel.class, ObjectDndHandler.ASPECT_DOC_NODE, fragmentDragSourceFn );
+	private static final ObjectDndHandler.DragSource fragmentDragSource = new ObjectDndHandler.DragSource( FragmentData.class, ObjectDndHandler.ASPECT_DOC_NODE, fragmentDragSourceFn );
 	
 	
 	
