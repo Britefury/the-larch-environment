@@ -37,7 +37,7 @@ from BritefuryJ.Pres import ApplyPerspective
 from BritefuryJ.Pres.Primitive import Paragraph, Segment
 
 from BritefuryJ.Projection import Perspective, Subject
-from BritefuryJ.IncrementalView import FragmentView
+from BritefuryJ.IncrementalView import FragmentView, FragmentData
 
 from BritefuryJ.Editor.Sequential import SequentialEditorPerspective
 from BritefuryJ.Editor.Sequential.Item import *
@@ -409,7 +409,7 @@ class Python25View (ObjectNodeDispatchView):
 		else:
 			lineViews = SREInnerFragment.map( suite, PRECEDENCE_NONE, EditMode.EDIT )
 		s = suiteView( lineViews ).alignHPack().alignVRefY()
-		_embeddedObject_dropDest = ObjectDndHandler.DropDest( FragmentView.FragmentModel, _onDrop_embeddedObject )
+		_embeddedObject_dropDest = ObjectDndHandler.DropDest( FragmentData, _onDrop_embeddedObject )
 		s = s.withDropDest( _embeddedObject_dropDest )
 		s = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._makeSuiteEditListener( suite ), self._topLevel ], suite, s )
 		s = s.withContextMenuInteractor( _pythonModuleContextMenuFactory )
@@ -427,7 +427,7 @@ class Python25View (ObjectNodeDispatchView):
 		else:
 			lineViews = SREInnerFragment.map( suite, PRECEDENCE_NONE, EditMode.EDIT )
 		s = suiteView( lineViews ).alignHPack().alignVRefY()
-		_embeddedObject_dropDest = ObjectDndHandler.DropDest( FragmentView.FragmentModel, _onDrop_embeddedObject )
+		_embeddedObject_dropDest = ObjectDndHandler.DropDest( FragmentData, _onDrop_embeddedObject )
 		s = s.withDropDest( _embeddedObject_dropDest )
 		s = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._makeSuiteEditListener( suite ), self._topLevel ], suite, s )
 		s = s.withContextMenuInteractor( _pythonModuleContextMenuFactory )
@@ -447,7 +447,7 @@ class Python25View (ObjectNodeDispatchView):
 			exprView = SREInnerFragment( expr, PRECEDENCE_NONE, EditMode.DISPLAY )
 			seg = Segment( exprView )
 		e = Paragraph( [ seg ] ).alignHPack().alignVRefY()
-		_embeddedObject_dropDest = ObjectDndHandler.DropDest( FragmentView.FragmentModel, _onDrop_embeddedObject )
+		_embeddedObject_dropDest = ObjectDndHandler.DropDest( FragmentData, _onDrop_embeddedObject )
 		e = e.withDropDest( _embeddedObject_dropDest )
 		e = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._exprOuter, self._exprTopLevel ],  model,  e )
 		e = e.withContextMenuInteractor( _pythonModuleContextMenuFactory )

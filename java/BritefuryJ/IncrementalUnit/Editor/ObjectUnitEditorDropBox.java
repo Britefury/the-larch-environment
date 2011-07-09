@@ -9,7 +9,7 @@ package BritefuryJ.IncrementalUnit.Editor;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.IncrementalUnit.LiteralUnit;
-import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.IncrementalView.FragmentData;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.ObjectPres.ObjectBox;
@@ -23,7 +23,7 @@ public class ObjectUnitEditorDropBox extends LiteralUnitEditor
 		{
 			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
 			{
-				setCellValue( ((FragmentView.FragmentModel)data).getModel() );
+				setCellValue( ((FragmentData)data).getModel() );
 				return true;
 			}
 		}
@@ -45,7 +45,7 @@ public class ObjectUnitEditorDropBox extends LiteralUnitEditor
 			{
 				p = new ObjectBox( "DocModel", new Label( "null" ) );
 			}
-			p = p.withDropDest( FragmentView.FragmentModel.class, new Listener() );
+			p = p.withDropDest( FragmentData.class, new Listener() );
 			setPres( p );
 		}
 	}
