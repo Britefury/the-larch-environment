@@ -437,20 +437,14 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 		f = a;
 		while ( f != null )
 		{
-			if ( filter.testFragmentView( f ) )
-			{
-				pathA.add( f );
-			}
+			pathA.add( f );
 			f = (FragmentView)f.getParent();
 		}
 
 		f = b;
 		while ( f != null )
 		{
-			if ( filter.testFragmentView( f ) )
-			{
-				pathB.add( f );
-			}
+			pathB.add( f );
 			f = (FragmentView)f.getParent();
 		}
 		
@@ -473,7 +467,15 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 		}
 		else
 		{
-			return pathA.get( pathA.size() - commonLength );
+			for (int i = pathA.size() - commonLength ; i < pathA.size(); i++)
+			{
+				f = pathA.get( i );
+				if ( filter.testFragmentView( f ) )
+				{
+					return f;
+				}
+			}
+			return null;
 		}
 	}
 
