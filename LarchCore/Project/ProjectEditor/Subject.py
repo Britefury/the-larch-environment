@@ -39,11 +39,20 @@ def _saveAs(subject):
 
 	DocumentManagement.promptSaveDocumentAs( subject.getSubjectContext()['world'], None, handleSaveDocumentAsFn )
 
+
+def _reset(subject):
+	document = subject._document
+	modules = document.unloadAllImportedModules()
+	print 'LarchCore.Project.ProjectEditor.Subject: unloaded modules:'
+	for module in modules:
+		print '\t' + module
+
 	
 	
 _saveCommand = Command( CommandName( '&Save' ), _save )
 _saveAsCommand = Command( CommandName( '&Save &as' ), _saveAs )
-_projectCommands = CommandSet( 'LarchCore.Project.Save', [ _saveCommand, _saveAsCommand ] )
+_resetCommand = Command( CommandName( '&Reset' ), _reset )
+_projectCommands = CommandSet( 'LarchCore.Project.Save', [ _saveCommand, _saveAsCommand, _resetCommand ] )
 	
 
 
