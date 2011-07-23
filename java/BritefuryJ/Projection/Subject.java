@@ -72,4 +72,11 @@ public abstract class Subject
 			return Arrays.asList();
 		}
 	}
+	
+	
+	
+	public Subject redirect()
+	{
+		return null;
+	}
 }
