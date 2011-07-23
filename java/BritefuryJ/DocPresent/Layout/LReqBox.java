@@ -330,28 +330,6 @@ public class LReqBox implements LReqBoxInterface
 
 
 
-
-
-	private static int PACKFLAG_EXPAND = 1;
-	
-	
-	public static int packFlags(boolean bExpand)
-	{
-		return ( bExpand ? PACKFLAG_EXPAND : 0 );
-	}
-	
-	public static int combinePackFlags(int flags0, int flags1)
-	{
-		return flags0 | flags1;
-	}
-	
-	public static boolean testPackFlagExpand(int packFlags)
-	{
-		return ( packFlags & PACKFLAG_EXPAND )  !=  0;
-	}
-	
-	
-	
 	public LReqBox copy()
 	{
 		return new LReqBox( this );
