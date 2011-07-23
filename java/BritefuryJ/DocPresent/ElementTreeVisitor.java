@@ -115,7 +115,7 @@ public abstract class ElementTreeVisitor
 			{
 				List<DPElement> path = leaf.getElementPathFromSubtreeRoot( (DPContainer)root );
 				
-				// First, scan throught the path, and find the range of elements we should visit - we must stop at any element for which shouldVisitChildrenOfElement() returns false
+				// First, scan through the path, and find the range of elements we should visit - we must stop at any element for which shouldVisitChildrenOfElement() returns false
 				int startIndex = 1;
 				for (int i = 0; i < path.size() - 1; i++)
 				{
