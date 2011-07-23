@@ -259,6 +259,20 @@ public class ProjectiveBrowserContext
 		
 		if ( result instanceof Subject )
 		{
+			boolean bRedirected = true;
+			while ( bRedirected )
+			{
+				Subject redirect = ((Subject)result).redirect();
+				if ( redirect != null  &&  redirect != result )
+				{
+					result = redirect;
+				}
+				else
+				{
+					bRedirected = false;
+				}
+			}
+			
 			return (Subject)result;
 		}
 		else if ( result instanceof BrowserPage )

@@ -7,9 +7,15 @@
 ##-*************************
 from BritefuryJ.DocPresent.Browser import Location
 
+from BritefuryJ.DefaultPerspective import DefaultPerspective
+
 from BritefuryJ.Projection import Subject
 
 from BritefuryJ.Command import CommandName, Command, CommandSet
+
+from BritefuryJ.Controls import Hyperlink
+from BritefuryJ.Pres.Pres import *
+from BritefuryJ.Pres.Primitive import *
 
 from LarchCore.MainApp import DocumentManagement
 
@@ -56,40 +62,74 @@ _projectCommands = CommandSet( 'LarchCore.Project.Save', [ _saveCommand, _saveAs
 	
 
 
-def _packageSubject(projectSubject, model, location):
-	"""
-	Create a package subject
-	This is done using a function, that declares a class within its body, as the subject class must used __getattribute__; __getattr__ will prevent
-	certain package/page names from being usable (e.g. __init__).
-	Unfortunately, __getattribute__ also makes it hard to access instance attributes, so we have it access them from the surrounding scope
-	(this function)
-	"""
-	class _PackageSubject (object):
-		# We use __getattribute__ rather than __getattr__, otherwise the __init__ method can prevent some item names from being accessible
-		def __getattribute__(self, name):
-			item = model.contentsMap.get( name )
-			if item is not None:
-				itemLocation = location + '.' + name
-				if isinstance( item, ProjectPackage ):
-					return _packageSubject( projectSubject, item, itemLocation )
-				elif isinstance( item, ProjectPage ):
-					return projectSubject._document.newModelSubject( item.data, projectSubject, itemLocation, name )
-			raise AttributeError, "Did not find item for '%s'"  %  ( name, )
-	return _PackageSubject()
+class _PackageSubject (object):
+	def __init__(self, projectSubject, model, location):
+		self._projectSubject = projectSubject
+		self._model = model
+		self._location = location
+	
+	def __resolve__(self, name):
+		item = self._model.contentsMap.get( name )
+		if item is not None:
+			itemLocation = self._location + '.' + name
+			if isinstance( item, ProjectPackage ):
+				return _packageSubject( self._projectSubject, item, itemLocation )
+			elif isinstance( item, ProjectPage ):
+				return self._projectSubject._document.newModelSubject( item.data, self._projectSubject, itemLocation, name )
+		raise AttributeError, "Did not find item for '%s'"  %  ( name, )
 
 
 
-class ProjectSubject (Subject):
+class _IndexPage (object):
+	def __init__(self, model, perspective, projectPageLoc):
+		self._model = model
+		self._perspective = perspective
+		self._projectPageLoc = projectPageLoc
+	
+	def __present__(self, fragment, inherited_state):
+		projectLink = Hyperlink( 'Go to project page', self._projectPageLoc )
+		return Column( [ self._perspective( self._model ).alignHExpand().alignVExpand(), Spacer( 0.0, 10.0 ).alignVTop(), projectLink.alignHLeft().alignVTop() ] ).alignHExpand()
+
+
+class _ProjectIndexSubject (Subject):
+	def __init__(self, indexSubject, enclosingSubject, projectLoc):
+		super( _ProjectIndexSubject, self ).__init__( enclosingSubject )
+		self._indexSubject = indexSubject
+		self._page = _IndexPage( indexSubject.getFocus(), indexSubject.getPerspective(), projectLoc )
+	
+	
+	def getFocus(self):
+		return self._page
+
+	def getPerspective(self):
+		return DefaultPerspective.instance
+
+	def getTitle(self):
+		return self._indexSubject.getTitle()
+
+	def getSubjectContext(self):
+		return self._indexSubject.getSubjectContext()
+
+	def getChangeHistory(self):
+		return self._indexSubject.getChangeHistory()
+	
+	def getBoundCommandSets(self):
+		return self._indexSubject.getBoundCommandSets()
+	
+	
+
+
+
+class _RootSubject (Subject):
 	def __init__(self, document, model, enclosingSubject, location, title):
-		super( ProjectSubject, self ).__init__( enclosingSubject )
+		super( _RootSubject, self ).__init__( enclosingSubject )
 		self._document = document
 		self._model = model
 		self._enclosingSubject = enclosingSubject
 		self._location = location
-		self._moduleFinder = ModuleFinder( self )
-		self._rootFinder = RootFinder( self )
 		self._title = title
-
+		
+		
 
 	def getFocus(self):
 		return self._model
@@ -110,16 +150,40 @@ class ProjectSubject (Subject):
 		return [ _projectCommands.bindTo( self ) ]  +  self._enclosingSubject.getBoundCommandSets()
 
 
-
-	def __getattr__(self, name):
+	def __resolve__(self, name):
 		item = self._model.contentsMap.get( name )
 		if item is not None:
 			itemLocation = self._location + '.' + name
 			if isinstance( item, ProjectPackage ):
-				return _packageSubject( self, item, itemLocation )
+				return _PackageSubject( self, item, itemLocation )
 			elif isinstance( item, ProjectPage ):
 				return self._document.newModelSubject( item.data, self, itemLocation, name )
 		raise AttributeError, "Did not find item for '%s'"  %  ( name, )
+
+
+
+class ProjectSubject (_RootSubject):
+	def __init__(self, document, model, enclosingSubject, location, title):
+		super( ProjectSubject, self ).__init__( document, model, enclosingSubject, location, title )
+		self._moduleFinder = ModuleFinder( self )
+		self._rootFinder = RootFinder( self )
+		self._rootSubject = _RootSubject( document, model, enclosingSubject, location, title )
+		
+		
+
+	def redirect(self):
+		index = self._model.contentsMap.get( 'index' )
+		if index is not None  and  isinstance( index, ProjectPage ):
+			return _ProjectIndexSubject( self.__resolve__( 'index' ), self._enclosingSubject, Location( self._location + '.___project___' ) )
+		else:
+			return None
+	
+
+	def __resolve__(self, name):
+		if name == '___project___':
+			return self._rootSubject
+		else:
+			return super( ProjectSubject, self ).__resolve__( name )
 
 
 
