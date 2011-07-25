@@ -25,6 +25,12 @@ public class SStart extends StartTag
 	}
 	
 	
+	public Map<Object, Object> getStyleAttrs()
+	{
+		return styleAttrs;
+	}
+	
+	
 	@Override
 	protected Pres presentTagContents()
 	{

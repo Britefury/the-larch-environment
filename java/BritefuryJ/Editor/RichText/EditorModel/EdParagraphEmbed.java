@@ -6,41 +6,17 @@
 //##************************
 package BritefuryJ.Editor.RichText.EditorModel;
 
-import java.util.List;
-
-import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.Editor.RichText.Tags.Tag;
-
-public abstract class EdNode implements Presentable
+public class EdParagraphEmbed extends EdEmbed
 {
-	protected Tag startTag()
+	public EdParagraphEmbed(Object value)
 	{
-		return null;
+		super( value );
 	}
 
-	protected Tag endTag()
-	{
-		return null;
-	}
 
-	protected Tag prefixTag()
-	{
-		return null;
-	}
-
-	protected Tag suffixTag()
-	{
-		return null;
-	}
-
-	protected abstract void buildTagList(List<Object> tags);
-	
-	
-	protected abstract boolean isTextual();
-	
-	
+	@Override
 	public boolean isParagraph()
 	{
-		return false;
+		return true;
 	}
 }
