@@ -36,6 +36,12 @@ public class EdStyleSpan extends EdAbstractText
 		this.styleAttrs.putAll( styleAttrs );
 	}
 	
+	public EdStyleSpan(Map<Object, Object> styleAttrs)
+	{
+		super();
+		this.styleAttrs.putAll( styleAttrs );
+	}
+	
 	
 	public HashMap<Object, Object> getStyleAttrs()
 	{

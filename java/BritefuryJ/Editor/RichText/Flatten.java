@@ -108,7 +108,7 @@ class Flatten
 	}
 	
 	// SHOULD IMPLEMENT AS ITERATOR, BUT I'M BUGGERED IF I AM GOING TO SPEND TIME CONVERTING A NICE PYTHON GENERATOR TO A JAVA ITERATOR......
-	private static ArrayList<Object> flattenSpans(List<Object> xs)
+	private static ArrayList<Object> flatten(List<Object> xs)
 	{
 		ArrayList<Object> result = new ArrayList<Object>();
 		HashMap<Object, Object> currentStyleAttrs = new HashMap<Object, Object>();
@@ -181,8 +181,13 @@ class Flatten
 	}
 	
 	
-	protected static ArrayList<Object> flatten(List<Object> xs)
+	protected static ArrayList<Object> flattenSpans(List<Object> xs)
 	{
-		return flattenSpans( textJoin( newlineSplit( xs ) ) );
+		return flatten( textJoin( newlineSplit( xs ) ) );
+	}
+
+	protected static ArrayList<Object> flattenParagraphs(List<Object> xs)
+	{
+		return flatten( textJoin( newlineSplit( xs ) ) );
 	}
 }

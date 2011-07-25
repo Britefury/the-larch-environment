@@ -21,6 +21,12 @@ public class PStart extends StartTag
 	}
 	
 	
+	public Object getAttrs()
+	{
+		return styleAttrs;
+	}
+	
+	
 	@Override
 	protected Pres presentTagContents()
 	{
