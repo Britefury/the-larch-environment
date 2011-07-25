@@ -22,7 +22,15 @@ public abstract class EdAbstractText extends EdNode
 		this.contents.addAll( contents );
 	}
 	
+	protected EdAbstractText()
+	{
+	}
 	
+	
+	public List<Object> getContents()
+	{
+		return contents;
+	}
 	
 	public void setContents(List<Object> contents)
 	{

@@ -213,34 +213,6 @@ public class Test_HorizontalLayout extends Test_Layout_base
 
 
 
-	public void test_allocateWidth()
-	{
-		// We need to test for the following conditions:
-		//	- allocation < minimum
-		//		- spacing and padding have no effect
-		//		- expand has no effect
-		//	- allocation == minimum
-		//		- allocation must include spacing and padding
-		//		- expand has no effect
-		//	- minimum < allocation < preferred
-		//		- allocation must include spacing and padding
-		//		- expand has no effect
-		//	- allocation == preferred
-		//		- allocation must include spacing and padding
-		//		- expand has no effect
-		//	- allocation > preferred
-		//		- allocation must include spacing and padding
-		//		- expansion distributed among children		
-		
-		
-	}
-
-
-
-
-
-
-
 	//
 	//
 	// ALLOCATION TESTS
@@ -615,7 +587,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 
 
 
-	public void test_hpackY()
+	public void test_allocateY()
 	{
 		// vpackX( [ <300,0,V.TOP>, <200,0,V.TOP> ] )
 		// 	boxAllocation=400   ->   [ 300, 200 ] @ [ 0, 0 ]		- no expansion, no expansion
