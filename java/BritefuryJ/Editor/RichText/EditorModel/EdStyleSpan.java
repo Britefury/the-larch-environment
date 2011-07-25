@@ -74,7 +74,7 @@ public class EdStyleSpan extends EdAbstractText
 		{
 			if ( x instanceof EdAbstractText )
 			{
-				((EdAbstractText)x).buildTagList( tags );
+				((EdNode)x).buildTagList( tags );
 			}
 			else
 			{

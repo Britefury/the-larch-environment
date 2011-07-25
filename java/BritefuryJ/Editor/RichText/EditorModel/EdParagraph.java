@@ -66,7 +66,7 @@ public class EdParagraph extends EdAbstractText
 		{
 			if ( x instanceof EdAbstractText )
 			{
-				((EdAbstractText)x).buildTagList( tags );
+				((EdNode)x).buildTagList( tags );
 			}
 			else
 			{
@@ -78,6 +78,16 @@ public class EdParagraph extends EdAbstractText
 			tags.add( "\n" );
 		}
 	}
+	
+	
+	
+
+	@Override
+	public boolean isParagraph()
+	{
+		return true;
+	}
+
 
 	@Override
 	protected EdNode withContents(List<Object> contents)

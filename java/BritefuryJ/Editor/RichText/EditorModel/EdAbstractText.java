@@ -9,7 +9,6 @@ package BritefuryJ.Editor.RichText.EditorModel;
 import java.util.ArrayList;
 import java.util.List;
 
-import BritefuryJ.Editor.RichText.Tags.Tag;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.RichText.NormalText;
 
@@ -32,6 +31,7 @@ public abstract class EdAbstractText extends EdNode
 	}
 	
 	
+	@Override
 	protected boolean isTextual()
 	{
 		for (Object x: contents)
@@ -58,29 +58,6 @@ public abstract class EdAbstractText extends EdNode
 		return new NormalText( contents );
 	}
 	
-	
-	protected Tag startTag()
-	{
-		return null;
-	}
-	
-	protected Tag endTag()
-	{
-		return null;
-	}
-	
-	protected Tag prefixTag()
-	{
-		return null;
-	}
-	
-	protected Tag suffixTag()
-	{
-		return null;
-	}
-	
-	
-	protected abstract void buildTagList(List<Object> tags);
 	
 	protected abstract EdNode withContents(List<Object> contents);
 }
