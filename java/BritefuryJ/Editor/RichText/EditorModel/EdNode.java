@@ -13,30 +13,35 @@ import BritefuryJ.Editor.RichText.Tags.Tag;
 
 public abstract class EdNode implements Presentable
 {
-	protected Tag startTag()
+	public Tag startTag()
 	{
 		return null;
 	}
 
-	protected Tag endTag()
+	public Tag endTag()
 	{
 		return null;
 	}
 
-	protected Tag prefixTag()
+	public Tag prefixTag()
 	{
 		return null;
 	}
 
-	protected Tag suffixTag()
+	public Tag suffixTag()
 	{
 		return null;
 	}
 
-	protected abstract void buildTagList(List<Object> tags);
+	public abstract void buildTagList(List<Object> tags);
 	
 	
-	protected abstract boolean isTextual();
+	public abstract boolean isTextual();
+	
+	public void buildTextualValue(StringBuilder builder)
+	{
+		throw new RuntimeException( "Contents are not purely textual" );
+	}
 	
 	
 	public boolean isParagraph()

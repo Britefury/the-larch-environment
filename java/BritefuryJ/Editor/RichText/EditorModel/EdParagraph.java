@@ -35,7 +35,7 @@ public class EdParagraph extends EdAbstractText
 	}
 	
 	
-	protected void suppressNewline()
+	public void suppressNewline()
 	{
 		bSuppressNewline = true;
 	}
@@ -52,14 +52,14 @@ public class EdParagraph extends EdAbstractText
 	
 	
 	@Override
-	protected Tag prefixTag()
+	public Tag prefixTag()
 	{
 		return new PStart( styleAttrs );
 	}
 
 
 	@Override
-	protected void buildTagList(List<Object> tags)
+	public void buildTagList(List<Object> tags)
 	{
 		tags.add( new PStart( styleAttrs ) );
 		for (Object x: contents)
@@ -94,7 +94,8 @@ public class EdParagraph extends EdAbstractText
 	{
 		return new EdParagraph( contents, styleAttrs );
 	}
-
+	
+	
 	
 	@Override
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)

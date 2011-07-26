@@ -10,7 +10,6 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Stack;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
@@ -48,7 +47,7 @@ class Flatten
 	
 	
 	// SHOULD IMPLEMENT AS ITERATOR, BUT I'M BUGGERED IF I AM GOING TO SPEND TIME CONVERTING A NICE PYTHON GENERATOR TO A JAVA ITERATOR......
-	protected static ArrayList<Object> newlineSplit(List<Object> xs)
+	protected static ArrayList<Object> newlineSplit(Iterable<Object> xs)
 	{
 		ArrayList<Object> result = new ArrayList<Object>();
 		for (Object x: xs)
@@ -72,7 +71,7 @@ class Flatten
 	}
 	
 	// SHOULD IMPLEMENT AS ITERATOR, BUT I'M BUGGERED IF I AM GOING TO SPEND TIME CONVERTING A NICE PYTHON GENERATOR TO A JAVA ITERATOR......
-	protected static ArrayList<Object> textJoin(List<Object> xs)
+	protected static ArrayList<Object> textJoin(Iterable<Object> xs)
 	{
 		ArrayList<Object> result = new ArrayList<Object>();
 		StringBuilder text = new StringBuilder();
@@ -108,7 +107,7 @@ class Flatten
 	}
 	
 	// SHOULD IMPLEMENT AS ITERATOR, BUT I'M BUGGERED IF I AM GOING TO SPEND TIME CONVERTING A NICE PYTHON GENERATOR TO A JAVA ITERATOR......
-	private static ArrayList<Object> flatten(List<Object> xs)
+	private static ArrayList<Object> flatten(Iterable<Object> xs)
 	{
 		ArrayList<Object> result = new ArrayList<Object>();
 		HashMap<Object, Object> currentStyleAttrs = new HashMap<Object, Object>();
@@ -181,12 +180,12 @@ class Flatten
 	}
 	
 	
-	protected static ArrayList<Object> flattenSpans(List<Object> xs)
+	protected static ArrayList<Object> flattenSpans(Iterable<Object> xs)
 	{
 		return flatten( textJoin( newlineSplit( xs ) ) );
 	}
 
-	protected static ArrayList<Object> flattenParagraphs(List<Object> xs)
+	protected static ArrayList<Object> flattenParagraphs(Iterable<Object> xs)
 	{
 		return flatten( textJoin( newlineSplit( xs ) ) );
 	}

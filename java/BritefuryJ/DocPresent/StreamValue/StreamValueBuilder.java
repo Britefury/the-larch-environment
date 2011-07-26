@@ -93,7 +93,7 @@ public class StreamValueBuilder
                 this.items.addAll( Arrays.asList( items ) );
 	}
 	
-	public StreamValueBuilder(Iterable<Object> values)
+	public StreamValueBuilder(Iterable<? extends Object> values)
 	{
 		items = new ArrayList<Item>();
 		extend( values );
@@ -166,7 +166,7 @@ public class StreamValueBuilder
 		}
 	}
 	
-	public void extend(Iterable<Object> values)
+	public void extend(Iterable<? extends Object> values)
 	{
 		for (Object value: values)
 		{

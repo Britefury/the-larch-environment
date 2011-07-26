@@ -37,14 +37,14 @@ abstract class EdEmbed extends EdNode
 	
 	
 	@Override
-	protected void buildTagList(List<Object> tags)
+	public void buildTagList(List<Object> tags)
 	{
 		tags.add( this );
 	}
 	
 	
 	
-	protected boolean isTextual()
+	public boolean isTextual()
 	{
 		return false;
 	}

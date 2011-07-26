@@ -9,6 +9,8 @@ package BritefuryJ.Editor.RichText.EditorModel;
 import java.util.ArrayList;
 import java.util.List;
 
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.RichText.NormalText;
 
@@ -40,13 +42,13 @@ public abstract class EdAbstractText extends EdNode
 	
 	
 	@Override
-	protected boolean isTextual()
+	public boolean isTextual()
 	{
 		for (Object x: contents)
 		{
-			if ( x instanceof EdAbstractText )
+			if ( x instanceof EdNode )
 			{
-				if ( !((EdAbstractText)x).isTextual() )
+				if ( !((EdNode)x).isTextual() )
 				{
 					return false;
 				}
@@ -60,7 +62,36 @@ public abstract class EdAbstractText extends EdNode
 		return true;
 	}
 	
+	@Override
+	public void buildTextualValue(StringBuilder builder)
+	{
+		for (Object x: contents)
+		{
+			if ( x instanceof EdNode )
+			{
+				( (EdNode)x ).buildTextualValue( builder );
+			}
+			else if ( x instanceof String )
+			{
+				builder.append( (String)x );
+			}
+			else
+			{
+				throw new RuntimeException( "Contents are not purely textual" );
+			}
+		}
+	}
+
 	
+	
+	
+	@Override
+	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	protected Pres presentContents()
 	{
 		return new NormalText( contents );
