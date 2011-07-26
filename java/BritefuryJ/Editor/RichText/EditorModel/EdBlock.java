@@ -25,8 +25,14 @@ public class EdBlock extends EdNode
 	}
 	
 	
+	public List<EdNode> getContents()
+	{
+		return contents;
+	}
+	
+	
 	@Override
-	protected void buildTagList(List<Object> tags)
+	public void buildTagList(List<Object> tags)
 	{
 		for (EdNode node: contents)
 		{
@@ -35,12 +41,29 @@ public class EdBlock extends EdNode
 	}
 
 	@Override
-	protected boolean isTextual()
+	public boolean isTextual()
 	{
-		return false;
+		for (EdNode e: contents)
+		{
+			if ( !e.isTextual() )
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 
 	
+	@Override
+	public void buildTextualValue(StringBuilder builder)
+	{
+		for (EdNode e: contents)
+		{
+			e.buildTextualValue( builder );
+		}
+	}
+
+
 	@Override
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{

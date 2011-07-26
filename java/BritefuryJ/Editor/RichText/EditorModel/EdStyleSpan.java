@@ -60,20 +60,20 @@ public class EdStyleSpan extends EdAbstractText
 	
 	
 	@Override
-	protected Tag startTag()
+	public Tag startTag()
 	{
 		return new SStart( styleAttrs );
 	}
 
 	@Override
-	protected Tag endTag()
+	public Tag endTag()
 	{
 		return new SEnd();
 	}
 
 
 	@Override
-	protected void buildTagList(List<Object> tags)
+	public void buildTagList(List<Object> tags)
 	{
 		tags.add( new SStart( styleAttrs ) );
 		for (Object x: contents)
