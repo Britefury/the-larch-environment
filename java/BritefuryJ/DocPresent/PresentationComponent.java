@@ -269,6 +269,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		
 		
+		@Override
 		public int getSourceActions(JComponent component)
 		{
 			if ( drop != null )
@@ -290,6 +291,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			}
 		}
 		
+		@Override
 		public Transferable createTransferable(JComponent component)
 		{
 			if ( drop != null )
@@ -311,6 +313,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			}
 		}
 		
+		@Override
 		public void exportDone(JComponent component, Transferable data, int action)
 		{
 			if ( drop != null )
@@ -336,6 +339,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		
 		
+		@Override
 		public boolean canImport(TransferHandler.TransferSupport transfer)
 		{
 			try
@@ -365,6 +369,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			}
 		}
 
+		@Override
 		public boolean importData(TransferHandler.TransferSupport transfer)
 		{
 			try

@@ -32,7 +32,7 @@ public abstract class AbstractStreamValueVisitor
 		}
 
 		@Override
-		protected void inOrderVisitElement(DPElement e)
+		protected void inOrderCompletelyVisitElement(DPElement e)
 		{
 			AbstractStreamValueVisitor.this.inOrderVisitElement( builder, e );
 		}

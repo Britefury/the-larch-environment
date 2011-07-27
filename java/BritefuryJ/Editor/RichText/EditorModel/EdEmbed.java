@@ -20,7 +20,7 @@ import BritefuryJ.StyleSheet.StyleSheet;
 
 abstract class EdEmbed extends EdNode
 {
-	private Object value;
+	protected Object value;
 	
 	
 	public EdEmbed(Object value)

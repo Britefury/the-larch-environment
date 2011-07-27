@@ -6,10 +6,19 @@
 //##************************
 package BritefuryJ.Editor.RichText.EditorModel;
 
+import BritefuryJ.Editor.RichText.RichTextEditor;
+
 public class EdInlineEmbed extends EdEmbed
 {
 	public EdInlineEmbed(Object value)
 	{
 		super( value );
+	}
+
+
+	@Override
+	public EdNode deepCopy(RichTextEditor editor)
+	{
+		return new EdInlineEmbed( editor.deepCopyInlineEmbedValue( value ) );
 	}
 }

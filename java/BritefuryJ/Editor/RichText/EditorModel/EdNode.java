@@ -9,16 +9,17 @@ package BritefuryJ.Editor.RichText.EditorModel;
 import java.util.List;
 
 import BritefuryJ.DefaultPerspective.Presentable;
+import BritefuryJ.Editor.RichText.RichTextEditor;
 import BritefuryJ.Editor.RichText.Tags.Tag;
 
 public abstract class EdNode implements Presentable
 {
-	public Tag startTag()
+	public Tag regionStartTag()
 	{
 		return null;
 	}
 
-	public Tag endTag()
+	public Tag regionEndTag()
 	{
 		return null;
 	}
@@ -34,6 +35,9 @@ public abstract class EdNode implements Presentable
 	}
 
 	public abstract void buildTagList(List<Object> tags);
+	
+	
+	public abstract EdNode deepCopy(RichTextEditor editor);
 	
 	
 	public abstract boolean isTextual();

@@ -207,7 +207,7 @@ public abstract class ElementTreeVisitor
 			preOrderVisitElement( element, true );
 			
 			// In-order visit
-			inOrderVisitElement( element );
+			inOrderCompletelyVisitElement( element );
 			if ( shouldVisitChildrenOfElement( element, true ) )
 			{
 				List<DPElement> children = element.getChildrenInSequentialOrder();
@@ -234,7 +234,7 @@ public abstract class ElementTreeVisitor
 	
 	
 	protected abstract void preOrderVisitElement(DPElement e, boolean complete);
-	protected abstract void inOrderVisitElement(DPElement e);
+	protected abstract void inOrderCompletelyVisitElement(DPElement e);
 	protected abstract void postOrderVisitElement(DPElement e, boolean complete);
 	protected abstract void inOrderVisitPartialContentLeafEditable(DPContentLeafEditable e, int startIndex, int endIndex);
 	protected abstract boolean shouldVisitChildrenOfElement(DPElement e, boolean completeVisit);
