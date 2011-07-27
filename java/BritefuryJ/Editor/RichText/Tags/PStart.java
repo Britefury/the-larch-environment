@@ -6,22 +6,24 @@
 //##************************
 package BritefuryJ.Editor.RichText.Tags;
 
+import java.util.Map;
+
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Row;
 
 public class PStart extends StartTag
 {
-	private Object styleAttrs;
+	private Map<Object, Object> styleAttrs;
 	
 	
-	public PStart(Object styleAttrs)
+	public PStart(Map<Object, Object> styleAttrs)
 	{
 		this.styleAttrs = styleAttrs;
 	}
 	
 	
-	public Object getAttrs()
+	public Map<Object, Object> getAttrs()
 	{
 		return styleAttrs;
 	}

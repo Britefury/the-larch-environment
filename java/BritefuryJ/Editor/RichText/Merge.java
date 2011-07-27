@@ -201,7 +201,7 @@ class Merge
 	{
 		private ArrayList<Object> paragraphs = new ArrayList<Object>();
 		private ArrayList<Object> spans = new ArrayList<Object>();
-		private Object attrs = null;
+		private Map<Object, Object> attrs = null;
 		private boolean bHasContent = false;
 		
 		

@@ -48,7 +48,7 @@ public class EdStyleSpan extends EdAbstractText
 		return styleAttrs;
 	}
 	
-	public void setStyleAttrs(HashMap<Object, Object> styleAttrs)
+	public void setStyleAttrs(Map<Object, Object> styleAttrs)
 	{
 		this.styleAttrs.clear();
 		this.styleAttrs.putAll( styleAttrs );

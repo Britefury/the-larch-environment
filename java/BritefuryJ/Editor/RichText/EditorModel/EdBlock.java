@@ -30,6 +30,12 @@ public class EdBlock extends EdNode
 		return contents;
 	}
 	
+	public void setContents(List<EdNode> contents)
+	{
+		contents.clear();
+		contents.addAll( contents );
+	}
+	
 	
 	@Override
 	public void buildTagList(List<Object> tags)
