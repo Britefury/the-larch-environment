@@ -14,7 +14,7 @@ import java.util.Map;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Painter.FillPainter;
-import BritefuryJ.Editor.RichText.RichTextEditor;
+import BritefuryJ.Editor.RichText.RichTextEditor.EditorModel_Accessor;
 import BritefuryJ.Editor.RichText.Tags.SEnd;
 import BritefuryJ.Editor.RichText.Tags.SStart;
 import BritefuryJ.Editor.RichText.Tags.Tag;
@@ -94,9 +94,16 @@ public class EdStyleSpan extends EdAbstractText
 	
 	
 	@Override
-	public EdNode deepCopy(RichTextEditor editor)
+	public EdNode deepCopy(EditorModel_Accessor accessor)
 	{
-		return new EdStyleSpan( deepCopyContents( editor ), styleAttrs );
+		return new EdStyleSpan( deepCopyContents( accessor ), styleAttrs );
+	}
+
+
+	@Override
+	public Object buildModel(EditorModel_Accessor accessor)
+	{
+		return accessor.buildSpan( accessor.editorModelListToModelList( contents ), styleAttrs );
 	}
 
 	@Override

@@ -99,14 +99,14 @@ public abstract class EdAbstractText extends EdNode
 	}
 	
 	
-	protected ArrayList<Object> deepCopyContents(RichTextEditor editor)
+	protected ArrayList<Object> deepCopyContents(RichTextEditor.EditorModel_Accessor accessor)
 	{
 		ArrayList<Object> contentsCopy = new ArrayList<Object>();
 		for (Object x: contents)
 		{
 			if ( x instanceof EdNode )
 			{
-				contentsCopy.add( ( (EdNode)x ).deepCopy( editor ) );
+				contentsCopy.add( ( (EdNode)x ).deepCopy( accessor ) );
 			}
 			else
 			{

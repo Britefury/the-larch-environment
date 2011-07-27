@@ -345,7 +345,7 @@ public abstract class RichTextEditor extends SequentialEditor
 				}
 				else if ( event instanceof SelectionEditTreeEvent )
 				{
-					setModelContentsFromStream( model, value );
+					setModelContentsFromEditorModelStream( model, value );
 					return EditListener.HandleEditResult.HANDLED;
 				}
 				else if ( event instanceof RichTextEditEvents.RichTextRequest )
@@ -380,6 +380,18 @@ public abstract class RichTextEditor extends SequentialEditor
 
 
 	
+	
+	//
+	//
+	// PUBLIC INTERFACE
+	//
+	//
+	
+	
+	//
+	// Presentation methods - wrap Pres objects in event handlers to take care of editing events
+	//
+	
 	public Pres editableInlineEmbed(Object model, Object child)
 	{
 		child = new Proxy( child );
@@ -408,6 +420,11 @@ public abstract class RichTextEditor extends SequentialEditor
 	}
 	
 	
+	
+	//
+	// Content modification methods
+	//
+
 	public void insertParagraphAtCaret(Caret caret, MakeParagraphFn makeParagraph)
 	{
 		if ( caret.isValid()  &&  caret.isEditable() )
@@ -460,7 +477,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		{
 			log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setTextContentsFromStream" ).vItem( "stream", value ) );
 		}
-		setModelContentsFromStream( model, value );
+		setModelContentsFromEditorModelStream( model, value );
 		return !value.contains( "\n" );
 	}
 
@@ -469,7 +486,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		if ( value.endsWith( "\n" ) )
 		{
 			StreamValue toLast = value.subStream( 0, value.length() - 1 );
-			setModelContentsFromStream( model, toLast );
+			setModelContentsFromEditorModelStream( model, toLast );
 			if ( log.isRecording() )
 			{
 				log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setParagraphTextContentsFromStream - with trailing newline" ).vItem( "stream", value ) );
@@ -478,7 +495,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		}
 		else
 		{
-			setModelContentsFromStream( model, value );
+			setModelContentsFromEditorModelStream( model, value );
 			EdNode e = modelToEditorModel( model );
 			((EdParagraph)e).suppressNewline();
 			if ( log.isRecording() )
@@ -501,7 +518,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		{
 			EdParagraph block = (EdParagraph)items.get( 0 );
 			List<? extends Object> contents = block.getContents();
-			setModelContentsFromStream( paragraph, new StreamValueBuilder( contents ).stream() );
+			setModelContentsFromEditorModelStream( paragraph, new StreamValueBuilder( contents ).stream() );
 			return true;
 		}
 		else
@@ -522,31 +539,120 @@ public abstract class RichTextEditor extends SequentialEditor
 		{
 			log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setBlockContentsFromRawStream" ).vItem( "tags", tags ).vItem( "paras", paras ) );
 		}
-		setModelContentsFromStream( model, new StreamValueBuilder( paras ).stream() );
+		setModelContentsFromEditorModelStream( model, new StreamValueBuilder( paras ).stream() );
 	}
 
 
 
 	
-	protected abstract void setModelContentsFromStream(Object model, StreamValue value);
+	protected abstract void setModelContents(Object model, List<Object> contents);
 	protected abstract EdNode modelToEditorModel(Object model);
+
+	protected abstract boolean isDataModelObject(Object x);
 	
 	protected abstract void insertParagraphIntoBlockAfter(Object block, Object para, Object paragraphBefore);
 	protected abstract void deleteParagraphFromBlock(Object block, Object paragraph);
 	protected abstract void removeInlineEmbed(Object textSpan, Object embed);
+	
+	
+	protected abstract Object buildInlineEmbed(Object value);
+	protected abstract Object buildParagraphEmbed(Object value);
+	protected abstract Object buildParagraph(List<Object> contents, Map<Object, Object> styleAttrs);
+	protected abstract Object buildSpan(List<Object> contents, Map<Object, Object> styleAttrs);
 
 	
-	public abstract Object deepCopyInlineEmbedValue(Object value);
+	protected abstract Object deepCopyInlineEmbedValue(Object value);
 
 
-	public Object deepCopyParagraphEmbedValue(Object value)
+	protected Object deepCopyParagraphEmbedValue(Object value)
 	{
 		return deepCopyInlineEmbedValue( value );
+	}
+	
+	
+	private Object buildModelForEditorModel(EdNode editorModel)
+	{
+		return editorModel.buildModel( editorModel_accessor );
+	}
+
+	
+	public Object convertModelToEditorModel(Object model)
+	{
+		if ( model instanceof String )
+		{
+			return model;
+		}
+		else if ( model instanceof List )
+		{
+			List<?> xs = (List<?>)model;
+			ArrayList<Object> fxs = new ArrayList<Object>( xs.size() );
+			for (Object a: xs)
+			{
+				fxs.add( convertModelToEditorModel( a ) );
+			}
+			return fxs;
+		}
+		else
+		{
+			return modelToEditorModel( model );
+		}
+	}
+	
+	
+	public Object filterValueFromEditorModel(Object x)
+	{
+		if ( x instanceof String )
+		{
+			return x;
+		}
+		else if ( x instanceof EdNode )
+		{
+			return buildModelForEditorModel( (EdNode)x );
+		}
+		else if ( x instanceof List )
+		{
+			List<?> xs = (List<?>)x;
+			ArrayList<Object> fxs = new ArrayList<Object>( xs.size() );
+			for (Object a: xs)
+			{
+				fxs.add( filterValueFromEditorModel( a ) );
+			}
+			return fxs;
+		}
+		else if ( isDataModelObject( x ) )
+		{
+			return x;
+		}
+		else
+		{
+			throw new RuntimeException( "Could not filter editor model value: value is not a String, EdNode, List, or data model object - it is a " + x.getClass().getName() );
+		}
+	}
+
+
+	protected void setModelContentsFromEditorModelStream(Object model, StreamValue stream)
+	{
+		ArrayList<Object> values = stream.getItemValues();
+		ArrayList<Object> editorModelValues = new ArrayList<Object>();
+		editorModelValues.ensureCapacity( values.size() );
+		
+		for (Object x: values)
+		{
+			editorModelValues.add( filterValueFromEditorModel( x ) );
+		}
+		
+		setModelContents( model, editorModelValues );
 	}
 
 
 	
 	
+
+
+
+
+
+
 	protected Object modelToPrefixTag(Object model)
 	{
 		return modelToEditorModel( model ).prefixTag();
@@ -739,7 +845,7 @@ public abstract class RichTextEditor extends SequentialEditor
 
 
 	
-	public List<? extends Object> deepCopyFlattened(List<? extends Object> flattened)
+	private List<? extends Object> deepCopyFlattened(List<? extends Object> flattened)
 	{
 		ArrayList<Object> copy = new ArrayList<Object>();
 		copy.ensureCapacity( flattened.size() );
@@ -747,7 +853,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		{
 			if ( x instanceof EdNode )
 			{
-				copy.add( ( (EdNode)x ).deepCopy( this ) );
+				copy.add( ( (EdNode)x ).deepCopy( editorModel_accessor ) );
 			}
 			else
 			{
@@ -790,7 +896,7 @@ public abstract class RichTextEditor extends SequentialEditor
 	
 
 	
-	public StreamValue streamWithModifiedSelectionStyle(DPElement element, TextSelection selection, ComputeSpanStylesFn computeStylesFn)
+	protected StreamValue streamWithModifiedSelectionStyle(DPElement element, TextSelection selection, ComputeSpanStylesFn computeStylesFn)
 	{
 		FragmentView editFragment = (FragmentView)element.getFragmentContext();
 		DPElement editFragmentElement = editFragment.getFragmentElement();
@@ -850,4 +956,81 @@ public abstract class RichTextEditor extends SequentialEditor
 	
 	
 	private static final StyleSheet editableParaStyle = StyleSheet.instance.withAttr( RichText.appendNewlineToParagraphs, true );
+	
+	
+	
+	
+	//
+	//
+	// ACCESSORS
+	//
+	//
+	
+	public interface EditorModel_Accessor
+	{
+		Object buildInlineEmbed(Object value);
+		Object buildParagraphEmbed(Object value);
+		Object buildParagraph(List<Object> contents, Map<Object, Object> styleAttrs);
+		Object buildSpan(List<Object> contents, Map<Object, Object> styleAttrs);
+		
+		List<Object> editorModelListToModelList(List<Object> x);
+		
+		Object deepCopyInlineEmbedValue(Object value);
+		Object deepCopyParagraphEmbedValue(Object value);
+	}
+	
+	private class EditorModel_AccessorImpl implements EditorModel_Accessor
+	{
+		@Override
+		public Object buildInlineEmbed(Object value)
+		{
+			return RichTextEditor.this.buildInlineEmbed( value );
+		}
+
+		@Override
+		public Object buildParagraphEmbed(Object value)
+		{
+			return RichTextEditor.this.buildParagraphEmbed( value );
+		}
+
+		@Override
+		public Object buildParagraph(List<Object> contents, Map<Object, Object> styleAttrs)
+		{
+			return RichTextEditor.this.buildParagraph( contents, styleAttrs );
+		}
+
+		@Override
+		public Object buildSpan(List<Object> contents, Map<Object, Object> styleAttrs)
+		{
+			return RichTextEditor.this.buildSpan( contents, styleAttrs );
+		}
+
+		
+		@Override
+		public List<Object> editorModelListToModelList(List<Object> x)
+		{
+			ArrayList<Object> ed = new ArrayList<Object>();
+			ed.ensureCapacity( x.size() );
+			for (Object a: x)
+			{
+				ed.add( RichTextEditor.this.filterValueFromEditorModel( a ) );
+			}
+			return ed;
+		}
+
+		@Override
+		public Object deepCopyInlineEmbedValue(Object value)
+		{
+			return RichTextEditor.this.deepCopyInlineEmbedValue( value );
+		}
+
+		@Override
+		public Object deepCopyParagraphEmbedValue(Object value)
+		{
+			return RichTextEditor.this.deepCopyParagraphEmbedValue( value );
+		}
+	}
+	
+	
+	private EditorModel_AccessorImpl editorModel_accessor = new EditorModel_AccessorImpl();
 }

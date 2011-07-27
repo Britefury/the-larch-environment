@@ -84,7 +84,7 @@ class RichTextEditEvents
 			if ( selection instanceof TextSelection )
 			{
 				StreamValue stream = editor.streamWithModifiedSelectionStyle( element, (TextSelection)selection, computeStylesFn );
-				editor.setModelContentsFromStream( block, stream );
+				editor.setModelContentsFromEditorModelStream( block, stream );
 			}
 			return EditListener.HandleEditResult.HANDLED;
 		}

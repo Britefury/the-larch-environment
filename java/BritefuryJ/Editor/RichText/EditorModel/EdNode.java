@@ -10,6 +10,7 @@ import java.util.List;
 
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.Editor.RichText.RichTextEditor;
+import BritefuryJ.Editor.RichText.RichTextEditor.EditorModel_Accessor;
 import BritefuryJ.Editor.RichText.Tags.Tag;
 
 public abstract class EdNode implements Presentable
@@ -37,7 +38,7 @@ public abstract class EdNode implements Presentable
 	public abstract void buildTagList(List<Object> tags);
 	
 	
-	public abstract EdNode deepCopy(RichTextEditor editor);
+	public abstract EdNode deepCopy(EditorModel_Accessor accessor);
 	
 	
 	public abstract boolean isTextual();
@@ -46,6 +47,9 @@ public abstract class EdNode implements Presentable
 	{
 		throw new RuntimeException( "Contents are not purely textual" );
 	}
+	
+	
+	public abstract Object buildModel(RichTextEditor.EditorModel_Accessor accessor);
 	
 	
 	public boolean isParagraph()
