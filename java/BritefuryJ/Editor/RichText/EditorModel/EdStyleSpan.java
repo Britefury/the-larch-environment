@@ -14,6 +14,7 @@ import java.util.Map;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Painter.FillPainter;
+import BritefuryJ.Editor.RichText.RichTextEditor;
 import BritefuryJ.Editor.RichText.Tags.SEnd;
 import BritefuryJ.Editor.RichText.Tags.SStart;
 import BritefuryJ.Editor.RichText.Tags.Tag;
@@ -60,13 +61,13 @@ public class EdStyleSpan extends EdAbstractText
 	
 	
 	@Override
-	public Tag startTag()
+	public Tag regionStartTag()
 	{
 		return new SStart( styleAttrs );
 	}
 
 	@Override
-	public Tag endTag()
+	public Tag regionEndTag()
 	{
 		return new SEnd();
 	}
@@ -92,6 +93,12 @@ public class EdStyleSpan extends EdAbstractText
 
 	
 	
+	@Override
+	public EdNode deepCopy(RichTextEditor editor)
+	{
+		return new EdStyleSpan( deepCopyContents( editor ), styleAttrs );
+	}
+
 	@Override
 	protected EdNode withContents(List<Object> contents)
 	{

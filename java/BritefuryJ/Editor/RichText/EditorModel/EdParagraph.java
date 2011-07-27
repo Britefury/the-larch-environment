@@ -13,6 +13,7 @@ import java.util.Map;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Border.SolidBorder;
+import BritefuryJ.Editor.RichText.RichTextEditor;
 import BritefuryJ.Editor.RichText.Tags.PStart;
 import BritefuryJ.Editor.RichText.Tags.Tag;
 import BritefuryJ.IncrementalView.FragmentView;
@@ -86,6 +87,13 @@ public class EdParagraph extends EdAbstractText
 	
 	
 	
+
+	@Override
+	public EdNode deepCopy(RichTextEditor editor)
+	{
+		return new EdParagraph( deepCopyContents( editor ), styleAttrs );
+	}
+
 
 	@Override
 	public boolean isParagraph()

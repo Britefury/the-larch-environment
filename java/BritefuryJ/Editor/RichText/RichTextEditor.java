@@ -44,12 +44,12 @@ import BritefuryJ.StyleSheet.StyleSheet;
 
 public abstract class RichTextEditor extends SequentialEditor
 {
-	private static class Visitor extends ElementTreeVisitor
+	private static abstract class Visitor extends ElementTreeVisitor
 	{
-		private ArrayList<Object> prefix = new ArrayList<Object>();
-		private ArrayList<Object> contents = new ArrayList<Object>();
-		private ArrayList<Object> suffix = new ArrayList<Object>();
-		private RichTextEditor editor;
+		protected ArrayList<Object> prefix = new ArrayList<Object>();
+		protected ArrayList<Object> contents = new ArrayList<Object>();
+		protected ArrayList<Object> suffix = new ArrayList<Object>();
+		protected RichTextEditor editor;
 		
 		
 		public Visitor(RichTextEditor editor)
@@ -73,16 +73,16 @@ public abstract class RichTextEditor extends SequentialEditor
 				
 				if ( !complete )
 				{
-					Object start = editor.modelToStartTag( model );
-					Object end = editor.modelToEndTag( model );
+					Object regionStart = editor.modelToRegionStartTag( model );
+					Object regionEnd = editor.modelToRegionEndTag( model );
 					
-					if ( start != null )
+					if ( regionStart != null )
 					{
-						contents.add( start );
+						contents.add( regionStart );
 					}
-					if ( end != null )
+					if ( regionEnd != null )
 					{
-						suffix.add( 0, end );
+						suffix.add( 0, regionEnd );
 					}
 				}
 			}
@@ -90,14 +90,14 @@ public abstract class RichTextEditor extends SequentialEditor
 
 
 		@Override
-		protected void inOrderVisitElement(DPElement e)
+		protected void inOrderCompletelyVisitElement(DPElement e)
 		{
 			StreamValue stream = e.getStreamValue();
 			for (StreamValue.Item item: stream.getItems())
 			{
 				if ( item.isStructural() )
 				{
-					editor.modelToTags( contents, ((StreamValue.StructuralItem)item).getValue() );
+					completelyVisitStructralValue( ((StreamValue.StructuralItem)item).getValue() );
 				}
 				else
 				{
@@ -116,8 +116,8 @@ public abstract class RichTextEditor extends SequentialEditor
 				
 				if ( !complete )
 				{
-					Object start = editor.modelToStartTag( model );
-					Object end = editor.modelToEndTag( model );
+					Object start = editor.modelToRegionStartTag( model );
+					Object end = editor.modelToRegionEndTag( model );
 					
 					if ( start != null )
 					{
@@ -148,14 +148,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		@Override
 		protected boolean shouldVisitChildrenOfElement(DPElement e, boolean completeVisit)
 		{
-			if ( completeVisit )
-			{
-				return e.hasFixedValue();
-			}
-			else
-			{
-				return true;
-			}
+			return completeVisit  ?  e.hasFixedValue()  :  true;
 		}
 		
 		
@@ -165,6 +158,47 @@ public abstract class RichTextEditor extends SequentialEditor
 			joined.addAll( contents );
 			joined.addAll( suffix );
 			return Flatten.flattenParagraphs( joined );
+		}
+		
+		
+		
+		protected abstract void completelyVisitStructralValue(Object value);
+	}
+	
+	
+	private static class TagsVisitor extends Visitor
+	{
+		public TagsVisitor(RichTextEditor editor)
+		{
+			super( editor );
+		}
+
+		@Override
+		protected void completelyVisitStructralValue(Object value)
+		{
+			editor.modelToTags( contents, value );
+		}
+	}
+	
+	
+	private static class NodeVisitor extends Visitor
+	{
+		public NodeVisitor(RichTextEditor editor)
+		{
+			super( editor );
+		}
+
+		@Override
+		protected void completelyVisitStructralValue(Object value)
+		{
+			if ( editor.isStyleSpan( value ) )
+			{
+				editor.modelToTags( contents, value );
+			}
+			else
+			{
+				contents.add( editor.modelToEditorModel( value ) );
+			}
 		}
 	}
 	
@@ -502,6 +536,15 @@ public abstract class RichTextEditor extends SequentialEditor
 	protected abstract void removeInlineEmbed(Object textSpan, Object embed);
 
 	
+	public abstract Object deepCopyInlineEmbedValue(Object value);
+
+
+	public Object deepCopyParagraphEmbedValue(Object value)
+	{
+		return deepCopyInlineEmbedValue( value );
+	}
+
+
 	
 	
 	protected Object modelToPrefixTag(Object model)
@@ -514,14 +557,14 @@ public abstract class RichTextEditor extends SequentialEditor
 		return modelToEditorModel( model ).suffixTag();
 	}
 	
-	protected Object modelToStartTag(Object model)
+	protected Object modelToRegionStartTag(Object model)
 	{
-		return modelToEditorModel( model ).startTag();
+		return modelToEditorModel( model ).regionStartTag();
 	}
 	
-	protected Object modelToEndTag(Object model)
+	protected Object modelToRegionEndTag(Object model)
 	{
-		return modelToEditorModel( model ).endTag();
+		return modelToEditorModel( model ).regionEndTag();
 	}
 	
 	protected void modelToTags(List<Object> tags, Object model)
@@ -530,6 +573,11 @@ public abstract class RichTextEditor extends SequentialEditor
 	}
 	
 	
+	
+	protected boolean isStyleSpan(Object model)
+	{
+		return modelToEditorModel( model ) instanceof EdStyleSpan;
+	}
 	
 	protected boolean isParagraph(Object model)
 	{
@@ -637,9 +685,9 @@ public abstract class RichTextEditor extends SequentialEditor
 
 	protected void insertInlineEmbed(Log log, DPElement element, Object paragraph, Marker marker, EdInlineEmbed embed)
 	{
-		Visitor v1 = new Visitor( this );
+		Visitor v1 = new TagsVisitor( this );
 		v1.visitFromStartOfRootToMarker( marker, element );
-		Visitor v2 = new Visitor( this );
+		Visitor v2 = new TagsVisitor( this );
 		v2.visitFromMarkerToEndOfRoot( marker, element );
 		ArrayList<Object> splicedFlattened = new ArrayList<Object>();
 		splicedFlattened.addAll( v1.flattened() );
@@ -655,7 +703,13 @@ public abstract class RichTextEditor extends SequentialEditor
 	@Override
 	public Object getSequentialContentInSelection(FragmentView editFragment, DPElement editFragmentElement, TextSelection selection)
 	{
-		Visitor v = new Visitor( this );
+		Visitor v = new NodeVisitor( this );
+		return getFlattenedContentInSelection( v, editFragment, selection );
+	}
+
+
+	private Object getFlattenedContentInSelection(Visitor v, FragmentView editFragment, TextSelection selection)
+	{
 		v.visitTextSelection( selection );
 		
 		// Walk the tree from the common root of the selection, up to the 'edit fragment',
@@ -666,15 +720,15 @@ public abstract class RichTextEditor extends SequentialEditor
 		while ( rootFragment != editFragment )
 		{
 			Object m = rootFragment.getModel();
-			Object start = modelToStartTag( m );
-			Object end = modelToEndTag( m );
-			if ( start != null )
+			Object regionStart = modelToRegionStartTag( m );
+			Object regionEnd = modelToRegionEndTag( m );
+			if ( regionStart != null )
 			{
-				v.prefix.add( start );
+				v.prefix.add( regionStart );
 			}
-			if ( end != null )
+			if ( regionEnd != null )
 			{
-				v.suffix.add( end );
+				v.suffix.add( regionEnd );
 			}
 			
 			rootFragment = (FragmentView)rootFragment.getParent();
@@ -684,18 +738,37 @@ public abstract class RichTextEditor extends SequentialEditor
 	}
 
 
+	
+	public List<? extends Object> deepCopyFlattened(List<? extends Object> flattened)
+	{
+		ArrayList<Object> copy = new ArrayList<Object>();
+		copy.ensureCapacity( flattened.size() );
+		for (Object x: flattened)
+		{
+			if ( x instanceof EdNode )
+			{
+				copy.add( ( (EdNode)x ).deepCopy( this ) );
+			}
+			else
+			{
+				copy.add( x );
+			}
+		}
+		return copy;
+	}
+	
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public Object spliceForInsertion(FragmentView subtreeRootFragment, DPElement subtreeRootFragmentElement, Marker prefixEnd, Marker suffixStart, Object insertedContent)
 	{
-		Visitor v1 = new Visitor( this );
+		Visitor v1 = new NodeVisitor( this );
 		v1.visitFromStartOfRootToMarker( prefixEnd, subtreeRootFragmentElement );
-		Visitor v2 = new Visitor( this );
+		Visitor v2 = new NodeVisitor( this );
 		v2.visitFromMarkerToEndOfRoot( suffixStart, subtreeRootFragmentElement );
 		ArrayList<Object> splicedFlattened = new ArrayList<Object>();
 		splicedFlattened.addAll( v1.flattened() );
-		splicedFlattened.addAll( (List<? extends Object>)insertedContent );
+		splicedFlattened.addAll( deepCopyFlattened( (List<? extends Object>)insertedContent ) );
 		splicedFlattened.addAll( v2.flattened() );
 		ArrayList<Object> splicedMerged = Merge.mergeParagraphs( splicedFlattened );
 		return new StreamValueBuilder( splicedMerged ).stream();
@@ -704,9 +777,9 @@ public abstract class RichTextEditor extends SequentialEditor
 	@Override
 	public Object spliceForDeletion(FragmentView subtreeRootFragment, DPElement subtreeRootFragmentElement, Marker selectionStart, Marker selectionEnd)
 	{
-		Visitor v1 = new Visitor( this );
+		Visitor v1 = new NodeVisitor( this );
 		v1.visitFromStartOfRootToMarker( selectionStart, subtreeRootFragmentElement );
-		Visitor v2 = new Visitor( this );
+		Visitor v2 = new NodeVisitor( this );
 		v2.visitFromMarkerToEndOfRoot( selectionEnd, subtreeRootFragmentElement );
 		ArrayList<Object> splicedFlattened = new ArrayList<Object>();
 		splicedFlattened.addAll( v1.flattened() );
@@ -723,8 +796,9 @@ public abstract class RichTextEditor extends SequentialEditor
 		DPElement editFragmentElement = editFragment.getFragmentElement();
 		
 		// Get the content within the selection
+		Visitor selectionVisitor = new TagsVisitor( this );
 		@SuppressWarnings("unchecked")
-		List<? extends Object> selected = (List<? extends Object>)getSequentialContentInSelection( editFragment, editFragmentElement, selection );
+		List<? extends Object> selected = (List<? extends Object>)getFlattenedContentInSelection( selectionVisitor, editFragment, selection );
 		
 		// Extract style dictionaries
 		ArrayList< Map<Object, Object> > styles = new ArrayList< Map<Object, Object> >();
@@ -757,9 +831,9 @@ public abstract class RichTextEditor extends SequentialEditor
 		}
 		
 		// Get surrounding content
-		Visitor v1 = new Visitor( this );
+		Visitor v1 = new TagsVisitor( this );
 		v1.visitFromStartOfRootToMarker( selection.getStartMarker(), editFragmentElement );
-		Visitor v2 = new Visitor( this );
+		Visitor v2 = new TagsVisitor( this );
 		v2.visitFromMarkerToEndOfRoot( selection.getEndMarker(), editFragmentElement );
 		
 		// Splice and merge

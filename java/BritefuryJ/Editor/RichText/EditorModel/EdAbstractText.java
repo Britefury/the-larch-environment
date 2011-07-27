@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.Editor.RichText.RichTextEditor;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.RichText.NormalText;
@@ -95,6 +96,24 @@ public abstract class EdAbstractText extends EdNode
 	protected Pres presentContents()
 	{
 		return new NormalText( contents );
+	}
+	
+	
+	protected ArrayList<Object> deepCopyContents(RichTextEditor editor)
+	{
+		ArrayList<Object> contentsCopy = new ArrayList<Object>();
+		for (Object x: contents)
+		{
+			if ( x instanceof EdNode )
+			{
+				contentsCopy.add( ( (EdNode)x ).deepCopy( editor ) );
+			}
+			else
+			{
+				contentsCopy.add( x );
+			}
+		}
+		return contentsCopy;
 	}
 	
 	

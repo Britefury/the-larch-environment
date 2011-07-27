@@ -172,7 +172,7 @@ class Flatten
 			}
 			else
 			{
-				throw new RuntimeException( "Could not process element " + x );
+				throw new RuntimeException( "Could not process element " + x.getClass().getName() );
 			}
 			
 			prevElement = x;

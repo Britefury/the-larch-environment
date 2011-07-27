@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.Editor.RichText.RichTextEditor;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Column;
@@ -45,6 +46,19 @@ public class EdBlock extends EdNode
 			node.buildTagList( tags );
 		}
 	}
+	
+	
+	@Override
+	public EdNode deepCopy(RichTextEditor editor)
+	{
+		ArrayList<EdNode> contentsCopy = new ArrayList<EdNode>();
+		for (EdNode node: contents)
+		{
+			contentsCopy.add( node.deepCopy( editor ) );
+		}
+		return new EdBlock( contentsCopy );
+	}
+
 
 	@Override
 	public boolean isTextual()
