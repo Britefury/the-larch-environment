@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.Editor.RichText.RichTextEditor;
+import BritefuryJ.Editor.RichText.RichTextEditor.EditorModel_Accessor;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Column;
@@ -49,12 +49,19 @@ public class EdBlock extends EdNode
 	
 	
 	@Override
-	public EdNode deepCopy(RichTextEditor editor)
+	public Object buildModel(EditorModel_Accessor accessor)
+	{
+		throw new RuntimeException( "Cannot build model for an EdBlock" );
+	}
+
+
+	@Override
+	public EdNode deepCopy(EditorModel_Accessor accessor)
 	{
 		ArrayList<EdNode> contentsCopy = new ArrayList<EdNode>();
 		for (EdNode node: contents)
 		{
-			contentsCopy.add( node.deepCopy( editor ) );
+			contentsCopy.add( node.deepCopy( accessor ) );
 		}
 		return new EdBlock( contentsCopy );
 	}

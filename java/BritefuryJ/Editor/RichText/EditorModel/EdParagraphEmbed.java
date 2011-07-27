@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Editor.RichText.EditorModel;
 
-import BritefuryJ.Editor.RichText.RichTextEditor;
+import BritefuryJ.Editor.RichText.RichTextEditor.EditorModel_Accessor;
 
 public class EdParagraphEmbed extends EdEmbed
 {
@@ -17,9 +17,16 @@ public class EdParagraphEmbed extends EdEmbed
 
 
 	@Override
-	public EdNode deepCopy(RichTextEditor editor)
+	public EdNode deepCopy(EditorModel_Accessor accessor)
 	{
-		return new EdParagraphEmbed( editor.deepCopyParagraphEmbedValue( value ) );
+		return new EdParagraphEmbed( accessor.deepCopyParagraphEmbedValue( value ) );
+	}
+
+
+	@Override
+	public Object buildModel(EditorModel_Accessor accessor)
+	{
+		return accessor.buildParagraphEmbed( value );
 	}
 
 
