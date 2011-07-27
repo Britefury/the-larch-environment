@@ -436,7 +436,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		List<Object> items = stream.getItemValues();
 		if ( items.size() == 1 )
 		{
-			EdBlock block = (EdBlock)items.get( 0 );
+			EdParagraph block = (EdParagraph)items.get( 0 );
 			List<? extends Object> contents = block.getContents();
 			setModelContentsFromStream( paragraph, new StreamValueBuilder( contents ).stream() );
 			return true;
@@ -544,7 +544,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		}
 		else
 		{
-			throw new RuntimeException( "Not a list or an #EdNode" );
+			return false;
 		}
 	}
 	

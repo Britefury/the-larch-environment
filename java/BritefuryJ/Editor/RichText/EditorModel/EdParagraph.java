@@ -7,7 +7,9 @@
 package BritefuryJ.Editor.RichText.EditorModel;
 
 import java.awt.Color;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Border.SolidBorder;
@@ -24,14 +26,17 @@ import BritefuryJ.StyleSheet.StyleSheet;
 
 public class EdParagraph extends EdAbstractText
 {
-	private Object styleAttrs = null;
+	private Map<Object, Object> styleAttrs = new HashMap<Object, Object>();
 	private boolean bSuppressNewline = false;
 	
 	
-	public EdParagraph(List<Object> contents, Object styleAttrs)
+	public EdParagraph(List<Object> contents, Map<Object, Object> styleAttrs)
 	{
 		super( contents );
-		this.styleAttrs = styleAttrs;
+		if ( styleAttrs != null )
+		{
+			this.styleAttrs.putAll( styleAttrs );
+		}
 	}
 	
 	
@@ -41,7 +46,7 @@ public class EdParagraph extends EdAbstractText
 	}
 	
 	
-	public Object getStyleAttrs()
+	public Map<Object, Object> getStyleAttrs()
 	{
 		return styleAttrs;
 	}

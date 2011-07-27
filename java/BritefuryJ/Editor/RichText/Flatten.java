@@ -10,6 +10,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Stack;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
@@ -27,6 +28,7 @@ import BritefuryJ.Pres.Primitive.Border;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleSheet;
+import BritefuryJ.Util.StringSplit;
 
 class Flatten
 {
@@ -54,12 +56,12 @@ class Flatten
 		{
 			if ( x instanceof String  &&  ((String)x).contains( "\n" ) )
 			{
-				String lines[] = ((String)x).split( "\n" );
-				result.add( lines[0] );
-				for (int i = 1; i < lines.length; i++)
+				List<String> lines = StringSplit.split( (String)x, "\n" );
+				result.add( lines.get( 0 ) );
+				for (int i = 1; i < lines.size(); i++)
 				{
 					result.add( Newline.instance );
-					result.add( lines[i] );
+					result.add( lines.get( i ) );
 				}
 			}
 			else
