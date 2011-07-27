@@ -70,7 +70,7 @@ class RichTextEditEvents
 			if ( selection instanceof TextSelection )
 			{
 				StreamValue stream = editor.streamWithModifiedSelectionStyle( element, (TextSelection)selection, computeStylesFn );
-				editor.setParagraphContentsFromBlockStream( paragraph, stream );
+				editor.setParagraphContentsFromBlockStream( fragment.getView().getLog(), paragraph, stream );
 				return EditListener.HandleEditResult.HANDLED;
 			}
 			return EditListener.HandleEditResult.NOT_HANDLED;
@@ -192,7 +192,7 @@ class RichTextEditEvents
 		{
 			Object embedValue = makeInlineEmbedFn.invoke();
 			EdInlineEmbed embed = new EdInlineEmbed( embedValue );
-			editor.insertInlineEmbed( element, paragraph, marker, embed );
+			editor.insertInlineEmbed( fragment.getView().getLog(), element, paragraph, marker, embed );
 			return EditListener.HandleEditResult.HANDLED;
 		}
 	}

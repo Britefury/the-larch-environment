@@ -27,7 +27,7 @@ import BritefuryJ.StyleSheet.StyleSheet;
 public class EdParagraph extends EdAbstractText
 {
 	private Map<Object, Object> styleAttrs = new HashMap<Object, Object>();
-	private boolean bSuppressNewline = false;
+	private boolean isNewlineSuppressed = false;
 	
 	
 	public EdParagraph(List<Object> contents, Map<Object, Object> styleAttrs)
@@ -42,7 +42,7 @@ public class EdParagraph extends EdAbstractText
 	
 	public void suppressNewline()
 	{
-		bSuppressNewline = true;
+		isNewlineSuppressed = true;
 	}
 	
 	
@@ -78,7 +78,7 @@ public class EdParagraph extends EdAbstractText
 				tags.add( x );
 			}
 		}
-		if ( !bSuppressNewline )
+		if ( !isNewlineSuppressed )
 		{
 			tags.add( "\n" );
 		}

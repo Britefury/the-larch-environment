@@ -30,10 +30,10 @@ public class EdBlock extends EdNode
 		return contents;
 	}
 	
-	public void setContents(List<EdNode> contents)
+	public void setContents(List<EdNode> xs)
 	{
-		contents.clear();
-		contents.addAll( contents );
+		this.contents.clear();
+		this.contents.addAll( xs );
 	}
 	
 	

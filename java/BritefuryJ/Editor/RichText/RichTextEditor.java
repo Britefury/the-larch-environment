@@ -35,6 +35,8 @@ import BritefuryJ.Editor.Sequential.SequentialEditor;
 import BritefuryJ.Editor.Sequential.StreamEditListener;
 import BritefuryJ.Editor.Sequential.Item.EditableStructuralItem;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.Logging.Log;
+import BritefuryJ.Logging.LogEntry;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Proxy;
 import BritefuryJ.Pres.RichText.RichText;
@@ -224,7 +226,7 @@ public abstract class RichTextEditor extends SequentialEditor
 					boolean handled = false;
 					if ( sourceElement.getFragmentContext() == fragment )
 					{
-						handled = setTextContentsFromStream( model, value );
+						handled = setTextContentsFromStream( fragment.getView().getLog(), model, value );
 					}
 					return handled  ?  EditListener.HandleEditResult.HANDLED  :  EditListener.HandleEditResult.PASS_TO_PARENT;
 				}
@@ -248,13 +250,13 @@ public abstract class RichTextEditor extends SequentialEditor
 					boolean handled = false;
 					if ( sourceElement.getFragmentContext() == fragment )
 					{
-						handled = setParagraphTextContentsFromStream( model, value );
+						handled = setParagraphTextContentsFromStream( fragment.getView().getLog(), model, value );
 					}
 					return handled  ?  EditListener.HandleEditResult.HANDLED  :  EditListener.HandleEditResult.PASS_TO_PARENT;
 				}
 				else if ( event instanceof SelectionEditTreeEvent )
 				{
-					boolean handled = setParagraphContentsFromBlockStream( model, value );
+					boolean handled = setParagraphContentsFromBlockStream( fragment.getView().getLog(), model, value );
 					return handled  ?  EditListener.HandleEditResult.HANDLED  :  EditListener.HandleEditResult.PASS_TO_PARENT;
 				}
 				else if ( event instanceof RichTextEditEvents.RichTextRequest )
@@ -304,7 +306,7 @@ public abstract class RichTextEditor extends SequentialEditor
 			{
 				if ( event instanceof TextEditEvent )
 				{
-					setBlockContentsFromRawStream( model, value );
+					setBlockContentsFromRawStream( fragment.getView().getLog(), model, value );
 					return EditListener.HandleEditResult.HANDLED;
 				}
 				else if ( event instanceof SelectionEditTreeEvent )
@@ -401,24 +403,43 @@ public abstract class RichTextEditor extends SequentialEditor
 	}
 	
 	
-
-
-
-
-
-
-	protected boolean setTextContentsFromStream(Object model, StreamValue value)
+	public void applyStyleToSelection(TextSelection selection, ComputeSpanStylesFn computeSpanStyles)
 	{
+		selection.getCommonRoot().postTreeEvent( new RichTextEditEvents.StyleRequest( computeSpanStyles ) );
+	}
+	
+	public void modifyParagraphAtMarker(Marker marker, ModifyParagraphFn modifyParagraph)
+	{
+		marker.getElement().postTreeEvent( new RichTextEditEvents.ParagraphStyleRequest( modifyParagraph ) );
+	}
+	
+	
+
+
+
+
+
+
+	protected boolean setTextContentsFromStream(Log log, Object model, StreamValue value)
+	{
+		if ( log.isRecording() )
+		{
+			log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setTextContentsFromStream" ).vItem( "stream", value ) );
+		}
 		setModelContentsFromStream( model, value );
 		return !value.contains( "\n" );
 	}
 
-	protected boolean setParagraphTextContentsFromStream(Object model, StreamValue value)
+	protected boolean setParagraphTextContentsFromStream(Log log, Object model, StreamValue value)
 	{
 		if ( value.endsWith( "\n" ) )
 		{
 			StreamValue toLast = value.subStream( 0, value.length() - 1 );
 			setModelContentsFromStream( model, toLast );
+			if ( log.isRecording() )
+			{
+				log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setParagraphTextContentsFromStream - with trailing newline" ).vItem( "stream", value ) );
+			}
 			return !toLast.contains( "\n" );
 		}
 		else
@@ -426,13 +447,21 @@ public abstract class RichTextEditor extends SequentialEditor
 			setModelContentsFromStream( model, value );
 			EdNode e = modelToEditorModel( model );
 			((EdParagraph)e).suppressNewline();
+			if ( log.isRecording() )
+			{
+				log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setParagraphTextContentsFromStream - no trailing newline" ).vItem( "stream", value ) );
+			}
 		}
 		return false;
 	}
 
 
-	protected boolean setParagraphContentsFromBlockStream(Object paragraph, StreamValue stream)
+	protected boolean setParagraphContentsFromBlockStream(Log log, Object paragraph, StreamValue stream)
 	{
+		if ( log.isRecording() )
+		{
+			log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setParagraphContentsFromBlockStream" ).vItem( "stream", stream ) );
+		}
 		List<Object> items = stream.getItemValues();
 		if ( items.size() == 1 )
 		{
@@ -448,12 +477,17 @@ public abstract class RichTextEditor extends SequentialEditor
 	}
 
 
-	protected void setBlockContentsFromRawStream(Object model, StreamValue value)
+	protected void setBlockContentsFromRawStream(Log log, Object model, StreamValue value)
 	{
 		ArrayList<Object> tags = new ArrayList<Object>();
 		modelToTags( tags, model );
+		
 		List<Object> flattened = Flatten.flattenParagraphs( tags );
 		List<Object> paras = Merge.mergeParagraphs( flattened );
+		if ( log.isRecording() )
+		{
+			log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setBlockContentsFromRawStream" ).vItem( "tags", tags ).vItem( "paras", paras ) );
+		}
 		setModelContentsFromStream( model, new StreamValueBuilder( paras ).stream() );
 	}
 
@@ -601,7 +635,7 @@ public abstract class RichTextEditor extends SequentialEditor
 
 
 
-	protected void insertInlineEmbed(DPElement element, Object paragraph, Marker marker, EdInlineEmbed embed)
+	protected void insertInlineEmbed(Log log, DPElement element, Object paragraph, Marker marker, EdInlineEmbed embed)
 	{
 		Visitor v1 = new Visitor( this );
 		v1.visitFromStartOfRootToMarker( marker, element );
@@ -612,7 +646,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		splicedFlattened.add( embed );
 		splicedFlattened.addAll( v2.flattened() );
 		ArrayList<Object> splicedMerged = Merge.mergeParagraphs( splicedFlattened );
-		setParagraphContentsFromBlockStream( paragraph, new StreamValueBuilder( splicedMerged ).stream() );
+		setParagraphContentsFromBlockStream( log, paragraph, new StreamValueBuilder( splicedMerged ).stream() );
 	}
 
 
