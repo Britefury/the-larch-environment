@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.Editor.RichText.EditorModel;
+package BritefuryJ.Editor.RichText;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -14,10 +14,6 @@ import java.util.Map;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Painter.FillPainter;
-import BritefuryJ.Editor.RichText.RichTextEditor.EditorModel_Accessor;
-import BritefuryJ.Editor.RichText.Tags.SEnd;
-import BritefuryJ.Editor.RichText.Tags.SStart;
-import BritefuryJ.Editor.RichText.Tags.Tag;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Border;
@@ -31,13 +27,13 @@ public class EdStyleSpan extends EdAbstractText
 	private HashMap<Object, Object> styleAttrs = new HashMap<Object, Object>();
 	
 	
-	public EdStyleSpan(List<Object> contents, Map<Object, Object> styleAttrs)
+	protected EdStyleSpan(List<Object> contents, Map<Object, Object> styleAttrs)
 	{
 		super( contents );
 		this.styleAttrs.putAll( styleAttrs );
 	}
 	
-	public EdStyleSpan(Map<Object, Object> styleAttrs)
+	protected EdStyleSpan(Map<Object, Object> styleAttrs)
 	{
 		super();
 		this.styleAttrs.putAll( styleAttrs );
@@ -61,22 +57,22 @@ public class EdStyleSpan extends EdAbstractText
 	
 	
 	@Override
-	public Tag regionStartTag()
+	protected Tag regionStartTag()
 	{
-		return new SStart( styleAttrs );
+		return new TagSStart( styleAttrs );
 	}
 
 	@Override
-	public Tag regionEndTag()
+	protected Tag regionEndTag()
 	{
-		return new SEnd();
+		return new TagSEnd();
 	}
 
 
 	@Override
-	public void buildTagList(List<Object> tags)
+	protected void buildTagList(List<Object> tags)
 	{
-		tags.add( new SStart( styleAttrs ) );
+		tags.add( new TagSStart( styleAttrs ) );
 		for (Object x: contents)
 		{
 			if ( x instanceof EdAbstractText )
@@ -88,22 +84,22 @@ public class EdStyleSpan extends EdAbstractText
 				tags.add( x );
 			}
 		}
-		tags.add( new SEnd() );
+		tags.add( new TagSEnd() );
 	}
 
 	
 	
 	@Override
-	public EdNode deepCopy(EditorModel_Accessor accessor)
+	protected EdNode deepCopy(RichTextEditor editor)
 	{
-		return new EdStyleSpan( deepCopyContents( accessor ), styleAttrs );
+		return new EdStyleSpan( deepCopyContents( editor ), styleAttrs );
 	}
 
 
 	@Override
-	public Object buildModel(EditorModel_Accessor accessor)
+	protected Object buildModel(RichTextEditor editor)
 	{
-		return accessor.buildSpan( accessor.editorModelListToModelList( contents ), styleAttrs );
+		return editor.buildSpan( editor.editorModelListToModelList( contents ), styleAttrs );
 	}
 
 	@Override

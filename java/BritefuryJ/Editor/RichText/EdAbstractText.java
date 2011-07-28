@@ -4,14 +4,11 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.Editor.RichText.EditorModel;
+package BritefuryJ.Editor.RichText;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.Editor.RichText.RichTextEditor;
-import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.RichText.NormalText;
 
@@ -30,20 +27,22 @@ public abstract class EdAbstractText extends EdNode
 	}
 	
 	
-	public List<Object> getContents()
+	public void setModelContents(RichTextEditor editor, List<Object> modelContents)
+	{
+		List<Object> editorModelContents = editor.convertModelListToEditorModelList( modelContents );
+		this.contents.clear();
+		this.contents.addAll( editorModelContents );
+	}
+	
+
+	protected List<Object> getContents()
 	{
 		return contents;
 	}
 	
-	public void setContents(List<Object> contents)
-	{
-		this.contents.clear();
-		this.contents.addAll( contents );
-	}
-	
 	
 	@Override
-	public boolean isTextual()
+	protected boolean isTextual()
 	{
 		for (Object x: contents)
 		{
@@ -64,7 +63,7 @@ public abstract class EdAbstractText extends EdNode
 	}
 	
 	@Override
-	public void buildTextualValue(StringBuilder builder)
+	protected void buildTextualValue(StringBuilder builder)
 	{
 		for (Object x: contents)
 		{
@@ -86,27 +85,20 @@ public abstract class EdAbstractText extends EdNode
 	
 	
 	
-	@Override
-	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	protected Pres presentContents()
 	{
 		return new NormalText( contents );
 	}
 	
 	
-	protected ArrayList<Object> deepCopyContents(RichTextEditor.EditorModel_Accessor accessor)
+	protected ArrayList<Object> deepCopyContents(RichTextEditor editor)
 	{
 		ArrayList<Object> contentsCopy = new ArrayList<Object>();
 		for (Object x: contents)
 		{
 			if ( x instanceof EdNode )
 			{
-				contentsCopy.add( ( (EdNode)x ).deepCopy( accessor ) );
+				contentsCopy.add( ( (EdNode)x ).deepCopy( editor ) );
 			}
 			else
 			{

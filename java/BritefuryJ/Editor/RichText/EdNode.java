@@ -4,55 +4,52 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.Editor.RichText.EditorModel;
+package BritefuryJ.Editor.RichText;
 
 import java.util.List;
 
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.Editor.RichText.RichTextEditor;
-import BritefuryJ.Editor.RichText.RichTextEditor.EditorModel_Accessor;
-import BritefuryJ.Editor.RichText.Tags.Tag;
 
 public abstract class EdNode implements Presentable
 {
-	public Tag regionStartTag()
+	protected Tag regionStartTag()
 	{
 		return null;
 	}
 
-	public Tag regionEndTag()
+	protected Tag regionEndTag()
 	{
 		return null;
 	}
 
-	public Tag prefixTag()
+	protected Tag prefixTag()
 	{
 		return null;
 	}
 
-	public Tag suffixTag()
+	protected Tag suffixTag()
 	{
 		return null;
 	}
 
-	public abstract void buildTagList(List<Object> tags);
+	protected abstract void buildTagList(List<Object> tags);
 	
 	
-	public abstract EdNode deepCopy(EditorModel_Accessor accessor);
+	protected abstract EdNode deepCopy(RichTextEditor editor);
 	
 	
-	public abstract boolean isTextual();
+	protected abstract boolean isTextual();
 	
-	public void buildTextualValue(StringBuilder builder)
+	protected void buildTextualValue(StringBuilder builder)
 	{
 		throw new RuntimeException( "Contents are not purely textual" );
 	}
 	
 	
-	public abstract Object buildModel(RichTextEditor.EditorModel_Accessor accessor);
+	protected abstract Object buildModel(RichTextEditor editor);
 	
 	
-	public boolean isParagraph()
+	protected boolean isParagraph()
 	{
 		return false;
 	}

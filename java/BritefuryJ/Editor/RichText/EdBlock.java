@@ -4,13 +4,12 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.Editor.RichText.EditorModel;
+package BritefuryJ.Editor.RichText;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.Editor.RichText.RichTextEditor.EditorModel_Accessor;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Column;
@@ -20,26 +19,27 @@ public class EdBlock extends EdNode
 	private ArrayList<EdNode> contents = new ArrayList<EdNode>();
 	
 	
-	public EdBlock(List<EdNode> contents)
+	protected EdBlock(List<EdNode> contents)
 	{
 		this.contents.addAll( contents );
 	}
 	
 	
-	public List<EdNode> getContents()
+	public void setModelContents(RichTextEditor editor, List<Object> xs)
 	{
-		return contents;
-	}
-	
-	public void setContents(List<EdNode> xs)
-	{
+		ArrayList<EdNode> ed = new ArrayList<EdNode>();
+		ed.ensureCapacity( xs.size() );
+		for (Object x: xs)
+		{
+			ed.add( editor.modelToEditorModel( x ) );
+		}
 		this.contents.clear();
-		this.contents.addAll( xs );
+		this.contents.addAll( ed );
 	}
 	
 	
 	@Override
-	public void buildTagList(List<Object> tags)
+	protected void buildTagList(List<Object> tags)
 	{
 		for (EdNode node: contents)
 		{
@@ -49,26 +49,26 @@ public class EdBlock extends EdNode
 	
 	
 	@Override
-	public Object buildModel(EditorModel_Accessor accessor)
+	protected Object buildModel(RichTextEditor editor)
 	{
 		throw new RuntimeException( "Cannot build model for an EdBlock" );
 	}
 
 
 	@Override
-	public EdNode deepCopy(EditorModel_Accessor accessor)
+	protected EdNode deepCopy(RichTextEditor editor)
 	{
 		ArrayList<EdNode> contentsCopy = new ArrayList<EdNode>();
 		for (EdNode node: contents)
 		{
-			contentsCopy.add( node.deepCopy( accessor ) );
+			contentsCopy.add( node.deepCopy( editor ) );
 		}
 		return new EdBlock( contentsCopy );
 	}
 
 
 	@Override
-	public boolean isTextual()
+	protected boolean isTextual()
 	{
 		for (EdNode e: contents)
 		{
@@ -82,7 +82,7 @@ public class EdBlock extends EdNode
 
 	
 	@Override
-	public void buildTextualValue(StringBuilder builder)
+	protected void buildTextualValue(StringBuilder builder)
 	{
 		for (EdNode e: contents)
 		{

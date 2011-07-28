@@ -4,35 +4,27 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.Editor.RichText.EditorModel;
+package BritefuryJ.Editor.RichText;
 
-import BritefuryJ.Editor.RichText.RichTextEditor.EditorModel_Accessor;
 
-public class EdParagraphEmbed extends EdEmbed
+public class EdInlineEmbed extends EdEmbed
 {
-	public EdParagraphEmbed(Object value)
+	protected EdInlineEmbed(Object value)
 	{
 		super( value );
 	}
 
 
 	@Override
-	public EdNode deepCopy(EditorModel_Accessor accessor)
+	protected EdNode deepCopy(RichTextEditor editor)
 	{
-		return new EdParagraphEmbed( accessor.deepCopyParagraphEmbedValue( value ) );
+		return new EdInlineEmbed( editor.deepCopyInlineEmbedValue( value ) );
 	}
 
 
 	@Override
-	public Object buildModel(EditorModel_Accessor accessor)
+	protected Object buildModel(RichTextEditor editor)
 	{
-		return accessor.buildParagraphEmbed( value );
-	}
-
-
-	@Override
-	public boolean isParagraph()
-	{
-		return true;
+		return editor.buildInlineEmbed( value );
 	}
 }

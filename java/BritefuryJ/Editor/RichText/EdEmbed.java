@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.Editor.RichText.EditorModel;
+package BritefuryJ.Editor.RichText;
 
 import java.awt.Color;
 import java.util.List;
@@ -23,7 +23,7 @@ abstract class EdEmbed extends EdNode
 	protected Object value;
 	
 	
-	public EdEmbed(Object value)
+	protected EdEmbed(Object value)
 	{
 		this.value = value;
 	}
@@ -37,14 +37,14 @@ abstract class EdEmbed extends EdNode
 	
 	
 	@Override
-	public void buildTagList(List<Object> tags)
+	protected void buildTagList(List<Object> tags)
 	{
 		tags.add( this );
 	}
 	
 	
 	
-	public boolean isTextual()
+	protected boolean isTextual()
 	{
 		return false;
 	}

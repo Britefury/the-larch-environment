@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.Editor.RichText.Tags;
+package BritefuryJ.Editor.RichText;
 
 import java.awt.Color;
 
@@ -12,7 +12,7 @@ import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public abstract class Tag implements Presentable
+abstract class Tag implements Presentable
 {
 	protected abstract String getTagName();
 	

@@ -13,11 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import BritefuryJ.Editor.RichText.EditorModel.EdInlineEmbed;
-import BritefuryJ.Editor.RichText.EditorModel.EdParagraph;
-import BritefuryJ.Editor.RichText.EditorModel.EdParagraphEmbed;
-import BritefuryJ.Editor.RichText.EditorModel.EdStyleSpan;
-import BritefuryJ.Editor.RichText.Tags.PStart;
 
 class Merge
 {
@@ -225,10 +220,10 @@ class Merge
 				attrs = null;
 				bHasContent = false;
 			}
-			else if ( p instanceof PStart )
+			else if ( p instanceof TagPStart )
 			{
 				merge();
-				attrs = ((PStart)p).getAttrs();
+				attrs = ((TagPStart)p).getAttrs();
 				bHasContent = true;
 			}
 			else
