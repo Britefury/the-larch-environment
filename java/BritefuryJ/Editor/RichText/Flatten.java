@@ -16,12 +16,6 @@ import java.util.Stack;
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.Editor.RichText.EditorModel.EdInlineEmbed;
-import BritefuryJ.Editor.RichText.EditorModel.EdNode;
-import BritefuryJ.Editor.RichText.EditorModel.EdStyleSpan;
-import BritefuryJ.Editor.RichText.Tags.PStart;
-import BritefuryJ.Editor.RichText.Tags.SEnd;
-import BritefuryJ.Editor.RichText.Tags.SStart;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Border;
@@ -122,7 +116,7 @@ class Flatten
 			if ( prevElement instanceof Newline )
 			{
 				// Previous element was a newline
-				if ( x instanceof PStart  ||  isPara( x ) )
+				if ( x instanceof TagPStart  ||  isPara( x ) )
 				{
 					// Current element is a paragraph start tag, or a paragraph:
 					// Emit nothing as it will be handled further down
@@ -130,7 +124,7 @@ class Flatten
 				else
 				{
 					// Emit a paragraph start tag
-					result.add( new PStart( null ) );
+					result.add( new TagPStart( null ) );
 				}
 			}
 			
@@ -139,22 +133,22 @@ class Flatten
 			{
 				result.add( new EdStyleSpan( Arrays.asList( new Object[] { x } ), currentStyleAttrs ) );
 			}
-			else if ( x instanceof SStart )
+			else if ( x instanceof TagSStart )
 			{
 				// Update the style stack
 				HashMap<Object, Object> attrs = new HashMap<Object, Object>();
 				attrs.putAll( currentStyleAttrs );
-				attrs.putAll( ((SStart)x).getStyleAttrs() );
+				attrs.putAll( ((TagSStart)x).getStyleAttrs() );
 				currentStyleAttrs = attrs;
 				styleStack.add( attrs );
 			}
-			else if ( x instanceof SEnd )
+			else if ( x instanceof TagSEnd )
 			{
 				// Update the style stack
 				styleStack.pop();
 				currentStyleAttrs = styleStack.lastElement();
 			}
-			else if ( x instanceof PStart )
+			else if ( x instanceof TagPStart )
 			{
 				// Element is a paragraph start tag
 				if ( prevElement instanceof Newline  ||  isPara( prevElement )  ||  prevElement == null )

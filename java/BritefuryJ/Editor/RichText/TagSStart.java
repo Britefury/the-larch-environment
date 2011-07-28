@@ -4,26 +4,28 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.Editor.RichText.Tags;
+package BritefuryJ.Editor.RichText;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Row;
 
-public class PStart extends StartTag
+class TagSStart extends TagStart
 {
-	private Map<Object, Object> styleAttrs;
+	private HashMap<Object, Object> styleAttrs = new HashMap<Object, Object>();
 	
 	
-	public PStart(Map<Object, Object> styleAttrs)
+	public TagSStart(HashMap<Object, Object> styleAttrs)
 	{
-		this.styleAttrs = styleAttrs;
+		this.styleAttrs.putAll( styleAttrs );
 	}
 	
 	
-	public Map<Object, Object> getAttrs()
+	public Map<Object, Object> getStyleAttrs()
 	{
 		return styleAttrs;
 	}
@@ -32,7 +34,15 @@ public class PStart extends StartTag
 	@Override
 	protected Pres presentTagContents()
 	{
-		return new Row( new Object[] { new Label( " " ), Pres.coerceNonNull( styleAttrs ) } );
+		ArrayList<Object> xs = new ArrayList<Object>();
+		for (Map.Entry<Object, Object> entry: styleAttrs.entrySet())
+		{
+			xs.add( new Label( " " ) );
+			xs.add( Pres.coerce( entry.getKey() ) );
+			xs.add( new Label( "=" ) );
+			xs.add( Pres.coerceNonNull( entry.getValue() ) );
+		}
+		return new Row( xs );
 	}
 	
 
@@ -40,6 +50,6 @@ public class PStart extends StartTag
 	@Override
 	protected String getTagName()
 	{
-		return "p";
+		return "start";
 	}
 }

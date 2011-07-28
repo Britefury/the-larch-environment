@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.Editor.RichText.Tags;
+package BritefuryJ.Editor.RichText;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.IncrementalView.FragmentView;
@@ -13,7 +13,7 @@ import BritefuryJ.Pres.Primitive.Blank;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Row;
 
-public abstract class StartTag extends Tag
+abstract class TagStart extends Tag
 {
 	protected Pres presentTagContents()
 	{

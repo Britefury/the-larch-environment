@@ -12,7 +12,6 @@ import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.Selection.TextSelection;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
-import BritefuryJ.Editor.RichText.EditorModel.EdInlineEmbed;
 import BritefuryJ.Editor.Sequential.EditListener;
 import BritefuryJ.IncrementalView.FragmentView;
 

@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.Editor.RichText.EditorModel;
+package BritefuryJ.Editor.RichText;
 
 import java.awt.Color;
 import java.util.HashMap;
@@ -13,9 +13,6 @@ import java.util.Map;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.Editor.RichText.RichTextEditor.EditorModel_Accessor;
-import BritefuryJ.Editor.RichText.Tags.PStart;
-import BritefuryJ.Editor.RichText.Tags.Tag;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Border;
@@ -31,7 +28,7 @@ public class EdParagraph extends EdAbstractText
 	private boolean isNewlineSuppressed = false;
 	
 	
-	public EdParagraph(List<Object> contents, Map<Object, Object> styleAttrs)
+	protected EdParagraph(List<Object> contents, Map<Object, Object> styleAttrs)
 	{
 		super( contents );
 		if ( styleAttrs != null )
@@ -41,7 +38,7 @@ public class EdParagraph extends EdAbstractText
 	}
 	
 	
-	public void suppressNewline()
+	protected void suppressNewline()
 	{
 		isNewlineSuppressed = true;
 	}
@@ -58,16 +55,16 @@ public class EdParagraph extends EdAbstractText
 	
 	
 	@Override
-	public Tag prefixTag()
+	protected Tag prefixTag()
 	{
-		return new PStart( styleAttrs );
+		return new TagPStart( styleAttrs );
 	}
 
 
 	@Override
-	public void buildTagList(List<Object> tags)
+	protected void buildTagList(List<Object> tags)
 	{
-		tags.add( new PStart( styleAttrs ) );
+		tags.add( new TagPStart( styleAttrs ) );
 		for (Object x: contents)
 		{
 			if ( x instanceof EdAbstractText )
@@ -89,21 +86,21 @@ public class EdParagraph extends EdAbstractText
 	
 
 	@Override
-	public EdNode deepCopy(EditorModel_Accessor accessor)
+	protected EdNode deepCopy(RichTextEditor editor)
 	{
-		return new EdParagraph( deepCopyContents( accessor ), styleAttrs );
+		return new EdParagraph( deepCopyContents( editor ), styleAttrs );
 	}
 
 
 	@Override
-	public Object buildModel(EditorModel_Accessor accessor)
+	protected Object buildModel(RichTextEditor accessor)
 	{
 		return accessor.buildParagraph( accessor.editorModelListToModelList( contents ), styleAttrs );
 	}
 
 
 	@Override
-	public boolean isParagraph()
+	protected boolean isParagraph()
 	{
 		return true;
 	}

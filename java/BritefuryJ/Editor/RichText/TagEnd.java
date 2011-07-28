@@ -4,14 +4,14 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.Editor.RichText.Tags;
+package BritefuryJ.Editor.RichText;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Label;
 
-public abstract class EndTag extends Tag
+abstract class TagEnd extends Tag
 {
 	@Override
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)

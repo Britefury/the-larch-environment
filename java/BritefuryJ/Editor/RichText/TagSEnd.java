@@ -4,9 +4,9 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.Editor.RichText.Tags;
+package BritefuryJ.Editor.RichText;
 
-public class SEnd extends EndTag
+class TagSEnd extends TagEnd
 {
 	@Override
 	protected String getTagName()
