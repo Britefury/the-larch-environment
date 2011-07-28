@@ -15,6 +15,7 @@ import org.python.core.PyTuple;
 import org.python.core.PyType;
 import org.python.core.__builtin__;
 
+import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.Util.PolymorphicMap;
 
 public class ObjectPyMethodDispatch
@@ -69,7 +70,7 @@ public class ObjectPyMethodDispatch
 		if ( invoker == null )
 		{
 			throw new DispatchError( "objectMethodDispatch(): could not find method for nodes of type " +
-					node.getClass().getName() + " in class " + dispatchInstance.getType().getName() );
+					className( node ) + " in class " + dispatchInstance.getType().getName() );
 		}
 		return invoker.invoke( node, dispatchInstance, argsFromJava( args ) );
 	}
@@ -90,7 +91,7 @@ public class ObjectPyMethodDispatch
 		if ( invoker == null )
 		{
 			throw new DispatchError( "objectMethodDispatchAndGetName(): could not find method for nodes of type " +
-					node.getClass().getName() + " in class " + dispatchInstance.getType().getName() );
+					className( node ) + " in class " + dispatchInstance.getType().getName() );
 		}
 		PyObject result = invoker.invoke( node, dispatchInstance, argsFromJava( args ) );
 		return new PyTuple( result, Py.newString( invoker.getName() ) );
@@ -115,7 +116,7 @@ public class ObjectPyMethodDispatch
 		if ( invoker == null )
 		{
 			throw new DispatchError( "objectMethodDispatchFromJava(): could not find method for nodes of type " +
-					node.getClass().getName() + " in class " + dispatchInstance.getType().getName() );
+					className( node ) + " in class " + dispatchInstance.getType().getName() );
 		}
 		return invoker.invoke( node, dispatchInstance, argsFromJava( args ) );
 	}
@@ -127,10 +128,24 @@ public class ObjectPyMethodDispatch
 		if ( invoker == null )
 		{
 			throw new DispatchError( "objectMethodDispatchAndGetNameFromJava(): could not find method for nodes of type " +
-					node.getClass().getName() + " in class " + dispatchInstance.getType().getName() );
+					className( node ) + " in class " + dispatchInstance.getType().getName() );
 		}
 		PyObject result = invoker.invoke( node, dispatchInstance, argsFromJava( args ) );
 		name[0] = invoker.getName();
 		return result;
+	}
+	
+	
+	
+	private static String className(Object node)
+	{
+		if ( node instanceof DMObject )
+		{
+			return "DMObject[" + ( (DMObject)node ).getDMObjectClass().getName() + "]";
+		}
+		else
+		{
+			return node.getClass().getName();
+		}
 	}
 }
