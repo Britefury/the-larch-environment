@@ -17,6 +17,7 @@ from LarchCore.Languages.Python25 import Python25
 
 from LarchCore.Worksheet import Schema
 from LarchCore.Worksheet import AbstractViewSchema
+from LarchCore.Worksheet import WorksheetEditor2
 
 
 
@@ -70,10 +71,14 @@ class WorksheetEditor (AbstractViewSchema.WorksheetAbstractView):
 class BodyEditor (AbstractViewSchema.BodyAbstractView):
 	def __init__(self, worksheet, model):
 		super( BodyEditor, self ).__init__( worksheet, model )
+		self._editorModel = WorksheetEditor2.RichTextEditor.WorksheetRichTextEditor.instance.editorModelBlock( [] )
 
 
 
-	def insertEditorAfter(self, editor, pos):
+	def appendEditorNode(self, editor):
+		self._model['contents'].append( editor.getModel() )
+
+	def insertEditorNodeAfter(self, editor, pos):
 		try:
 			index = self.getContents().index( pos )
 		except ValueError:
@@ -81,9 +86,9 @@ class BodyEditor (AbstractViewSchema.BodyAbstractView):
 		self._model['contents'].insert( index + 1, editor.getModel() )
 		return True
 
-	def deleteEditor(self, editor):
+	def deleteEditorNode(self, editor):
 		try:
-			index = self.getContents().index( node )
+			index = self.getContents().index( editor )
 		except ValueError:
 			return False
 		del self._model['contents'][index]
@@ -91,82 +96,76 @@ class BodyEditor (AbstractViewSchema.BodyAbstractView):
 
 
 
+	def setContents(self, contents):
+		modelContents = [ x.getModel()   for x in contents ]
+		self._model['contents'] = modelContents
+
+
+	def _computeContents(self):
+		blank = BlankParagraphEditor( self._worksheet, self )
+		xs = [ self._viewOf( x )   for x in self._model['contents'] ]  +  [ blank ]
+		self._editorModel.setModelContents( WorksheetEditor2.RichTextEditor.WorksheetRichTextEditor.instance, xs )
+		return xs
 
 
 
+class BlankParagraphEditor (AbstractViewSchema.NodeAbstractView):
+	def __init__(self, worksheet, blockEditor):
+		super( BlankParagraphEditor, self ).__init__( worksheet, None )
+		self._style = 'normal'
+		self._editorModel = WorksheetEditor2.RichTextEditor.WorksheetRichTextEditor.instance.editorModelParagraph( [ '' ], { 'style' : self._style } )
+		self._incr = IncrementalValueMonitor()
+		self._blockEditor = blockEditor
 
-	
-	def appendModel(self, node):
-		self._model['contents'].append( node )
-	
-	def insertModelAfterNode(self, node, model):
-		try:
-			index = self.getContents().index( node )
-		except ValueError:
-			return False
-		self._model['contents'].insert( index + 1, model )
-		return True
 
-	def deleteNode(self, node):
-		try:
-			index = self.getContents().index( node )
-		except ValueError:
-			return False
-		del self._model['contents'][index]
-		return True
-		
-		
-		
-	def joinConsecutiveTextNodes(self, firstNode):
-		assert isinstance( firstNode, ParagraphEditor )
-		contents = self.getContents()
-		
-		try:
-			index = contents.index( firstNode )
-		except ValueError:
-			return False
-		
-		if ( index + 1)  <  len( contents ):
-			next = contents[index+1]
-			if isinstance( next, ParagraphEditor ):
-				firstNode.setText( firstNode.getText() + next.getText() )
-				del self._model['contents'][index+1]
-				return True
-		return False
-	
-	def splitTextNodes(self, textNode, textLines):
-		style = textNode.getStyle()
-		textModels = [ Schema.Paragraph( text=t, style=style )   for t in textLines ]
-		try:
-			index = self.getContents().index( textNode )
-		except ValueError:
-			return False
-		self._model['contents'][index:index+1] = textModels
-		return True
+	def getText(self):
+		self._incr.onAccess()
+		return ''
 
-		
+	def setContents(self, contents):
+		if len( contents ) == 0:
+			return
+		elif len( contents ) == 1  and  contents[0] == '':
+			return
+		p = ParagraphEditor.newParagraph( contents, self._style )
+		self._blockEditor.appendEditorNode( p )
+
+
+	def getStyle(self):
+		self._incr.onAccess()
+		return self._style
+
+	def setStyle(self, style):
+		self._style = style
+		self._incr.onChanged()
+
+
+	def _refreshResults(self, module):
+		pass
+
+
 
 
 class ParagraphEditor (AbstractViewSchema.ParagraphAbstractView):
 	def __init__(self, worksheet, model):
 		super( ParagraphEditor, self ).__init__( worksheet, model )
+		self._editorModel = WorksheetEditor2.RichTextEditor.WorksheetRichTextEditor.instance.editorModelParagraph( [ model['text'] ], { 'style' : model['style'] } )
 	
-		
-	def setText(self, text):
-		self._model['text'] = text
-		
-	
+
+	def setContents(self, contents):
+		modelContents = [ ( x   if isinstance( x, str ) or isinstance( x, unicode )   else x.getModel() )   for x in contents ]
+		self._model['text'] = modelContents[0]   if len( modelContents ) > 0   else ''
+		self._editorModel.setModelContents( WorksheetEditor2.RichTextEditor.WorksheetRichTextEditor.instance, modelContents )
+
+
 	def setStyle(self, style):
 		self._model['style'] = style
-		
-		
-	def partialModel(self):
-		return Schema.PartialParagraph( style=self._model['style'] )
+		self._editorModel.setStyleAttrs( { 'style' : style } )
 		
 		
 	@staticmethod
 	def newParagraph(contents, style):
-		m = ParagraphEditor.newParagraphModel( contents, style )
+		m = ParagraphEditor.newParagraphModel( contents[0]   if len( contents ) > 0   else '', style )
 		return ParagraphEditor( None, m )
 
 	@staticmethod
@@ -178,19 +177,27 @@ class ParagraphEditor (AbstractViewSchema.ParagraphAbstractView):
 class TextSpanEditor (AbstractViewSchema.TextSpanAbstractView):
 	def __init__(self, worksheet, model):
 		super( TextSpanEditor, self ).__init__( worksheet, model )
-	
+		styleAttrs = {}
+		for key, value in model['styleAttrs']:
+			styleAttrs[key] = value
+		self._editorModel = WorksheetEditor2.RichTextEditor.WorksheetRichTextEditor.instance.editorModelSpan( [ model['text'] ], styleAttrs )
+
 		
-	def setText(self, text):
-		self._model['text'] = text
-		
+	def setContents(self, contents):
+		modelContents = [ ( x   if isinstance( x, str ) or isinstance( x, unicode )   else x.getModel() )   for x in contents ]
+		self._model['text'] = modelContents[0]
+		self._editorModel.setModelContents( WorksheetEditor2.RichTextEditor.WorksheetRichTextEditor.instance, modelContents )
+
 	
 	def setStyleAttrs(self, styleAttrs):
-		self._model['styleAttrs'] = styleAttrs
-		
+		modelAttrs = [ [ key, value ]   for key, value in styleAttrs.items() ]
+		self._model['styleAttrs'] = modelAttrs
+		self._editorModel.setStyleAttrs( styleAttrs )
+
 		
 	@staticmethod
 	def newTextSpan(contents, styleAttrs):
-		m = TextSpanEditor.newTextSpanModel( contents, styleAttrs )
+		m = TextSpanEditor.newTextSpanModel( contents[0]   if len( contents ) > 0   else '', styleAttrs )
 		return TextSpanEditor( None, m )
 
 	@staticmethod
@@ -202,6 +209,7 @@ class TextSpanEditor (AbstractViewSchema.TextSpanAbstractView):
 class PythonCodeEditor (AbstractViewSchema.PythonCodeAbstractView):
 	def __init__(self, worksheet, model):
 		super( PythonCodeEditor, self ).__init__( worksheet, model )
+		self._editorModel = WorksheetEditor2.RichTextEditor.WorksheetRichTextEditor.instance.editorModelParagraphEmbed( model )
 
 		
 	def setCode(self, code):
@@ -218,6 +226,11 @@ class PythonCodeEditor (AbstractViewSchema.PythonCodeAbstractView):
 
 
 	@staticmethod
+	def newPythonCode():
+		m = PythonCodeEditor.newPythonCodeModel()
+		return PythonCodeEditor( None, m )
+
+	@staticmethod
 	def newPythonCodeModel():
 		return Schema.PythonCode( style='code_result', code=Python25.py25NewModule() )
 
@@ -226,6 +239,7 @@ class PythonCodeEditor (AbstractViewSchema.PythonCodeAbstractView):
 class QuoteLocationEditor (AbstractViewSchema.QuoteLocationAbstractView):
 	def __init__(self, worksheet, model):
 		super( QuoteLocationEditor, self ).__init__( worksheet, model )
+		self._editorModel = WorksheetEditor2.RichTextEditor.WorksheetRichTextEditor.instance.editorModelParagraphEmbed( model )
 
 		
 	def setLocation(self, location):
@@ -241,6 +255,11 @@ class QuoteLocationEditor (AbstractViewSchema.QuoteLocationAbstractView):
 		self._model['style'] = name
 		
 		
+	@staticmethod
+	def newQuoteLocation():
+		m = QuoteLocationEditor.newQuoteLocationModel()
+		return QuoteLocationEditor( None, m )
+
 	@staticmethod
 	def newQuoteLocationModel():
 		return Schema.QuoteLocation( location='', style='normal' )

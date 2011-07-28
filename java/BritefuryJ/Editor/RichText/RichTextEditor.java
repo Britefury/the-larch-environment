@@ -393,7 +393,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		return new EditableStructuralItem( this, inlineEmbedEditListener, model, child );
 	}
 	
-	public Pres editableText(Object model, Object child)
+	public Pres editableSpan(Object model, Object child)
 	{
 		return new EditableStructuralItem( this, textEditListener, model, child );
 	}

@@ -5,25 +5,29 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
+from copy import copy, deepcopy
+
+from BritefuryJ.DocModel import DMObject
+
 from BritefuryJ.Editor.RichText import RichTextEditor
 
 from Britefury.Util.Abstract import abstractmethod
 
 from LarchCore.Worksheet.WorksheetEditor2 import EditorSchema
 from LarchCore.Worksheet import AbstractViewSchema
+from LarchCore.Worksheet import Schema
+
 
 class WorksheetRichTextEditor (RichTextEditor):
 	def getName(self):
 		return 'WsEdit'
 
 
-	@abstractmethod
 	def setModelContents(self, model, contents):
-		pass
+		model.setContents( contents )
 
-	@abstractmethod
 	def modelToEditorModel(self, model):
-		pass
+		return model._editorModel
 
 
 
@@ -31,9 +35,14 @@ class WorksheetRichTextEditor (RichTextEditor):
 	def buildInlineEmbed(self, value):
 		pass
 
-	@abstractmethod
 	def buildParagraphEmbed(self, value):
-		pass
+		assert isinstance( value, DMObject )
+		if value.isInstanceOf( Schema.PythonCode ):
+			return EditorSchema.PythonCodeEditor( None, value )
+		elif value.isInstanceOf( Schema.QuoteLocation ):
+			return EditorSchema.QuoteLocationEditor( None, value )
+		else:
+			raise TypeError, 'cannot create paragraph embed for %s'  %  value.getDMClass().getName()
 
 
 	def buildParagraph(self, contents, styleAttrs):
@@ -50,19 +59,20 @@ class WorksheetRichTextEditor (RichTextEditor):
 		return isinstance( x, AbstractViewSchema.NodeAbstractView )
 
 	def insertParagraphIntoBlockAfter(self, block, paragraph, p):
-		block.insertEditorAfter( paragraph, p )
+		block.insertEditorNodeAfter( paragraph, p )
 
-	@abstractmethod
 	def deleteParagraphFromBlock(self, block, paragraph):
-		pass
+		block.deleteEditorNode( paragraph )
 
 	@abstractmethod
 	def removeInlineEmbed(self, model, embed):
 		pass
 
-	@abstractmethod
 	def deepCopyInlineEmbedValue(self, value):
-		pass
+		return deepcopy( value )
+
+	def deepCopyParagraphEmbedValue(self, value):
+		return deepcopy( value )
 
 
 
