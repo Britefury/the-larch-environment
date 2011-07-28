@@ -28,16 +28,10 @@ from BritefuryJ.Pres import InnerFragment, LocationAsInnerFragment
 
 from LarchCore.Languages.Python25.Execution.ExecutionPresCombinators import executionResultBox, minimalExecutionResultBox
 
-from LarchCore.Worksheet.WorksheetEditor import EditorSchema
+from LarchCore.Worksheet import Schema
+from LarchCore.Worksheet import ViewSchema
 
-from LarchCore.Worksheet.WorksheetEditor.PythonCode import *
-from LarchCore.Worksheet.WorksheetEditor.QuoteLocation import *
-
-from LarchCore.Worksheet.WorksheetEditor.TextNodeEditor import *
-from LarchCore.Worksheet.WorksheetEditor.BodyNodeEditor import *
-from LarchCore.Worksheet.WorksheetEditor.WorksheetNodeEditor import *
-
-from LarchCore.Worksheet.WorksheetEditor.SequentialEditor import *
+from LarchCore.Worksheet.WorksheetEditor2.SequentialEditor import *
 
 from BritefuryJ.Controls import *
 from BritefuryJ.DocPresent import *
@@ -123,7 +117,7 @@ def _worksheetContextMenuFactory(element, menu):
 
 
 class WorksheetEditor (ObjectDispatchView):
-	@ObjectDispatchMethod( EditorSchema.WorksheetEditor )
+	@ObjectDispatchMethod( ViewSchema.WorksheetView )
 	def Worksheet(self, fragment, inheritedState, node):
 		bodyView = InnerFragment( node.getBody() )
 		
@@ -140,7 +134,7 @@ class WorksheetEditor (ObjectDispatchView):
 		return w
 	
 	
-	@ObjectDispatchMethod( EditorSchema.BodyEditor )
+	@ObjectDispatchMethod( ViewSchema.BodyView )
 	def Body(self, fragment, inheritedState, node):
 		emptyLine = Paragraph( [ Text( '' ) ] )
 		emptyLine = EditableSequentialItem( [ EmptyEditListener.instance, EmptyEventListener.instance ],  emptyLine )
@@ -151,7 +145,7 @@ class WorksheetEditor (ObjectDispatchView):
 		return w
 	
 	
-	@ObjectDispatchMethod( EditorSchema.ParagraphEditor )
+	@ObjectDispatchMethod( ViewSchema.ParagraphView )
 	def Paragraph(self, fragment, inheritedState, node):
 		text = node.getText()
 		style = node.getStyle()
@@ -179,7 +173,7 @@ class WorksheetEditor (ObjectDispatchView):
 		return w
 	
 	
-	@ObjectDispatchMethod( EditorSchema.TextSpanEditor )
+	@ObjectDispatchMethod( ViewSchema.TextSpanView )
 	def TextSpan(self, fragment, inheritedState, node):
 		text = node.getText()
 		styleAttrs = node.getStyleAttrs()
@@ -192,16 +186,16 @@ class WorksheetEditor (ObjectDispatchView):
 
 
 	
-	@ObjectDispatchMethod( EditorSchema.PythonCodeEditor )
+	@ObjectDispatchMethod( ViewSchema.PythonCodeView )
 	def PythonCode(self, fragment, inheritedState, node):
 		choiceValues = [
-		        EditorSchema.PythonCodeEditor.STYLE_MINIMAL_RESULT,
-		        EditorSchema.PythonCodeEditor.STYLE_RESULT,
-		        EditorSchema.PythonCodeEditor.STYLE_CODE_AND_RESULT,
-		        EditorSchema.PythonCodeEditor.STYLE_CODE,
-		        EditorSchema.PythonCodeEditor.STYLE_EDITABLE_CODE_AND_RESULT,
-		        EditorSchema.PythonCodeEditor.STYLE_EDITABLE_CODE,
-		        EditorSchema.PythonCodeEditor.STYLE_HIDDEN ]
+		        ViewSchema.PythonCodeView.STYLE_MINIMAL_RESULT,
+		        ViewSchema.PythonCodeView.STYLE_RESULT,
+		        ViewSchema.PythonCodeView.STYLE_CODE_AND_RESULT,
+		        ViewSchema.PythonCodeView.STYLE_CODE,
+		        ViewSchema.PythonCodeView.STYLE_EDITABLE_CODE_AND_RESULT,
+		        ViewSchema.PythonCodeView.STYLE_EDITABLE_CODE,
+		        ViewSchema.PythonCodeView.STYLE_HIDDEN ]
 
 		
 		def _onStyleOptionMenu(optionMenu, prevChoice, choice):
@@ -251,11 +245,11 @@ class WorksheetEditor (ObjectDispatchView):
 
 
 	
-	@ObjectDispatchMethod( EditorSchema.QuoteLocationEditor )
+	@ObjectDispatchMethod( ViewSchema.QuoteLocationView )
 	def QuoteLocation(self, fragment, inheritedState, node):
 		choiceValues = [
-		        EditorSchema.QuoteLocationEditor.STYLE_MINIMAL,
-		        EditorSchema.QuoteLocationEditor.STYLE_NORMAL ]
+		        ViewSchema.QuoteLocationView.STYLE_MINIMAL,
+		        ViewSchema.QuoteLocationView.STYLE_NORMAL ]
 		
 		
 		class _LocationEntryListener (TextEntry.TextEntryListener):
@@ -317,7 +311,7 @@ class WorksheetEditorSubject (Subject):
 
 	def _getModelView(self):
 		if self._modelView is None:
-			self._modelView = EditorSchema.WorksheetEditor( None, self._model )
+			self._modelView = ViewSchema.WorksheetView( None, self._model )
 		return self._modelView
 		
 	

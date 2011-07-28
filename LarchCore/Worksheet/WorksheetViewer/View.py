@@ -44,7 +44,7 @@ from LarchCore.Languages.Python25.CodeGenerator import compileForModuleExecution
 from LarchCore.Languages.Python25.Execution.ExecutionPresCombinators import executionResultBox, minimalExecutionResultBox
 
 from LarchCore.Worksheet import Schema
-from LarchCore.Worksheet import ViewSchema
+from LarchCore.Worksheet.WorksheetViewer import ViewSchema
 from LarchCore.Worksheet.WorksheetEditor.View import perspective as editorPerspective, WorksheetEditorSubject
 
 
