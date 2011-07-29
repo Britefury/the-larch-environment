@@ -97,7 +97,7 @@ class BodyEditor (AbstractViewSchema.BodyAbstractView):
 
 
 	def setContents(self, contents):
-		modelContents = [ x.getModel()   for x in contents ]
+		modelContents = [ x.getModel()   for x in contents   if not isinstance( x, BlankParagraphEditor ) ]
 		self._model['contents'] = modelContents
 
 
