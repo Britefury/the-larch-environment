@@ -46,8 +46,8 @@ from BritefuryJ.Editor.Sequential.Item import *
 from LarchCore.Languages.Python25 import Python25
 from LarchCore.Languages.Python25.Execution.ExecutionPresCombinators import executionResultBox, minimalExecutionResultBox
 
-from LarchCore.Worksheet.WorksheetEditor2 import EditorSchema
-from LarchCore.Worksheet.WorksheetEditor2.RichTextEditor import WorksheetRichTextEditor
+from LarchCore.Worksheet.WorksheetEditor import EditorSchema
+from LarchCore.Worksheet.WorksheetEditor.RichTextEditor import WorksheetRichTextEditor
 
 
 
@@ -207,7 +207,7 @@ def _worksheetContextMenuFactory(element, menu):
 
 
 
-class WorksheetEditor2 (ObjectDispatchView):
+class WorksheetEditor (ObjectDispatchView):
 	@ObjectDispatchMethod( EditorSchema.WorksheetEditor )
 	def Worksheet(self, fragment, inheritedState, node):
 		bodyView = InnerFragment( node.getBody() )
@@ -399,13 +399,13 @@ class WorksheetEditor2 (ObjectDispatchView):
 
 
 
-_view = WorksheetEditor2()
+_view = WorksheetEditor()
 perspective2 = SequentialEditorPerspective( _view.fragmentViewFunction, WorksheetRichTextEditor.instance )
 
 
-class WorksheetEditor2Subject (Subject):
+class WorksheetEditorSubject (Subject):
 	def __init__(self, document, model, enclosingSubject, location, title):
-		super( WorksheetEditor2Subject, self ).__init__( enclosingSubject )
+		super( WorksheetEditorSubject, self ).__init__( enclosingSubject )
 		self._document = document
 		self._model = model
 		# Defer the creation of the model view - it involves executing all the code in the worksheet which can take some time
