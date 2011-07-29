@@ -17,7 +17,7 @@ from LarchCore.Languages.Python25 import Python25
 
 from LarchCore.Worksheet import Schema
 from LarchCore.Worksheet import AbstractViewSchema
-from LarchCore.Worksheet import WorksheetEditor2
+from LarchCore.Worksheet import WorksheetEditor as WSEditor
 
 
 
@@ -71,7 +71,7 @@ class WorksheetEditor (AbstractViewSchema.WorksheetAbstractView):
 class BodyEditor (AbstractViewSchema.BodyAbstractView):
 	def __init__(self, worksheet, model):
 		super( BodyEditor, self ).__init__( worksheet, model )
-		self._editorModel = WorksheetEditor2.RichTextEditor.WorksheetRichTextEditor.instance.editorModelBlock( [] )
+		self._editorModel = WSEditor.RichTextEditor.WorksheetRichTextEditor.instance.editorModelBlock( [] )
 
 
 
@@ -104,7 +104,7 @@ class BodyEditor (AbstractViewSchema.BodyAbstractView):
 	def _computeContents(self):
 		blank = BlankParagraphEditor( self._worksheet, self )
 		xs = [ self._viewOf( x )   for x in self._model['contents'] ]  +  [ blank ]
-		self._editorModel.setModelContents( WorksheetEditor2.RichTextEditor.WorksheetRichTextEditor.instance, xs )
+		self._editorModel.setModelContents( WSEditor.RichTextEditor.WorksheetRichTextEditor.instance, xs )
 		return xs
 
 
@@ -113,7 +113,7 @@ class BlankParagraphEditor (AbstractViewSchema.NodeAbstractView):
 	def __init__(self, worksheet, blockEditor):
 		super( BlankParagraphEditor, self ).__init__( worksheet, None )
 		self._style = 'normal'
-		self._editorModel = WorksheetEditor2.RichTextEditor.WorksheetRichTextEditor.instance.editorModelParagraph( [ '' ], { 'style' : self._style } )
+		self._editorModel = WSEditor.RichTextEditor.WorksheetRichTextEditor.instance.editorModelParagraph( [ '' ], { 'style' : self._style } )
 		self._incr = IncrementalValueMonitor()
 		self._blockEditor = blockEditor
 
@@ -149,13 +149,13 @@ class BlankParagraphEditor (AbstractViewSchema.NodeAbstractView):
 class ParagraphEditor (AbstractViewSchema.ParagraphAbstractView):
 	def __init__(self, worksheet, model):
 		super( ParagraphEditor, self ).__init__( worksheet, model )
-		self._editorModel = WorksheetEditor2.RichTextEditor.WorksheetRichTextEditor.instance.editorModelParagraph( [ model['text'] ], { 'style' : model['style'] } )
+		self._editorModel = WSEditor.RichTextEditor.WorksheetRichTextEditor.instance.editorModelParagraph( [ model['text'] ], { 'style' : model['style'] } )
 	
 
 	def setContents(self, contents):
 		modelContents = [ ( x   if isinstance( x, str ) or isinstance( x, unicode )   else x.getModel() )   for x in contents ]
 		self._model['text'] = modelContents[0]   if len( modelContents ) > 0   else ''
-		self._editorModel.setModelContents( WorksheetEditor2.RichTextEditor.WorksheetRichTextEditor.instance, modelContents )
+		self._editorModel.setModelContents( WSEditor.RichTextEditor.WorksheetRichTextEditor.instance, modelContents )
 
 
 	def setStyle(self, style):
@@ -180,13 +180,13 @@ class TextSpanEditor (AbstractViewSchema.TextSpanAbstractView):
 		styleAttrs = {}
 		for key, value in model['styleAttrs']:
 			styleAttrs[key] = value
-		self._editorModel = WorksheetEditor2.RichTextEditor.WorksheetRichTextEditor.instance.editorModelSpan( [ model['text'] ], styleAttrs )
+		self._editorModel = WSEditor.RichTextEditor.WorksheetRichTextEditor.instance.editorModelSpan( [ model['text'] ], styleAttrs )
 
 		
 	def setContents(self, contents):
 		modelContents = [ ( x   if isinstance( x, str ) or isinstance( x, unicode )   else x.getModel() )   for x in contents ]
 		self._model['text'] = modelContents[0]
-		self._editorModel.setModelContents( WorksheetEditor2.RichTextEditor.WorksheetRichTextEditor.instance, modelContents )
+		self._editorModel.setModelContents( WSEditor.RichTextEditor.WorksheetRichTextEditor.instance, modelContents )
 
 	
 	def setStyleAttrs(self, styleAttrs):
@@ -209,7 +209,7 @@ class TextSpanEditor (AbstractViewSchema.TextSpanAbstractView):
 class PythonCodeEditor (AbstractViewSchema.PythonCodeAbstractView):
 	def __init__(self, worksheet, model):
 		super( PythonCodeEditor, self ).__init__( worksheet, model )
-		self._editorModel = WorksheetEditor2.RichTextEditor.WorksheetRichTextEditor.instance.editorModelParagraphEmbed( model )
+		self._editorModel = WSEditor.RichTextEditor.WorksheetRichTextEditor.instance.editorModelParagraphEmbed( model )
 
 		
 	def setCode(self, code):
@@ -239,7 +239,7 @@ class PythonCodeEditor (AbstractViewSchema.PythonCodeAbstractView):
 class QuoteLocationEditor (AbstractViewSchema.QuoteLocationAbstractView):
 	def __init__(self, worksheet, model):
 		super( QuoteLocationEditor, self ).__init__( worksheet, model )
-		self._editorModel = WorksheetEditor2.RichTextEditor.WorksheetRichTextEditor.instance.editorModelParagraphEmbed( model )
+		self._editorModel = WSEditor.RichTextEditor.WorksheetRichTextEditor.instance.editorModelParagraphEmbed( model )
 
 		
 	def setLocation(self, location):

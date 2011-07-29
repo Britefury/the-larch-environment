@@ -13,7 +13,7 @@ from BritefuryJ.Editor.RichText import RichTextEditor
 
 from Britefury.Util.Abstract import abstractmethod
 
-from LarchCore.Worksheet.WorksheetEditor2 import EditorSchema
+from LarchCore.Worksheet.WorksheetEditor import EditorSchema
 from LarchCore.Worksheet import AbstractViewSchema
 from LarchCore.Worksheet import Schema
 

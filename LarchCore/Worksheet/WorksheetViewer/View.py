@@ -45,7 +45,7 @@ from LarchCore.Languages.Python25.Execution.ExecutionPresCombinators import exec
 
 from LarchCore.Worksheet import Schema
 from LarchCore.Worksheet.WorksheetViewer import ViewSchema
-from LarchCore.Worksheet.WorksheetEditor2.View import WorksheetEditor2Subject
+from LarchCore.Worksheet.WorksheetEditor.View import WorksheetEditorSubject
 
 
 
@@ -215,7 +215,7 @@ class WorksheetViewerSubject (Subject):
 		self._editLocation = self._location + '.edit'
 		self._title = title
 		
-		self.edit = WorksheetEditor2Subject( document, model, self, self._editLocation, title )
+		self.edit = WorksheetEditorSubject( document, model, self, self._editLocation, title )
 
 	
 	def _getModelView(self):
