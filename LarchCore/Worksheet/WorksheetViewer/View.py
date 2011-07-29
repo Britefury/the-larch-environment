@@ -45,7 +45,6 @@ from LarchCore.Languages.Python25.Execution.ExecutionPresCombinators import exec
 
 from LarchCore.Worksheet import Schema
 from LarchCore.Worksheet.WorksheetViewer import ViewSchema
-from LarchCore.Worksheet.WorksheetEditor.View import WorksheetEditorSubject
 from LarchCore.Worksheet.WorksheetEditor2.View import WorksheetEditor2Subject
 
 
@@ -78,12 +77,10 @@ class WorksheetViewer (ObjectDispatchView):
 		bodyView = InnerFragment( node.getBody() )
 		
 		editLocation = fragment.getSubjectContext()['editLocation']
-		edit2Location = fragment.getSubjectContext()['edit2Location']
 
 		homeLink = Hyperlink( 'HOME PAGE', Location( '' ) )
 		editLink = Hyperlink( 'Edit this worksheet', editLocation )
-		edit2Link = Hyperlink( 'EDIT2', edit2Location )
-		linkHeader = SplitLinkHeaderBar( [ editLink, edit2Link ], [ homeLink ] )
+		linkHeader = SplitLinkHeaderBar( [ editLink ], [ homeLink ] )
 		
 		w = Page( [ linkHeader, bodyView ] )
 		w = w.withContextMenuInteractor( _worksheetContextMenuFactory )
@@ -216,11 +213,9 @@ class WorksheetViewerSubject (Subject):
 		self._enclosingSubject = enclosingSubject
 		self._location = location
 		self._editLocation = self._location + '.edit'
-		self._edit2Location = self._location + '.edit2'
 		self._title = title
 		
-		self.edit = WorksheetEditorSubject( document, model, self, self._editLocation, title )
-		self.edit2 = WorksheetEditor2Subject( document, model, self, self._editLocation, title )
+		self.edit = WorksheetEditor2Subject( document, model, self, self._editLocation, title )
 
 	
 	def _getModelView(self):
@@ -240,7 +235,7 @@ class WorksheetViewerSubject (Subject):
 		return self._title + ' [WsView]'
 	
 	def getSubjectContext(self):
-		return self._enclosingSubject.getSubjectContext().withAttrs( location=self._location, editLocation=Location( self._editLocation ), edit2Location=Location( self._edit2Location ), viewLocation=Location( self._location ) )
+		return self._enclosingSubject.getSubjectContext().withAttrs( location=self._location, editLocation=Location( self._editLocation ), viewLocation=Location( self._location ) )
 	
 	def getChangeHistory(self):
 		return self._document.getChangeHistory()
