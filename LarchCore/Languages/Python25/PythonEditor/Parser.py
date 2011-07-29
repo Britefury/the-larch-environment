@@ -124,7 +124,7 @@ class Python25Grammar (Grammar):
 		return ( Suppress( Literal( 'r' )  |  Literal( 'R' ) ) + doubleQuotedString ).action( lambda input, begin, end, xs, bindings: Schema.StringLiteral( format='ascii-regex', quotation='double', value=xs[0][1:-1] ) )
 
 	@Rule
-	def regexUnicodeStringSLiteral(sefl):
+	def regexUnicodeStringSLiteral(self):
 		return ( Suppress( Literal( 'ur' )  |  Literal( 'uR' )  |  Literal( 'Ur' )  |  Literal( 'UR' ) ) + singleQuotedString ).action(
 			lambda input, begin, end, xs, bindings: Schema.StringLiteral( format='unicode-regex', quotation='single', value=xs[0][1:-1] ) )
 
@@ -379,7 +379,7 @@ class Python25Grammar (Grammar):
 	# Subscript and slice
 	@Rule
 	def subscriptSlice(self):
-		return ( ( Optional( self.expression() ) + ':' + Optional( self.expression() )  ).action( lambda input, begin, end, xs, bindings: Schema.SubscriptSlice( lower=xs[0], upper=xs[2] ) ) )
+		return ( Optional( self.expression() ) + ':' + Optional( self.expression() )  ).action( lambda input, begin, end, xs, bindings: Schema.SubscriptSlice( lower=xs[0], upper=xs[2] ) )
 
 	@Rule
 	def subscriptLongSlice(self):

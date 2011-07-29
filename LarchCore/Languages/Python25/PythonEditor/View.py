@@ -531,18 +531,18 @@ class Python25View (ObjectNodeDispatchView):
 	def IntLiteral(self, fragment, inheritedState, model, format, numType, value):
 		boxContents = []
 
-		if numType == 'int':
-			if format == 'decimal':
-				valueString = '%d'  %  int( value )
-			elif format == 'hex':
-				valueString = '0x%x'  %  int( value, 16 )
-			fmt = None
-		elif numType == 'long':
-			if format == 'decimal':
-				valueString = '%d'  %  long( value )
-			elif format == 'hex':
+		if numType == 'long':
+			if format == 'hex':
 				valueString = '0x%x'  %  long( value, 16 )
+			else:
+				valueString = '%d'  %  long( value )
 			fmt = 'L'
+		else:
+			if format == 'hex':
+				valueString = '0x%x'  %  int( value, 16 )
+			else:
+				valueString = '%d'  %  int( value )
+			fmt = None
 
 		return intLiteral( fmt, valueString )
 

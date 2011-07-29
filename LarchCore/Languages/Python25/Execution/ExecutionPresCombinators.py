@@ -111,14 +111,14 @@ def minimalExecutionResultBox(stdoutText, stderrText, exception, resultInTuple, 
 	else:
 		boxContents = []
 		if stderrText is not None:
-			boxContents.append( execStderr( stderrText ) )
+			boxContents.append( execStderr( stderrText, bUseDefaultPerspectiveForResult ) )
 		if exception is not None:
 			exceptionView = InnerFragment( exception )
 			if bUseDefaultPerspecitveForException:
 				exceptionView = ApplyPerspective.defaultPerspective( exceptionView )
 			boxContents.append( execException( exceptionView ) )
 		if stdoutText is not None:
-			boxContents.append( execStdout( stdoutText ) )
+			boxContents.append( execStdout( stdoutText, bUseDefaultPerspectiveForResult ) )
 		if resultInTuple is not None:
 			resultView = InnerFragment( resultInTuple[0] ).alignHPack()
 			if bUseDefaultPerspectiveForResult:

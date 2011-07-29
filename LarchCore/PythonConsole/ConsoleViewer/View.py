@@ -190,8 +190,7 @@ class ConsoleView (ObjectDispatchView):
 		caughtExceptionView = ApplyPerspective.defaultPerspective( InnerFragment( caughtException ) )   if caughtException is not None   else None
 		resultView = ApplyPerspective.defaultPerspective( InnerFragment( result[0] ) )   if result is not None   else None
 			
-		blockContents = []
-		blockContents.append( _pythonModuleBorderStyle.applyTo( Border( moduleView.alignHExpand() ).alignHExpand() ) )
+		blockContents = [ _pythonModuleBorderStyle.applyTo( Border( moduleView.alignHExpand() ).alignHExpand() ) ]
 		if stderr is not None:
 			blockContents.append( execStderr( stderr, True ) )
 		if caughtExceptionView is not None:

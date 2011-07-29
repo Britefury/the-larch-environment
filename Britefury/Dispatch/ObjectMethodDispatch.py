@@ -5,13 +5,6 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from BritefuryJ.Dispatch import ObjectPyMethodDispatch
-
-from Britefury.Dispatch.ObjectMethodDispatch_base import ObjectDispatchMethodWrapper
-
-
-
-
 """
 Defines a metaclass for dispatching method calls based on node classes of DMObject instances,
 and a dispatch function.
@@ -52,6 +45,13 @@ To dispatch, call:
 		node - the node to use as the dispatch 'key'
 		args - additional arguments to be supplied to the method from @dispatchInstance that is invoked
 """
+
+
+from BritefuryJ.Dispatch import ObjectPyMethodDispatch
+
+from Britefury.Dispatch.ObjectMethodDispatch_base import ObjectDispatchMethodWrapper
+
+
 
 
 

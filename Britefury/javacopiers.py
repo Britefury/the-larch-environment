@@ -5,11 +5,12 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
-from java.awt import Color
-
 """
 Monkeypatch copiers for various Java objects.
 """
+
+from java.awt import Color
+
 
 
 def _immutable__copy__(self):
