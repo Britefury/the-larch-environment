@@ -56,35 +56,27 @@ class _Projection (object):
 class WorksheetView (AbstractViewSchema.WorksheetAbstractView):
 	_projection = _Projection()
 
-	def __init__(self, worksheet, model):
-		super( WorksheetView, self ).__init__( worksheet, model )
-
 		
 
 class BodyView (AbstractViewSchema.BodyAbstractView):
-	def __init__(self, worksheet, model):
-		super( BodyView, self ).__init__( worksheet, model )
+	pass
 
 		
 
 class ParagraphView (AbstractViewSchema.ParagraphAbstractView):
-	def __init__(self, worksheet, model):
-		super( ParagraphView, self ).__init__( worksheet, model )
+	pass
 
 		
 		
 class TextSpanView (AbstractViewSchema.TextSpanAbstractView):
-	def __init__(self, worksheet, model):
-		super( TextSpanView, self ).__init__( worksheet, model )
+	pass
 
 		
 		
 class PythonCodeView (AbstractViewSchema.PythonCodeAbstractView):
-	def __init__(self, worksheet, model):
-		super( PythonCodeView, self ).__init__( worksheet, model )
+	pass
 
 	
 	
 class QuoteLocationView (AbstractViewSchema.QuoteLocationAbstractView):
-	def __init__(self, worksheet, model):
-		super( QuoteLocationView, self ).__init__( worksheet, model )
+	pass
