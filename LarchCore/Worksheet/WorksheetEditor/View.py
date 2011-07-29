@@ -252,6 +252,8 @@ class WorksheetEditor (ObjectDispatchView):
 			p = Heading6( text )
 		elif style == 'title':
 			p = TitleBar( text )
+		else:
+			p = NormalText( text )
 		p = WorksheetRichTextEditor.instance.editableParagraph( node, p )
 		p = p.withElementInteractor( ParagraphNodeInteractor.instance )
 		return p
@@ -276,6 +278,8 @@ class WorksheetEditor (ObjectDispatchView):
 			p = Heading6( '' )
 		elif style == 'title':
 			p = TitleBar( '' )
+		else:
+			p = NormalText( '' )
 		p = WorksheetRichTextEditor.instance.editableParagraph( node, p )
 		p = p.withElementInteractor( ParagraphNodeInteractor.instance )
 		return p
@@ -336,8 +340,8 @@ class WorksheetEditor (ObjectDispatchView):
 		                Row( [ Label( 'Python code' ) ] ).alignHLeft(),
 		                Row( [ styleOptionMenu, deleteButton.alignVCentre() ] ).alignHRight() ] ) ).pad( 2.0, 2.0 ) ) )
 		
-		boxContents = [ headerBox ]
-		boxContents.append( _pythonCodeBorderStyle.applyTo( Border( codeView ) ) )
+		boxContents = [ headerBox,
+				_pythonCodeBorderStyle.applyTo( Border( codeView ) ) ]
 		if executionResultView is not None:
 			boxContents.append( executionResultView.alignHExpand() )
 		box = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( Column( boxContents ) )
@@ -384,8 +388,8 @@ class WorksheetEditor (ObjectDispatchView):
 		                locationEditor.alignHExpand(),
 		                Row( [ styleOptionMenu, deleteButton.alignVCentre() ] ).alignHRight() ] ) ).pad( 2.0, 2.0 ) ) )
 		
-		boxContents = [ headerBox ]
-		boxContents.append( _quoteLocationBorderStyle.applyTo( Border( targetView ) ) )
+		boxContents = [ headerBox,
+				_quoteLocationBorderStyle.applyTo( Border( targetView ) ) ]
 		box = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( Column( boxContents ) )
 		
 		p = _quoteLocationEditorBorderStyle.applyTo( Border( box ).alignHExpand() )

@@ -17,7 +17,7 @@ from LarchCore.Project import ProjectEditor
 
 
 class ProjectRoot (ProjectContainer):
-	def __init__(self, packageName=None, contents=[]):
+	def __init__(self, packageName=None, contents=None):
 		super( ProjectRoot, self ).__init__( contents )
 		self._pythonPackageName = packageName
 	

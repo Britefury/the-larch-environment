@@ -14,7 +14,7 @@ class FrameTestApp (object):
 	def __init__(self, title, component):
 		self._frame = JFrame( title )
 		
-		self._frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
+		self._frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE )
 		
 		self._frame.setPreferredSize( Dimension( 640, 480 ) )
 		

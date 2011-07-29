@@ -38,7 +38,7 @@ class _Importer (object):
 	
 def _extractParameters(node):
 	numDefaultParams = len( node.defaults )
-	numSimpleParams = len( node.args )  -  ( numDefaultParams )
+	numSimpleParams = len( node.args )  -  numDefaultParams
 	
 	params = [ Schema.SimpleParam( name=name.id )   for name in node.args[:numSimpleParams] ]
 	params.extend( [ Schema.DefaultValueParam( name=name.id, defaultValue=_expr( value ) )   for name, value in zip( node.args[numSimpleParams:], node.defaults ) ] )

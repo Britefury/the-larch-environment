@@ -95,11 +95,11 @@ class DMListSetCommand (ChangeHistory.Command):
 
 
 	def canJoinWith(self, command):
-		"Determine if @command can be joined with @self"
+		"""Determine if @command can be joined with @self"""
 		return isinstance( command, DMListSetCommand )  and  self._ls is command._ls  and  not self._bFinished
 
 	def joinWith(self, command):
-		"Join @command with @self, where @command took place after @self, and the result should go into @self"
+		"""Join @command with @self, where @command took place after @self, and the result should go into @self"""
 		self._contents = command._contents
 
 

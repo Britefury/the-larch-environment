@@ -113,6 +113,8 @@ class WorksheetViewer (ObjectDispatchView):
 			p = Heading6( text )
 		elif style == 'title':
 			p = TitleBar( text )
+		else:
+			p = NormalText( text )
 		return p
 
 
@@ -169,8 +171,8 @@ class WorksheetViewer (ObjectDispatchView):
 				StyleSheet.instance.withAttr( Primitive.rowSpacing, 20.0 ).applyTo( Row(
 			                [ Label( 'Location: ' ).alignHExpand(), Label( node.getLocation() ) ] ) ).alignHExpand().pad( 2.0, 2.0 ) ) )
 			
-			boxContents = [ headerBox.alignHExpand() ]
-			boxContents.append( _quoteLocationBorderStyle.applyTo( Border( targetView.alignHExpand() ).alignHExpand() ) )
+			boxContents = [ headerBox.alignHExpand(),
+					_quoteLocationBorderStyle.applyTo( Border( targetView.alignHExpand() ).alignHExpand() ) ]
 			box = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( Column( boxContents ) )
 			
 			return _quoteLocationEditorBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
