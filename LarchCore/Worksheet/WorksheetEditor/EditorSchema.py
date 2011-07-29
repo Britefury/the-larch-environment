@@ -61,10 +61,6 @@ class _Projection (object):
 class WorksheetEditor (AbstractViewSchema.WorksheetAbstractView):
 	_projection = _Projection()
 
-	
-	def __init__(self, worksheet, model):
-		super( WorksheetEditor, self ).__init__( worksheet, model )
-
 		
 
 
