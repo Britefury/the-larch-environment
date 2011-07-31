@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
+import sys
+
 from java.awt import Color
 
 from java.awt.event import KeyEvent
@@ -42,6 +44,8 @@ from BritefuryJ.Projection import Perspective, Subject
 from LarchCore.Languages.Python25 import Python25
 from LarchCore.Languages.Python25.CodeGenerator import compileForModuleExecution
 from LarchCore.Languages.Python25.Execution.ExecutionPresCombinators import executionResultBox, minimalExecutionResultBox
+
+from LarchCore.Project.ProjectEditor.Subject import ProjectSubject
 
 from LarchCore.Worksheet import Schema
 from LarchCore.Worksheet.WorksheetViewer import ViewSchema
@@ -190,6 +194,11 @@ class _WorksheetModuleLoader (object):
 		self._document = document
 		
 	def load_module(self, fullname):
+		try:
+			return sys.modules[fullname]
+		except KeyError:
+			pass
+
 		mod = self._document.newModule( fullname, self )
 		
 		sources = []
@@ -206,7 +215,7 @@ class _WorksheetModuleLoader (object):
 
 
 class WorksheetViewerSubject (Subject):
-	def __init__(self, document, model, enclosingSubject, location, title):
+	def __init__(self, document, model, enclosingSubject, location, importName, title):
 		super( WorksheetViewerSubject, self ).__init__( enclosingSubject )
 		assert isinstance( location, Location )
 		self._document = document
@@ -215,15 +224,16 @@ class WorksheetViewerSubject (Subject):
 		self._modelView = None
 		self._enclosingSubject = enclosingSubject
 		self._location = location
+		self._importName = importName
 		self._editLocation = self._location + '.edit'
 		self._title = title
 		
-		self.edit = WorksheetEditorSubject( document, model, self, self._editLocation, title )
+		self.edit = WorksheetEditorSubject( document, model, self, self._editLocation, self._importName, title )
 
 	
 	def _getModelView(self):
 		if self._modelView is None:
-			self._modelView = ViewSchema.WorksheetView( None, self._model )
+			self._modelView = ViewSchema.WorksheetView( None, self._model, self._importName )
 		return self._modelView
 		
 	

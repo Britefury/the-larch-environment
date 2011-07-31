@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2010.
 ##-*************************
+import sys
+
 from LarchCore.Project.ProjectPackage import ProjectPackage
 from LarchCore.Project.ProjectPage import ProjectPage
 
@@ -22,13 +24,18 @@ class _PackageLoader (object):
 		
 
 	def load_module(self, fullname):
+		try:
+			return sys.modules[fullname]
+		except KeyError:
+			pass
+
 		# First, see if there is an '__init__; page
 		initPage = self._package.contentsMap.get( '__init__' )
 		
-		if initPage is not None and initPage.isInstanceOf( Schema.Page ):
+		if initPage is not None and isinstance( initPage, ProjectPage ):
 			# We have found a page called '__init__' - get its subject
 			modelLocation = self._packageLocation + '.__init__'
-			pageSubject = self._projectSubject._document.newModelSubject( initPage.data, self._projectSubject, modelLocation, '__init__' )
+			pageSubject = self._projectSubject._document.newModelSubject( initPage.data, self._projectSubject, modelLocation, fullname + '.__init__', '__init__' )
 			# Now, check if it has a 'createModuleLoader' method - if it has, then we can use it. Otherwise, use the default
 			try:
 				createModuleLoader = pageSubject.createModuleLoader
@@ -56,8 +63,7 @@ class ModuleFinder (object):
 		
 		while suffix != '':
 			prefix, dot, suffix = suffix.partition( '.' )
-			bFoundItem = False
-			
+
 			item = model.contentsMap.get( prefix )
 
 			if item is not None:
@@ -67,7 +73,7 @@ class ModuleFinder (object):
 				if isinstance( model, ProjectPage ):
 					if suffix == '':
 						# We have found a page: get its subject
-						pageSubject = self._projectSubject._document.newModelSubject( model.data, self._projectSubject, modelLocation, prefix )
+						pageSubject = self._projectSubject._document.newModelSubject( model.data, self._projectSubject, modelLocation, fullname, prefix )
 						# Now, check if it has a 'createModuleLoader' method - if it has, then we can use it. Otherwise, we can't
 						try:
 							createModuleLoader = pageSubject.createModuleLoader
@@ -87,11 +93,11 @@ class ModuleFinder (object):
 						# Still path to consume; exit into the traversal while-loop
 						continue
 				else:
-					raise TypeError, 'unreckognised model type'
+					raise TypeError, 'unrecognised model type'
 			else:
 				return None
 
-		# Ran out of name to comsume, ERROR
+		# Ran out of name to consume, ERROR
 		raise ValueError, 'Name \'%s\' consumed, target not found' % namesuffix
 
 
@@ -102,6 +108,11 @@ class _RootModuleLoader (object):
 		self._document = document
 
 	def load_module(self, fullname):
+		try:
+			return sys.modules[fullname]
+		except KeyError:
+			pass
+
 		return self._document.newModule( fullname, self )
 	
 

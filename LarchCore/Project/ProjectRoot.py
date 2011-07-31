@@ -38,8 +38,8 @@ class ProjectRoot (ProjectContainer):
 		return ProjectRoot( self._pythonPackageName, [ deepcopy( x, memo )   for x in self ] )
 	
 	
-	def __new_subject__(self, document, enclosingSubject, location, title):
-		return ProjectEditor.Subject.ProjectSubject( document, self, enclosingSubject, location, title )
+	def __new_subject__(self, document, enclosingSubject, location, importName, title):
+		return ProjectEditor.Subject.ProjectSubject( document, self, enclosingSubject, location, importName, title )
 
 		
 	def getPythonPackageName(self):

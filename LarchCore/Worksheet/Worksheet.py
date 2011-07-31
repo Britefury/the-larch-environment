@@ -21,8 +21,8 @@ class WorksheetPageData (PageData):
 	def makeEmptyContents(self):
 		return newWorksheet()
 	
-	def __new_subject__(self, document, enclosingSubject, location, title):
-		return WorksheetViewerSubject( document, self.contents, enclosingSubject, location, title )
+	def __new_subject__(self, document, enclosingSubject, location, importName, title):
+		return WorksheetViewerSubject( document, self.contents, enclosingSubject, location, importName, title )
 
 	
 registerPageFactory( 'Worksheet', WorksheetPageData, 'Worksheet' )

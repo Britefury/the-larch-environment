@@ -127,11 +127,11 @@ class Document (ChangeHistoryListener):
 	
 	
 	
-	def newSubject(self, enclosingSubject, location, title):
-		return self.newModelSubject( self._contents, enclosingSubject, location, title )
+	def newSubject(self, enclosingSubject, location, importName, title):
+		return self.newModelSubject( self._contents, enclosingSubject, location, importName, title )
 
-	def newModelSubject(self, model, enclosingSubject, location, title):
-		return model.__new_subject__( self, enclosingSubject, location, title )
+	def newModelSubject(self, model, enclosingSubject, location, importName, title):
+		return model.__new_subject__( self, enclosingSubject, location, importName, title )
 
 		
 	

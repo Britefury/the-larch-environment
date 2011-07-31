@@ -5,8 +5,6 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from copy import deepcopy
-
 from java.lang import Throwable
 
 from java.awt.event import KeyEvent
@@ -15,13 +13,7 @@ from java.util import List
 
 from BritefuryJ.Parser import ParserExpression
 
-from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod
-
 from Britefury.Kernel.View.DispatchView import ObjectNodeDispatchView
-
-
-from Britefury.Util.NodeUtil import *
-from Britefury.Util.InstanceCache import instanceCache
 
 
 from BritefuryJ.DocModel import DMObjectClass

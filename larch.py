@@ -6,7 +6,6 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
 import sys
-import os
 
 from javax.swing import UIManager
 

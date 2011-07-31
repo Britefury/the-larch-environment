@@ -29,8 +29,9 @@ class AppState (object):
 		return copy( self._openDocuments )
 	
 	def registerOpenDocument(self, document, documentCollectionLocation):
+		assert isinstance( documentCollectionLocation, Location )
 		relativeLocation = 'Doc%03d'  %  ( self._documentIDCounter, )
-		location = Location( documentCollectionLocation + '.' + relativeLocation )
+		location = documentCollectionLocation + '.' + relativeLocation
 		self._documentIDCounter += 1
 		appDocument = AppDocument( document, relativeLocation )
 		document.setLocation( location )

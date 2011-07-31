@@ -101,8 +101,8 @@ class Python25PageData (PageData):
 	def makeEmptyContents(self):
 		return py25NewModule()
 	
-	def __new_subject__(self, document, enclosingSubject, location, title):
-		return Python25Subject( document, self.contents, enclosingSubject, location, title )
+	def __new_subject__(self, document, enclosingSubject, location, importName, title):
+		return Python25Subject( document, self.contents, enclosingSubject, location, importName, title )
 
 
 def _py25ImportPage(filename):

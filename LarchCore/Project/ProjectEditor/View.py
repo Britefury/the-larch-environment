@@ -60,9 +60,10 @@ def _ProjectViewState(location):
 
 
 
-def _joinLocation(*xs):
-	s = '.'.join( [ str( x )   for x in xs ] )
-	return Location( s )
+def _joinLocation(a, *xs):
+	for x in xs:
+		a = a + '.' + x
+	return a
 
 
 

@@ -5,15 +5,11 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from weakref import WeakValueDictionary
-
 from java.lang import Object, System
 from java.io import IOException
 from java.util import List
 from java.awt.event import KeyEvent
 from java.awt import Color
-
-from Britefury.Util.Abstract import abstractmethod
 
 from BritefuryJ.DocModel import DMList, DMObject, DMObjectInterface
 
@@ -29,13 +25,6 @@ from BritefuryJ.Logging import LogEntry
 from BritefuryJ.Editor.Sequential import SequentialEditor, SelectionEditTreeEvent, EditListener
 from BritefuryJ.Editor.Sequential.StreamEditListener import HandleEditResult
 from BritefuryJ.Editor.SyntaxRecognizing import ParsingEditListener, PartialParsingEditListener, UnparsedEditListener, TopLevelEditListener
-
-
-
-from Britefury.Util.NodeUtil import *
-
-
-from Britefury.Kernel.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
 
 
 
