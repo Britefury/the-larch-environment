@@ -46,14 +46,16 @@ class NodeAbstractView (object):
 class WorksheetAbstractView (NodeAbstractView):
 	_projection = None
 
-	def __init__(self, worksheet, model):
+	def __init__(self, worksheet, model, importName):
 		super( WorksheetAbstractView, self ).__init__( worksheet, model )
 		self._modelToView = WeakValueDictionary()
+		self._importName = importName
 		self.refreshResults()
 		
 		
 	def _initModule(self):
-		self._module = imp.new_module( 'worksheet' )
+		name = self._importName   if self._importName is not None   else 'worksheet'
+		self._module = imp.new_module( name )
 		LoadBuiltins.loadBuiltins( self._module )
 		
 		

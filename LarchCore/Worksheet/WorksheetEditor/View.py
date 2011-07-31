@@ -43,6 +43,8 @@ from BritefuryJ.Editor.Sequential.Item import *
 from LarchCore.Languages.Python25 import Python25
 from LarchCore.Languages.Python25.Execution.ExecutionPresCombinators import executionResultBox, minimalExecutionResultBox
 
+from LarchCore.Project.ProjectEditor.Subject import ProjectSubject
+
 from LarchCore.Worksheet.WorksheetEditor import EditorSchema
 from LarchCore.Worksheet.WorksheetEditor.RichTextEditor import WorksheetRichTextEditor
 
@@ -405,7 +407,7 @@ perspective2 = SequentialEditorPerspective( _view.fragmentViewFunction, Workshee
 
 
 class WorksheetEditorSubject (Subject):
-	def __init__(self, document, model, enclosingSubject, location, title):
+	def __init__(self, document, model, enclosingSubject, location, importName, title):
 		super( WorksheetEditorSubject, self ).__init__( enclosingSubject )
 		assert isinstance( location, Location )
 		self._document = document
@@ -414,12 +416,13 @@ class WorksheetEditorSubject (Subject):
 		self._modelView = None
 		self._enclosingSubject = enclosingSubject
 		self._location = location
+		self._importName = importName
 		self._title = title
 
 
 	def _getModelView(self):
 		if self._modelView is None:
-			self._modelView = EditorSchema.WorksheetEditor( None, self._model )
+			self._modelView = EditorSchema.WorksheetEditor( None, self._model, self._importName )
 		return self._modelView
 		
 	

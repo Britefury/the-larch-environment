@@ -5,11 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from weakref import WeakValueDictionary
-
 import copy
-
-import cPickle
 
 
 from java.lang import Object
@@ -17,8 +13,6 @@ from java.io import IOException
 from java.util import List
 from java.awt.event import KeyEvent
 from java.awt.datatransfer import UnsupportedFlavorException, DataFlavor, StringSelection, Transferable
-
-from Britefury.Util.Abstract import abstractmethod
 
 from BritefuryJ.DocModel import DMList, DMObject, DMObjectInterface, DMNode
 
@@ -29,10 +23,6 @@ from BritefuryJ.DocPresent.Selection import TextSelection
 from BritefuryJ.DocPresent import *
 
 from BritefuryJ.DocPresent.StreamValue import StreamValueBuilder, StreamValue
-
-
-from Britefury.Util.NodeUtil import *
-
 
 
 

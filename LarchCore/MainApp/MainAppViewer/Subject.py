@@ -45,7 +45,7 @@ class _DocumentListSubject (object):
 		for appDocument in self._appState.getOpenDocuments():
 			if appDocument.getRelativeLocation() == relativeLocation:
 				doc = appDocument.getDocument()
-				return doc.newSubject( self._enclosingSubject, self._enclosingSubject._rootLocation + '.documents.' + relativeLocation, appDocument.getName() )
+				return doc.newSubject( self._enclosingSubject, self._enclosingSubject._rootLocation + '.documents.' + relativeLocation, None, appDocument.getName() )
 		raise AttributeError, 'no document at %s'  %  ( location, )
 		
 
@@ -85,7 +85,7 @@ class MainAppSubject (Subject):
 	def find_module(self, fullname, path, document):
 		for appDocument in self._appState.getOpenDocuments():
 			doc = appDocument.getDocument()
-			subject = doc.newSubject( self, self._rootLocation + '.documents.' + appDocument.getRelativeLocation(), appDocument.getName() )
+			subject = doc.newSubject( self, self._rootLocation + '.documents.' + appDocument.getRelativeLocation(), None, appDocument.getName() )
 			try:
 				f = subject.find_module
 			except AttributeError:

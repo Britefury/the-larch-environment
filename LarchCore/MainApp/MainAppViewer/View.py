@@ -116,7 +116,7 @@ class AppView (ObjectDispatchView):
 				name = _newDocumentName( openDocuments )
 				document.setDocumentName( name )
 				
-				appDoc = node.registerOpenDocument( document, fragment.getSubjectContext()['location'].getLocationString() + '.documents' )
+				appDoc = node.registerOpenDocument( document, fragment.getSubjectContext()['location'] + '.documents' )
 				
 			element = link.getElement()
 			openDocuments = node.getOpenDocuments()
@@ -128,7 +128,7 @@ class AppView (ObjectDispatchView):
 			
 		def _onOpenDoc(link, event):
 			def handleOpenedDocumentFn(fullPath, document):
-				appDoc = node.registerOpenDocument( document, fragment.getSubjectContext()['location'].getLocationString() + '.documents' )
+				appDoc = node.registerOpenDocument( document, fragment.getSubjectContext()['location'] + '.documents' )
 
 				
 			element = link.getElement()
@@ -144,7 +144,7 @@ class AppView (ObjectDispatchView):
 				filename = str( filename )
 				
 				document = Document.readFile( world, filename )
-				node.registerOpenDocument( document, fragment.getSubjectContext()['location'].getLocationString() + '.documents' )
+				node.registerOpenDocument( document, fragment.getSubjectContext()['location'] + '.documents' )
 			return True
 
 		
