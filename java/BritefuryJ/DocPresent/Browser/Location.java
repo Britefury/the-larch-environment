@@ -91,7 +91,7 @@ public class Location implements Presentable
 	
 	public String toString()
 	{
-		return locationString;
+		return "Location(" + locationString + ")";
 	}
 	
 	public boolean equals(Object x)

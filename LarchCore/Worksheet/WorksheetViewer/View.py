@@ -208,6 +208,7 @@ class _WorksheetModuleLoader (object):
 class WorksheetViewerSubject (Subject):
 	def __init__(self, document, model, enclosingSubject, location, title):
 		super( WorksheetViewerSubject, self ).__init__( enclosingSubject )
+		assert isinstance( location, Location )
 		self._document = document
 		self._model = model
 		# Defer the creation of the model view - it involves executing all the code in the worksheet which can take some time
@@ -237,7 +238,7 @@ class WorksheetViewerSubject (Subject):
 		return self._title + ' [WsView]'
 	
 	def getSubjectContext(self):
-		return self._enclosingSubject.getSubjectContext().withAttrs( location=self._location, editLocation=Location( self._editLocation ), viewLocation=Location( self._location ) )
+		return self._enclosingSubject.getSubjectContext().withAttrs( location=self._location, editLocation=self._editLocation, viewLocation=self._location )
 	
 	def getChangeHistory(self):
 		return self._document.getChangeHistory()

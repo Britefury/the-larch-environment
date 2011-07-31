@@ -178,7 +178,7 @@ public class ProjectiveBrowserContext
 	
 	
 	private static final Pattern separator = Pattern.compile( Pattern.quote( "." ) );
-	private static final Pattern identifier = Pattern.compile( "[a-zA-Z_][a-zA-Z0-9_]++" );
+	private static final Pattern identifier = Pattern.compile( "[a-zA-Z_][a-zA-Z0-9_]*" );
 	private static final PyString resolveName = Py.newString( "__resolve__".intern() );
 
 	private Object evaluateLocationString(Location location)
@@ -364,7 +364,7 @@ public class ProjectiveBrowserContext
 			StyleSheet contentsStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 16 );
 			StyleSheet validSyntaxStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 14 );
 			
-			Pres errorTitle = titleStyle.applyTo( new Label( "Invalid location string syntax invalid" ) );
+			Pres errorTitle = titleStyle.applyTo( new Label( "Invalid location syntax" ) );
 			Pres loc = contentsStyle.applyTo( new StaticText( location ) );
 			Pres validSyntax = validSyntaxStyle.applyTo( new Label( "Valid syntax: dot separated identifiers" ) );
 			Pres body = new Body( new Pres[] { errorTitle.alignHCentre(), loc.alignHCentre(), validSyntax.alignHCentre() } );

@@ -26,6 +26,7 @@ def _getSuiteStmtByName(suite, name):
 class _MemberSubject (Subject):
 	def __init__(self, model, pythonSubject, location, name):
 		super( _MemberSubject, self ).__init__( pythonSubject )
+		assert isinstance( location, Location )
 		self._model = model
 		self._pythonSubject = pythonSubject
 		self._location = location
@@ -80,6 +81,7 @@ class _Python25ModuleLoader (object):
 class Python25Subject (Subject):
 	def __init__(self, document, model, enclosingSubject, location, title):
 		super( Python25Subject, self ).__init__( enclosingSubject )
+		assert isinstance( location, Location )
 		self._document = document
 		self._model = model
 		self._enclosingSubject = enclosingSubject
