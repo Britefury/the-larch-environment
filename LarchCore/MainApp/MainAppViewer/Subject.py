@@ -45,13 +45,14 @@ class _DocumentListSubject (object):
 		for appDocument in self._appState.getOpenDocuments():
 			if appDocument.getRelativeLocation() == relativeLocation:
 				doc = appDocument.getDocument()
-				return doc.newSubject( self._enclosingSubject, self._enclosingSubject._rootLocation.getLocationString() + '.documents.' + relativeLocation, appDocument.getName() )
+				return doc.newSubject( self._enclosingSubject, self._enclosingSubject._rootLocation + '.documents.' + relativeLocation, appDocument.getName() )
 		raise AttributeError, 'no document at %s'  %  ( location, )
 		
 
 class MainAppSubject (Subject):
 	def __init__(self, appState, world, rootLocation):
 		super( MainAppSubject, self ).__init__( None )
+		assert isinstance( rootLocation, Location )
 		self._appState = appState
 		self._world = world
 		self._rootLocation = rootLocation
@@ -75,7 +76,7 @@ class MainAppSubject (Subject):
 	def loadDocument(self, filename):
 		document = Document.readFile( self._world, filename )
 		if document is not None:
-			self._appState.registerOpenDocument( document, self._rootLocation.getLocationString() + '.documents' )
+			self._appState.registerOpenDocument( document, self._rootLocation + '.documents' )
 			return document
 		return None
 		
@@ -84,7 +85,7 @@ class MainAppSubject (Subject):
 	def find_module(self, fullname, path, document):
 		for appDocument in self._appState.getOpenDocuments():
 			doc = appDocument.getDocument()
-			subject = doc.newSubject( self, self._rootLocation.getLocationString() + '.documents.' + appDocument.getRelativeLocation(), appDocument.getName() )
+			subject = doc.newSubject( self, self._rootLocation + '.documents.' + appDocument.getRelativeLocation(), appDocument.getName() )
 			try:
 				f = subject.find_module
 			except AttributeError:

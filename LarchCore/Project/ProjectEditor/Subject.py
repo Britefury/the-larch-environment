@@ -64,6 +64,7 @@ _projectCommands = CommandSet( 'LarchCore.Project.Save', [ _saveCommand, _saveAs
 
 class _PackageSubject (object):
 	def __init__(self, projectSubject, model, location):
+		assert isinstance( location, Location )
 		self._projectSubject = projectSubject
 		self._model = model
 		self._location = location
@@ -82,6 +83,7 @@ class _PackageSubject (object):
 
 class _IndexPage (object):
 	def __init__(self, model, perspective, projectPageLoc):
+		assert isinstance( projectPageLoc, Location )
 		self._model = model
 		self._perspective = perspective
 		self._projectPageLoc = projectPageLoc
@@ -94,6 +96,7 @@ class _IndexPage (object):
 class _ProjectIndexSubject (Subject):
 	def __init__(self, indexSubject, enclosingSubject, projectLoc):
 		super( _ProjectIndexSubject, self ).__init__( enclosingSubject )
+		assert isinstance( projectLoc, Location )
 		self._indexSubject = indexSubject
 		self._page = _IndexPage( indexSubject.getFocus(), indexSubject.getPerspective(), projectLoc )
 	
@@ -123,6 +126,7 @@ class _ProjectIndexSubject (Subject):
 class _RootSubject (Subject):
 	def __init__(self, document, model, enclosingSubject, location, title):
 		super( _RootSubject, self ).__init__( enclosingSubject )
+		assert isinstance( location, Location )
 		self._document = document
 		self._model = model
 		self._enclosingSubject = enclosingSubject
@@ -141,7 +145,7 @@ class _RootSubject (Subject):
 		return self._title + ' [Prj]'
 
 	def getSubjectContext(self):
-		return self._enclosingSubject.getSubjectContext().withAttrs( document=self._document, docLocation=Location( self._location ), location=Location( self._location ) )
+		return self._enclosingSubject.getSubjectContext().withAttrs( document=self._document, docLocation=self._location, location=self._location )
 
 	def getChangeHistory(self):
 		return self._document.getChangeHistory()
@@ -165,6 +169,7 @@ class _RootSubject (Subject):
 class ProjectSubject (_RootSubject):
 	def __init__(self, document, model, enclosingSubject, location, title):
 		super( ProjectSubject, self ).__init__( document, model, enclosingSubject, location, title )
+		assert isinstance( location, Location )
 		self._moduleFinder = ModuleFinder( self )
 		self._rootFinder = RootFinder( self )
 		self._rootSubject = _RootSubject( document, model, enclosingSubject, location, title )
@@ -174,7 +179,7 @@ class ProjectSubject (_RootSubject):
 	def redirect(self):
 		index = self._model.contentsMap.get( 'index' )
 		if index is not None  and  isinstance( index, ProjectPage ):
-			return _ProjectIndexSubject( self.__resolve__( 'index' ), self._enclosingSubject, Location( self._location + '.___project___' ) )
+			return _ProjectIndexSubject( self.__resolve__( 'index' ), self._enclosingSubject, self._location + '.___project___' )
 		else:
 			return None
 	
