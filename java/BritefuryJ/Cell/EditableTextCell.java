@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.Cell;
 
+import java.awt.event.KeyEvent;
 import java.util.IdentityHashMap;
 
 import BritefuryJ.DocPresent.DPElement;
@@ -14,6 +15,8 @@ import BritefuryJ.DocPresent.TextEditEvent;
 import BritefuryJ.DocPresent.TreeEventListener;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Clipboard.TextClipboardHandler;
+import BritefuryJ.DocPresent.Interactor.CaretCrossingElementInteractor;
+import BritefuryJ.DocPresent.Interactor.KeyElementInteractor;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.TextSelection;
 import BritefuryJ.Pres.Pres;
@@ -27,7 +30,7 @@ public class EditableTextCell
 	{
 		TreeEventListener listener = cachedTreeEventListenerFor( textToValue );
 		Pres textPres = new Text( text );
-		textPres = textPres.withTreeEventListener( listener );
+		textPres = textPres.withElementInteractor( caretInteractor ).withElementInteractor( keyInteractor ).withTreeEventListener( listener );
 		return new Region( textPres, clipboardHandler );
 	}
 
@@ -36,7 +39,7 @@ public class EditableTextCell
 	{
 		TreeEventListener listener = treeEventListenerFor( textToValue );
 		Pres textPres = new Text( text );
-		textPres = textPres.withTreeEventListener( listener );
+		textPres = textPres.withElementInteractor( caretInteractor ).withElementInteractor( keyInteractor ).withTreeEventListener( listener );
 		return new Region( textPres, clipboardHandler );
 	}
 
@@ -73,6 +76,48 @@ public class EditableTextCell
 	};
 	
 	
+	private static final CaretCrossingElementInteractor caretInteractor = new CaretCrossingElementInteractor()
+	{
+		@Override
+		public void caretEnter(DPElement element, Caret c)
+		{
+		}
+
+		@Override
+		public void caretLeave(DPElement element, Caret c)
+		{
+			element.postTreeEvent( CommitEvent.instance );
+		}
+	};
+	
+	
+	private static final KeyElementInteractor keyInteractor = new KeyElementInteractor()
+	{
+		@Override
+		public boolean keyPressed(DPElement element, KeyEvent event)
+		{
+			return false;
+		}
+
+		@Override
+		public boolean keyReleased(DPElement element, KeyEvent event)
+		{
+			return false;
+		}
+
+		@Override
+		public boolean keyTyped(DPElement element, KeyEvent event)
+		{
+			if ( event.getKeyChar() == '\n' )
+			{
+				element.postTreeEvent( CommitEvent.instance );
+				return true;
+			}
+			return false;
+		}
+	};
+	
+	
 	
 	private static final IdentityHashMap<UnaryFn, TreeEventListener> textCellTreeEventListeners = new IdentityHashMap<UnaryFn, TreeEventListener>();
 	
@@ -96,19 +141,33 @@ public class EditableTextCell
 		{
 			public boolean onTreeEvent(DPElement element, DPElement sourceElement, Object event)
 			{
-				if ( event instanceof TextEditEvent )
+				if ( event instanceof CommitEvent )
 				{
+					// Attempt to commit the value
 					String textValue = element.getTextRepresentation();
 					Object value = textToValue.invoke( textValue );
 					if ( value != null )
 					{
-						return CellEditPerspective.notifySetCellValue( element, value );
+						CellEditPerspective.notifySetCellValue( element, value );
 					}
+					return true;
+				}
+				else if ( event instanceof TextEditEvent )
+				{
+					// Ignore text edit events - let the text element have its contents modified, until a commit event is received
+					return true;
 				}
 				return false;
 			}
 		};
 		
 		return listener;
+	}
+	
+	
+	
+	private static class CommitEvent
+	{
+		public static final CommitEvent instance = new CommitEvent();
 	}
 }
