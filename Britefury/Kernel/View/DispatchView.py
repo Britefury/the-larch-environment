@@ -24,6 +24,23 @@ class ObjectNodeDispatchView (object):
 	
 	def __init__(self):
 		self.fragmentViewFunction = DMObjectNodeDispatchViewFragmentFunction( self )
+
+
+	def _startProfiling(self):
+		self.fragmentViewFunction.startProfiling()
+
+	def _stopProfiling(self):
+		self.fragmentViewFunction.stopProfiling()
+
+	def _resetProfile(self):
+		self.fragmentViewFunction.resetProfile()
+
+	def _getProfileTimings(self):
+		return self.fragmentViewFunction.getProfileTimings()
+
+	def _getProfileResults(self):
+		return self.fragmentViewFunction.getProfileResults()
+		
 	
 		
 

@@ -7,6 +7,7 @@
 package BritefuryJ.Editor.Table.ObjectList;
 
 import org.python.core.Py;
+import org.python.core.PyException;
 import org.python.core.PyObject;
 import org.python.core.PyString;
 import org.python.core.__builtin__;
@@ -62,7 +63,21 @@ public class AttributeColumn extends AbstractColumn
 	{
 		PyObject pyRow = Py.java2py( modelRow );
 		PyObject pyValue = Py.java2py( value );
-		__builtin__.setattr( pyRow, attrname, pyValue );
+		try
+		{
+			__builtin__.setattr( pyRow, attrname, pyValue );
+		}
+		catch (PyException e)
+		{
+			if ( e.match( Py.AttributeError ) )
+			{
+				System.out.println( "Warning: AttributeColumn.set() attempting to set read-only attribute" );
+			}
+			else
+			{
+				throw e;
+			}
+		}
 	}
 
 	@Override

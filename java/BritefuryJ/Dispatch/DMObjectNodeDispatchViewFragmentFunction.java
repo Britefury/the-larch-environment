@@ -15,7 +15,7 @@ import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.IncrementalView.ViewFragmentFunction;
 import BritefuryJ.Pres.Pres;
 
-public class DMObjectNodeDispatchViewFragmentFunction implements ViewFragmentFunction
+public class DMObjectNodeDispatchViewFragmentFunction extends DispatchViewFragmentFunction implements ViewFragmentFunction
 {
 	private PyObject dispatchInstance;
 	
@@ -25,7 +25,7 @@ public class DMObjectNodeDispatchViewFragmentFunction implements ViewFragmentFun
 		this.dispatchInstance = dispatchInstance;
 	}
 	
-
+	
 	@Override
 	public Pres createViewFragment(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
@@ -35,7 +35,9 @@ public class DMObjectNodeDispatchViewFragmentFunction implements ViewFragmentFun
 		}
 		DMObject obj = (DMObject)x;
 		String name[] = { "" };
+		long startTime = profile_start();
 		PyObject pyPres = DMObjectNodePyMethodDispatch.dmObjectNodeMethodDispatchAndGetNameFromJava( dispatchInstance, obj, new Object[] { fragment, inheritedState }, name );
+		profile_stop( name[0], startTime );
 		Pres pres = Py.tojava( pyPres, Pres.class );
 		return pres.setDebugName( name[0] );
 	}
