@@ -277,6 +277,7 @@ def _pythonTargetContextMenuFactory(element, menu):
 	
 def _setUnwrappedMethod(method, m):
 	m.__dispatch_unwrapped_method__ = method
+	m.__name__ = method.__name__
 	return m
 
 

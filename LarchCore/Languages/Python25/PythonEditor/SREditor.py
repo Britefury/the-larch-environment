@@ -10,6 +10,7 @@ from copy import deepcopy
 from BritefuryJ.DocPresent.Clipboard import *
 from BritefuryJ.DocPresent.Selection import TextSelection
 from BritefuryJ.DocPresent.StyleParams import *
+from BritefuryJ.DocPresent.StreamValue import StreamValueBuilder
 from BritefuryJ.DocPresent import *
 
 from BritefuryJ.Editor.Sequential import SequentialClipboardHandler, SelectionEditTreeEvent
@@ -67,8 +68,9 @@ class PythonSyntaxRecognizingEditor (SyntaxRecognizingEditor):
 		return isStmtFragment( fragment )  or  isTopLevelFragment( fragment )
 		
 	
-	def filterTextForImport(self, text):
-		return text.replace( '\t', '' )
+	def textToSequentialForImport(self, text):
+		text = text.replace( '\t', '' )
+		return StreamValueBuilder( text ).stream()
 
 	
 	def joinStreamsForInsertion(self, subtreeRootFragment, before, insertion, after):

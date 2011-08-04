@@ -142,7 +142,11 @@ public class IncrementalView extends IncrementalTree implements Presentable
 				{
 					Pres exceptionView = DefaultPerspective.instance.presentObject( t, fragmentView, inheritedState );
 					fragment = new ErrorBox( "Presentation error - exception during presentation", exceptionView );
-					return fragment.present( new PresentationContext( fragmentView, DefaultPerspective.instance, inheritedState ), style );
+					view.profile_stopPresBuild();
+					view.profile_startPresRealise();
+					Object result = fragment.present( new PresentationContext( fragmentView, DefaultPerspective.instance, inheritedState ), style );
+					view.profile_stopPresRealise();
+					return result;
 				}
 				catch (Exception e2)
 				{
@@ -151,7 +155,11 @@ public class IncrementalView extends IncrementalTree implements Presentable
 							exceptionStyle.applyTo( new StaticText( e2.toString() ) ).padX( 15.0, 0.0 ),
 							labelStyle.applyTo( new Label( "While trying to display exception:" ) ),
 							exceptionStyle.applyTo( new StaticText( t.toString() ) ).padX( 15.0, 0.0 )   } ) );
-					return fragment.present( new PresentationContext( fragmentView, DefaultPerspective.instance, inheritedState ), style );
+					view.profile_stopPresBuild();
+					view.profile_startPresRealise();
+					Object result = fragment.present( new PresentationContext( fragmentView, DefaultPerspective.instance, inheritedState ), style );
+					view.profile_stopPresRealise();
+					return result;
 				}
 			}
 			
