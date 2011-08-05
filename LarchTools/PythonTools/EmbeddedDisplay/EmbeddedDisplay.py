@@ -101,20 +101,20 @@ class EmbeddedDisplay (object):
 	
 class _TableSchema (object):
 	def __init__(self):
-		self._namedValues = []
-		self._namedValueToindex = {}
+		self._monitoredExpressions = []
+		self._monitoredExpressionToindex = {}
 		
-	def registerNamedValue(self, namedValue):
-		index = len( self._namedValues )
-		self._namedValues.append( namedValue )
-		self._namedValueToindex[namedValue] = index
+	def registerMonitoredExpression(self, monitoredExpression):
+		index = len( self._monitoredExpressions )
+		self._monitoredExpressions.append( monitoredExpression )
+		self._monitoredExpressionToindex[monitoredExpression] = index
 
 
 class _TableView (object):
 	def __init__(self, schema):
 		self._incr = IncrementalValueMonitor()
 		self._schema = schema
-		self._tableEditor = GenericTableEditor( [ v._name   for v in schema._namedValues ], True, True, False, False )
+		self._tableEditor = GenericTableEditor( [ v._name   for v in schema._monitoredExpressions ], True, True, False, False )
 		self._tableContent = GenericTableModel( lambda: '', lambda x: x )
 		self._tableRow = None
 		self._numTableRows = None
@@ -131,8 +131,8 @@ class _TableView (object):
 		self._incr.onChanged()
 
 	
-	def logValue(self, namedValue, value):
-		index = self._schema._namedValueToindex[namedValue]
+	def logValue(self, monitoredExpression, value):
+		index = self._schema._monitoredExpressionToindex[monitoredExpression]
 		self._tableContent.set( index, self._tableRow, value )
 	
 	
@@ -148,12 +148,12 @@ class _FrameValues (object):
 		self._values = []
 	
 	
-	def logValue(self, namedValue, value):
-		self._values.append( ( namedValue, value ) )
+	def logValue(self, monitoredExpression, value):
+		self._values.append( ( monitoredExpression, value ) )
 	
 	
 	def __present__(self, fragment, inheritedState):
-		fields = [ VerticalField( namedValue._name, value )   for namedValue, value in self._values ]
+		fields = [ VerticalField( monitoredExpression._name, value )   for monitoredExpression, value in self._values ]
 		return ObjectBorder( Column( fields ) )
 	
 
@@ -225,9 +225,9 @@ class _TreeView (object):
 		self._currentFrame = prevFrame
 	
 	
-	def logValue(self, namedValue, value):
+	def logValue(self, monitoredExpression, value):
 		if self._currentFrame is not None:
-			self._currentFrame.values.logValue( namedValue, value )
+			self._currentFrame.values.logValue( monitoredExpression, value )
 	
 	
 	def __present__(self, fragment, inheritedState):
@@ -282,14 +282,14 @@ class EmbeddedSuiteDisplay (object):
 		self._incr.onChanged()
 	
 	
-	def _registerNamedValue(self, namedValue):
-		self._tableSchema.registerNamedValue( namedValue )
+	def _registerMonitoredExpression(self, monitoredExpression):
+		self._tableSchema.registerMonitoredExpression( monitoredExpression )
 	
 	
 		
-	def _logValue(self, namedValue, value):
-		self._tableView.logValue( namedValue, value )
-		self._treeView.logValue( namedValue, value )
+	def _logValue(self, monitoredExpression, value):
+		self._tableView.logValue( monitoredExpression, value )
+		self._treeView.logValue( monitoredExpression, value )
 
 		
 	def _clear(self):
@@ -348,7 +348,7 @@ class EmbeddedSuiteDisplay (object):
 		valuesPres = TabbedBox( [ [ treeLabel, treePres ],  [ tableLabel, tablePres ] ], None )
 		
 		contents = Column( [ suitePres, valuesPres ] )
-		return ObjectBox( 'Embedded suite display', contents ).withContextMenuInteractor( _embeddedDisplayMenu ).withCommands( _nvCommands )
+		return ObjectBox( 'Embedded suite display', contents ).withContextMenuInteractor( _embeddedDisplayMenu ).withCommands( _mxCommands )
 
 
 
@@ -385,7 +385,7 @@ class NamedValue (object):
 		self._code = codeGen.compileForEvaluation( self._expr.model )
 		self._suite = self._currentSuite
 		if self._suite is not None:
-			self._suite._registerNamedValue( self )
+			self._suite._registerMonitoredExpression( self )
 	
 	
 	def __py_eval__(self, _globals, _locals, codeGen):
@@ -411,28 +411,28 @@ class NamedValue (object):
 		exprPres = self._expr
 		
 		contents = Row( [ namePres, Label( ': ' ), exprPres ] )
-		return ObjectBox( 'Named value', contents )
+		return ObjectBox( 'Monitored exp.', contents )
 		
 	_nameNotSetStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.5, 0.0, 0.0 ) ).withAttr( Primitive.fontItalic, True )
 
 	
 	
-def _newNamedValueAtCaret(caret):
+def _newMonitoredExpressionAtCaret(caret):
 	return NamedValue()
 
-def _newNamedValueAtSelection(expr, selection):
+def _newMonitoredExpressionAtSelection(expr, selection):
 	d = NamedValue()
 	d._expr.model['expr'] = deepcopy( expr )
 	if expr.isInstanceOf( Schema.Load ):
 		d._name = expr['name']
 	return d
 
-_exprNamedValueAtCaret = makeInsertEmbeddedExpressionAtCaretAction( _newNamedValueAtCaret )
-_exprNamedValueAtSelection = makeWrapSelectionInEmbeddedExpressionAction( _newNamedValueAtSelection )
+_exprMonitoredExpressionAtCaret = makeInsertEmbeddedExpressionAtCaretAction( _newMonitoredExpressionAtCaret )
+_exprMonitoredExpressionAtSelection = makeWrapSelectionInEmbeddedExpressionAction( _newMonitoredExpressionAtSelection )
 
-_nvCommand = Command( '&Named &Value', chainActions( _exprNamedValueAtSelection, _exprNamedValueAtCaret ) )
+_mxCommand = Command( '&Monitored E&xpression', chainActions( _exprMonitoredExpressionAtSelection, _exprMonitoredExpressionAtCaret ) )
 
-_nvCommands = CommandSet( 'LarchTools.PythonTools.EmbeddedDisplay.NamedValue', [ _nvCommand ] )
+_mxCommands = CommandSet( 'LarchTools.PythonTools.EmbeddedDisplay.MonitoredExpression', [ _mxCommand ] )
 
 	
 
