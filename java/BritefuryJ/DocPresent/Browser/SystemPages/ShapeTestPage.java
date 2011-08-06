@@ -33,11 +33,9 @@ public class ShapeTestPage extends SystemPage
 	{
 		return "The box element covers all space given to it, with a specified minimum size. The shape element displays a java.awt.shape.";
 	}
-	
-	
-	
-	private static StyleSheet styleSheet = StyleSheet.instance.withAttr( Primitive.shapePainter, new FillPainter( Color.black ) ).withAttr(
-			Primitive.hoverShapePainter, new FillPainter( new Color( 0.0f, 0.5f, 0.5f ) ) );
+
+
+	private static StyleSheet styleSheet = StyleSheet.style( Primitive.shapePainter.as( new FillPainter( Color.black ) ), Primitive.hoverShapePainter.as( new FillPainter( new Color( 0.0f, 0.5f, 0.5f ) ) ) );
 
 	
 	

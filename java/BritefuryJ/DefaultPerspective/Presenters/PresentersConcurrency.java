@@ -171,8 +171,8 @@ public class PresentersConcurrency extends ObjectPresenterRegistry
 			}
 		}
 	};
-	
-	
-	private static final StyleSheet cancelledStyle = StyleSheet.instance.withAttr( Primitive.fontItalic, true ).withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.0f ) );
-	private static final StyleSheet waitingStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.3f, 0.3f, 0.3f ) );
+
+
+	private static final StyleSheet cancelledStyle = StyleSheet.style( Primitive.fontItalic.as( true ), Primitive.foreground.as( new Color( 0.5f, 0.0f, 0.0f ) ) );
+	private static final StyleSheet waitingStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.3f, 0.3f, 0.3f ) ) );
 }

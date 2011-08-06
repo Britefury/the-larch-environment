@@ -377,11 +377,10 @@ public class SimpleAttributeTable implements Presentable
 		Pres valueField = new VerticalField( "Attributes:", presentAttributeMap( fragment, inheritedState, values ) );
 		return new ObjectBoxWithFields( getClass().getName(), new Pres[] { valueField } );
 	}
-	
-	
+
+
 	// We have to initialise this style sheet on request, otherwise we can end up with a circular class initialisation problem
-	private static final StyleSheet attrTableStyle = StyleSheet.instance.withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, 14 )
-			.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.tableColumnSpacing, 10.0 );
+	private static final StyleSheet attrTableStyle = StyleSheet.style( Primitive.fontBold.as( true ), Primitive.fontSize.as( 14 ), Primitive.foreground.as( new Color( 0.0f, 0.0f, 0.5f ) ), Primitive.tableColumnSpacing.as( 10.0 ) );
 
 
 

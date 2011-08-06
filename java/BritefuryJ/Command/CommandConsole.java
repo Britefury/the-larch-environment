@@ -365,13 +365,9 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 
 		return null;
 	}
-	
-	
-	
-	
-	
-	private static final StyleSheet promptStyle = StyleSheet.instance.withAttr( Primitive.border, Command.cmdBorder( new Color( 0.5f, 0.5f, 0.5f ), new Color( 0.9f, 0.9f, 0.9f ) ) );
-	private static final StyleSheet cmdFailStyle = StyleSheet.instance.withAttr( Primitive.border, Command.cmdBorder( new Color( 1.0f, 0.0f, 0.0f ), new Color( 1.0f, 0.85f, 0.85f ) ) )
-		.withAttr( Primitive.foreground, new Color( 0.7f, 0.0f, 0.0f ) );
-	private static final StyleSheet cmdRowStyle = StyleSheet.instance.withAttr( Primitive.rowSpacing, 7.0 );
+
+
+	private static final StyleSheet promptStyle = StyleSheet.style( Primitive.border.as( Command.cmdBorder( new Color( 0.5f, 0.5f, 0.5f ), new Color( 0.9f, 0.9f, 0.9f ) ) ) );
+	private static final StyleSheet cmdFailStyle = StyleSheet.style( Primitive.border.as( Command.cmdBorder( new Color( 1.0f, 0.0f, 0.0f ), new Color( 1.0f, 0.85f, 0.85f ) ) ), Primitive.foreground.as( new Color( 0.7f, 0.0f, 0.0f ) ) );
+	private static final StyleSheet cmdRowStyle = StyleSheet.style( Primitive.rowSpacing.as( 7.0 ) );
 }

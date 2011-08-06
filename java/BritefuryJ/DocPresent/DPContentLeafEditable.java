@@ -827,10 +827,9 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	//
 	// Meta element methods
 	//
-	
-	protected static StyleSheet metaHeaderHighlightBorderStyle = StyleSheet.instance.withAttr( Primitive.border,
-			new SolidBorder( 1.0, 1.0, 5.0, 5.0, new Color( 0.75f, 0.0f, 0.0f ), new Color( 1.0f, 0.9f, 0.8f ) ) );
-	protected static StyleSheet metaHeaderCaretPosStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
+
+	protected static StyleSheet metaHeaderHighlightBorderStyle = StyleSheet.style( Primitive.border.as( new SolidBorder( 1.0, 1.0, 5.0, 5.0, new Color( 0.75f, 0.0f, 0.0f ), new Color( 1.0f, 0.9f, 0.8f ) ) ) );
+	protected static StyleSheet metaHeaderCaretPosStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.25f, 0.0f, 0.5f ) ) );
 
 	protected void createDebugPresentationHeaderContents(ArrayList<Object> elements)
 	{

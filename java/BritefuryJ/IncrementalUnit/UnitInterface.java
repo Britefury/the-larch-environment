@@ -97,7 +97,7 @@ public abstract class UnitInterface implements Presentable
 	{
 		return ApplyPerspective.defaultPerspective( new InnerFragment( new ValuePres( this ) ) );
 	}
-	
-	
-	private static StyleSheet unitStyle = StyleSheet.instance.withAttr( ObjectPresStyle.objectBorderPaint, new Color( 0.5f, 0.0f, 0.5f ) ).withAttr( ObjectPresStyle.objectTitlePaint, new Color( 0.5f, 0.0f, 0.5f ) );
+
+
+	private static StyleSheet unitStyle = StyleSheet.style( ObjectPresStyle.objectBorderPaint.as( new Color( 0.5f, 0.0f, 0.5f ) ), ObjectPresStyle.objectTitlePaint.as( new Color( 0.5f, 0.0f, 0.5f ) ) );
 }

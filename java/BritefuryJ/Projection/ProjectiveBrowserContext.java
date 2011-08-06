@@ -312,7 +312,7 @@ public class ProjectiveBrowserContext
 			Pres linkHeader = SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_SYSTEMPAGE );
 			Pres title = new TitleBar( "Default Root Page" );
 			
-			Pres contents = StyleSheet.instance.withAttr( Primitive.fontSize, 16 ).applyTo( new Label( "Empty document" ) ).alignHCentre();
+			Pres contents = StyleSheet.style( Primitive.fontSize.as( 16 ) ).applyTo( new Label( "Empty document" ) ).alignHCentre();
 			
 			Pres head = new Head( new Pres[] { linkHeader, title } );
 			
@@ -336,8 +336,8 @@ public class ProjectiveBrowserContext
 		
 		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
-			StyleSheet titleStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 24 );
-			StyleSheet contentsStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 16 );
+			StyleSheet titleStyle = StyleSheet.style( Primitive.fontSize.as( 24 ) );
+			StyleSheet contentsStyle = StyleSheet.style( Primitive.fontSize.as( 16 ) );
 			
 			Pres errorTitle = titleStyle.applyTo( new Label( "Could not resolve" ) );
 			Pres loc = contentsStyle.applyTo( new StaticText( location ) );
@@ -360,9 +360,9 @@ public class ProjectiveBrowserContext
 		
 		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
-			StyleSheet titleStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 24 );
-			StyleSheet contentsStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 16 );
-			StyleSheet validSyntaxStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 14 );
+			StyleSheet titleStyle = StyleSheet.style( Primitive.fontSize.as( 24 ) );
+			StyleSheet contentsStyle = StyleSheet.style( Primitive.fontSize.as( 16 ) );
+			StyleSheet validSyntaxStyle = StyleSheet.style( Primitive.fontSize.as( 14 ) );
 			
 			Pres errorTitle = titleStyle.applyTo( new Label( "Invalid location syntax" ) );
 			Pres loc = contentsStyle.applyTo( new StaticText( location ) );

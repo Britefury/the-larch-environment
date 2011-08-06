@@ -133,6 +133,5 @@ public class Location implements Presentable
 	}
 
 
-	private static final StyleSheet locationStyle = StyleSheet.instance.withAttr( ObjectPresStyle.objectBorderPaint, new Color( 0.4f, 0.65f, 0.4f ) )
-			.withAttr( ObjectPresStyle.objectTitlePaint, new Color( 0.4f, 0.65f, 0.4f ) ); 
+	private static final StyleSheet locationStyle = StyleSheet.style( ObjectPresStyle.objectBorderPaint.as( new Color( 0.4f, 0.65f, 0.4f ) ), ObjectPresStyle.objectTitlePaint.as( new Color( 0.4f, 0.65f, 0.4f ) ) );
 }

@@ -278,8 +278,8 @@ public class ParseResult implements ParseResultInterface, Presentable
 	}
 
 
-	protected static final StyleSheet successStyle = StyleSheet.instance.withAttr( Primitive.fontItalic, true ).withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
-	protected static final StyleSheet failStyle = StyleSheet.instance.withAttr( Primitive.fontItalic, true ).withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.0f ) );
-	protected static final StyleSheet rangeStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.5f ) );
-	protected static final StyleSheet parseResultStyle = StyleSheet.instance.withAttr( ObjectPresStyle.objectTitlePaint, new Color( 0.4f, 0.4f, 0.4f ) ).withAttr( ObjectPresStyle.objectBorderPaint, new Color( 0.6f, 0.6f, 0.6f ) );
+	protected static final StyleSheet successStyle = StyleSheet.style( Primitive.fontItalic.as( true ), Primitive.fontSize.as( 12 ), Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.0f ) ) );
+	protected static final StyleSheet failStyle = StyleSheet.style( Primitive.fontItalic.as( true ), Primitive.fontSize.as( 12 ), Primitive.foreground.as( new Color( 0.5f, 0.0f, 0.0f ) ) );
+	protected static final StyleSheet rangeStyle = StyleSheet.style( Primitive.fontSize.as( 12 ), Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.5f ) ) );
+	protected static final StyleSheet parseResultStyle = StyleSheet.style( ObjectPresStyle.objectTitlePaint.as( new Color( 0.4f, 0.4f, 0.4f ) ), ObjectPresStyle.objectBorderPaint.as( new Color( 0.6f, 0.6f, 0.6f ) ) );
 }

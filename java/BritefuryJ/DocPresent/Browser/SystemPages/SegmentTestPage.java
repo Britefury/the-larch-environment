@@ -43,7 +43,7 @@ public class SegmentTestPage extends SystemPage
 	
 	protected Pres text(String t, Color colour)
 	{
-		return styleSheet.withAttr( Primitive.foreground, colour ).applyTo( new Text( t ) );
+		return styleSheet.withValues( Primitive.foreground.as( colour ) ).applyTo( new Text( t ) );
 	}
 	
 	protected Pres text(String t)

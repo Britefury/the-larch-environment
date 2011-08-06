@@ -24,7 +24,7 @@ import BritefuryJ.StyleSheet.StyleSheet;
 
 public abstract class LiteralUnitEditor implements Presentable, IncrementalMonitorListener
 {
-	private static final StyleSheet errorStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.8f, 0.0f, 0.0f ) );
+	private static final StyleSheet errorStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.8f, 0.0f, 0.0f ) ) );
 	
 	protected abstract class Editor
 	{

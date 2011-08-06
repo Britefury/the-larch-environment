@@ -267,19 +267,18 @@ public class Inspector
 		
 		return new Column( contents );
 	}
-	
-	
-	
-	private static final StyleSheet staticStyle = StyleSheet.instance.withAttr( Primitive.editable, false );
-	private static final StyleSheet labelStyle = StyleSheet.instance.withAttr( Primitive.editable, false ).withAttr( Primitive.selectable, false );
-
-	private static final StyleSheet sectionHeadingStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontFace, "Serif" );
-	private static final StyleSheet attributeNameStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.25f ) );
-
-	private static final StyleSheet typeNameStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.4f ) );
 
 
-	private static final StyleSheet errorStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.0f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontFace, "Serif" );
+	private static final StyleSheet staticStyle = StyleSheet.style( Primitive.editable.as( false ) );
+	private static final StyleSheet labelStyle = StyleSheet.style( Primitive.editable.as( false ), Primitive.selectable.as( false ) );
+
+	private static final StyleSheet sectionHeadingStyle = labelStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.0f, 0.5f ) ), Primitive.fontBold.as( true ), Primitive.fontFace.as( "Serif" ) );
+	private static final StyleSheet attributeNameStyle = labelStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.0f, 0.25f ) ) );
+
+	private static final StyleSheet typeNameStyle = labelStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.4f ) ) );
+
+
+	private static final StyleSheet errorStyle = labelStyle.withValues( Primitive.foreground.as( new Color( 0.5f, 0.0f, 0.0f ) ), Primitive.fontBold.as( true ), Primitive.fontFace.as( "Serif" ) );
 
 	private static final Pres space = staticStyle.applyTo( new StaticText( " " ) );
 }

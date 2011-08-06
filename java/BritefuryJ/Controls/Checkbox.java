@@ -8,6 +8,7 @@ package BritefuryJ.Controls;
 
 import java.awt.Paint;
 
+import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
@@ -114,7 +115,7 @@ public class Checkbox extends ControlPres
 	@Override
 	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
-		StyleSheet checkStyle = StyleSheet.instance.withAttr( Primitive.border, style.get( Controls.checkboxCheckBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class ) );
+		StyleSheet checkStyle = StyleSheet.style( Primitive.border.as( style.get( Controls.checkboxCheckBorder, AbstractBorder.class ) ) );
 		StyleSheet checkboxStyle = Controls.checkboxStyle.get( style );
 		
 		double checkSize = style.get( Controls.checkboxCheckSize, Double.class );

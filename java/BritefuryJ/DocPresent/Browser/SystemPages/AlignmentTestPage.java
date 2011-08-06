@@ -41,9 +41,9 @@ public class AlignmentTestPage extends SystemPage
 	protected Pres createContents()
 	{
 		StyleSheet styleSheet = StyleSheet.instance;
-		StyleSheet textStyleSheet = styleSheet.withAttr( Primitive.background, new FilledOutlinePainter( new Color( 1.0f, 1.0f, 0.7f ), new Color( 1.0f, 1.0f, 0.0f ) ) );
-		StyleSheet dividerStyleSheet = styleSheet.withAttr( Primitive.shapePainter, new FillPainter( new Color( 1.0f, 0.5f, 0.0f ) ) );
-		StyleSheet sectionStyleSheet = styleSheet.withAttr( Primitive.columnSpacing, 5.0 );
+		StyleSheet textStyleSheet = styleSheet.withValues( Primitive.background.as( new FilledOutlinePainter( new Color( 1.0f, 1.0f, 0.7f ), new Color( 1.0f, 1.0f, 0.0f ) ) ) );
+		StyleSheet dividerStyleSheet = styleSheet.withValues( Primitive.shapePainter.as( new FillPainter( new Color( 1.0f, 0.5f, 0.0f ) ) ) );
+		StyleSheet sectionStyleSheet = styleSheet.withValues( Primitive.columnSpacing.as( 5.0 ) );
 		
 		Pres halignTitle = new Heading2( "Horizontal alignment" ); 
 		Pres halignLeft = new Border( textStyleSheet.applyTo( new Label( "hAlign=LEFT" ).alignHLeft() ) );
@@ -72,7 +72,7 @@ public class AlignmentTestPage extends SystemPage
 
 		Pres refColumn = new Column( new Pres[] { new Label( "0" ), new Label( "1 (ref-y)" ), new Label( "2" ),
 				new Label( "3" ), new Label( "4" ), new Label( "5" ) }, 1 );
-		Pres refBox = styleSheet.withAttr( Primitive.background, new FilledOutlinePainter( new Color( 0.8f, 0.85f, 1.0f ), new Color( 0.0f, 0.25f, 1.0f ) ) ).applyTo( new Bin( refColumn.pad( 5.0, 5.0 ) ) );
+		Pres refBox = styleSheet.withValues( Primitive.background.as( new FilledOutlinePainter( new Color( 0.8f, 0.85f, 1.0f ), new Color( 0.0f, 0.25f, 1.0f ) ) ) ).applyTo( new Bin( refColumn.pad( 5.0, 5.0 ) ) );
 		
 
 		Pres valignBaselines = new Border( textStyleSheet.applyTo( new Label( "vAlign=REFY" ).alignVRefY() ) );
@@ -82,15 +82,15 @@ public class AlignmentTestPage extends SystemPage
 		Pres valignBottom = new Border( textStyleSheet.applyTo( new Label( "vAlign=BOTTOM" ).alignVBottom() ) );
 		Pres valignExpand = new Border( textStyleSheet.applyTo( new Label( "vAlign=EXPAND" ).alignVExpand() ) );
 
-		Pres valignContentsBox = styleSheet.withAttr( Primitive.rowSpacing, 10.0 ).applyTo( new Row( new Pres[] { valignBaselines.alignVRefYExpand(), valignBaselinesExpand.alignVRefYExpand(),
+		Pres valignContentsBox = styleSheet.withValues( Primitive.rowSpacing.as( 10.0 ) ).applyTo( new Row( new Pres[] { valignBaselines.alignVRefYExpand(), valignBaselinesExpand.alignVRefYExpand(),
 				valignTop.alignVRefYExpand(), valignCentre.alignVRefYExpand(), valignBottom.alignVRefYExpand(), valignExpand.alignVRefYExpand() } ) );
 		
 		
-		Pres vAlignBox = styleSheet.withAttr( Primitive.rowSpacing, 50.0 ).applyTo( new Row( new Pres[] { refBox.alignVRefYExpand(), valignContentsBox.alignVRefYExpand() } ) );
+		Pres vAlignBox = styleSheet.withValues( Primitive.rowSpacing.as( 50.0 ) ).applyTo( new Row( new Pres[] { refBox.alignVRefYExpand(), valignContentsBox.alignVRefYExpand() } ) );
 		
 		Pres valignSection = sectionStyleSheet.applyTo( new Column( new Pres[] { valignTitle.alignHPack(), vAlignBox } ) );
 		
-		Pres mainBox = styleSheet.withAttr( Primitive.columnSpacing, 15.0 ).applyTo( new Column( new Pres[] { halignSection.alignHExpand(), halignRowSection.alignHExpand(), valignSection } ) );
+		Pres mainBox = styleSheet.withValues( Primitive.columnSpacing.as( 15.0 ) ).applyTo( new Column( new Pres[] { halignSection.alignHExpand(), halignRowSection.alignHExpand(), valignSection } ) );
 		return new Bin( mainBox );
 	}
 }

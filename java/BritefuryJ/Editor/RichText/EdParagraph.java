@@ -127,6 +127,6 @@ public class EdParagraph extends EdAbstractText
 		return paraStyle.applyTo( new Border( new Column( new Object[] { presentContents(), new Box( 1.0, 1.0 ).pad( 1.0, 1.0 ).alignHExpand(), attrs } ) ) );
 	}
 
-	
-	private static final StyleSheet paraStyle = StyleSheet.instance.withAttr( Primitive.border, new SolidBorder( 2.0, 2.0, new Color( 0.0f, 0.25f, 0.5f ), null ) );
+
+	private static final StyleSheet paraStyle = StyleSheet.style( Primitive.border.as( new SolidBorder( 2.0, 2.0, new Color( 0.0f, 0.25f, 0.5f ), null ) ) );
 }

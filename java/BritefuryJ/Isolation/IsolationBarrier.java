@@ -167,8 +167,7 @@ public class IsolationBarrier <ValueType> implements Presentable, Trackable
 			return null;
 		}
 	}
-	
-	
-	
-	private static final StyleSheet style = StyleSheet.instance.withAttr( ObjectPresStyle.objectBorderPaint, new Color( 0.25f, 0.0f, 0.5f ) );
+
+
+	private static final StyleSheet style = StyleSheet.style( ObjectPresStyle.objectBorderPaint.as( new Color( 0.25f, 0.0f, 0.5f ) ) );
 }

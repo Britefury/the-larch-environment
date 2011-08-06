@@ -15,7 +15,7 @@ import BritefuryJ.StyleSheet.StyleSheet;
 abstract class Tag implements Presentable
 {
 	protected abstract String getTagName();
-	
-	
-	protected static final StyleSheet tagStyle = StyleSheet.instance.withAttr( Primitive.fontBold, true ).withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
+
+
+	protected static final StyleSheet tagStyle = StyleSheet.style( Primitive.fontBold.as( true ), Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.0f ) ) );
 }

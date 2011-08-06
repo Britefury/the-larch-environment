@@ -533,35 +533,33 @@ public class PrimitivePresenter
 	{
 		return new VerticalSequenceView( children, openBrace, closeBrace, comma, mapSpace, TrailingSeparator.NEVER );
 	}
-	
-
-	
-	private static final StyleSheet punctuationStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color.blue );
-
-	private static final StyleSheet charStyle = StyleSheet.instance; 
-	private static final StyleSheet multiLineStringStyle = StyleSheet.instance.withAttr( Primitive.background, new FillPainter( new Color( 1.0f, 1.0f, 0.75f ) ) );
-	private static final StyleSheet integerStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.5f ) );
-	private static final StyleSheet floatStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
-	private static final StyleSheet booleanStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) ).withAttr( Primitive.fontSmallCaps, true );
-	private static final StyleSheet nullStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.75f, 0.0f, 0.5f ) ).withAttr( Primitive.fontSmallCaps, true );
 
 
+	private static final StyleSheet punctuationStyle = StyleSheet.style( Primitive.foreground.as( Color.blue ) );
 
-	private static final StyleSheet staticStyle = StyleSheet.instance.withAttr( Primitive.editable, false );
-	private static final StyleSheet labelStyle = StyleSheet.instance.withAttr( Primitive.editable, false ).withAttr( Primitive.selectable, false );
-	
-	
-	private static final StyleSheet typePunctuationStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
+	private static final StyleSheet charStyle = StyleSheet.instance;
+	private static final StyleSheet multiLineStringStyle = StyleSheet.style( Primitive.background.as( new FillPainter( new Color( 1.0f, 1.0f, 0.75f ) ) ) );
+	private static final StyleSheet integerStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.5f, 0.0f, 0.5f ) ) );
+	private static final StyleSheet floatStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.25f, 0.0f, 0.5f ) ) );
+	private static final StyleSheet booleanStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.0f ) ), Primitive.fontSmallCaps.as( true ) );
+	private static final StyleSheet nullStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.75f, 0.0f, 0.5f ) ), Primitive.fontSmallCaps.as( true ) );
 
-	private static final StyleSheet privateNameStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.0f ) );
-	private static final StyleSheet protectedNameStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.35f, 0.35f, 0.0f ) );
-	private static final StyleSheet publicNameStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
-	private static final StyleSheet defaultNameStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.35f, 0.35f, 0.15f ) );
-	
-	private static final StyleSheet modifierStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.1f, 0.15f, 0.35f ) );
 
-	private static final StyleSheet delimStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.1f, 0.3f, 0.4f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, 14 );
-	private static final StyleSheet setDelimStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.4f, 0.3f, 0.1f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, 14 );
+	private static final StyleSheet staticStyle = StyleSheet.style( Primitive.editable.as( false ) );
+	private static final StyleSheet labelStyle = StyleSheet.style( Primitive.editable.as( false ), Primitive.selectable.as( false ) );
+
+
+	private static final StyleSheet typePunctuationStyle = labelStyle.withValues( Primitive.foreground.as( new Color( 0.25f, 0.0f, 0.5f ) ) );
+
+	private static final StyleSheet privateNameStyle = labelStyle.withValues( Primitive.foreground.as( new Color( 0.5f, 0.0f, 0.0f ) ) );
+	private static final StyleSheet protectedNameStyle = labelStyle.withValues( Primitive.foreground.as( new Color( 0.35f, 0.35f, 0.0f ) ) );
+	private static final StyleSheet publicNameStyle = labelStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.0f ) ) );
+	private static final StyleSheet defaultNameStyle = labelStyle.withValues( Primitive.foreground.as( new Color( 0.35f, 0.35f, 0.15f ) ) );
+
+	private static final StyleSheet modifierStyle = labelStyle.withValues( Primitive.foreground.as( new Color( 0.1f, 0.15f, 0.35f ) ) );
+
+	private static final StyleSheet delimStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.1f, 0.3f, 0.4f ) ), Primitive.fontBold.as( true ), Primitive.fontSize.as( 14 ) );
+	private static final StyleSheet setDelimStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.4f, 0.3f, 0.1f ) ), Primitive.fontBold.as( true ), Primitive.fontSize.as( 14 ) );
 
 	private static final Pres space = staticStyle.applyTo( new StaticText( " " ) );
 	private static final Pres comma = punctuationStyle.applyTo( new StaticText( "," ) );

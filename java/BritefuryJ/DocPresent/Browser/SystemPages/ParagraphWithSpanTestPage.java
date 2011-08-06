@@ -48,7 +48,7 @@ public class ParagraphWithSpanTestPage extends SystemPage
 		{
 			children = ParagraphTestPage.addLineBreaks( children, lineBreakStep );
 		}
-		return textStyle.withAttr( Primitive.paragraphIndentation, indentation ).applyTo( new Paragraph( children ) );
+		return textStyle.withValues( Primitive.paragraphIndentation.as( indentation ) ).applyTo( new Paragraph( children ) );
 	}
 	
 	protected Pres makeSpan(String title, int lineBreakStep, StyleSheet spanStyle)
@@ -66,16 +66,15 @@ public class ParagraphWithSpanTestPage extends SystemPage
 		ArrayList<Object> children = ParagraphTestPage.makeTextNodes( title + ": " + textBlock );
 		children = ParagraphTestPage.addLineBreaks( children, lineBreakStep );
 		children.add( children.size()/2, makeSpan( title + " (inner)", lineBreakStep, spanStyle ) );
-		return textStyle.withAttr( Primitive.paragraphIndentation, indentation ).applyTo( new Paragraph( children ) );
+		return textStyle.withValues( Primitive.paragraphIndentation.as( indentation ) ).applyTo( new Paragraph( children ) );
 	}
 	
 	
 	protected Pres createContents()
 	{
 		StyleSheet styleSheet = StyleSheet.instance;
-		StyleSheet nestedTextStyleSheet = styleSheet.withAttr( Primitive.foreground, Color.red );
-		StyleSheet spanStyleSheet = styleSheet.withAttr( Primitive.background, new OutlinePainter( new Color( 1.0f, 0.7f, 0.3f ) ) ).withAttr(
-				Primitive.hoverBackground, new FilledOutlinePainter( new Color( 1.0f, 1.0f, 0.7f ), new Color( 1.0f, 1.0f, 0.0f ), new BasicStroke( 1.0f ) ) );
+		StyleSheet nestedTextStyleSheet = styleSheet.withValues( Primitive.foreground.as( Color.red ) );
+		StyleSheet spanStyleSheet = styleSheet.withValues( Primitive.background.as( new OutlinePainter( new Color( 1.0f, 0.7f, 0.3f ) ) ), Primitive.hoverBackground.as( new FilledOutlinePainter( new Color( 1.0f, 1.0f, 0.7f ), new Color( 1.0f, 1.0f, 0.0f ), new BasicStroke( 1.0f ) ) ) );
 		
 		Pres b2 = makeParagraph( "PER-WORD", 0.0, 1, styleSheet );
 		Pres b3 = makeParagraph( "EVERY-4-WORDS", 0.0, 4, styleSheet);

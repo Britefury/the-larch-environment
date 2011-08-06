@@ -43,8 +43,8 @@ import BritefuryJ.StyleSheet.StyleValues;
 public class ClipboardTestPage extends SystemPage
 {
 	private static StyleSheet styleSheet = StyleSheet.instance;
-	
-	private static StyleSheet placeHolderStyle = styleSheet.withAttr( Primitive.background, new FillPainter( new Color( 1.0f, 0.9f, 0.75f  ) ) );
+
+	private static StyleSheet placeHolderStyle = styleSheet.withValues( Primitive.background.as( new FillPainter( new Color( 1.0f, 0.9f, 0.75f ) ) ) );
 	
 	
 	protected ClipboardTestPage()
@@ -215,7 +215,7 @@ public class ClipboardTestPage extends SystemPage
 		
 		
 		Pres title = new Heading5( "Text element (displays description of pasted content):" );
-		Pres borderedReceiver = StyleSheet.instance.withAttr( Primitive.border, new SolidBorder( 2.0, 2.0, new Color( 0.3f, 0.3f, 0.3f ), null ) ).applyTo( receiverPres );
+		Pres borderedReceiver = StyleSheet.style( Primitive.border.as( new SolidBorder( 2.0, 2.0, new Color( 0.3f, 0.3f, 0.3f ), null ) ) ).applyTo( receiverPres );
 		return new Column( new Pres[] { title, borderedReceiver } );
 	}
 	
@@ -225,7 +225,7 @@ public class ClipboardTestPage extends SystemPage
 	{
 		Pres title = new Heading5( "Text area (can send and receive text):" );
 		Pres area = new TextArea( "Enter text here", null );
-		Pres borderedArea = StyleSheet.instance.withAttr( Primitive.border, new SolidBorder( 2.0, 2.0, new Color( 0.3f, 0.3f, 0.3f ), null ) ).applyTo( area );
+		Pres borderedArea = StyleSheet.style( Primitive.border.as( new SolidBorder( 2.0, 2.0, new Color( 0.3f, 0.3f, 0.3f ), null ) ) ).applyTo( area );
 		return new Column( new Pres[] { title, borderedArea } );
 	}
 	

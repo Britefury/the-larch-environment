@@ -227,8 +227,8 @@ public class StreamValue implements Presentable
 			return borderStyle.applyTo( new Border( new InnerFragment( structuralValue ) ) );
 		}
 
-	
-		private static StyleSheet borderStyle = StyleSheet.instance.withAttr( Primitive.border, new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.15f, 0.25f, 0.75f ), null ) ); 
+
+		private static StyleSheet borderStyle = StyleSheet.style( Primitive.border.as( new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.15f, 0.25f, 0.75f ), null ) ) );
 	}
 	
 	
@@ -739,5 +739,5 @@ public class StreamValue implements Presentable
 	}
 
 
-	private static StyleSheet streamValueStyle = StyleSheet.instance.withAttr( ObjectPresStyle.objectBorderPaint,new Color( 0.65f, 0.0f, 0.55f ) ).withAttr( ObjectPresStyle.objectTitlePaint,new Color( 0.65f, 0.0f, 0.55f ) );
+	private static StyleSheet streamValueStyle = StyleSheet.style( ObjectPresStyle.objectBorderPaint.as( new Color( 0.65f, 0.0f, 0.55f ) ), ObjectPresStyle.objectTitlePaint.as( new Color( 0.65f, 0.0f, 0.55f ) ) );
 }

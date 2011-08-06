@@ -54,7 +54,7 @@ public class EditableLabelTestPage extends SystemPage
 		
 		return new Body( new Pres[] { new Heading2( "Editable labels" ), entriesBox } );
 	}
-	
-	
-	private static final StyleSheet notSetStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.0f ) );
+
+
+	private static final StyleSheet notSetStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.5f, 0.0f, 0.0f ) ) );
 }

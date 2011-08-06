@@ -39,7 +39,7 @@ public abstract class AbstractBorder implements Presentable
 	{
 		if ( style == null )
 		{
-			style = StyleSheet.instance.withAttr( Primitive.border, this );
+			style = StyleSheet.style( Primitive.border.as( this ) );
 		}
 		return style.applyTo( new Border( x ) );
 	}
@@ -59,7 +59,7 @@ public abstract class AbstractBorder implements Presentable
 
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return new ObjectBox( getClass().getName(), StyleSheet.instance.withAttr( Primitive.border, this ).applyTo( new Border( presentationSwatch() ) ) );
+		return new ObjectBox( getClass().getName(), StyleSheet.style( Primitive.border.as( this ) ).applyTo( new Border( presentationSwatch() ) ) );
 	}
 	
 	
@@ -70,10 +70,9 @@ public abstract class AbstractBorder implements Presentable
 	{
 		if ( _swatchStyle == null )
 		{
-			_swatchStyle = StyleSheet.instance.withAttr( Primitive.shapePainter, 
-					new FilledOutlinePainter(
-							new LinearGradientPaint( 0.0f, 0.0f, 50.0f, 25.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 73, 69, 94 ), new Color( 24, 5, 7 ) } ),
-							new LinearGradientPaint( 0.0f, 0.0f, 50.0f, 25.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 98, 95, 115 ), new Color( 126, 125, 135 ) } ) ) );
+			_swatchStyle = StyleSheet.style( Primitive.shapePainter.as( new FilledOutlinePainter(
+				    new LinearGradientPaint( 0.0f, 0.0f, 50.0f, 25.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 73, 69, 94 ), new Color( 24, 5, 7 ) } ),
+				    new LinearGradientPaint( 0.0f, 0.0f, 50.0f, 25.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 98, 95, 115 ), new Color( 126, 125, 135 ) } ) ) ) );
 		}
 		return _swatchStyle;
 	}

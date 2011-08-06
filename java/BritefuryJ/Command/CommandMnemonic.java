@@ -157,7 +157,6 @@ public abstract class CommandMnemonic
 	}
 
 
-
-	private static final StyleSheet cmdNameStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
-	private static final StyleSheet cmdCharStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.25f, 0.0f ) ).withAttr( Primitive.fontBold, true );
+	private static final StyleSheet cmdNameStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.0f ) ) );
+	private static final StyleSheet cmdCharStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.0f, 0.25f, 0.0f ) ), Primitive.fontBold.as( true ) );
 }

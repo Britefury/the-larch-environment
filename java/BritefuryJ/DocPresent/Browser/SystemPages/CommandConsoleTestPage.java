@@ -81,16 +81,16 @@ public class CommandConsoleTestPage extends SystemPage
 	
 
 	private static StyleSheet styleSheet = StyleSheet.instance;
-	private static StyleSheet blackText = styleSheet.withAttr( Primitive.foreground, Color.black );
-	private static StyleSheet redText = styleSheet.withAttr( Primitive.foreground, Color.red );
-	private static StyleSheet greenText = styleSheet.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
-	private static StyleSheet blueText = styleSheet.withAttr( Primitive.foreground, new Color( 0.0f, 0.25f, 0.5f ) );
+	private static StyleSheet blackText = styleSheet.withValues( Primitive.foreground.as( Color.black ) );
+	private static StyleSheet redText = styleSheet.withValues( Primitive.foreground.as( Color.red ) );
+	private static StyleSheet greenText = styleSheet.withValues( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.0f ) ) );
+	private static StyleSheet blueText = styleSheet.withValues( Primitive.foreground.as( new Color( 0.0f, 0.25f, 0.5f ) ) );
 
 
 	
 	private static Pres colouredText(StyleSheet style)
 	{
-		return style.withAttr( Primitive.editable, false ).applyTo(
+		return style.withValues( Primitive.editable.as( false ) ).applyTo(
 				new NormalText( "Change the colour of this text, using the buttons below." ) );
 	}
 	

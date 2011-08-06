@@ -41,21 +41,20 @@ public class DocModelPresenter
 	}
 
 
-	private static final StyleSheet defaultStyle = StyleSheet.instance.withAttr( Primitive.fontFace, "Sans serif" ).withAttr( Primitive.fontSize, 14 )
-		.withAttr( Primitive.foreground, Color.black ).withAttr( Primitive.paragraphIndentation, 60.0 );
+	private static final StyleSheet defaultStyle = StyleSheet.style( Primitive.fontFace.as( "Sans serif" ), Primitive.fontSize.as( 14 ), Primitive.foreground.as( Color.black ), Primitive.paragraphIndentation.as( 60.0 ) );
 
-	private static final StyleSheet nullStyle = defaultStyle.withAttr( Primitive.fontItalic, true ).withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.25f ) );
+	private static final StyleSheet nullStyle = defaultStyle.withValues( Primitive.fontItalic.as( true ), Primitive.foreground.as( new Color( 0.5f, 0.0f, 0.25f ) ) );
 
-	private static final StyleSheet stringStyle = defaultStyle.withAttr( ObjectPresStyle.stringContentStyle, StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.25f, 0.5f ) ) );
-	
-	private static final StyleSheet punctuationStyle = defaultStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 1.0f ) );
+	private static final StyleSheet stringStyle = defaultStyle.withValues( ObjectPresStyle.stringContentStyle.as( StyleSheet.style( Primitive.foreground.as( new Color( 0.0f, 0.25f, 0.5f ) ) ) ) );
 
-	private static final StyleSheet classNameStyle = defaultStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
-	private static final StyleSheet schemaNameStyle = defaultStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) );
+	private static final StyleSheet punctuationStyle = defaultStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.0f, 1.0f ) ) );
 
-	private static final StyleSheet embedStyle = defaultStyle.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) ).withAttr( Primitive.fontItalic, true );
+	private static final StyleSheet classNameStyle = defaultStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.0f ) ) );
+	private static final StyleSheet schemaNameStyle = defaultStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.0f, 0.5f ) ) );
 
-	private static final StyleSheet fieldNameStyle = defaultStyle.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.25f ) );
+	private static final StyleSheet embedStyle = defaultStyle.withValues( Primitive.foreground.as( new Color( 0.25f, 0.0f, 0.5f ) ), Primitive.fontItalic.as( true ) );
+
+	private static final StyleSheet fieldNameStyle = defaultStyle.withValues( Primitive.foreground.as( new Color( 0.5f, 0.0f, 0.25f ) ) );
 
 	
 	

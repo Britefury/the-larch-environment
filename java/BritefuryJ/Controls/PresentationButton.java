@@ -118,7 +118,7 @@ public class PresentationButton extends ControlPres
 		Bin presBin = new Bin( null );
 		DPBin binElement = (DPBin)presBin.present( ctx, usedStyle );
 		
-		Pres presButton = StyleSheet.instance.withAttr( Primitive.columnSpacing, spacing ).applyTo( new Column( new Object[] { button, binElement } ) );
+		Pres presButton = StyleSheet.style( Primitive.columnSpacing.as( spacing ) ).applyTo( new Column( new Object[] { button, binElement } ) );
 		DPElement element = presButton.present( ctx, usedStyle );
 		
 		PresentationButtonControl control = new PresentationButtonControl( ctx, usedStyle, element, binElement, presFactory );

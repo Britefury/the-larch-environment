@@ -80,16 +80,16 @@ public class DropDownExpander extends Expander
 	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
 		StyleValues usedStyle = Controls.useDropDownExpanderAttrs( style );
-		
-		StyleSheet arrowStyle = StyleSheet.instance.withAttr( Primitive.shapePainter, style.get( Controls.dropDownExpanderHeaderArrowPainter, Painter.class ) );
+
+		StyleSheet arrowStyle = StyleSheet.style( Primitive.shapePainter.as( style.get( Controls.dropDownExpanderHeaderArrowPainter, Painter.class ) ) );
 		double arrowSize = style.get( Controls.dropDownExpanderHeaderArrowSize, Double.class );
 		double padding = style.get( Controls.dropDownExpanderPadding, Double.class );
 		Pres expandedArrow = arrowStyle.applyTo( new Arrow( Arrow.Direction.DOWN, arrowSize ) );
 		Pres contractedArrow = arrowStyle.applyTo( new Arrow( Arrow.Direction.RIGHT, arrowSize ) );
 		
 		DropDownExpanderInteractor headerInteractor = new DropDownExpanderInteractor();
-		
-		StyleSheet headerStyle = StyleSheet.instance.withAttr( Primitive.rowSpacing, style.get( Controls.dropDownExpanderHeaderContentsSpacing, Double.class ) );
+
+		StyleSheet headerStyle = StyleSheet.style( Primitive.rowSpacing.as( style.get( Controls.dropDownExpanderHeaderContentsSpacing, Double.class ) ) );
 		
 		Pres expandedHeader = headerStyle.applyTo( new Row( new Pres[] { expandedArrow.alignHPack().alignVCentre(), header.alignHExpand() } ) ).withElementInteractor( headerInteractor );
 		Pres expanded = new Column( new Pres[] { expandedHeader, contents.padX( padding ) } );

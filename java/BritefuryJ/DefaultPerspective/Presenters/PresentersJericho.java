@@ -118,12 +118,10 @@ public class PresentersJericho extends ObjectPresenterRegistry
 		p.add( value );
 	}
 
-	
-	
-	private static final StyleSheet htmlSourceStyle = StyleSheet.instance.withAttr( Primitive.fontBold, true ).withAttr( Primitive.foreground, new Color( 0.2f, 0.4f, 0.6f ) ).withAttr(
-			Primitive.background, new FillPainter( new Color( 0.85f, 0.85f, 0.85f ) ) );
-	private static final StyleSheet tagStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.2f, 0.5f ) );
-	private static final StyleSheet attrNameStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.4f, 0.4f, 0.4f ) );
-	private static final StyleSheet attrPunctuationStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.3f, 0.4f, 0.3f ) );
-	private static final StyleSheet attrValueStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.2f, 0.4f, 0.2f ) );
+
+	private static final StyleSheet htmlSourceStyle = StyleSheet.style( Primitive.fontBold.as( true ), Primitive.foreground.as( new Color( 0.2f, 0.4f, 0.6f ) ), Primitive.background.as( new FillPainter( new Color( 0.85f, 0.85f, 0.85f ) ) ) );
+	private static final StyleSheet tagStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.0f, 0.2f, 0.5f ) ) );
+	private static final StyleSheet attrNameStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.4f, 0.4f, 0.4f ) ) );
+	private static final StyleSheet attrPunctuationStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.3f, 0.4f, 0.3f ) ) );
+	private static final StyleSheet attrValueStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.2f, 0.4f, 0.2f ) ) );
 }

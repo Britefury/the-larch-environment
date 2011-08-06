@@ -45,7 +45,7 @@ public class HScrollBar extends ScrollBar
 
 	protected Pres createScrollBarPres(double spacing, DPElement decArrowElement, DPElement dragBarElement, DPElement incArrowElement)
 	{
-		return StyleSheet.instance.withAttr( Primitive.rowSpacing, spacing ).applyTo( new Row( new Object[] {
-				decArrowElement, dragBarElement, incArrowElement } ) );
+		return StyleSheet.style( Primitive.rowSpacing.as( spacing ) ).applyTo( new Row( new Object[] {
+			    decArrowElement, dragBarElement, incArrowElement } ) );
 	}
 }

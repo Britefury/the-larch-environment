@@ -62,8 +62,8 @@ public class PresentersAWT extends ObjectPresenterRegistry
 					return event.getButton() == 1;
 				}
 			};
-			
-			StyleSheet swatchStyle = StyleSheet.instance.withAttr( Primitive.shapePainter, new FillPainter( colour ) ).withAttr( Primitive.cursor, new Cursor( Cursor.HAND_CURSOR ) );
+
+			StyleSheet swatchStyle = StyleSheet.style( Primitive.shapePainter.as( new FillPainter( colour ) ), Primitive.cursor.as( new Cursor( Cursor.HAND_CURSOR ) ) );
 			Pres swatch = swatchStyle.applyTo( new Box( 25.0, 10.0 ) );
 			return swatch.withElementInteractor( interactor ).alignVRefYExpand();
 		}

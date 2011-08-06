@@ -453,8 +453,7 @@ public class AttributeTable implements Presentable
 	{
 		if ( _attrTableStyle == null )
 		{
-			_attrTableStyle = StyleSheet.instance.withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, 14 )
-					.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.tableColumnSpacing, 10.0 );
+			_attrTableStyle = StyleSheet.style( Primitive.fontBold.as( true ), Primitive.fontSize.as( 14 ), Primitive.foreground.as( new Color( 0.0f, 0.0f, 0.5f ) ), Primitive.tableColumnSpacing.as( 10.0 ) );
 		}
 		return _attrTableStyle;
 	}

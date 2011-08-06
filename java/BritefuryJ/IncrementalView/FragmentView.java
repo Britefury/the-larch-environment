@@ -510,8 +510,8 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 		
 		return new Column( new Pres[] { name, childrenPres } );
 	}
-	
-	
-	private static final StyleSheet nameStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
-	private static final StyleSheet noNameStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) );
+
+
+	private static final StyleSheet nameStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.0f ) ) );
+	private static final StyleSheet noNameStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.0f, 0.0f, 0.5f ) ) );
 }

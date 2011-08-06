@@ -54,9 +54,9 @@ public class SequenceViewTestPage extends SystemPage
 	{
 		String[] lessTexts = new String[] { "abcdef", "hello", "world" };
 		String[] texts = new String[] { "abcdef", "123456", "hello", "world", "this", "is", "a", "test", "of", "the", "list", "layout", "system" };
-		
-		
-		StyleSheet puncStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
+
+
+		StyleSheet puncStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.0f ) ) );
 		Pres beginDelim = puncStyle.applyTo( new Label( "[" ) );
 		Pres endDelim = puncStyle.applyTo( new Label( "]" ) );
 		Pres separator = puncStyle.applyTo( new Label( "," ) );

@@ -564,16 +564,12 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 		
 		return new ObjectBox( "ChangeHistory", mainBox );
 	}
-	
-	
-	private static final StyleSheet pastTitleStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.5f ) )
-			.withAttr( Primitive.shapePainter, new FillPainter( new Color( 0.5f, 0.0f, 0.5f ) ) )
-			.withAttr( Primitive.fontFace, "Serif" ).withAttr( Primitive.fontSmallCaps, true );
-	private static final StyleSheet futureTitleStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.25f, 0.5f ) )
-			.withAttr( Primitive.shapePainter, new FillPainter( new Color( 0.0f, 0.25f, 0.5f ) ) )
-			.withAttr( Primitive.fontFace, "Serif" ).withAttr( Primitive.fontSmallCaps, true );
-	private static final StyleSheet pastBorderStyle = StyleSheet.instance.withAttr( Primitive.border, new SolidBorder( 2.0, 3.0, 10.0, 10.0, new Color( 0.5f, 0.0f, 0.5f ), null ) );
-	private static final StyleSheet futureBorderStyle = StyleSheet.instance.withAttr( Primitive.border, new SolidBorder( 2.0, 3.0, 10.0, 10.0, new Color( 0.0f, 0.25f, 0.5f ), null ) );
-	private static final StyleSheet listBoxStyle = StyleSheet.instance.withAttr( Primitive.columnSpacing, 10.0 );
-	private static final StyleSheet changeHistoryColumnStyle = StyleSheet.instance.withAttr( Primitive.columnSpacing, 20.0 );
+
+
+	private static final StyleSheet pastTitleStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.5f, 0.0f, 0.5f ) ), Primitive.shapePainter.as( new FillPainter( new Color( 0.5f, 0.0f, 0.5f ) ) ), Primitive.fontFace.as( "Serif" ), Primitive.fontSmallCaps.as( true ) );
+	private static final StyleSheet futureTitleStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.0f, 0.25f, 0.5f ) ), Primitive.shapePainter.as( new FillPainter( new Color( 0.0f, 0.25f, 0.5f ) ) ), Primitive.fontFace.as( "Serif" ), Primitive.fontSmallCaps.as( true ) );
+	private static final StyleSheet pastBorderStyle = StyleSheet.style( Primitive.border.as( new SolidBorder( 2.0, 3.0, 10.0, 10.0, new Color( 0.5f, 0.0f, 0.5f ), null ) ) );
+	private static final StyleSheet futureBorderStyle = StyleSheet.style( Primitive.border.as( new SolidBorder( 2.0, 3.0, 10.0, 10.0, new Color( 0.0f, 0.25f, 0.5f ), null ) ) );
+	private static final StyleSheet listBoxStyle = StyleSheet.style( Primitive.columnSpacing.as( 10.0 ) );
+	private static final StyleSheet changeHistoryColumnStyle = StyleSheet.style( Primitive.columnSpacing.as( 20.0 ) );
 }

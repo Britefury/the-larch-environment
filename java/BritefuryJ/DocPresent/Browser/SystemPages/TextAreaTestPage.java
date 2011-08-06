@@ -23,7 +23,7 @@ import BritefuryJ.StyleSheet.StyleSheet;
 
 public class TextAreaTestPage extends SystemPage
 {
-	private static final StyleSheet redText = StyleSheet.instance.withAttr( Primitive.foreground, Color.RED );
+	private static final StyleSheet redText = StyleSheet.style( Primitive.foreground.as( Color.RED ) );
 	
 	protected TextAreaTestPage()
 	{
@@ -124,11 +124,11 @@ public class TextAreaTestPage extends SystemPage
 	{
 		DPColumn resultArea = (DPColumn)new Column( new Pres[] {} ).present();
 		DPColumn eventArea = (DPColumn)new Column( new Pres[] {} ).present();
-		Pres resultBox = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( new Column( new Object[] { new Heading6( "Text:" ), resultArea, new Heading6( "Event:" ), eventArea } ) );
+		Pres resultBox = StyleSheet.style( Primitive.columnSpacing.as( 5.0 ) ).applyTo( new Column( new Object[] { new Heading6( "Text:" ), resultArea, new Heading6( "Event:" ), eventArea } ) );
 		
 		TextArea area = new TextArea( testString, new AreaListener( resultArea, eventArea, testString ) );
 		
-		Pres areaBox = StyleSheet.instance.withAttr( Primitive.columnSpacing, 10.0 ).applyTo( new Column( new Object[] { area.alignHExpand(), resultBox.alignHExpand() } ) );
+		Pres areaBox = StyleSheet.style( Primitive.columnSpacing.as( 10.0 ) ).applyTo( new Column( new Object[] { area.alignHExpand(), resultBox.alignHExpand() } ) );
 		
 		return new Body( new Pres[] { new Heading2( "Text area" ), areaBox.alignHExpand() } ).alignHExpand();
 	}

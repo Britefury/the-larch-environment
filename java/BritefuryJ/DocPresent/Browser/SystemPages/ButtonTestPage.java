@@ -67,15 +67,15 @@ public class ButtonTestPage extends SystemPage
 	
 
 	private static StyleSheet styleSheet = StyleSheet.instance;
-	private static StyleSheet blackText = styleSheet.withAttr( Primitive.foreground, Color.black );
-	private static StyleSheet redText = styleSheet.withAttr( Primitive.foreground, Color.red );
-	private static StyleSheet greenText = styleSheet.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
+	private static StyleSheet blackText = styleSheet.withValues( Primitive.foreground.as( Color.black ) );
+	private static StyleSheet redText = styleSheet.withValues( Primitive.foreground.as( Color.red ) );
+	private static StyleSheet greenText = styleSheet.withValues( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.0f ) ) );
 
 
 	
 	private static Pres colouredText(StyleSheet style)
 	{
-		return style.withAttr( Primitive.editable, false ).applyTo(
+		return style.withValues( Primitive.editable.as( false ) ).applyTo(
 				new NormalText( "Change the colour of this text, using the buttons below." ) );
 	}
 	
@@ -85,7 +85,7 @@ public class ButtonTestPage extends SystemPage
 		Button blackButton = Button.buttonWithLabel( "Black", new ButtonContentChanger( colouredTextProxyRef, colouredText( blackText ) ) );
 		Button redButton = Button.buttonWithLabel( "Red", new ButtonContentChanger( colouredTextProxyRef, colouredText( redText ) ) );
 		Button greenButton = Button.buttonWithLabel( "Green", new ButtonContentChanger( colouredTextProxyRef, colouredText( greenText ) ) );
-		Pres colourLinks = styleSheet.withAttr( Primitive.rowSpacing, 20.0 ).applyTo( new Row( new Pres[] { blackButton, redButton, greenButton } ) ).padX( 5.0 );
+		Pres colourLinks = styleSheet.withValues( Primitive.rowSpacing.as( 20.0 ) ).applyTo( new Row( new Pres[] { blackButton, redButton, greenButton } ) ).padX( 5.0 );
 		Pres colourBox = new Column( new Pres[] { colouredTextProxyRef, colourLinks } );
 		
 		return new Body( new Pres[] { new Heading2( "Action button" ), colourBox } );

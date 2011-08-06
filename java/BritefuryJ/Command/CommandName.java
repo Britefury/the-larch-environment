@@ -37,7 +37,6 @@ public class CommandName extends CommandMnemonic implements Presentable
 		return cmdBorderStyle.applyTo( new Border( completePres ) );
 	}
 
-	
-	
-	private static final StyleSheet cmdBorderStyle = StyleSheet.instance.withAttr( Primitive.border, Command.cmdBorder( new Color( 0.0f, 0.7f, 0.0f ), new Color( 0.85f, 0.95f, 0.85f ) ) );
+
+	private static final StyleSheet cmdBorderStyle = StyleSheet.style( Primitive.border.as( Command.cmdBorder( new Color( 0.0f, 0.7f, 0.0f ), new Color( 0.85f, 0.95f, 0.85f ) ) ) );
 }

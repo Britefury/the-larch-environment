@@ -2940,11 +2940,11 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	//
 	// Meta-element
 	//
-	
-	protected static StyleSheet headerDebugTextStyle = StyleSheet.instance.withAttr( Primitive.fontBold, true ).withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.5f ) );
-	protected static StyleSheet headerDescriptionTextStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.75f ) );
-	protected static StyleSheet metaHeaderRowStyle = StyleSheet.instance.withAttr( Primitive.rowSpacing, 10.0 );
-	protected static StyleSheet metaHeaderEmptyBorderStyle = StyleSheet.instance.withAttr( Primitive.border, new FilledBorder() );
+
+	protected static StyleSheet headerDebugTextStyle = StyleSheet.style( Primitive.fontBold.as( true ), Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.5f ) ) );
+	protected static StyleSheet headerDescriptionTextStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.0f, 0.0f, 0.75f ) ) );
+	protected static StyleSheet metaHeaderRowStyle = StyleSheet.style( Primitive.rowSpacing.as( 10.0 ) );
+	protected static StyleSheet metaHeaderEmptyBorderStyle = StyleSheet.style( Primitive.border.as( new FilledBorder() ) );
 	
 	private static Color explorerHeadHoverFillPaint = new Color( 0.0f, 0.4f, 0.8f, 0.25f );
 	private static Color explorerHeadHoverOutlinePaint = new Color( 0.0f, 0.4f, 0.8f, 0.5f );
@@ -3137,9 +3137,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		System.err.println( "Exception during element event handler " + eventHandler + ":" );
 		e.printStackTrace();
 	}
-	
-	
-	
-	private static final StyleSheet alreadyInUseStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.75f, 0.0f, 0.0f ) ).withAttr( Primitive.border,
-			new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.75f, 0.0f, 0.0f ), null ) );
+
+
+	private static final StyleSheet alreadyInUseStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.75f, 0.0f, 0.0f ) ), Primitive.border.as( new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.75f, 0.0f, 0.0f ), null ) ) );
 }

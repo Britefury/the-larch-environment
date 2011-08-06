@@ -1008,8 +1008,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		// Convert to stream
 		return new StreamValueBuilder( splicedMerged ).stream();
 	}
-	
-	
-	
-	private static final StyleSheet editableParaStyle = StyleSheet.instance.withAttr( RichText.appendNewlineToParagraphs, true );
+
+
+	private static final StyleSheet editableParaStyle = StyleSheet.style( RichText.appendNewlineToParagraphs.as( true ) );
 }
