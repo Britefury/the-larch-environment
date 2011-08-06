@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.python.core.Py;
+import org.python.core.PyObject;
 
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.IncrementalView.FragmentView;
@@ -230,6 +231,40 @@ public class AttributeTable implements Presentable
 		}
 	}
 	
+	
+	
+	public static AttributeTable values(AttributeWithValue... values)
+	{
+		return instance.withValues( values );
+	}
+	
+	public static AttributeTable values(PyObject values[])
+	{
+		return instance.withValues( values );
+	}
+	
+	public AttributeTable withValues(AttributeWithValue... values)
+	{
+		AttributeTable t = this;
+		for (AttributeWithValue pair: values)
+		{
+			t = t.withAttr( pair.getAttribute(), pair.getValue() );
+		}
+		return t;
+	}
+	
+	public AttributeTable withValues(PyObject values[])
+	{
+		AttributeTable t = this;
+		for (PyObject value: values)
+		{
+			AttributeWithValue pair = Py.tojava( value, AttributeWithValue.class );
+			t = t.withAttr( pair.getAttribute(), pair.getValue() );
+		}
+		return t;
+	}
+	
+
 	
 	public AttributeTable withAttr(AttributeBase attribute, Object value)
 	{

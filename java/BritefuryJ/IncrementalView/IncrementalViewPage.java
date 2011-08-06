@@ -12,6 +12,7 @@ import BritefuryJ.ChangeHistory.ChangeHistory;
 import BritefuryJ.ChangeHistory.ChangeHistoryController;
 import BritefuryJ.ChangeHistory.ChangeHistoryListener;
 import BritefuryJ.Command.BoundCommandSet;
+import BritefuryJ.Controls.AbstractHyperlink;
 import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.DocPresent.PageController;
 import BritefuryJ.DocPresent.Browser.BrowserPage;
@@ -44,7 +45,7 @@ public class IncrementalViewPage extends BrowserPage
 		
 		Hyperlink.LinkListener listener = new Hyperlink.LinkListener()
 		{
-			public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonClickedEvent event)
+			public void onLinkClicked(Hyperlink.AbstractHyperlinkControl link, PointerButtonClickedEvent event)
 			{
 				Log log = getLog();
 				log.startRecording();
@@ -54,7 +55,7 @@ public class IncrementalViewPage extends BrowserPage
 			}
 		};
 
-		Hyperlink logLink = new Hyperlink( "Page log", listener );
+		AbstractHyperlink logLink = new Hyperlink( "Page log", listener );
 //		pagePres = new Column( new Object[] { this.element.alignHExpand(), logLink.pad( 10, 10 ).alignHRight() } );
 		pagePres = new Column( new Object[] { pres.alignHExpand().alignVExpand(), logLink.pad( 10, 10 ).alignHRight().alignVRefY() } );
 	}

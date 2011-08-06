@@ -8,8 +8,12 @@ package BritefuryJ.StyleSheet;
 
 import java.util.HashMap;
 
+import org.python.core.Py;
+import org.python.core.PyObject;
+
 import BritefuryJ.AttributeTable.AttributeBase;
 import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.AttributeWithValue;
 import BritefuryJ.Pres.ApplyStyleSheet;
 
 public class StyleSheet extends AttributeTable
@@ -25,6 +29,38 @@ public class StyleSheet extends AttributeTable
 		return new StyleSheet();
 	}
 	
+	
+	public static StyleSheet style(AttributeWithValue... values)
+	{
+		return instance.withValues( values );
+	}
+	
+	public static StyleSheet style(PyObject values[])
+	{
+		return instance.withValues( values );
+	}
+	
+	public StyleSheet withValues(AttributeWithValue... values)
+	{
+		StyleSheet s = this;
+		for (AttributeWithValue pair: values)
+		{
+			s = s.withAttr( pair.getAttribute(), pair.getValue() );
+		}
+		return s;
+	}
+	
+	public StyleSheet withValues(PyObject values[])
+	{
+		StyleSheet s = this;
+		for (PyObject value: values)
+		{
+			AttributeWithValue pair = Py.tojava( value, AttributeWithValue.class );
+			s = s.withAttr( pair.getAttribute(), pair.getValue() );
+		}
+		return s;
+	}
+
 	
 	public ApplyStyleSheet applyTo(Object child)
 	{

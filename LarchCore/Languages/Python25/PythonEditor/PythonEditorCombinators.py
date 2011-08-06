@@ -25,68 +25,68 @@ class PythonEditorStyle (object):
 	pythonEditor = AttributeNamespace( 'pythonEditor' )
 
 	#keywordStyle = InheritedAttributeNonNull( pythonEditor, 'keywordStyle', StyleSheet,
-							#StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontBold, True ).withAttr( Primitive.fontSize, 14 )
-							#.withAttr( Primitive.foreground, Color( 0.25, 0.0, 0.5 ) ).withAttr( Primitive.fontSmallCaps, True ) )
+							#StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.fontBold( True ),
+							#Primitive.foreground( Color( 0.25, 0.0, 0.5 ) ), Primitive.fontSmallCaps( True ) )
 	keywordStyle = InheritedAttributeNonNull( pythonEditor, 'keywordStyle', StyleSheet,
-	                                          StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontBold, True ).withAttr( Primitive.fontSize, 14 )
-	                                          .withAttr( Primitive.foreground, Color( 0.25, 0.0, 0.5 ) ) )
+	                                          StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.fontBold( True ),
+	                                          Primitive.foreground( Color( 0.25, 0.0, 0.5 ) ) ) )
 	literalFormatStyle = InheritedAttributeNonNull( pythonEditor, 'literalFormatStyle', StyleSheet,
-	                                                StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color( 0.0, 0.25, 0.25 ) ) )
+	                                                StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.0, 0.25, 0.25 ) ) ) )
 	quotationStyle = InheritedAttributeNonNull( pythonEditor, 'quotationStyle', StyleSheet,
-	                                            StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color( 0.0, 0.0, 0.5 ) ) )
+	                                            StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.0, 0.0, 0.5 ) ) ) )
 	stringLiteralStyle = InheritedAttributeNonNull( pythonEditor, 'stringLiteralStyle', StyleSheet,
-	                                                StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color( 0.25, 0.0, 0.5 ) ) )
+	                                                StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.25, 0.0, 0.5 ) ) ) )
 	numLiteralStyle = InheritedAttributeNonNull( pythonEditor, 'numLiteralStyle', StyleSheet,
-	                                             StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color( 0.0, 0.5, 0.5 ) ) )
+	                                             StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.0, 0.5, 0.5 ) ) ) )
 	punctuationStyle = InheritedAttributeNonNull( pythonEditor, 'punctuationStyle', StyleSheet,
-	                                              StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color( 0.0, 0.0, 1.0 ) ) )
+	                                              StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.0, 0.0, 1.0 ) ) ) )
 	delimStyle = InheritedAttributeNonNull( pythonEditor, 'delimStyle', StyleSheet,
-	                                        StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color( 0.0, 0.0, 1.0 ) ) )
+	                                        StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.0, 0.0, 1.0 ) ) ) )
 	targetStyle = InheritedAttributeNonNull( pythonEditor, 'targetStyle', StyleSheet,
-	                                         StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color.black ) )
+	                                         StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.foreground( Color.black ) ) )
 	varStyle = InheritedAttributeNonNull( pythonEditor, 'varStyle', StyleSheet,
-	                                      StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color.black ) )
+	                                      StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.foreground( Color.black ) ) )
 	attributeStyle = InheritedAttributeNonNull( pythonEditor, 'attributeStyle', StyleSheet,
-	                                            StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color.black ) )
+	                                            StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.foreground( Color.black ) ) )
 	kwNameStyle = InheritedAttributeNonNull( pythonEditor, 'kwNameStyle', StyleSheet,
-	                                         StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color.black ) )
+	                                         StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.foreground( Color.black ) ) )
 	operatorStyle = InheritedAttributeNonNull( pythonEditor, 'operatorStyle', StyleSheet,
-	                                           StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontBold, True )
-	                                           .withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color( 0.0, 0.5, 0.0 ) ) )
+	                                           StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontBold( True ), Primitive.fontSize( 14 ),
+						   Primitive.foreground( Color( 0.0, 0.5, 0.0 ) ) ) )
 	paramStyle = InheritedAttributeNonNull( pythonEditor, 'paramStyle', StyleSheet,
-	                                        StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color.black ) )
+	                                        StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.foreground( Color.black ) ) )
 	importStyle = InheritedAttributeNonNull( pythonEditor, 'importStyle', StyleSheet,
-	                                         StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color.black ) )
+	                                         StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.foreground( Color.black ) ) )
 	commentStyle = InheritedAttributeNonNull( pythonEditor, 'commentStyle', StyleSheet,
-	                                          StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color( 0.4, 0.4, 0.4 ) ) )
+	                                          StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.4, 0.4, 0.4 ) ) ) )
 	unparseableStyle = InheritedAttributeNonNull( pythonEditor, 'unparseableStyle', StyleSheet,
-	                                              StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 )
-	                                              .withAttr( Primitive.foreground, Color.black ).withAttr( Primitive.textSquiggleUnderlinePaint, Color.red ) )
+	                                              StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ),
+	                                              Primitive.foreground( Color.black ), Primitive.textSquiggleUnderlinePaint( Color.red ) ) )
 
 	sequenceStyle = InheritedAttributeNonNull( pythonEditor, 'sequenceStyle', StyleSheet,
-	                                           StyleSheet.instance.withAttr( Sequence.addLineBreaks, True ).withAttr( Sequence.matchOuterIndentation, True ).withAttr( Sequence.addLineBreakCost, True ) )
+	                                           StyleSheet.style( Sequence.addLineBreaks( True ), Sequence.matchOuterIndentation( True ), Sequence.addLineBreakCost( True ) ) )
 
 	quoteBorderStyle = InheritedAttributeNonNull( pythonEditor, 'quoteBorderStyle', StyleSheet,
-	                                              StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.5, 0.3, 0.7 ), None ) ) )
+	                                              StyleSheet.style( Primitive.border( SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.5, 0.3, 0.7 ), None ) ) ) )
 	quoteTitleStyle = InheritedAttributeNonNull( pythonEditor, 'quoteTitleStyle', StyleSheet,
-	                                             StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.3, 0.1, 0.5 ) ).withAttr( Primitive.fontSize, 10 ) )
+	                                             StyleSheet.style( Primitive.foreground( Color( 0.3, 0.1, 0.5 ) ), Primitive.fontSize( 10 ) ) )
 
 	unquoteBorderStyle = InheritedAttributeNonNull( pythonEditor, 'unquoteBorderStyle', StyleSheet,
-	                                                StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 1.0, 0.5, 0.3 ), None ) ) )
+	                                                StyleSheet.style( Primitive.border( SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 1.0, 0.5, 0.3 ), None ) ) ) )
 	unquoteTitleStyle = InheritedAttributeNonNull( pythonEditor, 'unquoteTitleStyle', StyleSheet,
-	                                               StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.7, 0.35, 0.0 ) ).withAttr( Primitive.fontSize, 10 ) )
+	                                               StyleSheet.style( Primitive.foreground( Color( 0.7, 0.35, 0.0 ) ), Primitive.fontSize( 10 ) ) )
 
 	externalExprBorderStyle = InheritedAttributeNonNull( pythonEditor, 'externalExprBorderStyle', StyleSheet,
-	                                                     StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.3, 0.7, 1.0 ), None ) ) )
+	                                                     StyleSheet.style( Primitive.border( SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.3, 0.7, 1.0 ), None ) ) ) )
 	externalExprTitleStyle = InheritedAttributeNonNull( pythonEditor, 'externalExprTitleStyle', StyleSheet,
-	                                                    StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.5, 1.0 ) ).withAttr( Primitive.fontSize, 10 ) )
+	                                                    StyleSheet.style( Primitive.foreground( Color( 0.0, 0.5, 1.0 ) ), Primitive.fontSize( 10 ) ) )
 
 	embeddedObjectBorderStyle = InheritedAttributeNonNull( pythonEditor, 'embeddedObjectBorderStyle', StyleSheet,
-	                                                     StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 2.0, 2.0, 4.0, 4.0, Color( 0.6, 0.65, 0.8 ), None ) ) )
+	                                                     StyleSheet.style( Primitive.border( SolidBorder( 2.0, 2.0, 4.0, 4.0, Color( 0.6, 0.65, 0.8 ), None ) ) ) )
 	embeddedObjectLineStyle = InheritedAttributeNonNull( pythonEditor, 'embeddedObjectLineStyle', StyleSheet,
-	                                                   StyleSheet.instance.withAttr( Primitive.shapePainter, FillPainter( Color( 0.1, 0.2, 0.3 ) ) ) )
+	                                                   StyleSheet.style( Primitive.shapePainter( FillPainter( Color( 0.1, 0.2, 0.3 ) ) ) ) )
 	embeddedObjectExpansionLabelStyle = InheritedAttributeNonNull( pythonEditor, 'embeddedObjectExpansionLabelStyle', StyleSheet,
-	                                                     StyleSheet.instance.withAttr( Primitive.fontSize, 10 ) )
+	                                                     StyleSheet.style( Primitive.fontSize( 10 ) ) )
 
 
 	solidHighlightRounding = InheritedAttributeNonNull( pythonEditor, 'solidHighlightRounding', float, 3.0 )
@@ -106,27 +106,27 @@ class PythonEditorStyle (object):
 	@PyDerivedValueTable( pythonEditor )
 	def _defStmtHeaderHighlightStyle(style):
 		border = _solidHighlightBorder( style, style.get( PythonEditorStyle.defStmtHighlightColour ) )
-		return style.withAttr( Primitive.border, border )
+		return style.withValues( Primitive.border( border ) )
 
 	@PyDerivedValueTable( pythonEditor )
 	def _defStmtHighlightStyle(style):
 		border = _outlineHighlightBorder( style, style.get( PythonEditorStyle.defStmtHighlightColour ) )
-		return style.withAttr( Primitive.border, border )
+		return style.withValues( Primitive.border( border ) )
 
 	@PyDerivedValueTable( pythonEditor )
 	def _classStmtHeaderHighlightStyle(style):
 		border = _solidHighlightBorder( style, style.get( PythonEditorStyle.classStmtHighlightColour ) )
-		return style.withAttr( Primitive.border, border )
+		return style.withValues( Primitive.border( border ) )
 
 	@PyDerivedValueTable( pythonEditor )
 	def _classStmtHighlightStyle(style):
 		border = _outlineHighlightBorder( style, style.get( PythonEditorStyle.classStmtHighlightColour ) )
-		return style.withAttr( Primitive.border, border )
+		return style.withValues( Primitive.border( border ) )
 
 	@PyDerivedValueTable( pythonEditor )
 	def _badIndentationRectangleStyle(style):
 		painter = style.get( PythonEditorStyle.badIndentationRectanglePainter )
-		return style.withAttr( Primitive.shapePainter, painter )
+		return style.withValues( Primitive.shapePainter( painter ) )
 
 
 
@@ -564,7 +564,7 @@ def embeddedObject(ctx, style, valueView):
 
 @PyPresCombinatorFn
 def embeddedObjectMacro(ctx, style, valueView, modelView):
-	modelView = StyleSheet.instance.withAttr( Primitive.editable, False ).applyTo( modelView )
+	modelView = StyleSheet.style( Primitive.editable( False ) ).applyTo( modelView )
 
 	embeddedObjectBorderStyle = style.get( PythonEditorStyle.embeddedObjectBorderStyle )
 	embeddedObjectLineStyle = style.get( PythonEditorStyle.embeddedObjectLineStyle )

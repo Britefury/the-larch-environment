@@ -42,7 +42,6 @@ public class Controls
 			StyleSheet.instance.withAttr( Primitive.editable, false ).withAttr( Primitive.foreground, Color.blue )
 			.withAttr( Primitive.hoverForeground, Color.red ).withAttr( Primitive.cursor, new Cursor( Cursor.HAND_CURSOR ) ) );
 
-	
 	public static final InheritedAttributeNonNull checkboxHoverBackground = new InheritedAttributeNonNull( controlsNamespace, "checkboxHoverBackground", Painter.class,
 			new OutlinePainter( new Color( 0.5f, 0.625f, 0.75f ) ) );
 	public static final InheritedAttributeNonNull checkboxCheckBorder = new InheritedAttributeNonNull( controlsNamespace, "checkboxCheckBorder", AbstractBorder.class,

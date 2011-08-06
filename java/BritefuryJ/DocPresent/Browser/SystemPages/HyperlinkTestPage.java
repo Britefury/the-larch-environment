@@ -8,6 +8,7 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 
+import BritefuryJ.Controls.AbstractHyperlink;
 import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPProxy;
@@ -55,7 +56,7 @@ public class HyperlinkTestPage extends SystemPage
 		}
 
 
-		public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonClickedEvent event)
+		public void onLinkClicked(Hyperlink.AbstractHyperlinkControl link, PointerButtonClickedEvent event)
 		{
 			for (DPElement element: parentElement.getElements())
 			{
@@ -84,13 +85,13 @@ public class HyperlinkTestPage extends SystemPage
 	protected Pres createContents()
 	{
 		ElementRef colouredTextProxyRef = new Proxy( colouredText( blackText ) ).elementRef();
-		Hyperlink blackLink = new Hyperlink( "Black", new LinkContentChanger( colouredTextProxyRef, colouredText( blackText ) ) );
-		Hyperlink redLink = new Hyperlink( "Red", new LinkContentChanger( colouredTextProxyRef, colouredText( redText ) ) );
-		Hyperlink greenLink = new Hyperlink( "Green", new LinkContentChanger( colouredTextProxyRef, colouredText( greenText ) ) );
+		AbstractHyperlink blackLink = new Hyperlink( "Black", new LinkContentChanger( colouredTextProxyRef, colouredText( blackText ) ) );
+		AbstractHyperlink redLink = new Hyperlink( "Red", new LinkContentChanger( colouredTextProxyRef, colouredText( redText ) ) );
+		AbstractHyperlink greenLink = new Hyperlink( "Green", new LinkContentChanger( colouredTextProxyRef, colouredText( greenText ) ) );
 		Pres colourLinks = styleSheet.withAttr( Primitive.rowSpacing, 20.0 ).applyTo( new Row( new Pres[] { blackLink, redLink, greenLink } ) ).padX( 5.0 );
 		Pres colourBox = new Column( new Pres[] { colouredTextProxyRef, colourLinks } );
 		
-		Hyperlink locationLink = new Hyperlink( "To home page", new Location( "" ) );
+		AbstractHyperlink locationLink = new Hyperlink( "To home page", new Location( "" ) );
 		
 		return new Body( new Object[] { new Heading2( "Action hyperlinks" ), colourBox, new Heading2( "Location hyperlinks" ), locationLink } );
 	}

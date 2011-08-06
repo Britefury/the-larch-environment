@@ -150,7 +150,7 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 		Hyperlink.LinkListener listener = new Hyperlink.LinkListener()
 		{
 			@Override
-			public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonClickedEvent event)
+			public void onLinkClicked(Hyperlink.AbstractHyperlinkControl link, PointerButtonClickedEvent event)
 			{
 				FragmentView fragment = (FragmentView)link.getElement().getFragmentContext();
 				Location location = fragment.getBrowserContext().getLocationForObject( error );

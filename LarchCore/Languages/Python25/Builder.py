@@ -27,7 +27,7 @@ class _Builder (object):
 	
 def expr(x):
 	if x is None:
-		return none
+		return none_
 	elif isinstance( x, _Expr ):
 		return x
 	elif isinstance( x, str ):
@@ -36,9 +36,9 @@ def expr(x):
 		return StrLit( x, format='unicode' )
 	elif isinstance( x, bool ):
 		if x:
-			return true
+			return true_
 		else:
-			return false
+			return false_
 	elif isinstance( x, int ):
 		return IntLit( x )
 	elif isinstance( x, long ):
@@ -140,7 +140,7 @@ class SingleTarget (_Target):
 	
 class TupleTarget (_Target):
 	def __init__(self, targets):
-		self.targets = [ coerceTarget( t )   for t in targets ]
+		self.targets = [ target( t )   for t in targets ]
 	
 	def build(self):
 		return Py.TupleTarget( targets=[ t.build()   for t in self.targets ] )
@@ -148,7 +148,7 @@ class TupleTarget (_Target):
 	
 class ListTarget (_Target):
 	def __init__(self, targets):
-		self.targets = [ coerceTarget( t )   for t in targets ]
+		self.targets = [ target( t )   for t in targets ]
 	
 	def build(self):
 		return Py.ListTarget( targets=[ t.build()   for t in self.targets ] )
@@ -164,9 +164,9 @@ class Load (_Expr):
 	def build(self):
 		return Py.Load( name=self.name )
 	
-false = Load( 'False' )
-true = Load( 'True' )
-none = Load( 'None' )
+false_ = Load( 'False' )
+true_ = Load( 'True' )
+none_ = Load( 'None' )
 
 
 

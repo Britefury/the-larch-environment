@@ -53,12 +53,12 @@ from LarchCore.Worksheet.WorksheetEditor.View import WorksheetEditorSubject
 
 
 
-_pythonCodeBorderStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) )
-_pythonCodeEditorBorderStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 2.0, 5.0, 20.0, 20.0, Color( 0.4, 0.5, 0.6 ), None ) )
+_pythonCodeBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) ) )
+_pythonCodeEditorBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 2.0, 5.0, 20.0, 20.0, Color( 0.4, 0.5, 0.6 ), None ) ) )
 
-_quoteLocationHeaderStyle = StyleSheet.instance.withAttr( Primitive.background, FillPainter( Color( 0.75, 0.8, 0.925 ) ) )
-_quoteLocationBorderStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) )
-_quoteLocationEditorBorderStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 2.0, 5.0, 20.0, 20.0, Color( 0.4, 0.5, 0.6 ), None ) )
+_quoteLocationHeaderStyle = StyleSheet.style( Primitive.background( FillPainter( Color( 0.75, 0.8, 0.925 ) ) ) )
+_quoteLocationBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) ) )
+_quoteLocationEditorBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 2.0, 5.0, 20.0, 20.0, Color( 0.4, 0.5, 0.6 ), None ) ) )
 
 
 def _worksheetContextMenuFactory(element, menu):
@@ -88,7 +88,7 @@ class WorksheetViewer (ObjectDispatchView):
 		
 		w = Page( [ linkHeader, bodyView ] )
 		w = w.withContextMenuInteractor( _worksheetContextMenuFactory )
-		return StyleSheet.instance.withAttr( Primitive.editable, False ).applyTo( w )
+		return StyleSheet.style( Primitive.editable( False ) ).applyTo( w )
 
 
 	@ObjectDispatchMethod( ViewSchema.BodyView )
@@ -129,7 +129,7 @@ class WorksheetViewer (ObjectDispatchView):
 			if node.isCodeVisible():
 				codeView = Python25.python25EditorPerspective.applyTo( InnerFragment( node.getCode() ) )
 				if node.isCodeEditable():
-					codeView = StyleSheet.instance.withAttr( Primitive.editable, True ).applyTo( codeView )
+					codeView = StyleSheet.style( Primitive.editable( True ) ).applyTo( codeView )
 			else:
 				codeView = None
 			
@@ -156,7 +156,7 @@ class WorksheetViewer (ObjectDispatchView):
 					boxContents.append( _pythonCodeBorderStyle.applyTo( Border( codeView.alignHExpand() ).alignHExpand() ) )
 				if node.isResultVisible()  and  executionResultView is not None:
 					boxContents.append( executionResultView.alignHExpand() )
-				box = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( Column( boxContents ) )
+				box = StyleSheet.style( Primitive.columnSpacing( 5.0 ) ).applyTo( Column( boxContents ) )
 				
 				return _pythonCodeEditorBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
 		else:
@@ -166,18 +166,18 @@ class WorksheetViewer (ObjectDispatchView):
 	
 	@ObjectDispatchMethod( ViewSchema.QuoteLocationView )
 	def QuoteLocation(self, fragment, inheritedState, node):
-		targetView = StyleSheet.instance.withAttr( Primitive.editable, True ).applyTo( LocationAsInnerFragment( Location( node.getLocation() ) ) )
+		targetView = StyleSheet.style( Primitive.editable( True ) ).applyTo( LocationAsInnerFragment( Location( node.getLocation() ) ) )
 		
 		if node.isMinimal():
 			return targetView.alignHExpand()
 		else:
 			headerBox = _quoteLocationHeaderStyle.applyTo( Bin(
-				StyleSheet.instance.withAttr( Primitive.rowSpacing, 20.0 ).applyTo( Row(
+				StyleSheet.style( Primitive.rowSpacing( 20.0 ) ).applyTo( Row(
 			                [ Label( 'Location: ' ).alignHExpand(), Label( node.getLocation() ) ] ) ).alignHExpand().pad( 2.0, 2.0 ) ) )
 			
 			boxContents = [ headerBox.alignHExpand(),
 					_quoteLocationBorderStyle.applyTo( Border( targetView.alignHExpand() ).alignHExpand() ) ]
-			box = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( Column( boxContents ) )
+			box = StyleSheet.style( Primitive.columnSpacing( 5.0 ) ).applyTo( Column( boxContents ) )
 			
 			return _quoteLocationEditorBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
 

@@ -50,8 +50,8 @@ from LarchCore.PythonConsole import Console
 
 _appDocRightPadding = 30.0
 _controlsPadding = 5.0
-_appDocumentControlsStyle = StyleSheet.instance.withAttr( Primitive.rowSpacing, 20.0 ).withAttr( Primitive.border, FilledBorder( 5.0, 5.0, 5.0, 5.0, Color( 0.9, 0.9, 0.9 ) ) )
-_documentListTableStyle = StyleSheet.instance.withAttr( Primitive.tableColumnSpacing, 15.0 ).withAttr( Primitive.tableRowSpacing, 5.0 )
+_appDocumentControlsStyle = StyleSheet.style( Primitive.rowSpacing( 20.0 ), Primitive.border( FilledBorder( 5.0, 5.0, 5.0, 5.0, Color( 0.9, 0.9, 0.9 ) ) ) )
+_documentListTableStyle = StyleSheet.style( Primitive.tableColumnSpacing( 15.0 ), Primitive.tableRowSpacing( 5.0 ) )
 
 
 
@@ -179,7 +179,7 @@ class AppView (ObjectDispatchView):
 		
 		head = Head( [ linkHeader, title ] )
 		body = Body( [ openDocumentsBox.pad( 10.0, 10.0 ).alignHLeft(), consolesBox.pad( 10.0, 10.0 ).alignHLeft() ] )
-		return StyleSheet.instance.withAttr( Primitive.editable, False ).applyTo( Page( [ head, body ] ) )
+		return StyleSheet.style( Primitive.editable( False ) ).applyTo( Page( [ head, body ] ) )
 
 
 

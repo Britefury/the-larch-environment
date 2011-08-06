@@ -8,6 +8,7 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.util.regex.Pattern;
 
+import BritefuryJ.Controls.AbstractHyperlink;
 import BritefuryJ.Controls.ControlPres;
 import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.Controls.Hyperlink.HyperlinkControl;
@@ -84,10 +85,10 @@ public class TextEntryTestPage extends SystemPage
 			private class LinkListener implements Hyperlink.LinkListener
 			{
 				
-				public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonClickedEvent event)
+				public void onLinkClicked(Hyperlink.AbstractHyperlinkControl link, PointerButtonClickedEvent event)
 				{
 					status.setText( "" );
-					entry.setText( link.getText() );
+					entry.setText( ((Hyperlink.HyperlinkControl)link).getText() );
 					proxy.setChild( StyleSheet.instance.withAttr( Primitive.rowSpacing, 10.0 ).applyTo( new Row( new Object[] { entry.getElement(), status } ) ).present( ctx, style ) );
 					entry.grabCaret();
 				}
@@ -154,7 +155,7 @@ public class TextEntryTestPage extends SystemPage
 			Label status = new Label( "" );
 			DPText statusElement = (DPText)status.present( ctx, style );
 			
-			Hyperlink link = new Hyperlink( initialText, ctl.linkListener() );
+			AbstractHyperlink link = new Hyperlink( initialText, ctl.linkListener() );
 			TextEntry entry;
 			
 			if ( validationRegex == null )

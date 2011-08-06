@@ -167,12 +167,12 @@ class GraphVizConfigurationPage (ConfigurationPage):
 		return Body( [ pathSection ] )
 	
 	
-	_sectionStyle = StyleSheet.instance.withAttr( Primitive.columnSpacing, 1.0 )
-	_dirBorderStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 1.0, 0.85, 0.0 ), Color( 1.0, 1.0, 0.85 ) ) )
-	_notSetStyle = StyleSheet.instance.withAttr( Primitive.fontItalic, True )
-	_configTableStyle = StyleSheet.instance.withAttr( Primitive.tableColumnSpacing, 10.0 )
-	_configTableHeadingStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.0, 0.5 ) ).withAttr( Primitive.fontBold, True )
-	_configTableToolNameStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.25, 0.5 ) )
+	_sectionStyle = StyleSheet.style( Primitive.columnSpacing( 1.0 ) )
+	_dirBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 1.0, 0.85, 0.0 ), Color( 1.0, 1.0, 0.85 ) ) ) )
+	_notSetStyle = StyleSheet.style( Primitive.fontItalic( True ) )
+	_configTableStyle = StyleSheet.style( Primitive.tableColumnSpacing( 10.0 ) )
+	_configTableHeadingStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.0, 0.5 ) ), Primitive.fontBold( True ) )
+	_configTableToolNameStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.25, 0.5 ) ) )
 	
 
 	

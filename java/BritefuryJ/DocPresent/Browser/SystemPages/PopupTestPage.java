@@ -8,6 +8,7 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 
+import BritefuryJ.Controls.AbstractHyperlink;
 import BritefuryJ.Controls.HPopupMenu;
 import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.Controls.MenuItem;
@@ -62,12 +63,12 @@ public class PopupTestPage extends SystemPage
 	protected Pres createContents()
 	{
 		ElementRef colouredTextProxyRef = new Proxy( colouredText( blackText ) ).elementRef();
-		Hyperlink blackLink = new Hyperlink( "Black", new HyperlinkTestPage.LinkContentChanger( colouredTextProxyRef, colouredText( blackText ) ) );
-		Hyperlink redLink = new Hyperlink( "Red", new HyperlinkTestPage.LinkContentChanger( colouredTextProxyRef, colouredText( redText ) ) );
-		Hyperlink greenLink = new Hyperlink( "Green", new HyperlinkTestPage.LinkContentChanger( colouredTextProxyRef, colouredText( greenText ) ) );
-		Hyperlink blueLink = new Hyperlink( "Blue", new HyperlinkTestPage.LinkContentChanger( colouredTextProxyRef, colouredText( blueText ) ) );
-		Hyperlink purpleLink = new Hyperlink( "Purple", new HyperlinkTestPage.LinkContentChanger( colouredTextProxyRef, colouredText( purpleText ) ) );
-		Hyperlink cyanLink = new Hyperlink( "Cyan", new HyperlinkTestPage.LinkContentChanger( colouredTextProxyRef, colouredText( cyanText ) ) );
+		AbstractHyperlink blackLink = new Hyperlink( "Black", new HyperlinkTestPage.LinkContentChanger( colouredTextProxyRef, colouredText( blackText ) ) );
+		AbstractHyperlink redLink = new Hyperlink( "Red", new HyperlinkTestPage.LinkContentChanger( colouredTextProxyRef, colouredText( redText ) ) );
+		AbstractHyperlink greenLink = new Hyperlink( "Green", new HyperlinkTestPage.LinkContentChanger( colouredTextProxyRef, colouredText( greenText ) ) );
+		AbstractHyperlink blueLink = new Hyperlink( "Blue", new HyperlinkTestPage.LinkContentChanger( colouredTextProxyRef, colouredText( blueText ) ) );
+		AbstractHyperlink purpleLink = new Hyperlink( "Purple", new HyperlinkTestPage.LinkContentChanger( colouredTextProxyRef, colouredText( purpleText ) ) );
+		AbstractHyperlink cyanLink = new Hyperlink( "Cyan", new HyperlinkTestPage.LinkContentChanger( colouredTextProxyRef, colouredText( cyanText ) ) );
 
 		
 		PopupMenu menuA = new VPopupMenu( new Pres[] { greenLink, blueLink } );
@@ -81,13 +82,13 @@ public class PopupTestPage extends SystemPage
 		
 		Hyperlink.LinkListener popupListener = new Hyperlink.LinkListener()
 		{
-			public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonClickedEvent event)
+			public void onLinkClicked(Hyperlink.AbstractHyperlinkControl link, PointerButtonClickedEvent event)
 			{
 				mainMenu.popupToRightOf( link.getElement() );
 			}
 		};
 		
-		Hyperlink popupLink = new Hyperlink( "Popup", popupListener );
+		AbstractHyperlink popupLink = new Hyperlink( "Popup", popupListener );
 		Pres colourBox = new Column( new Pres[] { colouredTextProxyRef, popupLink } );
 		
 		return new Body( new Object[] { new Heading2( "Action hyperlinks" ), colourBox } );

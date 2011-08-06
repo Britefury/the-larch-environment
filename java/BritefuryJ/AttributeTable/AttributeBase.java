@@ -100,6 +100,18 @@ public abstract class AttributeBase
 	
 	
 	
+	public AttributeWithValue __call__(Object value)
+	{
+		return new AttributeWithValue( this, value );
+	}
+	
+	public AttributeWithValue as(Object value)
+	{
+		return new AttributeWithValue( this, value );
+	}
+	
+	
+	
 	abstract protected Object checkValue(Object value);
 	
 	
