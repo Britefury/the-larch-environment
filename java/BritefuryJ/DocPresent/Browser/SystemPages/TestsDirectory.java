@@ -119,10 +119,9 @@ public class TestsDirectory extends BrowserPage
 	{
 		return "System tests";
 	}
-	
 
-	
-	private static StyleSheet outlineStyle = StyleSheet.instance.withAttr( Primitive.border, new SolidBorder( 2.0, 10.0, new Color( 0.6f, 0.7f, 0.8f ), null ) );
+
+	private static StyleSheet outlineStyle = StyleSheet.style( Primitive.border.as( new SolidBorder( 2.0, 10.0, new Color( 0.6f, 0.7f, 0.8f ), null ) ) );
 
 	
 	

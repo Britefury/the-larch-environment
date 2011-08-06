@@ -42,15 +42,15 @@ public class ScrolledViewportTestPage extends SystemPage
 	
 	protected Pres createContents()
 	{
-		StyleSheet blackText = StyleSheet.instance.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, Color.black );
-		
-		StyleSheet borderStyle = StyleSheet.instance.withAttr( Primitive.border,  new SolidBorder( 2.0, 2.0, 5.0, 5.0, Color.black, null ) );
+		StyleSheet blackText = StyleSheet.style( Primitive.fontSize.as( 12 ), Primitive.foreground.as( Color.black ) );
+
+		StyleSheet borderStyle = StyleSheet.style( Primitive.border.as( new SolidBorder( 2.0, 2.0, 5.0, 5.0, Color.black, null ) ) );
 		
 		Pres b2 = blackText.applyTo( new NormalText( textBlock ) );
 		
 		Pres viewport = new SpaceBin( new ScrolledViewport( b2, 0.0, 0.0, new PersistentState() ), 0.0, 200.0 );
 		Pres border = borderStyle.applyTo( new Border( viewport ) );
-		Pres column = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( new Column( new Pres[] { new Label( "Viewport:" ).alignHPack().alignVRefY(), border } ) );
+		Pres column = StyleSheet.style( Primitive.columnSpacing.as( 5.0 ) ).applyTo( new Column( new Pres[] { new Label( "Viewport:" ).alignHPack().alignVRefY(), border } ) );
 		return column.pad( 50.0, 50.0 ).alignHExpand().alignVExpand();
 	}
 }

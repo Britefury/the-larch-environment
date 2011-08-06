@@ -32,9 +32,9 @@ import BritefuryJ.StyleSheet.StyleValues;
 public class NonLocalDndTestPage extends SystemPage
 {
 	private static StyleSheet styleSheet = StyleSheet.instance;
-	private static StyleSheet textStyle = styleSheet.withAttr( Primitive.fontSize, 18 );
-	
-	private static StyleSheet placeHolderStyle = styleSheet.withAttr( Primitive.background, new FillPainter( new Color( 1.0f, 0.9f, 0.75f  ) ) );
+	private static StyleSheet textStyle = styleSheet.withValues( Primitive.fontSize.as( 18 ) );
+
+	private static StyleSheet placeHolderStyle = styleSheet.withValues( Primitive.background.as( new FillPainter( new Color( 1.0f, 0.9f, 0.75f ) ) ) );
 	
 	
 	protected NonLocalDndTestPage()
@@ -63,7 +63,7 @@ public class NonLocalDndTestPage extends SystemPage
 	{
 		Pres titleElem = textStyle.applyTo( new StaticText( title ) );
 		
-		return styleSheet.withAttr( Primitive.rowSpacing, 20.0 ).applyTo( new Row( new Pres[] { titleElem, dest } ) );
+		return styleSheet.withValues( Primitive.rowSpacing.as( 20.0 ) ).applyTo( new Row( new Pres[] { titleElem, dest } ) );
 	}
 	
 	protected Pres makeFileReceiver()

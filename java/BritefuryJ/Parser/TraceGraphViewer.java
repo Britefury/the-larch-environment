@@ -255,5 +255,5 @@ public class TraceGraphViewer
 	}
 
 
-	private final static StyleSheet viewportBorderStyle = StyleSheet.instance.withAttr( Primitive.border, new SolidBorder( 2.0, 2.0, 5.0, 5.0, Color.black, null ) );
+	private final static StyleSheet viewportBorderStyle = StyleSheet.style( Primitive.border.as( new SolidBorder( 2.0, 2.0, 5.0, 5.0, Color.black, null ) ) );
 }

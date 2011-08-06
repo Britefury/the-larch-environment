@@ -123,16 +123,15 @@ public class PresentersSQL extends ObjectPresenterRegistry
 	};
 
 
+	private static final StyleSheet staticStyle = StyleSheet.style( Primitive.editable.as( false ) );
 
-	private static final StyleSheet staticStyle = StyleSheet.instance.withAttr( Primitive.editable, false );
-	
-	
-	private static final StyleSheet sectionHeadingStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontFace, "Serif" );
 
-	
-	private static final StyleSheet columnStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.fontBold, true );
-	
-	
-	private static final StyleSheet resultStyle = staticStyle.withAttr( Primitive.tableRowSpacing, 1.0 ).withAttr( Primitive.tableColumnSpacing, 25.0 );
+	private static final StyleSheet sectionHeadingStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.0f, 0.5f ) ), Primitive.fontBold.as( true ), Primitive.fontFace.as( "Serif" ) );
+
+
+	private static final StyleSheet columnStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.0f, 0.5f ) ), Primitive.fontBold.as( true ) );
+
+
+	private static final StyleSheet resultStyle = staticStyle.withValues( Primitive.tableRowSpacing.as( 1.0 ), Primitive.tableColumnSpacing.as( 25.0 ) );
 }
 

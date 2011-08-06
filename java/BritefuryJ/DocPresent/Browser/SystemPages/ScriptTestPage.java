@@ -38,11 +38,11 @@ public class ScriptTestPage extends SystemPage
 	
 	
 	private static StyleSheet styleSheet = StyleSheet.instance;
-	private static StyleSheet scriptPreStyleSheet = styleSheet.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, Color.blue );
-	private static StyleSheet scriptPostStyleSheet = styleSheet.withAttr( Primitive.fontSize, 24 ).withAttr( Primitive.foreground, Color.red );
-	private static StyleSheet dividerStyleSheet = styleSheet.withAttr( Primitive.fontSize, 24 );
+	private static StyleSheet scriptPreStyleSheet = styleSheet.withValues( Primitive.fontSize.as( 12 ), Primitive.foreground.as( Color.blue ) );
+	private static StyleSheet scriptPostStyleSheet = styleSheet.withValues( Primitive.fontSize.as( 24 ), Primitive.foreground.as( Color.red ) );
+	private static StyleSheet dividerStyleSheet = styleSheet.withValues( Primitive.fontSize.as( 24 ) );
 
-	private static StyleSheet scriptStyleSheet = styleSheet.withAttr( Primitive.fontSize, 16 ).withAttr( Primitive.foreground, Color.black );
+	private static StyleSheet scriptStyleSheet = styleSheet.withValues( Primitive.fontSize.as( 16 ), Primitive.foreground.as( Color.black ) );
 
 	
 	

@@ -196,7 +196,7 @@ public class IncrementalView extends IncrementalTree implements Presentable
 
 	
 		private static final StyleSheet labelStyle = StyleSheet.instance;
-		private static final StyleSheet exceptionStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 1.0f, 0.2f, 0.0f ) );
+		private static final StyleSheet exceptionStyle = StyleSheet.style( Primitive.foreground.as( new Color( 1.0f, 0.2f, 0.0f ) ) );
 	}
 	
 	
@@ -717,8 +717,8 @@ public class IncrementalView extends IncrementalTree implements Presentable
 
 		return new ObjectBorder( boxContents );
 	}
-	
-	
-	private static final StyleSheet titleStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.fontBold, true );
-	private static final StyleSheet contentsStyle = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 );
+
+
+	private static final StyleSheet titleStyle = StyleSheet.style( Primitive.fontSize.as( 14 ), Primitive.fontBold.as( true ) );
+	private static final StyleSheet contentsStyle = StyleSheet.style( Primitive.columnSpacing.as( 5.0 ) );
 }

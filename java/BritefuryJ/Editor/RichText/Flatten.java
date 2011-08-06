@@ -34,8 +34,7 @@ class Flatten
 			return style.applyTo( new Border( new Label( "<newline>" ) ) );
 		}
 
-		private static final StyleSheet style = StyleSheet.instance.withAttr( Primitive.border, new SolidBorder( 1.0, 1.0, 5.0, 5.0, Color.BLACK, new Color( 0.85f, 0.85f, 0.95f ) ) ).withAttr(
-				Primitive.fontBold, true ).withAttr( Primitive.fontItalic, true );
+		private static final StyleSheet style = StyleSheet.style( Primitive.border.as( new SolidBorder( 1.0, 1.0, 5.0, 5.0, Color.BLACK, new Color( 0.85f, 0.85f, 0.95f ) ) ), Primitive.fontBold.as( true ), Primitive.fontItalic.as( true ) );
 		
 		
 		protected static final Newline instance = new Newline();

@@ -37,13 +37,13 @@ import BritefuryJ.StyleSheet.StyleSheet;
 public class DndTestPage extends SystemPage
 {
 	private static StyleSheet mainStyle = StyleSheet.instance;
-	private static StyleSheet mathStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 16 ).withAttr( Primitive.editable, false );
-	private static StyleSheet paletteTitleStyle = mainStyle.withAttr( Primitive.fontFace, "Serif" ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, 28 );
-	private static StyleSheet paletteSectionStyle = mainStyle.withAttr( Primitive.fontFace, "Serif" ).withAttr( Primitive.fontSize, 18 );
-	private static StyleSheet outlineStyle = mainStyle.withAttr( Primitive.border, new SolidBorder( 2.0, 10.0, new Color( 0.6f, 0.7f, 0.8f ), null ) );
-	
-	private static StyleSheet placeHolderStyle = mainStyle.withAttr( Primitive.background, new FillPainter( new Color( 1.0f, 0.9f, 0.75f  ) ) );
-	private static StyleSheet sourceStyle = mainStyle.withAttr( Primitive.background, new FillPainter( new Color( 0.75f, 0.85f, 1.0f ) ) );
+	private static StyleSheet mathStyle = StyleSheet.style( Primitive.fontSize.as( 16 ), Primitive.editable.as( false ) );
+	private static StyleSheet paletteTitleStyle = mainStyle.withValues( Primitive.fontFace.as( "Serif" ), Primitive.fontBold.as( true ), Primitive.fontSize.as( 28 ) );
+	private static StyleSheet paletteSectionStyle = mainStyle.withValues( Primitive.fontFace.as( "Serif" ), Primitive.fontSize.as( 18 ) );
+	private static StyleSheet outlineStyle = mainStyle.withValues( Primitive.border.as( new SolidBorder( 2.0, 10.0, new Color( 0.6f, 0.7f, 0.8f ), null ) ) );
+
+	private static StyleSheet placeHolderStyle = mainStyle.withValues( Primitive.background.as( new FillPainter( new Color( 1.0f, 0.9f, 0.75f ) ) ) );
+	private static StyleSheet sourceStyle = mainStyle.withValues( Primitive.background.as( new FillPainter( new Color( 0.75f, 0.85f, 1.0f ) ) ) );
 
 	
 	protected DndTestPage()
@@ -133,16 +133,16 @@ public class DndTestPage extends SystemPage
 		{
 			textElements.add( makeTextSource( texts.substring( i, i+1 ) ) );
 		}
-		Pres textSection = mainStyle.withAttr( Primitive.rowSpacing, 3.0 ).applyTo( new Row( textElements ) );
+		Pres textSection = mainStyle.withValues( Primitive.rowSpacing.as( 3.0 ) ).applyTo( new Row( textElements ) );
 		
 		Pres mathTitle = paletteSectionStyle.applyTo( new Label( "Math:" ) );
 		ArrayList<Object> mathElements = new ArrayList<Object>();
 		mathElements.add( mathTitle.padX( 0.0, 20.0 ) );
 		mathElements.add( makeFractionSource() );
 		mathElements.add( makeScriptSource() );
-		Pres mathSection = mainStyle.withAttr( Primitive.rowSpacing, 3.0 ).applyTo( new Row( mathElements ) );
+		Pres mathSection = mainStyle.withValues( Primitive.rowSpacing.as( 3.0 ) ).applyTo( new Row( mathElements ) );
 		
-		Pres column = mainStyle.withAttr( Primitive.columnSpacing, 10.0 ).applyTo( new Column( new Pres[] { title, textSection.alignHPack(), mathSection.alignHPack() } ) );
+		Pres column = mainStyle.withValues( Primitive.columnSpacing.as( 10.0 ) ).applyTo( new Column( new Pres[] { title, textSection.alignHPack(), mathSection.alignHPack() } ) );
 		
 		return outlineStyle.applyTo( new Border( column ) ).pad( 20.0, 5.0 ).alignHExpand().alignVRefY();
 	}
@@ -153,7 +153,7 @@ public class DndTestPage extends SystemPage
 		Pres formula = mathStyle.applyTo( makePlaceHolder() );
 		Pres formulaPara = new Bin( mainStyle.applyTo( new Paragraph( new Pres[] { formula } ) ) ).alignHPack();
 		
-		Pres column = mainStyle.withAttr( Primitive.columnSpacing, 10.0 ).applyTo( new Column( new Pres[] { title, formulaPara } ) ).alignHExpand().alignVRefY();
+		Pres column = mainStyle.withValues( Primitive.columnSpacing.as( 10.0 ) ).applyTo( new Column( new Pres[] { title, formulaPara } ) ).alignHExpand().alignVRefY();
 		
 		return column.pad( 20.0, 5.0 );
 	}

@@ -46,7 +46,7 @@ public abstract class SystemPage extends BrowserPage
 	}
 	
 	protected abstract Pres createContents();
-	
-	
-	private static final StyleSheet staticStyle = StyleSheet.instance.withAttr( Primitive.editable, false );
+
+
+	private static final StyleSheet staticStyle = StyleSheet.style( Primitive.editable.as( false ) );
 }

@@ -69,16 +69,16 @@ public class HyperlinkTestPage extends SystemPage
 	
 
 	private static StyleSheet styleSheet = StyleSheet.instance;
-	private static StyleSheet blackText = styleSheet.withAttr( Primitive.foreground, Color.black );
-	private static StyleSheet redText = styleSheet.withAttr( Primitive.foreground, Color.red );
-	private static StyleSheet greenText = styleSheet.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
+	private static StyleSheet blackText = styleSheet.withValues( Primitive.foreground.as( Color.black ) );
+	private static StyleSheet redText = styleSheet.withValues( Primitive.foreground.as( Color.red ) );
+	private static StyleSheet greenText = styleSheet.withValues( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.0f ) ) );
 
 
 	
 	
 	private static Pres colouredText(StyleSheet style)
 	{
-		return style.withAttr( Primitive.editable, false ).applyTo(
+		return style.withValues( Primitive.editable.as( false ) ).applyTo(
 				new NormalText( "Change the colour of this text, using the hyperlinks below." ) );
 	}
 	
@@ -88,7 +88,7 @@ public class HyperlinkTestPage extends SystemPage
 		AbstractHyperlink blackLink = new Hyperlink( "Black", new LinkContentChanger( colouredTextProxyRef, colouredText( blackText ) ) );
 		AbstractHyperlink redLink = new Hyperlink( "Red", new LinkContentChanger( colouredTextProxyRef, colouredText( redText ) ) );
 		AbstractHyperlink greenLink = new Hyperlink( "Green", new LinkContentChanger( colouredTextProxyRef, colouredText( greenText ) ) );
-		Pres colourLinks = styleSheet.withAttr( Primitive.rowSpacing, 20.0 ).applyTo( new Row( new Pres[] { blackLink, redLink, greenLink } ) ).padX( 5.0 );
+		Pres colourLinks = styleSheet.withValues( Primitive.rowSpacing.as( 20.0 ) ).applyTo( new Row( new Pres[] { blackLink, redLink, greenLink } ) ).padX( 5.0 );
 		Pres colourBox = new Column( new Pres[] { colouredTextProxyRef, colourLinks } );
 		
 		AbstractHyperlink locationLink = new Hyperlink( "To home page", new Location( "" ) );

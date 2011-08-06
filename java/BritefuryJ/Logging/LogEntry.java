@@ -210,6 +210,5 @@ public class LogEntry implements Presentable
 	}
 
 
-	private static StyleSheet logEntryStyle = StyleSheet.instance.withAttr( ObjectPresStyle.objectBorderPaint, new Color( 0.45f, 0.65f, 0.0f ) ).withAttr( ObjectPresStyle.objectTitlePaint,
-			new Color( 0.45f, 0.65f, 0.0f ) );
+	private static StyleSheet logEntryStyle = StyleSheet.style( ObjectPresStyle.objectBorderPaint.as( new Color( 0.45f, 0.65f, 0.0f ) ), ObjectPresStyle.objectTitlePaint.as( new Color( 0.45f, 0.65f, 0.0f ) ) );
 }

@@ -127,6 +127,6 @@ public class EdStyleSpan extends EdAbstractText
 		return new Border( new Column( new Object[] { presentContents(), presentStyleAttrs( styleAttrs ) } ) );
 	}
 
-	
-	private static final StyleSheet attrStyle = StyleSheet.instance.withAttr( Primitive.background, new FillPainter( new Color( 0.85f, 0.95f, 1.0f ) ) );
+
+	private static final StyleSheet attrStyle = StyleSheet.style( Primitive.background.as( new FillPainter( new Color( 0.85f, 0.95f, 1.0f ) ) ) );
 }

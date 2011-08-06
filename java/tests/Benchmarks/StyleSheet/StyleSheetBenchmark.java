@@ -22,8 +22,8 @@ public class StyleSheetBenchmark
 	
 //	private static final int RUN_LENGTH = 64;
 //	private static final int NUM_REPEATS = 64;
-	
-	private static final StyleSheet newStyle = StyleSheet.instance.withAttr( Primitive.fontFace, "Serif" );
+
+	private static final StyleSheet newStyle = StyleSheet.style( Primitive.fontFace.as( "Serif" ) );
 
 	
 	

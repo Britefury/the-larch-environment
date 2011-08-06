@@ -184,9 +184,9 @@ public class MenuItem extends ControlPres
 			{
 				throw new RuntimeException( "Invalid submenu popup direction" );
 			}
-			Pres childWithArrow = StyleSheet.instance.withAttr( Primitive.rowSpacing, spacing ).applyTo( 
-					new Row( new Pres[] { child.alignHExpand().alignVRefYExpand(),
-					StyleSheet.instance.withAttr( Primitive.shapePainter, arrowPainter ).applyTo( new Arrow( arrowDirection, arrowSize ).alignHPack().alignVCentre() ) } ) ).alignHExpand();
+			Pres childWithArrow = StyleSheet.style( Primitive.rowSpacing.as( spacing ) ).applyTo(
+				    new Row( new Pres[] { child.alignHExpand().alignVRefYExpand(),
+						StyleSheet.style( Primitive.shapePainter.as( arrowPainter ) ).applyTo( new Arrow( arrowDirection, arrowSize ).alignHPack().alignVCentre() ) } ) ).alignHExpand();
 			childElem = presentAsCombinator( ctx, usedStyle, childWithArrow );
 		}
 		else
@@ -198,7 +198,7 @@ public class MenuItem extends ControlPres
 		double padX = style.get( Controls.menuItemXPadding, Double.class );
 		double padY = style.get( Controls.menuItemYPadding, Double.class );
 		boolean bClosePopupOnActivate = style.get( Controls.bClosePopupOnActivate, Boolean.class );
-		
+
 		StyleValues menuItemStyle = style.withAttr( Primitive.hoverBackground, hoverBackground );
 		Pres menuItem = new Bin( childElem.pad( padX, padY ) ).alignHExpand();
 

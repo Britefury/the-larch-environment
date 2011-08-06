@@ -546,30 +546,30 @@ public class Primitive
 	
 	public static StyleSheet align(HAlignment h, VAlignment v)
 	{
-		return StyleSheet.instance.withAttr( hAlign, h ).withAttr( vAlign, v );
+		return StyleSheet.style( hAlign.as( h ), vAlign.as( v ) );
 	}
 	
 	public static StyleSheet alignH(HAlignment h)
 	{
-		return StyleSheet.instance.withAttr( hAlign, h );
+		return StyleSheet.style( hAlign.as( h ) );
 	}
 	
 	public static StyleSheet alignV(VAlignment v)
 	{
-		return StyleSheet.instance.withAttr( vAlign, v );
+		return StyleSheet.style( vAlign.as( v ) );
 	}
-	
 
-	public static final StyleSheet alignHPack = StyleSheet.instance.withAttr( hAlign, HAlignment.PACK );
-	public static final StyleSheet alignHLeft = StyleSheet.instance.withAttr( hAlign, HAlignment.LEFT );
-	public static final StyleSheet alignHCentre = StyleSheet.instance.withAttr( hAlign, HAlignment.CENTRE );
-	public static final StyleSheet alignHRight = StyleSheet.instance.withAttr( hAlign, HAlignment.RIGHT );
-	public static final StyleSheet alignHExpand = StyleSheet.instance.withAttr( hAlign, HAlignment.EXPAND );	
-	
-	public static final StyleSheet alignVRefY = StyleSheet.instance.withAttr( vAlign, VAlignment.REFY );
-	public static final StyleSheet alignVRefYExpand = StyleSheet.instance.withAttr( vAlign, VAlignment.REFY_EXPAND );
-	public static final StyleSheet alignVTop = StyleSheet.instance.withAttr( vAlign, VAlignment.TOP );
-	public static final StyleSheet alignVCentre = StyleSheet.instance.withAttr( vAlign, VAlignment.CENTRE );
-	public static final StyleSheet alignVBottom = StyleSheet.instance.withAttr( vAlign, VAlignment.BOTTOM );
-	public static final StyleSheet alignVExpand = StyleSheet.instance.withAttr( vAlign, VAlignment.EXPAND );
+
+	public static final StyleSheet alignHPack = StyleSheet.style( hAlign.as( HAlignment.PACK ) );
+	public static final StyleSheet alignHLeft = StyleSheet.style( hAlign.as( HAlignment.LEFT ) );
+	public static final StyleSheet alignHCentre = StyleSheet.style( hAlign.as( HAlignment.CENTRE ) );
+	public static final StyleSheet alignHRight = StyleSheet.style( hAlign.as( HAlignment.RIGHT ) );
+	public static final StyleSheet alignHExpand = StyleSheet.style( hAlign.as( HAlignment.EXPAND ) );
+
+	public static final StyleSheet alignVRefY = StyleSheet.style( vAlign.as( VAlignment.REFY ) );
+	public static final StyleSheet alignVRefYExpand = StyleSheet.style( vAlign.as( VAlignment.REFY_EXPAND ) );
+	public static final StyleSheet alignVTop = StyleSheet.style( vAlign.as( VAlignment.TOP ) );
+	public static final StyleSheet alignVCentre = StyleSheet.style( vAlign.as( VAlignment.CENTRE ) );
+	public static final StyleSheet alignVBottom = StyleSheet.style( vAlign.as( VAlignment.BOTTOM ) );
+	public static final StyleSheet alignVExpand = StyleSheet.style( vAlign.as( VAlignment.EXPAND ) );
 }

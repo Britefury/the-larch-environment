@@ -68,12 +68,11 @@ public class TableTestPage extends SystemPage
 	};
 
 	private static final StyleSheet styleSheet = StyleSheet.instance;
-	private static StyleSheet t12 = styleSheet.withAttr( Primitive.fontSize, 12 );
-	private static StyleSheet t18 = styleSheet.withAttr( Primitive.fontSize, 18 );
-	private static StyleSheet sectionStyle = styleSheet.withAttr( Primitive.columnSpacing, 5.0 ).withAttr( Primitive.border, new SolidBorder( 2.0, 3.0, new Color( 0.0f, 0.3f, 0.7f ), new Color( 0.95f, 0.975f, 1.0f  ) ) );
-	private static StyleSheet tableStyle = styleSheet.withAttr( Primitive.tableColumnSpacing, 5.0 ).withAttr( Primitive.tableRowSpacing, 5.0 )
-		.withAttr( Primitive.tableBorder, new SolidBorder( 1.0, 0.0, Color.BLACK, null ) ).withAttr( Primitive.tableCellBoundaryPaint, new Color( 0.5f, 0.5f, 0.5f ) )
-		.withAttr( Primitive.tableBackgroundPainter, checkeredTableBackgroundPainter );
+	private static StyleSheet t12 = styleSheet.withValues( Primitive.fontSize.as( 12 ) );
+	private static StyleSheet t18 = styleSheet.withValues( Primitive.fontSize.as( 18 ) );
+	private static StyleSheet sectionStyle = styleSheet.withValues( Primitive.columnSpacing.as( 5.0 ), Primitive.border.as( new SolidBorder( 2.0, 3.0, new Color( 0.0f, 0.3f, 0.7f ), new Color( 0.95f, 0.975f, 1.0f ) ) ) );
+	private static StyleSheet tableStyle = styleSheet.withValues( Primitive.tableColumnSpacing.as( 5.0 ), Primitive.tableRowSpacing.as( 5.0 ), Primitive.tableBorder.as( new SolidBorder( 1.0, 0.0, Color.BLACK, null ) ),
+		    Primitive.tableCellBoundaryPaint.as( new Color( 0.5f, 0.5f, 0.5f ) ), Primitive.tableBackgroundPainter.as( checkeredTableBackgroundPainter ) );
 
 	private Table makeTable0()
 	{

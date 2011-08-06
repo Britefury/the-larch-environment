@@ -140,7 +140,7 @@ public class Button extends ControlPres
 		boolean bClosePopupOnActivate = style.get( Controls.bClosePopupOnActivate, Boolean.class );
 		
 		Pres childElement = presentAsCombinator( ctx, Controls.useButtonAttrs( style ), child );
-		DPBorder borderElement = (DPBorder)StyleSheet.instance.withAttr( Primitive.border, border ).applyTo( new Border( childElement.alignHCentre() ) ).present( ctx, style );
+		DPBorder borderElement = (DPBorder)StyleSheet.style( Primitive.border.as( border ) ).applyTo( new Border( childElement.alignHCentre() ) ).present( ctx, style );
 		
 		return new ButtonControl( ctx, style, borderElement, border, highlightBorder, listener, bClosePopupOnActivate );
 	}

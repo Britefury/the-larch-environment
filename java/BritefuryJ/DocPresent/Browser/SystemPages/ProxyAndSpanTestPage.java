@@ -48,10 +48,10 @@ public class ProxyAndSpanTestPage extends SystemPage
 	
 
 	private static StyleSheet styleSheet = StyleSheet.instance;
-	private static StyleSheet blackText = styleSheet.withAttr( Primitive.foreground, Color.black );
-	private static StyleSheet redText = styleSheet.withAttr( Primitive.foreground, Color.red );
-	private static StyleSheet greenText = styleSheet.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
-	private static StyleSheet seaGreenText = styleSheet.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.5f ) );
+	private static StyleSheet blackText = styleSheet.withValues( Primitive.foreground.as( Color.black ) );
+	private static StyleSheet redText = styleSheet.withValues( Primitive.foreground.as( Color.red ) );
+	private static StyleSheet greenText = styleSheet.withValues( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.0f ) ) );
+	private static StyleSheet seaGreenText = styleSheet.withValues( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.5f ) ) );
 
 	
 	protected ArrayList<Object> makeTextNodes(String text)
@@ -120,7 +120,7 @@ public class ProxyAndSpanTestPage extends SystemPage
 		};
 		AbstractHyperlink modifySpanLink = new Hyperlink( "Place secondary text into span", onModifySpanLink );
 		
-		return styleSheet.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( new Column( new Pres[] { paragraph, modifySpanLink } ) );
+		return styleSheet.withValues( Primitive.columnSpacing.as( 5.0 ) ).applyTo( new Column( new Pres[] { paragraph, modifySpanLink } ) );
 	}
 	
 	protected Pres createParagraph3()
@@ -170,8 +170,8 @@ public class ProxyAndSpanTestPage extends SystemPage
 		};
 		AbstractHyperlink modifyProxyLink = new Hyperlink( "Place new span into proxy", onModifyProxyLink );
 
-		return styleSheet.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( new Column( new Pres[] { paragraph,
-				styleSheet.withAttr( Primitive.rowSpacing, 15.0 ).applyTo( new Row( new Pres[] { modifySpanLink, modifyProxyLink } ) ) } ) );
+		return styleSheet.withValues( Primitive.columnSpacing.as( 5.0 ) ).applyTo( new Column( new Pres[] { paragraph,
+			    styleSheet.withValues( Primitive.rowSpacing.as( 15.0 ) ).applyTo( new Row( new Pres[] { modifySpanLink, modifyProxyLink } ) ) } ) );
 	}
 	
 	protected Pres createContents()

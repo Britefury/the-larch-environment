@@ -85,10 +85,10 @@ public class SpinEntryTestPage extends SystemPage
 		IntSpinEntryTextChanger intListener = new IntSpinEntryTextChanger( intValueText );
 		RealSpinEntry realSpinEntry = new RealSpinEntry( 0.0, -100.0, 100.0, 1.0, 10.0, realListener );
 		IntSpinEntry intSpinEntry = new IntSpinEntry( 0, -100, 100, 1, 10, intListener );
-		Pres realLine = StyleSheet.instance.withAttr( Primitive.rowSpacing, 20.0 ).applyTo( new Row( new Object[] { new Label( "Real number: " ),
-				new SpaceBin( realSpinEntry.alignHExpand(), 100.0, -1.0 ), realValueText } ).padX( 5.0 ) );
-		Pres intLine = StyleSheet.instance.withAttr( Primitive.rowSpacing, 20.0 ).applyTo( new Row( new Object[] { new Label( "Integer: " ),
-				new SpaceBin( intSpinEntry.alignHExpand(), 100.0, -1.0 ), intValueText } ).padX( 5.0 ) );
+		Pres realLine = StyleSheet.style( Primitive.rowSpacing.as( 20.0 ) ).applyTo( new Row( new Object[] { new Label( "Real number: " ),
+			    new SpaceBin( realSpinEntry.alignHExpand(), 100.0, -1.0 ), realValueText } ).padX( 5.0 ) );
+		Pres intLine = StyleSheet.style( Primitive.rowSpacing.as( 20.0 ) ).applyTo( new Row( new Object[] { new Label( "Integer: " ),
+			    new SpaceBin( intSpinEntry.alignHExpand(), 100.0, -1.0 ), intValueText } ).padX( 5.0 ) );
 		Pres spinEntrySectionContents = new Column( new Pres[] { realLine, intLine } );
 		
 		return new Body( new Pres[] { new Heading2( "Spin entries" ), spinEntrySectionContents } );

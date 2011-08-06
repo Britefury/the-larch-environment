@@ -37,11 +37,11 @@ public class ColumnTestPage extends SystemPage
 
 	
 	StyleSheet styleSheet = StyleSheet.instance;
-	StyleSheet outlineStyleSheet = styleSheet.withAttr( Primitive.border, new SolidBorder( 1.0, 0.0, new Color( 0.0f, 0.3f, 0.7f ), null ) );
-	StyleSheet textOnGreyStyle = styleSheet.withAttr( Primitive.background, new FillPainter( new Color( 0.8f, 0.8f, 0.8f ) ) );
-	StyleSheet t12Style = styleSheet.withAttr( Primitive.fontSize, 12 );
-	StyleSheet t18Style = styleSheet.withAttr( Primitive.fontSize, 18 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.3f, 0.6f ) );
-	StyleSheet t24Style = styleSheet.withAttr( Primitive.fontSize, 24 );
+	StyleSheet outlineStyleSheet = styleSheet.withValues( Primitive.border.as( new SolidBorder( 1.0, 0.0, new Color( 0.0f, 0.3f, 0.7f ), null ) ) );
+	StyleSheet textOnGreyStyle = styleSheet.withValues( Primitive.background.as( new FillPainter( new Color( 0.8f, 0.8f, 0.8f ) ) ) );
+	StyleSheet t12Style = styleSheet.withValues( Primitive.fontSize.as( 12 ) );
+	StyleSheet t18Style = styleSheet.withValues( Primitive.fontSize.as( 18 ), Primitive.foreground.as( new Color( 0.0f, 0.3f, 0.6f ) ) );
+	StyleSheet t24Style = styleSheet.withValues( Primitive.fontSize.as( 24 ) );
 
 	
 	
@@ -49,7 +49,7 @@ public class ColumnTestPage extends SystemPage
 	{
 		Pres v = new Column( new Pres[] { styleSheet.applyTo( new Label( "First item" ) ), styleSheet.applyTo( new Label( "Second item" ) ),
 				styleSheet.applyTo( new Label( "Third item" ) ), styleSheet.applyTo( new Label( "Fourth item item" ) ) }, refPointIndex );
-		v = styleSheet.withAttr( Primitive.columnSpacing, 0.0 ).applyTo( v );
+		v = styleSheet.withValues( Primitive.columnSpacing.as( 0.0 ) ).applyTo( v );
 		return new Row( new Pres[] { t18Style.applyTo( new Label( header ) ), v, t18Style.applyTo( new Label( "After" ) ) } );
 	}
 	
@@ -62,7 +62,7 @@ public class ColumnTestPage extends SystemPage
 				t12Style.applyTo( new Label( "Second item" ) ),
 				t12Style.applyTo( new Label( "Third item" ) ) } );
 		
-		Pres hAlignTest = styleSheet.withAttr( Primitive.columnSpacing, 10.0 ).applyTo( new Column( new Pres[] {
+		Pres hAlignTest = styleSheet.withValues( Primitive.columnSpacing.as( 10.0 ) ).applyTo( new Column( new Pres[] {
 				t24Style.applyTo( new Label( "Horizontal alignment" ) ),
 				textOnGreyStyle.applyTo( new Label( "Left" ) ).alignHLeft(),
 				textOnGreyStyle.applyTo( new Label( "Centre" ) ).alignHCentre(),
@@ -70,7 +70,7 @@ public class ColumnTestPage extends SystemPage
 				textOnGreyStyle.applyTo( new Label( "Expand" ) ).alignHExpand() } ) );
 		
 		
-		Pres refPointAlignTest = styleSheet.withAttr( Primitive.columnSpacing, 20.0 ).applyTo( new Column( new Pres[] {
+		Pres refPointAlignTest = styleSheet.withValues( Primitive.columnSpacing.as( 20.0 ) ).applyTo( new Column( new Pres[] {
 				t24Style.applyTo( new Label( "Column reference point alignment" ) ),
 				makeRefAlignedRow( 0, "ALIGN_WITH_0" ),
 				makeRefAlignedRow( 1, "ALIGN_WITH_1" ),

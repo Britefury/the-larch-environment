@@ -180,8 +180,8 @@ public class Range implements Presentable
 		Pres stepSizeField = new HorizontalField( "Step size:", numValueStyle.applyTo( new StaticText( String.valueOf( stepSize ) ) ) );
 		return new ObjectBoxWithFields( getClass().getName(), new Pres[] { rangeField, valueField, stepSizeField } );
 	}
-	
-	
-	private final static StyleSheet numValueStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.25f ) );
+
+
+	private final static StyleSheet numValueStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.5f, 0.0f, 0.25f ) ) );
 }
 

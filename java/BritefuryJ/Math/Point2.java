@@ -193,7 +193,7 @@ public class Point2 implements Presentable, Serializable
 				vectorStyle.applyTo( new Column( new Pres[] { new Label( String.valueOf( x ) ), new Label( String.valueOf( y ) ) } ) ),
 				delimStyle.applyTo( new Label( ")" ) ).alignVCentre() } );
 	}
-	
-	private static StyleSheet vectorStyle = StyleSheet.instance.withAttr( Primitive.fontFace, "Serif" ).withAttr( Primitive.columnSpacing, 2.0 );
-	private static StyleSheet delimStyle = StyleSheet.instance.withAttr( Primitive.fontScale, 2.1 );
+
+	private static StyleSheet vectorStyle = StyleSheet.style( Primitive.fontFace.as( "Serif" ), Primitive.columnSpacing.as( 2.0 ) );
+	private static StyleSheet delimStyle = StyleSheet.style( Primitive.fontScale.as( 2.1 ) );
 }

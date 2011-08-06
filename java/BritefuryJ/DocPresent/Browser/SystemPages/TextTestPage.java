@@ -34,9 +34,9 @@ public class TextTestPage extends SystemPage
 	
 	
 	private static StyleSheet styleSheet = StyleSheet.instance;
-	private static StyleSheet smallCapsStyle = styleSheet.withAttr( Primitive.fontSmallCaps, true );
-	private static StyleSheet redUnderlineStyle = styleSheet.withAttr( Primitive.textSquiggleUnderlinePaint, Color.red );
-	private static StyleSheet hoverStyle = styleSheet.withAttr( Primitive.hoverForeground, new Color( 0.0f, 0.5f, 0.5f ) );
+	private static StyleSheet smallCapsStyle = styleSheet.withValues( Primitive.fontSmallCaps.as( true ) );
+	private static StyleSheet redUnderlineStyle = styleSheet.withValues( Primitive.textSquiggleUnderlinePaint.as( Color.red ) );
+	private static StyleSheet hoverStyle = styleSheet.withValues( Primitive.hoverForeground.as( new Color( 0.0f, 0.5f, 0.5f ) ) );
 
 	
 	

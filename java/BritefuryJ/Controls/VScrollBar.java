@@ -45,7 +45,7 @@ public class VScrollBar extends ScrollBar
 
 	protected Pres createScrollBarPres(double spacing, DPElement decArrowElement, DPElement dragBarElement, DPElement incArrowElement)
 	{
-		return StyleSheet.instance.withAttr( Primitive.columnSpacing, spacing ).applyTo( new Column( new Object[] {
-				decArrowElement, dragBarElement, incArrowElement } ) );
+		return StyleSheet.style( Primitive.columnSpacing.as( spacing ) ).applyTo( new Column( new Object[] {
+			    decArrowElement, dragBarElement, incArrowElement } ) );
 	}
 }

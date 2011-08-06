@@ -89,7 +89,7 @@ public class TextEntryTestPage extends SystemPage
 				{
 					status.setText( "" );
 					entry.setText( ((Hyperlink.HyperlinkControl)link).getText() );
-					proxy.setChild( StyleSheet.instance.withAttr( Primitive.rowSpacing, 10.0 ).applyTo( new Row( new Object[] { entry.getElement(), status } ) ).present( ctx, style ) );
+					proxy.setChild( StyleSheet.style( Primitive.rowSpacing.as( 10.0 ) ).applyTo( new Row( new Object[] { entry.getElement(), status } ) ).present( ctx, style ) );
 					entry.grabCaret();
 				}
 			}

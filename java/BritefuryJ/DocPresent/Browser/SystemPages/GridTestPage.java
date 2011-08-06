@@ -38,10 +38,8 @@ public class GridTestPage extends SystemPage
 	}
 
 	private static final StyleSheet styleSheet = StyleSheet.instance;
-	private static StyleSheet t12 = styleSheet.withAttr( Primitive.fontSize, 12 );
-	private static StyleSheet tableStyle = styleSheet.withAttr( Primitive.tableColumnSpacing, 5.0 ).withAttr( Primitive.tableRowSpacing, 5.0 )
-		.withAttr( Primitive.tableBorder, new SolidBorder( 1.0, 0.0, Color.BLACK, null ) ).withAttr( Primitive.tableCellBoundaryPaint, new Color( 0.5f, 0.5f, 0.5f ) )
-		.withAttr( Primitive.tableBackgroundPainter, TableTestPage.checkeredTableBackgroundPainter );
+	private static StyleSheet t12 = styleSheet.withValues( Primitive.fontSize.as( 12 ) );
+	private static StyleSheet tableStyle = styleSheet.withValues( Primitive.tableColumnSpacing.as( 5.0 ), Primitive.tableRowSpacing.as( 5.0 ), Primitive.tableBorder.as( new SolidBorder( 1.0, 0.0, Color.BLACK, null ) ), Primitive.tableCellBoundaryPaint.as( new Color( 0.5f, 0.5f, 0.5f ) ), Primitive.tableBackgroundPainter.as( TableTestPage.checkeredTableBackgroundPainter ) );
 
 	private Pres span(int row, int startCol, int endCol)
 	{

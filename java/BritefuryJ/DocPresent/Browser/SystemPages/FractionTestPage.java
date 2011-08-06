@@ -21,9 +21,9 @@ import BritefuryJ.StyleSheet.StyleSheet;
 public class FractionTestPage extends SystemPage
 {
 	private static final StyleSheet styleSheet = StyleSheet.instance;
-	private static final StyleSheet fractionStyle = styleSheet.withAttr( Primitive.foreground, Color.black ).withAttr( Primitive.hoverForeground, new Color( 0.0f, 0.5f, 0.5f ) );
-	private static final StyleSheet smallStyle = styleSheet.withAttr( Primitive.fontSize, 10 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f) );
-	private static final StyleSheet largeStyle = styleSheet.withAttr( Primitive.fontSize, 24 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f) );
+	private static final StyleSheet fractionStyle = styleSheet.withValues( Primitive.foreground.as( Color.black ), Primitive.hoverForeground.as( new Color( 0.0f, 0.5f, 0.5f ) ) );
+	private static final StyleSheet smallStyle = styleSheet.withValues( Primitive.fontSize.as( 10 ), Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.0f ) ) );
+	private static final StyleSheet largeStyle = styleSheet.withValues( Primitive.fontSize.as( 24 ), Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.0f ) ) );
 	
 	
 	protected FractionTestPage()
@@ -68,7 +68,7 @@ public class FractionTestPage extends SystemPage
 		lines.add( makeFractionLine( new Text( "a+b" ), new Text( "p" ) ) );
 		lines.add( makeFractionLine( new Text( "a+b" ), new Text( "p+q" ) ) );
 
-		lines.add( styleSheet.withAttr( Primitive.fontSize, 24 ).applyTo( new Text( "---" ) ) );
+		lines.add( styleSheet.withValues( Primitive.fontSize.as( 24 ) ).applyTo( new Text( "---" ) ) );
 		
 		lines.add( makeFractionLine( spanOf( new Text( "a+" ), fractionOf( new Text( "x" ), new Text( "y" ), "/" ) ),
 				new Text( "p+q" ) ) );

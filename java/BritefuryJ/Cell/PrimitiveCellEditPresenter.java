@@ -246,8 +246,8 @@ public class PrimitiveCellEditPresenter
 	
 
 	private static final StyleSheet charStyle = StyleSheet.instance; 
-	private static final StyleSheet stringStyle = StyleSheet.instance; 
-	private static final StyleSheet integerStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.5f ) );
-	private static final StyleSheet floatStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
-	private static final StyleSheet booleanStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) ).withAttr( Primitive.fontSmallCaps, true );
+	private static final StyleSheet stringStyle = StyleSheet.instance;
+	private static final StyleSheet integerStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.5f, 0.0f, 0.5f ) ) );
+	private static final StyleSheet floatStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.25f, 0.0f, 0.5f ) ) );
+	private static final StyleSheet booleanStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.0f ) ), Primitive.fontSmallCaps.as( true ) );
 }

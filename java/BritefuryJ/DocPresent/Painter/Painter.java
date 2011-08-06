@@ -29,6 +29,6 @@ public abstract class Painter implements Presentable
 	@Override
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return new ObjectBox( getClass().getName(), new Border( StyleSheet.instance.withAttr( Primitive.shapePainter, this ).applyTo( new Box( 50.0, 25.0 ) ) ) );
+		return new ObjectBox( getClass().getName(), new Border( StyleSheet.style( Primitive.shapePainter.as( this ) ).applyTo( new Box( 50.0, 25.0 ) ) ) );
 	}
 }

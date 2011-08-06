@@ -91,7 +91,6 @@ public class LogView implements Presentable
 	}
 
 
-
-	static StyleSheet titleStyle = StyleSheet.instance.withAttr( Primitive.fontFace, "Serif" ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, 28 );
-	static StyleSheet boxStyle = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 );
+	static StyleSheet titleStyle = StyleSheet.style( Primitive.fontFace.as( "Serif" ), Primitive.fontBold.as( true ), Primitive.fontSize.as( 28 ) );
+	static StyleSheet boxStyle = StyleSheet.style( Primitive.columnSpacing.as( 5.0 ) );
 }

@@ -349,7 +349,7 @@ public class TabbedBox extends ControlPres
 		// Build the header
 		TabbedBoxHeaderInteractor headerInteractor = new TabbedBoxHeaderInteractor( headerSpacing, rounding, headerTabRounding, headerFillPaint, headerOutlinePaint,
 				inactiveFillPaint, inactiveOutlinePaint );
-		StyleSheet rowStyle = StyleSheet.instance.withAttr( Primitive.rowSpacing, headerSpacing );
+		StyleSheet rowStyle = StyleSheet.style( Primitive.rowSpacing.as( headerSpacing ) );
 		Pres header = rowStyle.applyTo( new Row( headers ) ).withElementInteractor( headerInteractor ).withPainter( headerInteractor ).alignHExpand();
 		
 		

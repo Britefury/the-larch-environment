@@ -34,10 +34,10 @@ public class MathRootTestPage extends SystemPage
 		return "The math-root element places its child within a mathematical square-root symbol."; 
 	}
 
-	
-	private static StyleSheet styleSheet = StyleSheet.instance.withAttr( Primitive.editable, false );
-	private static StyleSheet rootStyleSheet = styleSheet.withAttr( Primitive.foreground, Color.black ).withAttr( Primitive.hoverForeground, new Color( 0.0f, 0.5f, 0.5f ) );
-	private static StyleSheet textStyleSheet = styleSheet.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) ).withAttr( Primitive.hoverForeground, null );
+
+	private static StyleSheet styleSheet = StyleSheet.style( Primitive.editable.as( false ) );
+	private static StyleSheet rootStyleSheet = styleSheet.withValues( Primitive.foreground.as( Color.black ), Primitive.hoverForeground.as( new Color( 0.0f, 0.5f, 0.5f ) ) );
+	private static StyleSheet textStyleSheet = styleSheet.withValues( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.0f ) ), Primitive.hoverForeground.as( null ) );
 
 	
 	private Pres makeFraction(String numeratorText, String denominatorText)

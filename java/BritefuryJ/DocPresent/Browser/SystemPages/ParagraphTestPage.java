@@ -85,8 +85,8 @@ public class ParagraphTestPage extends SystemPage
 	
 	protected Pres createContents()
 	{
-		StyleSheet blackText = StyleSheet.instance.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, Color.black );
-		StyleSheet redText = StyleSheet.instance.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, Color.red );
+		StyleSheet blackText = StyleSheet.style( Primitive.fontSize.as( 12 ), Primitive.foreground.as( Color.black ) );
+		StyleSheet redText = StyleSheet.style( Primitive.fontSize.as( 12 ), Primitive.foreground.as( Color.red ) );
 		
 		Pres b2 = makeParagraph( "PER-WORD", 1, blackText );
 		Pres b3 = makeParagraph( "EVERY-4-WORDS", 4, blackText);

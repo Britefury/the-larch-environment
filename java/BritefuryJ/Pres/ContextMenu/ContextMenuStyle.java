@@ -20,13 +20,13 @@ public class ContextMenuStyle
 	
 	
 	public static final AttributeNonNull sectionTitleStyle = new AttributeNonNull( contextMenuNamespace, "sectionTitleStyle", StyleSheet.class,
-			StyleSheet.instance.withAttr( Primitive.fontSize, 16 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.3f, 0.5f ) ).withAttr( Primitive.fontBold, true ) );
+		    StyleSheet.style( Primitive.fontSize.as( 16 ), Primitive.foreground.as( new Color( 0.0f, 0.3f, 0.5f ) ), Primitive.fontBold.as( true ) ) );
 	public static final AttributeNonNull sectionColumnStyle = new AttributeNonNull( contextMenuNamespace, "sectionColumnStyle", StyleSheet.class,
-			StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 ) );
+		    StyleSheet.style( Primitive.columnSpacing.as( 5.0 ) ) );
 	public static final AttributeNonNull controlsRowStyle = new AttributeNonNull( contextMenuNamespace, "controlsRowStyle", StyleSheet.class,
-			StyleSheet.instance.withAttr( Primitive.rowSpacing, 10.0 ) );
+		    StyleSheet.style( Primitive.rowSpacing.as( 10.0 ) ) );
 	public static final AttributeNonNull controlsColumnStyle = new AttributeNonNull( contextMenuNamespace, "controlsColumnStyle", StyleSheet.class,
-			StyleSheet.instance.withAttr( Primitive.columnSpacing, 2.0 ) );
+		    StyleSheet.style( Primitive.columnSpacing.as( 2.0 ) ) );
 	
 	
 	

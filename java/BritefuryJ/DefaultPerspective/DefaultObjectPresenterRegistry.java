@@ -1096,41 +1096,39 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 	};
 
 
+	private static final StyleSheet staticStyle = StyleSheet.style( Primitive.editable.as( false ) );
 
 
-	private static final StyleSheet staticStyle = StyleSheet.instance.withAttr( Primitive.editable, false );
-	
-	
-	private static final StyleSheet punctuationStyle = staticStyle.withAttr( Primitive.foreground, Color.blue );
-	private static final StyleSheet delimStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.1f, 0.3f, 0.4f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, 14 );
-	private static final StyleSheet setDelimStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.4f, 0.3f, 0.1f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, 14 );
-	private static final StyleSheet sectionHeadingStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontFace, "Serif" );
-	
-	
-	private static final StyleSheet stackTraceStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.75f, 0.1f, 0.4f ) );
-
-	
-	private static final StyleSheet javaKeywordStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSmallCaps, true );
-	private static final StyleSheet pythonKeywordStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSmallCaps, true );
-	
-	private static final StyleSheet classPunctuationStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
-	
-	private static final StyleSheet classNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.25f, 0.5f ) );
-
-	private static final StyleSheet typeNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.4f ) );
-
-	private static final StyleSheet attributeNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.25f ) );
-	private static final StyleSheet propertyNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.15f ) );
-	private static final StyleSheet moduleNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) ).withAttr( Primitive.fontSize, 18 ).withAttr( Primitive.fontBold, true );
-
-	private static final StyleSheet fnPunctuationStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
-	private static final StyleSheet fnNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.25f, 0.5f ) );
-	private static final StyleSheet fnArgStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.25f ) );
-	private static final StyleSheet fnKWArgStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.25f ) ).withAttr( Primitive.fontItalic, true );
-	private static final StyleSheet fnVarArgStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.25f ) );
+	private static final StyleSheet punctuationStyle = staticStyle.withValues( Primitive.foreground.as( Color.blue ) );
+	private static final StyleSheet delimStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.1f, 0.3f, 0.4f ) ), Primitive.fontBold.as( true ), Primitive.fontSize.as( 14 ) );
+	private static final StyleSheet setDelimStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.4f, 0.3f, 0.1f ) ), Primitive.fontBold.as( true ), Primitive.fontSize.as( 14 ) );
+	private static final StyleSheet sectionHeadingStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.0f, 0.5f ) ), Primitive.fontBold.as( true ), Primitive.fontFace.as( "Serif" ) );
 
 
-	private static final StyleSheet matchIndentStyle = staticStyle.withAttr( Sequence.matchOuterIndentation, true );
+	private static final StyleSheet stackTraceStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.75f, 0.1f, 0.4f ) ) );
+
+
+	private static final StyleSheet javaKeywordStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.0f, 0.5f ) ), Primitive.fontBold.as( true ), Primitive.fontSmallCaps.as( true ) );
+	private static final StyleSheet pythonKeywordStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.0f, 0.5f ) ), Primitive.fontBold.as( true ), Primitive.fontSmallCaps.as( true ) );
+
+	private static final StyleSheet classPunctuationStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.25f, 0.0f, 0.5f ) ) );
+
+	private static final StyleSheet classNameStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.25f, 0.5f ) ) );
+
+	private static final StyleSheet typeNameStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.4f ) ) );
+
+	private static final StyleSheet attributeNameStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.0f, 0.25f ) ) );
+	private static final StyleSheet propertyNameStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.5f, 0.0f, 0.15f ) ) );
+	private static final StyleSheet moduleNameStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.0f ) ), Primitive.fontSize.as( 18 ), Primitive.fontBold.as( true ) );
+
+	private static final StyleSheet fnPunctuationStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.25f, 0.0f, 0.5f ) ) );
+	private static final StyleSheet fnNameStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.25f, 0.5f ) ) );
+	private static final StyleSheet fnArgStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.25f ) ) );
+	private static final StyleSheet fnKWArgStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.25f ) ), Primitive.fontItalic.as( true ) );
+	private static final StyleSheet fnVarArgStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.25f ) ) );
+
+
+	private static final StyleSheet matchIndentStyle = staticStyle.withValues( Sequence.matchOuterIndentation.as( true ) );
 
 	
 	private static final Pres comma = punctuationStyle.applyTo( new StaticText( "," ) );

@@ -85,7 +85,7 @@ public class PresentersAWT extends ObjectPresenterRegistry
 			
 			Pres textBox = new Column( new Pres[] { title, components } );
 			
-			Pres swatch = staticStyle.withAttr( Primitive.shapePainter, new FillPainter( colour ) ).applyTo( new Box( 50.0, 20.0 ) ).alignVExpand();
+			Pres swatch = staticStyle.withValues( Primitive.shapePainter.as( new FillPainter( colour ) ) ).applyTo( new Box( 50.0, 20.0 ) ).alignVExpand();
 			
 			Pres contents = colourBoxStyle.applyTo( new Row( new Pres[] { textBox, swatch } ) );
 			
@@ -140,15 +140,14 @@ public class PresentersAWT extends ObjectPresenterRegistry
 	};
 
 
-	private static final StyleSheet staticStyle = StyleSheet.instance.withAttr( Primitive.editable, false );
+	private static final StyleSheet staticStyle = StyleSheet.style( Primitive.editable.as( false ) );
 
-	private static final StyleSheet xformMatrixStyle = staticStyle.withAttr( Primitive.fontFace, "Serif" ).withAttr( Primitive.tableColumnSpacing, 10.0 ).withAttr( Primitive.tableRowSpacing, 10.0 );
-	
-	private static final StyleSheet colourObjectBoxStyle = staticStyle.withAttr( ObjectPresStyle.objectBorderPaint, new Color( 0.0f, 0.1f, 0.4f ) ).withAttr(
-			ObjectPresStyle.objectTitlePaint, new Color( 0.0f, 0.1f, 0.4f ) );
-	private static final StyleSheet colourRedStyle = staticStyle.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.75f, 0.0f, 0.0f ) );
-	private static final StyleSheet colourGreenStyle = staticStyle.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.75f, 0.0f ) );
-	private static final StyleSheet colourBlueStyle = staticStyle.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.75f ) );
-	private static final StyleSheet colourAlphaStyle = staticStyle.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.3f, 0.3f, 0.3f ) );
-	private static final StyleSheet colourBoxStyle = staticStyle.withAttr( Primitive.rowSpacing, 5.0 );
+	private static final StyleSheet xformMatrixStyle = staticStyle.withValues( Primitive.fontFace.as( "Serif" ), Primitive.tableColumnSpacing.as( 10.0 ), Primitive.tableRowSpacing.as( 10.0 ) );
+
+	private static final StyleSheet colourObjectBoxStyle = staticStyle.withValues( ObjectPresStyle.objectBorderPaint.as( new Color( 0.0f, 0.1f, 0.4f ) ), ObjectPresStyle.objectTitlePaint.as( new Color( 0.0f, 0.1f, 0.4f ) ) );
+	private static final StyleSheet colourRedStyle = staticStyle.withValues( Primitive.fontSize.as( 12 ), Primitive.foreground.as( new Color( 0.75f, 0.0f, 0.0f ) ) );
+	private static final StyleSheet colourGreenStyle = staticStyle.withValues( Primitive.fontSize.as( 12 ), Primitive.foreground.as( new Color( 0.0f, 0.75f, 0.0f ) ) );
+	private static final StyleSheet colourBlueStyle = staticStyle.withValues( Primitive.fontSize.as( 12 ), Primitive.foreground.as( new Color( 0.0f, 0.0f, 0.75f ) ) );
+	private static final StyleSheet colourAlphaStyle = staticStyle.withValues( Primitive.fontSize.as( 12 ), Primitive.foreground.as( new Color( 0.3f, 0.3f, 0.3f ) ) );
+	private static final StyleSheet colourBoxStyle = staticStyle.withValues( Primitive.rowSpacing.as( 5.0 ) );
 }
