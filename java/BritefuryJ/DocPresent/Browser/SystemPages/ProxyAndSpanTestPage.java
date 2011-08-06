@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import BritefuryJ.Controls.AbstractHyperlink;
 import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPProxy;
@@ -102,7 +103,7 @@ public class ProxyAndSpanTestPage extends SystemPage
 		
 		Hyperlink.LinkListener onModifySpanLink = new Hyperlink.LinkListener()
 		{
-			public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonClickedEvent buttonEvent)
+			public void onLinkClicked(Hyperlink.AbstractHyperlinkControl link, PointerButtonClickedEvent buttonEvent)
 			{
 				for (DPElement element: spanRef.getElements())
 				{
@@ -117,7 +118,7 @@ public class ProxyAndSpanTestPage extends SystemPage
 				}
 			}
 		};
-		Hyperlink modifySpanLink = new Hyperlink( "Place secondary text into span", onModifySpanLink );
+		AbstractHyperlink modifySpanLink = new Hyperlink( "Place secondary text into span", onModifySpanLink );
 		
 		return styleSheet.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( new Column( new Pres[] { paragraph, modifySpanLink } ) );
 	}
@@ -138,7 +139,7 @@ public class ProxyAndSpanTestPage extends SystemPage
 		
 		Hyperlink.LinkListener onModifySpanLink = new Hyperlink.LinkListener()
 		{
-			public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonClickedEvent buttonEvent)
+			public void onLinkClicked(Hyperlink.AbstractHyperlinkControl link, PointerButtonClickedEvent buttonEvent)
 			{
 				for (DPElement element: spanRef.getElements())
 				{
@@ -153,11 +154,11 @@ public class ProxyAndSpanTestPage extends SystemPage
 				}
 			}
 		};
-		Hyperlink modifySpanLink = new Hyperlink( "Place secondary text into span", onModifySpanLink );
+		AbstractHyperlink modifySpanLink = new Hyperlink( "Place secondary text into span", onModifySpanLink );
 		
 		Hyperlink.LinkListener onModifyProxyLink = new Hyperlink.LinkListener()
 		{
-			public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonClickedEvent buttonEvent)
+			public void onLinkClicked(Hyperlink.AbstractHyperlinkControl link, PointerButtonClickedEvent buttonEvent)
 			{
 				for (DPElement element: proxyRef.getElements())
 				{
@@ -167,7 +168,7 @@ public class ProxyAndSpanTestPage extends SystemPage
 				}
 			}
 		};
-		Hyperlink modifyProxyLink = new Hyperlink( "Place new span into proxy", onModifyProxyLink );
+		AbstractHyperlink modifyProxyLink = new Hyperlink( "Place new span into proxy", onModifyProxyLink );
 
 		return styleSheet.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( new Column( new Pres[] { paragraph,
 				styleSheet.withAttr( Primitive.rowSpacing, 15.0 ).applyTo( new Row( new Pres[] { modifySpanLink, modifyProxyLink } ) ) } ) );

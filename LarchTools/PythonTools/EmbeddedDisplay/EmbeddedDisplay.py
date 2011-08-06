@@ -183,10 +183,10 @@ class _FrameBox (object):
 		else:
 			return self._tabFrameStyle.applyTo( box )
 
-	_tabFrameStyle = StyleSheet.instance.withAttr( Primitive.shapePainter, FilledOutlinePainter( Color( 0.85, 0.9, 0.85 ), Color( 0.6, 0.8, 0.6 ) ) ). \
-	               withAttr( Primitive.hoverShapePainter, FilledOutlinePainter( Color( 0.6, 0.8, 0.6 ), Color( 0.0, 0.5, 0.0 ) ) )
-	_selectedTabFrameStyle = StyleSheet.instance.withAttr( Primitive.shapePainter, FilledOutlinePainter( Color( 1.0, 1.0, 0.85 ), Color( 1.0, 0.8, 0.0 ) ) ). \
-	               withAttr( Primitive.hoverShapePainter, FilledOutlinePainter( Color( 1.0, 1.0, 0.6 ), Color( 1.0, 0.5, 0.0 ) ) )
+	_tabFrameStyle = StyleSheet.style( Primitive.shapePainter( FilledOutlinePainter( Color( 0.85, 0.9, 0.85 ), Color( 0.6, 0.8, 0.6 ) ) ),
+	               Primitive.hoverShapePainter( FilledOutlinePainter( Color( 0.6, 0.8, 0.6 ), Color( 0.0, 0.5, 0.0 ) ) ) )
+	_selectedTabFrameStyle = StyleSheet.style( Primitive.shapePainter( FilledOutlinePainter( Color( 1.0, 1.0, 0.85 ), Color( 1.0, 0.8, 0.0 ) ) ),
+	               Primitive.hoverShapePainter( FilledOutlinePainter( Color( 1.0, 1.0, 0.6 ), Color( 1.0, 0.5, 0.0 ) ) ) )
 
 
 class _Frame (object):
@@ -413,7 +413,7 @@ class NamedValue (object):
 		contents = Row( [ namePres, Label( ': ' ), exprPres ] )
 		return ObjectBox( 'Monitored exp.', contents )
 		
-	_nameNotSetStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.5, 0.0, 0.0 ) ).withAttr( Primitive.fontItalic, True )
+	_nameNotSetStyle = StyleSheet.style( Primitive.foreground( Color( 0.5, 0.0, 0.0 ) ), Primitive.fontItalic( True ) )
 
 	
 	

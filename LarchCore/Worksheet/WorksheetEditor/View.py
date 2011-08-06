@@ -50,13 +50,13 @@ from LarchCore.Worksheet.WorksheetEditor.RichTextEditor import WorksheetRichText
 
 
 
-_pythonCodeHeaderStyle = StyleSheet.instance.withAttr( Primitive.background, FillPainter( Color( 0.75, 0.8, 0.925 ) ) )
-_pythonCodeBorderStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) )
-_pythonCodeEditorBorderStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 2.0, 5.0, 20.0, 20.0, Color( 0.4, 0.5, 0.6 ), None ) )
+_pythonCodeHeaderStyle = StyleSheet.style( Primitive.background( FillPainter( Color( 0.75, 0.8, 0.925 ) ) ) )
+_pythonCodeBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) ) )
+_pythonCodeEditorBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 2.0, 5.0, 20.0, 20.0, Color( 0.4, 0.5, 0.6 ), None ) ) )
 
-_quoteLocationHeaderStyle = StyleSheet.instance.withAttr( Primitive.background, FillPainter( Color( 0.75, 0.8, 0.925 ) ) )
-_quoteLocationBorderStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) )
-_quoteLocationEditorBorderStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 2.0, 5.0, 20.0, 20.0, Color( 0.4, 0.5, 0.6 ), None ) )
+_quoteLocationHeaderStyle = StyleSheet.style( Primitive.background( FillPainter( Color( 0.75, 0.8, 0.925 ) ) ) )
+_quoteLocationBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) ) )
+_quoteLocationEditorBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 2.0, 5.0, 20.0, 20.0, Color( 0.4, 0.5, 0.6 ), None ) ) )
 
 
 
@@ -338,7 +338,7 @@ class WorksheetEditor (ObjectDispatchView):
 		deleteButton = Button( Image.systemIcon( 'delete' ), _onDeleteButton )
 		
 		headerBox = _pythonCodeHeaderStyle.applyTo( Bin(
-		        StyleSheet.instance.withAttr( Primitive.rowSpacing, 20.0 ).applyTo( Row( [
+		        StyleSheet.style( Primitive.rowSpacing( 20.0 ) ).applyTo( Row( [
 		                Row( [ Label( 'Python code' ) ] ).alignHLeft(),
 		                Row( [ styleOptionMenu, deleteButton.alignVCentre() ] ).alignHRight() ] ) ).pad( 2.0, 2.0 ) ) )
 		
@@ -346,7 +346,7 @@ class WorksheetEditor (ObjectDispatchView):
 				_pythonCodeBorderStyle.applyTo( Border( codeView ) ) ]
 		if executionResultView is not None:
 			boxContents.append( executionResultView.alignHExpand() )
-		box = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( Column( boxContents ) )
+		box = StyleSheet.style( Primitive.columnSpacing( 5.0 ) ).applyTo( Column( boxContents ) )
 		
 		p = _pythonCodeEditorBorderStyle.applyTo( Border( box ).alignHExpand() )
 
@@ -374,7 +374,7 @@ class WorksheetEditor (ObjectDispatchView):
 		def _onDeleteButton(button, event):
 			WorksheetRichTextEditor.instance.deleteParagraphContainingElement( button.getElement() )
 
-		targetView = StyleSheet.instance.withAttr( Primitive.editable, True ).applyTo( LocationAsInnerFragment( Location( node.getLocation() ) ) )
+		targetView = StyleSheet.style( Primitive.editable( True ) ).applyTo( LocationAsInnerFragment( Location( node.getLocation() ) ) )
 		
 		optionTexts = [ 'Minimal', 'Normal' ]
 		optionChoices = [ StaticText( text )   for text in optionTexts ]
@@ -385,14 +385,14 @@ class WorksheetEditor (ObjectDispatchView):
 		locationEditor = TextEntry( node.getLocation(), _LocationEntryListener() )
 		
 		headerBox = _quoteLocationHeaderStyle.applyTo( Bin(
-		        StyleSheet.instance.withAttr( Primitive.rowSpacing, 20.0 ).applyTo( Row( [
+		        StyleSheet.style( Primitive.rowSpacing( 20.0 ) ).applyTo( Row( [
 		                Row( [ Label( 'Location: ' ) ] ).alignHPack(),
 		                locationEditor.alignHExpand(),
 		                Row( [ styleOptionMenu, deleteButton.alignVCentre() ] ).alignHRight() ] ) ).pad( 2.0, 2.0 ) ) )
 		
 		boxContents = [ headerBox,
 				_quoteLocationBorderStyle.applyTo( Border( targetView ) ) ]
-		box = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( Column( boxContents ) )
+		box = StyleSheet.style( Primitive.columnSpacing( 5.0 ) ).applyTo( Column( boxContents ) )
 		
 		p = _quoteLocationEditorBorderStyle.applyTo( Border( box ).alignHExpand() )
 

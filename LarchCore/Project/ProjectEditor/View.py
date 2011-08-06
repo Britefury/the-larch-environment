@@ -197,14 +197,14 @@ _projectIndexDropDest = ObjectDndHandler.DropDest( ProjectDrag, _projectIndexDro
 
 
 
-_controlsStyle = StyleSheet.instance.withAttr( Controls.bClosePopupOnActivate, True )
-_projectControlsStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 2.0, 2.0, Color( 131, 149, 172 ), None ) ).withAttr( Primitive.rowSpacing, 30.0 )
-_projectIndexNameStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.25, 0.5 ) ).withAttr( Primitive.fontBold, True ).withAttr( Primitive.fontSize, 14 )
-_packageNameStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.0, 0.5 ) ).withAttr( Primitive.fontBold, True ).withAttr( Primitive.fontSize, 14 )
-_itemHoverHighlightStyle = StyleSheet.instance.withAttr( Primitive.hoverBackground, FilledOutlinePainter( Color( 0.8, 0.825, 0.9 ), Color( 0.125, 0.341, 0.574 ), BasicStroke( 1.0 ) ) )
-_pythonPackageNameStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.0, 0.5 ) )
-_pythonPackageNameNotSetStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.5, 0.0, 0.0 ) )
-_pythonPackageNameNotSetCommentStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.2, 0.2, 0.2 ) ).withAttr( Primitive.fontItalic, True )
+_controlsStyle = StyleSheet.style( Controls.bClosePopupOnActivate( True ) )
+_projectControlsStyle = StyleSheet.style( Primitive.border( SolidBorder( 2.0, 2.0, Color( 131, 149, 172 ), None ) ), Primitive.rowSpacing( 30.0 ) )
+_projectIndexNameStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.25, 0.5 ) ), Primitive.fontBold( True ), Primitive.fontSize( 14 ) )
+_packageNameStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.0, 0.5 ) ), Primitive.fontBold( True ), Primitive.fontSize( 14 ) )
+_itemHoverHighlightStyle = StyleSheet.style( Primitive.hoverBackground( FilledOutlinePainter( Color( 0.8, 0.825, 0.9 ), Color( 0.125, 0.341, 0.574 ), BasicStroke( 1.0 ) ) ) )
+_pythonPackageNameStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.0, 0.5 ) ) )
+_pythonPackageNameNotSetStyle = StyleSheet.style( Primitive.foreground( Color( 0.5, 0.0, 0.0 ) ) )
+_pythonPackageNameNotSetCommentStyle = StyleSheet.style( Primitive.foreground( Color( 0.2, 0.2, 0.2 ) ), Primitive.fontItalic( True ) )
 
 _packageContentsIndentation = 20.0
 
@@ -338,7 +338,7 @@ class ProjectView (ObjectDispatchView):
 		head = Head( [ linkHeader, title ] )
 		body = Body( [ controlsBorder.pad( 5.0, 10.0 ).alignHLeft(), pythonPackageNameBox, reset, projectIndex ] )
 
-		return StyleSheet.instance.withAttr( Primitive.editable, False ).applyTo( Page( [ head, body ] ) )
+		return StyleSheet.style( Primitive.editable( False ) ).applyTo( Page( [ head, body ] ) )
 
 
 	@ObjectDispatchMethod( ProjectPackage )

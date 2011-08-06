@@ -110,7 +110,7 @@ class PathsConfigurationPage (ConfigurationPage):
 	pluginPaths = property( getPluginPaths )
 	pluginRootPaths = property( getPluginRootPaths )
 	
-	_sectionStyle = StyleSheet.instance.withAttr( Primitive.columnSpacing, 1.0 )
+	_sectionStyle = StyleSheet.style( Primitive.columnSpacing( 1.0 ) )
 	
 
 	

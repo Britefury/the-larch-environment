@@ -18,7 +18,7 @@ from Britefury.Util.Abstract import abstractmethod
 
 
 
-_staticStyle = StyleSheet.instance.withAttr( Primitive.editable, False )
+_staticStyle = StyleSheet.style( Primitive.editable( False ) )
 
 
 class ConfigurationPage (object):
@@ -83,7 +83,7 @@ class ConfigurationPage (object):
 		return self._configPageStyle.applyTo( Page( [ head, contents ] ) )
 	
 	
-	_configPageStyle = StyleSheet.instance.withAttr( Primitive.editable, False )
+	_configPageStyle = StyleSheet.style( Primitive.editable( False ) )
 
 
 	

@@ -81,25 +81,25 @@ class CurrentModuleInteractor (KeyElementInteractor):
 
 
 
-_bannerTextStyle = StyleSheet.instance.withAttr( Primitive.fontFace, 'Serif' ).withAttr( Primitive.fontSmallCaps, True ).withAttr( Primitive.editable, False )
-_bannerHelpKeyTextStyle = StyleSheet.instance.withAttr( Primitive.fontFace, 'Serif' ).withAttr( Primitive.fontSmallCaps, True ).withAttr( Primitive.fontItalic, True ).withAttr( Primitive.foreground, Color( 0.25, 0.25, 0.25 ) )
-_bannerHelpTextStyle = StyleSheet.instance.withAttr( Primitive.fontFace, 'Serif' ).withAttr( Primitive.fontItalic, True ).withAttr( Primitive.foreground, Color( 0.25, 0.25, 0.25 ) )
+_bannerTextStyle = StyleSheet.style( Primitive.fontFace( 'Serif' ), Primitive.fontSmallCaps( True ), Primitive.editable( False ) )
+_bannerHelpKeyTextStyle = StyleSheet.style( Primitive.fontFace( 'Serif' ), Primitive.fontSmallCaps( True ), Primitive.fontItalic( True ), Primitive.foreground( Color( 0.25, 0.25, 0.25 ) ) )
+_bannerHelpTextStyle = StyleSheet.style( Primitive.fontFace( 'Serif' ), Primitive.fontItalic( True ), Primitive.foreground( Color( 0.25, 0.25, 0.25 ) ) )
 _bannerBorder = SolidBorder( 2.0, 5.0, 8.0, 8.0, Color( 0.3, 0.5, 0.3 ), Color( 0.875, 0.9, 0.875 ) )
 
 
-_labelStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 10 )
+_labelStyle = StyleSheet.style( Primitive.fontSize( 10 ) )
 
-_blockStyle = StyleSheet.instance.withAttr( Primitive.columnSpacing, 2.0 ).withAttr( Primitive.border, SolidBorder( 1.0, 5.0, 15.0, 15.0, Color( 0.25, 0.25, 0.25 ), Color( 0.8, 0.8, 0.8 ) ) )
+_blockStyle = StyleSheet.style( Primitive.columnSpacing( 2.0 ), Primitive.border( SolidBorder( 1.0, 5.0, 15.0, 15.0, Color( 0.25, 0.25, 0.25 ), Color( 0.8, 0.8, 0.8 ) ) ) )
 
-_pythonModuleBorderStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), Color.WHITE ) )
-_dropPromptStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.0, 0.8, 0.0 ), None ) )
+_pythonModuleBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), Color.WHITE ) ) )
+_dropPromptStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.0, 0.8, 0.0 ), None ) ) )
 
-_varAssignVarNameStyle = StyleSheet.instance.withAttr( Primitive.fontItalic, True ).withAttr( Primitive.foreground, Color( 0.0, 0.0, 0.5 ) )
-_varAssignTypeNameStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.125, 0.0 ) )
-_varAssignMsgStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.125, 0.0 ) )
+_varAssignVarNameStyle = StyleSheet.style( Primitive.fontItalic( True ), Primitive.foreground( Color( 0.0, 0.0, 0.5 ) ) )
+_varAssignTypeNameStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.125, 0.0 ) ) )
+_varAssignMsgStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.125, 0.0 ) ) )
 
-_consoleBlockListStyle = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 )
-_consoleStyle = StyleSheet.instance.withAttr( Primitive.columnSpacing, 8.0 )
+_consoleBlockListStyle = StyleSheet.style( Primitive.columnSpacing( 5.0 ) )
+_consoleStyle = StyleSheet.style( Primitive.columnSpacing( 8.0 ) )
 
 
 
@@ -186,7 +186,7 @@ class ConsoleView (ObjectDispatchView):
 		stdout = executionResult.getStdOut()
 		stderr = executionResult.getStdErr()
 		
-		moduleView = StyleSheet.instance.withAttr( Primitive.editable, False ).applyTo( Python25.python25EditorPerspective.applyTo( InnerFragment( pythonModule ) ) )
+		moduleView = StyleSheet.style( Primitive.editable( False ) ).applyTo( Python25.python25EditorPerspective.applyTo( InnerFragment( pythonModule ) ) )
 		caughtExceptionView = ApplyPerspective.defaultPerspective( InnerFragment( caughtException ) )   if caughtException is not None   else None
 		resultView = ApplyPerspective.defaultPerspective( InnerFragment( result[0] ) )   if result is not None   else None
 			

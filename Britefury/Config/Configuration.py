@@ -15,7 +15,7 @@ from BritefuryJ.StyleSheet import StyleSheet
 from BritefuryJ.Projection import Subject
 
 
-_staticStyle = StyleSheet.instance.withAttr( Primitive.editable, False )
+_staticStyle = StyleSheet.style( Primitive.editable( False ) )
 
 
 class Configuration (object):
