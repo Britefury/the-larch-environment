@@ -356,6 +356,12 @@ public class Marker
 	
 	public void moveToPositionAndBiasWithinSubtree(DPElement subtree, int newPosition, Bias newBias, ElementFilter leafFilter)
 	{
+		moveTo( markerAtPositionAndBiasWithinSubtree( subtree, newPosition, newBias, leafFilter ) );
+	}
+	
+	
+	public static Marker markerAtPositionAndBiasWithinSubtree(DPElement subtree, int newPosition, Bias newBias, ElementFilter leafFilter)
+	{
 		int subtreeTextRepLength = subtree.getTextRepresentationLength();
 		
 		if ( newPosition < 0 )
@@ -389,7 +395,7 @@ public class Marker
 			
 			if ( leafFilter == null  ||  leafFilter.testElement( leaf ) )
 			{
-				moveTo( ((DPContentLeafEditable)leaf).marker( leafPosition, newBias ) );
+				return ((DPContentLeafEditable)leaf).marker( leafPosition, newBias );
 			}
 			else
 			{
@@ -441,7 +447,7 @@ public class Marker
 					DPContentLeaf left = leaf.getPreviousLeaf( segFilter, null, leafFilter );
 					if ( left != null )
 					{
-						moveTo( left.markerAtEnd() );
+						return left.markerAtEnd();
 					}
 					else
 					{
@@ -449,7 +455,7 @@ public class Marker
 						DPContentLeaf right = leaf.getNextLeaf( segFilter, null, leafFilter );
 						if ( right != null )
 						{
-							moveTo( right.markerAtStart() );
+							return right.markerAtStart();
 						}
 						else
 						{
@@ -457,7 +463,7 @@ public class Marker
 							left = leaf.getPreviousLeaf( null, null, leafFilter );
 							if ( left != null )
 							{
-								moveTo( left.markerAtEnd() );
+								return left.markerAtEnd();
 							}
 							else
 							{
@@ -465,12 +471,12 @@ public class Marker
 								right = leaf.getNextLeaf( null, null, leafFilter );
 								if ( right != null )
 								{
-									moveTo( right.markerAtStart() );
+									return right.markerAtStart();
 								}
 								else
 								{
 									// Searching backwards and forwards failed; place the cursor in the non-editable leaf and hope for the best
-									moveTo( leaf.markerAtStart() );
+									return leaf.markerAtStart();
 								}
 							}
 						}
@@ -482,7 +488,7 @@ public class Marker
 					DPContentLeaf right = leaf.getNextLeaf( segFilter, null, leafFilter );
 					if ( right != null )
 					{
-						moveTo( right.markerAtStart() );
+						return right.markerAtStart();
 					}
 					else
 					{
@@ -490,7 +496,7 @@ public class Marker
 						DPContentLeaf left = leaf.getPreviousLeaf( segFilter, null, leafFilter );
 						if ( left != null )
 						{
-							moveTo( left.markerAtEnd() );
+							return left.markerAtEnd();
 						}
 						else
 						{
@@ -498,7 +504,7 @@ public class Marker
 							right = leaf.getNextLeaf( null, null, leafFilter );
 							if ( right != null )
 							{
-								moveTo( right.markerAtStart() );
+								return right.markerAtStart();
 							}
 							else
 							{
@@ -506,12 +512,12 @@ public class Marker
 								left = leaf.getPreviousLeaf( null, null, leafFilter );
 								if ( left != null )
 								{
-									moveTo( left.markerAtEnd() );
+									return left.markerAtEnd();
 								}
 								else
 								{
 									// Searching forwards and backwards failed; place the cursor in the non-editable leaf and hope for the best
-									moveTo( leaf.markerAtStart() );
+									return leaf.markerAtStart();
 								}
 							}
 						}
@@ -523,6 +529,8 @@ public class Marker
 				}
 			}
 		}
+		
+		return null;
 	}
 	
 	

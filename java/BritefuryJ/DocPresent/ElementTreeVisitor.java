@@ -106,7 +106,7 @@ public abstract class ElementTreeVisitor
 		
 		if ( leaf == root )
 		{
-			inOrderVisitPartialContentLeafEditable( leaf, marker.getClampedIndex(), leaf.getTextRepresentation().length() );
+			inOrderVisitPartialContentLeafEditable( leaf, marker.getClampedIndex(), leaf.getTextRepresentationLength() );
 			postOrderVisitElement( leaf, false );
 		}
 		else
@@ -129,7 +129,7 @@ public abstract class ElementTreeVisitor
 				if ( startIndex == path.size() - 1 )
 				{
 					// We are visiting the last element (leaf)
-					inOrderVisitPartialContentLeafEditable( leaf, marker.getClampedIndex(), leaf.getTextRepresentation().length() );
+					inOrderVisitPartialContentLeafEditable( leaf, marker.getClampedIndex(), leaf.getTextRepresentationLength() );
 					postOrderVisitElement( leaf, false );
 					
 					// We have visited the leaf
