@@ -56,7 +56,8 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	
 	public interface NodeElementChangeListener
 	{
-		public void reset(IncrementalView view);
+		public void begin(IncrementalView view);
+		public void end(IncrementalView view);
 		public void elementChangeFrom(FragmentView node, DPElement e);
 		public void elementChangeTo(FragmentView node, DPElement e);
 	}
@@ -328,7 +329,7 @@ public class IncrementalView extends IncrementalTree implements Presentable
 		}
 		
 		
-		setElementChangeListener( new NodeElementChangeListenerDiff() );
+		setElementChangeListener( new NodeElementChangeListenerDiff( this ) );
 
 		RootPres rootPres = new RootPres();
 		viewPres = new Column( new Pres[] { new Region( rootPres, getRootPerspective().getClipboardHandler() ) } );
@@ -605,14 +606,25 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	
 	
 
-	protected void onResultChangeTreeRefresh()
+	@Override
+	protected void onResultChangeTreeRefreshBegin()
 	{
 		if ( elementChangeListener != null )
 		{
-			elementChangeListener.reset( this );
+			elementChangeListener.begin( this );
 		}
 	}
 
+	@Override
+	protected void onResultChangeTreeRefreshEnd()
+	{
+		if ( elementChangeListener != null )
+		{
+			elementChangeListener.end( this );
+		}
+	}
+
+	@Override
 	protected void onResultChangeFrom(IncrementalTreeNode node, Object result)
 	{
 		if ( elementChangeListener != null )
@@ -623,6 +635,7 @@ public class IncrementalView extends IncrementalTree implements Presentable
 		}
 	}
 
+	@Override
 	protected void onResultChangeTo(IncrementalTreeNode node, Object result)
 	{
 		if ( elementChangeListener != null )
@@ -638,17 +651,20 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	
 	
 	
-	
+	public PresentationComponent.RootElement getPresentationRootElement()
+	{
+		return rootElement != null  ?  rootElement.getRootElement()  :  null;
+	}
 	
 	public Caret getCaret()
 	{
-		PresentationComponent.RootElement elementTree = rootElement.getRootElement();
+		PresentationComponent.RootElement elementTree = getPresentationRootElement();
 		return elementTree != null  ?  elementTree.getCaret()  :  null;
 	}
 	
 	public Selection getSelection()
 	{
-		PresentationComponent.RootElement elementTree = rootElement.getRootElement();
+		PresentationComponent.RootElement elementTree = getPresentationRootElement();
 		return elementTree != null  ?  elementTree.getSelection()  :  null;
 	}
 	

@@ -7,12 +7,15 @@
 package BritefuryJ.IncrementalView;
 
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Marker.Marker.Bias;
+import BritefuryJ.DocPresent.Selection.Selection;
+import BritefuryJ.DocPresent.Selection.TextSelection;
+import BritefuryJ.DocPresent.Selection.TextSelectionPoint;
 import BritefuryJ.Util.StringDiff;
 
 public class NodeElementChangeListenerDiff implements IncrementalView.NodeElementChangeListener
@@ -20,78 +23,104 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 	private static final int DIFF_THRESHHOLD = 65536;
 	
 	
-	private FragmentView caretNode;
-	private String textRepresentation;
-	private Marker.Bias bias;
-	private int position;
 	
-	
-	public NodeElementChangeListenerDiff()
+	public static class MonitoredMarker
 	{
-		caretNode = null;
-		textRepresentation = null;
-		bias = Marker.Bias.START;
-		position = -1;
-	}
-	
-	
-	public void reset(IncrementalView view)
-	{
-		caretNode = null;
-		textRepresentation = null;
-		bias = Marker.Bias.START;
-		position = -1;
-	}
-
-	
-	public void elementChangeFrom(FragmentView node, DPElement element)
-	{
-		if ( caretNode == null )
-		{
-			// Get and store initial state
-			DPElement nodeElement = node.getFragmentContentElement();
-			if ( nodeElement != null )
-			{
-				PresentationComponent.RootElement root = nodeElement.getRootElement();
-				if ( root != null )
-				{
-					Caret caret = root.getCaret();
+		private Marker marker;
+		private MarkerState state;
 		
-					String text = nodeElement.getTextRepresentation();
-					int pos = -1;
-					
-					try
-					{
-						pos = caret.getPositionInSubtree( nodeElement );
-						caretNode = node;
-						textRepresentation = text;
-						bias = caret.getBias();
-						position = pos;
-					}
-					catch (DPElement.IsNotInSubtreeException e)
-					{
-					}
-				}
-			}
+		
+		public MonitoredMarker(Marker marker)
+		{
+			this.marker = marker;
+		}
+		
+		
+		private boolean canReposition()
+		{
+			return state != null  &&  state.subtree != null;
 		}
 	}
-
-	public void elementChangeTo(FragmentView node, DPElement element)
+	
+	
+	private static class MarkerState
 	{
-		if ( caretNode == node )
+		private DPElement subtree;
+		private int position;
+		private Marker.Bias bias;
+		
+		public MarkerState(int position, Marker.Bias bias)
+		{
+			this.position = position;
+			this.bias = bias;
+		}
+		
+		
+		public void setSubtreeElement(DPElement subtree)
+		{
+			this.subtree = subtree;
+		}
+
+		public void reposition(int position, Marker.Bias bias)
+		{
+			this.position = position;
+			this.bias = bias;
+		}
+
+		public void reposition(int position)
+		{
+			this.position = position;
+		}
+	}
+	
+	
+	private static class NodeState
+	{
+		private FragmentView node;
+		private String textRepresentation;
+		
+		private ArrayList<MarkerState> markerStates  =  new ArrayList<MarkerState>();
+		
+		
+		public NodeState(FragmentView node)
+		{
+			this.node = node;
+			textRepresentation = node.getFragmentContentElement().getTextRepresentation();
+		}
+		
+		
+		public MarkerState addMarkerStateFor(Marker marker, int position)
+		{
+			Marker.Bias bias = marker.getBias();
+			for (MarkerState state: markerStates)
+			{
+				if ( state.position == position  &&  state.bias == bias )
+				{
+					return state;
+				}
+			}
+			
+			MarkerState state = new MarkerState( position, bias );
+			markerStates.add( state );
+			return state;
+		}
+		
+		
+		
+		public void handleModification()
 		{
 			DPElement nodeElement = node.getFragmentContentElement();
 			
 			// Invoking child.refresh() above can cause this method to be invoked on another node; recursively;
 			// Ensure that only the inner-most recursion level handles the caret
-			if ( nodeElement != null  &&  position != -1 )
+			if ( nodeElement != null  &&  !markerStates.isEmpty() )
 			{
 				String newTextRepresentation = nodeElement.getTextRepresentation();
 				
-				int newPosition = position;
-				Marker.Bias newBias = bias;
-				
-				//int oldIndex = position  +  ( bias == Marker.Bias.END  ?  1  :  0 );
+				for (MarkerState state: markerStates)
+				{
+					state.setSubtreeElement( nodeElement );
+				}
 				
 				if ( !newTextRepresentation.equals( textRepresentation ) )
 				{
@@ -117,32 +146,42 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 					int origChangeRegionLength = textRepresentation.length() - prefixLen - suffixLen;
 					int newChangeRegionLength = newTextRepresentation.length() - prefixLen - suffixLen;
 					
+					//int oldIndex = position  +  ( bias == Marker.Bias.END  ?  1  :  0 );
+					
 					if ( origChangeRegionLength <= 0  ||  newChangeRegionLength <= 0 )
 					{
-						if ( origChangeRegionLength <= 0  &&  newChangeRegionLength > 0 )
+						for (MarkerState state: markerStates)
 						{
-							// Text inserted
-							if ( newPosition >= textRepresentation.length() - suffixLen )
+							int newPosition = state.position;
+							Marker.Bias newBias = state.bias;
+							
+							if ( origChangeRegionLength <= 0  &&  newChangeRegionLength > 0 )
 							{
-								newPosition = newTextRepresentation.length() - ( textRepresentation.length() - newPosition );
+								// Text inserted
+								if ( newPosition >= textRepresentation.length() - suffixLen )
+								{
+									newPosition = newTextRepresentation.length() - ( textRepresentation.length() - newPosition );
+								}
 							}
-						}
-						else if ( origChangeRegionLength > 0  &&  newChangeRegionLength <= 0 )
-						{
-							// Text deleted
-							if ( newPosition >= prefixLen  &&  newPosition < textRepresentation.length() - suffixLen )
+							else if ( origChangeRegionLength > 0  &&  newChangeRegionLength <= 0 )
 							{
-								newPosition = prefixLen;
-								newBias = Bias.START;
+								// Text deleted
+								if ( newPosition >= prefixLen  &&  newPosition < textRepresentation.length() - suffixLen )
+								{
+									newPosition = prefixLen;
+									newBias = Bias.START;
+								}
 							}
-						}
-						else if ( origChangeRegionLength < 0  &&  newChangeRegionLength < 0 )
-						{
-							if ( newPosition >= prefixLen )
+							else if ( origChangeRegionLength < 0  &&  newChangeRegionLength < 0 )
 							{
-								newPosition -= ( newTextRepresentation.length() - textRepresentation.length() );
-								newPosition = Math.max( newPosition, prefixLen );
+								if ( newPosition >= prefixLen )
+								{
+									newPosition -= ( newTextRepresentation.length() - textRepresentation.length() );
+									newPosition = Math.max( newPosition, prefixLen );
+								}
 							}
+							
+							state.reposition( newPosition, newBias );
 						}
 					}
 					else if ( ( origChangeRegionLength * newChangeRegionLength)  >  DIFF_THRESHHOLD )
@@ -153,90 +192,215 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 						// FIXME FIXME FIXME
 						System.out.println( "Computing caret position using non-diff hack; " + textRepresentation.length() + " (" + prefixLen + ":" + origChangeRegionLength + ":" + suffixLen + ")  ->  " +
 								newTextRepresentation.length()  +  " (" + prefixLen + ":" + newChangeRegionLength + ":" + suffixLen + ")" );
-						if ( position > prefixLen )
+						for (MarkerState state: markerStates)
 						{
-							int rel = position = prefixLen;
-							if ( rel > origChangeRegionLength )
+							int newPosition = state.position;
+							
+							if ( state.position > prefixLen )
 							{
-								rel += newChangeRegionLength - origChangeRegionLength;
+								int rel = state.position - prefixLen;
+								if ( rel > origChangeRegionLength )
+								{
+									rel += newChangeRegionLength - origChangeRegionLength;
+								}
+								else
+								{
+									rel = Math.min( rel, newChangeRegionLength );
+								}
+								newPosition = rel + prefixLen; 
 							}
-							else
-							{
-								rel = Math.min( rel, newChangeRegionLength );
-							}
-							newPosition = rel + prefixLen; 
+							
+							state.reposition( newPosition );
 						}
 						// HACK HACK HACK
 						// FIXME FIXME FIXME
 					}
 					else
 					{
-						// Cannot simply use contentString[prefixLen:-suffixLen], since suffixLen may be 0
-						if ( newPosition < prefixLen )
-						{
-							// Within prefix; leave it as it is
-						}
-						else if ( newPosition >= textRepresentation.length() - suffixLen )
-						{
-							// Within suffix; offset by change in length
-							newPosition += newTextRepresentation.length() - textRepresentation.length();
-						}
-						else
-						{
-							String origChangeRegion = textRepresentation.substring( prefixLen, textRepresentation.length() - suffixLen );
-							String newChangeRegion = newTextRepresentation.substring( prefixLen, newTextRepresentation.length() - suffixLen );
-							
-							newPosition = position;
-							newBias = bias;
-							
-							
-							ArrayList<StringDiff.Operation> operations = StringDiff.levenshteinDiff( origChangeRegion, newChangeRegion );
+						ArrayList<StringDiff.Operation> operations = null;
 
-							// Apply the prefix offset
-							for (StringDiff.Operation op: operations)
-							{
-								op.offset( prefixLen );
-							}
+						for (MarkerState state: markerStates)
+						{
+							int newPosition = state.position;
+							Marker.Bias newBias = state.bias;
 							
-							// Prepend and append some 'equal' operations that cover the prefix and suffix
-							if ( suffixLen > 0 )
+							
+							// Cannot simply use contentString[prefixLen:-suffixLen], since suffixLen may be 0
+							if ( newPosition < prefixLen )
 							{
-								operations.add( 0, new StringDiff.Operation( StringDiff.Operation.OpCode.EQUAL, textRepresentation.length() - suffixLen, textRepresentation.length(),
-										newTextRepresentation.length() - suffixLen, newTextRepresentation.length() ) );
+								// Within prefix; leave it as it is
 							}
-							if ( prefixLen > 0 )
+							else if ( newPosition >= textRepresentation.length() - suffixLen )
 							{
-								operations.add( new StringDiff.Operation( StringDiff.Operation.OpCode.EQUAL, 0, prefixLen, 0, prefixLen ) );
+								// Within suffix; offset by change in length
+								newPosition += newTextRepresentation.length() - textRepresentation.length();
 							}
-
-							// Find the operation which covers the caret
-							for (StringDiff.Operation op: operations)
+							else
 							{
-								if ( position >= op.aBegin  &&  position < op.aEnd )
+								if ( operations == null )
 								{
-									if ( op.opcode == StringDiff.Operation.OpCode.DELETE )
+									String origChangeRegion = textRepresentation.substring( prefixLen, textRepresentation.length() - suffixLen );
+									String newChangeRegion = newTextRepresentation.substring( prefixLen, newTextRepresentation.length() - suffixLen );
+								
+								
+									operations = StringDiff.levenshteinDiff( origChangeRegion, newChangeRegion );
+	
+									// Apply the prefix offset
+									for (StringDiff.Operation op: operations)
 									{
-										// Range deleted; move to the start of the range in the destination string, bias:STARt
-										newPosition = op.bBegin;
-										newBias = Marker.Bias.START;
+										op.offset( prefixLen );
 									}
-									else
+									
+									// Prepend and append some 'equal' operations that cover the prefix and suffix
+									if ( suffixLen > 0 )
 									{
-										// Range replaced, equal, or inserted; offset position be delta between starts of ranges
-										newPosition = position + op.bBegin - op.aBegin;
+										operations.add( 0, new StringDiff.Operation( StringDiff.Operation.OpCode.EQUAL, textRepresentation.length() - suffixLen, textRepresentation.length(),
+												newTextRepresentation.length() - suffixLen, newTextRepresentation.length() ) );
+									}
+									if ( prefixLen > 0 )
+									{
+										operations.add( new StringDiff.Operation( StringDiff.Operation.OpCode.EQUAL, 0, prefixLen, 0, prefixLen ) );
+									}
+								}
+	
+								// Find the operation which covers the caret
+								for (StringDiff.Operation op: operations)
+								{
+									if ( state.position >= op.aBegin  &&  state.position < op.aEnd )
+									{
+										if ( op.opcode == StringDiff.Operation.OpCode.DELETE )
+										{
+											// Range deleted; move to the start of the range in the destination string, bias:STARt
+											newPosition = op.bBegin;
+											newBias = Marker.Bias.START;
+										}
+										else
+										{
+											// Range replaced, equal, or inserted; offset position be delta between starts of ranges
+											newPosition = state.position + op.bBegin - op.aBegin;
+										}
 									}
 								}
 							}
+							
+							
+							state.reposition( newPosition, newBias );
 						}
 					}
 				}
-				
-				
-				PresentationComponent.RootElement elementTree = nodeElement.getRootElement();
-				Caret caret = elementTree.getCaret();
-				
-				caret.moveToPositionAndBiasWithinSubtree( nodeElement, newPosition, newBias );
 			}
+		}
+	}
+	
+	
+	private IdentityHashMap<Marker, MarkerState> markerToState = new IdentityHashMap<Marker, MarkerState>();
+	private IdentityHashMap<FragmentView, NodeState> nodeToState = new IdentityHashMap<FragmentView, NodeState>();
+	private ArrayList<MonitoredMarker> markers = new ArrayList<MonitoredMarker>();
+	
+	private MonitoredMarker caretMon, selStartMon, selEndMon;
+	
+	
+	public NodeElementChangeListenerDiff(IncrementalView view)
+	{
+	}
+	
+	
+	public void begin(IncrementalView view)
+	{
+		markerToState.clear();
+		nodeToState.clear();
+		
+		
+		caretMon = selStartMon = selEndMon = null;
+		
+		
+		// Gather the markers that we are watching
+		markers.clear();
+		Caret caret = view.getCaret();
+		if ( caret != null  &&  caret.isValid() )
+		{
+			caretMon = monitorMarker( caret.getMarker() );
+		}
+		
+		Selection selection = view.getSelection();
+		if ( selection instanceof TextSelection )
+		{
+			TextSelection ts = (TextSelection)selection;
+			if ( ts.isValid() )
+			{
+				selStartMon = monitorMarker( ts.getStartMarker() );
+				selEndMon = monitorMarker( ts.getEndMarker() );
+			}
+		}
+	}
+	
+	public void end(IncrementalView view)
+	{
+		if ( caretMon != null  &&  caretMon.canReposition() )
+		{
+			view.getCaret().moveToPositionAndBiasWithinSubtree( caretMon.state.subtree, caretMon.state.position, caretMon.state.bias );
+		}
+
+		if ( selStartMon != null  &&  selStartMon.canReposition()  &&  selEndMon != null  &&  selEndMon.canReposition() )
+		{
+			TextSelectionPoint start = new TextSelectionPoint( Marker.markerAtPositionAndBiasWithinSubtree( selStartMon.state.subtree, selStartMon.state.position, selStartMon.state.bias, null ) );
+			TextSelectionPoint end = new TextSelectionPoint( Marker.markerAtPositionAndBiasWithinSubtree( selEndMon.state.subtree, selEndMon.state.position, selEndMon.state.bias, null ) );
+			view.getPresentationRootElement().setSelection( start.createSelectionTo( end ) );
+		}
+	}
+	
+	
+	private MonitoredMarker monitorMarker(Marker marker)
+	{
+		MonitoredMarker m = new MonitoredMarker( marker );
+		markers.add( m );
+		return m;
+	}
+	
+	
+	private NodeState validNodeStateFor(FragmentView node)
+	{
+		NodeState state = nodeToState.get( node );
+		if ( state == null )
+		{
+			state = new NodeState( node );
+			nodeToState.put( node, state );
+		}
+		return state;
+	}
+
+	
+	public void elementChangeFrom(FragmentView node, DPElement element)
+	{
+		for (MonitoredMarker m: markers)
+		{
+			Marker marker = m.marker;
+			if ( markerToState.get( marker ) == null )
+			{
+				DPElement nodeElement = node.getFragmentContentElement();
+				try
+				{
+					int pos = marker.getPositionInSubtree( nodeElement );
+					
+					NodeState nodeState = validNodeStateFor( node );
+					MarkerState state = nodeState.addMarkerStateFor( marker, pos );
+					markerToState.put( marker, state );
+					m.state = state;
+				}
+				catch (DPElement.IsNotInSubtreeException e)
+				{
+					// Caret is not in this sub-tree - do nothing
+				}
+			}
+		}
+	}
+
+	public void elementChangeTo(FragmentView node, DPElement element)
+	{
+		NodeState nodeState = nodeToState.get( node );
+		if ( nodeState != null )
+		{
+			nodeState.handleModification();
 		}
 	}
 }
