@@ -132,16 +132,4 @@ public class DPBin extends DPContainer
 	{
 		return true;
 	}
-	
-	
-	
-	//
-	// Text representation methods
-	//
-	
-	protected String computeSubtreeTextRepresentation()
-	{
-		DPElement child = getChild();
-		return child != null  ?  child.getTextRepresentation()  :  "";
-	}
 }

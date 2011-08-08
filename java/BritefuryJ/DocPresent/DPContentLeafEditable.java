@@ -502,59 +502,11 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	//
 	//
-	// TEXT REPRESENTATION METHODS
-	//
-	//
-	
-	protected void getTextRepresentationFromStartToPath(StringBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
-	{
-		builder.append( textRepresentation.substring( 0, marker.getClampedIndex() ) );
-	}
-
-	protected void getTextRepresentationFromPathToEnd(StringBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
-	{
-		builder.append( textRepresentation.substring( marker.getClampedIndex() ) );
-	}
-
-	public String getTextRepresentationBetweenMarkers(Marker startMarker, Marker endMarker)
-	{
-		if ( startMarker.getElement() != this  ||  endMarker.getElement() != this )
-		{
-			throw new RuntimeException();
-		}
-		return textRepresentation.substring( startMarker.getClampedIndex(), endMarker.getClampedIndex() );
-	}
-
-	protected void getTextRepresentationFromStartOfRootToMarker(StringBuilder builder, Marker marker, DPElement root)
-	{
-		if ( this != root  &&  parent != null )
-		{
-			parent.getTextRepresentationFromStartOfRootToMarkerFromChild( builder, marker, root, this );
-		}
-		builder.append( textRepresentation.substring( 0, marker.getClampedIndex() ) );
-	}
-	
-	protected void getTextRepresentationFromMarkerToEndOfRoot(StringBuilder builder, Marker marker, DPElement root)
-	{
-		builder.append( textRepresentation.substring( marker.getClampedIndex() ) );
-		if ( this != root  &&  parent != null )
-		{
-			parent.getTextRepresentationFromMarkerToEndOfRootFromChild( builder, marker, root, this );
-		}
-	}
-	
-	
-	
-	
-	
-	
-	//
-	//
 	// TEXT REPRESENTATION MODIFICATION METHODS
 	//
 	//
 	
-	public void setTextRepresentation(String newTextRepresentation)
+	public void setLeafTextRepresentation(String newTextRepresentation)
 	{
 		if ( newTextRepresentation == null )
 		{

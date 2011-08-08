@@ -447,6 +447,8 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		
 		private ElementValueCacheManager valueCacheManager = new ElementValueCacheManager( this );
+		private ElementValueCache<String> textRepresentationCache = new ElementValueCache<String>();
+		
 
 		
 		private ArrayList<ElementPreview> elementPreviews = new ArrayList<ElementPreview>();
@@ -637,23 +639,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		public String getTextRepresentationInSelection(TextSelection s)
 		{
-			DPContainer commonRootContainer = s.getCommonRootContainer();
-			ArrayList<DPElement> startPath = s.getStartPathFromCommonRoot();
-			ArrayList<DPElement> endPath = s.getEndPathFromCommonRoot();
-			
-			if ( commonRootContainer != null )
-			{
-				StringBuilder builder = new StringBuilder();
-
-				commonRootContainer.getTextRepresentationBetweenPaths( builder, s.getStartMarker(), startPath, 0, s.getEndMarker(), endPath, 0 );
-			
-				return builder.toString();
-			}
-			else
-			{
-				DPContentLeafEditable commonRoot = (DPContentLeafEditable)s.getCommonRoot();
-				return commonRoot.getTextRepresentationBetweenMarkers( s.getStartMarker(), s.getEndMarker() );
-			}
+			TextRepresentationVisitor v = textRepresentationVisitor();
+			v.visitTextSelection( s );
+			return v.getValue();
 		}
 
 				
@@ -1664,9 +1652,14 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		}
 		
 		
-		protected ElementValueCacheManager getValueCacheManager()
+		protected ElementValueCacheManager getElementValueCacheManager()
 		{
 			return valueCacheManager;
+		}
+		
+		protected TextRepresentationVisitor textRepresentationVisitor()
+		{
+			return new TextRepresentationVisitor( textRepresentationCache );
 		}
 	}
 

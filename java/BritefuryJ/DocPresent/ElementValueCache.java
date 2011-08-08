@@ -20,7 +20,7 @@ public class ElementValueCache <ValueType extends Object>
 	{
 		if ( manager == null )
 		{
-			manager = element.getRootElement().getValueCacheManager();
+			manager = element.getRootElement().getElementValueCacheManager();
 			manager.registerCache( this );
 		}
 	}

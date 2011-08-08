@@ -209,7 +209,7 @@ public class TextEntry extends ControlPres
 			@Override
 			protected String getText(TextSelection selection)
 			{
-				return textElement.getTextRepresentationBetweenMarkers( selection.getStartMarker(), selection.getEndMarker() );
+				return textElement.getRootElement().getTextRepresentationInSelection( selection );
 			}
 		}
 		

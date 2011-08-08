@@ -70,8 +70,7 @@ public class EditableTextCell
 		@Override
 		protected String getText(TextSelection selection)
 		{
-			DPText textElement = (DPText)selection.getStartMarker().getElement();
-			return textElement.getTextRepresentationBetweenMarkers( selection.getStartMarker(), selection.getEndMarker() );
+			return selection.getStartMarker().getElement().getRootElement().getTextRepresentationInSelection( selection );
 		}
 	};
 	

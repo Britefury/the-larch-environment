@@ -6,10 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import java.util.ArrayList;
-
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeBlank;
-import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
 
 public class DPBlank extends DPElement
@@ -61,28 +58,13 @@ public class DPBlank extends DPElement
 	//
 	//
 	
-	
-	public String getTextRepresentation()
+	@Override
+	protected String getLeafTextRepresentation()
 	{
 		return "";
 	}
 	
-	public int getTextRepresentationLength()
-	{
-		return 0;
-	}
-
-	protected void getTextRepresentationFromPathToEnd(StringBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
-	{
-	}
-
-	protected void getTextRepresentationFromStartToPath(StringBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
-	{
-	}
-
-
-
-
+	
 	//
 	//
 	// VALUE METHODS

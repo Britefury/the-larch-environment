@@ -99,7 +99,7 @@ public class DPText extends DPContentLeafEditable
 		}
 
 		this.text = text;
-		setTextRepresentation( textRepresentation );
+		setLeafTextRepresentation( textRepresentation );
 		onTextModified();
 	}
 	

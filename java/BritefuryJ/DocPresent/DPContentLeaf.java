@@ -10,7 +10,6 @@ package BritefuryJ.DocPresent;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.LayoutTree.ContentLeafLayoutNodeInterface;
-import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.DocPresent.StyleParams.ContentLeafStyleParams;
 import BritefuryJ.Math.Point2;
@@ -251,24 +250,11 @@ public abstract class DPContentLeaf extends DPElement
 	//
 	//
 	
-	public String getTextRepresentation()
+	public String getLeafTextRepresentation()
 	{
 		return textRepresentation;
 	}
 	
-	public int getTextRepresentationLength()
-	{
-		return textRepresentation.length();
-	}
-	
-	protected void getTextRepresentationFromStartToPath(StringBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
-	{
-	}
-
-	protected void getTextRepresentationFromPathToEnd(StringBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
-	{
-	}
-
 	public DPContentLeaf getLeafAtTextRepresentationPosition(int position)
 	{
 		return this;

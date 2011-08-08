@@ -2653,20 +2653,17 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	public String getTextRepresentationFromStartToMarker(Marker marker)
 	{
-		StringBuilder builder = new StringBuilder();
-		marker.getElement().getTextRepresentationFromStartOfRootToMarker( builder, marker, this );
-		return builder.toString();
+		TextRepresentationVisitor v = getRootElement().textRepresentationVisitor();
+		v.visitFromStartOfRootToMarker( marker, this );
+		return v.getValue();
 	}
 	
 	public String getTextRepresentationFromMarkerToEnd(Marker marker)
 	{
-		StringBuilder builder = new StringBuilder();
-		marker.getElement().getTextRepresentationFromMarkerToEndOfRoot( builder, marker, this );
-		return builder.toString();
+		TextRepresentationVisitor v = getRootElement().textRepresentationVisitor();
+		v.visitFromMarkerToEndOfRoot( marker, this );
+		return v.getValue();
 	}
-
-	protected abstract void getTextRepresentationFromStartToPath(StringBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex);
-	protected abstract void getTextRepresentationFromPathToEnd(StringBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex);
 
 
 
@@ -2687,14 +2684,40 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		invalidateCachedValues();
 	}
 	
-	public DPElement getElementAtTextRepresentationStart()
+	public String getTextRepresentation()
 	{
-		return this;
+		String leafTextRep = getLeafTextRepresentation();
+		if ( leafTextRep != null )
+		{
+			return leafTextRep;
+		}
+		else
+		{
+			TextRepresentationVisitor v = getRootElement().textRepresentationVisitor();
+			v.visitSubtree( this );
+			return v.getValue();
+		}
 	}
 	
-		
-	public abstract String getTextRepresentation();
-	public abstract int getTextRepresentationLength();
+	public int getTextRepresentationLength()
+	{
+		String leafTextRep = getLeafTextRepresentation();
+		if ( leafTextRep != null )
+		{
+			return leafTextRep.length();
+		}
+		else
+		{
+			return getTextRepresentation().length();
+		}
+	}
+	
+	
+	
+	protected String getLeafTextRepresentation()
+	{
+		return null;
+	}
 	
 	
 	
@@ -2947,7 +2970,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	{
 		if ( hasCachedValues() )
 		{
-			getRootElement().getValueCacheManager().invalidateCachedValuesFor( this );
+			getRootElement().getElementValueCacheManager().invalidateCachedValuesFor( this );
 		}
 	}
 	
