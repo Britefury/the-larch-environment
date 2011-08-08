@@ -444,6 +444,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		
 		protected ArrayList<Runnable> waitingImmediateEvents;			// only initialised when non-empty; otherwise null
+		
+		
+		private ElementValueCacheManager valueCacheManager = new ElementValueCacheManager( this );
 
 		
 		private ArrayList<ElementPreview> elementPreviews = new ArrayList<ElementPreview>();
@@ -1658,6 +1661,12 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		{
 			Selection selection = getSelection();
 			return selection != null  ?  selection.getRegion()  :  null;
+		}
+		
+		
+		protected ElementValueCacheManager getValueCacheManager()
+		{
+			return valueCacheManager;
 		}
 	}
 

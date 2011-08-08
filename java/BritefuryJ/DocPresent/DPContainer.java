@@ -109,9 +109,11 @@ public abstract class DPContainer extends DPElement
 	}
 	
 	
+	
 	protected void onChildListModified()
 	{
 		onSubtreeStructureChanged();
+		
 		onDebugPresentationStateChanged();
 		
 		BranchLayoutNode branchLayout = (BranchLayoutNode)getValidLayoutNodeOfClass( BranchLayoutNode.class );
@@ -206,6 +208,7 @@ public abstract class DPContainer extends DPElement
 	protected void onSubtreeStructureChanged()
 	{
 		cachedTextRep = null;
+		invalidateCachedValues();
 		
 		if ( parent != null )
 		{
