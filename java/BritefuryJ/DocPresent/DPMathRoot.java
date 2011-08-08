@@ -191,17 +191,4 @@ public class DPMathRoot extends DPContainer
 			graphics.setPaint( curPaint );
 		}
 	}
-
-	
-	
-	//
-	//
-	// TEXT REPRESENTATION METHODS
-	//
-	//
-	
-	protected String computeSubtreeTextRepresentation()
-	{
-		return child != null  ?  child.getTextRepresentation()  :  "";
-	}
 }

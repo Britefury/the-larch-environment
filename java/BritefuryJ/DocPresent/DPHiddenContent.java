@@ -7,10 +7,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import java.util.ArrayList;
-
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeHiddenContent;
-import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
 
@@ -78,22 +75,10 @@ public class DPHiddenContent extends DPElement
 	//
 	
 	
-	public String getTextRepresentation()
+	@Override
+	public String getLeafTextRepresentation()
 	{
 		return textRepresentation;
-	}
-	
-	public int getTextRepresentationLength()
-	{
-		return textRepresentation.length();
-	}
-
-	protected void getTextRepresentationFromPathToEnd(StringBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
-	{
-	}
-
-	protected void getTextRepresentationFromStartToPath(StringBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
-	{
 	}
 
 

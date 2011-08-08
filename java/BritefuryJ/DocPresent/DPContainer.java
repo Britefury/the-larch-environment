@@ -41,7 +41,6 @@ public abstract class DPContainer extends DPElement
 	
 	
 	protected ArrayList<DPElement> registeredChildren = new ArrayList<DPElement>();			// Replace with array; operations like insert etc are hardly used at all
-	public String cachedTextRep = null;
 	
 	
 	
@@ -207,7 +206,6 @@ public abstract class DPContainer extends DPElement
 	
 	protected void onSubtreeStructureChanged()
 	{
-		cachedTextRep = null;
 		invalidateCachedValues();
 		
 		if ( parent != null )
@@ -731,145 +729,6 @@ public abstract class DPContainer extends DPElement
 
 
 
-	public void onTextRepresentationModified()
-	{
-		cachedTextRep = null;
-		super.onTextRepresentationModified();
-	}
-	
-	
-	public String getTextRepresentation()
-	{
-		if ( cachedTextRep == null )
-		{
-			cachedTextRep = computeSubtreeTextRepresentation();
-		}
-		return cachedTextRep;
-	}
-	
-	public int getTextRepresentationLength()
-	{
-		return getTextRepresentation().length();
-	}
-	
-	
-	
-
-	protected String computeSubtreeTextRepresentation()
-	{
-		StringBuilder builder = new StringBuilder();
-		for (DPElement child: getInternalChildren())
-		{
-			builder.append( child.getTextRepresentation() );
-		}
-		return builder.toString();
-	}
-	
-	
-	
-	public void getTextRepresentationFromStartToPath(StringBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
-	{
-		DPElement pathChild = path.get( pathMyIndex + 1 );
-		for (DPElement child: getInternalChildren())
-		{
-			if ( child != pathChild )
-			{
-				builder.append( child.getTextRepresentation() );
-			}
-			else
-			{
-				child.getTextRepresentationFromStartToPath( builder, marker, path, pathMyIndex + 1 );
-				break;
-			}
-		}
-	}
-	
-	public void getTextRepresentationFromPathToEnd(StringBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
-	{
-		List<DPElement> children = getInternalChildren();
-		int pathChildIndex = pathMyIndex + 1;
-		DPElement pathChild = path.get( pathChildIndex );
-		int childIndex = children.indexOf( pathChild );
-		
-		pathChild.getTextRepresentationFromPathToEnd( builder, marker, path, pathChildIndex );
-
-		if ( (childIndex + 1) < children.size() )
-		{
-			for (DPElement child: children.subList( childIndex + 1, children.size() ))
-			{
-				builder.append( child.getTextRepresentation() );
-			}
-		}
-	}
-
-	public void getTextRepresentationBetweenPaths(StringBuilder builder, Marker startMarker, ArrayList<DPElement> startPath, int startPathMyIndex,
-			Marker endMarker, ArrayList<DPElement> endPath, int endPathMyIndex)
-	{
-		List<DPElement> children = getInternalChildren();
-		
-	
-		int startPathChildIndex = startPathMyIndex + 1;
-		int endPathChildIndex = endPathMyIndex + 1;
-		
-		DPElement startChild = startPath.get( startPathChildIndex );
-		DPElement endChild = endPath.get( endPathChildIndex );
-		
-		int startIndex = children.indexOf( startChild );
-		int endIndex = children.indexOf( endChild );
-	
-		
-		startChild.getTextRepresentationFromPathToEnd( builder, startMarker, startPath, startPathChildIndex );
-		
-		for (int i = startIndex + 1; i < endIndex; i++)
-		{
-			builder.append( children.get( i ).getTextRepresentation() );
-		}
-
-		endChild.getTextRepresentationFromStartToPath( builder, endMarker, endPath, endPathChildIndex );
-	}
-
-
-	protected void getTextRepresentationFromStartOfRootToMarkerFromChild(StringBuilder builder, Marker marker, DPElement root, DPElement fromChild)
-	{
-		if ( root != this  &&  parent != null )
-		{
-			parent.getTextRepresentationFromStartOfRootToMarkerFromChild( builder, marker, root, this );
-		}
-		
-		for (DPElement child: getInternalChildren())
-		{
-			if ( child != fromChild )
-			{
-				builder.append( child.getTextRepresentation() );
-			}
-			else
-			{
-				break;
-			}
-		}
-	}
-	
-	protected void getTextRepresentationFromMarkerToEndOfRootFromChild(StringBuilder builder, Marker marker, DPElement root, DPElement fromChild)
-	{
-		List<DPElement> children = getInternalChildren();
-		int childIndex = children.indexOf( fromChild );
-		
-		if ( (childIndex + 1) < children.size() )
-		{
-			for (DPElement child: children.subList( childIndex + 1, children.size() ))
-			{
-				builder.append( child.getTextRepresentation() );
-			}
-		}
-
-		if ( root != this  &&  parent != null )
-		{
-			parent.getTextRepresentationFromMarkerToEndOfRootFromChild( builder, marker, root, this );
-		}
-	}
-
-	
-	
 	
 	
 	//

@@ -365,17 +365,4 @@ public class DPViewport extends DPContainer implements FiniteViewportBehaviour.F
 	{
 		viewportBehaviour.onWorldSizeChanged();
 	}
-	
-	
-	
-
-	//
-	// Text representation methods
-	//
-	
-	protected String computeSubtreeTextRepresentation()
-	{
-		DPElement child = getChild();
-		return child != null  ?  child.getTextRepresentation()  :  "";
-	}
 }
