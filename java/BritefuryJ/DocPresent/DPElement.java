@@ -355,7 +355,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	//
 	//
-	// FIELDS
+	// FLAGS
 	//
 	//
 	
@@ -366,13 +366,20 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	protected final static int FLAG_HOVER = 0x10;
 	protected final static int FLAG_ENSURE_VISIBLE_QUEUED = 0x20;
 	protected final static int FLAG_HAS_FIXED_VALUE = 0x40;
+	protected final static int FLAG_HAS_CACHED_VALUES = 0x80;
 
-	protected final static int _ALIGN_SHIFT = 7;
+	protected final static int _ALIGN_SHIFT = 8;
 	protected final static int _ALIGN_MASK = ElementAlignment._ELEMENTALIGN_MASK  <<  _ALIGN_SHIFT;
 	protected final static int _HALIGN_MASK = ElementAlignment._HALIGN_MASK  <<  _ALIGN_SHIFT;
 	protected final static int _VALIGN_MASK = ElementAlignment._VALIGN_MASK  <<  _ALIGN_SHIFT;
 	protected final static int FLAGS_ELEMENT_END = ElementAlignment._ELEMENTALIGN_END  <<  _ALIGN_SHIFT;
 	
+	
+	//
+	//
+	// FIELDS
+	//
+	//
 	
 	protected int flags;
 	
@@ -2676,6 +2683,8 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		{
 			parent.onTextRepresentationModified();
 		}
+		
+		invalidateCachedValues();
 	}
 	
 	public DPElement getElementAtTextRepresentationStart()
@@ -2913,7 +2922,43 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	
 	
+	//
+	//
+	// VALUE CACHE METHODS
+	//
+	//
 	
+	protected boolean hasCachedValues()
+	{
+		return testFlag( FLAG_HAS_CACHED_VALUES );
+	}
+	
+	protected void setHasCachedValues()
+	{
+		setFlag( FLAG_HAS_CACHED_VALUES );
+	}
+	
+	protected void clearHasCachedValues()
+	{
+		clearFlag( FLAG_HAS_CACHED_VALUES );
+	}
+	
+	protected void invalidateCachedValues()
+	{
+		if ( hasCachedValues() )
+		{
+			getRootElement().getValueCacheManager().invalidateCachedValuesFor( this );
+		}
+	}
+	
+	
+	
+	
+	//
+	//
+	// DEBUG NAME METHODS
+	//
+	//	
 	
 	public void setDebugName(String debugName)
 	{
@@ -2927,6 +2972,12 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 	
 	
+	
+	//
+	//
+	// STYLE PARAMS METHODS
+	//
+	//
 	
 	public ElementStyleParams getStyleParams()
 	{
