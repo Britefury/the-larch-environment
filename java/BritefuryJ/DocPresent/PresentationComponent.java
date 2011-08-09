@@ -447,7 +447,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		
 		private ElementValueCacheManager valueCacheManager = new ElementValueCacheManager( this );
-		private ElementValueCache<String> textRepresentationCache = new ElementValueCache<String>();
+		private DefaultTextRepresentationManager defaultTextRepresentationManager = new DefaultTextRepresentationManager();
 		
 
 		
@@ -639,9 +639,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		public String getTextRepresentationInSelection(TextSelection s)
 		{
-			TextRepresentationVisitor v = textRepresentationVisitor();
-			v.visitTextSelection( s );
-			return v.getValue();
+			return defaultTextRepresentationManager.getTextRepresentationInTextSelection( s );
 		}
 
 				
@@ -1657,9 +1655,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			return valueCacheManager;
 		}
 		
-		protected TextRepresentationVisitor textRepresentationVisitor()
+		protected DefaultTextRepresentationManager getDefaultTextRepresentationManager()
 		{
-			return new TextRepresentationVisitor( textRepresentationCache );
+			return defaultTextRepresentationManager;
 		}
 	}
 
