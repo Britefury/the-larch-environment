@@ -381,21 +381,21 @@ public class Marker
 		DPContentLeaf leaf = subtree.getLeafAtTextRepresentationPosition( newPosition );
 		if ( leaf != null )
 		{
-			int leafOffset = -1;
+			int elemOffset = -1;
 			if ( leaf == subtree )
 			{
-				leafOffset = 0;
+				elemOffset = 0;
 			}
 			else
 			{
-				leafOffset = leaf.getTextRepresentationOffsetInSubtree( (DPContainer)subtree );
+				elemOffset = leaf.getTextRepresentationOffsetInSubtree( (DPContainer)subtree );
 			}
-			int leafPosition = newPosition - leafOffset;
+			int leafPosition = newPosition - elemOffset;
 			
 			
-			if ( leafFilter == null  ||  leafFilter.testElement( leaf ) )
+			if ( leaf instanceof DPContentLeafEditable  &&  ( leafFilter == null  ||  leafFilter.testElement( leaf ) ) )
 			{
-				return ((DPContentLeafEditable)leaf).marker( leafPosition, newBias );
+				return ( (DPContentLeafEditable)leaf ).marker( leafPosition, newBias );
 			}
 			else
 			{
@@ -413,7 +413,7 @@ public class Marker
 				// First, see if the leaf textual representation contains a new-line. If so, try to stay on the same side of the new line.
 				if ( leafTextRepresentation.contains( "\n" ) )
 				{
-					int leafIndex = newIndex - leafOffset;
+					int leafIndex = newIndex - elemOffset;
 					if ( leafTextRepresentation.substring( leafIndex, leafTextReprLength ).contains( "\n" ) )
 					{
 						// Newline in text after the caret position; search backwards

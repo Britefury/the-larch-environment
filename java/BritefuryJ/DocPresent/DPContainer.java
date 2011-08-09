@@ -670,65 +670,6 @@ public abstract class DPContainer extends DPElement
 	}
 	
 	
-	//
-	//
-	// TEXT REPRESENTATION METHODS
-	//
-	//
-	
-	public DPContentLeaf getLeafAtTextRepresentationPosition(int position)
-	{
-		DPElement c = getChildAtTextRepresentationPosition( position );
-		
-		if ( c != null )
-		{
-			return c.getLeafAtTextRepresentationPosition( position - getTextRepresentationOffsetOfChild( c ) );
-		}
-		else
-		{
-			return null;
-		}
-	}
-
-	public DPElement getChildAtTextRepresentationPosition(int position)
-	{
-		int offset = 0;
-		for (DPElement c: getInternalChildren())
-		{
-			int end = offset + c.getTextRepresentationLength();
-			if ( position >= offset  &&  position < end )
-			{
-				return c;
-			}
-			offset = end;
-		}
-		
-		return null;
-	}
-
-	
-	public int getTextRepresentationOffsetOfChild(DPElement elem)
-	{
-		int offset = 0;
-		for (DPElement c: getInternalChildren())
-		{
-			if ( c == elem )
-			{
-				return offset;
-			}
-			offset += c.getTextRepresentationLength();
-		}
-		
-		throw new DPContainer.CouldNotFindChildException();
-	}
-	
-	protected int getChildTextRepresentationOffsetInSubtree(DPElement child, DPContainer subtreeRoot)
-	{
-		return getTextRepresentationOffsetOfChild( child )  +  getTextRepresentationOffsetInSubtree( subtreeRoot );
-	}
-
-
-
 	
 	
 	//

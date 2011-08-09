@@ -2634,20 +2634,13 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	public DPContentLeaf getLeafAtTextRepresentationPosition(int position)
 	{
-		return null;
+		return getRootElement().getDefaultTextRepresentationManager().getLeafAtPositionInSubtree( this, position );
 	}
 	
 	
 	public int getTextRepresentationOffsetInSubtree(DPContainer subtreeRoot)
 	{
-		if ( this == subtreeRoot )
-		{
-			return 0;
-		}
-		else
-		{
-			return parent.getChildTextRepresentationOffsetInSubtree( this, subtreeRoot );
-		}
+		return getRootElement().getDefaultTextRepresentationManager().getPositionOfElementInSubtree( subtreeRoot, this );
 	}
 	
 	

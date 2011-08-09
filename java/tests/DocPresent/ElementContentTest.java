@@ -16,6 +16,7 @@ import BritefuryJ.DocPresent.DPHiddenContent;
 import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.PresentationComponent;
 
 public class ElementContentTest extends TestCase
 {
@@ -43,6 +44,9 @@ public class ElementContentTest extends TestCase
 		DPBin b = new DPBin( );
 		
 		b.setChild( t0 );
+		
+		PresentationComponent component = new PresentationComponent();
+		component.getRootElement().setChild( b );
 
 		assertEquals( b.getTextRepresentation(), "abc" );
 		assertEquals( b.getTextRepresentationLength(), 3 );
@@ -61,7 +65,9 @@ public class ElementContentTest extends TestCase
 		
 		p.setChildren( Arrays.asList( t ) );
 		
-		
+		PresentationComponent component = new PresentationComponent();
+		component.getRootElement().setChild( p );
+	
 		assertEquals( p.getTextRepresentation(), "abcghimnostu" );
 		assertEquals( p.getTextRepresentationLength(), 12 );
 	}
@@ -105,6 +111,10 @@ public class ElementContentTest extends TestCase
 		root.setChildren( Arrays.asList( rootChildren ) );
 		
 		
+		PresentationComponent component = new PresentationComponent();
+		component.getRootElement().setChild( root );
+
+		
 		// Test getContent() and getContentLength() of all elements
 		assertEquals( ta0.getTextRepresentation(), "abc" );
 		assertEquals( ta0.getTextRepresentationLength(), 3 );
@@ -126,40 +136,41 @@ public class ElementContentTest extends TestCase
 		
 		
 		// Test getContentOffsetOfChild() for containers
-		assertEquals( pa.getTextRepresentationOffsetOfChild( ta0 ), 0 );
-		assertEquals( pa.getTextRepresentationOffsetOfChild( ta1 ), 3 );
-		assertEquals( pa.getTextRepresentationOffsetOfChild( ta2 ), 6 );
-		assertEquals( pa.getTextRepresentationOffsetOfChild( ta3 ), 9 );
+		assertEquals( ta0.getTextRepresentationOffsetInSubtree( pa ), 0 );
+		assertEquals( ta1.getTextRepresentationOffsetInSubtree( pa ), 3 );
+		assertEquals( ta2.getTextRepresentationOffsetInSubtree( pa ), 6 );
+		assertEquals( ta3.getTextRepresentationOffsetInSubtree( pa ), 9 );
 
-		assertEquals( b.getTextRepresentationOffsetOfChild( pb ), 0 );
+		assertEquals( pb.getTextRepresentationOffsetInSubtree( b ), 0 );
 		
-		assertEquals( root.getTextRepresentationOffsetOfChild( pa ), 0 );
-		assertEquals( root.getTextRepresentationOffsetOfChild( e ), 12 );
-		assertEquals( root.getTextRepresentationOffsetOfChild( b ), 12 );
-		assertEquals( root.getTextRepresentationOffsetOfChild( tx ), 17 );
-		assertEquals( root.getTextRepresentationOffsetOfChild( ty ), 19 );
+		assertEquals( pa.getTextRepresentationOffsetInSubtree( root ), 0 );
+		assertEquals( e.getTextRepresentationOffsetInSubtree( root ), 12 );
+		assertEquals( b.getTextRepresentationOffsetInSubtree( root ), 12 );
+		assertEquals( tx.getTextRepresentationOffsetInSubtree( root ), 17 );
+		assertEquals( ty.getTextRepresentationOffsetInSubtree( root ), 19 );
 		
 		// Test getChildAtContentPosition() for containers
 		DPElement[] getChildAtContentPositionResultsPA = { ta0, ta0, ta0, ta1, ta1, ta1, ta2, ta2, ta2, ta3, ta3, ta3, null };
 		for (int i = 0; i < getChildAtContentPositionResultsPA.length; i++)
 		{
-			assertSame( pa.getChildAtTextRepresentationPosition( i ), getChildAtContentPositionResultsPA[i] );
+			System.out.println( i );
+			assertSame( pa.getLeafAtTextRepresentationPosition( i ), getChildAtContentPositionResultsPA[i] );
 		}
 		
-		assertEquals( b.getChildAtTextRepresentationPosition( 0 ), pb );
-		assertEquals( b.getChildAtTextRepresentationPosition( 4 ), pb );
-		assertEquals( b.getChildAtTextRepresentationPosition( 5 ), null );
+		assertEquals( b.getLeafAtTextRepresentationPosition( 0 ), tb0 );
+		assertEquals( b.getLeafAtTextRepresentationPosition( 4 ), tb2 );
+		assertEquals( b.getLeafAtTextRepresentationPosition( 5 ), null );
 
-		assertEquals( root.getChildAtTextRepresentationPosition( 0 ), pa );
-		assertEquals( root.getChildAtTextRepresentationPosition( 1 ), pa );
-		assertEquals( root.getChildAtTextRepresentationPosition( 11 ), pa );
-		assertEquals( root.getChildAtTextRepresentationPosition( 12 ), b );
-		assertEquals( root.getChildAtTextRepresentationPosition( 16 ), b );
-		assertEquals( root.getChildAtTextRepresentationPosition( 17 ), tx );
-		assertEquals( root.getChildAtTextRepresentationPosition( 18 ), tx );
-		assertEquals( root.getChildAtTextRepresentationPosition( 19 ), ty );
-		assertEquals( root.getChildAtTextRepresentationPosition( 20 ), ty );
-		assertEquals( root.getChildAtTextRepresentationPosition( 21 ), null );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 0 ), ta0 );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 1 ), ta0 );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 11 ),ta3 );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 12 ), tb0 );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 16 ), tb2 );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 17 ), tx );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 18 ), tx );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 19 ), ty );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 20 ), ty );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 21 ), null );
 
 		
 		// Test getLeafAtContentPosition() for elements
@@ -243,6 +254,14 @@ public class ElementContentTest extends TestCase
 		root.setChildren( Arrays.asList( rootChildren ) );
 		
 		
+		PresentationComponent component = new PresentationComponent();
+		component.getRootElement().setChild( root );
+
+		
+		assertEquals( root.getTextRepresentation(), "abcghimnostuvwxyz1122" );
+		assertEquals( root.getTextRepresentationLength(), 21 );
+
+		
 		// Test getContent() and getContentLength() of all elements
 		assertEquals( ta0.getTextRepresentation(), "abc" );
 		assertEquals( ta0.getTextRepresentationLength(), 3 );
@@ -261,31 +280,31 @@ public class ElementContentTest extends TestCase
 		
 		
 		// Test getContentOffsetOfChild() for containers
-		assertEquals( pa.getTextRepresentationOffsetOfChild( ta0 ), 0 );
-		assertEquals( pa.getTextRepresentationOffsetOfChild( ta1 ), 3 );
-		assertEquals( pa.getTextRepresentationOffsetOfChild( ta2 ), 6 );
-		assertEquals( pa.getTextRepresentationOffsetOfChild( ta3 ), 9 );
+		assertEquals( ta0.getTextRepresentationOffsetInSubtree( pa ), 0 );
+		assertEquals( ta1.getTextRepresentationOffsetInSubtree( pa ), 3 );
+		assertEquals( ta2.getTextRepresentationOffsetInSubtree( pa ), 6 );
+		assertEquals( ta3.getTextRepresentationOffsetInSubtree( pa ), 9 );
 
-		assertEquals( root.getTextRepresentationOffsetOfChild( pa ), 0 );
-		assertEquals( root.getTextRepresentationOffsetOfChild( e ), 12 );
-		assertEquals( root.getTextRepresentationOffsetOfChild( tx ), 17 );
-		assertEquals( root.getTextRepresentationOffsetOfChild( ty ), 19 );
-		
+		assertEquals( pa.getTextRepresentationOffsetInSubtree( root ), 0 );
+		assertEquals( e.getTextRepresentationOffsetInSubtree( root ), 12 );
+		assertEquals( tx.getTextRepresentationOffsetInSubtree( root ), 17 );
+		assertEquals( ty.getTextRepresentationOffsetInSubtree( root ), 19 );
+
 		// Test getChildAtContentPosition() for containers
 		DPElement[] getChildAtContentPositionResultsPA = { ta0, ta0, ta0, ta1, ta1, ta1, ta2, ta2, ta2, ta3, ta3, ta3, null };
 		for (int i = 0; i < getChildAtContentPositionResultsPA.length; i++)
 		{
-			assertSame( pa.getChildAtTextRepresentationPosition( i ), getChildAtContentPositionResultsPA[i] );
+			assertSame( pa.getLeafAtTextRepresentationPosition( i ), getChildAtContentPositionResultsPA[i] );
 		}
 		
-		assertEquals( root.getChildAtTextRepresentationPosition( 0 ), pa );
-		assertEquals( root.getChildAtTextRepresentationPosition( 1 ), pa );
-		assertEquals( root.getChildAtTextRepresentationPosition( 11 ), pa );
-		assertEquals( root.getChildAtTextRepresentationPosition( 17 ), tx );
-		assertEquals( root.getChildAtTextRepresentationPosition( 18 ), tx );
-		assertEquals( root.getChildAtTextRepresentationPosition( 19 ), ty );
-		assertEquals( root.getChildAtTextRepresentationPosition( 20 ), ty );
-		assertEquals( root.getChildAtTextRepresentationPosition( 21 ), null );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 0 ), ta0 );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 1 ), ta0 );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 11 ), ta3 );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 17 ), tx );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 18 ), tx );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 19 ), ty );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 20 ), ty );
+		assertEquals( root.getLeafAtTextRepresentationPosition( 21 ), null );
 
 		
 		// Test getLeafAtContentPosition() for elements
