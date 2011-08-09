@@ -2653,16 +2653,12 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	public String getTextRepresentationFromStartToMarker(Marker marker)
 	{
-		TextRepresentationVisitor v = getRootElement().textRepresentationVisitor();
-		v.visitFromStartOfRootToMarker( marker, this );
-		return v.getValue();
+		return getRootElement().getDefaultTextRepresentationManager().getTextRepresentationFromStartToMarker( marker, this );
 	}
 	
 	public String getTextRepresentationFromMarkerToEnd(Marker marker)
 	{
-		TextRepresentationVisitor v = getRootElement().textRepresentationVisitor();
-		v.visitFromMarkerToEndOfRoot( marker, this );
-		return v.getValue();
+		return getRootElement().getDefaultTextRepresentationManager().getTextRepresentationFromMarkerToEnd( marker, this );
 	}
 
 
@@ -2693,9 +2689,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		}
 		else
 		{
-			TextRepresentationVisitor v = getRootElement().textRepresentationVisitor();
-			v.visitSubtree( this );
-			return v.getValue();
+			return getRootElement().getDefaultTextRepresentationManager().getTextRepresentationOf( this );
 		}
 	}
 	
