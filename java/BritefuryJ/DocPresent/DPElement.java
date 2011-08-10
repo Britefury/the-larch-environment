@@ -28,7 +28,6 @@ import java.awt.Paint;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -1537,6 +1536,13 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		clearFlagRealised();
 	}
 	
+	
+	//
+	//
+	// PAINTING METHODS
+	//
+	//
+	
 	protected Shape pushClip(Graphics2D graphics)
 	{
 		Shape clipShape = null;
@@ -2136,55 +2142,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	// Focus navigation methods
 	//
 	
-	protected boolean handleMotionKeyPress(KeyEvent keyEvent, int modifiers)
-	{
-		return false;
-	}
-	
-	protected List<DPElement> horizontalNavigationList()
-	{
-		if ( layoutNode != null )
-		{
-			return layoutNode.horizontalNavigationList();
-		}
-		else
-		{
-			DPContainer p = parent;
-			while ( p != null )
-			{
-				LayoutNode parentLayoutNode = p.getLayoutNode();
-				if ( parentLayoutNode != null )
-				{
-					return parentLayoutNode.horizontalNavigationList();
-				}
-				p = p.getParent();
-			}
-			return null;
-		}
-	}
-	
-	protected List<DPElement> verticalNavigationList()
-	{
-		if ( layoutNode != null )
-		{
-			return layoutNode.verticalNavigationList();
-		}
-		else
-		{
-			DPContainer p = parent;
-			while ( p != null )
-			{
-				LayoutNode parentLayoutNode = p.getLayoutNode();
-				if ( parentLayoutNode != null )
-				{
-					return parentLayoutNode.verticalNavigationList();
-				}
-				p = p.getParent();
-			}
-			return null;
-		}
-	}
-	
 	public Point2 getMarkerPosition(Marker marker)
 	{
 		if ( marker.getElement() != this )
@@ -2776,16 +2733,14 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	//
 	//
 	
+	protected boolean isSegment()
+	{
+		return false;
+	}
+	
 	public DPSegment getSegment()
 	{
-		if ( parent != null )
-		{
-			return parent.getSegment();
-		}
-		else
-		{
-			return null;
-		}
+		return DPSegment.getSegmentOf( this );
 	}
 	
 	
@@ -2796,16 +2751,14 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	//
 	//
 	
+	protected boolean isRegion()
+	{
+		return false;
+	}
+	
 	public DPRegion getRegion()
 	{
-		if ( parent != null )
-		{
-			return parent.getRegion();
-		}
-		else
-		{
-			return null;
-		}
+		return DPRegion.getRegionOf( this );
 	}
 	
 	
