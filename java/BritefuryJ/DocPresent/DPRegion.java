@@ -26,7 +26,7 @@ public class DPRegion extends DPProxy
 		
 		public boolean testElement(DPElement element)
 		{
-			DPRegion regionB = element.getRegion();
+			DPRegion regionB = getRegionOf( element );
 			
 			if ( regionB == regionA )
 			{
@@ -121,9 +121,27 @@ public class DPRegion extends DPProxy
 
 	
 	
-	public DPRegion getRegion()
+	//
+	// REGION
+	//
+	
+	protected boolean isRegion()
 	{
-		return this;
+		return true;
+	}
+	
+	protected static DPRegion getRegionOf(DPElement e)
+	{
+		while ( e != null )
+		{
+			if ( e.isRegion() )
+			{
+				return (DPRegion)e;
+			}
+			
+			e = e.parent;
+		}
+		return null;
 	}
 	
 	

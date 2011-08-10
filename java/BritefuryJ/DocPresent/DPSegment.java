@@ -33,7 +33,7 @@ public class DPSegment extends DPContainer
 		
 		public boolean testElement(DPElement element)
 		{
-			return element.getSegment() == segment;
+			return getSegmentOf( element ) == segment;
 		}
 	}
 
@@ -201,8 +201,8 @@ public class DPSegment extends DPContainer
 			
 			if ( firstLeaf != null  &&  lastLeaf != null )
 			{
-				bBegin = firstLeaf.getSegment() != this;
-				bEnd = lastLeaf.getSegment() != this;
+				bBegin = getSegmentOf( firstLeaf ) != this;
+				bEnd = getSegmentOf( lastLeaf ) != this;
 			}
 		}
 		
@@ -381,11 +381,25 @@ public class DPSegment extends DPContainer
 	
 	
 	//
-	// Get Segment
+	// SEGMENT
 	//
 	
-	public DPSegment getSegment()
+	protected boolean isSegment()
 	{
-		return this;
+		return true;
+	}
+	
+	protected static DPSegment getSegmentOf(DPElement e)
+	{
+		while ( e != null )
+		{
+			if ( e.isSegment() )
+			{
+				return (DPSegment)e;
+			}
+			
+			e = e.parent;
+		}
+		return null;
 	}
 }
