@@ -169,18 +169,11 @@ public abstract class AbstractTextRepresentationManager
 		@Override
 		protected void inOrderCompletelyVisitElement(DPElement e)
 		{
+			// DO NOT ATTEMPT TO USE THE CACHE IN FINDERS, AS CHILD ELEMENTS MUST BE VISITED
 			int length = getElementContentLength( e );
 			if ( length != -1 )
 			{
 				position += length;
-			}
-			else
-			{
-				String value = cache.get( e );
-				if ( value != null )
-				{
-					position += value.length();
-				}
 			}
 		}
 
@@ -199,7 +192,8 @@ public abstract class AbstractTextRepresentationManager
 		@Override
 		protected boolean shouldVisitChildrenOfElement(DPElement e, boolean completeVisit)
 		{
-			return !cache.containsKey( e );
+			// DO NOT ATTEMPT TO USE THE CACHE IN FINDERS, AS CHILD ELEMENTS MUST BE VISITED
+			return true;
 		}
 
 		@Override
@@ -282,14 +276,6 @@ public abstract class AbstractTextRepresentationManager
 		}
 		
 		
-		@Override
-		protected void preOrderVisitElement(DPElement e, boolean complete)
-		{
-			testElement( e );
-			super.preOrderVisitElement( e, complete );
-		}
-
-
 		@Override
 		protected void inOrderCompletelyVisitElement(DPElement e)
 		{
@@ -395,7 +381,12 @@ public abstract class AbstractTextRepresentationManager
 	{
 		FindLeafAtPositionVisitor visitor = new FindLeafAtPositionVisitor( position );
 		visitor.visitSubtree( subtreeRoot );
-		return visitor.getLeaf();
+		DPContentLeaf leaf = visitor.getLeaf( );
+		if ( leaf == null )
+		{
+			System.out.println( "getLeafAtPositionInSubtree: NULL, position=" + position + ", length=" + getTextRepresentationOf( subtreeRoot ).length() );
+		}
+		return leaf;
 	}
 	
 	public int getPositionOfElementInSubtree(DPContainer subtreeRoot, DPElement e)

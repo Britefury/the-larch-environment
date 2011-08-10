@@ -6,6 +6,11 @@
 //##************************
 package BritefuryJ.Editor.Table.Generic;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.python.core.PyList;
+
 import BritefuryJ.Cell.EditableTextCell;
 import BritefuryJ.Editor.Table.AbstractTableEditor;
 import BritefuryJ.Editor.Table.AbstractTableEditorInstance;
@@ -47,10 +52,62 @@ public class GenericTableEditor extends AbstractTableEditor<GenericTableModelInt
 	
 	
 	
+	private static GenericTableModel.ValueFactory stringFactory = new GenericTableModel.ValueFactory()
+	{
+		@Override
+		public Object createValue()
+		{
+			return "";
+		}
+	};
+	
+	private static GenericTableModel.RowFactory pyListFactory = new GenericTableModel.RowFactory()
+	{
+		@SuppressWarnings("unchecked")
+		@Override
+		public List<Object> createRow()
+		{
+			return new PyList();
+		}
+	};
+	
+	private static GenericTableModel.RowFactory arrayListFactory = new GenericTableModel.RowFactory()
+	{
+		@Override
+		public List<Object> createRow()
+		{
+			return new ArrayList<Object>();
+		}
+	};
+	
+	private static GenericTableModel.ValueCopier identityCopier = new GenericTableModel.ValueCopier()
+	{
+		@Override
+		public Object copyValue(Object value)
+		{
+			return value;
+		}
+	};
+	
 	@Override
 	protected GenericTableModelInterface coerceModel(Object model)
 	{
-		return (GenericTableModelInterface)model;
+		if ( model instanceof PyList )
+		{
+			@SuppressWarnings("unchecked")
+			List<List<Object>> ls = (List<List<Object>>)model;
+			return new GenericTableModel( ls, stringFactory, pyListFactory, identityCopier );
+		}
+		else if ( model instanceof List )
+		{
+			@SuppressWarnings("unchecked")
+			List<List<Object>> ls = (List<List<Object>>)model;
+			return new GenericTableModel( ls, stringFactory, arrayListFactory, identityCopier );
+		}
+		else
+		{
+			return (GenericTableModelInterface)model;
+		}
 	}
 
 	@Override

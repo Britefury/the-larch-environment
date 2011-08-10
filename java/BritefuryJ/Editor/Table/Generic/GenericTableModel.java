@@ -18,24 +18,52 @@ public class GenericTableModel implements GenericTableModelInterface
 		Object createValue();
 	}
 	
+	public static interface RowFactory
+	{
+		List<Object> createRow();
+	}
+	
 	public static interface ValueCopier
 	{
 		Object copyValue(Object value);
 	}
 	
 	
-	private ArrayList<ArrayList<Object>> data = new ArrayList<ArrayList<Object>>();
+	private static RowFactory defaultRowFactory = new RowFactory()
+	{
+		@Override
+		public List<Object> createRow()
+		{
+			return new ArrayList<Object>();
+		}
+	};
+	
+	
+	private List<List<Object>> data;
 	private ValueFactory cellFactory;
+	private RowFactory rowFactory;
 	private ValueCopier cellCopier;
 	private IncrementalValueMonitor incr = new IncrementalValueMonitor();
 	
 	
 	
 	
+	public GenericTableModel(List<List<Object>> data, ValueFactory cellFactory, RowFactory rowFactory, ValueCopier cellCopier)
+	{
+		this.data = data;
+		this.cellFactory = cellFactory;
+		this.rowFactory = rowFactory;
+		this.cellCopier = cellCopier;
+	}
+
+	public GenericTableModel(ValueFactory cellFactory, RowFactory rowFactory, ValueCopier cellCopier)
+	{
+		this( new ArrayList<List<Object>>(), cellFactory, rowFactory, cellCopier );
+	}
+
 	public GenericTableModel(ValueFactory cellFactory, ValueCopier cellCopier)
 	{
-		this.cellFactory = cellFactory;
-		this.cellCopier = cellCopier;
+		this( new ArrayList<List<Object>>(), cellFactory, defaultRowFactory, cellCopier );
 	}
 
 	
@@ -44,7 +72,7 @@ public class GenericTableModel implements GenericTableModelInterface
 	{
 		incr.onAccess();
 		int width = 0;
-		for (ArrayList<Object> row: data)
+		for (List<Object> row: data)
 		{
 			width = Math.max( width, row.size() );
 		}
@@ -79,7 +107,7 @@ public class GenericTableModel implements GenericTableModelInterface
 	public void set(int x, int y, Object value)
 	{
 		growHeight( y + 1 );
-		ArrayList<Object> row = data.get( y );
+		List<Object> row = data.get( y );
 		growRowWidth( row, x + 1 );
 		row.set( x, value );
 		incr.onChanged();
@@ -93,7 +121,7 @@ public class GenericTableModel implements GenericTableModelInterface
 		Object[][] block = new Object[h][];
 		for (int j = y, b = 0; b < h; j++, b++)
 		{
-			ArrayList<Object> srcRow = data.get( j );
+			List<Object> srcRow = data.get( j );
 			int numCells = Math.max( 0, Math.min( w, srcRow.size() - x ) );
 			Object destRow[] = new Object[numCells];
 			if ( numCells > 0 )
@@ -116,7 +144,7 @@ public class GenericTableModel implements GenericTableModelInterface
 		for (int j = y, b = 0; b < blockHeight; j++, b++)
 		{
 			Object srcRow[] = block[b];
-			ArrayList<Object> destRow = data.get( j );
+			List<Object> destRow = data.get( j );
 			
 			int rowWidth = srcRow.length;
 			
@@ -136,7 +164,7 @@ public class GenericTableModel implements GenericTableModelInterface
 		int bottomRowIndex = Math.min( y + h - 1, data.size() - 1 );
 		for (int j = bottomRowIndex; j >= y; j--)
 		{
-			ArrayList<Object> row = data.get( j );
+			List<Object> row = data.get( j );
 			
 			if ( x == 0  &&  w >= row.size() )
 			{
@@ -171,12 +199,12 @@ public class GenericTableModel implements GenericTableModelInterface
 		{
 			for (int y = height; y < h; y++)
 			{
-				data.add( new ArrayList<Object>() );
+				data.add( rowFactory.createRow() );
 			}
 		}
 	}
 	
-	private void growRowWidth(ArrayList<Object> row, int w)
+	private void growRowWidth(List<Object> row, int w)
 	{
 		int width = row.size();
 		if ( width < w )
