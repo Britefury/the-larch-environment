@@ -7,6 +7,7 @@
 package BritefuryJ.Editor.Table;
 
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.ElementSearchBredthFirst;
 import BritefuryJ.DocPresent.TableElement;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
@@ -102,7 +103,7 @@ public abstract class AbstractTableEditorInstance <ModelType>
 			TargetInteractor interactor = new TargetInteractor();
 			
 			DPElement element = contents.present( ctx, style );
-			DPElement tableElement = element.bredthFirstSearchByType( TableElement.class );
+			DPElement tableElement = ElementSearchBredthFirst.searchByType( element, TableElement.class );
 			tableElement.addElementInteractor( interactor );
 			return element;
 		}

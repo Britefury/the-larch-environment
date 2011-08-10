@@ -31,13 +31,11 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Stack;
 import java.util.WeakHashMap;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
@@ -1318,126 +1316,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	{
 		return null;
 	}
-	
-	public DPElement preOrderDepthFirstSearch(ElementFilter filter, boolean bForwards)
-	{
-		Stack<DPElement> stack = new Stack<DPElement>();
-
-		stack.push( this );
-		
-		while ( !stack.isEmpty() )
-		{
-			DPElement e = stack.pop();
-			
-			// PRE-ORDER: test e
-			if ( filter.testElement( e ) )
-			{
-				return e;
-			}
-			
-			List<DPElement> children = e.getSearchChildren();
-			
-			if ( bForwards )
-			{
-				for (int i = 1; i <= children.size(); i++)
-				{
-					stack.push( children.get( children.size() - i ) );
-				}
-			}
-			else
-			{
-				stack.addAll( children );
-			}
-		}
-		
-		return null;
-	}
-
-	public DPElement preOrderDepthFirstSearch(ElementFilter filter)
-	{
-		return preOrderDepthFirstSearch( filter, true );
-	}
-	
-	
-	public DPElement bredthFirstSearch(ElementFilter filter, boolean bForwards)
-	{
-		ArrayDeque<DPElement> queue = new ArrayDeque<DPElement>();
-
-		queue.add( this );
-		
-		while ( !queue.isEmpty() )
-		{
-			DPElement e = queue.removeFirst();
-			
-			// Test e
-			if ( filter.testElement( e ) )
-			{
-				return e;
-			}
-			
-			List<DPElement> children = e.getSearchChildren();
-			
-			if ( bForwards )
-			{
-				queue.addAll( children );
-			}
-			else
-			{
-				for (int i = 1; i <= children.size(); i++)
-				{
-					queue.add( children.get( children.size() - i ) );
-				}
-			}
-		}
-		
-		return null;
-	}
-	
-	public DPElement bredthFirstSearch(ElementFilter filter)
-	{
-		return bredthFirstSearch( filter, true );
-	}
-
-	
-	
-	public DPElement preOrderDepthFirstSearchByType(final Class<?> elementClass, boolean bForwards)
-	{
-		ElementFilter filter = new ElementFilter()
-		{
-			public boolean testElement(DPElement element)
-			{
-				return elementClass.isInstance( element );
-			}
-		};
-		
-		return preOrderDepthFirstSearch( filter, bForwards );
-	}
-
-	public DPElement preOrderDepthFirstSearchByType(final Class<?> elementClass)
-	{
-		return preOrderDepthFirstSearchByType( elementClass, true );
-	}
-
-	
-	public DPElement bredthFirstSearchByType(final Class<?> elementClass, boolean bForwards)
-	{
-		ElementFilter filter = new ElementFilter()
-		{
-			public boolean testElement(DPElement element)
-			{
-				return elementClass.isInstance( element );
-			}
-		};
-		
-		return bredthFirstSearch( filter, bForwards );
-	}
-
-	public DPElement bredthFirstSearchByType(final Class<?> elementClass)
-	{
-		return bredthFirstSearchByType( elementClass, true );
-	}
-
-	
 	
 	
 
