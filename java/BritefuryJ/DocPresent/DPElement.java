@@ -1508,6 +1508,8 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	protected void handleUnrealise(DPElement unrealiseRoot)
 	{
+		invalidateCachedValues();
+
 		if ( testFlag( FLAG_CARET_GRABBED ) )
 		{
 			if ( rootElement != null )
