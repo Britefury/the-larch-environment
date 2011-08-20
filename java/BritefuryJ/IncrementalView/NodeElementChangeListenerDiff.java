@@ -9,7 +9,9 @@ package BritefuryJ.IncrementalView;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 
+import BritefuryJ.DocPresent.DPContentLeaf;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.ElementFilter;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Marker.Marker.Bias;
@@ -27,18 +29,33 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 	public static class MonitoredMarker
 	{
 		private Marker marker;
+		private ElementFilter leafFilter;
 		private MarkerState state;
 		
 		
-		public MonitoredMarker(Marker marker)
+		private MonitoredMarker(Marker marker, ElementFilter leafFilter)
 		{
 			this.marker = marker;
+			this.leafFilter = leafFilter;
 		}
 		
 		
 		private boolean canReposition()
 		{
 			return state != null  &&  state.subtree != null;
+		}
+		
+		
+		public Marker markerAtNewPosition()
+		{
+			if ( canReposition() )
+			{
+				return Marker.markerAtPositionAndBiasWithinSubtree( state.subtree, state.position, state.bias, leafFilter );
+			}
+			else
+			{
+				return null;
+			}
 		}
 	}
 	
@@ -319,7 +336,7 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 		Caret caret = view.getCaret();
 		if ( caret != null  &&  caret.isValid() )
 		{
-			caretMon = monitorMarker( caret.getMarker() );
+			caretMon = monitorMarker( caret.getMarker(), new DPContentLeaf.EditableLeafElementFilter() );
 		}
 		
 		Selection selection = view.getSelection();
@@ -328,8 +345,8 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 			TextSelection ts = (TextSelection)selection;
 			if ( ts.isValid() )
 			{
-				selStartMon = monitorMarker( ts.getStartMarker() );
-				selEndMon = monitorMarker( ts.getEndMarker() );
+				selStartMon = monitorMarker( ts.getStartMarker(), null );
+				selEndMon = monitorMarker( ts.getEndMarker(), null );
 			}
 		}
 	}
@@ -338,21 +355,21 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 	{
 		if ( caretMon != null  &&  caretMon.canReposition() )
 		{
-			view.getCaret().moveToPositionAndBiasWithinSubtree( caretMon.state.subtree, caretMon.state.position, caretMon.state.bias );
+			view.getCaret().moveTo( caretMon.markerAtNewPosition() );
 		}
 
 		if ( selStartMon != null  &&  selStartMon.canReposition()  &&  selEndMon != null  &&  selEndMon.canReposition() )
 		{
-			TextSelectionPoint start = new TextSelectionPoint( Marker.markerAtPositionAndBiasWithinSubtree( selStartMon.state.subtree, selStartMon.state.position, selStartMon.state.bias, null ) );
-			TextSelectionPoint end = new TextSelectionPoint( Marker.markerAtPositionAndBiasWithinSubtree( selEndMon.state.subtree, selEndMon.state.position, selEndMon.state.bias, null ) );
+			TextSelectionPoint start = new TextSelectionPoint( selStartMon.markerAtNewPosition() ); 
+			TextSelectionPoint end = new TextSelectionPoint( selEndMon.markerAtNewPosition() ); 
 			view.getPresentationRootElement().setSelection( start.createSelectionTo( end ) );
 		}
 	}
 	
 	
-	private MonitoredMarker monitorMarker(Marker marker)
+	public MonitoredMarker monitorMarker(Marker marker, ElementFilter leafFilter)
 	{
-		MonitoredMarker m = new MonitoredMarker( marker );
+		MonitoredMarker m = new MonitoredMarker( marker, leafFilter );
 		markers.add( m );
 		return m;
 	}

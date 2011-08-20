@@ -6,9 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent.Selection;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Paint;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -210,11 +208,7 @@ public class TextSelection extends Selection implements MarkerListener
 			List<DPElement> startPath = getStartPathFromCommonRoot();
 			List<DPElement> endPath = getEndPathFromCommonRoot();
 	
-			Paint prevPaint = graphics.getPaint();
-			//graphics.setPaint( Color.yellow );
-			graphics.setPaint( new Color( 1.0f, 0.9f, 0.0f, 0.4f ) );
 			getCommonRoot().getRootElement().drawTextRange( graphics, startMarker, startPath, endMarker, endPath );
-			graphics.setPaint( prevPaint );
 		}
 	}
 }
