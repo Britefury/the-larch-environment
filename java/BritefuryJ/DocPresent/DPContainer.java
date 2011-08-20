@@ -283,40 +283,6 @@ public abstract class DPContainer extends DPElement
 	
 	
 	//
-	//
-	// SELECTION METHODS
-	//
-	//
-	
-	protected void drawSubtreeSelection(Graphics2D graphics, Marker startMarker, List<DPElement> startPath, Marker endMarker, List<DPElement> endPath)
-	{
-		List<DPElement> children = getInternalChildren();
-		
-		int startIndex = startMarker != null  ?  children.indexOf( startPath.get( 1 ) )  :  0;
-		int endIndex = endMarker != null  ?  children.indexOf( endPath.get( 1) )  :  children.size() - 1;
-		
-		for (int i = startIndex; i <= endIndex; i++)
-		{
-			if ( i == startIndex  &&  startMarker != null )
-			{
-				children.get( i ).drawSubtreeSelection( graphics, startMarker, startPath.subList( 1, startPath.size() ), null, null );
-			}
-			else if ( i == endIndex  &&  endMarker != null )
-			{
-				children.get( i ).drawSubtreeSelection( graphics, null, null, endMarker, endPath.subList( 1, endPath.size() ) );
-			}
-			else
-			{
-				children.get( i ).drawSubtreeSelection( graphics, null, null, null, null );
-			}
-		}
-	}
-	
-	
-	
-	
-	
-	//
 	// Event handling methods
 	//
 	

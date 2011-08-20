@@ -17,7 +17,6 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeFraction;
-import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleParams.FractionStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
@@ -131,17 +130,15 @@ public class DPFraction extends DPContainer
 		
 		//
 		//
-		// SELECTION METHODS
+		// TEXT SELECTION METHODS
 		//
 		//
 		
-		public void drawSelection(Graphics2D graphics, Marker from, Marker to)
+		public void drawTextSelection(Graphics2D graphics, int startIndex, int endIndex)
 		{
 			double width = getWidth();
 			double height = getHeight();
 			AffineTransform current = pushGraphicsTransform( graphics );
-			int startIndex = from != null  ?  from.getIndex()  :  0;
-			int endIndex = to != null  ?  to.getIndex()  :  1;
 			double startX = startIndex == 0  ?  0.0  :  width;
 			double endX = endIndex == 0  ?  0.0  :  width;
 			Rectangle2D.Double shape = new Rectangle2D.Double( startX, -2.0, endX - startX, height + 4.0 );

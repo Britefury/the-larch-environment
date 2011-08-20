@@ -8,16 +8,62 @@ package BritefuryJ.DocPresent.Selection;
 
 import java.awt.Graphics2D;
 import java.util.ArrayList;
-import java.util.List;
 
 import BritefuryJ.DocPresent.DPContainer;
+import BritefuryJ.DocPresent.DPContentLeafEditable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRegion;
+import BritefuryJ.DocPresent.ElementTreeVisitor;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Marker.MarkerListener;
 
 public class TextSelection extends Selection implements MarkerListener
 {
+	private static class DrawVisitor extends ElementTreeVisitor
+	{
+		private Graphics2D graphics;
+		
+		
+		public DrawVisitor(Graphics2D graphics)
+		{
+			this.graphics = graphics;
+		}
+		
+		
+		@Override
+		protected void preOrderVisitElement(DPElement e, boolean complete)
+		{
+		}
+
+		@Override
+		protected void inOrderCompletelyVisitElement(DPElement e)
+		{
+			if ( e instanceof DPContentLeafEditable )
+			{
+				( (DPContentLeafEditable)e ).drawTextSelection( graphics, 0, e.getTextRepresentationLength() );
+			}
+		}
+
+		@Override
+		protected void postOrderVisitElement(DPElement e, boolean complete)
+		{
+		}
+
+		@Override
+		protected void inOrderVisitPartialContentLeafEditable(DPContentLeafEditable e, int startIndex, int endIndex)
+		{
+			e.drawTextSelection( graphics, startIndex, endIndex );
+		}
+
+		@Override
+		protected boolean shouldVisitChildrenOfElement(DPElement e, boolean completeVisit)
+		{
+			return true;
+		}
+	}
+	
+	
+	
 	private Marker marker0, marker1;
 	
 	private Marker startMarker, endMarker;
@@ -203,12 +249,8 @@ public class TextSelection extends Selection implements MarkerListener
 	{
 		if ( isValid() )
 		{
-			Marker startMarker = getStartMarker();
-			Marker endMarker = getEndMarker();
-			List<DPElement> startPath = getStartPathFromCommonRoot();
-			List<DPElement> endPath = getEndPathFromCommonRoot();
-	
-			getCommonRoot().getRootElement().drawTextRange( graphics, startMarker, startPath, endMarker, endPath );
+			DrawVisitor v = new DrawVisitor( graphics );
+			v.visitTextSelection( this );
 		}
 	}
 }

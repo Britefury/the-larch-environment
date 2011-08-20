@@ -1320,20 +1320,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 	
 	//
-	//
-	// SELECTION METHODS
-	//
-	//
-	
-	protected void drawSubtreeSelection(Graphics2D graphics, Marker startMarker, List<DPElement> startPath, Marker endMarker, List<DPElement> endPath)
-	{
-	}
-
-	
-	
-	
-	
-	//
 	// Immediate event queue methods
 	//
 	
