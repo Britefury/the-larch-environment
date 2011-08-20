@@ -11,7 +11,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.List;
 
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
@@ -125,18 +124,13 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	//
 	//
-	// SELECTION METHODS
+	// TEXT SELECTION METHODS
 	//
 	//
 	
-	public abstract void drawSelection(Graphics2D graphics, Marker from, Marker to);
+	public abstract void drawTextSelection(Graphics2D graphics, int startIndex, int endIndex);
 	
 
-	protected void drawSubtreeSelection(Graphics2D graphics, Marker startMarker, List<DPElement> startPath, Marker endMarker, List<DPElement> endPath)
-	{
-		drawSelection( graphics, startMarker, endMarker );
-	}
-	
 	
 
 	

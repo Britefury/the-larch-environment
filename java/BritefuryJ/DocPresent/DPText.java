@@ -219,15 +219,13 @@ public class DPText extends DPContentLeafEditable
 
 	//
 	//
-	// SELECTION METHODS
+	// TEXT SELECTION METHODS
 	//
 	//
 	
-	public void drawSelection(Graphics2D graphics, Marker from, Marker to)
+	public void drawTextSelection(Graphics2D graphics, int startIndex, int endIndex)
 	{
 		AffineTransform current = pushGraphicsTransform( graphics );
-		int startIndex = from != null  ?  from.getClampedIndex()  :  0;
-		int endIndex = to != null  ?  to.getClampedIndex()  :  textRepresentation.length();
 		visual.drawSelection( graphics, startIndex, endIndex );
 		popGraphicsTransform( graphics, current );
 	}

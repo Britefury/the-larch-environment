@@ -1017,10 +1017,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		}
 		
 		
-		public void drawTextRange(Graphics2D graphics, Marker startMarker, List<DPElement> startPath, Marker endMarker, List<DPElement> endPath)
-		{
-			startPath.get( 0 ).drawSubtreeSelection( graphics, startMarker, startPath, endMarker, endPath );
-		}
+		
 		
 		
 		
