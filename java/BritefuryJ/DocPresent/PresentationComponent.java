@@ -11,6 +11,7 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -1008,7 +1009,10 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		{
 			if ( selection != null )
 			{
+				Paint prevPaint = graphics.getPaint();
+				graphics.setPaint( new Color( 1.0f, 0.9f, 0.0f, 0.4f ) );
 				selection.draw( graphics );
+				graphics.setPaint( prevPaint );
 			}
 		}
 		

@@ -376,8 +376,6 @@ public class Marker
 		}
 
 		
-		int newIndex = newPosition  +  ( newBias == Marker.Bias.END  ?  1  :  0 );
-
 		DPContentLeaf leaf = subtree.getLeafAtTextRepresentationPosition( newPosition );
 		if ( leaf != null )
 		{
@@ -413,6 +411,7 @@ public class Marker
 				// First, see if the leaf textual representation contains a new-line. If so, try to stay on the same side of the new line.
 				if ( leafTextRepresentation.contains( "\n" ) )
 				{
+					int newIndex = newPosition  +  ( newBias == Marker.Bias.END  ?  1  :  0 );
 					int leafIndex = newIndex - elemOffset;
 					if ( leafTextRepresentation.substring( leafIndex, leafTextReprLength ).contains( "\n" ) )
 					{
