@@ -52,24 +52,6 @@ public class DPHiddenContent extends DPElement
 	
 	//
 	//
-	// Presentation tree cloning
-	//
-	//
-	
-	public DPElement clonePresentationSubtree()
-	{
-		DPHiddenContent clone = new DPHiddenContent( this );
-		clone.clonePostConstuct( this );
-		return clone;
-	}
-	
-	
-	
-
-	
-	
-	//
-	//
 	// TEXT REPRESENTATION METHODS
 	//
 	//

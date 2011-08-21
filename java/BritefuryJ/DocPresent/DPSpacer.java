@@ -42,22 +42,6 @@ public class DPSpacer extends DPBlank
 	
 	//
 	//
-	// Presentation tree cloning
-	//
-	//
-	
-	public DPElement clonePresentationSubtree()
-	{
-		DPSpacer clone = new DPSpacer( this );
-		clone.clonePostConstuct( this );
-		return clone;
-	}
-	
-	
-	
-	
-	//
-	//
 	// Space requirements
 	//
 	//

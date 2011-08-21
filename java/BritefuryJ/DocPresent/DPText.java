@@ -68,23 +68,10 @@ public class DPText extends DPContentLeafEditable
 	}
 	
 	
+
 	//
+	// Text access / modification
 	//
-	// Presentation tree cloning
-	//
-	//
-	
-	public DPElement clonePresentationSubtree()
-	{
-		DPText clone = new DPText( this );
-		clone.clonePostConstuct( this );
-		return clone;
-	}
-	
-	
-	
-	
-	
 	
 	public void setText(String text)
 	{

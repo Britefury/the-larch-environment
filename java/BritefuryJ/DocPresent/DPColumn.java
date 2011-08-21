@@ -43,31 +43,6 @@ public class DPColumn extends DPAbstractBox
 		clearFlag( FLAG_HAS_REFPOINT_INDEX );
 	}
 	
-	protected DPColumn(DPColumn element)
-	{
-		super( element );
-		
-		layoutNode = new LayoutNodeColumn( this );
-		setFlagValue( FLAG_HAS_REFPOINT_INDEX, element.testFlag( FLAG_HAS_REFPOINT_INDEX ) );
-		refPointIndex = element.refPointIndex;
-	}
-	
-	
-	
-	//
-	//
-	// Presentation tree cloning
-	//
-	//
-	
-	public DPElement clonePresentationSubtree()
-	{
-		DPColumn clone = new DPColumn( this );
-		clone.clonePostConstuct( this );
-		return clone;
-	}
-
-	
 	
 	
 	//

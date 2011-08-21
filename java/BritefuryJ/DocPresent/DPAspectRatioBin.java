@@ -29,31 +29,6 @@ public class DPAspectRatioBin extends DPBin
 		layoutNode = new LayoutNodeAspectRatioBin( this );
 	}
 	
-	private DPAspectRatioBin(DPAspectRatioBin element)
-	{
-		super( element );
-
-		minWidth = element.minWidth;
-		aspectRatio = element.aspectRatio;
-		
-		layoutNode = new LayoutNodeAspectRatioBin( this );
-	}
-	
-	
-	
-	//
-	//
-	// Presentation tree cloning
-	//
-	//
-	
-	public DPElement clonePresentationSubtree()
-	{
-		DPAspectRatioBin clone = new DPAspectRatioBin( this );
-		clone.clonePostConstuct( this );
-		return clone;
-	}
-
 	
 	
 	//

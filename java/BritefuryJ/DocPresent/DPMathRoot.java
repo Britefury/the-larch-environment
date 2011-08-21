@@ -43,35 +43,6 @@ public class DPMathRoot extends DPContainer
 	
 	
 	
-	//
-	//
-	// Presentation tree cloning
-	//
-	//
-	
-	protected void clonePostConstuct(DPElement src)
-	{
-		super.clonePostConstuct( src );
-		DPElement child = ((DPMathRoot)src).getChild();
-		if ( child != null )
-		{
-			setChild( child.clonePresentationSubtree() );
-		}
-	}
-	
-	
-	public DPElement clonePresentationSubtree()
-	{
-		DPMathRoot clone = new DPMathRoot( this );
-		clone.clonePostConstuct( this );
-		return clone;
-	}
-
-	
-	
-	
-	
-	
 	public DPElement getChild()
 	{
 		return child;

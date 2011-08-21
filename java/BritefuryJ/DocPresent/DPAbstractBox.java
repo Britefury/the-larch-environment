@@ -28,11 +28,6 @@ abstract public class DPAbstractBox extends DPContainerSequence
 	{
 		super(styleParams);
 	}
-	
-	protected DPAbstractBox(DPAbstractBox element)
-	{
-		super( element );
-	}
 
 
 	

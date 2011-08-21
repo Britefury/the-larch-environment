@@ -10,33 +10,18 @@ import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 
 public class DPLineBreakCostSpan extends DPSpan
 {
+	public DPLineBreakCostSpan()
+	{
+		super( ContainerStyleParams.defaultStyleParams );
+	}
+	
 	public DPLineBreakCostSpan(ContainerStyleParams styleParams)
 	{
 		super( styleParams );
 	}
 	
-	protected DPLineBreakCostSpan(DPSpan element)
-	{
-		super( element );
-	}
 	
 	
-	
-	//
-	//
-	// Presentation tree cloning
-	//
-	//
-	
-	public DPElement clonePresentationSubtree()
-	{
-		DPLineBreakCostSpan clone = new DPLineBreakCostSpan( this );
-		clone.clonePostConstuct( this );
-		return clone;
-	}
-
-
-
 	//
 	//
 	// LAYOUT METHODS

@@ -43,21 +43,6 @@ public class DPSpaceBin extends DPBin
 	
 	//
 	//
-	// Presentation tree cloning
-	//
-	//
-	
-	public DPElement clonePresentationSubtree()
-	{
-		DPSpaceBin clone = new DPSpaceBin( this );
-		clone.clonePostConstuct( this );
-		return clone;
-	}
-
-	
-	
-	//
-	//
 	// Space bin
 	//
 	//

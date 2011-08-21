@@ -456,22 +456,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	//
 	//
-	// Presentation tree cloning
-	//
-	//
-	
-	protected void clonePostConstuct(DPElement src)
-	{
-	}
-	
-	public abstract DPElement clonePresentationSubtree();
-	
-	
-	
-	
-	
-	//
-	//
 	// Context
 	//
 	//
@@ -481,7 +465,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		DPElement w = this;
 		while ( w != null )
 		{
-			FragmentContext c = w.getFragmentContext_helper();
+			FragmentContext c = w.getContextOfFragment();
 			if ( c != null )
 			{
 				return c;
@@ -494,7 +478,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	}
 	
 	// Override this in subclasses
-	protected FragmentContext getFragmentContext_helper()
+	protected FragmentContext getContextOfFragment()
 	{
 		return null;
 	}
@@ -907,16 +891,11 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		}
 	}
 	
-	public void ensureVisibleImpl()
-	{
-		ensureRegionVisible( getLocalAABox() );
-	}
-	
 	public void ensureVisible()
 	{
 		if ( isRealised() )
 		{
-			ensureVisibleImpl();
+			ensureRegionVisible( getLocalAABox() );
 		}
 		else
 		{
@@ -1417,12 +1396,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	}
 	
 	
-	public void clip(Graphics2D graphics)
-	{
-		graphics.clip( new Rectangle2D.Double( 0.0, 0.0, getWidth(), getHeight() ) );
-	}
-
-	
 	protected void queueResize()
 	{
 		LayoutNode layout = getValidLayoutNode();
@@ -1550,7 +1523,12 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 			graphics.setClip( clipShape );
 		}
 	}
-	
+
+	public void clip(Graphics2D graphics)
+	{
+		graphics.clip( new Rectangle2D.Double( 0.0, 0.0, getWidth(), getHeight() ) );
+	}
+
 	protected void handleDrawBackground(Graphics2D graphics, AABox2 areaBox)
 	{
 		drawBackground( graphics );

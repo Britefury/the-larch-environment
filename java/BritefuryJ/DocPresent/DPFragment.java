@@ -37,30 +37,13 @@ public class DPFragment extends DPProxy
 	
 	
 	//
-	//
-	// Presentation tree cloning
-	//
-	//
-	
-	public DPElement clonePresentationSubtree()
-	{
-		DPFragment clone = new DPFragment( this );
-		clone.clonePostConstuct( this );
-		return clone;
-	}
-
-
-
-
-
-	//
 	// Context
 	//
 	
 	// DPElement.getContext() is the public method to get the element context, this helper method
 	// simply retrieves the context at this element, DPElement.getContext() will search parent elements
 	// for it.
-	protected FragmentContext getFragmentContext_helper()
+	protected FragmentContext getContextOfFragment()
 	{
 		return context;
 	}

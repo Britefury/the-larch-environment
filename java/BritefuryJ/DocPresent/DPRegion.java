@@ -87,22 +87,6 @@ public class DPRegion extends DPProxy
 	
 	//
 	//
-	// Presentation tree cloning
-	//
-	//
-	
-	public DPElement clonePresentationSubtree()
-	{
-		DPRegion clone = new DPRegion( this );
-		clone.clonePostConstuct( this );
-		return clone;
-	}
-
-	
-	
-
-	//
-	//
 	// CLIPBOARD HANDLER
 	//
 	//

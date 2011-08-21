@@ -31,18 +31,4 @@ public class DPParagraphIndentMarker extends DPBlank
 		
 		layoutNode = new LayoutNodeParagraphIndentMarker( this );
 	}
-	
-	
-	//
-	//
-	// Presentation tree cloning
-	//
-	//
-	
-	public DPElement clonePresentationSubtree()
-	{
-		DPParagraphIndentMarker clone = new DPParagraphIndentMarker( this );
-		clone.clonePostConstuct( this );
-		return clone;
-	}
 }
