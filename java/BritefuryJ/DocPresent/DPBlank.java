@@ -38,22 +38,6 @@ public class DPBlank extends DPElement
 	
 	//
 	//
-	// Presentation tree cloning
-	//
-	//
-	
-	public DPElement clonePresentationSubtree()
-	{
-		DPBlank clone = new DPBlank( this );
-		clone.clonePostConstuct( this );
-		return clone;
-	}
-
-	
-	
-	
-	//
-	//
 	// TEXT REPRESENTATION METHODS
 	//
 	//

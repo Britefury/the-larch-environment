@@ -47,21 +47,6 @@ public class DPFraction extends DPContainer
 		
 		
 		
-		//
-		//
-		// Presentation tree cloning
-		//
-		//
-		
-		public DPElement clonePresentationSubtree()
-		{
-			DPFractionBar clone = new DPFractionBar( this );
-			clone.clonePostConstuct( this );
-			return clone;
-		}
-
-	
-
 		public boolean isRedrawRequiredOnHover()
 		{
 			return super.isRedrawRequiredOnHover()  ||  getHoverBarPaint() != null;
@@ -246,34 +231,6 @@ public class DPFraction extends DPContainer
 		paras = new DPParagraph[NUMCHILDREN];
 	}
 	
-	
-	
-	//
-	//
-	// Presentation tree cloning
-	//
-	//
-	
-	protected void clonePostConstuct(DPElement src)
-	{
-		super.clonePostConstuct( src );
-		for (int i = 0; i < NUMCHILDREN; i++)
-		{
-			DPElement child = ((DPFraction)src).getChild( i );
-			if ( child != null )
-			{
-				setChild( i, child.clonePresentationSubtree() );
-			}
-		}
-	}
-	
-	public DPElement clonePresentationSubtree()
-	{
-		DPFraction clone = new DPFraction( this );
-		clone.clonePostConstuct( this );
-		return clone;
-	}
-
 	
 	
 	//

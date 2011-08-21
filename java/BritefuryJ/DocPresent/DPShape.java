@@ -66,21 +66,6 @@ public class DPShape extends DPContentLeaf
 	
 	//
 	//
-	// Presentation tree cloning
-	//
-	//
-	
-	public DPElement clonePresentationSubtree()
-	{
-		DPShape clone = new DPShape( this );
-		clone.clonePostConstuct( this );
-		return clone;
-	}
-	
-	
-	
-	//
-	//
 	// Geometry methods
 	//
 	//

@@ -98,47 +98,6 @@ public class DPViewport extends DPContainer implements FiniteViewportBehaviour.F
 		addElementInteractor( interactor );
 	}
 	
-	private DPViewport(DPViewport element)
-	{
-		super( element );
-		
-		layoutNode = new LayoutNodeViewport( this );
-		this.state = element.state;
-		
-		viewportBehaviour = new FiniteViewportBehaviour( this, element.getXRange(), element.getYRange(), element.getViewportXform() );
-		
-		addElementInteractor( interactor );
-	}
-	
-	
-	//
-	//
-	// Presentation tree cloning
-	//
-	//
-	
-	protected void clonePostConstuct(DPElement src)
-	{
-		super.clonePostConstuct( src );
-		DPElement child = ((DPViewport)src).getChild();
-		if ( child != null )
-		{
-			setChild( child.clonePresentationSubtree() );
-		}
-	}
-	
-	public DPElement clonePresentationSubtree()
-	{
-		DPViewport clone = new DPViewport( this );
-		clone.clonePostConstuct( this );
-		return clone;
-	}
-	
-	
-	
-	
-	
-	
 	
 	public Range getXRange()
 	{

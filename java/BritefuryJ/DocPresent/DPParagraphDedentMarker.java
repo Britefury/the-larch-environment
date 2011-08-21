@@ -31,18 +31,4 @@ public class DPParagraphDedentMarker extends DPBlank
 		
 		layoutNode = new LayoutNodeParagraphDedentMarker( this );
 	}
-	
-	
-	//
-	//
-	// Presentation tree cloning
-	//
-	//
-	
-	public DPElement clonePresentationSubtree()
-	{
-		DPParagraphDedentMarker clone = new DPParagraphDedentMarker( this );
-		clone.clonePostConstuct( this );
-		return clone;
-	}
 }

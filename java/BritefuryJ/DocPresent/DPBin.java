@@ -37,33 +37,6 @@ public class DPBin extends DPContainer
 	
 	//
 	//
-	// Presentation tree cloning
-	//
-	//
-	
-	protected void clonePostConstuct(DPElement src)
-	{
-		super.clonePostConstuct( src );
-		DPElement child = ((DPBin)src).getChild();
-		if ( child != null )
-		{
-			setChild( child.clonePresentationSubtree() );
-		}
-	}
-	
-	public DPElement clonePresentationSubtree()
-	{
-		DPBin clone = new DPBin( this );
-		clone.clonePostConstuct( this );
-		return clone;
-	}
-	
-	
-	
-	
-	
-	//
-	//
 	// Child access / modification
 	//
 	//

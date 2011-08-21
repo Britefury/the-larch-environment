@@ -56,23 +56,6 @@ public class DPWhitespace extends DPContentLeaf
 	
 	//
 	//
-	// Presentation tree cloning
-	//
-	//
-	
-	public DPElement clonePresentationSubtree()
-	{
-		DPWhitespace clone = new DPWhitespace( this );
-		clone.clonePostConstuct( this );
-		return clone;
-	}
-	
-	
-	
-	
-	
-	//
-	//
 	// Whitespace width
 	//
 	//

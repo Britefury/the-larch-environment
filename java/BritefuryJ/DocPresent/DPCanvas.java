@@ -70,22 +70,6 @@ public class DPCanvas extends DPContentLeaf implements DrawingOwner
 	
 	//
 	//
-	// Presentation tree cloning
-	//
-	//
-	
-	public DPElement clonePresentationSubtree()
-	{
-		DPCanvas clone = new DPCanvas( this );
-		clone.clonePostConstuct( this );
-		return clone;
-	}
-
-	
-	
-	
-	//
-	//
 	// Drawing
 	//
 	//

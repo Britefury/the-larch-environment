@@ -95,38 +95,6 @@ public class DPTable extends DPContainer implements TableElement
 	
 	
 	
-	//
-	//
-	// Presentation tree cloning
-	//
-	//
-	
-	protected void clonePostConstuct(DPElement src)
-	{
-		super.clonePostConstuct( src );
-		DPTable table = (DPTable)src;
-		List<DPElement> children = table.getChildren();
-		List<? extends TableLayout.TablePackingParams> packingParams = table.getTablePackingParams();
-		for (int i = 0; i < children.size(); i++)
-		{
-			TableLayout.TablePackingParams packing = packingParams.get( i );
-			put( packing.x, packing.y, packing.colSpan, packing.rowSpan, children.get( i ) );
-		}
-	}
-	
-	public DPElement clonePresentationSubtree()
-	{
-		DPTable clone = new DPTable( this );
-		clone.clonePostConstuct( this );
-		return clone;
-	}
-
-	
-	
-
-	
-	
-	
 	public void setChildren(DPElement[][] itemTable)
 	{
 		for (DPElement row[]: itemTable)

@@ -75,36 +75,6 @@ public class DPSegment extends DPContainer
 	
 	
 	
-	//
-	//
-	// Presentation tree cloning
-	//
-	//
-	
-	protected void clonePostConstuct(DPElement src)
-	{
-		super.clonePostConstuct( src );
-
-		DPElement child = ((DPSegment)src).getChild();
-		if ( child != null )
-		{
-			setChild( child.clonePresentationSubtree() );
-		}
-	}
-	
-	public DPElement clonePresentationSubtree()
-	{
-		DPSegment clone = new DPSegment( this );
-		clone.clonePostConstuct( this );
-		return clone;
-	}
-
-	
-	
-	
-	
-	
-	
 	public void setGuardPolicy(boolean bGuardBegin, boolean bGuardEnd)
 	{
 		if ( bGuardBegin != this.bGuardBegin  ||  bGuardEnd != this.bGuardEnd )

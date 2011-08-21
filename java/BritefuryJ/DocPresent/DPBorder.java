@@ -67,21 +67,6 @@ public class DPBorder extends DPBin
 	
 	//
 	//
-	// Presentation tree cloning
-	//
-	//
-	
-	public DPElement clonePresentationSubtree()
-	{
-		DPBorder clone = new DPBorder( this );
-		clone.clonePostConstuct( this );
-		return clone;
-	}
-
-	
-	
-	//
-	//
 	// Border
 	//
 	//

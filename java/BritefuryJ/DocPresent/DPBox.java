@@ -46,21 +46,6 @@ public class DPBox extends DPContentLeaf
 	
 	//
 	//
-	// Presentation tree cloning
-	//
-	//
-	
-	public DPElement clonePresentationSubtree()
-	{
-		DPBox clone = new DPBox( this );
-		clone.clonePostConstuct( this );
-		return clone;
-	}
-	
-	
-	
-	//
-	//
 	// Box size
 	//
 	//

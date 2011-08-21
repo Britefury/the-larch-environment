@@ -67,31 +67,6 @@ public class DPScript extends DPContainer
 	
 	
 	
-	//
-	//
-	// Presentation tree cloning
-	//
-	//
-	
-	protected void clonePostConstuct(DPElement src)
-	{
-		super.clonePostConstuct( src );
-		for (int i = 0; i < NUMCHILDREN; i++)
-		{
-			DPElement child = ((DPScript)src).getChild( i );
-			if ( child != null )
-			{
-				setChild( i, child.clonePresentationSubtree() );
-			}
-		}
-	}
-	
-	public DPElement clonePresentationSubtree()
-	{
-		DPScript clone = new DPScript( this );
-		clone.clonePostConstuct( this );
-		return clone;
-	}
 
 	
 	

@@ -37,22 +37,6 @@ public class DPLineBreak extends DPBlank
 	
 	//
 	//
-	// Presentation tree cloning
-	//
-	//
-	
-	public DPElement clonePresentationSubtree()
-	{
-		DPLineBreak clone = new DPLineBreak( this );
-		clone.clonePostConstuct( this );
-		return clone;
-	}
-	
-	
-	
-	
-	//
-	//
 	// Line break
 	//
 	//

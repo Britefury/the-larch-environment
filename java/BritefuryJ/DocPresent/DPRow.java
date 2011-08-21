@@ -24,26 +24,4 @@ public class DPRow extends DPAbstractBox
 		
 		layoutNode = new LayoutNodeRow( this );
 	}
-	
-	protected DPRow(DPRow element)
-	{
-		super( element );
-		
-		layoutNode = new LayoutNodeRow( this );
-	}
-	
-	
-	
-	//
-	//
-	// Presentation tree cloning
-	//
-	//
-	
-	public DPElement clonePresentationSubtree()
-	{
-		DPRow clone = new DPRow( this );
-		clone.clonePostConstuct( this );
-		return clone;
-	}
 }
