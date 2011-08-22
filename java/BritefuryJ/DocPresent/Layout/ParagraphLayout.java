@@ -16,6 +16,7 @@ public class ParagraphLayout
 		public int indexInChildList;
 		public double indentation;
 		public boolean bOnStack;
+		public boolean bFixed = false;
 		
 		
 		public IndentationEntry(int indexInChildList, double indentation)
@@ -328,7 +329,7 @@ public class ParagraphLayout
 			
 			if ( child.isReqParagraphIndentMarker() )
 			{
-				indentationStack.push( new IndentationEntry( i, lineX ) );
+				indentationStack.push( new IndentationEntry( i, Math.max( lineX, indentation ) ) );
 			}
 			else if ( child.isReqParagraphDedentMarker() )
 			{
@@ -476,9 +477,15 @@ public class ParagraphLayout
 					IndentationEntry breakIndentation = entry.lineIndentation;
 					if ( !breakIndentation.bOnStack )
 					{
-						// Indentation entry is not on the stack; it will not have been offset in the loop over the indentation stack
-						breakIndentation.indentation -= xAfterLineBreak;
-						breakIndentation.indentation += nextLineIndentation;
+						// Don't want to apply the offset to an indentation entry more than once - line break entries can share the same
+						// indentation entry
+						if ( breakIndentation.bFixed )
+						{
+							// Indentation entry is not on the stack; it will not have been offset in the loop over the indentation stack
+							breakIndentation.indentation -= xAfterLineBreak;
+							breakIndentation.indentation += nextLineIndentation;
+							breakIndentation.bFixed = true;
+						}
 					}
 					
 					if ( bestLineBreak == null  ||  entry.breakBox.getReqLineBreakCost() <= bestLineBreak.breakBox.getReqLineBreakCost() )
@@ -488,7 +495,17 @@ public class ParagraphLayout
 						bestLineBreakEntryIndex = j;
 					}
 				}
-				
+
+				// Reset the 'fixed' flags
+				for (int j = lineBreakEntryListOffset; j < lineBreaks.size(); j++)
+				{
+					BreakEntry entry = lineBreaks.get( j );
+					IndentationEntry breakIndentation = entry.lineIndentation;
+					if ( !breakIndentation.bOnStack )
+					{
+						breakIndentation.bFixed = false;
+					}
+				}
 				
 				bFirstLine = false;
 			}
