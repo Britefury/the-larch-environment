@@ -85,7 +85,19 @@ public class EditableTextCell
 		@Override
 		public void caretLeave(DPElement element, Caret c)
 		{
-			element.postTreeEvent( CommitEvent.instance );
+			// Only send a commit event if:
+			// - the caret is valid
+			// - the current target is the caret - e.g. the user is editing text within the cell
+			// If we do not check for this:
+			// - When pasting data from a spreadsheet into a table editor, a cell is chosen to position the pasted data. Choosing this position will normally alter
+			//   the position of the caret, but it will not be visible, as the table highlight is the current target. The paste operation will cause the table to be refreshed.
+			//   This involves removing presentation elements, which will cause the caret to leave them, resulting in this event being received. This will result in the
+			//   text representation of the *old* data being retrieved, and commit, overwriting the pasted data, preventing the current cell from being successfully
+			//   altered by the paste operation.
+			if ( c.isValid()  &&  element.getRootElement().getTarget() == c )
+			{
+				element.postTreeEvent( CommitEvent.instance );
+			}
 		}
 	};
 	

@@ -16,6 +16,8 @@ import BritefuryJ.DocPresent.Interactor.TargetElementInteractor;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.SelectionPoint;
 import BritefuryJ.DocPresent.Target.Target;
+import BritefuryJ.IncrementalUnit.Unit;
+import BritefuryJ.IncrementalUnit.UnitEvaluator;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
@@ -113,6 +115,7 @@ public abstract class AbstractTableEditorInstance <ModelType>
 	protected AbstractTableEditor<ModelType> editor;
 	protected ModelType model;
 	protected boolean editable;
+	protected Unit tableUnit;
 	
 	
 	protected AbstractTableEditorInstance(AbstractTableEditor<ModelType> editor, ModelType model, boolean editable)
@@ -120,6 +123,17 @@ public abstract class AbstractTableEditorInstance <ModelType>
 		this.editor = editor;
 		this.model = model;
 		this.editable = editable;
+		
+		UnitEvaluator eval = new UnitEvaluator()
+		{
+			@Override
+			public Object evaluate()
+			{
+				return presentTable();
+			}
+		};
+		
+		tableUnit = new Unit( eval );
 	}
 	
 	
@@ -142,7 +156,7 @@ public abstract class AbstractTableEditorInstance <ModelType>
 	
 	protected Pres editTable()
 	{
-		Pres table = presentTable();
+		Pres table = (Pres)tableUnit.getValue();
 		Pres region = new Region( table, editor.clipboardHandler );
 		return new TableEditorPres( region );
 	}
