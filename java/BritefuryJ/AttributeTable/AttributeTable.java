@@ -418,6 +418,23 @@ public class AttributeTable implements Presentable
 	
 	
 	
+	public String toString()
+	{
+		StringBuilder builder = new StringBuilder();
+		builder.append( "{ " );
+		for (Map.Entry<AttributeBase, Object> entry: values.entrySet())
+		{
+			builder.append( entry.getKey().toString() );
+			builder.append( "=" );
+			builder.append( entry.getValue().toString() );
+			builder.append( ", " );
+		}
+		builder.append( " }" );
+		return builder.toString();
+	}
+	
+	
+	
 	protected static Pres presentAttributeMap(FragmentView fragment, SimpleAttributeTable inheritedState, HashMap<AttributeBase, Object> values)
 	{
 		Set<AttributeBase> attributeSet = values.keySet();

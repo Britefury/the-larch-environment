@@ -28,4 +28,10 @@ public class AttributeWithValue
 	{
 		return value;
 	}
+	
+	
+	public String toString()
+	{
+		return attribute.toString() + "=" + value.toString();
+	}
 }

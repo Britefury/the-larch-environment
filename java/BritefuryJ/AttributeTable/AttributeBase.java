@@ -48,7 +48,7 @@ public abstract class AttributeBase
 	
 	
 	protected AttributeNamespace namespace;
-	protected String  name;
+	protected String name;
 	protected Class<?> valueClass;
 	protected Object defaultValue;
 	
@@ -142,5 +142,11 @@ public abstract class AttributeBase
 	protected void notifyAttributeShouldNotBeNull()
 	{
 		System.err.println( "WARNING: attrib table \"" + getClass().getName() + "\": attribute '" + getFullName() + "' should not have a null value" );
+	}
+	
+	
+	public String toString()
+	{
+		return namespace.toString() + "." + name;
 	}
 }

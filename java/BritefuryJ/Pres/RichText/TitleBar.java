@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.Pres.RichText;
 
+import java.util.List;
+
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
@@ -14,19 +16,28 @@ import BritefuryJ.StyleSheet.StyleValues;
 
 public class TitleBar extends Pres
 {
-	private String text;
+	private Title title;
 	
 	
+	public TitleBar(Object contents[])
+	{
+		title = new Title( contents );
+	}
+
+	public TitleBar(List<Object> contents)
+	{
+		title = new Title( contents );
+	}
+
 	public TitleBar(String text)
 	{
-		this.text = text;
+		title = new Title( text );
 	}
 
 
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		Title title = new Title( text );
 		Pres titleBackground = new Border( title.alignHCentre() );
 		double borderWidth = style.get( RichText.titleBorderWidth, Double.class );
 		return RichText.titleStyle.get( style ).applyTo(

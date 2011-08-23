@@ -89,4 +89,10 @@ public class AttributeNamespace
 		}
 		return attr;
 	}
+	
+	
+	public String toString()
+	{
+		return name;
+	}
 }

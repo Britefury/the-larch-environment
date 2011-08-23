@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.Pres.RichText;
 
+import java.util.List;
+
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
@@ -15,12 +17,25 @@ import BritefuryJ.StyleSheet.StyleValues;
 
 public class TitleBarWithSubtitle extends Pres
 {
-	private String text, subtitleText;
+	private Title title;
+	private String subtitleText;
 	
 	
+	public TitleBarWithSubtitle(Object contents[], String subtitleText)
+	{
+		title = new Title( contents );
+		this.subtitleText = subtitleText;
+	}
+
+	public TitleBarWithSubtitle(List<Object> contents, String subtitleText)
+	{
+		title = new Title( contents );
+		this.subtitleText = subtitleText;
+	}
+
 	public TitleBarWithSubtitle(String text, String subtitleText)
 	{
-		this.text = text;
+		title = new Title( text );
 		this.subtitleText = subtitleText;
 	}
 
@@ -28,7 +43,6 @@ public class TitleBarWithSubtitle extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		Title title = new Title( text );
 		Subtitle subtitle = new Subtitle( subtitleText );
 		Pres titleColumn = new Column( new Pres[] { title.alignHCentre(), subtitle.alignHCentre() } );
 		Pres titleBackground = new Border( titleColumn.alignHCentre() );
