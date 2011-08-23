@@ -10,7 +10,7 @@ from BritefuryJ.DocModel import DMSchema, DMObjectClass
 
 
 
-schema = DMSchema( 'Worksheet', 'ws', 'LarchCore.Worksheet', 2 )
+schema = DMSchema( 'Worksheet', 'ws', 'LarchCore.Worksheet', 3 )
 
 
 
@@ -23,7 +23,6 @@ Worksheet = schema.newClass( 'Worksheet', WorksheetNode, [ 'body' ] )
 Body = schema.newClass( 'Body', WorksheetNode, [ 'contents' ] )
 Text = schema.newClass( 'Text', WorksheetNode, [ 'text' ] )
 Paragraph = schema.newClass( 'Paragraph', Text, [ 'style' ] )
-PartialParagraph = schema.newClass( 'PartialParagraph', WorksheetPartialNode, [ 'style' ] )
 TextSpan = schema.newClass( 'TextSpan', Text, [ 'styleAttrs' ] )
 
 StyleAttr = schema.newClass( 'StyleAttr', WorksheetNode, [ 'name', 'value' ] )
@@ -53,5 +52,23 @@ def _readWorksheet_v1(fieldValues):
 	return Worksheet( body=body )
 
 schema.registerReader( 'Worksheet', 1, _readWorksheet_v1 )
+
+
+
+
+#
+#
+# Version 2 backwards compatibility
+#
+#
+
+def _readParagraph_v2(fieldValues):
+	# V2 represented text as a string. Wrap it in a list
+	text = fieldValues['text']
+	style = fieldValues['style']
+
+	return Paragraph( text=[ text ], style=style )
+
+schema.registerReader( 'Paragraph', 2, _readParagraph_v2 )
 
 

@@ -12,6 +12,7 @@ from java.awt import Color
 from java.awt.event import KeyEvent
 
 from java.util.regex import Pattern
+import java.util.List
 
 from javax.swing import AbstractAction
 from javax.swing import JPopupMenu, JOptionPane, JFileChooser
@@ -120,6 +121,13 @@ class WorksheetViewer (ObjectDispatchView):
 		else:
 			p = NormalText( text )
 		return p
+
+
+	@ObjectDispatchMethod( ViewSchema.TextSpanView )
+	def TextSpan(self, fragment, inheritedState, node):
+		text = node.getText()
+		styleSheet = node.getStyleSheet()
+		return styleSheet.applyTo( RichSpan( text ) )
 
 
 	

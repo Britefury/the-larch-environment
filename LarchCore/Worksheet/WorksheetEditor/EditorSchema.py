@@ -143,15 +143,17 @@ class BlankParagraphEditor (AbstractViewSchema.NodeAbstractView):
 
 
 class ParagraphEditor (AbstractViewSchema.ParagraphAbstractView):
-	def __init__(self, worksheet, model):
+	def __init__(self, worksheet, model, projectedContents=None):
 		super( ParagraphEditor, self ).__init__( worksheet, model )
-		self._editorModel = WSEditor.RichTextEditor.WorksheetRichTextEditor.instance.editorModelParagraph( [ model['text'] ], { 'style' : model['style'] } )
+		if projectedContents is None:
+			projectedContents = self._computeText()
+		self._editorModel = WSEditor.RichTextEditor.WorksheetRichTextEditor.instance.editorModelParagraph( projectedContents, { 'style' : model['style'] } )
 	
 
 	def setContents(self, contents):
-		modelContents = [ ( x   if isinstance( x, str ) or isinstance( x, unicode )   else x.getModel() )   for x in contents ]
-		self._model['text'] = modelContents[0]   if len( modelContents ) > 0   else ''
-		self._editorModel.setModelContents( WSEditor.RichTextEditor.WorksheetRichTextEditor.instance, modelContents )
+		modelContents = self._textToModel( contents )
+		self._model['text'] = modelContents
+		self._editorModel.setModelContents( WSEditor.RichTextEditor.WorksheetRichTextEditor.instance, contents )
 
 
 	def setStyle(self, style):
@@ -161,8 +163,8 @@ class ParagraphEditor (AbstractViewSchema.ParagraphAbstractView):
 		
 	@staticmethod
 	def newParagraph(contents, style):
-		m = ParagraphEditor.newParagraphModel( contents[0]   if len( contents ) > 0   else '', style )
-		return ParagraphEditor( None, m )
+		m = ParagraphEditor.newParagraphModel( ParagraphEditor._textToModel( contents ), style )
+		return ParagraphEditor( None, m, contents )
 
 	@staticmethod
 	def newParagraphModel(text, style):
@@ -171,30 +173,35 @@ class ParagraphEditor (AbstractViewSchema.ParagraphAbstractView):
 		
 		
 class TextSpanEditor (AbstractViewSchema.TextSpanAbstractView):
-	def __init__(self, worksheet, model):
+	def __init__(self, worksheet, model, projectedContents=None):
 		super( TextSpanEditor, self ).__init__( worksheet, model )
 		styleAttrs = {}
-		for key, value in model['styleAttrs']:
-			styleAttrs[key] = value
-		self._editorModel = WSEditor.RichTextEditor.WorksheetRichTextEditor.instance.editorModelSpan( [ model['text'] ], styleAttrs )
+		for a in model['styleAttrs']:
+			styleAttrs[a['name']] = a['value']
+		if projectedContents is None:
+			projectedContents = self._computeText()
+		self._editorModel = WSEditor.RichTextEditor.WorksheetRichTextEditor.instance.editorModelSpan( projectedContents, styleAttrs )
 
 		
 	def setContents(self, contents):
-		modelContents = [ ( x   if isinstance( x, str ) or isinstance( x, unicode )   else x.getModel() )   for x in contents ]
-		self._model['text'] = modelContents[0]
-		self._editorModel.setModelContents( WSEditor.RichTextEditor.WorksheetRichTextEditor.instance, modelContents )
+		modelContents = self._textToModel( contents )
+		self._model['text'] = modelContents
+		self._editorModel.setModelContents( WSEditor.RichTextEditor.WorksheetRichTextEditor.instance, contents )
 
 	
-	def setStyleAttrs(self, styleAttrs):
-		modelAttrs = [ [ key, value ]   for key, value in styleAttrs.items() ]
+	def setStyleAttrs(self, styleMap):
+		styleAttrs = dict( [ ( n, v )   for n, v in styleMap.items()   if v is not None ] )
+		modelAttrs = [ Schema.StyleAttr( name=n, value=v )   for n, v in styleAttrs.items() ]
+
 		self._model['styleAttrs'] = modelAttrs
 		self._editorModel.setStyleAttrs( styleAttrs )
 
 		
 	@staticmethod
-	def newTextSpan(contents, styleAttrs):
-		m = TextSpanEditor.newTextSpanModel( contents[0]   if len( contents ) > 0   else '', styleAttrs )
-		return TextSpanEditor( None, m )
+	def newTextSpan(contents, styleMap):
+		styleAttrs = [ Schema.StyleAttr( name=n, value=v )   for n, v in styleMap.items()   if v is not None ]
+		m = TextSpanEditor.newTextSpanModel( ParagraphEditor._textToModel( contents ), styleAttrs )
+		return TextSpanEditor( None, m, contents )
 
 	@staticmethod
 	def newTextSpanModel(text, styleAttrs):

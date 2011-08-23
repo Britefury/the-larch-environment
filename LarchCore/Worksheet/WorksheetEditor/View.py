@@ -9,6 +9,7 @@ from java.awt import Color
 from java.awt.event import KeyEvent
 
 from java.util.regex import Pattern
+import java.util.List
 
 from javax.swing import AbstractAction
 from javax.swing import JPopupMenu, JOptionPane, JFileChooser
@@ -29,6 +30,7 @@ from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.Border import *
 from BritefuryJ.DocPresent.Painter import *
 from BritefuryJ.DocPresent.Browser import Location
+from BritefuryJ.DocPresent.Selection import TextSelection
 from BritefuryJ.StyleSheet import StyleSheet
 from BritefuryJ.Pres import *
 from BritefuryJ.Pres.Primitive import *
@@ -140,13 +142,17 @@ ParagraphNodeInteractor.instance = ParagraphNodeInteractor()
 
 
 
+_italicButtonLabelStyle = StyleSheet.style( Primitive.fontFace( 'Monospaced' ), Primitive.fontItalic( True ) )
+_boldButtonLabelStyle = StyleSheet.style( Primitive.fontFace( 'Monospaced' ), Primitive.fontBold( True ) )
+
 
 
 def _worksheetContextMenuFactory(element, menu):
+	region = element.getRegion()
 	rootElement = element.getRootElement()
 
 	
-	def makeStyleFn(style):
+	def makeParaStyleFn(style):
 		def _modifyParagraph(paragraph):
 			paragraph.setStyle( style )
 
@@ -156,18 +162,42 @@ def _worksheetContextMenuFactory(element, menu):
 				WorksheetRichTextEditor.instance.modifyParagraphAtMarker( caret.getMarker(), _modifyParagraph )
 		return _onLink
 	
-	normalStyle = Hyperlink( 'Normal', makeStyleFn( 'normal' ) )
-	h1Style = Hyperlink( 'H1', makeStyleFn( 'h1' ) )
-	h2Style = Hyperlink( 'H2', makeStyleFn( 'h2' ) )
-	h3Style = Hyperlink( 'H3', makeStyleFn( 'h3' ) )
-	h4Style = Hyperlink( 'H4', makeStyleFn( 'h4' ) )
-	h5Style = Hyperlink( 'H5', makeStyleFn( 'h5' ) )
-	h6Style = Hyperlink( 'H6', makeStyleFn( 'h6' ) )
-	titleStyle = Hyperlink( 'Title', makeStyleFn( 'title' ) )
-	styles = ControlsRow( [ normalStyle, h1Style, h2Style, h3Style, h4Style, h5Style, h6Style, titleStyle ] )
+	normalParaStyle = Hyperlink( 'Normal', makeParaStyleFn( 'normal' ) )
+	h1ParaStyle = Hyperlink( 'H1', makeParaStyleFn( 'h1' ) )
+	h2ParaStyle = Hyperlink( 'H2', makeParaStyleFn( 'h2' ) )
+	h3ParaStyle = Hyperlink( 'H3', makeParaStyleFn( 'h3' ) )
+	h4ParaStyle = Hyperlink( 'H4', makeParaStyleFn( 'h4' ) )
+	h5ParaStyle = Hyperlink( 'H5', makeParaStyleFn( 'h5' ) )
+	h6ParaStyle = Hyperlink( 'H6', makeParaStyleFn( 'h6' ) )
+	titleParaStyle = Hyperlink( 'Title', makeParaStyleFn( 'title' ) )
+	styles = ControlsRow( [ normalParaStyle, h1ParaStyle, h2ParaStyle, h3ParaStyle, h4ParaStyle, h5ParaStyle, h6ParaStyle, titleParaStyle ] )
+	menu.add( SectionColumn( [ SectionTitle( 'Paragraph style' ), styles ] ).alignHExpand() )
+	
+	
+	def makeToggleStyleFn(attrName):
+		def computeStyleValues(styleAttrDicts):
+			value = bool( dict( styleAttrDicts[0] ).get( attrName, None ) )
+			value = not value
+			attrs = {}
+			attrs[attrName] = '1'   if value   else None
+			return attrs
+
+		def onButton(button, event):
+			selection = rootElement.getSelection()
+			if isinstance( selection, TextSelection ):
+				if selection.getRegion() == region:
+					WorksheetRichTextEditor.instance.applyStyleToSelection( selection, computeStyleValues )
+
+
+		return onButton
+
+	
+	italicStyle = Button( _italicButtonLabelStyle( Label( 'I' ) ), makeToggleStyleFn( 'italic' ) )
+	boldStyle = Button( _boldButtonLabelStyle( Label( 'B' ) ), makeToggleStyleFn( 'bold' ) )
+	styles = ControlsRow( [ italicStyle, boldStyle ] ).alignHPack()
 	menu.add( SectionColumn( [ SectionTitle( 'Style' ), styles ] ).alignHExpand() )
-	
-	
+
+
 	def _onPythonCode(link, event):
 		def _makePythonCode():
 			return EditorSchema.PythonCodeEditor.newPythonCode()
@@ -261,6 +291,15 @@ class WorksheetEditor (ObjectDispatchView):
 		return p
 	
 	
+	@ObjectDispatchMethod( EditorSchema.TextSpanEditor )
+	def TextSpan(self, fragment, inheritedState, node):
+		text = node.getText()
+		styleSheet = node.getStyleSheet()
+		p = styleSheet.applyTo( RichSpan( text ) )
+		p = WorksheetRichTextEditor.instance.editableSpan( node, p )
+		return p
+
+
 	@ObjectDispatchMethod( EditorSchema.BlankParagraphEditor )
 	def BlankParagraph(self, fragment, inheritedState, node):
 		style = node.getStyle()
@@ -287,16 +326,6 @@ class WorksheetEditor (ObjectDispatchView):
 		return p
 
 
-	@ObjectDispatchMethod( EditorSchema.TextSpanEditor )
-	def TextSpan(self, fragment, inheritedState, node):
-		text = node.getText()
-		styleAttrs = node.getStyleAttrs()
-		p = RichSpan( text )
-		p = WorksheetRichTextEditor.instance.editableSpan( node, p )
-		return p
-
-
-	
 	@ObjectDispatchMethod( EditorSchema.PythonCodeEditor )
 	def PythonCode(self, fragment, inheritedState, node):
 		choiceValues = [

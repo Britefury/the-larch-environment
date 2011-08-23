@@ -13,6 +13,8 @@ from BritefuryJ.Incremental import IncrementalValueMonitor
 from BritefuryJ.IncrementalUnit import Unit
 
 from BritefuryJ.Pres import InnerFragment
+from BritefuryJ.Pres.Primitive import Primitive
+from BritefuryJ.StyleSheet import StyleSheet
 
 
 from Britefury import LoadBuiltins
@@ -106,15 +108,35 @@ class BodyAbstractView (NodeAbstractView):
 		
 
 
-class ParagraphAbstractView (NodeAbstractView):
+class _TextAbstractView (NodeAbstractView):
+	def __init__(self, worksheet, model):
+		super( _TextAbstractView, self ).__init__( worksheet, model )
+		self._textUnit = Unit( self._computeText )
+
+
+	def getText(self):
+		return self._textUnit.getValue()
+
+
+	def _refreshResults(self, module):
+		pass
+
+
+	def _computeText(self):
+		return [ x   if isinstance( x, str ) or isinstance( x, unicode )   else self._viewOf( x )   for x in self._model['text'] ]
+
+
+	@staticmethod
+	def _textToModel(text):
+		return [ ( x   if isinstance( x, str ) or isinstance( x, unicode )   else x.getModel() )   for x in text ]
+
+
+
+class ParagraphAbstractView (_TextAbstractView):
 	def __init__(self, worksheet, model):
 		super( ParagraphAbstractView, self ).__init__( worksheet, model )
-	
-		
-	def getText(self):
-		return self._model['text']
-	
 
+		
 	def getStyle(self):
 		return self._model['style']
 	
@@ -124,24 +146,47 @@ class ParagraphAbstractView (NodeAbstractView):
 
 		
 		
-class TextSpanAbstractView (NodeAbstractView):
+class TextSpanAbstractView (_TextAbstractView):
 	def __init__(self, worksheet, model):
 		super( TextSpanAbstractView, self ).__init__( worksheet, model )
-	
-		
-	def getText(self):
-		return self._model['text']
+		self._styleMapUnit = Unit( self.__compute_style_map )
 
-	
+		
 	def getStyleAttrs(self):
-		return self._model['styleAttrs']
+		return self._styleMapUnit.getValue()[0]
 
-		
+
+	def getStyleSheet(self):
+		return self._styleMapUnit.getValue()[1]
+
+
+
 	def _refreshResults(self, module):
 		pass
 
 		
-		
+	_styleMap = {}
+	_styleMap['italic'] = lambda value: Primitive.fontItalic( bool( value ) )
+	_styleMap['bold'] = lambda value: Primitive.fontBold( bool( value ) )
+
+	def __compute_style_map(self):
+		attrs = self._model['styleAttrs']
+
+		m = {}
+		styles = []
+
+		for a in attrs:
+			key = a['name']
+			value = a['value']
+
+			m[key] = value
+			styles.append( self._styleMap[key]( value ) )
+
+		return m, StyleSheet.style( *styles )
+
+
+
+	
 class PythonCodeAbstractView (NodeAbstractView):
 	STYLE_MINIMAL_RESULT = 0
 	STYLE_RESULT = 1
