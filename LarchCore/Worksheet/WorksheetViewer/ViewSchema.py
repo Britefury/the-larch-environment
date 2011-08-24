@@ -51,6 +51,14 @@ class _Projection (object):
 	def quoteLocation(self, worksheet, node):
 		return QuoteLocationView( worksheet, node )
 
+	@DMObjectNodeDispatchMethod( Schema.InlineEmbeddedObject )
+	def inlineEmbeddedObject(self, worksheet, node):
+		return InlineEmbeddedObjectView( worksheet, node )
+
+	@DMObjectNodeDispatchMethod( Schema.ParagraphEmbeddedObject )
+	def paragraphEmbeddedObject(self, worksheet, node):
+		return ParagraphEmbeddedObjectView( worksheet, node )
+
 
 
 class WorksheetView (AbstractViewSchema.WorksheetAbstractView):
@@ -79,4 +87,14 @@ class PythonCodeView (AbstractViewSchema.PythonCodeAbstractView):
 	
 	
 class QuoteLocationView (AbstractViewSchema.QuoteLocationAbstractView):
+	pass
+
+
+
+class InlineEmbeddedObjectView (AbstractViewSchema.InlineEmbeddedObjectAbstractView):
+	pass
+
+
+
+class ParagraphEmbeddedObjectView (AbstractViewSchema.ParagraphEmbeddedObjectAbstractView):
 	pass

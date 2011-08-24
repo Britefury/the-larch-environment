@@ -33,8 +33,6 @@ from LarchCore.Languages.Python25.PythonCommands import pythonCommands, makeInse
 	makeWrapSelectedStatementRangeInEmbeddedObjectAction, chainActions
 from LarchCore.Languages.Python25.Python25 import EmbeddedPython25
 from LarchCore.Languages.Python25 import Schema
-from LarchCore.Languages.Python25.PythonEditor.PythonEditOperations import getSelectedExpression, pyReplaceNode
-from LarchCore.Languages.Python25.PythonEditor.View import perspective as pyPerspective
 
 
 

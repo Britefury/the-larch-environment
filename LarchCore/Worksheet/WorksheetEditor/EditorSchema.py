@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
+from BritefuryJ.DocModel import DMObject, DMNode
+
 from BritefuryJ.Incremental import IncrementalValueMonitor
 from BritefuryJ.IncrementalUnit import Unit
 
@@ -53,6 +55,14 @@ class _Projection (object):
 	@DMObjectNodeDispatchMethod( Schema.QuoteLocation )
 	def quoteLocation(self, worksheet, node):
 		return QuoteLocationEditor( worksheet, node )
+
+	@DMObjectNodeDispatchMethod( Schema.InlineEmbeddedObject )
+	def inlineEmbeddedObject(self, worksheet, node):
+		return InlineEmbeddedObjectEditor( worksheet, node )
+
+	@DMObjectNodeDispatchMethod( Schema.ParagraphEmbeddedObject )
+	def paragraphEmbeddedObject(self, worksheet, node):
+		return ParagraphEmbeddedObjectEditor( worksheet, node )
 
 
 
@@ -155,6 +165,10 @@ class ParagraphEditor (AbstractViewSchema.ParagraphAbstractView):
 		self._model['text'] = modelContents
 		self._editorModel.setModelContents( WSEditor.RichTextEditor.WorksheetRichTextEditor.instance, contents )
 
+	def _removeInlineEmbed(self, embed):
+		index = self.getText().index( embed )
+		del self._model['text'][index]
+
 
 	def setStyle(self, style):
 		self._model['style'] = style
@@ -187,6 +201,10 @@ class TextSpanEditor (AbstractViewSchema.TextSpanAbstractView):
 		modelContents = self._textToModel( contents )
 		self._model['text'] = modelContents
 		self._editorModel.setModelContents( WSEditor.RichTextEditor.WorksheetRichTextEditor.instance, contents )
+
+	def _removeInlineEmbed(self, embed):
+		index = self.getText().index( embed )
+		del self._model['text'][index]
 
 	
 	def setStyleAttrs(self, styleMap):
@@ -266,3 +284,41 @@ class QuoteLocationEditor (AbstractViewSchema.QuoteLocationAbstractView):
 	@staticmethod
 	def newQuoteLocationModel():
 		return Schema.QuoteLocation( location='', style='normal' )
+
+
+
+class InlineEmbeddedObjectEditor (AbstractViewSchema.InlineEmbeddedObjectAbstractView):
+	def __init__(self, worksheet, model):
+		super( InlineEmbeddedObjectEditor, self ).__init__( worksheet, model )
+		self._editorModel = WSEditor.RichTextEditor.WorksheetRichTextEditor.instance.editorModelInlineEmbed( model )
+
+
+	@staticmethod
+	def newInlineEmbeddedObject(value):
+		m = InlineEmbeddedObjectEditor.newInlineEmbeddedObjectModel( value )
+		return InlineEmbeddedObjectEditor( None, m )
+
+	@staticmethod
+	def newInlineEmbeddedObjectModel(value):
+		embeddedValue = DMNode.embedIsolated( value )
+		return Schema.InlineEmbeddedObject( embeddedValue=embeddedValue )
+
+
+
+
+class ParagraphEmbeddedObjectEditor (AbstractViewSchema.ParagraphEmbeddedObjectAbstractView):
+	def __init__(self, worksheet, model):
+		super( ParagraphEmbeddedObjectEditor, self ).__init__( worksheet, model )
+		self._editorModel = WSEditor.RichTextEditor.WorksheetRichTextEditor.instance.editorModelParagraphEmbed( model )
+
+
+	@staticmethod
+	def newParagraphEmbeddedObject(value):
+		m = ParagraphEmbeddedObjectEditor.newParagraphEmbeddedObjectModel( value )
+		return ParagraphEmbeddedObjectEditor( None, m )
+
+	@staticmethod
+	def newParagraphEmbeddedObjectModel(value):
+		embeddedValue = DMNode.embedIsolated( value )
+		return Schema.ParagraphEmbeddedObject( embeddedValue=embeddedValue )
+
