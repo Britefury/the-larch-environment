@@ -28,6 +28,7 @@ from BritefuryJ.Pres import InnerFragment, LocationAsInnerFragment
 from BritefuryJ.Controls import *
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.Border import *
+from BritefuryJ.DocPresent.Input import ObjectDndHandler
 from BritefuryJ.DocPresent.Painter import *
 from BritefuryJ.DocPresent.Browser import Location
 from BritefuryJ.DocPresent.Selection import TextSelection
@@ -36,6 +37,9 @@ from BritefuryJ.Pres import *
 from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.Pres.RichText import *
 from BritefuryJ.Pres.ContextMenu import *
+from BritefuryJ.Pres.ObjectPres import *
+
+from BritefuryJ.IncrementalView import FragmentData
 
 from BritefuryJ.DocPresent.Interactor import KeyElementInteractor
 
@@ -44,8 +48,6 @@ from BritefuryJ.Editor.Sequential.Item import *
 
 from LarchCore.Languages.Python25 import Python25
 from LarchCore.Languages.Python25.Execution.ExecutionPresCombinators import executionResultBox, minimalExecutionResultBox
-
-from LarchCore.Project.ProjectEditor.Subject import ProjectSubject
 
 from LarchCore.Worksheet.WorksheetEditor import EditorSchema
 from LarchCore.Worksheet.WorksheetEditor.RichTextEditor import WorksheetRichTextEditor
@@ -59,6 +61,38 @@ _pythonCodeEditorBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 
 _quoteLocationHeaderStyle = StyleSheet.style( Primitive.background( FillPainter( Color( 0.75, 0.8, 0.925 ) ) ) )
 _quoteLocationBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) ) )
 _quoteLocationEditorBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 2.0, 5.0, 20.0, 20.0, Color( 0.4, 0.5, 0.6 ), None ) ) )
+
+
+
+def _onDrop_embeddedObject(element, pos, data, action):
+	marker = element.getEditableMarkerClosestToLocalPoint( pos )
+	if marker is not None  and  marker.isValid():
+		def _performInsertion(model):
+			embeddedValue = DMNode.embedIsolated( model )
+			expr = Schema.EmbeddedObjectExpr( embeddedValue=embeddedValue )
+			insertSpecialFormAtMarker( marker, expr )
+
+		# Display a context menu
+		def _onDropInline(control):
+			def _makeInline():
+				model = data.getModel()
+				return EditorSchema.InlineEmbeddedObjectEditor.newInlineEmbeddedObjectModel( model )
+			WorksheetRichTextEditor.instance.insertInlineEmbedAtMarker( marker, _makeInline )
+
+		def _onDropParagraph(control):
+			def _makeParagraph():
+				model = data.getModel()
+				return EditorSchema.ParagraphEmbeddedObjectEditor.newParagraphEmbeddedObject( model )
+			WorksheetRichTextEditor.instance.insertParagraphAtMarker( marker, _makeParagraph )
+
+		menu = VPopupMenu( [ MenuItem.menuItemWithLabel( 'Inline', _onDropInline ),
+		                     MenuItem.menuItemWithLabel( 'As paragraph', _onDropParagraph ) ] )
+		menu.popupAtMousePosition( marker.getElement() )
+	return True
+
+
+_embeddedObject_dropDest = ObjectDndHandler.DropDest( FragmentData, _onDrop_embeddedObject )
+
 
 
 
@@ -236,6 +270,30 @@ def _worksheetContextMenuFactory(element, menu):
 
 
 
+
+def _inlineEmbeddedObjectContextMenuFactory(element, menu):
+	def _onDelete(control):
+		WorksheetRichTextEditor.instance.deleteInlineEmbedContainingElement( element )
+
+	deleteItem = MenuItem.menuItemWithLabel( 'Delete embedded object', _onDelete )
+
+	menu.add( deleteItem )
+	return True
+
+
+def _paragraphEmbeddedObjectContextMenuFactory(element, menu):
+	def _onDelete(control):
+		WorksheetRichTextEditor.instance.deleteParagraphContainingElement( element )
+
+	deleteItem = MenuItem.menuItemWithLabel( 'Delete embedded object paragraph', _onDelete )
+
+	menu.add( deleteItem )
+	return True
+
+
+
+	
+
 class WorksheetEditor (ObjectDispatchView):
 	@ObjectDispatchMethod( EditorSchema.WorksheetEditor )
 	def Worksheet(self, fragment, inheritedState, node):
@@ -251,6 +309,7 @@ class WorksheetEditor (ObjectDispatchView):
 		w = Page( [ linkHeader, bodyView ] )
 		w = w.withElementInteractor( WorksheetNodeInteractor.instance )
 		w = w.withContextMenuInteractor( _worksheetContextMenuFactory )
+		w = w.withDropDest( _embeddedObject_dropDest )
 		w = WorksheetRichTextEditor.instance.region( w )
 		return w
 	
@@ -425,6 +484,28 @@ class WorksheetEditor (ObjectDispatchView):
 		
 		p = _quoteLocationEditorBorderStyle.applyTo( Border( box ).alignHExpand() )
 
+		p = WorksheetRichTextEditor.instance.editableParagraphEmbed( node, p )
+		return p
+
+
+
+	@ObjectDispatchMethod( EditorSchema.InlineEmbeddedObjectEditor )
+	def InlineEmbeddedObject(self, fragment, inheritedState, node):
+		value = node.getValue()
+		valueView = ApplyPerspective( None, value )
+		p = ObjectBorder( valueView )
+		p = p.withContextMenuInteractor( _inlineEmbeddedObjectContextMenuFactory )
+		p = WorksheetRichTextEditor.instance.editableInlineEmbed( node, p )
+		return p
+
+
+
+	@ObjectDispatchMethod( EditorSchema.ParagraphEmbeddedObjectEditor )
+	def ParagraphEmbeddedObject(self, fragment, inheritedState, node):
+		value = node.getValue()
+		valueView = ApplyPerspective( None, value )
+		p = ObjectBorder( valueView )
+		p = p.withContextMenuInteractor( _paragraphEmbeddedObjectContextMenuFactory )
 		p = WorksheetRichTextEditor.instance.editableParagraphEmbed( node, p )
 		return p
 

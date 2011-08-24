@@ -466,6 +466,14 @@ public abstract class RichTextEditor extends SequentialEditor
 		}
 	}
 	
+	public void insertParagraphAtMarker(Marker marker, MakeParagraphFn makeParagraph)
+	{
+		if ( marker.isValid()  &&  marker.getElement().isEditable() )
+		{
+			marker.getElement().postTreeEvent( new RichTextEditEvents.InsertParagraphRequest( makeParagraph ) );
+		}
+	}
+	
 	public void deleteParagraphContainingElement(DPElement element)
 	{
 		element.postTreeEvent( new RichTextEditEvents.DeleteParagraphRequest() );

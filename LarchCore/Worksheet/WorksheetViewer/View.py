@@ -38,6 +38,7 @@ from BritefuryJ.Pres import *
 from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.Pres.RichText import *
 from BritefuryJ.Pres.ContextMenu import *
+from BritefuryJ.Pres.ObjectPres import *
 
 from BritefuryJ.Projection import Perspective, Subject
 
@@ -188,6 +189,24 @@ class WorksheetViewer (ObjectDispatchView):
 			box = StyleSheet.style( Primitive.columnSpacing( 5.0 ) ).applyTo( Column( boxContents ) )
 			
 			return _quoteLocationEditorBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
+
+
+
+	@ObjectDispatchMethod( ViewSchema.InlineEmbeddedObjectView )
+	def InlineEmbeddedObject(self, fragment, inheritedState, node):
+		value = node.getValue()
+		valueView = ApplyPerspective( None, value )
+		p = ObjectBorder( valueView )
+		return p
+
+
+
+	@ObjectDispatchMethod( ViewSchema.ParagraphEmbeddedObjectView )
+	def ParagraphEmbeddedObject(self, fragment, inheritedState, node):
+		value = node.getValue()
+		valueView = ApplyPerspective( None, value )
+		p = ObjectBorder( valueView )
+		return p
 
 
 

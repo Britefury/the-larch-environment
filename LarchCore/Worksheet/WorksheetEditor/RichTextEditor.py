@@ -31,9 +31,8 @@ class WorksheetRichTextEditor (RichTextEditor):
 
 
 
-	@abstractmethod
 	def buildInlineEmbed(self, value):
-		pass
+		return EditorSchema.InlineEmbeddedObjectEditor.newInlineEmbeddedObject( value['embeddedValue'].getValue() )
 
 	def buildParagraphEmbed(self, value):
 		assert isinstance( value, DMObject )
@@ -41,6 +40,8 @@ class WorksheetRichTextEditor (RichTextEditor):
 			return EditorSchema.PythonCodeEditor( None, value )
 		elif value.isInstanceOf( Schema.QuoteLocation ):
 			return EditorSchema.QuoteLocationEditor( None, value )
+		elif value.isInstanceOf( Schema.ParagraphEmbeddedObject ):
+			return EditorSchema.ParagraphEmbeddedObjectEditor( None, value )
 		else:
 			raise TypeError, 'cannot create paragraph embed for %s'  %  value.getDMClass().getName()
 
@@ -64,15 +65,17 @@ class WorksheetRichTextEditor (RichTextEditor):
 	def deleteParagraphFromBlock(self, block, paragraph):
 		block.deleteEditorNode( paragraph )
 
-	@abstractmethod
 	def removeInlineEmbed(self, model, embed):
-		pass
+		model._removeInlineEmbed( embed )
 
 	def deepCopyInlineEmbedValue(self, value):
-		return deepcopy( value )
+		return EditorSchema.InlineEmbeddedObjectEditor.newInlineEmbeddedObjectModel( value['embeddedValue'].getValue() )
 
 	def deepCopyParagraphEmbedValue(self, value):
-		return deepcopy( value )
+		if value.isInstanceOf( Schema.ParagraphEmbeddedObject ):
+			return EditorSchema.ParagraphEmbeddedObjectEditor.newParagraphEmbeddedObjectModel( value['embeddedValue'].getValue() )
+		else:
+			return deepcopy( value )
 
 
 

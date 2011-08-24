@@ -303,3 +303,37 @@ class QuoteLocationAbstractView (NodeAbstractView):
 		
 	def _refreshResults(self, module):
 		pass
+
+
+
+
+class InlineEmbeddedObjectAbstractView (NodeAbstractView):
+	def __init__(self, worksheet, model):
+		NodeAbstractView.__init__( self, worksheet, model )
+		self._incr = IncrementalValueMonitor( self )
+		self._result = None
+
+
+	def getValue(self):
+		return self._model['embeddedValue'].getValue()
+
+
+	def _refreshResults(self, module):
+		pass
+
+
+
+
+class ParagraphEmbeddedObjectAbstractView (NodeAbstractView):
+	def __init__(self, worksheet, model):
+		NodeAbstractView.__init__( self, worksheet, model )
+		self._incr = IncrementalValueMonitor( self )
+		self._result = None
+
+
+	def getValue(self):
+		return self._model['embeddedValue'].getValue()
+
+
+	def _refreshResults(self, module):
+		pass

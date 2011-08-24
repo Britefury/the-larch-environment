@@ -186,6 +186,9 @@ def _onDrop_embeddedObject(element, pos, data, action):
 	return True
 
 
+_embeddedObject_dropDest = ObjectDndHandler.DropDest( FragmentData, _onDrop_embeddedObject )
+
+
 
 
 def _embeddedObjectExprContextMenuFactory(element, menu):
@@ -402,7 +405,6 @@ class Python25View (ObjectNodeDispatchView):
 		else:
 			lineViews = SREInnerFragment.map( suite, PRECEDENCE_NONE, EditMode.EDIT )
 		s = suiteView( lineViews ).alignHPack().alignVRefY()
-		_embeddedObject_dropDest = ObjectDndHandler.DropDest( FragmentData, _onDrop_embeddedObject )
 		s = s.withDropDest( _embeddedObject_dropDest )
 		s = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._makeSuiteEditListener( suite ), self._topLevel ], suite, s )
 		s = s.withContextMenuInteractor( _pythonModuleContextMenuFactory )
@@ -420,7 +422,6 @@ class Python25View (ObjectNodeDispatchView):
 		else:
 			lineViews = SREInnerFragment.map( suite, PRECEDENCE_NONE, EditMode.EDIT )
 		s = suiteView( lineViews ).alignHPack().alignVRefY()
-		_embeddedObject_dropDest = ObjectDndHandler.DropDest( FragmentData, _onDrop_embeddedObject )
 		s = s.withDropDest( _embeddedObject_dropDest )
 		s = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._makeSuiteEditListener( suite ), self._topLevel ], suite, s )
 		s = s.withContextMenuInteractor( _pythonModuleContextMenuFactory )
@@ -440,7 +441,6 @@ class Python25View (ObjectNodeDispatchView):
 			exprView = SREInnerFragment( expr, PRECEDENCE_NONE, EditMode.DISPLAY )
 			seg = Segment( exprView )
 		e = Paragraph( [ seg ] ).alignHPack().alignVRefY()
-		_embeddedObject_dropDest = ObjectDndHandler.DropDest( FragmentData, _onDrop_embeddedObject )
 		e = e.withDropDest( _embeddedObject_dropDest )
 		e = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._exprOuter, self._exprTopLevel ],  model,  e )
 		e = e.withContextMenuInteractor( _pythonModuleContextMenuFactory )
