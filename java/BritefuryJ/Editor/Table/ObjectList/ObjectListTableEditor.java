@@ -10,6 +10,7 @@ import java.lang.reflect.Constructor;
 import java.util.List;
 
 import org.python.core.Py;
+import org.python.core.PyException;
 import org.python.core.PyObject;
 import org.python.core.PySlice;
 import org.python.core.PyString;
@@ -112,8 +113,8 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 
 	private static class PyObjectModelWrapper implements ObjectListInterface
 	{
-		private static final PyString append = __builtin__.intern( Py.newString( "append" ) );
-		private static final PyString __delitem__ = __builtin__.intern( Py.newString( "__delitem__" ) );
+		private static final PyString appendName = __builtin__.intern( Py.newString( "append" ) );
+		private static final PyString __delitem__Name = __builtin__.intern( Py.newString( "__delitem__" ) );
 		
 		private PyObject model;
 		
@@ -137,13 +138,45 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 		@Override
 		public void append(Object x)
 		{
-			__builtin__.getattr( model, append ).__call__( Py.java2py( x ) );
+			PyObject append;
+			try
+			{
+				append = __builtin__.getattr( model, appendName );
+			}
+			catch (PyException e)
+			{
+				if ( e.match( Py.AttributeError ) )
+				{
+					throw new UnsupportedOperationException();
+				}
+				else
+				{
+					throw e;
+				}
+			}
+			append.__call__( Py.java2py( x ) );
 		}
 
 		@Override
 		public void removeRange(int start, int end)
 		{
-			__builtin__.getattr( model, __delitem__ ).__call__( new PySlice( Py.newInteger( start ), Py.newInteger( end ), Py.None ) );
+			PyObject __delitem__;
+			try
+			{
+				__delitem__ = __builtin__.getattr( model, __delitem__Name );
+			}
+			catch (PyException e)
+			{
+				if ( e.match( Py.AttributeError ) )
+				{
+					throw new UnsupportedOperationException();
+				}
+				else
+				{
+					throw e;
+				}
+			}
+			__delitem__.__call__( new PySlice( Py.newInteger( start ), Py.newInteger( end ), Py.None ) );
 		}
 	}
 	
@@ -262,23 +295,30 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 		int width = columns.length;
 		int h = data.length;
 		
-		growHeight( model, y + h );
-		
-		for (int j = y, b = 0; b < h; j++, b++)
+		try
 		{
-			Object dataRow[] = data[b];
-			Object modelRow = model.get( j );
-			
-			int w = Math.min( dataRow.length, width - x );
-			for (int i = x, a = 0; a < w; i++, a++)
+			growHeight( model, y + h );
+		
+			for (int j = y, b = 0; b < h; j++, b++)
 			{
-				columns[i].set( modelRow, dataRow[a] );
+				Object dataRow[] = data[b];
+				Object modelRow = model.get( j );
+				
+				int w = Math.min( dataRow.length, width - x );
+				for (int i = x, a = 0; a < w; i++, a++)
+				{
+					columns[i].set( modelRow, dataRow[a] );
+				}
+				
+				if ( !rowsAreLive )
+				{
+					instance.onRowChanged( modelRow );
+				}
 			}
-			
-			if ( !rowsAreLive )
-			{
-				instance.onRowChanged( modelRow );
-			}
+		}
+		catch (UnsupportedOperationException e)
+		{
+			return;
 		}
 	}
 	
@@ -287,29 +327,35 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 	{
 		ObjectListTableEditorInstance instance = (ObjectListTableEditorInstance)editorInstance;
 		
-		if ( x == 0  &&  w >= columns.length )
+		try
 		{
-			// We are removing entire rows
-			model.removeRange( y, y + h );
-		}
-		else
-		{
-			int bottomRowIndex = Math.min( y + h - 1, model.size() - 1 );
-			for (int j = bottomRowIndex; j >= y; j--)
+			if ( x == 0  &&  w >= columns.length )
 			{
-				Object modelRow = model.get( j );
-				
-				for (int i = x; i < x + w; i++)
+				// We are removing entire rows
+				model.removeRange( y, y + h );
+			}
+			else
+			{
+				int bottomRowIndex = Math.min( y + h - 1, model.size() - 1 );
+				for (int j = bottomRowIndex; j >= y; j--)
 				{
-					AbstractColumn column = columns[i];
-					column.set( modelRow, column.defaultValue() );
-				}
-
-				if ( !rowsAreLive )
-				{
-					instance.onRowChanged( modelRow );
+					Object modelRow = model.get( j );
+					
+					for (int i = x; i < x + w; i++)
+					{
+						AbstractColumn column = columns[i];
+						column.set( modelRow, column.defaultValue() );
+					}
+	
+					if ( !rowsAreLive )
+					{
+						instance.onRowChanged( modelRow );
+					}
 				}
 			}
+		}
+		catch (UnsupportedOperationException e)
+		{
 		}
 	}
 

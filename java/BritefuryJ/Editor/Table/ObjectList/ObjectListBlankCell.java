@@ -26,7 +26,13 @@ public class ObjectListBlankCell extends AbstractBlankCell
 	@Override
 	public void setValue(Object value)
 	{
-		Object modelRow = editorInstance.newRow(); 
-		column.set( modelRow, value );
+		try
+		{
+			Object modelRow = editorInstance.newRow(); 
+			column.set( modelRow, value );
+		}
+		catch (UnsupportedOperationException e)
+		{
+		}
 	}
 }

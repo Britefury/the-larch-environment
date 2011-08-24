@@ -6,10 +6,20 @@
 //##************************
 package BritefuryJ.AttributeTable;
 
+import java.awt.Color;
 import java.util.Comparator;
 import java.util.regex.Pattern;
 
-public abstract class AttributeBase
+import BritefuryJ.DefaultPerspective.Presentable;
+import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.ObjectPres.ObjectBoxWithFields;
+import BritefuryJ.Pres.ObjectPres.VerticalField;
+import BritefuryJ.Pres.Primitive.Label;
+import BritefuryJ.Pres.Primitive.Primitive;
+import BritefuryJ.StyleSheet.StyleSheet;
+
+public abstract class AttributeBase implements Presentable
 {
 	protected static Pattern validNamePattern = Pattern.compile( "[a-zA-Z_][a-zA-Z0-9_]*" );
 
@@ -145,8 +155,34 @@ public abstract class AttributeBase
 	}
 	
 	
+	
+	@Override
+	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
+	{
+		initStyles();
+		
+		return new ObjectBoxWithFields( "Attribute", new Object[] {
+				nameStyle.applyTo( new Label( getFullName() ) ),
+				new VerticalField( "Default", defaultValue ) } );
+	}
+
+
+	
 	public String toString()
 	{
 		return namespace.toString() + "." + name;
 	}
+	
+	
+	
+	private static void initStyles()
+	{
+		if ( nameStyle == null )
+		{
+			nameStyle = StyleSheet.style( Primitive.fontBold.as( true ), Primitive.foreground.as( new Color( 0.0f, 0.25f, 0.25f ) ) );
+		}
+	}
+	
+	
+	private static StyleSheet nameStyle = null;
 }
