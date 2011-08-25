@@ -82,10 +82,18 @@ class LiterateExpression (object):
 		self._incr.onAccess()
 		exprPres = self._expr
 
-		return ObjectBox( 'Literate expression', exprPres ).withDragSource( _dragSource )
+		header = Row( [ self._angleQuoteStyle( Label( u'\u00ab' ) ),
+					self._angleQuoteStyle( Label( u'\u00bb' ) ),
+					Spacer( 9.0, 0.0 ) ] ).withDragSource( _dragSource )
+
+		return ObjectBorder( Row( [ header.alignVCentre(), exprPres ] ) )
+
+
+	_angleQuoteStyle = StyleSheet.style( Primitive.foreground( Color( 0.15, 0.15, 0.45 ) ), Primitive.fontBold( True ), Primitive.fontSize( 12 ) )
 
 
 
+	
 
 class LiterateSuiteDefinition (object):
 	def __init__(self, name='suite', suite=None):
@@ -202,15 +210,19 @@ class LiterateSuite (object):
 		nameLabel =  self._nameStyle( Label( self._definition._name ) )
 		nameUnit = LiteralUnit( nameLabel )
 
-		def _onNameButton(button, event):
-			class _Listener (TextEntry.TextEntryListener):
-				def onAccept(listener, textEntry, text):
-					self.setName( text )
+		
+		class _NameEntryListener (TextEntry.TextEntryListener):
+			def onAccept(listener, textEntry, text):
+				self.setName( text )
 
-				def onCancel(listener, textEntry, orignalText):
-					nameUnit.setLiteralValue( nameLabel )
-				
-			nameEntry = self._nameStyle( TextEntry( self._definition._name, _Listener() ) )
+			def onCancel(listener, textEntry, orignalText):
+				nameUnit.setLiteralValue( nameLabel )
+
+
+		def _onNameButton(button, event):
+			nameEntry = TextEntry( self._definition._name, _NameEntryListener() )
+			nameEntry.grabCaretOnRealise()
+			nameEntry = self._nameStyle( nameEntry )
 			nameUnit.setLiteralValue( nameEntry )
 
 		renameButton = self._nameButtonStyle( Button.buttonWithLabel( '...', _onNameButton ) )
@@ -219,12 +231,12 @@ class LiterateSuite (object):
 		                        nameUnit.valuePresInFragment(),
 					self._angleQuoteStyle( Label( u'\u00bb' ) ),
 					Spacer( 10.0, 0.0 ),
-					renameButton ] )
+					renameButton ] ).withDragSource( _dragSource )
 	
 
 		dropDown = self._dropDownStyle( DropDownExpander( header, suitePres, self._expanded ) )
 
-		return ObjectBox( 'Literate suite', dropDown ).withContextMenuInteractor( _literateExpressionMenu ).withDragSource( _dragSource )
+		return ObjectBorder( dropDown ).withContextMenuInteractor( _literateExpressionMenu )
 
 	_nameStyle = StyleSheet.style( Primitive.foreground( Color( 0.15, 0.15, 0.45 ) ), Primitive.fontSize( 12 ) )
 	_nameButtonStyle = StyleSheet.style( Primitive.fontSize( 10 ) )
