@@ -217,6 +217,10 @@ EmbeddedObjectExpr = schema.newClass( 'EmbeddedObjectExpr', Expr, [ 'embeddedVal
 EmbeddedObjectStmt = schema.newClass( 'EmbeddedObjectStmt', SimpleStmt, [ 'embeddedValue' ] )
 
 
+# TEMPORARY Special form statement wrapper
+_temp_SpecialFormStmtWrapper = schema.newClass( '_temp_SpecialFormStmtWrapper', Node, [ 'value' ] )
+
+
 
 #
 # Top level nodes
