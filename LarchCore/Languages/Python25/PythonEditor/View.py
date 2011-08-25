@@ -167,7 +167,7 @@ def _onDrop_embeddedObject(element, pos, data, action):
 					insertSpecialFormAtMarker( marker, expr )
 				elif modelType is Schema.Stmt:
 					stmt = Schema.EmbeddedObjectStmt( embeddedValue=embeddedValue )
-					insertSpecialFormAtMarker( marker, stmt )
+					insertSpecialFormStatementAtMarker( marker, stmt )
 		
 		# Display a context menu
 		def _onDropByCopy(control):

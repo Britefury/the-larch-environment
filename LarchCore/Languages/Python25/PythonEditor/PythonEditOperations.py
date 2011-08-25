@@ -359,6 +359,17 @@ def insertSpecialFormAtCaret(caret, specialForm):
 
 
 
+def insertSpecialFormStatementAtMarker(marker, specialForm):
+	insertSpecialFormAtMarker( marker, Schema._temp_SpecialFormStmtWrapper( value=specialForm ) )
+
+
+def insertSpecialFormStatementAtCaret(caret, specialForm):
+	return insertSpecialFormStatementAtMarker( caret.getMarker(), specialForm )
+
+
+
+
+
 #
 #
 # SELECTION / TARGET ACQUISITION

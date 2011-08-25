@@ -132,7 +132,7 @@ class LiterateSuiteDefinition (object):
 			self.__change_history__.addChange( lambda: self.setName( name ), lambda: self.setName( oldName ), 'Literate suite definition set name' )
 
 
-
+import traceback
 
 
 class LiterateSuite (object):

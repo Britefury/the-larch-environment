@@ -1158,10 +1158,15 @@ class Python25Grammar (Grammar):
 	# STATEMENTS
 	#
 	#
-	
+
+	@Rule
+	def specialFormStmtWrapper_temporary(self):
+		return ( ObjectNode( Schema._temp_SpecialFormStmtWrapper ) + '\n' ).action( lambda input, begin, end, xs, bindings: xs[0]['value'] )
+
 	@Rule
 	def simpleStmt(self):
 		return ObjectNode( Schema.SimpleStmt )  |  \
+			self.specialFormStmtWrapper_temporary()  |  \
 		       self.assertStmt() | self.assignmentStmt() | self.augAssignStmt() | self.passStmt() | self.delStmt() | self.returnStmt() | self.yieldStmt() | self.raiseStmt() | self.breakStmt() | \
 		       self.continueStmt() | self.importStmt() | self.globalStmt() | self.execStmt() | self.printStmt() | self.exprStmt()
 
