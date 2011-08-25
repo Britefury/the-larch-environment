@@ -22,7 +22,7 @@ from BritefuryJ.IncrementalUnit import LiteralUnit
 from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.Pres.ObjectPres import *
 
-from BritefuryJ.Controls import Controls, DropDownExpander, MenuItem
+from BritefuryJ.Controls import Controls, DropDownExpander, MenuItem, TextEntry, Button
 
 from BritefuryJ.StyleSheet import StyleSheet
 
@@ -199,9 +199,27 @@ class LiterateSuite (object):
 		self._definition._incr.onAccess()
 		suitePres = self._definition._suite
 
-		header = Row( [  self._angleQuoteStyle( Label( u'\u00ab' ) ),
-		                        self._nameStyle( Label( self._definition._name ) ),
-					 self._angleQuoteStyle( Label( u'\u00bb' ) ) ] )
+		nameLabel =  self._nameStyle( Label( self._definition._name ) )
+		nameUnit = LiteralUnit( nameLabel )
+
+		def _onNameButton(button, event):
+			class _Listener (TextEntry.TextEntryListener):
+				def onAccept(listener, textEntry, text):
+					self.setName( text )
+
+				def onCancel(listener, textEntry, orignalText):
+					nameUnit.setLiteralValue( nameLabel )
+				
+			nameEntry = self._nameStyle( TextEntry( self._definition._name, _Listener() ) )
+			nameUnit.setLiteralValue( nameEntry )
+
+		renameButton = self._nameButtonStyle( Button.buttonWithLabel( '...', _onNameButton ) )
+
+		header = Row( [ self._angleQuoteStyle( Label( u'\u00ab' ) ),
+		                        nameUnit.valuePresInFragment(),
+					self._angleQuoteStyle( Label( u'\u00bb' ) ),
+					Spacer( 10.0, 0.0 ),
+					renameButton ] )
 	
 
 		dropDown = self._dropDownStyle( DropDownExpander( header, suitePres, self._expanded ) )
@@ -209,6 +227,7 @@ class LiterateSuite (object):
 		return ObjectBox( 'Literate suite', dropDown ).withContextMenuInteractor( _literateExpressionMenu ).withDragSource( _dragSource )
 
 	_nameStyle = StyleSheet.style( Primitive.foreground( Color( 0.15, 0.15, 0.45 ) ), Primitive.fontSize( 12 ) )
+	_nameButtonStyle = StyleSheet.style( Primitive.fontSize( 10 ) )
 	_angleQuoteStyle = StyleSheet.style( Primitive.foreground( Color( 0.15, 0.15, 0.45 ) ), Primitive.fontBold( True ), Primitive.fontSize( 12 ) )
 	_dropDownStyle = StyleSheet.style( Controls.dropDownExpanderHeaderArrowSize( 10.0 ), Controls.dropDownExpanderPadding( 12.0 ) )
 
