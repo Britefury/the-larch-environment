@@ -30,6 +30,7 @@ class Line (object):
 		return self.text
 
 
+
 class Block (object):
 	def __init__(self, lines):
 		self.lines = []
@@ -55,7 +56,7 @@ class Block (object):
 	def __str__(self):
 		return '\n'.join( [ l.text   for l in self.lines ] ) + '\n'
 
-		
+
 _emptyBlock = Block( [] )
 
 
@@ -1003,7 +1004,7 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 		else:
 			# Got a 'model' function - invoke to create AST nodes, then convert them to code
 			model = modelFn()
-			return Line( str( self( model ) ),   node )
+			return self( model )
 
 		
 		# Try to use the __py_exec__ method
