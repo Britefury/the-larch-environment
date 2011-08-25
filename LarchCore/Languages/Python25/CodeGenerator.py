@@ -1003,7 +1003,7 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 		else:
 			# Got a 'model' function - invoke to create AST nodes, then convert them to code
 			model = modelFn()
-			return Line( self( model ),   node )
+			return Line( str( self( model ) ),   node )
 
 		
 		# Try to use the __py_exec__ method
