@@ -66,8 +66,8 @@ class LiterateExpression (object):
 		return [ self._expr ]
 
 
-	def __py_evalmodel__(self, _globals, _locals, codeGen):
-		return self._expr.model['expr']
+	def __py_evalmodel__(self):
+		return self._expr.model
 
 	def __py_replacement__(self):
 		return deepcopy( self._expr.model['expr'] )
@@ -87,45 +87,30 @@ class LiterateExpression (object):
 
 
 
-class LiterateSuite (object):
-	def __init__(self, name='suite', suite=None, expanded=True):
+class LiterateSuiteDefinition (object):
+	def __init__(self, name='suite', suite=None):
 		self._name = name
-		
+
 		if suite is None:
 			suite = EmbeddedPython25.suite()
 		self._suite = suite
-
-		self._expanded = expanded
 
 		self._incr = IncrementalValueMonitor()
 		self.__change_history__ = None
 
 
 	def __getstate__(self):
-		return { 'name' : self._name, 'suite' : self._suite, 'expanded' : self._expanded }
+		return { 'name' : self._name, 'suite' : self._suite }
 
 	def __setstate__(self, state):
 		self._name = state['name']
 		self._suite = state['suite']
-		self._expanded = state['expanded']
 		self._incr = IncrementalValueMonitor()
 		self.__change_history__ = None
 
 
 	def __get_trackable_contents__(self):
 		return [ self._suite ]
-
-
-	def __py_execmodel__(self, _globals, _locals, codeGen):
-		return self._suite.model['suite']
-
-	def __py_replacement__(self):
-		return deepcopy( self._suite.model['suite'] )
-
-
-	def _new_reference(self):
-		return LiterateSuite( self._name, self._suite )
-
 
 
 	def getName(self):
@@ -136,7 +121,55 @@ class LiterateSuite (object):
 		self._name = name
 		self._incr.onChanged()
 		if self.__change_history__ is not None:
-			self.__change_history__.addChange( lambda: self.setName( name ), lambda: self.setName( oldName ), 'Literate suite set name' )
+			self.__change_history__.addChange( lambda: self.setName( name ), lambda: self.setName( oldName ), 'Literate suite definition set name' )
+
+
+
+
+
+class LiterateSuite (object):
+	def __init__(self, definition=None, expanded=True):
+		if definition is None:
+			definition = LiterateSuiteDefinition()
+		self._definition = definition
+		
+		self._expanded = expanded
+
+		self._incr = IncrementalValueMonitor()
+		self.__change_history__ = None
+
+
+	def __getstate__(self):
+		return { 'definition' : self._definition, 'expanded' : self._expanded }
+
+	def __setstate__(self, state):
+		self._definition = state['definition']
+		self._expanded = state['expanded']
+		self._incr = IncrementalValueMonitor()
+		self.__change_history__ = None
+
+
+	def __get_trackable_contents__(self):
+		return [ self._definition ]
+
+
+	def __py_execmodel__(self):
+		return self._definition._suite.model
+
+	def __py_replacement__(self):
+		return deepcopy( self._definition._suite.model['suite'] )
+
+
+	def _new_reference(self):
+		return LiterateSuite( self._definition )
+
+
+
+	def getName(self):
+		return self._definition.getName()
+
+	def setName(self, name):
+		self._definition.setName( name )
 
 
 	def isExpanded(self):
@@ -163,10 +196,11 @@ class LiterateSuite (object):
 
 
 		self._incr.onAccess()
-		suitePres = self._suite
+		self._definition._incr.onAccess()
+		suitePres = self._definition._suite
 
 		header = Row( [  self._angleQuoteStyle( Label( u'\u00ab' ) ),
-		                        self._nameStyle( Label( self._name ) ),
+		                        self._nameStyle( Label( self._definition._name ) ),
 					 self._angleQuoteStyle( Label( u'\u00bb' ) ) ] )
 	
 
@@ -196,7 +230,7 @@ def _newLiterateSuiteAtCaret(caret):
 
 def _newLiterateSuiteAtStatementRange(statements, selection):
 	d = LiterateSuite()
-	d._suite.model['suite'][:] = deepcopy( statements )
+	d._definition._suite.model['suite'][:] = deepcopy( statements )
 	return d
 
 
