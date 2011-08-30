@@ -196,8 +196,7 @@ class WorksheetViewer (ObjectDispatchView):
 	def InlineEmbeddedObject(self, fragment, inheritedState, node):
 		value = node.getValue()
 		valueView = ApplyPerspective( None, value )
-		p = ObjectBorder( valueView )
-		return p
+		return valueView
 
 
 
