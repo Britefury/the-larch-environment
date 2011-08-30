@@ -475,11 +475,11 @@ public class ParagraphLayout
 					entry.xAfterBreak += nextLineIndentation;
 					
 					IndentationEntry breakIndentation = entry.lineIndentation;
-					if ( !breakIndentation.bOnStack )
+					if ( !breakIndentation.bOnStack  &&  breakIndentation.indexInChildList > lineBreakIndex )
 					{
 						// Don't want to apply the offset to an indentation entry more than once - line break entries can share the same
 						// indentation entry
-						if ( breakIndentation.bFixed )
+						if ( !breakIndentation.bFixed )
 						{
 							// Indentation entry is not on the stack; it will not have been offset in the loop over the indentation stack
 							breakIndentation.indentation -= xAfterLineBreak;
