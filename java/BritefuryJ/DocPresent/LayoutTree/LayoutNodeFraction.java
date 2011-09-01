@@ -105,7 +105,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 			DPElement child = frac.getWrappedChild( i );
 			reqBoxes[i] = child != null  ?  child.getLayoutNode().getRequisitionBox()  :  null;
 			allocBoxes[i] = child != null  ?  child.getLayoutNode().getAllocationBox()  :  null;
-			prevChildWidths[i] = child != null  ?  allocBoxes[i].getAllocationX()  :  0.0;
+			prevChildWidths[i] = child != null  ?  allocBoxes[i].getAllocWidth()  :  0.0;
 		}
 		
 

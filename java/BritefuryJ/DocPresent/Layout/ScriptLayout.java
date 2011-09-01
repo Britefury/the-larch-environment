@@ -268,7 +268,7 @@ public class ScriptLayout
 		double t;
 		double boxReqMinWidth = box.getReqMinWidth();
 		double boxReqPrefWidth = box.getReqPrefWidth();
-		double allocAllocationX = Math.max( allocBox.getAllocationX(), box.getReqMinWidth() );
+		double allocAllocationX = Math.max( allocBox.getAllocWidth(), box.getReqMinWidth() );
 		if ( boxReqPrefWidth > boxReqMinWidth )
 		{
 			t = ( allocAllocationX - boxReqMinWidth )  /  ( boxReqPrefWidth - boxReqMinWidth );
@@ -335,7 +335,7 @@ public class ScriptLayout
 			LAllocBoxInterface allocBox, LAllocBoxInterface leftSuperAlloc, LAllocBoxInterface leftSubAlloc, LAllocBoxInterface mainAlloc, LAllocBoxInterface rightSuperAlloc, LAllocBoxInterface rightSubAlloc,
 			double columnSpacing, double rowSpacing)
 	{
-		double padding = Math.max( ( allocBox.getAllocationY() - box.getReqHeight() ) * 0.5, 0.0 );
+		double padding = Math.max( ( allocBox.getAllocHeight() - box.getReqHeight() ) * 0.5, 0.0 );
 		
 		
 		double superBaselineY = rowBaselineY[0], mainBaselineY = rowBaselineY[1], subBaselineY = rowBaselineY[2];

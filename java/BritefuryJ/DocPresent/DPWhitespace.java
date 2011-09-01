@@ -75,8 +75,8 @@ public class DPWhitespace extends DPContentLeaf
 	
 	public void drawSelection(Graphics2D graphics, Marker from, Marker to)
 	{
-		double width = getWidth();
-		double height = getHeight();
+		double width = getActualWidth();
+		double height = getActualHeight();
 		AffineTransform current = pushGraphicsTransform( graphics );
 		int startIndex = from != null  ?  from.getIndex()  :  0;
 		int endIndex = to != null  ?  to.getIndex()  :  1;

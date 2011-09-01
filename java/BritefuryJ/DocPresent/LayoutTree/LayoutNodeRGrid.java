@@ -139,7 +139,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 				LayoutNode childLayoutNode = child.getLayoutNode();
 				childBoxes[i] = new LReqBoxInterface[] { childLayoutNode.getRequisitionBox() };
 				childAllocBoxes[i] = new LAllocBoxInterface[] { childLayoutNode.getAllocationBox() };
-				prevWidths[i] = new double[] { child.getAllocationX() };
+				prevWidths[i] = new double[] { child.getAllocWidth() };
 				childAlignmentFlags[i] = new int[] { child.getAlignmentFlags() };
 				bRowIsGridRow[i] = false;
 			}
@@ -210,7 +210,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 			for (int i = 0; i < columnAllocBoxes.length - 1; i++)
 			{
 				LAllocBoxInterface columnJ = columnAllocBoxes[i+1];
-				double iUpperX = columnI.getAllocPositionInParentSpaceX() + columnI.getAllocationX();
+				double iUpperX = columnI.getAllocPositionInParentSpaceX() + columnI.getAllocWidth();
 				double jLowerX = columnJ.getAllocPositionInParentSpaceX();
 				
 				double midX = ( iUpperX + jLowerX ) * 0.5;
@@ -245,7 +245,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 			for (int i = 0; i < rowAllocBoxes.length - 1; i++)
 			{
 				LAllocBoxInterface rowJ = rowAllocBoxes[i+1];
-				double iUpperY = rowI.getAllocPositionInParentSpaceY() + rowI.getAllocationY();
+				double iUpperY = rowI.getAllocPositionInParentSpaceY() + rowI.getAllocHeight();
 				double jLowerY = rowJ.getAllocPositionInParentSpaceY();
 				
 				double midY = ( iUpperY + jLowerY ) * 0.5;
@@ -299,8 +299,8 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 				DPElement startLeaf = leaves[rangeStart];
 				DPElement endLeaf = leaves[rangeEnd-1];
 				double yStart = startLeaf.getPositionInParentSpaceY();
-				double yEnd = endLeaf.getPositionInParentSpaceY()  +  endLeaf.getHeightInParentSpace();
-				AABox2 box = new AABox2( 0.0, yStart, getWidth(), yEnd );
+				double yEnd = endLeaf.getPositionInParentSpaceY()  +  endLeaf.getActualHeightInParentSpace();
+				AABox2 box = new AABox2( 0.0, yStart, getActualWidth(), yEnd );
 				return new AABox2[] { box };
 			}
 		}
@@ -512,7 +512,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 	public double getColumnRight(int column)
 	{
 		LAllocBoxInterface box = columnAllocBoxes[column];
-		return box.getAllocPositionInParentSpaceX() + box.getWidth();
+		return box.getAllocPositionInParentSpaceX() + box.getActualWidth();
 	}
 
 	public double getRowTop(int row)
@@ -524,7 +524,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 	public double getRowBottom(int row)
 	{
 		LAllocBoxInterface box = leaves[row].getLayoutNode().getAllocationBox();
-		return box.getAllocPositionInParentSpaceY() + box.getHeight();
+		return box.getAllocPositionInParentSpaceY() + box.getAllocHeight();
 	}
 	
 	

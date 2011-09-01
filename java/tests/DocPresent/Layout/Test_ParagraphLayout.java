@@ -192,11 +192,11 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		ParagraphLayout.allocateX( box, children, boxAlloc, childrenAlloc, childAllocFlags, indentation, hSpacing );
 		for (int i = 0; i < children.length; i++)
 		{
-			if ( childrenAlloc[i].getAllocationX() != expectedSize[i] )
+			if ( childrenAlloc[i].getAllocWidth() != expectedSize[i] )
 			{
-				System.out.println( "Child allocation for " + i + " is not as expected; expected=" + expectedSize[i] + ", result=" + childrenAlloc[i].getAllocationX() + ", boxAllocation=" + boxAllocation );
+				System.out.println( "Child allocation for " + i + " is not as expected; expected=" + expectedSize[i] + ", result=" + childrenAlloc[i].getAllocWidth() + ", boxAllocation=" + boxAllocation );
 			}
-			assertEquals( childrenAlloc[i].getAllocationX(), expectedSize[i] );
+			assertEquals( childrenAlloc[i].getAllocWidth(), expectedSize[i] );
 
 			if ( childrenAlloc[i].getAllocPositionInParentSpaceX() != expectedPosition[i] )
 			{
@@ -327,17 +327,17 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		
 		for (int i = 0; i < children.length; i++)
 		{
-			if ( childrenAlloc[i].getAllocationX() != expectedSize[i*2] )
+			if ( childrenAlloc[i].getAllocWidth() != expectedSize[i*2] )
 			{
-				System.out.println( "Child allocation width for " + i + " is not as expected; expected=" + expectedSize[i*2] + ", result=" + childrenAlloc[i].getAllocationX() );
+				System.out.println( "Child allocation width for " + i + " is not as expected; expected=" + expectedSize[i*2] + ", result=" + childrenAlloc[i].getAllocWidth() );
 			}
-			assertEquals( childrenAlloc[i].getAllocationX(), expectedSize[i*2] );
+			assertEquals( childrenAlloc[i].getAllocWidth(), expectedSize[i*2] );
 
-			if ( childrenAlloc[i].getAllocationY() != expectedSize[i*2+1] )
+			if ( childrenAlloc[i].getAllocHeight() != expectedSize[i*2+1] )
 			{
-				System.out.println( "Child allocation height for " + i + " is not as expected; expected=" + expectedSize[i*2+1] + ", result=" + childrenAlloc[i].getAllocationY() );
+				System.out.println( "Child allocation height for " + i + " is not as expected; expected=" + expectedSize[i*2+1] + ", result=" + childrenAlloc[i].getAllocHeight() );
 			}
-			assertEquals( childrenAlloc[i].getAllocationY(), expectedSize[i*2+1] );
+			assertEquals( childrenAlloc[i].getAllocHeight(), expectedSize[i*2+1] );
 
 			
 			if ( childrenAlloc[i].getAllocPositionInParentSpaceX() != expectedPosition[i*2] )

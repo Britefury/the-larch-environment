@@ -63,8 +63,8 @@ public class LayoutNodeBin extends ArrangedLayoutNode
 		if ( child != null )
 		{
 			LayoutNode childLayout = child.getLayoutNode();
-			double prevWidth = childLayout.getAllocationBox().getAllocationX();
-			LAllocHelper.allocateChildXAligned( childLayout.getAllocationBox(), childLayout.getRequisitionBox(), child.getAlignmentFlags(), 0.0, getAllocationBox().getAllocationX() );
+			double prevWidth = childLayout.getAllocationBox().getAllocWidth();
+			LAllocHelper.allocateChildXAligned( childLayout.getAllocationBox(), childLayout.getRequisitionBox(), child.getAlignmentFlags(), 0.0, getAllocationBox().getAllocWidth() );
 			childLayout.refreshAllocationX( prevWidth );
 		}
 	}

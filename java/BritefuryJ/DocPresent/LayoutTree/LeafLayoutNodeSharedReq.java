@@ -51,19 +51,19 @@ public abstract class LeafLayoutNodeSharedReq extends LayoutNode implements LAll
 	
 	
 	
-	public double getWidthInParentSpace()
+	public double getActualWidthInParentSpace()
 	{
-		return getWidth()  *  getLocalToParentAllocationSpaceXform().scale;
+		return getActualWidth()  *  getLocalToParentAllocationSpaceXform().scale;
 	}
 	
-	public double getHeightInParentSpace()
+	public double getActualHeightInParentSpace()
 	{
-		return getHeight()  *  getLocalToParentAllocationSpaceXform().scale;
+		return getActualHeight()  *  getLocalToParentAllocationSpaceXform().scale;
 	}
 	
-	public Vector2 getSizeInParentSpace()
+	public Vector2 getActualSizeInParentSpace()
 	{
-		return getSize().mul( getLocalToParentAllocationSpaceXform().scale );
+		return getActualSize().mul( getLocalToParentAllocationSpaceXform().scale );
 	}
 
 	
@@ -99,7 +99,7 @@ public abstract class LeafLayoutNodeSharedReq extends LayoutNode implements LAll
 	
 	public void refreshAllocationX(double prevWidth)
 	{
-		if ( !element.isAllocationUpToDate()  ||  getAllocationBox().getAllocationX() != prevWidth )
+		if ( !element.isAllocationUpToDate()  ||  getAllocationBox().getAllocWidth() != prevWidth )
 		{
 			updateAllocationX();
 			element.clearFlagAllocationUpToDate();
@@ -186,7 +186,7 @@ public abstract class LeafLayoutNodeSharedReq extends LayoutNode implements LAll
 	//
 
 	protected double alloc_positionInParentAllocationSpaceX, alloc_positionInParentAllocationSpaceY;
-	protected double alloc_width, alloc_allocationX, alloc_allocationY;
+	protected double alloc_actualWidth, alloc_allocWidth, alloc_allocHeight;
 	protected double alloc_refY;
 
 	
@@ -217,30 +217,30 @@ public abstract class LeafLayoutNodeSharedReq extends LayoutNode implements LAll
 		return new Point2( alloc_positionInParentAllocationSpaceX, alloc_positionInParentAllocationSpaceY );
 	}
 	
-	public double getWidth()
+	public double getActualWidth()
 	{
-		return alloc_width;
+		return alloc_actualWidth;
 	}
 	
-	public double getHeight()
+	public double getActualHeight()
 	{
-		return alloc_allocationY;
+		return alloc_allocHeight;
 	}
 	
-	public Vector2 getSize()
+	public Vector2 getActualSize()
 	{
-		return new Vector2( alloc_width, alloc_allocationY );
+		return new Vector2( alloc_actualWidth, alloc_allocHeight );
 	}
 	
 
-	public double getAllocationX()
+	public double getAllocWidth()
 	{
-		return alloc_allocationX;
+		return alloc_allocWidth;
 	}
 	
-	public double getAllocationY()
+	public double getAllocHeight()
 	{
-		return alloc_allocationY;
+		return alloc_allocHeight;
 	}
 	
 	public double getAllocRefY()
@@ -250,12 +250,12 @@ public abstract class LeafLayoutNodeSharedReq extends LayoutNode implements LAll
 	
 	public LAllocV getAllocV()
 	{
-		return new LAllocV( alloc_allocationY, alloc_refY );
+		return new LAllocV( alloc_allocHeight, alloc_refY );
 	}
 	
-	public Vector2 getAllocation()
+	public Vector2 getAllocSize()
 	{
-		return new Vector2( alloc_allocationX, alloc_allocationY );
+		return new Vector2( alloc_allocWidth, alloc_allocHeight );
 	}
 
 
@@ -276,36 +276,36 @@ public abstract class LeafLayoutNodeSharedReq extends LayoutNode implements LAll
 		alloc_positionInParentAllocationSpaceY = y;
 	}
 	
-	public void setAllocationX(double allocX, double width)
+	public void setAllocationX(double allocWidth, double actualWidth)
 	{
-		alloc_allocationX = allocX;
-		alloc_width = width;
+		alloc_allocWidth = allocWidth;
+		alloc_actualWidth = actualWidth;
 	}
 
-	public void setAllocationY(double height, double refY)
+	public void setAllocationY(double allocHeight, double refY)
 	{
-		alloc_allocationY = height;
+		alloc_allocHeight = allocHeight;
 		this.alloc_refY = refY;
 	}
 
-	public void setPositionInParentSpaceAndAllocationX(double x, double allocX, double width)
+	public void setPositionInParentSpaceAndAllocationX(double x, double allocWidth, double actualWidth)
 	{
 		alloc_positionInParentAllocationSpaceX = x;
-		alloc_allocationX = allocX;
-		alloc_width = width;
+		alloc_allocWidth = allocWidth;
+		alloc_actualWidth = actualWidth;
 	}
 	
 	public void setPositionInParentSpaceAndAllocationY(double y, double height)
 	{
 		alloc_positionInParentAllocationSpaceY = y;
-		alloc_allocationY = height;
+		alloc_allocHeight = height;
 		alloc_refY = height * 0.5;
 	}
 	
 	public void setPositionInParentSpaceAndAllocationY(double y, double height, double refY)
 	{
 		alloc_positionInParentAllocationSpaceY = y;
-		alloc_allocationY = height;
+		alloc_allocHeight = height;
 		this.alloc_refY = refY;
 	}
 
@@ -313,12 +313,12 @@ public abstract class LeafLayoutNodeSharedReq extends LayoutNode implements LAll
 
 	public void transformAllocationX(Xform2 xform)
 	{
-		alloc_allocationX = xform.scale( alloc_allocationX );
+		alloc_allocWidth = xform.scale( alloc_allocWidth );
 	}
 
 	public void transformAllocationY(Xform2 xform)
 	{
-		alloc_allocationY = xform.scale( alloc_allocationY );
+		alloc_allocHeight = xform.scale( alloc_allocHeight );
 		alloc_refY = xform.scale( alloc_refY );
 	}
 }

@@ -43,8 +43,8 @@ class CheckboxHelper
 		{
 			if ( checkbox.getState() )
 			{
-				double w = element.getWidth();
-				double h = element.getHeight();
+				double w = element.getActualWidth();
+				double h = element.getActualHeight();
 				Line2D.Double a = new Line2D.Double( 0.0, 0.0, w, h );
 				Line2D.Double b = new Line2D.Double( w, 0.0, 0.0, h );
 				

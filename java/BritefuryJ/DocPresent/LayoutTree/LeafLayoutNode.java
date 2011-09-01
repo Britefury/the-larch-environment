@@ -73,50 +73,50 @@ public abstract class LeafLayoutNode extends LayoutNode
 		return layoutAllocBox.getPositionInParentSpace();
 	}
 	
-	public double getWidth()
+	public double getActualWidth()
 	{
-		return layoutAllocBox.getWidth();
+		return layoutAllocBox.getActualWidth();
 	}
 	
-	public double getHeight()
+	public double getActualHeight()
 	{
-		return layoutAllocBox.getHeight();
+		return layoutAllocBox.getAllocHeight();
 	}
 	
-	public Vector2 getSize()
+	public Vector2 getActualSize()
 	{
-		return layoutAllocBox.getSize();
+		return layoutAllocBox.getActualSize();
 	}
 
-	public double getWidthInParentSpace()
+	public double getActualWidthInParentSpace()
 	{
-		return layoutAllocBox.getWidth()  *  getLocalToParentAllocationSpaceXform().scale;
+		return layoutAllocBox.getActualWidth()  *  getLocalToParentAllocationSpaceXform().scale;
 	}
 	
-	public double getHeightInParentSpace()
+	public double getActualHeightInParentSpace()
 	{
-		return layoutAllocBox.getHeight()  *  getLocalToParentAllocationSpaceXform().scale;
+		return layoutAllocBox.getAllocHeight()  *  getLocalToParentAllocationSpaceXform().scale;
 	}
 	
-	public Vector2 getSizeInParentSpace()
+	public Vector2 getActualSizeInParentSpace()
 	{
-		return layoutAllocBox.getSize().mul( getLocalToParentAllocationSpaceXform().scale );
+		return layoutAllocBox.getActualSize().mul( getLocalToParentAllocationSpaceXform().scale );
 	}
 	
 
-	public double getAllocationX()
+	public double getAllocWidth()
 	{
-		return layoutAllocBox.getAllocationX();
+		return layoutAllocBox.getAllocWidth();
 	}
 	
-	public double getAllocationY()
+	public double getAllocHeight()
 	{
-		return layoutAllocBox.getAllocationY();
+		return layoutAllocBox.getAllocHeight();
 	}
 
-	public Vector2 getAllocation()
+	public Vector2 getAllocSize()
 	{
-		return layoutAllocBox.getAllocation();
+		return layoutAllocBox.getAllocSize();
 	}
 
 	public LAllocV getAllocV()
@@ -157,7 +157,7 @@ public abstract class LeafLayoutNode extends LayoutNode
 	
 	public void refreshAllocationX(double prevWidth)
 	{
-		if ( !element.isAllocationUpToDate()  ||  layoutAllocBox.getAllocationX() != prevWidth )
+		if ( !element.isAllocationUpToDate()  ||  layoutAllocBox.getAllocWidth() != prevWidth )
 		{
 			updateAllocationX();
 			element.clearFlagAllocationUpToDate();

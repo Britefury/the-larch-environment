@@ -104,8 +104,8 @@ public class LayoutNodeGridRow extends ArrangedSequenceLayoutNode
 				DPElement startLeaf = leaves[rangeStart];
 				DPElement endLeaf = leaves[rangeEnd-1];
 				double xStart = startLeaf.getPositionInParentSpaceX();
-				double xEnd = endLeaf.getPositionInParentSpaceX()  +  endLeaf.getWidthInParentSpace();
-				AABox2 box = new AABox2( xStart, 0.0, xEnd, getAllocationY() );
+				double xEnd = endLeaf.getPositionInParentSpaceX()  +  endLeaf.getActualWidthInParentSpace();
+				AABox2 box = new AABox2( xStart, 0.0, xEnd, getAllocHeight() );
 				return new AABox2[] { box };
 			}
 		}

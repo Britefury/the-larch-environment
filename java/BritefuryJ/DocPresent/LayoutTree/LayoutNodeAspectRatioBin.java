@@ -48,7 +48,7 @@ public class LayoutNodeAspectRatioBin extends LayoutNodeBin
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPAspectRatioBin spacer = (DPAspectRatioBin)element;
 		DPElement child = spacer.getChild();
-		double width = spacer.getLayoutNode().getAllocationX();
+		double width = spacer.getLayoutNode().getAllocWidth();
 		double aspectRatio = spacer.getAspectRatio();
 		double minHeight = width / aspectRatio;
 		if ( child != null )

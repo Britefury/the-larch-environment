@@ -55,19 +55,19 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 	
 	
 	
-	public double getWidthInParentSpace()
+	public double getActualWidthInParentSpace()
 	{
-		return getWidth()  *  getLocalToParentAllocationSpaceXform().scale;
+		return getActualWidth()  *  getLocalToParentAllocationSpaceXform().scale;
 	}
 	
-	public double getHeightInParentSpace()
+	public double getActualHeightInParentSpace()
 	{
-		return getHeight()  *  getLocalToParentAllocationSpaceXform().scale;
+		return getActualHeight()  *  getLocalToParentAllocationSpaceXform().scale;
 	}
 	
-	public Vector2 getSizeInParentSpace()
+	public Vector2 getActualSizeInParentSpace()
 	{
-		return getSize().mul( getLocalToParentAllocationSpaceXform().scale );
+		return getActualSize().mul( getLocalToParentAllocationSpaceXform().scale );
 	}
 
 	
@@ -103,7 +103,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 	
 	public void refreshAllocationX(double prevWidth)
 	{
-		if ( !element.isAllocationUpToDate()  ||  getAllocationX() != prevWidth )
+		if ( !element.isAllocationUpToDate()  ||  getAllocWidth() != prevWidth )
 		{
 			updateAllocationX();
 			element.clearFlagAllocationUpToDate();
@@ -242,7 +242,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 		double[] values = new double[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
 		{
-			values[i] = nodes.get( i ).getAllocationX();
+			values[i] = nodes.get( i ).getAllocWidth();
 		}
 		return values;
 	}
@@ -254,7 +254,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 		double[] values = new double[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
 		{
-			values[i] = nodes.get( i ).getAllocationY();
+			values[i] = nodes.get( i ).getAllocHeight();
 		}
 		return values;
 	}
@@ -304,7 +304,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 			for (int i = 0; i < searchList.size() - 1; i++)
 			{
 				DPElement childJ = searchList.get( i + 1 );
-				double iUpperX = childI.getPositionInParentSpaceX() + childI.getWidthInParentSpace();
+				double iUpperX = childI.getPositionInParentSpaceX() + childI.getActualWidthInParentSpace();
 				double jLowerX = childJ.getPositionInParentSpaceX();
 				
 				double midx = ( iUpperX + jLowerX ) * 0.5;
@@ -371,7 +371,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 				}
 				else
 				{
-					double distToPrev = localPos.x - ( prev.getPositionInParentSpace().x + prev.getWidthInParentSpace() );
+					double distToPrev = localPos.x - ( prev.getPositionInParentSpace().x + prev.getActualWidthInParentSpace() );
 					double distToNext = next.getPositionInParentSpace().x - localPos.x;
 					
 					return distToPrev > distToNext  ?  prevC  :  nextC;
@@ -398,7 +398,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 			for (int i = 0; i < searchList.size() - 1; i++)
 			{
 				DPElement childJ = searchList.get( i + 1 );
-				double iUpperY = childI.getPositionInParentSpaceY() + childI.getHeightInParentSpace();
+				double iUpperY = childI.getPositionInParentSpaceY() + childI.getActualHeightInParentSpace();
 				double jLowerY = childJ.getPositionInParentSpaceY();
 				
 				double midY = ( iUpperY + jLowerY ) * 0.5;
@@ -461,7 +461,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 				}
 				else
 				{
-					double distToPrev = localPos.y - ( prev.getPositionInParentSpaceY() + prev.getHeightInParentSpace() );
+					double distToPrev = localPos.y - ( prev.getPositionInParentSpaceY() + prev.getActualHeightInParentSpace() );
 					double distToNext = next.getPositionInParentSpaceY() - localPos.y;
 					
 					return distToPrev > distToNext  ?  prev  :  next;
@@ -737,7 +737,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 	//
 
 	protected double alloc_positionInParentAllocationSpaceX, alloc_positionInParentAllocationSpaceY;
-	protected double alloc_width, alloc_allocationX, alloc_allocationY;
+	protected double alloc_actualWidth, alloc_allocWidth, alloc_allocHeight;
 	protected double alloc_refY;
 
 	
@@ -768,30 +768,30 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 		return new Point2( alloc_positionInParentAllocationSpaceX, alloc_positionInParentAllocationSpaceY );
 	}
 	
-	public double getWidth()
+	public double getActualWidth()
 	{
-		return alloc_width;
+		return alloc_actualWidth;
 	}
 	
-	public double getHeight()
+	public double getActualHeight()
 	{
-		return alloc_allocationY;
+		return alloc_allocHeight;
 	}
 	
-	public Vector2 getSize()
+	public Vector2 getActualSize()
 	{
-		return new Vector2( alloc_width, alloc_allocationY );
+		return new Vector2( alloc_actualWidth, alloc_allocHeight );
 	}
 	
 
-	public double getAllocationX()
+	public double getAllocWidth()
 	{
-		return alloc_allocationX;
+		return alloc_allocWidth;
 	}
 	
-	public double getAllocationY()
+	public double getAllocHeight()
 	{
-		return alloc_allocationY;
+		return alloc_allocHeight;
 	}
 	
 	public double getAllocRefY()
@@ -801,12 +801,12 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 	
 	public LAllocV getAllocV()
 	{
-		return new LAllocV( alloc_allocationY, alloc_refY );
+		return new LAllocV( alloc_allocHeight, alloc_refY );
 	}
 	
-	public Vector2 getAllocation()
+	public Vector2 getAllocSize()
 	{
-		return new Vector2( alloc_allocationX, alloc_allocationY );
+		return new Vector2( alloc_allocWidth, alloc_allocHeight );
 	}
 
 
@@ -827,36 +827,36 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 		alloc_positionInParentAllocationSpaceY = y;
 	}
 	
-	public void setAllocationX(double allocX, double width)
+	public void setAllocationX(double allocWidth, double actualWidth)
 	{
-		alloc_allocationX = allocX;
-		alloc_width = width;
+		alloc_allocWidth = allocWidth;
+		alloc_actualWidth = actualWidth;
 	}
 
-	public void setAllocationY(double height, double refY)
+	public void setAllocationY(double allocHeight, double refY)
 	{
-		alloc_allocationY = height;
+		alloc_allocHeight = allocHeight;
 		this.alloc_refY = refY;
 	}
 
-	public void setPositionInParentSpaceAndAllocationX(double x, double allocX, double width)
+	public void setPositionInParentSpaceAndAllocationX(double x, double allocWidth, double actualWidth)
 	{
 		alloc_positionInParentAllocationSpaceX = x;
-		alloc_allocationX = allocX;
-		alloc_width = width;
+		alloc_allocWidth = allocWidth;
+		alloc_actualWidth = actualWidth;
 	}
 	
 	public void setPositionInParentSpaceAndAllocationY(double y, double height)
 	{
 		alloc_positionInParentAllocationSpaceY = y;
-		alloc_allocationY = height;
+		alloc_allocHeight = height;
 		alloc_refY = height * 0.5;
 	}
 	
 	public void setPositionInParentSpaceAndAllocationY(double y, double height, double refY)
 	{
 		alloc_positionInParentAllocationSpaceY = y;
-		alloc_allocationY = height;
+		alloc_allocHeight = height;
 		this.alloc_refY = refY;
 	}
 
@@ -864,12 +864,12 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 
 	public void transformAllocationX(Xform2 xform)
 	{
-		alloc_allocationX = xform.scale( alloc_allocationX );
+		alloc_allocWidth = xform.scale( alloc_allocWidth );
 	}
 
 	public void transformAllocationY(Xform2 xform)
 	{
-		alloc_allocationY = xform.scale( alloc_allocationY );
+		alloc_allocHeight = xform.scale( alloc_allocHeight );
 		alloc_refY = xform.scale( alloc_refY );
 	}
 }

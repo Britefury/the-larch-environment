@@ -91,7 +91,7 @@ public class VerticalLayout
 	{
 		for (int i = 0; i < children.length; i++)
 		{
-			LAllocHelper.allocateChildXAligned( childrenAlloc[i], children[i], childAllocationFlags[i], 0.0, allocBox.getAllocationX() );
+			LAllocHelper.allocateChildXAligned( childrenAlloc[i], children[i], childAllocationFlags[i], 0.0, allocBox.getAllocWidth() );
 		}
 	}
 
@@ -129,7 +129,7 @@ public class VerticalLayout
 			}
 		}
 
-		double allocBoxAllocationY = allocBox.getAllocationY();
+		double allocBoxAllocationY = allocBox.getAllocHeight();
 
 		if ( allocBoxAllocationY <= box.getReqHeight() * LReqBox.ONE_PLUS_EPSILON  ||
 				( numExpandBeforeRef == 0.0  &&  numExpandAfterRef == 0.0 ) )			// if allocation <= required   or   numExpand == 0
@@ -211,7 +211,7 @@ public class VerticalLayout
 				}
 			}
 			
-			double allocBoxAllocationY = allocBox.getAllocationY();
+			double allocBoxAllocationY = allocBox.getAllocHeight();
 			
 			if ( allocBoxAllocationY <= box.getReqHeight() * LReqBox.ONE_PLUS_EPSILON  ||  numFill == 0 )			// if allocation <= required   or   numFill == 0
 			{
@@ -226,7 +226,7 @@ public class VerticalLayout
 					LAllocHelper.allocateChildYAsRequisition( childAlloc, child, pos );
 
 					// Accumulate height and y
-					size = pos + childAlloc.getAllocationY();
+					size = pos + childAlloc.getAllocHeight();
 					pos = size + child.getReqVSpacing() + spacing;
 				}
 			}
@@ -293,7 +293,7 @@ public class VerticalLayout
 				}
 			}
 
-			double allocBoxAllocationY = allocBox.getAllocationY();
+			double allocBoxAllocationY = allocBox.getAllocHeight();
 
 			if ( allocBoxAllocationY <= box.getReqHeight() * LReqBox.ONE_PLUS_EPSILON  ||
 					( numFillBeforeRef == 0.0  &&  numFillAfterRef == 0.0 ) )			// if allocation <= required   or   numFill == 0
@@ -368,7 +368,7 @@ public class VerticalLayout
 					}
 
 					// Accumulate height and xy
-					size = pos + childAlloc.getAllocationY();
+					size = pos + childAlloc.getAllocHeight();
 					pos = size + child.getReqVSpacing() + spacing;
 				}
 			}
@@ -386,7 +386,7 @@ public class VerticalLayout
 		
 		// There should be at least the specified amount of spacing between each child, or the child's own v-spacing if it is greater
 
-		double allocBoxAllocationY = allocBox.getAllocationY();
+		double allocBoxAllocationY = allocBox.getAllocHeight();
 		if ( allocBoxAllocationY <= box.getReqHeight() * LReqBox.ONE_PLUS_EPSILON  ||  !bExpand )		// if allocation <= required   or   numExpand == 0
 		{
 			double size = 0.0;
@@ -401,7 +401,7 @@ public class VerticalLayout
 				LAllocHelper.allocateChildYAsRequisition( childAlloc, child, pos );
 
 				// Accumulate height and y
-				size = pos + childAlloc.getAllocationY();
+				size = pos + childAlloc.getAllocHeight();
 				pos = size + child.getReqVSpacing() + spacing;
 			}
 		}

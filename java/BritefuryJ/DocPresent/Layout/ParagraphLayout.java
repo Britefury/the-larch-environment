@@ -311,7 +311,7 @@ public class ParagraphLayout
 		double lineAdvance = 0.0;
 		double lineX = 0.0;
 		
-		double allocBoxAllocationX = allocBox.getAllocationX();
+		double allocBoxAllocationX = allocBox.getAllocWidth();
 		
 		// We keep a list of all line breaks, and the x position 
 		ArrayList<BreakEntry> lineBreaks = new ArrayList<BreakEntry>();

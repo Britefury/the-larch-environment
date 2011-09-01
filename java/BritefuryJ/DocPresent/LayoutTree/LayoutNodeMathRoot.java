@@ -72,9 +72,9 @@ public class LayoutNodeMathRoot extends ArrangedLayoutNode
 			MathRootStyleParams s = (MathRootStyleParams)mathRoot.getStyleParams();
 
 			LayoutNode childLayout = child.getLayoutNode();
-			double prevWidth = childLayout.getAllocationBox().getAllocationX();
+			double prevWidth = childLayout.getAllocationBox().getAllocWidth();
 			double offset = s.getGlyphWidth();
-			LAllocHelper.allocateChildXAligned( childLayout.getAllocationBox(), childLayout.getRequisitionBox(), child.getAlignmentFlags(), offset, getAllocationBox().getAllocationX() - offset );
+			LAllocHelper.allocateChildXAligned( childLayout.getAllocationBox(), childLayout.getRequisitionBox(), child.getAlignmentFlags(), offset, getAllocationBox().getAllocWidth() - offset );
 			childLayout.refreshAllocationX( prevWidth );
 		}
 	}

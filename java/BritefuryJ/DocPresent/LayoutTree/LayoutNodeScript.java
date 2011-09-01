@@ -100,7 +100,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 			DPElement child = script.getWrappedChild( i );
 			reqBoxes[i] = child != null  ?  child.getLayoutNode().getRequisitionBox()  :  null;
 			allocBoxes[i] = child != null  ?  child.getLayoutNode().getAllocationBox()  :  null;
-			prevChildWidths[i] = child != null  ?  allocBoxes[i].getAllocationX()  :  0.0;
+			prevChildWidths[i] = child != null  ?  allocBoxes[i].getAllocWidth()  :  0.0;
 		}
 		
 		ScriptLayout.allocateX( layoutReqBox, reqBoxes[LEFTSUPER], reqBoxes[LEFTSUB], reqBoxes[MAIN], reqBoxes[RIGHTSUPER], reqBoxes[RIGHTSUB], columnBoxes,
@@ -205,7 +205,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 			double edgeX = 0.0;
 			if ( bRightEdge )
 			{
-				edgeX = childNode.getAllocPositionInParentSpaceX() + childNode.getWidthInParentSpace();
+				edgeX = childNode.getAllocPositionInParentSpaceX() + childNode.getActualWidthInParentSpace();
 			}
 			else
 			{
@@ -246,7 +246,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 		{
 			DPElement childI = column.get( 0 );
 			DPElement childJ = column.get( 1 );
-			double iUpperY = childI.getPositionInParentSpaceY() + childI.getHeightInParentSpace();
+			double iUpperY = childI.getPositionInParentSpaceY() + childI.getActualHeightInParentSpace();
 			double jLowerY = childJ.getPositionInParentSpaceY();
 				
 			double midY = ( iUpperY + jLowerY ) * 0.5;
@@ -380,7 +380,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 				}
 				else
 				{
-					double distToPrev = localPos.y - ( prev.getPositionInParentSpaceY() + prev.getHeightInParentSpace() );
+					double distToPrev = localPos.y - ( prev.getPositionInParentSpaceY() + prev.getActualHeightInParentSpace() );
 					double distToNext = next.getPositionInParentSpaceY() - localPos.y;
 					
 					return distToPrev > distToNext  ?  prev  :  next;

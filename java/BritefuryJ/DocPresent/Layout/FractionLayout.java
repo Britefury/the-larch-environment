@@ -81,7 +81,7 @@ public class FractionLayout
 	public static void allocateX(LReqBoxInterface box, LReqBoxInterface numerator, LReqBoxInterface bar, LReqBoxInterface denominator,
 			LAllocBoxInterface boxAlloc, LAllocBoxInterface numeratorAlloc, LAllocBoxInterface barAlloc, LAllocBoxInterface denominatorAlloc, double hPadding, double vSpacing, double baselineOffset)
 	{
-		double boxAllocAllocationX = boxAlloc.getAllocationX();
+		double boxAllocAllocationX = boxAlloc.getAllocWidth();
 		double allocX = Math.min( boxAllocAllocationX, box.getReqPrefWidth() );
 		double childrenAlloc = allocX - hPadding * 2.0;
 		

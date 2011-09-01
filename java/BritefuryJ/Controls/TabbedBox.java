@@ -151,7 +151,7 @@ public class TabbedBox extends ControlPres
 		private void addChildPath(Path2D.Double path, DPElement child, Vector2 size, boolean start)
 		{
 			Point2 childPos = child.getPositionInParentSpace();
-			Vector2 childSize = child.getSizeInParentSpace();
+			Vector2 childSize = child.getActualSizeInParentSpace();
 
 			// Start of child
 			if ( start )
@@ -173,7 +173,7 @@ public class TabbedBox extends ControlPres
 		@Override
 		public void drawBackground(DPElement element, Graphics2D graphics)
 		{
-			Vector2 size = element.getSize();
+			Vector2 size = element.getActualSize();
 			DPRow header = (DPRow)element;
 			
 			List<DPElement> children = header.getChildren();
@@ -259,7 +259,7 @@ public class TabbedBox extends ControlPres
 		@Override
 		public void drawBackground(DPElement element, Graphics2D graphics)
 		{
-			Vector2 size = element.getSize();
+			Vector2 size = element.getActualSize();
 			
 			Path2D.Double path = new Path2D.Double();
 			path.moveTo( 0.0, 0.0 );
