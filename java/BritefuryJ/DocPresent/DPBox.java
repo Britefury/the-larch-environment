@@ -86,7 +86,7 @@ public class DPBox extends DPContentLeaf
 		
 		if ( painter != null )
 		{
-			painter.drawShape( graphics, new Rectangle2D.Double( 0.0, 0.0, getWidth(), getHeight() ) );
+			painter.drawShape( graphics, new Rectangle2D.Double( 0.0, 0.0, getActualWidth(), getActualHeight() ) );
 		}
 	}
 }

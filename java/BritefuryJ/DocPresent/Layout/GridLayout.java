@@ -99,7 +99,7 @@ public class GridLayout
 		
 		for (int i = 0; i < children.length; i++)
 		{
-			if ( children != null )
+			if ( children[i] != null )
 			{
 				LAllocHelper.allocateChildYAligned( childrenAlloc[i], children[i], childAlignmentFlags[i], 0.0, h );
 			}
@@ -209,7 +209,7 @@ public class GridLayout
 						HAlignment hAlign = ElementAlignment.getHAlignment( alignmentFlags );
 						
 						LAllocBoxInterface colAlloc = columnAllocBoxes[c];
-						double cellWidth = Math.max( colAlloc.getAllocationX(), childRequisition.getReqMinWidth() );
+						double cellWidth = Math.max( colAlloc.getAllocWidth(), childRequisition.getReqMinWidth() );
 			
 						LAllocHelper.allocateChildXAligned( childAlloc, childRequisition, hAlign, colAlloc.getAllocPositionInParentSpaceX(), cellWidth );
 					}
@@ -224,7 +224,7 @@ public class GridLayout
 					int alignmentFlags = rowAlignmentFlags[0];
 					HAlignment hAlign = ElementAlignment.getHAlignment( alignmentFlags );
 					
-					double cellWidth = Math.max( allocBox.getAllocationX(), childRequisition.getReqMinWidth() );
+					double cellWidth = Math.max( allocBox.getAllocWidth(), childRequisition.getReqMinWidth() );
 		
 					LAllocHelper.allocateChildXAligned( childAlloc, childRequisition, hAlign, 0.0, cellWidth );
 				}

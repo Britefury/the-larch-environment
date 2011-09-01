@@ -369,7 +369,7 @@ abstract public class DPContainerSequence extends DPContainer
 		double[] values = new double[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
 		{
-			values[i] = nodes.get( i ).getAllocationX();
+			values[i] = nodes.get( i ).getAllocWidth();
 		}
 		return values;
 	}
@@ -386,7 +386,7 @@ abstract public class DPContainerSequence extends DPContainer
 		double[] values = new double[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
 		{
-			values[i] = nodes.get( i ).getAllocationY();
+			values[i] = nodes.get( i ).getAllocHeight();
 		}
 		return values;
 	}

@@ -120,8 +120,8 @@ public class DPMathRoot extends DPContainer
 		
 		if ( child != null )
 		{
-			double width = getWidth();
-			double height = getHeight();
+			double width = getActualWidth();
+			double height = getActualHeight();
 
 			MathRootStyleParams s = (MathRootStyleParams)styleParams;
 			Paint symbolPaint;

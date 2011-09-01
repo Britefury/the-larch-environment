@@ -141,7 +141,7 @@ public class DPViewport extends DPContainer implements FiniteViewportBehaviour.F
 	public void focusOn(DPElement element)
 	{
 		Point2 topLeft = element.getLocalPointRelativeToAncestor( this, new Point2( 0.0, 0.0 ) );
-		Point2 bottomRight = element.getLocalPointRelativeToAncestor( this, new Point2( element.getSize() ) );
+		Point2 bottomRight = element.getLocalPointRelativeToAncestor( this, new Point2( element.getActualSize() ) );
 		viewportBehaviour.focusOn( new AABox2( topLeft, bottomRight ) );
 	}
 	
@@ -296,7 +296,7 @@ public class DPViewport extends DPContainer implements FiniteViewportBehaviour.F
 	@Override
 	public Vector2 getFiniteViewportSize()
 	{
-		return getSize();
+		return getActualSize();
 	}
 	
 	@Override
@@ -304,7 +304,7 @@ public class DPViewport extends DPContainer implements FiniteViewportBehaviour.F
 	{
 		DPElement child = getChild();
 		
-		return child != null  ?  child.getSize()  :  new Vector2( 1.0, 1.0 );
+		return child != null  ?  child.getActualSize()  :  new Vector2( 1.0, 1.0 );
 	}
 	
 	@Override

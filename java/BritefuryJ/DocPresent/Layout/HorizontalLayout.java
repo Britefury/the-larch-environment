@@ -121,7 +121,7 @@ public class HorizontalLayout
 			}
 		}
 
-		double allocBoxAllocationX = allocBox.getAllocationX();
+		double allocBoxAllocationX = allocBox.getAllocWidth();
 
 		if ( allocBoxAllocationX >= box.getReqPrefWidth() * LReqBox.ONE_MINUS_EPSILON )		// if allocation >= prefferred
 		{
@@ -200,7 +200,7 @@ public class HorizontalLayout
 	
 	public static void allocateX(LReqBoxInterface box, LReqBoxInterface children[], LAllocBoxInterface allocBox, LAllocBoxInterface childrenAlloc[], double spacing, boolean bExpand)
 	{
-		double allocBoxAllocationX = allocBox.getAllocationX();
+		double allocBoxAllocationX = allocBox.getAllocWidth();
 		if ( allocBoxAllocationX >= box.getReqPrefWidth() * LReqBox.ONE_MINUS_EPSILON )		// if allocation >= prefferred
 		{
 			if ( allocBoxAllocationX <= box.getReqPrefWidth() * LReqBox.ONE_PLUS_EPSILON  ||  !bExpand )			// if allocation == preferred   or   not bExpand
@@ -269,7 +269,7 @@ public class HorizontalLayout
 	public static LAllocV computeVerticalAllocationForRow(LReqBoxInterface reqBox, LAllocBoxInterface allocBox)
 	{
 		//return new LAllocV( Math.max( reqBox.getReqHeight(), allocBox.getAllocationY() ),  Math.max( reqBox.getRefY(), ))
-		double allocBoxAllocationY = allocBox.getAllocationY();
+		double allocBoxAllocationY = allocBox.getAllocHeight();
 		if ( allocBoxAllocationY < reqBox.getReqHeight() )
 		{
 			return new LAllocV( reqBox.getReqHeight(), reqBox.getReqRefY() );

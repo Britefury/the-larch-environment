@@ -14,7 +14,7 @@ import BritefuryJ.Math.Xform2;
 public class LAllocBox implements LAllocBoxInterface
 {
 	protected double positionInParentAllocationSpaceX, positionInParentAllocationSpaceY;
-	protected double width, allocationX, allocationY;
+	protected double actualWidth, allocWidth, allocHeight;
 	protected double refY;
 	protected LayoutNode layoutNode;
 
@@ -28,8 +28,8 @@ public class LAllocBox implements LAllocBoxInterface
 	{
 		positionInParentAllocationSpaceX = x;
 		positionInParentAllocationSpaceY = y;
-		allocationX = width;
-		allocationY = height;
+		allocWidth = width;
+		allocHeight = height;
 		this.refY = refY;
 		this.layoutNode = layoutNode;
 	}
@@ -57,29 +57,24 @@ public class LAllocBox implements LAllocBoxInterface
 		return new Point2( positionInParentAllocationSpaceX, positionInParentAllocationSpaceY );
 	}
 	
-	public double getWidth()
+	public double getActualWidth()
 	{
-		return width;
+		return actualWidth;
 	}
 	
-	public double getHeight()
+	public Vector2 getActualSize()
 	{
-		return allocationY;
-	}
-	
-	public Vector2 getSize()
-	{
-		return new Vector2( width, allocationY );
+		return new Vector2( actualWidth, allocHeight );
 	}
 
-	public double getAllocationX()
+	public double getAllocWidth()
 	{
-		return allocationX;
+		return allocWidth;
 	}
 	
-	public double getAllocationY()
+	public double getAllocHeight()
 	{
-		return allocationY;
+		return allocHeight;
 	}
 	
 	public double getAllocRefY()
@@ -89,12 +84,12 @@ public class LAllocBox implements LAllocBoxInterface
 	
 	public LAllocV getAllocV()
 	{
-		return new LAllocV( allocationY, refY );
+		return new LAllocV( allocHeight, refY );
 	}
 	
-	public Vector2 getAllocation()
+	public Vector2 getAllocSize()
 	{
-		return new Vector2( allocationX, allocationY );
+		return new Vector2( allocWidth, allocHeight );
 	}
 
 
@@ -115,36 +110,36 @@ public class LAllocBox implements LAllocBoxInterface
 		positionInParentAllocationSpaceY = y;
 	}
 	
-	public void setAllocationX(double allocX, double width)
+	public void setAllocationX(double allocWidth, double actualWidth)
 	{
-		allocationX = allocX;
-		this.width = width;
+		this.allocWidth = allocWidth;
+		this.actualWidth = actualWidth;
 	}
 
-	public void setAllocationY(double height, double refY)
+	public void setAllocationY(double allocHeight, double refY)
 	{
-		allocationY = height;
+		this.allocHeight = allocHeight;
 		this.refY = refY;
 	}
 
-	public void setPositionInParentSpaceAndAllocationX(double x, double allocX, double width)
+	public void setPositionInParentSpaceAndAllocationX(double x, double allocWidth, double actualWidth)
 	{
 		positionInParentAllocationSpaceX = x;
-		allocationX = allocX;
-		this.width = width;
+		this.allocWidth = allocWidth;
+		this.actualWidth = actualWidth;
 	}
 	
 	public void setPositionInParentSpaceAndAllocationY(double y, double height)
 	{
 		positionInParentAllocationSpaceY = y;
-		allocationY = height;
+		allocHeight = height;
 		refY = height * 0.5;
 	}
 	
 	public void setPositionInParentSpaceAndAllocationY(double y, double height, double refY)
 	{
 		positionInParentAllocationSpaceY = y;
-		allocationY = height;
+		allocHeight = height;
 		this.refY = refY;
 	}
 
@@ -152,12 +147,12 @@ public class LAllocBox implements LAllocBoxInterface
 
 	public void transformAllocationX(Xform2 xform)
 	{
-		allocationX = xform.scale( allocationX );
+		allocWidth = xform.scale( allocWidth );
 	}
 
 	public void transformAllocationY(Xform2 xform)
 	{
-		allocationY = xform.scale( allocationY );
+		allocHeight = xform.scale( allocHeight );
 		refY = xform.scale( refY );
 	}
 	
@@ -175,7 +170,7 @@ public class LAllocBox implements LAllocBoxInterface
 			LAllocBox b = (LAllocBox)x;
 			
 			return positionInParentAllocationSpaceX == b.positionInParentAllocationSpaceX  &&  positionInParentAllocationSpaceY == b.positionInParentAllocationSpaceY  &&  
-					allocationX == b.allocationX  &&  allocationY == b.allocationY  &&  refY == b.refY;
+					allocWidth == b.allocWidth  &&  allocHeight == b.allocHeight  &&  refY == b.refY;
 		}
 		else
 		{
@@ -187,6 +182,6 @@ public class LAllocBox implements LAllocBoxInterface
 	public String toString()
 	{
 		return "LAllocBox( positionInParentSpaceX=" + positionInParentAllocationSpaceX + ", positionInParentSpaceY=" + positionInParentAllocationSpaceY +
-			", allocationX=" + allocationX + ", allocationY=" + allocationY + ", refY=" + refY + " )";
+			", allocationX=" + allocWidth + ", allocationY=" + allocHeight + ", refY=" + refY + " )";
 	}
 }

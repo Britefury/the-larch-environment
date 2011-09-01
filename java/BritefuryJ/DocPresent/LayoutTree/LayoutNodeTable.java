@@ -107,7 +107,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 			LayoutNode layoutNode = child.getLayoutNode();
 			childBoxes[i] = layoutNode.getRequisitionBox();
 			childAllocBoxes[i] = layoutNode.getAllocationBox();
-			prevWidths[i] = layoutNode.getAllocationX();
+			prevWidths[i] = layoutNode.getAllocWidth();
 			childAlignmentFlags[i] = child.getAlignmentFlags();
 		}
 		
@@ -258,7 +258,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 			for (int i = 0; i < columnAllocBoxes.length - 1; i++)
 			{
 				LAllocBox columnJ = columnAllocBoxes[i+1];
-				double iUpperX = columnI.getAllocPositionInParentSpaceX() + columnI.getAllocationX();
+				double iUpperX = columnI.getAllocPositionInParentSpaceX() + columnI.getAllocWidth();
 				double jLowerX = columnJ.getAllocPositionInParentSpaceX();
 				
 				double midX = ( iUpperX + jLowerX ) * 0.5;
@@ -293,7 +293,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 			for (int i = 0; i < rowAllocBoxes.length - 1; i++)
 			{
 				LAllocBox rowJ = rowAllocBoxes[i+1];
-				double iUpperY = rowI.getAllocPositionInParentSpaceY() + rowI.getAllocationY();
+				double iUpperY = rowI.getAllocPositionInParentSpaceY() + rowI.getAllocHeight();
 				double jLowerY = rowJ.getAllocPositionInParentSpaceY();
 				
 				double midY = ( iUpperY + jLowerY ) * 0.5;
@@ -355,7 +355,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 	public double getColumnRight(int column)
 	{
 		LAllocBoxInterface box = columnAllocBoxes[column];
-		return box.getAllocPositionInParentSpaceX() + box.getWidth();
+		return box.getAllocPositionInParentSpaceX() + box.getActualWidth();
 	}
 
 	public double getRowTop(int row)
@@ -367,7 +367,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 	public double getRowBottom(int row)
 	{
 		LAllocBoxInterface box = rowAllocBoxes[row];
-		return box.getAllocPositionInParentSpaceY() + box.getHeight();
+		return box.getAllocPositionInParentSpaceY() + box.getAllocHeight();
 	}
 
 

@@ -759,7 +759,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				LReqBoxInterface reqX = rootLayout.refreshRequisitionX();
 				
 				// Allocate X
-				double prevWidth = rootLayout.getAllocationX();
+				double prevWidth = rootLayout.getAllocWidth();
 				rootLayout.allocateX( reqX, 0.0, windowSize.x );
 				rootLayout.refreshAllocationX( prevWidth );
 				

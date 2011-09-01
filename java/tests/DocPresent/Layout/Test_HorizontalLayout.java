@@ -237,11 +237,11 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		HorizontalLayout.allocateX( box, children, boxAlloc, childrenAlloc, childAllocFlags, spacing );
 		for (int i = 0; i < children.length; i++)
 		{
-			if ( childrenAlloc[i].getAllocationX() != expectedSize[i] )
+			if ( childrenAlloc[i].getAllocWidth() != expectedSize[i] )
 			{
-				System.out.println( "Child allocation for " + i + " is not as expected; expected=" + expectedSize[i] + ", result=" + childrenAlloc[i].getAllocationX() + ", boxAllocation=" + boxAllocation );
+				System.out.println( "Child allocation for " + i + " is not as expected; expected=" + expectedSize[i] + ", result=" + childrenAlloc[i].getAllocWidth() + ", boxAllocation=" + boxAllocation );
 			}
-			assertEquals( childrenAlloc[i].getAllocationX(), expectedSize[i] );
+			assertEquals( childrenAlloc[i].getAllocWidth(), expectedSize[i] );
 
 			if ( childrenAlloc[i].getAllocPositionInParentSpaceX() != expectedPosition[i] )
 			{

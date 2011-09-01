@@ -96,6 +96,6 @@ public class DPBorder extends DPBin
 	
 	protected void drawBackground(Graphics2D graphics)
 	{
-		border.draw( graphics, 0.0, 0.0, getWidth(), getHeight() );
+		border.draw( graphics, 0.0, 0.0, getActualWidth(), getActualHeight() );
 	}
 }

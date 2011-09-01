@@ -576,34 +576,34 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		return layoutNode != null  ?  layoutNode.getPositionInParentAllocationSpace()  :  new Point2();
 	}
 	
-	public double getWidth()
+	public double getActualWidth()
 	{
-		return layoutNode != null  ?  layoutNode.getWidth()  :  ( parent != null  ?  parent.getWidth()  :  0.0 );
+		return layoutNode != null  ?  layoutNode.getActualWidth()  :  ( parent != null  ?  parent.getActualWidth()  :  0.0 );
 	}
 	
-	public double getHeight()
+	public double getActualHeight()
 	{
-		return layoutNode != null  ?  layoutNode.getHeight()  :  ( parent != null  ?  parent.getHeight()  :  0.0 );
+		return layoutNode != null  ?  layoutNode.getActualHeight()  :  ( parent != null  ?  parent.getActualHeight()  :  0.0 );
 	}
 	
-	public Vector2 getSize()
+	public Vector2 getActualSize()
 	{
-		return layoutNode != null  ?  layoutNode.getSize()  :  ( parent != null  ?  parent.getSize()  :  new Vector2() );
+		return layoutNode != null  ?  layoutNode.getActualSize()  :  ( parent != null  ?  parent.getActualSize()  :  new Vector2() );
 	}
 	
-	public double getWidthInParentSpace()
+	public double getActualWidthInParentSpace()
 	{
-		return layoutNode != null  ?  layoutNode.getWidthInParentSpace()  :  ( parent != null  ?  parent.getWidth()  :  0.0 );
+		return layoutNode != null  ?  layoutNode.getActualWidthInParentSpace()  :  ( parent != null  ?  parent.getActualWidth()  :  0.0 );
 	}
 	
-	public double getHeightInParentSpace()
+	public double getActualHeightInParentSpace()
 	{
-		return layoutNode != null  ?  layoutNode.getHeightInParentSpace()  :  ( parent != null  ?  parent.getHeight()  :  0.0 );
+		return layoutNode != null  ?  layoutNode.getActualHeightInParentSpace()  :  ( parent != null  ?  parent.getActualHeight()  :  0.0 );
 	}
 	
-	public Vector2 getSizeInParentSpace()
+	public Vector2 getActualSizeInParentSpace()
 	{
-		return layoutNode != null  ?  layoutNode.getSizeInParentSpace()  :  ( parent != null  ?  parent.getSize()  :  new Vector2());
+		return layoutNode != null  ?  layoutNode.getActualSizeInParentSpace()  :  ( parent != null  ?  parent.getActualSize()  :  new Vector2());
 	}
 	
 	protected AABox2 getVisibleBoxInLocalSpace()
@@ -613,14 +613,14 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	
 
-	public double getAllocationX()
+	public double getAllocWidth()
 	{
-		return layoutNode != null  ?  layoutNode.getAllocationX()  :  ( parent != null  ?  parent.getAllocationX()  :  0.0 );
+		return layoutNode != null  ?  layoutNode.getAllocWidth()  :  ( parent != null  ?  parent.getAllocWidth()  :  0.0 );
 	}
 	
-	public double getAllocationY()
+	public double getAllocHeight()
 	{
-		return layoutNode != null  ?  layoutNode.getAllocationY()  :  ( parent != null  ?  parent.getAllocationY()  :  0.0 );
+		return layoutNode != null  ?  layoutNode.getAllocHeight()  :  ( parent != null  ?  parent.getAllocHeight()  :  0.0 );
 	}
 	
 	public LAllocV getAllocV()
@@ -628,16 +628,16 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		return layoutNode != null  ?  layoutNode.getAllocV()  :  ( parent != null  ?  parent.getAllocV()  :  new LAllocV( 0.0 ) );
 	}
 	
-	public Vector2 getAllocation()
+	public Vector2 getAllocSize()
 	{
-		return layoutNode != null  ?  layoutNode.getAllocation()  :  ( parent != null  ?  parent.getAllocation()  :  new Vector2() );
+		return layoutNode != null  ?  layoutNode.getAllocSize()  :  ( parent != null  ?  parent.getAllocSize()  :  new Vector2() );
 	}
 
 	
 	
 	public AABox2 getLocalAABox()
 	{
-		return new AABox2( new Point2(), getSize() );
+		return new AABox2( new Point2(), getActualSize() );
 	}
 	
 	public AABox2 getLocalClipBox()
@@ -647,13 +647,13 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	public AABox2 getAABoxInParentSpace()
 	{
-		return new AABox2( getPositionInParentSpace(), getSizeInParentSpace() );
+		return new AABox2( getPositionInParentSpace(), getActualSizeInParentSpace() );
 	}
 	
 	
 	protected Shape[] getShapes()
 	{
-		Vector2 size = getSize();
+		Vector2 size = getActualSize();
 		return new Shape[] { new Rectangle2D.Double( 0.0, 0.0, size.x, size.y ) };
 	}
 	
@@ -661,7 +661,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	// non-layout-less parent
 	public AABox2 getVisibleSpaceBox()
 	{
-		Vector2 size = getSize();
+		Vector2 size = getActualSize();
 		return new AABox2( 0.0, 0.0, size.x, size.y );
 	}
 
@@ -1526,7 +1526,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 	public void clip(Graphics2D graphics)
 	{
-		graphics.clip( new Rectangle2D.Double( 0.0, 0.0, getWidth(), getHeight() ) );
+		graphics.clip( new Rectangle2D.Double( 0.0, 0.0, getActualWidth(), getActualHeight() ) );
 	}
 
 	protected void handleDrawBackground(Graphics2D graphics, AABox2 areaBox)
@@ -2114,7 +2114,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		{
 			throw new RuntimeException( "Marker is not within the bounds of this element" );
 		}
-		return new Point2( getWidth() * 0.5, getHeight() * 0.5 );
+		return new Point2( getActualWidth() * 0.5, getActualHeight() * 0.5 );
 	}
 	
 	

@@ -67,10 +67,10 @@ public class LayoutNodeBorder extends LayoutNodeBin
 		if ( child != null )
 		{
 			LayoutNode childLayoutNode = child.getLayoutNode();
-			double prevWidth = childLayoutNode.getAllocationBox().getAllocationX();
+			double prevWidth = childLayoutNode.getAllocationBox().getAllocWidth();
 			double hborder = border.getLeftMargin() + border.getRightMargin();
 			LAllocHelper.allocateChildXAligned( childLayoutNode.getAllocationBox(), childLayoutNode.getRequisitionBox(), child.getAlignmentFlags(),
-					border.getLeftMargin(), getAllocationBox().getAllocationX() - hborder );
+					border.getLeftMargin(), getAllocationBox().getAllocWidth() - hborder );
 			childLayoutNode.refreshAllocationX( prevWidth );
 		}
 	}

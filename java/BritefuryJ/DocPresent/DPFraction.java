@@ -55,7 +55,7 @@ public class DPFraction extends DPContainer
 
 		protected void draw(Graphics2D graphics)
 		{
-			Shape s = new Rectangle2D.Double( 0.0, 0.0, getWidth(), getHeight() );
+			Shape s = new Rectangle2D.Double( 0.0, 0.0, getActualWidth(), getActualHeight() );
 			Paint curPaint = graphics.getPaint();
 
 			Paint barPaint;
@@ -83,7 +83,7 @@ public class DPFraction extends DPContainer
 		
 		private void drawCaretAtStart(Graphics2D graphics)
 		{
-			double height = getHeight();
+			double height = getActualHeight();
 			AffineTransform current = pushGraphicsTransform( graphics );
 			graphics.draw( new Line2D.Double( 0.0, -2.0, 0.0, height + 2.0 ) );
 			popGraphicsTransform( graphics, current );
@@ -91,8 +91,8 @@ public class DPFraction extends DPContainer
 
 		private void drawCaretAtEnd(Graphics2D graphics)
 		{
-			double width = getWidth();
-			double height = getHeight();
+			double width = getActualWidth();
+			double height = getActualHeight();
 			AffineTransform current = pushGraphicsTransform( graphics );
 			graphics.draw( new Line2D.Double( width, -2.0, width, height + 2.0 ) );
 			popGraphicsTransform( graphics, current );
@@ -121,8 +121,8 @@ public class DPFraction extends DPContainer
 		
 		public void drawTextSelection(Graphics2D graphics, int startIndex, int endIndex)
 		{
-			double width = getWidth();
-			double height = getHeight();
+			double width = getActualWidth();
+			double height = getActualHeight();
 			AffineTransform current = pushGraphicsTransform( graphics );
 			double startX = startIndex == 0  ?  0.0  :  width;
 			double endX = endIndex == 0  ?  0.0  :  width;
@@ -144,7 +144,7 @@ public class DPFraction extends DPContainer
 
 		public int getMarkerPositonForPoint(Point2 localPos)
 		{
-			double width = getWidth();
+			double width = getActualWidth();
 			if ( localPos.x >= width * 0.5 )
 			{
 				return 1;

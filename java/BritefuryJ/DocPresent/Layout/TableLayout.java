@@ -283,7 +283,7 @@ public class TableLayout
 			int endCol = packing.x + packing.colSpan;
 			LAllocBox startColAlloc = columnAllocBoxes[startCol], endColAlloc = columnAllocBoxes[endCol-1];
 			double xStart = startColAlloc.positionInParentAllocationSpaceX;
-			double xEnd = endColAlloc.positionInParentAllocationSpaceX  +  endColAlloc.allocationX;
+			double xEnd = endColAlloc.positionInParentAllocationSpaceX  +  endColAlloc.allocWidth;
 			double widthAvailable = xEnd - xStart;
 			double cellWidth = Math.max( widthAvailable, childRequisition.getReqMinWidth() );
 
@@ -329,7 +329,7 @@ public class TableLayout
 			else
 			{
 				LAllocBox endRowAlloc = rowAllocBoxes[endRow-1];
-				double yEnd = endRowAlloc.positionInParentAllocationSpaceY + endRowAlloc.getAllocationY();
+				double yEnd = endRowAlloc.positionInParentAllocationSpaceY + endRowAlloc.getAllocHeight();
 				double heightAvailable = yEnd - yStart;
 				vAlign = VAlignment.noRefPoint( vAlign );
 				height = new LAllocV( heightAvailable );

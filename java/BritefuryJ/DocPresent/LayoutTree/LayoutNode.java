@@ -36,15 +36,15 @@ public abstract class LayoutNode
 	public abstract double getAllocPositionInParentSpaceX();
 	public abstract double getAllocPositionInParentSpaceY();
 	public abstract Point2 getPositionInParentAllocationSpace();
-	public abstract double getWidth();
-	public abstract double getHeight();
-	public abstract Vector2 getSize();
-	public abstract double getWidthInParentSpace();
-	public abstract double getHeightInParentSpace();
-	public abstract Vector2 getSizeInParentSpace();
-	public abstract double getAllocationX();
-	public abstract double getAllocationY();
-	public abstract Vector2 getAllocation();
+	public abstract double getActualWidth();
+	public abstract double getActualHeight();
+	public abstract Vector2 getActualSize();
+	public abstract double getActualWidthInParentSpace();
+	public abstract double getActualHeightInParentSpace();
+	public abstract Vector2 getActualSizeInParentSpace();
+	public abstract double getAllocWidth();
+	public abstract double getAllocHeight();
+	public abstract Vector2 getAllocSize();
 	public abstract LAllocV getAllocV();
 
 	
