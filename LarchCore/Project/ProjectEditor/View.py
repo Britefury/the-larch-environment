@@ -130,7 +130,7 @@ def _pageDrop(element, targetPos, data, action):
 		destPage = _getModelOfPackageOrPageNameElement( element )
 		parent = destPage.parent
 		index = parent.indexOfById( destPage )
-		if targetPos.y > ( element.getHeight() * 0.5 ):
+		if targetPos.y > ( element.getActualHeight() * 0.5 ):
 			index += 1
 
 		_performDrop( data, action, parent, index )
@@ -141,13 +141,13 @@ def _pageDrop(element, targetPos, data, action):
 
 def _getDestPackageAndIndex(element, targetPos):
 	targetPackage = _getModelOfPackageOrPageNameElement( element )
-	if targetPos.x > ( element.getWidth() * 0.5 ):
+	if targetPos.x > ( element.getActualWidth() * 0.5 ):
 		return targetPackage, len( targetPackage )
 	else:
 		parent1 = targetPackage.parent
 		parent2 = parent1.parent
 		index = parent1.indexOfById( targetPackage )
-		if targetPos.y > ( element.getHeight() * 0.5 ):
+		if targetPos.y > ( element.getActualHeight() * 0.5 ):
 			index += 1
 		return parent2, index
 
@@ -168,13 +168,13 @@ def _packageDrop(element, targetPos, data, action):
 
 
 		targetPackage = _getModelOfPackageOrPageNameElement( element )
-		if targetPos.x > ( element.getWidth() * 0.5 ):
+		if targetPos.x > ( element.getActualWidth() * 0.5 ):
 			_performDrop( data, action, targetPackage, None )
 			return True
 		else:
 			parent = targetPackage.parent
 			index = parent.indexOfById( targetPackage )
-			if targetPos.y > ( element.getHeight() * 0.5 ):
+			if targetPos.y > ( element.getActualHeight() * 0.5 ):
 				index += 1
 
 			_performDrop( data, action, parent, index )
