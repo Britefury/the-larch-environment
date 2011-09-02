@@ -1130,11 +1130,13 @@ class ImporterTestCase (unittest.TestCase):
 		
 	def testReturnStmt(self):
 		self._stmtTest( 'return x', Schema.ReturnStmt( value=Schema.Load( name='x' ) ) )
-		
+		self._stmtTest( 'return', Schema.ReturnStmt( value=None ) )
+
 	
 	def testYieldStmt(self):
 		self._stmtTest( 'yield x', Schema.ExprStmt( expr=Schema.YieldExpr( value=Schema.Load( name='x' ) ) ) )
-		
+		self._stmtTest( 'yield', Schema.ExprStmt( expr=Schema.YieldExpr( value=None ) ) )
+
 		
 	def testRaiseStmt(self):
 		self._stmtTest( 'raise', Schema.RaiseStmt( excType=None, excValue=None, traceback=None ) )

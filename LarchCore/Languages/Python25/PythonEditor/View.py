@@ -652,7 +652,7 @@ class Python25View (ObjectNodeDispatchView):
 	@DMObjectNodeDispatchMethod( Schema.YieldExpr )
 	@Expression
 	def YieldExpr(self, fragment, inheritedState, model, value):
-		valueView = SREInnerFragment( value, PRECEDENCE_CONTAINER_YIELDEXPR )
+		valueView = SREInnerFragment( value, PRECEDENCE_CONTAINER_YIELDEXPR )   if value is not None   else None
 		return yieldExpr( valueView )
 
 
@@ -1104,7 +1104,7 @@ class Python25View (ObjectNodeDispatchView):
 	@DMObjectNodeDispatchMethod( Schema.ReturnStmt )
 	@Statement
 	def ReturnStmt(self, fragment, inheritedState, model, value):
-		valueView = SREInnerFragment( value, PRECEDENCE_STMT )
+		valueView = SREInnerFragment( value, PRECEDENCE_STMT )   if value is not None   else None
 		return returnStmt( valueView )
 
 
@@ -1112,7 +1112,7 @@ class Python25View (ObjectNodeDispatchView):
 	@DMObjectNodeDispatchMethod( Schema.YieldStmt )
 	@Statement
 	def YieldStmt(self, fragment, inheritedState, model, value):
-		valueView = SREInnerFragment( value, PRECEDENCE_STMT )
+		valueView = SREInnerFragment( value, PRECEDENCE_STMT )   if value is not None   else None
 		return yieldStmt( valueView )
 
 

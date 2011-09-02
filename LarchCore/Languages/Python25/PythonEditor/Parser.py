@@ -343,7 +343,7 @@ class Python25Grammar (Grammar):
 	# Yield expression
 	@Rule
 	def yieldExpression(self):
-		return ( Keyword( yieldKeyword )  +  self.tupleOrExpression() ).action( lambda input, begin, end, xs, bindings: Schema.YieldExpr( value=xs[1] ) )
+		return ( Keyword( yieldKeyword )  +  self.tupleOrExpression().optional() ).action( lambda input, begin, end, xs, bindings: Schema.YieldExpr( value=( xs[1]   if len( xs ) > 1   else None ) ) )
 
 
 	@Rule
@@ -725,14 +725,14 @@ class Python25Grammar (Grammar):
 	# Return statement
 	@Rule
 	def returnStmt(self):
-		return ( Keyword( returnKeyword )  +  self.tupleOrExpression() + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.ReturnStmt( value=xs[1] ) )
+		return ( Keyword( returnKeyword )  +  self.tupleOrExpression().optional() + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.ReturnStmt( value=( xs[1]   if len( xs ) > 1   else None ) ) )
 
 
 
 	# Yield statement
 	@Rule
 	def yieldStmt(self):
-		return ( Keyword( yieldKeyword )  +  self.expression() + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.YieldStmt( value=xs[1] ) )
+		return ( Keyword( yieldKeyword )  +  self.expression().optional() + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.YieldStmt( value=( xs[1]   if len( xs ) > 1   else None ) ) )
 
 
 
@@ -1416,6 +1416,7 @@ class TestCase_Python25Parser (ParserTestCase):
 	def testYieldExpr(self):
 		g = Python25Grammar()
 		self._parseStringTest( g.expression(), '(yield 2+3)', Schema.YieldExpr( value=Schema.Add( x=Schema.IntLiteral( format='decimal', numType='int', value='2' ), y=Schema.IntLiteral( format='decimal', numType='int', value='3' ) ) ) )
+		self._parseStringTest( g.expression(), '(yield)', Schema.YieldExpr( value=None ) )
 
 
 
@@ -1655,11 +1656,13 @@ class TestCase_Python25Parser (ParserTestCase):
 	def testReturnStmt(self):
 		g = Python25Grammar()
 		self._parseStringTest( g.singleLineStatementValid(), 'return x\n', Schema.ReturnStmt( value=Schema.Load( name='x' ) ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'return\n', Schema.ReturnStmt() )
 
 
 	def testYieldStmt(self):
 		g = Python25Grammar()
 		self._parseStringTest( g.singleLineStatementValid(), 'yield x\n', Schema.YieldStmt( value=Schema.Load( name='x' ) ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'yield\n', Schema.YieldStmt() )
 
 
 	def testRaiseStmt(self):

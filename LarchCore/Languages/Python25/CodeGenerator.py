@@ -285,7 +285,10 @@ class Python25CodeGenerator (object):
 	# Yield expression and yield atom
 	@DMObjectNodeDispatchMethod( Schema.YieldExpr )
 	def YieldExpr(self, node, value):
-		return '(yield ' + self( value, PRECEDENCE_CONTAINER_YIELDEXPR ) + ')'
+		if value is not None:
+			return '(yield ' + self( value, PRECEDENCE_CONTAINER_YIELDEXPR ) + ')'
+		else:
+			return '(yield)'
 		
 	
 	
@@ -590,13 +593,19 @@ class Python25CodeGenerator (object):
 	# Return statement
 	@DMObjectNodeDispatchMethod( Schema.ReturnStmt )
 	def ReturnStmt(self, node, value):
-		return Line( 'return '  +  self( value, PRECEDENCE_STMT ),   node )
+		if value is not None:
+			return Line( 'return '  +  self( value, PRECEDENCE_STMT ),   node )
+		else:
+			return Line( 'return',  node )
 	
 	
 	# Yield statement
 	@DMObjectNodeDispatchMethod( Schema.YieldStmt )
 	def YieldStmt(self, node, value):
-		return Line( 'yield '  +  self( value, PRECEDENCE_STMT ),   node )
+		if value is not None:
+			return Line( 'yield '  +  self( value, PRECEDENCE_STMT ),   node )
+		else:
+			return Line( 'yield',  node )
 	
 	
 	# Raise statement
@@ -1212,7 +1221,8 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 	
 	def test_YieldExpr(self):
 		self._testSX( '(py YieldExpr value=(py Load name=a))', '(yield a)' )
-		
+		self._testSX( '(py YieldExpr value=`null`)', '(yield)' )
+
 		
 	def test_AttributeRef(self):
 		self._testSX( '(py AttributeRef target=(py Load name=a) name=b)', 'a.b' )
@@ -1335,11 +1345,13 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 		
 	def test_ReturnStmt(self):
 		self._testSX( '(py ReturnStmt value=(py Load name=a))', 'return a' )
-		
+		self._testSX( '(py ReturnStmt value=`null`)', 'return' )
+
 		
 	def test_YieldStmt(self):
 		self._testSX( '(py YieldStmt value=(py Load name=a))', 'yield a' )
-		
+		self._testSX( '(py YieldStmt value=`null`)', 'yield' )
+
 		
 	def test_raiseStmt(self):
 		self._testSX( '(py RaiseStmt excType=`null` excValue=`null` traceback=`null`)', 'raise' )
