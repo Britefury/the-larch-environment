@@ -353,9 +353,10 @@ def dictLiteral(items, bTrailingSeparator):
 
 
 def yieldExpr(value):
-	return Span( [ _keyword( 'yield' ),
-	               _space,
-	               value ] )
+	if value is not None:
+		return Span( [ _keyword( 'yield' ), _space, value ] )
+	else:
+		return _keyword( 'yield' )
 
 
 def attributeRef(target, name):
@@ -613,10 +614,13 @@ def assertStmt(condition, fail):
 
 
 def assignStmt(targets, value):
-	targetElements = []
-	for t in targets:
-		targetElements.extend( [ t,  _space,  _equals,  _space,  _lineBreak ] )
-	return Span( targetElements  +  [ value ] )
+	if len( targets ) == 1:
+		return Span( [ targets[0], _space, _equals, _space, value ] )
+	else:
+		targetElements = []
+		for t in targets:
+			targetElements.extend( [ t,  _space,  _equals,  _space,  _lineBreak ] )
+		return Span( targetElements  +  [ value ] )
 
 
 def augAssignStmt(op, target, value):
@@ -634,11 +638,17 @@ def delStmt(target):
 
 
 def returnStmt(value):
-	return Span( [ _keyword( 'return' ),  _space,  value ] )
+	if value is not None:
+		return Span( [ _keyword( 'return' ),  _space,  value ] )
+	else:
+		return _keyword( 'return' )
 
 
 def yieldStmt(value):
-	return Span( [ _keyword( 'yield' ),  _space,  value ] )
+	if value is not None:
+		return Span( [ _keyword( 'yield' ),  _space,  value ] )
+	else:
+		return _keyword( 'yield' )
 
 
 def raiseStmt(excType, excValue, traceback):

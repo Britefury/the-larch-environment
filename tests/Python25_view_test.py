@@ -7,7 +7,7 @@
 ##-*************************
 import sys
 
-print 'This is a view test - it is not executable; import it to test the functionality of the Python editor'
+print 'This is a view test - it is not executable; import it in gSym'
 
 sys.exit()
 
@@ -145,6 +145,8 @@ y = a or b
 # lambda with params
 x = lambda: 1
 x = lambda a, b=2, *c, **d: 1
+x = lambda a, (b, c): 1
+x = lambda a, (b, c), (d,e)=2: 1
 
 
 # conditional expr
@@ -182,10 +184,18 @@ del x
 def f():
 	return 1
 
+# empty return
+def f():
+	return
+
 
 # yield
 def f():
 	yield 1
+
+# empty yield
+def f():
+	yield
 
 
 
