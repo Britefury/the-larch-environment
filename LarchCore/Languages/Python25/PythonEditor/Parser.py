@@ -571,8 +571,13 @@ class Python25Grammar (Grammar):
 		return self.pythonIdentifier().action( lambda input, begin, end, xs, bindings: Schema.SimpleParam( name=xs ) )
 
 	@Rule
+	def tupleParam(self):
+		return SeparatedList( self.tupleParam() | self.simpleParam(), '(', ')', 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ). \
+		       listAction( lambda input, begin, end, xs, bindings, bTrailingSep: Schema.TupleParam( params=xs, paramsTrailingSeparator='1'   if bTrailingSep   else None ) )
+
+	@Rule
 	def defaultValueParam(self):
-		return ( self.paramName() + '=' + self.expression() ).action( lambda input, begin, end, xs, bindings: Schema.DefaultValueParam( name=xs[0], defaultValue=xs[2] ) )
+		return ( ( self.tupleParam() | self.simpleParam() ) + '=' + self.expression() ).action( lambda input, begin, end, xs, bindings: Schema.DefaultValueParam( param=xs[0], defaultValue=xs[2] ) )
 
 	@Rule
 	def paramList(self):
@@ -584,7 +589,7 @@ class Python25Grammar (Grammar):
 
 	@Rule
 	def param(self):
-		return self.kwParamList() | self.paramList() | self.defaultValueParam() | self.simpleParam()
+		return self.kwParamList() | self.paramList() | self.defaultValueParam() | self.tupleParam() | self.simpleParam()
 
 	@Rule
 	def params(self):
@@ -1520,14 +1525,30 @@ class TestCase_Python25Parser (ParserTestCase):
 		self._parseStringTest( g.params(), 'f', [ [ Schema.SimpleParam( name='f' ) ], None ] )
 		self._parseStringTest( g.params(), 'f,', [ [ Schema.SimpleParam( name='f' ) ], '1' ] )
 		self._parseStringTest( g.params(), 'f,g', [ [ Schema.SimpleParam( name='f' ), Schema.SimpleParam( name='g' ) ], None ] )
-		self._parseStringTest( g.params(), 'f,g,m=a', [ [ Schema.SimpleParam( name='f' ), Schema.SimpleParam( name='g' ), Schema.DefaultValueParam( name='m', defaultValue=Schema.Load( name='a' ) ) ], None ] )
-		self._parseStringTest( g.params(), 'f,g,m=a,n=b', [ [ Schema.SimpleParam( name='f' ), Schema.SimpleParam( name='g' ), Schema.DefaultValueParam( name='m', defaultValue=Schema.Load( name='a' ) ), Schema.DefaultValueParam( name='n', defaultValue=Schema.Load( name='b' ) ) ], None ] )
-		self._parseStringTest( g.params(), 'f,g,m=a,n=b,*p', [ [ Schema.SimpleParam( name='f' ), Schema.SimpleParam( name='g' ), Schema.DefaultValueParam( name='m', defaultValue=Schema.Load( name='a' ) ), Schema.DefaultValueParam( name='n', defaultValue=Schema.Load( name='b' ) ), Schema.ParamList( name='p' ) ], None ] )
-		self._parseStringTest( g.params(), 'f,m=a,*p,**w', [ [ Schema.SimpleParam( name='f' ), Schema.DefaultValueParam( name='m', defaultValue=Schema.Load( name='a' ) ), Schema.ParamList( name='p' ), Schema.KWParamList( name='w' ) ], None ] )
-		self._parseStringTest( g.params(), 'f,m=a,*p', [ [ Schema.SimpleParam( name='f' ), Schema.DefaultValueParam( name='m', defaultValue=Schema.Load( name='a' ) ), Schema.ParamList( name='p' ) ], None ] )
-		self._parseStringTest( g.params(), 'f,m=a,**w', [ [ Schema.SimpleParam( name='f' ), Schema.DefaultValueParam( name='m', defaultValue=Schema.Load( name='a' ) ), Schema.KWParamList( name='w' ) ], None ] )
+		self._parseStringTest( g.params(), 'f,g,m=a', [ [ Schema.SimpleParam( name='f' ), Schema.SimpleParam( name='g' ), Schema.DefaultValueParam( param=Schema.SimpleParam( name='m' ), defaultValue=Schema.Load( name='a' ) ) ], None ] )
+		self._parseStringTest( g.params(), 'f,g,m=a,n=b', [ [ Schema.SimpleParam( name='f' ), Schema.SimpleParam( name='g' ), Schema.DefaultValueParam( param=Schema.SimpleParam( name='m' ), defaultValue=Schema.Load( name='a' ) ),
+								      Schema.DefaultValueParam( param=Schema.SimpleParam( name='n' ), defaultValue=Schema.Load( name='b' ) ) ], None ] )
+
+		self._parseStringTest( g.params(), '(f)', [ [ Schema.TupleParam( params=[ Schema.SimpleParam( name='f' ) ], paramsTrailingSeparator=None ) ], None ] )
+		self._parseStringTest( g.params(), '(f,)', [ [ Schema.TupleParam( params=[ Schema.SimpleParam( name='f' ) ], paramsTrailingSeparator='1' ) ], None ] )
+		self._parseStringTest( g.params(), '(f,g)', [ [ Schema.TupleParam( params=[ Schema.SimpleParam( name='f' ), Schema.SimpleParam( name='g' ) ], paramsTrailingSeparator=None ) ], None ] )
+		self._parseStringTest( g.params(), '(f,g,m)=a', [ [ Schema.DefaultValueParam( param=Schema.TupleParam( params=[ Schema.SimpleParam( name='f' ), Schema.SimpleParam( name='g' ), Schema.SimpleParam( name='m' ) ],
+												paramsTrailingSeparator=None ), defaultValue=Schema.Load( name='a' ) ) ], None ] )
+
+		self._parseStringTest( g.params(), '(f,g), (h,i)', [ [ Schema.TupleParam( params=[ Schema.SimpleParam( name='f' ), Schema.SimpleParam( name='g' ) ], paramsTrailingSeparator=None ),
+								       Schema.TupleParam( params=[ Schema.SimpleParam( name='h' ), Schema.SimpleParam( name='i' ) ], paramsTrailingSeparator=None )], None ] )
+		self._parseStringTest( g.params(), '(f,g), (h,i)=a', [ [ Schema.TupleParam( params=[ Schema.SimpleParam( name='f' ), Schema.SimpleParam( name='g' ) ], paramsTrailingSeparator=None ),
+								       Schema.DefaultValueParam( param=Schema.TupleParam( params=[ Schema.SimpleParam( name='h' ), Schema.SimpleParam( name='i' ) ], paramsTrailingSeparator=None ),
+											defaultValue=Schema.Load( name='a' ) ) ], None ] )
+
+		self._parseStringTest( g.params(), 'f,g,m=a,n=b,*p', [ [ Schema.SimpleParam( name='f' ), Schema.SimpleParam( name='g' ), Schema.DefaultValueParam( param=Schema.SimpleParam( name='m' ), defaultValue=Schema.Load( name='a' ) ),
+												Schema.DefaultValueParam( param=Schema.SimpleParam( name='n' ), defaultValue=Schema.Load( name='b' ) ), Schema.ParamList( name='p' ) ], None ] )
+		self._parseStringTest( g.params(), 'f,m=a,*p,**w', [ [ Schema.SimpleParam( name='f' ), Schema.DefaultValueParam( param=Schema.SimpleParam( name='m' ), defaultValue=Schema.Load( name='a' ) ), Schema.ParamList( name='p' ),
+																 Schema.KWParamList( name='w' ) ], None ] )
+		self._parseStringTest( g.params(), 'f,m=a,*p', [ [ Schema.SimpleParam( name='f' ), Schema.DefaultValueParam( param=Schema.SimpleParam( name='m' ), defaultValue=Schema.Load( name='a' ) ), Schema.ParamList( name='p' ) ], None ] )
+		self._parseStringTest( g.params(), 'f,m=a,**w', [ [ Schema.SimpleParam( name='f' ), Schema.DefaultValueParam( param=Schema.SimpleParam( name='m' ), defaultValue=Schema.Load( name='a' ) ), Schema.KWParamList( name='w' ) ], None ] )
 		self._parseStringTest( g.params(), 'f,*p,**w', [ [ Schema.SimpleParam( name='f' ), Schema.ParamList( name='p' ), Schema.KWParamList( name='w' ) ], None ] )
-		self._parseStringTest( g.params(), 'm=a,*p,**w', [ [ Schema.DefaultValueParam( name='m', defaultValue=Schema.Load( name='a' ) ), Schema.ParamList( name='p' ), Schema.KWParamList( name='w' ) ], None ] )
+		self._parseStringTest( g.params(), 'm=a,*p,**w', [ [ Schema.DefaultValueParam( param=Schema.SimpleParam( name='m' ), defaultValue=Schema.Load( name='a' ) ), Schema.ParamList( name='p' ), Schema.KWParamList( name='w' ) ], None ] )
 		self._parseStringTest( g.params(), '*p,**w', [ [ Schema.ParamList( name='p' ), Schema.KWParamList( name='w' ) ], None ] )
 		self._parseStringTest( g.params(), '**w', [ [ Schema.KWParamList( name='w' ) ], None ] )
 		self._parseStringFailTest( g.params(), 'm=a,f' )
@@ -1542,7 +1563,7 @@ class TestCase_Python25Parser (ParserTestCase):
 	def testLambda(self):
 		g = Python25Grammar()
 		self._parseStringTest( g.expression(), 'lambda f,m=a,*p,**w: f+m+p+w', Schema.LambdaExpr( 
-			params=[ Schema.SimpleParam( name='f' ), Schema.DefaultValueParam( name='m', defaultValue=Schema.Load( name='a' ) ), Schema.ParamList( name='p' ), Schema.KWParamList( name='w' ) ],
+			params=[ Schema.SimpleParam( name='f' ), Schema.DefaultValueParam( param=Schema.SimpleParam( name='m' ), defaultValue=Schema.Load( name='a' ) ), Schema.ParamList( name='p' ), Schema.KWParamList( name='w' ) ],
 			expr=Schema.Add( x=Schema.Add( x=Schema.Add( x=Schema.Load( name='f' ), y=Schema.Load( name='m' ) ), y=Schema.Load( name='p' ) ), y=Schema.Load( name='w' ) ) ) )
 
 

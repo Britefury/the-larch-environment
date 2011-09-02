@@ -10,7 +10,7 @@ from BritefuryJ.DocModel import DMSchema, DMObjectClass, DMNode
 
 
 
-schema = DMSchema( 'Python25', 'py', 'LarchCore.Languages.Python25', 4 )
+schema = DMSchema( 'Python25', 'py', 'LarchCore.Languages.Python25', 5 )
 
 
 #
@@ -114,7 +114,8 @@ AndTest = schema.newClass( 'AndTest', BinOp, [] )
 OrTest = schema.newClass( 'OrTest', BinOp, [] )
 # Parameters for lambda / function definition
 SimpleParam = schema.newClass( 'SimpleParam', Node, [ 'name' ] )
-DefaultValueParam = schema.newClass( 'DefaultValueParam', Node, [ 'name', 'defaultValue' ] )
+TupleParam = schema.newClass( 'TupleParam', Node, [ 'params', 'paramsTrailingSeparator' ] )
+DefaultValueParam = schema.newClass( 'DefaultValueParam', Node, [ 'param', 'defaultValue' ] )
 ParamList = schema.newClass( 'ParamList', Node, [ 'name' ] )
 KWParamList = schema.newClass( 'KWParamList', Node, [ 'name' ] )
 # Lambda
@@ -318,3 +319,20 @@ def _readInlineObjectStmt_v3(fieldValues):
 
 schema.registerReader( 'InlineObjectExpr', 3, _readInlineObjectExpr_v3 )
 schema.registerReader( 'InlineObjectStmt', 3, _readInlineObjectStmt_v3 )
+
+
+
+
+#
+#
+# Version 4 backwards compatibility
+#
+#
+
+def _readDefaultValueParam_v4(fieldValues):
+	# Version 4 stored a name and defaultValue
+	name = fieldValues['name']
+	defaultValue = fieldValues['defaultValue']
+	return DefaultValueParam( param=SimpleParam( name=name ), defaultValue=defaultValue )
+
+schema.registerReader( 'DefaultValueParam', 4, _readDefaultValueParam_v4 )
