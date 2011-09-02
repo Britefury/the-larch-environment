@@ -39,9 +39,9 @@ class _Importer (object):
 def _extractParameters(node):
 	numDefaultParams = len( node.defaults )
 	numSimpleParams = len( node.args )  -  numDefaultParams
-	
-	params = [ Schema.SimpleParam( name=name.id )   for name in node.args[:numSimpleParams] ]
-	params.extend( [ Schema.DefaultValueParam( name=name.id, defaultValue=_expr( value ) )   for name, value in zip( node.args[numSimpleParams:], node.defaults ) ] )
+
+	params = [ _param( p )   for p in node.args[:numSimpleParams] ]
+	params.extend( [ Schema.DefaultValueParam( param=_param( p ), defaultValue=_expr( value ) )   for p, value in zip( node.args[numSimpleParams:], node.defaults ) ] )
 	
 	if node.vararg is not None:
 		params.append( Schema.ParamList( name=node.vararg ) )
@@ -49,6 +49,27 @@ def _extractParameters(node):
 		params.append( Schema.KWParamList( name=node.kwarg ) )
 	
 	return params
+
+
+
+
+
+class _ParamImporter (_Importer):
+	def __call__(self, node, method=None):
+		if method is None:
+			name = _getNodeTypeName( node )
+			try:
+				method = getattr( self, name )
+			except AttributeError:
+				return _expr( node )
+		return method( node )
+
+
+	def Name(self, node):
+		return Schema.SimpleParam( name=node.id )
+
+	def Tuple(self, node):
+		return Schema.TupleParam( params=[ _param( x )   for x in node.elts ] )
 
 
 
@@ -600,7 +621,8 @@ class _ModuleImporter (_Importer):
 	
 	
 	
-	
+
+_param = _ParamImporter()
 _target = _TargetImporter()
 _listComp = _ListCompImporter()
 _genExp = _GenExprImporter()
@@ -1031,14 +1053,33 @@ class ImporterTestCase (unittest.TestCase):
 		self._exprTest( 'lambda f: x', Schema.LambdaExpr( params=[ Schema.SimpleParam( name='f' ) ], expr=Schema.Load( name='x' ) ) )
 		self._exprTest( 'lambda f,: x', Schema.LambdaExpr( params=[ Schema.SimpleParam( name='f' ) ], expr=Schema.Load( name='x' ) ) )
 		self._exprTest( 'lambda f,g: x', Schema.LambdaExpr( params=[ Schema.SimpleParam( name='f' ), Schema.SimpleParam( name='g' ) ], expr=Schema.Load( name='x' ) ) )
-		self._exprTest( 'lambda f,g,m=a: x', Schema.LambdaExpr( params=[ Schema.SimpleParam( name='f' ), Schema.SimpleParam( name='g' ), Schema.DefaultValueParam( name='m', defaultValue=Schema.Load( name='a' ) ) ], expr=Schema.Load( name='x' ) ) )
-		self._exprTest( 'lambda f,g,m=a,n=b: x', Schema.LambdaExpr( params=[ Schema.SimpleParam( name='f' ), Schema.SimpleParam( name='g' ), Schema.DefaultValueParam( name='m', defaultValue=Schema.Load( name='a' ) ), Schema.DefaultValueParam( name='n', defaultValue=Schema.Load( name='b' ) ) ], expr=Schema.Load( name='x' ) ) )
-		self._exprTest( 'lambda f,g,m=a,n=b,*p: x', Schema.LambdaExpr( params=[ Schema.SimpleParam( name='f' ), Schema.SimpleParam( name='g' ), Schema.DefaultValueParam( name='m', defaultValue=Schema.Load( name='a' ) ), Schema.DefaultValueParam( name='n', defaultValue=Schema.Load( name='b' ) ), Schema.ParamList( name='p' ) ], expr=Schema.Load( name='x' ) ) )
-		self._exprTest( 'lambda f,m=a,*p,**w: x', Schema.LambdaExpr( params=[ Schema.SimpleParam( name='f' ), Schema.DefaultValueParam( name='m', defaultValue=Schema.Load( name='a' ) ), Schema.ParamList( name='p' ), Schema.KWParamList( name='w' ) ], expr=Schema.Load( name='x' ) ) )
-		self._exprTest( 'lambda f,m=a,*p: x', Schema.LambdaExpr( params=[ Schema.SimpleParam( name='f' ), Schema.DefaultValueParam( name='m', defaultValue=Schema.Load( name='a' ) ), Schema.ParamList( name='p' ) ], expr=Schema.Load( name='x' ) ) )
-		self._exprTest( 'lambda f,m=a,**w: x', Schema.LambdaExpr( params=[ Schema.SimpleParam( name='f' ), Schema.DefaultValueParam( name='m', defaultValue=Schema.Load( name='a' ) ), Schema.KWParamList( name='w' ) ], expr=Schema.Load( name='x' ) ) )
+		self._exprTest( 'lambda f,(g,h): x', Schema.LambdaExpr( params=[ Schema.SimpleParam( name='f' ),
+										 Schema.TupleParam( params=[ Schema.SimpleParam( name='g' ), Schema.SimpleParam( name='h' ) ] ) ], expr=Schema.Load( name='x' ) ) )
+		self._exprTest( 'lambda f,g,m=a: x', Schema.LambdaExpr( params=[ Schema.SimpleParam( name='f' ), Schema.SimpleParam( name='g' ),
+										 Schema.DefaultValueParam( param=Schema.SimpleParam( name='m' ), defaultValue=Schema.Load( name='a' ) ) ], expr=Schema.Load( name='x' ) ) )
+		self._exprTest( 'lambda f,(g,m)=a: x', Schema.LambdaExpr( params=[ Schema.SimpleParam( name='f' ),
+										 Schema.DefaultValueParam( param=Schema.TupleParam( params=[ Schema.SimpleParam( name='g' ), Schema.SimpleParam( name='m' ) ] ),
+																    defaultValue=Schema.Load( name='a' ) ) ],
+									  expr=Schema.Load( name='x' ) ) )
+		self._exprTest( 'lambda f,g,m=a,n=b: x', Schema.LambdaExpr( params=[ Schema.SimpleParam( name='f' ), Schema.SimpleParam( name='g' ),
+										     Schema.DefaultValueParam( param=Schema.SimpleParam( name='m' ), defaultValue=Schema.Load( name='a' ) ),
+										     Schema.DefaultValueParam( param=Schema.SimpleParam( name='n' ), defaultValue=Schema.Load( name='b' ) ) ], expr=Schema.Load( name='x' ) ) )
+		self._exprTest( 'lambda f,g,m=a,n=b,*p: x', Schema.LambdaExpr( params=[ Schema.SimpleParam( name='f' ), Schema.SimpleParam( name='g' ),
+											Schema.DefaultValueParam( param=Schema.SimpleParam( name='m' ), defaultValue=Schema.Load( name='a' ) ),
+											Schema.DefaultValueParam( param=Schema.SimpleParam( name='n' ), defaultValue=Schema.Load( name='b' ) ),
+											Schema.ParamList( name='p' ) ], expr=Schema.Load( name='x' ) ) )
+		self._exprTest( 'lambda f,m=a,*p,**w: x', Schema.LambdaExpr( params=[ Schema.SimpleParam( name='f' ),
+										      Schema.DefaultValueParam( param=Schema.SimpleParam( name='m' ), defaultValue=Schema.Load( name='a' ) ),
+										      Schema.ParamList( name='p' ), Schema.KWParamList( name='w' ) ], expr=Schema.Load( name='x' ) ) )
+		self._exprTest( 'lambda f,m=a,*p: x', Schema.LambdaExpr( params=[ Schema.SimpleParam( name='f' ),
+										  Schema.DefaultValueParam( param=Schema.SimpleParam( name='m' ), defaultValue=Schema.Load( name='a' ) ),
+										  Schema.ParamList( name='p' ) ], expr=Schema.Load( name='x' ) ) )
+		self._exprTest( 'lambda f,m=a,**w: x', Schema.LambdaExpr( params=[ Schema.SimpleParam( name='f' ),
+										   Schema.DefaultValueParam( param=Schema.SimpleParam( name='m' ), defaultValue=Schema.Load( name='a' ) ),
+										   Schema.KWParamList( name='w' ) ], expr=Schema.Load( name='x' ) ) )
 		self._exprTest( 'lambda f,*p,**w: x', Schema.LambdaExpr( params=[ Schema.SimpleParam( name='f' ), Schema.ParamList( name='p' ), Schema.KWParamList( name='w' ) ], expr=Schema.Load( name='x' ) ) )
-		self._exprTest( 'lambda m=a,*p,**w: x', Schema.LambdaExpr( params=[ Schema.DefaultValueParam( name='m', defaultValue=Schema.Load( name='a' ) ), Schema.ParamList( name='p' ), Schema.KWParamList( name='w' ) ], expr=Schema.Load( name='x' ) ) )
+		self._exprTest( 'lambda m=a,*p,**w: x', Schema.LambdaExpr( params=[ Schema.DefaultValueParam( param=Schema.SimpleParam( name='m' ), defaultValue=Schema.Load( name='a' ) ),
+										    Schema.ParamList( name='p' ), Schema.KWParamList( name='w' ) ], expr=Schema.Load( name='x' ) ) )
 		self._exprTest( 'lambda *p,**w: x', Schema.LambdaExpr( params=[ Schema.ParamList( name='p' ), Schema.KWParamList( name='w' ) ], expr=Schema.Load( name='x' ) ) )
 		self._exprTest( 'lambda **w: x', Schema.LambdaExpr( params=[ Schema.KWParamList( name='w' ) ], expr=Schema.Load( name='x' ) ) )
 		
@@ -1314,7 +1355,9 @@ def f():
 def f():
 	x"""
 		self._compStmtTest( src1, [ Schema.BlankLine(), Schema.DefStmt( decorators=[], name='f', params=[], suite=[ Schema.ExprStmt( expr=Schema.Load( name='x' ) ) ] ) ] )
-		self._compStmtTest( src2, [ Schema.BlankLine(), Schema.DefStmt( decorators=[], name='f', params=[ Schema.SimpleParam( name='a' ), Schema.DefaultValueParam( name='b', defaultValue=Schema.Load( name='q' ) ), Schema.ParamList( name='c' ), Schema.KWParamList( name='d' ) ], suite=[ Schema.ExprStmt( expr=Schema.Load( name='x' ) ) ] ) ] )
+		self._compStmtTest( src2, [ Schema.BlankLine(), Schema.DefStmt( decorators=[], name='f', params=[ Schema.SimpleParam( name='a' ),
+														  Schema.DefaultValueParam( param=Schema.SimpleParam( name='b' ), defaultValue=Schema.Load( name='q' ) ), Schema.ParamList( name='c' ),
+														  Schema.KWParamList( name='d' ) ], suite=[ Schema.ExprStmt( expr=Schema.Load( name='x' ) ) ] ) ] )
 		self._compStmtTest( src3, [ Schema.BlankLine(), Schema.DefStmt( decorators=[ Schema.Decorator( name='p', args=None ) ], name='f', params=[], suite=[ Schema.ExprStmt( expr=Schema.Load( name='x' ) ) ] ) ] )
 		self._compStmtTest( src4, [ Schema.BlankLine(), Schema.DefStmt( decorators=[ Schema.Decorator( name='p', args=[ Schema.Load( name='h' ) ] ) ], name='f', params=[], suite=[ Schema.ExprStmt( expr=Schema.Load( name='x' ) ) ] ) ] )
 		self._compStmtTest( src5, [ Schema.BlankLine(), Schema.DefStmt( decorators=[ Schema.Decorator( name='p', args=[ Schema.Load( name='h' ) ] ), Schema.Decorator( name='q', args=[ Schema.Load( name='j' ) ] ) ], name='f', params=[], suite=[ Schema.ExprStmt( expr=Schema.Load( name='x' ) ) ] ) ] )

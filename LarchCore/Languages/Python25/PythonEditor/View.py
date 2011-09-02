@@ -882,10 +882,16 @@ class Python25View (ObjectNodeDispatchView):
 	def SimpleParam(self, fragment, inheritedState, model, name):
 		return simpleParam( name )
 
+	@DMObjectNodeDispatchMethod( Schema.TupleParam )
+	def TupleParam(self, fragment, inheritedState, model, params, paramsTrailingSeparator):
+		paramViews = SREInnerFragment.map( params, PRECEDENCE_NONE )
+		return tupleParam( paramViews, paramsTrailingSeparator is not None )
+
 	@DMObjectNodeDispatchMethod( Schema.DefaultValueParam )
-	def DefaultValueParam(self, fragment, inheritedState, model, name, defaultValue):
+	def DefaultValueParam(self, fragment, inheritedState, model, param, defaultValue):
+		paramView = SREInnerFragment( param, PRECEDENCE_NONE )
 		valueView = SREInnerFragment( defaultValue, PRECEDENCE_NONE )
-		return defaultValueParam( name, valueView )
+		return defaultValueParam( paramView, valueView )
 
 	@DMObjectNodeDispatchMethod( Schema.ParamList )
 	def ParamList(self, fragment, inheritedState, model, name):

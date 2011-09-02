@@ -460,9 +460,23 @@ def simpleParam(name):
 	return ApplyStyleSheetFromAttribute( PythonEditorStyle.paramStyle, Text( name ) )
 
 
-def defaultValueParam(name, defaultValue):
-	nameView = ApplyStyleSheetFromAttribute( PythonEditorStyle.paramStyle, Text( name ) )
-	return Span( [ nameView, _equals, defaultValue ] )
+def tupleParam(params, bParamsTrailingSeparator):
+	elements = []
+	if len( params ) > 0:
+		for p in params[:-1]:
+			elements.append( p )
+			elements.append( _comma )
+			elements.append( _space )
+			elements.append( _lineBreak )
+		elements.append( params[-1] )
+		if bParamsTrailingSeparator:
+			elements.append( _comma )
+
+	return Span( [ _openParen, ParagraphIndentMatchSpan( elements ), _closeParen ] )
+
+
+def defaultValueParam(param, defaultValue):
+	return Span( [ param, _equals, defaultValue ] )
 
 
 def paramList(name):

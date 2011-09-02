@@ -488,9 +488,13 @@ class Python25CodeGenerator (object):
 	def SimpleParam(self, node, name):
 		return name
 	
+	@DMObjectNodeDispatchMethod( Schema.TupleParam )
+	def TupleParam(self, node, params, paramsTrailingSeparator):
+		return '(' + ', '.join( [ self( p, PRECEDENCE_NONE )   for p in params ] ) + ( ','   if paramsTrailingSeparator is not None   else '' ) + ')'
+
 	@DMObjectNodeDispatchMethod( Schema.DefaultValueParam )
-	def DefaultValueParam(self, node, name, defaultValue):
-		return name  +  '='  +  self( defaultValue, PRECEDENCE_NONE )
+	def DefaultValueParam(self, node, param, defaultValue):
+		return self( param, PRECEDENCE_NONE )  +  '='  +  self( defaultValue, PRECEDENCE_NONE )
 	
 	@DMObjectNodeDispatchMethod( Schema.ParamList )
 	def ParamList(self, node, name):
@@ -1085,7 +1089,7 @@ import unittest
 
 class TestCase_Python25CodeGenerator (unittest.TestCase):
 	def _testSX(self, sx, expected):
-		sx = '{ py=LarchCore.Languages.Python25<2> : ' + sx + ' }'
+		sx = '{ py=LarchCore.Languages.Python25<5> : ' + sx + ' }'
 		data = DMIOReader.readFromString( sx )
 		
 		gen = Python25CodeGenerator( '<test>' )
@@ -1104,7 +1108,7 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 		
 		
 	def _testGenSX(self, gen, sx, expected):
-		sx = '{ py=LarchCore.Languages.Python25 : ' + sx + ' }'
+		sx = '{ py=LarchCore.Languages.Python25<5> : ' + sx + ' }'
 		data = DMIOReader.readFromString( sx )
 		
 		result = str( gen( data ) )
@@ -1283,8 +1287,13 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 		
 		
 	def test_LambdaExpr(self):
-		self._testSX( '(py LambdaExpr params=[(py SimpleParam name=a) (py SimpleParam name=b) (py DefaultValueParam name=c defaultValue=(py Load name=d)) (py DefaultValueParam name=e defaultValue=(py Load name=f)) (py ParamList name=g) (py KWParamList name=h)] expr=(py Load name=a))',
-		              'lambda a, b, c=d, e=f, *g, **h: a' )
+		self._testSX( '(py LambdaExpr params=[(py SimpleParam name=a) (py SimpleParam name=b) '+\
+				'(py TupleParam params=[(py SimpleParam name=i) (py SimpleParam name=j)]) '
+			      '(py DefaultValueParam param=(py SimpleParam name=c) defaultValue=(py Load name=d))'+\
+			      '(py DefaultValueParam param=(py SimpleParam name=e) defaultValue=(py Load name=f)) '+\
+			      '(py DefaultValueParam param=(py TupleParam params=[(py SimpleParam name=k) (py SimpleParam name=l)]) defaultValue=(py Load name=x)) '+\
+			      '(py ParamList name=g) (py KWParamList name=h)] expr=(py Load name=a))',
+		              'lambda a, b, (i, j), c=d, e=f, (k, l)=x, *g, **h: a' )
 	
 		
 	def test_ConditionalExpr(self):
@@ -1435,9 +1444,14 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 
 		
 	def test_defStmt(self):
-		self._testSX( '(py DefStmt decorators=[] name=myFunc params=[(py SimpleParam name=a) (py DefaultValueParam name=b defaultValue=(py Load name=c)) (py ParamList name=d) (py KWParamList name=e)] suite=[(py ExprStmt expr=(py Load name=b))])', 'def myFunc(a, b=c, *d, **e):\n\tb\n' )
-		self._testSX( '(py DefStmt decorators=[(py Decorator name=myDeco args=`null`)] name=myFunc params=[(py SimpleParam name=a) (py DefaultValueParam name=b defaultValue=(py Load name=c)) (py ParamList name=d) (py KWParamList name=e)] suite=[(py ExprStmt expr=(py Load name=b))])', '@myDeco\ndef myFunc(a, b=c, *d, **e):\n\tb\n' )
-		self._testSX( '(py DefStmt decorators=[(py Decorator name=myDeco args=`null`) (py Decorator name=myDeco args=[(py Load name=a) (py Load name=b)])] name=myFunc params=[(py SimpleParam name=a) (py DefaultValueParam name=b defaultValue=(py Load name=c)) (py ParamList name=d) (py KWParamList name=e)] suite=[(py ExprStmt expr=(py Load name=b))])', '@myDeco\n@myDeco( a, b )\ndef myFunc(a, b=c, *d, **e):\n\tb\n' )
+		self._testSX( '(py DefStmt decorators=[] name=myFunc params=[(py SimpleParam name=a) (py DefaultValueParam param=(py SimpleParam name=b) defaultValue=(py Load name=c)) '+\
+			      '(py ParamList name=d) (py KWParamList name=e)] suite=[(py ExprStmt expr=(py Load name=b))])', 'def myFunc(a, b=c, *d, **e):\n\tb\n' )
+		self._testSX( '(py DefStmt decorators=[(py Decorator name=myDeco args=`null`)] name=myFunc params=[(py SimpleParam name=a) ' +\
+			      '(py DefaultValueParam param=(py SimpleParam name=b) defaultValue=(py Load name=c)) (py ParamList name=d) (py KWParamList name=e)] suite=[(py ExprStmt expr=(py Load name=b))])',
+			      '@myDeco\ndef myFunc(a, b=c, *d, **e):\n\tb\n' )
+		self._testSX( '(py DefStmt decorators=[(py Decorator name=myDeco args=`null`) (py Decorator name=myDeco args=[(py Load name=a) (py Load name=b)])] '+\
+			      'name=myFunc params=[(py SimpleParam name=a) (py DefaultValueParam param=(py SimpleParam name=b) defaultValue=(py Load name=c)) (py ParamList name=d) '+\
+			      '(py KWParamList name=e)] suite=[(py ExprStmt expr=(py Load name=b))])', '@myDeco\n@myDeco( a, b )\ndef myFunc(a, b=c, *d, **e):\n\tb\n' )
 
 
 	def test_classStmt(self):
