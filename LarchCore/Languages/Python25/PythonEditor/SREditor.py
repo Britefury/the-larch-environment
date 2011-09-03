@@ -16,9 +16,6 @@ from BritefuryJ.DocPresent import *
 from BritefuryJ.Editor.Sequential import SequentialClipboardHandler, SelectionEditTreeEvent
 
 
-from Britefury.Util.NodeUtil import *
-
-
 from BritefuryJ.Editor.SyntaxRecognizing import SyntaxRecognizingEditor
 
 from LarchCore.Languages.Python25 import Schema

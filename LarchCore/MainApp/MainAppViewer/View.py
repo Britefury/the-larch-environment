@@ -25,9 +25,6 @@ from Britefury.Kernel.View.DispatchView import ObjectDispatchView
 from Britefury.Kernel.Document import Document
 
 
-from Britefury.Util.NodeUtil import *
-
-
 from BritefuryJ.AttributeTable import *
 
 from BritefuryJ.StyleSheet import *

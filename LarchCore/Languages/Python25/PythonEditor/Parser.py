@@ -20,8 +20,6 @@ from BritefuryJ.DocPresent.StreamValue import StreamValueBuilder
 
 from Britefury.Tests.BritefuryJ.Parser.ParserTestCase import ParserTestCase
 
-from Britefury.Util.NodeUtil import isStringNode
-
 from Britefury.Grammar.Grammar import Grammar, Rule, RuleList
 
 from LarchCore.Languages.Python25 import Schema
@@ -44,7 +42,7 @@ def _incrementParens(node):
 		return node
 	p = node['parens']
 	numParens = 0
-	if p is not None   and   isStringNode( p ):
+	if p is not None   and   ( isinstance( p, str )  or  isinstance( p, unicode ) ):
 		p = str( p )
 		try:
 			numParens = int( p )

@@ -21,8 +21,6 @@ from Britefury.Dispatch.ObjectMethodDispatch import ObjectDispatchMethod
 from Britefury.Kernel.View.DispatchView import ObjectDispatchView
 
 
-from Britefury.Util.NodeUtil import *
-
 from BritefuryJ.IncrementalUnit import LiteralUnit
 
 from BritefuryJ.AttributeTable import *
