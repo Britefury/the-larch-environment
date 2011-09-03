@@ -54,6 +54,8 @@ from LarchCore.Worksheet.WorksheetEditor.RichTextEditor import WorksheetRichText
 
 
 
+_editableStyle = StyleSheet.style( Primitive.editable( True ) )
+
 _pythonCodeHeaderStyle = StyleSheet.style( Primitive.background( FillPainter( Color( 0.75, 0.8, 0.925 ) ) ) )
 _pythonCodeBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) ) )
 _pythonCodeEditorBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 2.0, 5.0, 20.0, 20.0, Color( 0.4, 0.5, 0.6 ), None ) ) )
@@ -492,7 +494,7 @@ class WorksheetEditor (ObjectDispatchView):
 	@ObjectDispatchMethod( EditorSchema.InlineEmbeddedObjectEditor )
 	def InlineEmbeddedObject(self, fragment, inheritedState, node):
 		value = node.getValue()
-		valueView = ApplyPerspective( None, value )
+		valueView = _editableStyle.applyTo( ApplyPerspective( None, value ) )
 		p = ObjectBorder( valueView )
 		p = p.withContextMenuInteractor( _inlineEmbeddedObjectContextMenuFactory )
 		p = WorksheetRichTextEditor.instance.editableInlineEmbed( node, p )
@@ -503,7 +505,7 @@ class WorksheetEditor (ObjectDispatchView):
 	@ObjectDispatchMethod( EditorSchema.ParagraphEmbeddedObjectEditor )
 	def ParagraphEmbeddedObject(self, fragment, inheritedState, node):
 		value = node.getValue()
-		valueView = ApplyPerspective( None, value )
+		valueView = _editableStyle.applyTo( ApplyPerspective( None, value ) )
 		p = ObjectBorder( valueView )
 		p = p.withContextMenuInteractor( _paragraphEmbeddedObjectContextMenuFactory )
 		p = WorksheetRichTextEditor.instance.editableParagraphEmbed( node, p )

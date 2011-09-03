@@ -23,9 +23,6 @@ from Britefury.Dispatch.ObjectMethodDispatch import ObjectDispatchMethod
 from Britefury.Kernel.View.DispatchView import ObjectDispatchView
 
 
-from Britefury.Util.NodeUtil import *
-from Britefury.Util.InstanceCache import instanceCache
-
 from BritefuryJ.AttributeTable import *
 
 from BritefuryJ.DocPresent import *
@@ -47,13 +44,13 @@ from LarchCore.Languages.Python25 import Python25
 from LarchCore.Languages.Python25.CodeGenerator import compileForModuleExecution
 from LarchCore.Languages.Python25.Execution.ExecutionPresCombinators import executionResultBox, minimalExecutionResultBox
 
-from LarchCore.Project.ProjectEditor.Subject import ProjectSubject
-
 from LarchCore.Worksheet import Schema
 from LarchCore.Worksheet.WorksheetViewer import ViewSchema
 from LarchCore.Worksheet.WorksheetEditor.View import WorksheetEditorSubject
 
 
+
+_editableStyle = StyleSheet.style( Primitive.editable( True ) )
 
 _pythonCodeBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) ) )
 _pythonCodeEditorBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 2.0, 5.0, 20.0, 20.0, Color( 0.4, 0.5, 0.6 ), None ) ) )
@@ -195,7 +192,7 @@ class WorksheetViewer (ObjectDispatchView):
 	@ObjectDispatchMethod( ViewSchema.InlineEmbeddedObjectView )
 	def InlineEmbeddedObject(self, fragment, inheritedState, node):
 		value = node.getValue()
-		valueView = ApplyPerspective( None, value )
+		valueView = _editableStyle.applyTo( ApplyPerspective( None, value ) )
 		return valueView
 
 
@@ -203,7 +200,7 @@ class WorksheetViewer (ObjectDispatchView):
 	@ObjectDispatchMethod( ViewSchema.ParagraphEmbeddedObjectView )
 	def ParagraphEmbeddedObject(self, fragment, inheritedState, node):
 		value = node.getValue()
-		valueView = ApplyPerspective( None, value )
+		valueView = _editableStyle.applyTo( ApplyPerspective( None, value ) )
 		p = ObjectBorder( valueView )
 		return p
 

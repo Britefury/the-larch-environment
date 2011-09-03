@@ -78,6 +78,7 @@ def _makeSuiteCommitFn(suite):
 	return _commit
 
 def _isValidUnparsedStatementValue(value):
+	# Unparsed statement is only valid if there is ONE newline, and it is at the end
 	i = value.indexOf( '\n' )
 	return i != -1   and   i == len( value ) - 1
 
@@ -372,7 +373,7 @@ class Python25View (ObjectNodeDispatchView):
 		self._expr = editor.parsingNodeEditListener( 'Expression', grammar.expression(), pyReplaceNode )
 		self._stmt = editor.parsingNodeEditListener( 'Statement', grammar.simpleSingleLineStatementValid(), pyReplaceNode )
 		self._compHdr = editor.partialParsingNodeEditListener( 'Compound header', grammar.compoundStmtHeader() )
-		self._stmtUnparsed = editor.unparsedNodeEditListener( 'Statement', _isValidUnparsedStatementValue, _commitUnparsedStatment, _commitInnerUnparsed )
+		self._stmtUnparsed = editor.unparsedNodeEditListener( 'Unparsed statement', _isValidUnparsedStatementValue, _commitUnparsedStatment, _commitInnerUnparsed )
 		self._topLevel = editor.topLevelNodeEditListener()
 		self._exprOuter = PythonExpressionEditListener( grammar.tupleOrExpression() )
 		self._exprTopLevel = PythonExpressionTopLevelEditListener()

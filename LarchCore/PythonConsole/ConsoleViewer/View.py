@@ -20,9 +20,6 @@ from Britefury.Kernel.View.DispatchView import ObjectDispatchView
 from Britefury.Kernel.Document import Document
 
 
-from Britefury.Util.NodeUtil import *
-
-
 from BritefuryJ.IncrementalUnit import LiteralUnit
 
 from BritefuryJ.AttributeTable import *
