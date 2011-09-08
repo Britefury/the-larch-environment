@@ -252,19 +252,19 @@ def _pythonModuleContextMenuFactory(element, menu):
 		caret = rootElement.getCaret()
 		if caret.isValid():
 			pyExpr = Schema.Quote( value=Schema.PythonExpression( expr=Schema.Load( name='None' ) ) )
-			_insertSpecialForm( caret, pyExpr )
+			insertSpecialFormAtCaret( caret, pyExpr )
 
 	def _onQuoteSuite(item):
 		caret = rootElement.getCaret()
 		if caret.isValid():
 			pyExpr = Schema.Quote( value=Schema.PythonSuite( suite=[] ) )
-			_insertSpecialForm( caret, pyExpr )
+			insertSpecialFormAtCaret( caret, pyExpr )
 
 	def _onUnquote(item):
 		caret = rootElement.getCaret()
 		if caret.isValid():
 			pyExpr = Schema.Unquote( value=Schema.PythonExpression( expr=Schema.Load( name='None' ) ) )
-			_insertSpecialForm( caret, pyExpr )
+			insertSpecialFormAtCaret( caret, pyExpr )
 
 
 	menu.add( MenuItem.menuItemWithLabel( 'Quote expression', _onQuoteExpr ) )
