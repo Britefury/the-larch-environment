@@ -143,8 +143,9 @@ public abstract class DMNode
 		else
 		{
 			Object copy = createDeepCopy( memo );
+			value = Py.java2py( copy );
 			memo.__setitem__( key, value );
-			return Py.java2py( copy );
+			return value;
 		}
 	}
 
