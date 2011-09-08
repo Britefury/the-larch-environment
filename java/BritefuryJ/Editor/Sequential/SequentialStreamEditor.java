@@ -45,13 +45,8 @@ public abstract class SequentialStreamEditor extends SequentialEditor
 	
 	
 	
-	// Override the following methods in SequentialEditor to support StreamValue objects
-
-	public Object getSequentialContentInSelection(FragmentView subtreeRootFragment, DPElement subtreeRootFragmentElement, TextSelection selection)
+	private StreamValue copyStream(StreamValue stream)
 	{
-		SequentialStreamValueVisitor visitor = new SequentialStreamValueVisitor();
-		StreamValue stream = visitor.getStreamValueInTextSelection( selection );
-		
 		StreamValueBuilder builder = new StreamValueBuilder();
 		for (StreamValue.Item item: stream.getItems())
 		{
@@ -66,8 +61,18 @@ public abstract class SequentialStreamEditor extends SequentialEditor
 				builder.appendTextValue( textItem.getValue() );
 			}
 		}
-		
 		return builder.stream();
+	}
+	
+	
+	
+	// Override the following methods in SequentialEditor to support StreamValue objects
+
+	public Object getSequentialContentInSelection(FragmentView subtreeRootFragment, DPElement subtreeRootFragmentElement, TextSelection selection)
+	{
+		SequentialStreamValueVisitor visitor = new SequentialStreamValueVisitor();
+		StreamValue stream = visitor.getStreamValueInTextSelection( selection );
+		return copyStream( stream );
 	}
 
 	public Object spliceForInsertion(FragmentView subtreeRootFragment, DPElement subtreeRootFragmentElement, Marker prefixEnd, Marker suffixStart, Object insertedContent)
@@ -77,8 +82,12 @@ public abstract class SequentialStreamEditor extends SequentialEditor
 		StreamValue before = visitor.getStreamValueFromStartToMarker( subtreeRootFragmentElement, prefixEnd );
 		StreamValue after = visitor.getStreamValueFromMarkerToEnd( subtreeRootFragmentElement, suffixStart );
 		
+		// Copy the inserted content - the same content can be pasted multiple times - the copies *must* be distinct, else modifying
+		// one pasted copy will alter all the others
+		StreamValue insertedStream = copyStream( (StreamValue)insertedContent );
+		
 		// Join
-		return joinStreamsForInsertion( subtreeRootFragment, before, (StreamValue)insertedContent, after );
+		return joinStreamsForInsertion( subtreeRootFragment, before, insertedStream, after );
 	}
 
 	public Object spliceForDeletion(FragmentView subtreeRootFragment, DPElement subtreeRootFragmentElement, Marker selectionStart, Marker selectionEnd)
