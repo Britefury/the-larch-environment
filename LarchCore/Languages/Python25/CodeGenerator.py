@@ -295,7 +295,10 @@ class Python25CodeGenerator (object):
 	# Attribute ref
 	@DMObjectNodeDispatchMethod( Schema.AttributeRef )
 	def AttributeRef(self, node, target, name):
-		return self( target, PRECEDENCE_CONTAINER_ATTRIBUTEREFTARGET ) + '.' + name
+		if target.isInstanceOf( Schema.IntLiteral ):
+			return '(' + self( target, PRECEDENCE_CONTAINER_ATTRIBUTEREFTARGET ) + ').' + name
+		else:
+			return self( target, PRECEDENCE_CONTAINER_ATTRIBUTEREFTARGET ) + '.' + name
 
 	
 
