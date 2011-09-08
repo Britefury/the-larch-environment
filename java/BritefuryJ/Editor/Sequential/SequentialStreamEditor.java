@@ -72,6 +72,7 @@ public abstract class SequentialStreamEditor extends SequentialEditor
 	{
 		SequentialStreamValueVisitor visitor = new SequentialStreamValueVisitor();
 		StreamValue stream = visitor.getStreamValueInTextSelection( selection );
+		// Copy the selected content - otherwise altering the original data *after* the copy operation will alter the contents of the cut buffer.
 		return copyStream( stream );
 	}
 
