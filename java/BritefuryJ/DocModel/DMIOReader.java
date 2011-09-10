@@ -722,6 +722,21 @@ public class DMIOReader extends DMIO
 						pos = res.position;
 						int index = Integer.parseInt( res.value );
 						
+						boolean valueDeepCopyable;
+						if ( source.substring( pos, pos+2 ).equals( ",t" ) )
+						{
+							valueDeepCopyable = true;
+						}
+						else if ( source.substring( pos, pos+2 ).equals( ",f" ) )
+						{
+							valueDeepCopyable = false;
+						}
+						else
+						{
+							throw new ParseErrorException( pos, "Excpected flag ,t or ,f to indicate copy-ability of embedded object" );
+						}
+						pos += 2;
+						
 						if ( !source.substring( pos, pos+2 ).equals( ">>" ) )
 						{
 							throw new ParseErrorException( pos, "Expected >> to close embedded object" );
@@ -729,7 +744,7 @@ public class DMIOReader extends DMIO
 						pos += 2;
 						
 						PyObject value = getEmbeddedPyValue( index );
-						DMEmbeddedObject embed = new DMEmbeddedObject( value );
+						DMEmbeddedObject embed = new DMEmbeddedObject( value, valueDeepCopyable );
 						closeItem( embed );
 					}
 					else if ( source.substring( pos, pos+8 ).equals( "<<EmIso:" ) )
@@ -747,6 +762,21 @@ public class DMIOReader extends DMIO
 						pos = res.position;
 						int index = Integer.parseInt( res.value );
 						
+						boolean valueDeepCopyable;
+						if ( source.substring( pos, pos+2 ).equals( ",t" ) )
+						{
+							valueDeepCopyable = true;
+						}
+						else if ( source.substring( pos, pos+2 ).equals( ",f" ) )
+						{
+							valueDeepCopyable = false;
+						}
+						else
+						{
+							throw new ParseErrorException( pos, "Excpected flag ,t or ,f to indicate copy-ability of embedded object" );
+						}
+						pos += 2;
+						
 						if ( !source.substring( pos, pos+2 ).equals( ">>" ) )
 						{
 							throw new ParseErrorException( pos, "Expected >> to close embedded object" );
@@ -755,7 +785,7 @@ public class DMIOReader extends DMIO
 						
 						Object value = getEmbeddedValue( index );
 						DMEmbeddedIsolatedObject embed = new DMEmbeddedIsolatedObject();
-						embed.setIsolationBarrier( (IsolationBarrier<PyObject>)value );
+						embed.setIsolationBarrier( (IsolationBarrier<PyObject>)value, valueDeepCopyable );
 						closeItem( embed );
 					}
 					else

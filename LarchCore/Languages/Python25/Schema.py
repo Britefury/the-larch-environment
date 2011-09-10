@@ -286,13 +286,13 @@ schema.registerReader( 'ClassStmt', 1, _readClassStmt_v1 )
 def _readInlineObjectExpr_v2(fieldValues):
 	# Version 2 called the field 'resource', rather than 'embeddedValue'
 	embeddedValue = fieldValues['resource']
-	embeddedValue = DMNode.embed( None )
+	embeddedValue = DMNode.embed( None, False )
 	return EmbeddedObjectExpr( embeddedValue=embeddedValue )
 
 def _readInlineObjectStmt_v2(fieldValues):
 	# Version 2 called the field 'resource', rather than 'embeddedValue'
 	embeddedValue = fieldValues['resource']
-	embeddedValue = DMNode.embed( None )
+	embeddedValue = DMNode.embed( None, False )
 	return EmbeddedObjectStmt( embeddedValue=embeddedValue )
 
 schema.registerReader( 'InlineObjectExpr', 2, _readInlineObjectExpr_v2 )

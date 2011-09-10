@@ -85,10 +85,16 @@ def _isValidUnparsedStatementValue(value):
 def _commitUnparsedStatment(model, value):
 	withoutNewline = value[:-1]
 	unparsed = Schema.UnparsedStmt( value=Schema.UNPARSED( value=withoutNewline.getItemValues() ) )
+	# In some cases, we will be replacing @model with an UNPARSED node that contains a reference to @model.
+	# Since pyReplaceNode calls model.become(), this causes severe problems, due to circular references.
+	# The call to deepcopy eliminates this possibility.
 	pyReplaceNode( model, deepcopy( unparsed ) )
 
 def _commitInnerUnparsed(model, value):
 	unparsed = Schema.UNPARSED( value=value.getItemValues() )
+	# In some cases, we will be replacing @model with an UNPARSED node that contains a reference to @model.
+	# Since pyReplaceNode calls model.become(), this causes severe problems, due to circular references.
+	# The call to deepcopy eliminates this possibility.
 	pyReplaceNode( model, deepcopy( unparsed ) )
 
 
@@ -157,7 +163,7 @@ def _onDrop_embeddedObject(element, pos, data, action):
 	marker = element.getEditableMarkerClosestToLocalPoint( pos )
 	if marker is not None  and  marker.isValid():
 		def _performInsertion(model):
-			embeddedValue = DMNode.embedIsolated( model )
+			embeddedValue = DMNode.embedIsolated( model, False )
 			try:
 				modelType = Schema.getEmbeddedObjectModelType( model )
 			except Exception, e:

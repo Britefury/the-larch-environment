@@ -13,10 +13,10 @@ import LarchCore.Languages.Python25.Schema as Py
 
 
 def embeddedExpression(x):
-	return Py.EmbeddedObjectExpr( embeddedValue=DMNode.embedIsolated( x ) )
+	return Py.EmbeddedObjectExpr( embeddedValue=DMNode.embedIsolated( x, False ) )
 
 def embeddedStatement(x):
-	return Py.EmbeddedObjectStmt( embeddedValue=DMNode.embedIsolated( x ) )
+	return Py.EmbeddedObjectStmt( embeddedValue=DMNode.embedIsolated( x, False ) )
 
 
 class _Builder (object):

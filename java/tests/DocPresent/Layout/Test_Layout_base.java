@@ -72,12 +72,23 @@ public abstract class Test_Layout_base extends TestCase
 
 	protected LAllocBox alloc(double x, double y, double width, double height)
 	{
-		return new LAllocBox( x, y, width, height, height * 0.5, null );
+		return new LAllocBox( x, y, width, height, width, height * 0.5, null );
 	}
 	
-	protected LAllocBox alloc(double x, double y, double width, double height, double refY)
+	protected LAllocBox allocr(double x, double y, double width, double height, double refY)
 	{
-		return new LAllocBox( x, y, width, height, refY, null );
+		return new LAllocBox( x, y, width, height, width, refY, null );
+	}
+	
+	
+	protected LAllocBox alloc(double x, double y, double width, double height, double actualWidth)
+	{
+		return new LAllocBox( x, y, width, height, actualWidth, height * 0.5, null );
+	}
+	
+	protected LAllocBox allocr(double x, double y, double width, double height, double refY, double actualWidth)
+	{
+		return new LAllocBox( x, y, width, height, actualWidth, refY, null );
 	}
 	
 	
