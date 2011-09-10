@@ -34,6 +34,17 @@ public class LAllocBox implements LAllocBoxInterface
 		this.layoutNode = layoutNode;
 	}
 	
+	public LAllocBox(double x, double y, double width, double height, double actualWidth, double refY, LayoutNode layoutNode)
+	{
+		positionInParentAllocationSpaceX = x;
+		positionInParentAllocationSpaceY = y;
+		allocWidth = width;
+		allocHeight = height;
+		this.actualWidth = actualWidth;
+		this.refY = refY;
+		this.layoutNode = layoutNode;
+	}
+	
 	
 	public LayoutNode getAllocLayoutNode()
 	{
@@ -170,7 +181,7 @@ public class LAllocBox implements LAllocBoxInterface
 			LAllocBox b = (LAllocBox)x;
 			
 			return positionInParentAllocationSpaceX == b.positionInParentAllocationSpaceX  &&  positionInParentAllocationSpaceY == b.positionInParentAllocationSpaceY  &&  
-					allocWidth == b.allocWidth  &&  allocHeight == b.allocHeight  &&  refY == b.refY;
+					allocWidth == b.allocWidth  &&  allocHeight == b.allocHeight  &&  actualWidth == b.actualWidth  &&  refY == b.refY;
 		}
 		else
 		{
@@ -181,7 +192,7 @@ public class LAllocBox implements LAllocBoxInterface
 	
 	public String toString()
 	{
-		return "LAllocBox( positionInParentSpaceX=" + positionInParentAllocationSpaceX + ", positionInParentSpaceY=" + positionInParentAllocationSpaceY +
-			", allocationX=" + allocWidth + ", allocationY=" + allocHeight + ", refY=" + refY + " )";
+		return "LAllocBox( positionInParentAllocationSpaceX=" + positionInParentAllocationSpaceX + ", positionInParentAllocationSpaceY=" + positionInParentAllocationSpaceY +
+			", allocWidth=" + allocWidth + ", allocHeight=" + allocHeight + ", actualWidth=" + actualWidth + ", refY=" + refY + " )";
 	}
 }

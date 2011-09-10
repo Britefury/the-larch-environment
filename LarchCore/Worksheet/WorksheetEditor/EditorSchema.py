@@ -300,7 +300,7 @@ class InlineEmbeddedObjectEditor (AbstractViewSchema.InlineEmbeddedObjectAbstrac
 
 	@staticmethod
 	def newInlineEmbeddedObjectModel(value):
-		embeddedValue = DMNode.embedIsolated( value )
+		embeddedValue = DMNode.embedIsolated( value, False )
 		return Schema.InlineEmbeddedObject( embeddedValue=embeddedValue )
 
 
@@ -319,6 +319,6 @@ class ParagraphEmbeddedObjectEditor (AbstractViewSchema.ParagraphEmbeddedObjectA
 
 	@staticmethod
 	def newParagraphEmbeddedObjectModel(value):
-		embeddedValue = DMNode.embedIsolated( value )
+		embeddedValue = DMNode.embedIsolated( value, False )
 		return Schema.ParagraphEmbeddedObject( embeddedValue=embeddedValue )
 

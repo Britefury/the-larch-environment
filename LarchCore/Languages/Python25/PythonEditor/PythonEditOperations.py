@@ -150,9 +150,6 @@ def getStatementDepth(ctx):
 #
 
 
-def pyForceNodeRefresh(data):
-	pyReplaceNode( data, data )
-
 def pyReplaceNode(data, replacement):
 	data.become( replacement )
 

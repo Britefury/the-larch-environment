@@ -124,7 +124,7 @@ public class Test_FractionLayout extends Test_Layout_base
 		allocTest( null, box( 50, 60, 0, 0, barHeight, 0 ), box( 10, 20, 0, 0, 20, 0 ),
 				5, 2, 5,
 				100, 200,
-				null, alloc( 0, 2, 30, barHeight ), alloc( 5, 2 + barHeight + 2, 20, 20 ) );
+				null, alloc( 0, 2, 30, barHeight, 50 ), alloc( 5, 2 + barHeight + 2, 20, 20 ) );
 
 		// no bar
 		allocTest( box( 20, 40, 0, 0, 10, 0 ), null, box( 10, 20, 0, 0, 20, 0 ),

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.python.core.Py;
+import org.python.core.PyBoolean;
 import org.python.core.PyDictionary;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
@@ -63,6 +64,7 @@ public class DMEmbeddedIsolatedObject extends DMNode implements DMEmbeddedPyObje
 
 
 	private IsolationBarrier<PyObject> iso = null;
+	private boolean valueDeepCopyable = true;
 	private ChangeHistory changeHistory = null;
 	
 	
@@ -71,10 +73,11 @@ public class DMEmbeddedIsolatedObject extends DMNode implements DMEmbeddedPyObje
 		super();
 	}
 	
-	public DMEmbeddedIsolatedObject(PyObject value)
+	public DMEmbeddedIsolatedObject(PyObject value, boolean valueDeepCopyable)
 	{
 		super();
 		this.iso = new IsolationBarrier<PyObject>( value );
+		this.valueDeepCopyable = valueDeepCopyable;
 	}
 	
 	
@@ -93,11 +96,11 @@ public class DMEmbeddedIsolatedObject extends DMNode implements DMEmbeddedPyObje
 				
 				if ( iso != null  &&  e.iso != null )
 				{
-					return iso.equals( e.iso );
+					return iso.equals( e.iso )  &&  valueDeepCopyable == e.valueDeepCopyable;
 				}
 				else
 				{
-					return ( iso != null ) == ( e.iso != null );
+					return ( iso != null ) == ( e.iso != null )  &&  valueDeepCopyable == e.valueDeepCopyable;
 				}
 			}
 			
@@ -118,6 +121,7 @@ public class DMEmbeddedIsolatedObject extends DMNode implements DMEmbeddedPyObje
 		{
 			DMEmbeddedIsolatedObject em = (DMEmbeddedIsolatedObject)x;
 			this.iso = em.iso;
+			this.valueDeepCopyable = em.valueDeepCopyable;
 			
 			// We could remove this exception - just include an incremental monitor (as with DMList), and notify it when the value is accessed and modified
 			throw new RuntimeException( "DMEmbeddedObjectIsolated does not support become()" );
@@ -133,7 +137,8 @@ public class DMEmbeddedIsolatedObject extends DMNode implements DMEmbeddedPyObje
 	{
 		if ( iso != null )
 		{
-			return new DMEmbeddedIsolatedObject( Jython_copy.deepcopy( iso.getValue() ) );
+			PyObject valueCopy = valueDeepCopyable  ?  Jython_copy.deepcopy( iso.getValue() )  :  iso.getValue();
+			return new DMEmbeddedIsolatedObject( valueCopy, valueDeepCopyable );
 		}
 		else
 		{
@@ -156,7 +161,7 @@ public class DMEmbeddedIsolatedObject extends DMNode implements DMEmbeddedPyObje
 
 	public PyObject __getstate__()
 	{
-		return new PyTuple( Py.java2py( iso ) );
+		return new PyTuple( Py.java2py( iso ), Py.newBoolean( valueDeepCopyable ) );
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -164,8 +169,19 @@ public class DMEmbeddedIsolatedObject extends DMNode implements DMEmbeddedPyObje
 	{
 		if ( state instanceof PyTuple )
 		{
-			PyObject x = ((PyTuple)state).pyget( 0 );
+			PyTuple tupleState = (PyTuple)state;
+			PyObject x = tupleState.pyget( 0 );
 			iso = Py.tojava( x, IsolationBarrier.class );
+		
+			valueDeepCopyable = true;
+			if ( tupleState.size() > 1 )
+			{
+				PyObject elem1 = tupleState.pyget( 1 );
+				if ( elem1 instanceof PyBoolean )
+				{
+					valueDeepCopyable = ((PyBoolean)elem1).getBooleanValue();
+				}
+			}
 		}
 		else
 		{
@@ -180,6 +196,11 @@ public class DMEmbeddedIsolatedObject extends DMNode implements DMEmbeddedPyObje
 		return iso.getValue();
 	}
 	
+	public boolean isDeepCopyable()
+	{
+		return valueDeepCopyable;
+	}
+	
 	
 	
 	protected IsolationBarrier<PyObject> getIsolationBarrier()
@@ -187,9 +208,10 @@ public class DMEmbeddedIsolatedObject extends DMNode implements DMEmbeddedPyObje
 		return iso;
 	}
 	
-	protected void setIsolationBarrier(IsolationBarrier<PyObject> iso)
+	protected void setIsolationBarrier(IsolationBarrier<PyObject> iso, boolean valueDeepCopyable)
 	{
 		this.iso = iso;
+		this.valueDeepCopyable = valueDeepCopyable;
 	}
 
 	

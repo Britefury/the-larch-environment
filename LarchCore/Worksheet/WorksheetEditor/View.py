@@ -69,11 +69,6 @@ _quoteLocationEditorBorderStyle = StyleSheet.style( Primitive.border( SolidBorde
 def _onDrop_embeddedObject(element, pos, data, action):
 	marker = element.getEditableMarkerClosestToLocalPoint( pos )
 	if marker is not None  and  marker.isValid():
-		def _performInsertion(model):
-			embeddedValue = DMNode.embedIsolated( model )
-			expr = Schema.EmbeddedObjectExpr( embeddedValue=embeddedValue )
-			insertSpecialFormAtMarker( marker, expr )
-
 		# Display a context menu
 		def _onDropInline(control):
 			def _makeInline():

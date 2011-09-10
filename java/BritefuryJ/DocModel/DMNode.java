@@ -296,13 +296,13 @@ public abstract class DMNode
 	
 	
 	
-	public static DMEmbeddedObject embed(PyObject x)
+	public static DMEmbeddedObject embed(PyObject x, boolean valueDeepCopyable)
 	{
-		return new DMEmbeddedObject( x );
+		return new DMEmbeddedObject( x, valueDeepCopyable );
 	}
 
-	public static DMEmbeddedIsolatedObject embedIsolated(PyObject x)
+	public static DMEmbeddedIsolatedObject embedIsolated(PyObject x, boolean valueDeepCopyable)
 	{
-		return new DMEmbeddedIsolatedObject( x );
+		return new DMEmbeddedIsolatedObject( x, valueDeepCopyable );
 	}
 }
