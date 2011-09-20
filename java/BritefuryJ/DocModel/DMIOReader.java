@@ -726,16 +726,22 @@ public class DMIOReader extends DMIO
 						if ( source.substring( pos, pos+2 ).equals( ",t" ) )
 						{
 							valueDeepCopyable = true;
+							pos += 2;
 						}
 						else if ( source.substring( pos, pos+2 ).equals( ",f" ) )
 						{
+							valueDeepCopyable = false;
+							pos += 2;
+						}
+						else if ( source.substring( pos, pos+2 ).equals( ">>" ) )
+						{
+							// No copy-ability flag - old version
 							valueDeepCopyable = false;
 						}
 						else
 						{
 							throw new ParseErrorException( pos, "Excpected flag ,t or ,f to indicate copy-ability of embedded object" );
 						}
-						pos += 2;
 						
 						if ( !source.substring( pos, pos+2 ).equals( ">>" ) )
 						{
@@ -766,16 +772,22 @@ public class DMIOReader extends DMIO
 						if ( source.substring( pos, pos+2 ).equals( ",t" ) )
 						{
 							valueDeepCopyable = true;
+							pos += 2;
 						}
 						else if ( source.substring( pos, pos+2 ).equals( ",f" ) )
 						{
+							valueDeepCopyable = false;
+							pos += 2;
+						}
+						else if ( source.substring( pos, pos+2 ).equals( ">>" ) )
+						{
+							// No copy-ability flag - old version
 							valueDeepCopyable = false;
 						}
 						else
 						{
 							throw new ParseErrorException( pos, "Excpected flag ,t or ,f to indicate copy-ability of embedded object" );
 						}
-						pos += 2;
 						
 						if ( !source.substring( pos, pos+2 ).equals( ">>" ) )
 						{

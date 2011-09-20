@@ -968,25 +968,28 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		private void drawTarget(Graphics2D graphics)
 		{
 			final Target t = getTarget();
-			if ( t != null  &&  t.isValid()  &&  t.isAnimated() )
+			if ( t != null  &&  t.isValid() )
 			{
 				t.draw( graphics );
 
-				// Repeat
-				ActionListener onTimer = new ActionListener()
+				if ( t.isAnimated() )
 				{
-					public void actionPerformed(ActionEvent e)
+					// Repeat
+					ActionListener onTimer = new ActionListener()
 					{
-						if ( t != null  &&  t.isValid()  &&  t.isAnimated() )
+						public void actionPerformed(ActionEvent e)
 						{
-							t.getElement().queueFullRedraw();
+							if ( t != null  &&  t.isValid()  &&  t.isAnimated() )
+							{
+								t.getElement().queueFullRedraw();
+							}
 						}
-					}
-				};
-				
-				Timer timer = new Timer( 40, onTimer );
-				timer.setRepeats( false );
-				timer.start();
+					};
+					
+					Timer timer = new Timer( 40, onTimer );
+					timer.setRepeats( false );
+					timer.start();
+				}
 			}
 		}
 		

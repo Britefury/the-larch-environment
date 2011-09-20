@@ -30,6 +30,9 @@ public class Caret extends Target implements MarkerListener
 	private static final double BLINK_TIME = 0.5;
 	
 	
+	public static boolean blinkingEnabled = true;
+	
+	
 	protected Marker marker;
 	protected DPElement grabElement = null;
 	
@@ -51,11 +54,19 @@ public class Caret extends Target implements MarkerListener
 			
 			if ( element != null )
 			{
-				double time = System.nanoTime() * 1.0e-9;
-				double alpha = AnimUtils.scurveSeesaw( time, BLINK_TIME );
-				
 				Paint prevPaint = graphics.getPaint();
-				graphics.setPaint( new Color( 0.0f, 0.0f, 1.0f, (float)alpha ) );
+
+				if ( blinkingEnabled )
+				{
+					double time = System.nanoTime() * 1.0e-9;
+					float alpha = (float)AnimUtils.scurveSeesaw( time, BLINK_TIME );
+					graphics.setPaint( new Color( 0.0f, 0.0f, 1.0f, alpha ) );
+				}
+				else
+				{
+					graphics.setPaint( new Color( 0.0f, 0.0f, 1.0f ) );
+				}
+				
 				element.drawCaret( graphics, this );
 				graphics.setPaint( prevPaint );
 			}
@@ -65,7 +76,7 @@ public class Caret extends Target implements MarkerListener
 	@Override
 	public boolean isAnimated()
 	{
-		return true;
+		return blinkingEnabled;
 	}
 	
 	
