@@ -410,6 +410,7 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	
 	
 	
+	@Override
 	protected void performRefresh()
 	{
 		// >>> PROFILING
@@ -699,6 +700,7 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	}
 	
 	
+	@Override
 	public void onRequestRefresh()
 	{
 		Runnable r = new Runnable()

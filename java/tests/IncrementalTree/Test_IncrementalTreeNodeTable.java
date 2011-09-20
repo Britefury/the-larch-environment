@@ -16,7 +16,6 @@ import BritefuryJ.IncrementalTree.IncrementalTree;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 import BritefuryJ.IncrementalTree.IncrementalTreeNodeTable;
 import BritefuryJ.IncrementalTree.IncrementalTree.DuplicatePolicy;
-import BritefuryJ.IncrementalTree.IncrementalTreeNode.NodeResultFactory;
 
 public abstract class Test_IncrementalTreeNodeTable extends TestCase
 {
@@ -25,11 +24,6 @@ public abstract class Test_IncrementalTreeNodeTable extends TestCase
 		public TestIncrementalTree(Object root, DuplicatePolicy duplicatePolicy)
 		{
 			super( root, duplicatePolicy );
-		}
-
-		protected NodeResultFactory getRootNodeResultFactory()
-		{
-			return null;
 		}
 
 		@Override
