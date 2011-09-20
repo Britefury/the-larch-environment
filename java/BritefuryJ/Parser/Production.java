@@ -85,27 +85,25 @@ public class Production extends ParserExpression
 
 	
 	
-	
-	protected ParseResult parseStream(ParserState state, StreamValueAccessor input, int start)
-	{
-		return state.memoisedMatchStream( subexp, input, start );
-	}
-
+	@Override
 	protected ParseResult evaluateNode(ParserState state, Object input)
 	{
 		return state.memoisedMatchNode( subexp, input );
 	}
 
+	@Override
 	protected ParseResult evaluateStringChars(ParserState state, String input, int start)
 	{
 		return state.memoisedMatchString( subexp, input, start );
 	}
 
+	@Override
 	protected ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start)
 	{
 		return state.memoisedMatchStream( subexp, input, start );
 	}
 
+	@Override
 	protected ParseResult evaluateListItems(ParserState state, List<Object> input, int start)
 	{
 		return state.memoisedMatchList( subexp, input, start );

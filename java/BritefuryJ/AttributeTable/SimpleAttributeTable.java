@@ -341,19 +341,6 @@ public class SimpleAttributeTable implements Presentable
 	
 	
 	
-	protected void notifyBadAttributeType(String attrName, Object value, Class<?> expectedType)
-	{
-		System.err.println( "WARNING: attrib table \"" + getClass().getName() + "\": attribute '" + attrName + "' should have value of type '" + expectedType.getName() + "', has value '" + value + "'; type '" + value.getClass().getName() + "'" );
-	}
-
-	protected void notifyAttributeShouldNotBeNull(String attrName, Class<?> expectedType)
-	{
-		System.err.println( "WARNING: attrib table \"" + getClass().getName() + "\": attribute '" + attrName + "' should not have a null value; type='" + expectedType.getName() + "'" );
-	}
-
-
-	
-	
 	protected static Pres presentAttributeMap(FragmentView ctx, SimpleAttributeTable inheritedState, HashMap<String, Object> values)
 	{
 		Set<String> nameSet = values.keySet();

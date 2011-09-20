@@ -12,17 +12,17 @@ import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
 
 /*
- * TerminalString
- * 
- * TerminalString:node( input )				->  TerminalString.matchNode( input, 0 )
- * TerminalString:string( input, start )		->  TerminalString.consumeString( input, start )
- * TerminalString:stream( input, start )		->  structural = input[start].matchStructural(); structural != null  ?  TerminalString.matchNode( structural )  :  TerminalString.consumeStream( input, start )
- * TerminalString:list( input, start )			->  TerminalString.matchNode( input[start], start )
- * 
- * TerminalString.matchNode(input, start)		->	input instanceof String  ->  res = TerminalString.consumeString( input, 0 ); res.end == input.length()  ?  success  :  fail 
- * 										input instanceof Stream  ->  res = TerminalString.consumeStream( input, 0 ); res.end == input.length()  ?  success  :  fail
- * TerminalString.consumeString(input, start)	->	defined in subclass
- * TerminalString.consumeStream(input, start)	->	defined in subclass
+	 * TerminalString
+	 * 
+	 * TerminalString:node( input )				->  TerminalString.matchNode( input, 0 )
+	 * TerminalString:string( input, start )		->  TerminalString.consumeString( input, start )
+	 * TerminalString:stream( input, start )		->  structural = input[start].matchStructural(); structural != null  ?  TerminalString.matchNode( structural )  :  TerminalString.consumeStream( input, start )
+	 * TerminalString:list( input, start )			->  TerminalString.matchNode( input[start], start )
+	 * 
+	 * TerminalString.matchNode(input, start)		->	input instanceof String  ->  res = TerminalString.consumeString( input, 0 ); res.end == input.length()  ?  success  :  fail 
+	 * 										input instanceof Stream  ->  res = TerminalString.consumeStream( input, 0 ); res.end == input.length()  ?  success  :  fail
+	 * TerminalString.consumeString(input, start)	->	defined in subclass
+	 * TerminalString.consumeStream(input, start)	->	defined in subclass
  */
 public abstract class TerminalString extends ParserExpression
 {

@@ -283,7 +283,7 @@ public class SeparatedList extends ParserExpression
 			
 			if ( sepRes.isValid() )
 			{
-				bindings = ParseResult.addBindings( bindings, res.bindings );
+				bindings = ParseResult.addBindings( bindings, sepRes.bindings );
 
 				// We have reached position @sepRes.end
 				itemPos = sepRes.end;

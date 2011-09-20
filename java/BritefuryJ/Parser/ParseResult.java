@@ -121,7 +121,7 @@ public class ParseResult implements ParseResultInterface, Presentable
 	}
 	
 	
-	
+		
 	protected ParseResult suppressed()
 	{
 		return new ParseResult( value, begin, end, true, bValid, bMerge, bindings );
