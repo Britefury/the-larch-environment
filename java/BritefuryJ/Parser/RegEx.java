@@ -12,14 +12,12 @@ import java.util.regex.Pattern;
 import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
 
 /*
- * Keyword
+ * RegEx
  * 
- * Keyword:node( input )			->  input == Keyword.keywordString  ?  input  :  fail
- * Keyword:string( input, start )		->  input[start:start+Keyword.keywordString.length()] == Keyword.keywordString  &&
- * 									input[start+Keyword.keywordString.length()] not in Keyword.disallowedSubsequentChars  ?  input[start:start+Keyword.keywordString.length()] : fail
- * Keyword:stream( input, start )	->  input[start:start+Keyword.keywordString.length()] == Keyword.keywordString  &&
- * 								input[start+Keyword.keywordString.length()] not in Keyword.disallowedSubsequentChars  ?  input[start:start+Keyword.keywordString.length()] : fail
- * Keyword:list( input, start )		->  input[start] == Keyword.keywordString  ?  input[start]  :  fail
+ * RegEx:node( input )			->  regex.match(input as string)  ?  input  :  fail
+ * RegEx:string( input, start )		->  regex.match(input[start:])  ?  match.group() : fail
+ * RegEx:stream( input, start )		->  regex.match(input[start:])  ?  match.group() : fail
+ * RegEx:list( input, start )			->  regex.match(input[start] as string)  ?  input[start]  :  fail
  */
 public class RegEx extends TerminalString
 {

@@ -13,10 +13,10 @@ import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
 /*
  * Choice
  * 
- * Choice:node( input )		->  first_success_of( [ s:node( input )   for s in Bind.subexps ] )
- * Choice:string( input, start )	->  first_success_of( [ s:string( input, start )   for s in Bind.subexps ] )
- * Choice:stream( input, start )	->  first_success_of( [ s:stream( input, start )   for s in Bind.subexps ] )
- * Choice:list( input, start )	->  first_success_of( [ s:list( input, start )   for s in Bind.subexps ] )
+ * Choice:node( input )		->  first_success_of( [ s:node( input )   for s in Choice.subexps ] )
+ * Choice:string( input, start )	->  first_success_of( [ s:string( input, start )   for s in Choice.subexps ] )
+ * Choice:stream( input, start )	->  first_success_of( [ s:stream( input, start )   for s in Choice.subexps ] )
+ * Choice:list( input, start )	->  first_success_of( [ s:list( input, start )   for s in Choice.subexps ] )
  */
 public class Choice extends BranchExpression
 {
@@ -53,7 +53,7 @@ public class Choice extends BranchExpression
 	
 	protected ParseResult evaluateStringChars(ParserState state, String input, int start)
 	{
-		int maxErrorPos = 0;
+		int maxErrorPos = start;
 		
 		for (ParserExpression subexp: subexps)
 		{
@@ -73,7 +73,7 @@ public class Choice extends BranchExpression
 
 	protected ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start)
 	{
-		int maxErrorPos = 0;
+		int maxErrorPos = start;
 		
 		for (ParserExpression subexp: subexps)
 		{
@@ -93,7 +93,7 @@ public class Choice extends BranchExpression
 
 	protected ParseResult evaluateListItems(ParserState state, List<Object> input, int start)
 	{
-		int maxErrorPos = 0;
+		int maxErrorPos = start;
 		
 		for (ParserExpression subexp: subexps)
 		{

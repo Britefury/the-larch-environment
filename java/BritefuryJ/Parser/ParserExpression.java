@@ -363,35 +363,35 @@ public abstract class ParserExpression
 	
 	private ParseResult traceEnd(ParserState state, Object input, ParseResult result)
 	{
-		TraceNode node = state.traceStack;
-		TraceNode prev = node.getPrev();
-		
-		node.setResult( result );
-		
-		// If @prev is valid, add @node as a call-child of @prev
-		if ( prev != null )
-		{
-			prev.addCallChild( node );
-		}
-		
-		// Pop @node off the debug stack
-		state.traceStack = prev;
-		
-		
-		if ( result instanceof TracedParseResult )
-		{
-			TracedParseResult debugResult = (TracedParseResult)result;
+			TraceNode node = state.traceStack;
+			TraceNode prev = node.getPrev();
 			
-			TraceNode fromNode = node;
-			TraceNode toNode = debugResult.traceNode;
+			node.setResult( result );
 			
-			if ( !fromNode.getCallChildren().contains( toNode ) )
+			// If @prev is valid, add @node as a call-child of @prev
+			if ( prev != null )
 			{
-				fromNode.addMemoChild( toNode );
+				prev.addCallChild( node );
 			}
-		}
-		
-		return result.debug( node );
+			
+			// Pop @node off the debug stack
+			state.traceStack = prev;
+			
+			
+			if ( result instanceof TracedParseResult )
+			{
+				TracedParseResult debugResult = (TracedParseResult)result;
+				
+				TraceNode fromNode = node;
+				TraceNode toNode = debugResult.traceNode;
+				
+				if ( !fromNode.getCallChildren().contains( toNode ) )
+				{
+					fromNode.addMemoChild( toNode );
+				}
+			}
+			
+			return result.debug( node );
 	}
 	
 	
