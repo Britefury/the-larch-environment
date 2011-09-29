@@ -24,11 +24,4 @@ public class DPParagraphDedentMarker extends DPBlank
 		
 		layoutNode = new LayoutNodeParagraphDedentMarker( this );
 	}
-	
-	protected DPParagraphDedentMarker(DPParagraphDedentMarker element)
-	{
-		super( element );
-		
-		layoutNode = new LayoutNodeParagraphDedentMarker( this );
-	}
 }

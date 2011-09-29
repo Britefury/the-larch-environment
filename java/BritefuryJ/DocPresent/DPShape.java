@@ -50,16 +50,6 @@ public class DPShape extends DPContentLeaf
 		
 		layoutNode = new LayoutNodeShape( this );
 	}
-	
-	protected DPShape(DPShape element)
-	{
-		super( element );
-		
-		bounds = element.bounds;
-		shape = element.shape;
-		
-		layoutNode = new LayoutNodeShape( this );
-	}
 
 	
 	

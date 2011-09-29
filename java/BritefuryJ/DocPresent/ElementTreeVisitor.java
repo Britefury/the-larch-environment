@@ -55,7 +55,7 @@ public abstract class ElementTreeVisitor
 		}
 		else
 		{
-			List<DPElement> path = leaf.getElementPathFromSubtreeRoot( (DPContainer)root );
+			List<DPElement> path = leaf.getElementPathFromAncestor( (DPContainer)root );
 			
 			// If we stop before we get to @leaf, don't visit it
 			boolean visitLeaf = true;
@@ -113,7 +113,7 @@ public abstract class ElementTreeVisitor
 		{
 			if ( shouldVisitChildrenOfElement( root , false ) )
 			{
-				List<DPElement> path = leaf.getElementPathFromSubtreeRoot( (DPContainer)root );
+				List<DPElement> path = leaf.getElementPathFromAncestor( (DPContainer)root );
 				
 				// First, scan through the path, and find the range of elements we should visit - we must stop at any element for which shouldVisitChildrenOfElement() returns false
 				int startIndex = 1;

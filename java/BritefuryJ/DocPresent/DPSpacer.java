@@ -29,16 +29,6 @@ public class DPSpacer extends DPBlank
 		layoutNode = new LayoutNodeSpacer( this );
 	}
 	
-	protected DPSpacer(DPSpacer element)
-	{
-		super( element );
-		
-		this.minWidth = element.minWidth;
-		this.minHeight = element.minHeight;
-		
-		layoutNode = new LayoutNodeSpacer( this );
-	}
-	
 	
 	//
 	//

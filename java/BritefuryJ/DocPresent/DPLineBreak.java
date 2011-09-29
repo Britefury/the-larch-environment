@@ -27,13 +27,6 @@ public class DPLineBreak extends DPBlank
 		layoutNode = new LayoutNodeLineBreak( this );
 	}
 	
-	protected DPLineBreak(DPLineBreak element)
-	{
-		super( element );
-		
-		layoutNode = new LayoutNodeLineBreak( this );
-	}
-	
 	
 	//
 	//

@@ -24,11 +24,4 @@ public class DPParagraphIndentMarker extends DPBlank
 		
 		layoutNode = new LayoutNodeParagraphIndentMarker( this );
 	}
-	
-	protected DPParagraphIndentMarker(DPParagraphIndentMarker element)
-	{
-		super( element );
-		
-		layoutNode = new LayoutNodeParagraphIndentMarker( this );
-	}
 }

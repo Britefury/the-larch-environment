@@ -50,14 +50,6 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		setFlagValue( FLAG_SELECTABLE, styleParams.getSelectable() );
 	}
 	
-	protected DPContentLeafEditable(DPContentLeafEditable element)
-	{
-		super( element );
-		
-		setFlagValue( FLAG_EDITABLE, element.testFlag( FLAG_EDITABLE ) );
-		setFlagValue( FLAG_SELECTABLE, element.testFlag( FLAG_SELECTABLE ) );
-	}
-	
 	
 	
 	

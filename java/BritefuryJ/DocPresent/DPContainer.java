@@ -59,11 +59,6 @@ public abstract class DPContainer extends DPElement
 		super(styleParams);
 	}
 	
-	protected DPContainer(DPContainer element)
-	{
-		super( element );
-	}
-	
 	
 	
 	//

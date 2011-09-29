@@ -40,15 +40,6 @@ public class DPHiddenContent extends DPElement
 		this.textRepresentation = textRepresentation;
 	}
 	
-	protected DPHiddenContent(DPHiddenContent element)
-	{
-		super( element );
-		
-		layoutNode = new LayoutNodeHiddenContent( this );
-		
-		this.textRepresentation = element.textRepresentation;
-	}
-	
 	
 	//
 	//

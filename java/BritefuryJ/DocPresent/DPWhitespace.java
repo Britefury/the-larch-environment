@@ -43,15 +43,6 @@ public class DPWhitespace extends DPContentLeaf
 		layoutNode = new LayoutNodeWhitespace( this );
 	}
 	
-	protected DPWhitespace(DPWhitespace element)
-	{
-		super( element );
-		
-		this.width = element.width;
-		
-		layoutNode = new LayoutNodeWhitespace( this );
-	}
-	
 	
 	
 	//

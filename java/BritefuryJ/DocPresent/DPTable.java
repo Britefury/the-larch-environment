@@ -80,19 +80,6 @@ public class DPTable extends DPContainer implements TableElement
 		numRows = 0;
 	}
 	
-	protected DPTable(DPTable element)
-	{
-		super( element );
-		
-		layoutNode = new LayoutNodeTable( this );
-
-		childEntryTable = new TableChildEntry[0][];
-		childEntries = new ArrayList<TableChildEntry>();
-		rowStartIndices = new int[0];
-		numColumns = 0;
-		numRows = 0;
-	}
-	
 	
 	
 	public void setChildren(DPElement[][] itemTable)

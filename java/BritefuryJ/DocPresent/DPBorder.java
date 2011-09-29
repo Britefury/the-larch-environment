@@ -56,13 +56,6 @@ public class DPBorder extends DPBin
 		layoutNode = new LayoutNodeBorder( this );
 	}
 	
-	protected DPBorder(DPBorder element)
-	{
-		super( element );
-		border = element.border;
-		layoutNode = new LayoutNodeBorder( this );
-	}
-	
 	
 	
 	//

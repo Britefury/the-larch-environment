@@ -38,13 +38,6 @@ public class DPFraction extends DPContainer
 			layoutNode = new LayoutNodeFraction.LayoutNodeFractionBar( this );
 		}
 		
-		protected DPFractionBar(DPFractionBar element)
-		{
-			super( element );
-			
-			layoutNode = new LayoutNodeFraction.LayoutNodeFractionBar( this );
-		}
-		
 		
 		
 		public boolean isRedrawRequiredOnHover()
@@ -216,19 +209,6 @@ public class DPFraction extends DPContainer
 		paras = new DPParagraph[NUMCHILDREN];
 		
 		setChild( BAR, new DPFractionBar( styleParams.getBarStyleSheet(), barTextRepresentation ) );
-	}
-	
-	protected DPFraction(DPFraction element)
-	{
-		super( element );
-		
-		layoutNode = new LayoutNodeFraction( this );
-		
-		this.segmentTextStyleParams = element.segmentTextStyleParams;
-		
-		children = new DPElement[NUMCHILDREN];
-		segs = new DPSegment[NUMCHILDREN];
-		paras = new DPParagraph[NUMCHILDREN];
 	}
 	
 	

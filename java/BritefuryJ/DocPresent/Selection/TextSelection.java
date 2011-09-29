@@ -200,7 +200,7 @@ public class TextSelection extends Selection implements MarkerListener
 				ArrayList<DPElement> path0 = new ArrayList<DPElement>();
 				DPElement w1 = marker1.getElement();
 				ArrayList<DPElement> path1 = new ArrayList<DPElement>();
-				DPElement.getPathsFromCommonSubtreeRoot( w0, path0, w1, path1 );
+				DPElement.getPathsFromCommonAncestor( w0, path0, w1, path1 );
 				
 				boolean bInOrder = true;
 				commonRootContainer = null;

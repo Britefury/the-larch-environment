@@ -32,6 +32,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -247,94 +248,38 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		}
 		
 		
-		public InteractionFields copy()
-		{
-			InteractionFields f = new InteractionFields();
-			f.dndHandler = dndHandler;
-			if ( elementInteractors != null )
-			{
-				f.elementInteractors = new ArrayList<AbstractElementInteractor>();
-				f.elementInteractors.addAll( elementInteractors );
-			}
-			if ( painters != null )
-			{
-				f.painters = new ArrayList<ElementPainter>();
-				f.painters.addAll( painters );
-			}
-			if ( treeEventListeners != null )
-			{
-				f.treeEventListeners = new ArrayList<TreeEventListener>();
-				f.treeEventListeners.addAll( treeEventListeners );
-			}
-			return f;
-		}
-		
-		
 		public void addElementInteractor(AbstractElementInteractor interactor)
 		{
-			if ( elementInteractors == null )
-			{
-				elementInteractors = new ArrayList<AbstractElementInteractor>();
-			}
-			elementInteractors.add( interactor );
+			elementInteractors = addElementToList( elementInteractors, interactor );
 		}
 		
 		public void removeElementInteractor(AbstractElementInteractor interactor)
 		{
-			if ( elementInteractors != null )
-			{
-				elementInteractors.remove( interactor );
-				if ( elementInteractors.isEmpty() )
-				{
-					elementInteractors = null;
-				}
-			}
+			elementInteractors = removeElementFromList( elementInteractors, interactor );
 		}
 		
 		
 		
 		public void addPainter(ElementPainter painter)
 		{
-			if ( painters == null )
-			{
-				painters = new ArrayList<ElementPainter>();
-			}
-			painters.add( painter );
+			painters = addElementToList( painters, painter );
 		}
 		
 		public void removePainter(ElementPainter painter)
 		{
-			if ( painters != null )
-			{
-				painters.remove( painter );
-				if ( painters.isEmpty() )
-				{
-					painters = null;
-				}
-			}
+			painters = removeElementFromList( painters, painter );
 		}
 		
 		
 		
 		public void addTreeEventListener(TreeEventListener listener)
 		{
-			if ( treeEventListeners == null )
-			{
-				treeEventListeners = new ArrayList<TreeEventListener>();
-			}
-			treeEventListeners.add( listener );
+			treeEventListeners = addElementToList( treeEventListeners, listener );
 		}
 		
 		public void removeTreeEventListener(TreeEventListener listener)
 		{
-			if ( treeEventListeners != null )
-			{
-				treeEventListeners.remove( listener );
-				if ( treeEventListeners.isEmpty() )
-				{
-					treeEventListeners = null;
-				}
-			}
+			treeEventListeners = removeElementFromList( treeEventListeners, listener );
 		}
 		
 		
@@ -344,6 +289,30 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		public boolean isIdentity()
 		{
 			return dndHandler == null  &&  treeEventListeners == null  &&  elementInteractors == null  &&  painters == null;
+		}
+		
+		
+		private static <T> ArrayList<T> addElementToList(ArrayList<T> ls, T x)
+		{
+			if ( ls == null )
+			{
+				ls = new ArrayList<T>();
+			}
+			ls.add( x );
+			return ls;
+		}
+		
+		private static <T> ArrayList<T> removeElementFromList(ArrayList<T> ls, T x)
+		{
+			if ( ls != null )
+			{
+				ls.remove( x );
+				if ( ls.isEmpty() )
+				{
+					ls = null;
+				}
+			}
+			return ls;
 		}
 	}
 
@@ -435,21 +404,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		flags = 0;
 		this.styleParams = styleParams;
 		setAlignmentFlags( ElementAlignment.flagValue( styleParams.getHAlignment(), styleParams.getVAlignment() ) );
-	}
-	
-	protected DPElement(DPElement element)
-	{
-		this( element.styleParams );
-		debugName = element.debugName;
-		valueFn = element.valueFn;
-		if ( element.hasFixedValue() )
-		{
-			setFixedValue( element.getFixedValue() );
-		}
-		if ( element.interactionFields != null )
-		{
-			interactionFields = element.interactionFields.copy();
-		}
 	}
 	
 	
@@ -1104,51 +1058,22 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	public ArrayList<DPElement> getElementPathFromRoot()
 	{
-		ArrayList<DPElement> path = new ArrayList<DPElement>();
-		
-		DPElement element = this;
-		while ( element != null )
-		{
-			path.add( 0, element );
-			element = element.getParent();
-		}
-		
-		return path;
+		return getElementPathFromAncestor( null );
 	}
 	
 	public ArrayList<DPElement> getElementPathToRoot()
 	{
-		ArrayList<DPElement> path = new ArrayList<DPElement>();
-		
-		DPElement element = this;
-		while ( element != null )
-		{
-			path.add( element );
-			element = element.getParent();
-		}
-		
+		return getElementPathToAncestor( null );
+	}
+	
+	public ArrayList<DPElement> getElementPathFromAncestor(DPContainer ancestor)
+	{
+		ArrayList<DPElement> path = getElementPathToAncestor( ancestor );
+		Collections.reverse( path );
 		return path;
 	}
 	
-	public ArrayList<DPElement> getElementPathFromSubtreeRoot(DPContainer subtreeRoot)
-	{
-		ArrayList<DPElement> path = new ArrayList<DPElement>();
-		
-		DPElement element = this;
-		while ( element != null )
-		{
-			path.add( 0, element );
-			if ( element == subtreeRoot )
-			{
-				return path;
-			}
-			element = element.getParent();
-		}
-		
-		throw new RuntimeException( "Element not within subtree" );
-	}
-	
-	public ArrayList<DPElement> getElementPathToSubtreeRoot(DPContainer subtreeRoot)
+	public ArrayList<DPElement> getElementPathToAncestor(DPContainer ancestor)
 	{
 		ArrayList<DPElement> path = new ArrayList<DPElement>();
 		
@@ -1156,14 +1081,21 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		while ( element != null )
 		{
 			path.add( element );
-			if ( element == subtreeRoot )
+			if ( element == ancestor )
 			{
 				return path;
 			}
 			element = element.getParent();
 		}
 
-		throw new RuntimeException( "Element not within subtree" );
+		if ( ancestor == null )
+		{
+			return path;
+		}
+		else
+		{
+			throw new RuntimeException( "Element not within subtree" );
+		}
 	}
 	
 	
@@ -1200,7 +1132,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 	
 	
-	public static void getPathsFromCommonSubtreeRoot(DPElement w0, List<DPElement> path0, DPElement w1, List<DPElement> path1)
+	public static void getPathsFromCommonAncestor(DPElement w0, List<DPElement> path0, DPElement w1, List<DPElement> path1)
 	{
 		if ( w0 == w1 )
 		{
@@ -1240,7 +1172,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	{
 		ArrayList<DPElement> path0 = new ArrayList<DPElement>();
 		ArrayList<DPElement> path1 = new ArrayList<DPElement>();
-		DPElement.getPathsFromCommonSubtreeRoot( w0, path0, w1, path1 );
+		DPElement.getPathsFromCommonAncestor( w0, path0, w1, path1 );
 		
 		if ( path0.size() > 1  &&  path1.size() > 1 )
 		{
