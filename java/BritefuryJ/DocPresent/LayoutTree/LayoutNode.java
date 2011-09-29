@@ -22,12 +22,24 @@ import BritefuryJ.Math.Xform2;
 
 public abstract class LayoutNode
 {
-	public boolean hasLayoutForElement(DPElement element)
+	protected DPElement element;
+	
+	
+	protected LayoutNode(DPElement element)
 	{
-		return element.getLayoutNode() != null;
+		this.element = element;
 	}
 	
-	public abstract DPElement getElement();
+	
+	public boolean hasLayoutForElement(DPElement e)
+	{
+		return e.getLayoutNode() != null;
+	}
+	
+	public DPElement getElement()
+	{
+		return element;
+	}
 	
 	public abstract LReqBoxInterface getRequisitionBox();
 	public abstract LAllocBoxInterface getAllocationBox();
@@ -48,33 +60,122 @@ public abstract class LayoutNode
 	public abstract LAllocV getAllocV();
 
 	
-	public abstract LReqBoxInterface refreshRequisitionX();
-	public abstract LReqBoxInterface refreshRequisitionY();
-
-	public abstract void refreshAllocationX(double prevWidth);
-	public abstract void refreshAllocationY(LAllocV prevHeight);
-
-	protected abstract void onAllocationXRefreshed();
-	protected abstract void onAllocationYRefreshed();
-	
-	protected abstract void onAllocationRefreshed();
-	protected abstract void onChildSizeRefreshed();
-	
-
 	
 	protected Xform2 getLocalToParentAllocationSpaceXform()
 	{
-		return getElement().getLocalToParentAllocationSpaceXform();
+		return element.getLocalToParentAllocationSpaceXform();
+	}
+	
+	
+	
+
+	//
+	//
+	// Requisition refresh methods
+	//
+	//
+	
+	public LReqBoxInterface refreshRequisitionX()
+	{
+		if ( !element.isAllocationUpToDate() )
+		{
+			updateRequisitionX();
+		}
+		return getRequisitionBox();
+	}
+	
+	public LReqBoxInterface refreshRequisitionY()
+	{
+		if ( !element.isAllocationUpToDate() )
+		{
+			updateRequisitionY();
+		}
+		return getRequisitionBox();
+	}
+
+	
+	
+	protected abstract void updateRequisitionX();
+	protected abstract void updateRequisitionY();
+	
+	
+	
+	//
+	//
+	// Allocation refresh methods
+	//
+	//
+	
+	public void refreshAllocationX(double prevWidth)
+	{
+		if ( !element.isAllocationUpToDate()  ||  getAllocWidth() != prevWidth )
+		{
+			updateAllocationX();
+			element.clearFlagAllocationUpToDate();
+		}
+	}
+	
+	public void refreshAllocationY(LAllocV prevHeight)
+	{
+		if ( !element.isAllocationUpToDate()  ||  !getAllocV().equals( prevHeight ) )
+		{
+			updateAllocationY();
+		}
+		onAllocationRefreshed();
 	}
 	
 
+	
+	
+	protected void updateAllocationX()
+	{
+	}
+
+	protected void updateAllocationY()
+	{
+	}
+
+	
+	
+	protected void onAllocationXRefreshed()
+	{
+		element.clearFlagAllocationUpToDate();
+	}
+	
+	protected void onAllocationRefreshed()
+	{
+		element.clearFlagResizeQueued();
+		element.setFlagAllocationUpToDate();
+		DPContainer parent = element.getParent();
+		while ( parent != null )
+		{
+			LayoutNode parentLayout = parent.getLayoutNode();
+			if ( parentLayout != null )
+			{
+				parentLayout.onChildSizeRefreshed();
+				break;
+			}
+			parent = parent.getParent();
+		}
+	}
+
+	protected void onChildSizeRefreshed()
+	{
+	}
+
+	
+	
+	
+	//
+	//
+	// Resize queueing methods
+	//
+	//
+	
 	protected void handleQueueResize()
 	{
-		DPElement element = getElement();
-
 		if ( !element.isResizeQueued() )
 		{
-			element.onSizeChange();
 			DPContainer parent = element.getParent();
 			if ( parent != null )
 			{
@@ -87,8 +188,6 @@ public abstract class LayoutNode
 
 	public void queueResize()
 	{
-		DPElement element = getElement();
-		
 		handleQueueResize();
 		element.clearFlagAllocationUpToDate();
 	}
@@ -117,7 +216,6 @@ public abstract class LayoutNode
 	
 	public DPContentLeaf getContentLeafToLeft()
 	{
-		DPElement element = getElement();
 		DPContainer parent = element.getParent();
 		BranchLayoutNode parentBranchLayout = parent != null  ?  (BranchLayoutNode)parent.getValidLayoutNodeOfClass( BranchLayoutNode.class )  :  null;
 		
@@ -133,7 +231,6 @@ public abstract class LayoutNode
 	
 	public DPContentLeaf getContentLeafToRight()
 	{
-		DPElement element = getElement();
 		DPContainer parent = element.getParent();
 		BranchLayoutNode parentBranchLayout = parent != null  ?  (BranchLayoutNode)parent.getValidLayoutNodeOfClass( BranchLayoutNode.class )  :  null;
 		

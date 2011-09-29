@@ -8,6 +8,7 @@ package BritefuryJ.DocPresent.LayoutTree;
 
 import java.util.List;
 
+import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPFraction;
 import BritefuryJ.DocPresent.ElementFilter;
@@ -161,7 +162,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 
 	protected DPElement getChildLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter)
 	{
-		return getChildLeafClosestToLocalPointVertical( element.getLayoutChildren(), localPos, filter );
+		return getChildLeafClosestToLocalPointVertical( ( (DPContainer)element ).getLayoutChildren(), localPos, filter );
 	}
 
 
@@ -177,7 +178,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 
 	public List<DPElement> verticalNavigationList()
 	{
-		return element.getLayoutChildren();
+		return ( (DPContainer)element ).getLayoutChildren();
 	}
 	
 	

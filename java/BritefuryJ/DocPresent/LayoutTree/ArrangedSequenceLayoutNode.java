@@ -85,7 +85,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 		if ( leaves == null )
 		{
 			int counts[] = new int [2];
-			gatherCount( element, counts );
+			gatherCount( (DPContainer)element, counts );
 			
 			leaves = new DPElement[counts[0]];
 			branches = new DPElement[counts[1]];
@@ -93,7 +93,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 			
 			counts[0] = 0;
 			counts[1] = 0;
-			gatherItems( element, counts );
+			gatherItems( (DPContainer)element, counts );
 			branchBoundsCache = null;
 		}
 	}
@@ -115,6 +115,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 	}
 	
 	
+	@Override
 	protected void onAllocationRefreshed()
 	{
 		super.onAllocationRefreshed();

@@ -33,13 +33,12 @@ public abstract class ContentLeafLayoutNode extends LeafLayoutNode implements Co
 	
 	public DPContentLeafEditable getEditableContentLeafAboveOrBelow(Point2 localPos, boolean bBelow)
 	{
-		DPElement element = getElement();
 		DPContainer parent = element.getParent();
 		BranchLayoutNode branchLayout = parent != null  ?  (BranchLayoutNode)parent.getValidLayoutNodeOfClass( BranchLayoutNode.class )  :  null;
 		
 		if ( branchLayout != null )
 		{
-			return branchLayout.getEditableContentLeafAboveOrBelowFromChild( element, bBelow, element.getLocalPointRelativeToAncestor( branchLayout.getElement(), localPos ) );
+			return branchLayout.getEditableContentLeafAboveOrBelowFromChild( element, bBelow, element.getLocalPointRelativeToAncestor( branchLayout.element, localPos ) );
 		}
 		else
 		{
@@ -51,20 +50,20 @@ public abstract class ContentLeafLayoutNode extends LeafLayoutNode implements Co
 	
 	public DPContentLeaf getLeftContentLeaf()
 	{
-		return (DPContentLeaf)getElement();
+		return (DPContentLeaf)element;
 	}
 
 	public DPContentLeaf getRightContentLeaf()
 	{
-		return (DPContentLeaf)getElement();
+		return (DPContentLeaf)element;
 	}
 
 	public DPContentLeafEditable getTopOrBottomEditableContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace)
 	{
-		DPContentLeaf element = (DPContentLeaf)getElement();
-		if ( element.isEditable() )
+		DPContentLeaf leafElement = (DPContentLeaf)element;
+		if ( leafElement.isEditable() )
 		{
-			return (DPContentLeafEditable)element;
+			return (DPContentLeafEditable)leafElement;
 		}
 		else
 		{

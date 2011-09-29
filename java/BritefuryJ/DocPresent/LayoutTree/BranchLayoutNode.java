@@ -18,6 +18,13 @@ import BritefuryJ.Math.Point2;
 
 public abstract class BranchLayoutNode extends LayoutNode
 {
+	public BranchLayoutNode(DPElement element)
+	{
+		super( element );
+	}
+	
+	
+	
 	public void onChildListModified()
 	{
 	}
@@ -211,7 +218,6 @@ public abstract class BranchLayoutNode extends LayoutNode
 			}
 		}
 		
-		DPElement element = getElement();
 		DPContainer parent = element.getParent();
 		BranchLayoutNode parentBranchLayout = parent != null  ?  (BranchLayoutNode)parent.getValidLayoutNodeOfClass( BranchLayoutNode.class )  :  null;
 		
@@ -245,7 +251,6 @@ public abstract class BranchLayoutNode extends LayoutNode
 			}
 		}
 		
-		DPElement element = getElement();
 		DPContainer parent = element.getParent();
 		BranchLayoutNode parentBranchLayout = parent != null  ?  (BranchLayoutNode)parent.getValidLayoutNodeOfClass( BranchLayoutNode.class )  :  null;
 		
@@ -267,7 +272,7 @@ public abstract class BranchLayoutNode extends LayoutNode
 			int index = navList.indexOf( child );
 			if ( index != -1 )
 			{
-				Point2 posInRootSpace = getElement().getLocalPointRelativeToRoot( localPos );
+				Point2 posInRootSpace = element.getLocalPointRelativeToRoot( localPos );
 				if ( bBelow )
 				{
 					for (int i = index + 1; i < navList.size(); i++)
@@ -295,13 +300,12 @@ public abstract class BranchLayoutNode extends LayoutNode
 			}
 		}
 		
-		DPElement element = getElement();
 		DPContainer parent = element.getParent();
 		BranchLayoutNode branchLayout = parent != null  ?  (BranchLayoutNode)parent.getValidLayoutNodeOfClass( BranchLayoutNode.class )  :  null;
 		
 		if ( branchLayout != null )
 		{
-			return branchLayout.getEditableContentLeafAboveOrBelowFromChild( element, bBelow, element.getLocalPointRelativeToAncestor( branchLayout.getElement(), localPos ) );
+			return branchLayout.getEditableContentLeafAboveOrBelowFromChild( element, bBelow, element.getLocalPointRelativeToAncestor( branchLayout.element, localPos ) );
 		}
 		else
 		{
