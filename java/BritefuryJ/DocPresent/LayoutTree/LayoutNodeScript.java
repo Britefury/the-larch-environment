@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent.LayoutTree;
 import java.util.ArrayList;
 import java.util.List;
 
+import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPScript;
 import BritefuryJ.DocPresent.ElementFilter;
@@ -269,7 +270,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 	
 	protected DPElement getChildLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter)
 	{
-		List<DPElement> layoutChildren = element.getLayoutChildren();
+		List<DPElement> layoutChildren = ( (DPContainer)element ).getLayoutChildren();
 		if ( layoutChildren.size() == 0 )
 		{
 			// No children
@@ -397,7 +398,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 	
 	public List<DPElement> horizontalNavigationList()
 	{
-		return element.getLayoutChildren();
+		return ( (DPContainer)element ).getLayoutChildren();
 	}
 	
 	

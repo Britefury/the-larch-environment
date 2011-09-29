@@ -18,12 +18,12 @@ public abstract class EditableContentLeafLayoutNode extends ContentLeafLayoutNod
 	
 	public DPContentLeafEditable getLeftEditableContentLeaf()
 	{
-		return (DPContentLeafEditable)getElement();
+		return (DPContentLeafEditable)element;
 	}
 
 	public DPContentLeafEditable getRightEditableContentLeaf()
 	{
-		return (DPContentLeafEditable)getElement();
+		return (DPContentLeafEditable)element;
 	}
 }
 

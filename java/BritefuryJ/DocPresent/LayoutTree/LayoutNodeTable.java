@@ -64,7 +64,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 	{
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPTable table = (DPTable)element;
-		List<DPElement> layoutChildren = element.getLayoutChildren();
+		List<DPElement> layoutChildren = ( (DPTable)element ).getLayoutChildren();
 		TableLayout.TablePackingParams packingParams[] = table.getTablePackingParamsArray();
 		
 		LReqBoxInterface childBoxes[] = new LReqBoxInterface[layoutChildren.size()];
@@ -94,7 +94,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 		
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPTable table = (DPTable)element;
-		List<DPElement> layoutChildren = element.getLayoutChildren();
+		List<DPElement> layoutChildren = ( (DPTable)element ).getLayoutChildren();
 		
 		LReqBoxInterface childBoxes[] = new LReqBoxInterface[layoutChildren.size()];
 		LAllocBoxInterface childAllocBoxes[] = new LAllocBoxInterface[layoutChildren.size()];
@@ -129,7 +129,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 		
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPTable table = (DPTable)element;
-		List<DPElement> layoutChildren = element.getLayoutChildren();
+		List<DPElement> layoutChildren = ( (DPTable)element ).getLayoutChildren();
 		
 		LReqBoxInterface childBoxes[] = new LReqBoxInterface[layoutChildren.size()];
 		LAllocBoxInterface childAllocBoxes[] = new LAllocBoxInterface[layoutChildren.size()];

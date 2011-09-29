@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.DocPresent.LayoutTree;
 
-import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
 import BritefuryJ.DocPresent.Layout.LAllocV;
@@ -18,22 +17,15 @@ import BritefuryJ.Math.Xform2;
 
 public abstract class LeafLayoutNodeSharedReq extends LayoutNode implements LAllocBoxInterface
 {
-	protected DPElement element;
 	protected LReqBox layoutReqBox;
 	
 	
 	public LeafLayoutNodeSharedReq(DPElement element, LReqBox reqBox)
 	{
-		this.element = element;
+		super( element );
 		layoutReqBox = reqBox;
 	}
 
-
-	public DPElement getElement()
-	{
-		return element;
-	}
-	
 
 	
 	
@@ -66,109 +58,6 @@ public abstract class LeafLayoutNodeSharedReq extends LayoutNode implements LAll
 		return getActualSize().mul( getLocalToParentAllocationSpaceXform().scale );
 	}
 
-	
-	
-	
-	
-	public LReqBoxInterface refreshRequisitionX()
-	{
-		if ( !element.isAllocationUpToDate() )
-		{
-			updateRequisitionX();
-		}
-		return layoutReqBox;
-	}
-	
-	public LReqBoxInterface refreshRequisitionY()
-	{
-		if ( !element.isAllocationUpToDate() )
-		{
-			updateRequisitionY();
-		}
-		return layoutReqBox;
-	}
-	
-
-	
-	protected abstract void updateRequisitionX();
-	protected abstract void updateRequisitionY();
-
-
-	
-	
-	
-	public void refreshAllocationX(double prevWidth)
-	{
-		if ( !element.isAllocationUpToDate()  ||  getAllocationBox().getAllocWidth() != prevWidth )
-		{
-			updateAllocationX();
-			element.clearFlagAllocationUpToDate();
-		}
-	}
-	
-	public void refreshAllocationY(LAllocV prevHeight)
-	{
-		if ( !element.isAllocationUpToDate()  ||  !getAllocationBox().getAllocV().equals( prevHeight ) )
-		{
-			updateAllocationY();
-		}
-		onAllocationRefreshed();
-	}
-	
-
-	
-	
-	protected void updateAllocationX()
-	{
-	}
-
-	protected void updateAllocationY()
-	{
-	}
-
-	
-	
-
-	
-	
-	
-	protected void onAllocationXRefreshed()
-	{
-		element.clearFlagAllocationUpToDate();
-	}
-	
-	protected void onAllocationYRefreshed()
-	{
-		onAllocationRefreshed();
-	}
-	
-	protected void onAllocationRefreshed()
-	{
-		element.clearFlagResizeQueued();
-		element.setFlagAllocationUpToDate();
-		DPContainer parent = element.getParent();
-		while ( parent != null )
-		{
-			LayoutNode parentLayout = parent.getLayoutNode();
-			if ( parentLayout != null )
-			{
-				parentLayout.onChildSizeRefreshed();
-				break;
-			}
-			parent = parent.getParent();
-		}
-	}
-	
-	protected void onChildSizeRefreshed()
-	{
-	}
-	
-	
-	
-	
-	
-	
-	
 	
 	
 	

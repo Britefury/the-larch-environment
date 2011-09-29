@@ -19,11 +19,11 @@ public abstract class EditableContentLeafLayoutNodeSharedReq extends ContentLeaf
 	
 	public DPContentLeafEditable getLeftEditableContentLeaf()
 	{
-		return (DPContentLeafEditable)getElement();
+		return (DPContentLeafEditable)element;
 	}
 
 	public DPContentLeafEditable getRightEditableContentLeaf()
 	{
-		return (DPContentLeafEditable)getElement();
+		return (DPContentLeafEditable)element;
 	}
 }

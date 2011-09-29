@@ -148,7 +148,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 		}
 		else if ( children.length == 1 )
 		{
-			return children[0].getAllocLayoutNode().getElement();
+			return children[0].getAllocLayoutNode().element;
 		}
 		else
 		{
@@ -163,13 +163,13 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 				
 				if ( localPos.x < midX )
 				{
-					return childI.getAllocLayoutNode().getElement();
+					return childI.getAllocLayoutNode().element;
 				}
 				
 				childI = childJ;
 			}
 			
-			return children[children.length-1].getAllocLayoutNode().getElement();
+			return children[children.length-1].getAllocLayoutNode().element;
 		}
 	}
 
@@ -376,13 +376,12 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 			}
 		}
 		
-		DPElement element = getElement();
 		DPContainer parent = element.getParent();
 		BranchLayoutNode branchLayout = parent != null  ?  (BranchLayoutNode)parent.getValidLayoutNodeOfClass( BranchLayoutNode.class )  :  null;
 		
 		if ( branchLayout != null )
 		{
-			return branchLayout.getEditableContentLeafAboveOrBelowFromChild( element, bBelow, element.getLocalPointRelativeToAncestor( branchLayout.getElement(), localCursorPos ) );
+			return branchLayout.getEditableContentLeafAboveOrBelowFromChild( element, bBelow, element.getLocalPointRelativeToAncestor( branchLayout.element, localCursorPos ) );
 		}
 		else
 		{
@@ -398,7 +397,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 		DPContentLeafEditable closestNode = null;
 		for (LAllocBoxInterface allocBox: line.getChildAllocBoxes())
 		{
-			DPElement item = allocBox.getAllocLayoutNode().getElement();
+			DPElement item = allocBox.getAllocLayoutNode().element;
 			
 			AABox2 bounds = item.getLocalAABox();
 			double lower = item.getLocalPointRelativeToRoot( bounds.getLower() ).x;

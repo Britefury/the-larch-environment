@@ -23,7 +23,7 @@ public class LayoutNodeRootElement extends LayoutNodeBin
 	{
 		super.handleQueueResize();
 		
-		PresentationComponent.RootElement rootElement = (PresentationComponent.RootElement)getElement();
+		PresentationComponent.RootElement rootElement = (PresentationComponent.RootElement)element;
 		rootElement.queueReallocation();
 	}
 
