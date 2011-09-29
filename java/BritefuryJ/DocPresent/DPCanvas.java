@@ -54,19 +54,6 @@ public class DPCanvas extends DPContentLeaf implements DrawingOwner
 		setFlagValue( FLAG_DIAGRAM_SHRINK_Y, bShrinkY );
 	}
 	
-	protected DPCanvas(DPCanvas element)
-	{
-		super( element );
-		
-		layoutNode = new LayoutNodeCanvas( this );
-		
-		this.drawing = element.drawing;
-		this.drawingWidth = element.drawingWidth;
-		this.drawingHeight = element.drawingHeight;
-		setFlagValue( FLAG_DIAGRAM_SHRINK_X, element.testFlag( FLAG_DIAGRAM_SHRINK_X ) );
-		setFlagValue( FLAG_DIAGRAM_SHRINK_Y, element.testFlag( FLAG_DIAGRAM_SHRINK_Y ) );
-	}
-	
 	
 	//
 	//

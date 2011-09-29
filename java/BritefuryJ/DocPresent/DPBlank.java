@@ -26,14 +26,6 @@ public class DPBlank extends DPElement
 	}
 	
 	
-	protected DPBlank(DPBlank element)
-	{
-		super( element );
-
-		layoutNode = new LayoutNodeBlank( this );
-	}
-	
-	
 	
 	
 	//

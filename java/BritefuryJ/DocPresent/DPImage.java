@@ -197,20 +197,6 @@ public class DPImage extends DPContentLeaf
 		this( styleParams, textRepresentation, new File( imageFilename ), hoverImageFilename != null  ?  new File( hoverImageFilename )  :  null );
 	}
 	
-	protected DPImage(DPImage element)
-	{
-		super( element );
-		
-		hoverImage = element.hoverImage;
-		hoverImageScaleX = element.hoverImageScaleX;
-		hoverImageScaleY = element.hoverImageScaleY;
-		image = element.image;
-		imageScaleX = element.imageScaleX;
-		imageScaleY = element.imageScaleY;
-		
-		layoutNode = new LayoutNodeImage( this );
-	}
-	
 	
 	//
 	//

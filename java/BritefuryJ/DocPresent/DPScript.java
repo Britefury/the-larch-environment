@@ -52,19 +52,6 @@ public class DPScript extends DPContainer
 		paras = new DPParagraph[NUMCHILDREN];
 	}
 	
-	protected DPScript(DPScript element)
-	{
-		super( element );
-		
-		layoutNode = new LayoutNodeScript( this );
-		
-		this.segmentTextStyleParams = element.segmentTextStyleParams;
-		
-		children = new DPElement[NUMCHILDREN];
-		segs = new DPSegment[NUMCHILDREN];
-		paras = new DPParagraph[NUMCHILDREN];
-	}
-	
 	
 	
 

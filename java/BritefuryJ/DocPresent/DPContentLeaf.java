@@ -85,13 +85,6 @@ public abstract class DPContentLeaf extends DPElement
 		this.textRepresentation = textRepresentation;
 	}
 	
-	protected DPContentLeaf(DPContentLeaf element)
-	{
-		super( element );
-		
-		this.textRepresentation = element.textRepresentation;
-	}
-	
 	
 	
 	

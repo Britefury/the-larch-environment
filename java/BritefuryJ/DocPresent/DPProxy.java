@@ -31,11 +31,6 @@ public class DPProxy extends DPContainer
 		super(styleParams);
 	}
 	
-	protected DPProxy(DPProxy element)
-	{
-		super( element );
-	}
-	
 	
 
 	//

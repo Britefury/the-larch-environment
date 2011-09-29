@@ -74,16 +74,6 @@ public class DPRegion extends DPProxy
 		setFlagValue( FLAG_SELECTABLE, styleParams.getSelectable() );
 	}
 	
-	protected DPRegion(DPRegion element)
-	{
-		super( element );
-		
-		clipboardHandler = element.clipboardHandler;
-
-		setFlagValue( FLAG_EDITABLE, element.testFlag( FLAG_EDITABLE ) );
-		setFlagValue( FLAG_SELECTABLE, element.testFlag( FLAG_SELECTABLE ) );
-	}
-	
 	
 	//
 	//

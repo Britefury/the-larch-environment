@@ -29,16 +29,6 @@ public class DPSpaceBin extends DPBin
 		layoutNode = new LayoutNodeSpaceBin( this );
 	}
 	
-	protected DPSpaceBin(DPSpaceBin element)
-	{
-		super( element );
-
-		minWidth = element.minWidth;
-		minHeight = element.minHeight;
-		
-		layoutNode = new LayoutNodeSpaceBin( this );
-	}
-	
 	
 	
 	//

@@ -64,15 +64,6 @@ public class DPSegment extends DPContainer
 		bGuardsRefreshing = false;
 	}
 	
-	protected DPSegment(DPSegment element)
-	{
-		super( element );
-		this.textStyleParams = element.textStyleParams;
-		this.bGuardBegin = element.bGuardBegin;
-		this.bGuardEnd = element.bGuardEnd;
-		bGuardsRefreshing = false;
-	}
-	
 	
 	
 	public void setGuardPolicy(boolean bGuardBegin, boolean bGuardEnd)

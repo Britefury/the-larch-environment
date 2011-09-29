@@ -57,16 +57,6 @@ public class DPText extends DPContentLeafEditable
 		layoutNode = new LayoutNodeText( this );
 	}
 	
-	protected DPText(DPText element)
-	{
-		super( element );
-		
-		text = element.text;
-		visual = element.visual;
-		
-		layoutNode = new LayoutNodeText( this );
-	}
-	
 	
 
 	//

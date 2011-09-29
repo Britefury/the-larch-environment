@@ -27,13 +27,6 @@ public class DPBin extends DPContainer
 		layoutNode = new LayoutNodeBin( this );
 	}
 	
-	protected DPBin(DPBin element)
-	{
-		super( element );
-		
-		layoutNode = new LayoutNodeBin( this );
-	}
-	
 	
 	//
 	//

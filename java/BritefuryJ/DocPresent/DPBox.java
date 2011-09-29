@@ -33,16 +33,6 @@ public class DPBox extends DPContentLeaf
 		layoutNode = new LayoutNodeBox( this );
 	}
 	
-	protected DPBox(DPBox element)
-	{
-		super( element );
-		
-		this.minWidth = element.minWidth;
-		this.minHeight = element.minHeight;
-		
-		layoutNode = new LayoutNodeBox( this );
-	}
-	
 	
 	//
 	//

@@ -34,13 +34,6 @@ public class DPMathRoot extends DPContainer
 		layoutNode = new LayoutNodeMathRoot( this );
 	}
 	
-	protected DPMathRoot(DPMathRoot element)
-	{
-		super( element );
-		
-		layoutNode = new LayoutNodeMathRoot( this );
-	}
-	
 	
 	
 	public DPElement getChild()

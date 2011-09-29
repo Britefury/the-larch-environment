@@ -28,13 +28,6 @@ public class DPFragment extends DPProxy
 		this.context = context;
 	}
 	
-	protected DPFragment(DPFragment element)
-	{
-		super( element );
-		
-		context = element.context;
-	}
-	
 	
 	//
 	// Context
