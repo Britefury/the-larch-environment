@@ -53,7 +53,7 @@ public class Browser
 	private static final String COMMAND_RELOAD = "reload";
 
 
-    private JTextField locationField;
+	private JTextField locationField;
 	private JPanel panel;
 
 	private PresentationComponent presComponent;
@@ -86,7 +86,7 @@ public class Browser
 		actionMap.put( TransferHandler.getPasteAction().getValue( Action.NAME ), TransferHandler.getPasteAction() );
 
 
-        JToolBar toolbar = new JToolBar();
+		JToolBar toolbar = new JToolBar();
 		toolbar.setFloatable(false);
 		toolbar.setRollover(true);
 		initialiseToolbar(toolbar);
