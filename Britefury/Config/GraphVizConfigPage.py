@@ -96,7 +96,7 @@ class GraphVizConfigurationPage (ConfigurationPage):
 			GraphVizConfiguration.setInstance( self._config )
 		else:
 			self._config = None
-			GraphViz.setConfiguration( None )
+			GraphVizConfiguration.setInstance( None )
 		self._incr.onChanged()
 		
 			
