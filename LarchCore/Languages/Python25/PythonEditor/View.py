@@ -28,6 +28,8 @@ from BritefuryJ.DocPresent.Input import ObjectDndHandler
 from BritefuryJ.Pres import ApplyPerspective
 from BritefuryJ.Pres.Primitive import Paragraph, Segment
 
+from BritefuryJ.EditPerspective import EditPerspective
+
 from BritefuryJ.Projection import Perspective, Subject
 from BritefuryJ.IncrementalView import FragmentView, FragmentData
 
@@ -417,7 +419,7 @@ class Python25View (ObjectNodeDispatchView):
 		s = s.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		s = s.withCommands( PythonCommands.pythonTargetCommands )
 		s = s.withCommands( PythonCommands.pythonCommands )
-		return s
+		return ApplyStyleSheetFromAttribute( PythonEditorStyle.paragraphIndentationStyle, s )
 
 
 
@@ -434,7 +436,7 @@ class Python25View (ObjectNodeDispatchView):
 		s = s.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		s = s.withCommands( PythonCommands.pythonTargetCommands )
 		s = s.withCommands( PythonCommands.pythonCommands )
-		return s
+		return ApplyStyleSheetFromAttribute( PythonEditorStyle.paragraphIndentationStyle, s )
 
 
 
@@ -1005,7 +1007,7 @@ class Python25View (ObjectNodeDispatchView):
 	@SpecialFormExpression
 	def EmbeddedObjectExpr(self, fragment, inheritedState, model, embeddedValue):
 		value = embeddedValue.getValue()
-		valueView = ApplyPerspective( None, value )
+		valueView = ApplyPerspective( EditPerspective.instance, value )
 		expansionFn = self._getExpansionFn( value )
 		
 		if expansionFn is None:
@@ -1025,7 +1027,7 @@ class Python25View (ObjectNodeDispatchView):
 	@SpecialFormStatement
 	def EmbeddedObjectStmt(self, fragment, inheritedState, model, embeddedValue):
 		value = embeddedValue.getValue()
-		valueView = ApplyPerspective( None, value )
+		valueView = ApplyPerspective( EditPerspective.instance, value )
 		expansionFn = self._getExpansionFn( value )
 
 		if expansionFn is None:

@@ -7,6 +7,8 @@
 ##-*************************
 from copy import deepcopy
 
+from BritefuryJ.DocModel import DMNode
+
 from LarchCore.Languages.Python25 import Schema
 from LarchCore.Languages.Python25.Python25Importer import importPy25File
 from LarchCore.Languages.Python25.PythonEditor.View import perspective as python25EditorPerspective
@@ -17,17 +19,37 @@ from LarchCore.Project.PageData import PageData, registerPageFactory, registerPa
 
 
 
-def py25NewModule():
+def _py25NewModule():
 	return Schema.PythonModule( suite=[] )
 
-def py25NewSuite():
+def _py25NewSuite():
 	return Schema.PythonSuite( suite=[] )
 
-def py25NewExpr():
+def _py25NewExpr():
 	return Schema.PythonExpression( expr=Schema.UNPARSED( value=[ '' ] ) )
 
-def py25NewTarget():
+def _py25NewTarget():
 	return Schema.PythonTarget( target=Schema.UNPARSED( value=[ '' ] ) )
+
+
+def py25NewModuleAsRoot():
+	module = _py25NewModule()
+	module.realiseAsRoot()
+	return module
+
+
+def isEmptyTopLevel(x):
+	if isinstance(x, DMNode):
+		if x.isInstanceOf(Schema.PythonModule)  or  x.isInstanceOf(Schema.PythonSuite):
+			return x['suite'] == []
+		elif x.isInstanceOf(Schema.PythonExpression):
+			return x['expr'] == Schema.UNPARSED( value=[ '' ] )
+		elif x.isInstanceOf(Schema.PythonTarget):
+			return x['target'] == Schema.UNPARSED( value=[ '' ] )
+	return False
+
+
+
 
 
 
@@ -63,15 +85,15 @@ class EmbeddedPython25 (object):
 
 	@staticmethod
 	def module():
-		return EmbeddedPython25( py25NewModule() )
+		return EmbeddedPython25( _py25NewModule() )
 
 	@staticmethod
 	def suite():
-		return EmbeddedPython25( py25NewSuite() )
+		return EmbeddedPython25( _py25NewSuite() )
 
 	@staticmethod
 	def expression():
-		return EmbeddedPython25( py25NewExpr() )
+		return EmbeddedPython25( _py25NewExpr() )
 
 	@staticmethod
 	def expressionFromText(text):
@@ -83,7 +105,7 @@ class EmbeddedPython25 (object):
 
 	@staticmethod
 	def target():
-		return EmbeddedPython25( py25NewTarget() )
+		return EmbeddedPython25( _py25NewTarget() )
 	
 	@staticmethod
 	def targetFromText(text):

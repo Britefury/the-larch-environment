@@ -39,6 +39,8 @@ from BritefuryJ.Pres.RichText import *
 from BritefuryJ.Pres.ContextMenu import *
 from BritefuryJ.Pres.ObjectPres import *
 
+from BritefuryJ.EditPerspective import EditPerspective
+
 from BritefuryJ.IncrementalView import FragmentData
 
 from BritefuryJ.DocPresent.Interactor import KeyElementInteractor
@@ -489,7 +491,7 @@ class WorksheetEditor (ObjectDispatchView):
 	@ObjectDispatchMethod( EditorSchema.InlineEmbeddedObjectEditor )
 	def InlineEmbeddedObject(self, fragment, inheritedState, node):
 		value = node.getValue()
-		valueView = _editableStyle.applyTo( ApplyPerspective( None, value ) )
+		valueView = _editableStyle.applyTo( ApplyPerspective( EditPerspective.instance, value ) )
 		p = ObjectBorder( valueView )
 		p = p.withContextMenuInteractor( _inlineEmbeddedObjectContextMenuFactory )
 		p = WorksheetRichTextEditor.instance.editableInlineEmbed( node, p )
@@ -500,7 +502,7 @@ class WorksheetEditor (ObjectDispatchView):
 	@ObjectDispatchMethod( EditorSchema.ParagraphEmbeddedObjectEditor )
 	def ParagraphEmbeddedObject(self, fragment, inheritedState, node):
 		value = node.getValue()
-		valueView = _editableStyle.applyTo( ApplyPerspective( None, value ) )
+		valueView = _editableStyle.applyTo( ApplyPerspective( EditPerspective.instance, value ) )
 		p = ObjectBorder( valueView )
 		p = p.withContextMenuInteractor( _paragraphEmbeddedObjectContextMenuFactory )
 		p = WorksheetRichTextEditor.instance.editableParagraphEmbed( node, p )

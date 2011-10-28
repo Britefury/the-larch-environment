@@ -253,7 +253,7 @@ class PythonCodeEditor (AbstractViewSchema.PythonCodeAbstractView):
 
 	@staticmethod
 	def newPythonCodeModel():
-		return Schema.PythonCode( style='code_result', code=Python25.py25NewModule() )
+		return Schema.PythonCode( style='code_result', code=Python25._py25NewModule() )
 
 	
 	

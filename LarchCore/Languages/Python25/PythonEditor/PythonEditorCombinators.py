@@ -88,6 +88,9 @@ class PythonEditorStyle (object):
 	embeddedObjectExpansionLabelStyle = InheritedAttributeNonNull( pythonEditor, 'embeddedObjectExpansionLabelStyle', StyleSheet,
 	                                                     StyleSheet.style( Primitive.fontSize( 10 ) ) )
 
+	paragraphIndentationStyle = InheritedAttributeNonNull( pythonEditor, 'paragraphIndentationStyle', StyleSheet, StyleSheet.style( Primitive.paragraphIndentation( 40.0 ) ) )
+
+
 
 	solidHighlightRounding = InheritedAttributeNonNull( pythonEditor, 'solidHighlightRounding', float, 3.0 )
 	outlineHighlightThickness = InheritedAttributeNonNull( pythonEditor, 'outlineHighlightThickness', float, 2.0 )
@@ -101,6 +104,7 @@ class PythonEditorStyle (object):
 	comprehensionSpacing = InheritedAttributeNonNull( pythonEditor, 'comprehensionSpacing', float, 15.0 )
 	conditionalSpacing = InheritedAttributeNonNull( pythonEditor, 'conditionalSpacing', float, 15.0 )
 	blockIndentation = InheritedAttributeNonNull( pythonEditor, 'blockIndentation', float, 30.0 )
+
 
 
 	@PyDerivedValueTable( pythonEditor )

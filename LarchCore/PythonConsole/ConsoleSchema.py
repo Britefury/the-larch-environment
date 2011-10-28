@@ -45,7 +45,7 @@ class Console (object):
 		self._incr = IncrementalValueMonitor( self )
 		
 		self._blocks = []
-		self._currentPythonModule = Python25.py25NewModule()
+		self._currentPythonModule = Python25.py25NewModuleAsRoot()
 		self._before = []
 		self._after = []
 		self._module = imp.new_module( name )
@@ -63,14 +63,13 @@ class Console (object):
 		
 	def _commit(self, module, execResult):
 		self._blocks.append( ConsoleBlock( module, execResult ) )
-		blank = Python25.py25NewModule()
 		for a in self._after:
-			if a != blank:
+			if not Python25.isEmptyTopLevel(a):
 				self._before.append( a )
-		if module != blank:
+		if not Python25.isEmptyTopLevel(module):
 			self._before.append( deepcopy( module ) )
 		self._after = []
-		self._currentPythonModule = Python25.py25NewModule()
+		self._currentPythonModule = Python25.py25NewModuleAsRoot()
 		self._incr.onChanged()
 	
 	def backwards(self):
@@ -96,12 +95,12 @@ class Console (object):
 		
 	def execute(self, bEvaluate=True):
 		module = self.getCurrentPythonModule()
-		if module != Python25.py25NewModule():
+		if not Python25.isEmptyTopLevel(module):
 			execResult = Execution.executePythonModule( module, self._module, bEvaluate )
 			self._commit( module, execResult )
 					
 	def executeModule(self, module, bEvaluate=True):
-		if module != Python25.py25NewModule():
+		if not Python25.isEmptyTopLevel(module):
 			execResult = Execution.executePythonModule( module, self._module, bEvaluate )
 			self._commit( module, execResult )
 					
