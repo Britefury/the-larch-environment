@@ -347,13 +347,6 @@ public class Marker
 	
 	
 	
-	public static int getIndex(int position, Bias bias)
-	{
-		return bias == Bias.END  ?  position + 1  :  position;
-	}
-	
-	
-	
 	public void moveToPositionAndBiasWithinSubtree(DPElement subtree, int newPosition, Bias newBias, ElementFilter leafFilter)
 	{
 		moveTo( markerAtPositionAndBiasWithinSubtree( subtree, newPosition, newBias, leafFilter ) );

@@ -41,6 +41,15 @@ public class ElementRef extends Pres
 	}
 	
 	
+	public void queueFullRedraw()
+	{
+		for (DPElement element: contextByElement.keySet())
+		{
+			element.queueFullRedraw();
+		}
+	}
+	
+	
 	public ElementRef elementRef()
 	{
 		return this;

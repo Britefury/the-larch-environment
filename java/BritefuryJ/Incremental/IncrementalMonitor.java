@@ -6,11 +6,11 @@
 //##************************
 package BritefuryJ.Incremental;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.WeakHashMap;
+
+import BritefuryJ.Util.WeakListenerList;
 
 public abstract class IncrementalMonitor
 {
@@ -23,7 +23,7 @@ public abstract class IncrementalMonitor
 	protected Object owner;
 	protected IncrementalState incrementalState;
 	protected WeakHashMap<IncrementalFunctionMonitor, Object> outgoingDependencies;
-	protected ArrayList<WeakReference<IncrementalMonitorListener>> listeners;
+	protected WeakListenerList<IncrementalMonitorListener> listeners;
 	
 	
 	
@@ -46,49 +46,12 @@ public abstract class IncrementalMonitor
 	
 	public void addListener(IncrementalMonitorListener listener)
 	{
-		if ( listeners == null )
-		{
-			listeners = new ArrayList<WeakReference<IncrementalMonitorListener>>();
-		}
-		for (int i = listeners.size() - 1; i >= 0; i--)
-		{
-			WeakReference<IncrementalMonitorListener> ref = listeners.get( i );
-			IncrementalMonitorListener l = ref.get();
-			if ( l == listener )
-			{
-				return;
-			}
-			else if ( l == null )
-			{
-				listeners.remove( i );
-			}
-		}
-		listeners.add( new WeakReference<IncrementalMonitorListener>( listener ) );
+		listeners = WeakListenerList.addListener( listeners, listener );
 	}
 
 	public void removeListener(IncrementalMonitorListener listener)
 	{
-		if ( listeners != null )
-		{
-			for (int i = listeners.size() - 1; i >= 0; i--)
-			{
-				WeakReference<IncrementalMonitorListener> ref = listeners.get( i );
-				IncrementalMonitorListener l = ref.get();
-				if ( l == listener )
-				{
-					listeners.remove( i );
-					if ( listeners.isEmpty() )
-					{
-						listeners = null;
-					}
-					return;
-				}
-				else if ( l == null )
-				{
-					listeners.remove( i );
-				}
-			}
-		}
+		listeners = WeakListenerList.removeListener( listeners, listener );
 	}
 	
 	public boolean hasListeners()
@@ -162,18 +125,9 @@ public abstract class IncrementalMonitor
 	{
 		if ( listeners != null )
 		{
-			for (int i = listeners.size() - 1; i >= 0; i--)
+			for (IncrementalMonitorListener listener: listeners)
 			{
-				WeakReference<IncrementalMonitorListener> ref = listeners.get( i );
-				IncrementalMonitorListener l = ref.get();
-				if ( l == null )
-				{
-					listeners.remove( i );
-				}
-				else
-				{
-					l.onIncrementalMonitorChanged( this );
-				}
+				listener.onIncrementalMonitorChanged( this );
 			}
 		}
 	}
