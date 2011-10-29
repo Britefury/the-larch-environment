@@ -23,10 +23,8 @@ public class HorizontalLayout
 		double minWidth = 0.0, prefWidth = 0.0;
 		double minAdvance = 0.0, prefAdvance = 0.0;
 		double minX = 0.0, prefX = 0.0;
-		for (int i = 0; i < children.length; i++)
+		for (LReqBoxInterface child: children)
 		{
-			LReqBoxInterface child = children[i];
-			
 			minWidth = minX + child.getReqMinWidth();
 			prefWidth = prefX + child.getReqPrefWidth();
 			minAdvance = minX + child.getReqMinHAdvance();
