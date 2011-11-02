@@ -18,14 +18,14 @@ public class StringUnitEditorTextArea extends LiteralUnitEditor
 			@Override
 			public void onAccept(TextArea.TextAreaControl textArea, String text)
 			{
-				setCellValue( text );
+				setUnitValue( text );
 			}
 		}
 		
 
 		public StringEditor()
 		{
-			String value = getCellValue( String.class );
+			String value = getUnitValue( String.class );
 			String text = value != null  ?  value  :  "";
 			if ( value != null )
 			{
@@ -40,7 +40,7 @@ public class StringUnitEditorTextArea extends LiteralUnitEditor
 		
 		protected void refreshEditor()
 		{
-			String text = getCellValue( String.class );
+			String text = getUnitValue( String.class );
 			if ( text != null )
 			{
 				setPres( new TextArea( text, new Listener() ) );
