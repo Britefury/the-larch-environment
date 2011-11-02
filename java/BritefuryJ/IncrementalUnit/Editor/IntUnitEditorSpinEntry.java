@@ -17,13 +17,13 @@ public class IntUnitEditorSpinEntry extends LiteralUnitEditor
 		{
 			public void onSpinEntryValueChanged(IntSpinEntry.IntSpinEntryControl spinEntry, int value)
 			{
-				setCellValue( value );
+				setUnitValue( value );
 			}
 		}
 		
 		public IntEditor()
 		{
-			Integer value = getCellValue( Integer.class );
+			Integer value = getUnitValue( Integer.class );
 			int v = value != null  ?  value  :  0;
 			if ( value != null )
 			{
@@ -37,7 +37,7 @@ public class IntUnitEditorSpinEntry extends LiteralUnitEditor
 		
 		protected void refreshEditor()
 		{
-			Integer value = getCellValue( Integer.class );
+			Integer value = getUnitValue( Integer.class );
 			if ( value != null )
 			{
 				setPres( new IntSpinEntry( value, min, max, stepSize, pageSize, new Listener() ) );

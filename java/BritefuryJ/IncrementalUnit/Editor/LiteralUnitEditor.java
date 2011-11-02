@@ -54,7 +54,7 @@ public abstract class LiteralUnitEditor implements Presentable, IncrementalMonit
 		}
 		
 		
-		protected void onCellChanged()
+		protected void onUnitChanged()
 		{
 			if ( !bSettingCellValue )
 			{
@@ -70,7 +70,7 @@ public abstract class LiteralUnitEditor implements Presentable, IncrementalMonit
 			}
 		}
 		
-		protected void setCellValue(Object value)
+		protected void setUnitValue(Object value)
 		{
 			bSettingCellValue = true;
 			cell.setLiteralValue( value );
@@ -93,7 +93,7 @@ public abstract class LiteralUnitEditor implements Presentable, IncrementalMonit
 	protected abstract Editor createEditor();
 	
 
-	protected <V> V getCellValue(Class<V> valueClass)
+	protected <V> V getUnitValue(Class<V> valueClass)
 	{
 		Object v = cell.getLiteralValue();
 		
@@ -115,7 +115,7 @@ public abstract class LiteralUnitEditor implements Presentable, IncrementalMonit
 		return typedV;
 	}
 	
-	protected <V> V getCellValueNonNull(Class<V> valueClass, V defaultValue)
+	protected <V> V getUnitValueNonNull(Class<V> valueClass, V defaultValue)
 	{
 		Object v = cell.getLiteralValue();
 		
@@ -149,7 +149,7 @@ public abstract class LiteralUnitEditor implements Presentable, IncrementalMonit
 	{
 		for (Editor editor: editors.keySet())
 		{
-			editor.onCellChanged();
+			editor.onUnitChanged();
 		}
 	}
 }

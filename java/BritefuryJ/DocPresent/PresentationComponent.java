@@ -579,13 +579,28 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		public void setTarget(Target t)
 		{
+			boolean wasCaret = target == null;
 			target = t;
+			boolean isCaret = target == null;
+			if ( isCaret && !wasCaret )
+			{
+				notifyCaretNowCurrentTarget();
+			}
+			else if ( !isCaret && wasCaret )
+			{
+				notifyCaretNoLongerCurrentTarget();
+			}
 			queueFullRedraw();
 		}
 		
 		public void setCaretAsTarget()
 		{
+			boolean wasCaret = target == null;
 			target = null;
+			if ( !wasCaret )
+			{
+				notifyCaretNowCurrentTarget();
+			}
 			queueFullRedraw();
 		}
 		
@@ -1455,65 +1470,100 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		//
 		//
 		
-		public void caretChanged(Caret c)
+		private void caretChanged(Caret c)
 		{
 			assert c == caret;
 			
-			DPContentLeafEditable caretLeaf = c.getElement();
-			
-			if ( caretLeaf != currentCaretLeaf )
+			if ( c.isValid()  &&  getTarget() == c )
 			{
-				ArrayList<DPElement> prevPath = null, curPath = null;
-				if ( currentCaretLeaf != null )
-				{
-					prevPath = currentCaretLeaf.getElementPathToRoot();
-				}
-				else
-				{
-					prevPath = new ArrayList<DPElement>();
-				}
+				DPContentLeafEditable caretLeaf = c.getElement();
 				
-				if ( caretLeaf != null )
+				if ( caretLeaf != currentCaretLeaf )
 				{
-					curPath = caretLeaf.getElementPathToRoot();
-				}
-				else
-				{
-					curPath = new ArrayList<DPElement>();
-				}
-				
-
-				int prevPathDivergeIndex = prevPath.size() - 1, curPathDivergeIndex = curPath.size() - 1;
-				for (int i = prevPath.size() - 1, j = curPath.size() - 1; i >= 0  &&  j >= 0;  i--, j--)
-				{
-					DPElement prev = prevPath.get( i ), cur = curPath.get( j );
-					if ( prev != cur )
+					ArrayList<DPElement> prevPath = null, curPath = null;
+					if ( currentCaretLeaf != null )
 					{
-						// Found indices where paths diverge
-						prevPathDivergeIndex = i;
-						curPathDivergeIndex = j;
-						
-						break;
+						prevPath = currentCaretLeaf.getElementPathToRoot();
+					}
+					else
+					{
+						prevPath = new ArrayList<DPElement>();
+					}
+					
+					if ( caretLeaf != null )
+					{
+						curPath = caretLeaf.getElementPathToRoot();
+					}
+					else
+					{
+						curPath = new ArrayList<DPElement>();
+					}
+					
+	
+					int prevPathDivergeIndex = prevPath.size() - 1, curPathDivergeIndex = curPath.size() - 1;
+					for (int i = prevPath.size() - 1, j = curPath.size() - 1; i >= 0  &&  j >= 0;  i--, j--)
+					{
+						DPElement prev = prevPath.get( i ), cur = curPath.get( j );
+						if ( prev != cur )
+						{
+							// Found indices where paths diverge
+							prevPathDivergeIndex = i;
+							curPathDivergeIndex = j;
+							
+							break;
+						}
+					}
+					
+					
+					// Send leave events
+					for (int x = 0; x <= prevPathDivergeIndex; x++)
+					{
+						prevPath.get( x ).handleCaretLeave( c );
+					}
+					
+					currentCaretLeaf = caretLeaf;
+	
+					for (int x = curPathDivergeIndex; x >= 0; x--)
+					{
+						curPath.get( x ).handleCaretEnter( c );
 					}
 				}
 				
 				
-				// Send leave events
-				for (int x = 0; x <= prevPathDivergeIndex; x++)
+				queueFullRedraw();
+			}
+		}
+		
+		private void notifyCaretNowCurrentTarget()
+		{
+			if ( caret.isValid() )
+			{
+				DPContentLeafEditable caretLeaf = caret.getElement();
+				
+				ArrayList<DPElement> path = caretLeaf.getElementPathFromRoot();
+				for (DPElement e: path)
 				{
-					prevPath.get( x ).handleCaretLeave( c );
+					e.handleCaretEnter( caret );
 				}
 				
 				currentCaretLeaf = caretLeaf;
-
-				for (int x = curPathDivergeIndex; x >= 0; x--)
-				{
-					curPath.get( x ).handleCaretEnter( c );
-				}
 			}
-			
-			
-			queueFullRedraw();
+		}
+		
+		private void notifyCaretNoLongerCurrentTarget()
+		{
+			if ( caret.isValid() )
+			{
+				DPContentLeafEditable caretLeaf = caret.getElement();
+				
+				ArrayList<DPElement> path = caretLeaf.getElementPathToRoot();
+				for (DPElement e: path)
+				{
+					e.handleCaretLeave( caret );
+				}
+				
+				currentCaretLeaf = null;
+			}
 		}
 		
 		

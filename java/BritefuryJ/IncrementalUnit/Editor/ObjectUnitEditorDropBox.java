@@ -23,7 +23,7 @@ public class ObjectUnitEditorDropBox extends LiteralUnitEditor
 		{
 			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
 			{
-				setCellValue( ((FragmentData)data).getModel() );
+				setUnitValue( ((FragmentData)data).getModel() );
 				return true;
 			}
 		}
@@ -35,7 +35,7 @@ public class ObjectUnitEditorDropBox extends LiteralUnitEditor
 		
 		protected void refreshEditor()
 		{
-			Object value = getCellValue( Object.class );
+			Object value = getUnitValue( Object.class );
 			Pres p;
 			if ( value != null )
 			{

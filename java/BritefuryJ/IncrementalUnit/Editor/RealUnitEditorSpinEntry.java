@@ -18,13 +18,13 @@ public class RealUnitEditorSpinEntry extends LiteralUnitEditor
 			@Override
 			public void onSpinEntryValueChanged(RealSpinEntry.RealSpinEntryControl spinEntry, double value)
 			{
-				setCellValue( value );
+				setUnitValue( value );
 			}
 		}
 		
 		public RealEditor()
 		{
-			Double value = getCellValue( Double.class );
+			Double value = getUnitValue( Double.class );
 			double v = value != null  ?  value  :  0.0;
 			
 			if ( value != null )
@@ -39,7 +39,7 @@ public class RealUnitEditorSpinEntry extends LiteralUnitEditor
 		
 		protected void refreshEditor()
 		{
-			Double value = getCellValue( Double.class );
+			Double value = getUnitValue( Double.class );
 			if ( value != null )
 			{
 				setPres( new RealSpinEntry( value, min, max, stepSize, pageSize, new Listener() ) );
