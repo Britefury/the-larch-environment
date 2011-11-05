@@ -121,7 +121,7 @@ _grammar = Python25Grammar()
 
 class Python25PageData (PageData):
 	def makeEmptyContents(self):
-		return py25NewModule()
+		return _py25NewModule()
 	
 	def __new_subject__(self, document, enclosingSubject, location, importName, title):
 		return Python25Subject( document, self.contents, enclosingSubject, location, importName, title )

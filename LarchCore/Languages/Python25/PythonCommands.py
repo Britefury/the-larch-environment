@@ -27,7 +27,7 @@ def _makeInsertEmbeddedObjectAtCaretAction(valueAtCaretFactory, embedFn):
 		if caret.isValid()  and  caret.isEditable():
 			value = valueAtCaretFactory( caret )
 			if value is not None:
-				specialForm = embedFn( value, False )
+				specialForm = embedFn( value )
 				insertSpecialFormAtCaret( caret, specialForm )
 				return True
 		

@@ -20,7 +20,9 @@ import BritefuryJ.DocPresent.Interactor.KeyElementInteractor;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.TextSelection;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.Bin;
 import BritefuryJ.Pres.Primitive.Region;
+import BritefuryJ.Pres.Primitive.Segment;
 import BritefuryJ.Pres.Primitive.Text;
 import BritefuryJ.Util.UnaryFn;
 
@@ -29,18 +31,18 @@ public class EditableTextCell
 	public static Pres textCellWithCachedListener(String text, UnaryFn textToValue)
 	{
 		TreeEventListener listener = cachedTreeEventListenerFor( textToValue );
-		Pres textPres = new Text( text );
+		Pres textPres = new Segment( new Text( text ) );
 		textPres = textPres.withElementInteractor( caretInteractor ).withElementInteractor( keyInteractor ).withTreeEventListener( listener );
-		return new Region( textPres, clipboardHandler );
+		return new Bin( new Region( textPres, clipboardHandler ) );
 	}
 
 
 	public static Pres textCell(String text, UnaryFn textToValue)
 	{
 		TreeEventListener listener = treeEventListenerFor( textToValue );
-		Pres textPres = new Text( text );
+		Pres textPres = new Segment( new Text( text ) );
 		textPres = textPres.withElementInteractor( caretInteractor ).withElementInteractor( keyInteractor ).withTreeEventListener( listener );
-		return new Region( textPres, clipboardHandler );
+		return new Bin( new Region( textPres, clipboardHandler ) );
 	}
 
 
