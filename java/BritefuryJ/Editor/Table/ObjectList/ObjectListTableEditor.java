@@ -307,7 +307,7 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 				int w = Math.min( dataRow.length, width - x );
 				for (int i = x, a = 0; a < w; i++, a++)
 				{
-					columns[i].set( modelRow, dataRow[a] );
+					columns[i].set( modelRow, columns[i].copyValue( dataRow[a] ) );
 				}
 				
 				if ( !rowsAreLive )

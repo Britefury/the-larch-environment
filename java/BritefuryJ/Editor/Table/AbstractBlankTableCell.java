@@ -11,7 +11,6 @@ import BritefuryJ.Cell.AbstractBlankCell;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Bin;
-import BritefuryJ.Pres.Primitive.Segment;
 
 public abstract class AbstractBlankTableCell extends AbstractBlankCell
 {
@@ -25,6 +24,7 @@ public abstract class AbstractBlankTableCell extends AbstractBlankCell
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		Pres cellContents = presentCell( fragment, inheritedState );
-		return new Bin( new Segment( cellContents.alignHPack().alignVRefY() ) ).alignHPack().alignVRefY();
+		//return new Bin( new Segment( cellContents.alignHPack().alignVRefY() ) ).alignHPack().alignVRefY();
+		return new Bin( cellContents.alignHPack().alignVRefY() ).alignHPack().alignVRefY();
 	}
 }

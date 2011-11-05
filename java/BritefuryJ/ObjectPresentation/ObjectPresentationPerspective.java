@@ -59,12 +59,17 @@ public abstract class ObjectPresentationPerspective extends AbstractPerspective
 	protected Pres presentModel(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		Pres result = null;
+		String typeName = null;
 		
 		
 		PyObject pyX = null;
 		
 		// Java object presentation protocol - Java interface
 		result = presentWithJavaInterface( x, fragment, inheritedState );
+		if ( result != null )
+		{
+			typeName = x.getClass().getName();
+		}
 		
 		// Python object presentation protocol
 		if ( result == null  &&  x instanceof PyObject )
@@ -84,6 +89,10 @@ public abstract class ObjectPresentationPerspective extends AbstractPerspective
 			if ( presentMethod != null  &&  presentMethod.isCallable() )
 			{
 				result = Py.tojava( presentMethod.__call__( Py.java2py( fragment ), Py.java2py( inheritedState ) ),  Pres.class );
+				if ( result != null )
+				{
+					typeName = pyX.getType().getName();
+				}
 			}
 			
 			
@@ -98,6 +107,10 @@ public abstract class ObjectPresentationPerspective extends AbstractPerspective
 				{
 					result = invokePyObjectPresenter( presenter, pyX, fragment, inheritedState );
 				}
+				if ( result != null )
+				{
+					typeName = pyX.getType().getName();
+				}
 			}
 		}
 		
@@ -105,6 +118,7 @@ public abstract class ObjectPresentationPerspective extends AbstractPerspective
 		if ( result == null  &&  x.getClass().isArray() )
 		{
 			result = presentJavaArray( x, fragment, inheritedState );
+			typeName = "[" + x.getClass().getComponentType().getName() + "]";
 		}
 		
 		// Java object presentation protocol - registered presenters
@@ -114,6 +128,10 @@ public abstract class ObjectPresentationPerspective extends AbstractPerspective
 			if ( presenter != null )
 			{
 				result = invokeObjectPresenter( presenter, x, fragment, inheritedState );
+			}
+			if ( result != null )
+			{
+				typeName = x.getClass().getName();
 			}
 		}
 		
@@ -131,8 +149,14 @@ public abstract class ObjectPresentationPerspective extends AbstractPerspective
 		}
 		else
 		{
-			result.setDebugName( x.getClass().getName() );
-			return result;
+			if ( typeName != null )
+			{
+				return result.setDebugName( typeName );
+			}
+			else
+			{
+				return result;
+			}
 		}
 	}
 
