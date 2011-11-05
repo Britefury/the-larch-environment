@@ -17,6 +17,7 @@ public abstract class AbstractColumn
 	
 	
 	public abstract Object defaultValue();
+	public abstract Object copyValue(Object x);
 	public abstract Object importValue(Object x);
 	public abstract String exportValue(Object x);
 	

@@ -19,17 +19,18 @@ public class AttributeColumn extends AbstractColumn
 {
 	private String title;
 	private PyString attrname;
-	private PyObject valueConstructorFn, valueExportFn;
+	private PyObject valueConstructorFn, valueExportFn, valueCopyFn;
 	private PyObject defaultValue, defaultValueCallable;
 	
 	
-	public AttributeColumn(String title, PyString attrname, PyObject valueConstructorFn, PyObject valueExportFn, PyObject defaultValue)
+	public AttributeColumn(String title, PyString attrname, PyObject valueConstructorFn, PyObject valueExportFn, PyObject valueCopyFn, PyObject defaultValue)
 	{
 		super();
 		this.title = title;
 		this.attrname = __builtin__.intern( attrname );
 		this.valueConstructorFn = valueConstructorFn;
 		this.valueExportFn = valueExportFn;
+		this.valueCopyFn = valueCopyFn;
 		if ( defaultValue.isCallable() )
 		{
 			this.defaultValueCallable = defaultValue;
@@ -40,14 +41,19 @@ public class AttributeColumn extends AbstractColumn
 		}
 	}
 	
+	public AttributeColumn(String title, PyString attrname, PyObject valueConstructorFn, PyObject valueCopyFn, PyObject defaultValue)
+	{
+		this( title, attrname, valueConstructorFn, null, valueCopyFn, defaultValue );
+	}
+	
 	public AttributeColumn(String title, PyString attrname, PyObject valueConstructorFn, PyObject defaultValue)
 	{
-		this( title, attrname, valueConstructorFn, null, defaultValue );
+		this( title, attrname, valueConstructorFn, null, null, defaultValue );
 	}
 	
 	public AttributeColumn(String title, PyString attrname)
 	{
-		this( title, attrname, null, null, Py.None );
+		this( title, attrname, null, null, null, Py.None );
 	}
 	
 	
@@ -90,6 +96,19 @@ public class AttributeColumn extends AbstractColumn
 		else
 		{
 			return defaultValue;
+		}
+	}
+
+	@Override
+	public Object copyValue(Object x)
+	{
+		if ( valueCopyFn != null  &&  valueCopyFn != Py.None )
+		{
+			return valueCopyFn.__call__( Py.java2py( x ) );
+		}
+		else
+		{
+			return x;
 		}
 	}
 
