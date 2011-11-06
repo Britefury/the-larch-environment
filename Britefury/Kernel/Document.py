@@ -142,8 +142,9 @@ class Document (ChangeHistoryListener):
 		
 		
 	def save(self):
+		data = IsolationPickle.dumps( self._contents )
 		f = open( self._filename, 'w' )
-		IsolationPickle.dump( self._contents, f )
+		f.write( data )
 		f.close()
 		if self._bHasUnsavedData:
 			self._bHasUnsavedData = False
