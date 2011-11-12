@@ -8,28 +8,18 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.util.regex.Pattern;
 
-import BritefuryJ.Controls.AbstractHyperlink;
-import BritefuryJ.Controls.ControlPres;
-import BritefuryJ.Controls.Hyperlink;
-import BritefuryJ.Controls.Hyperlink.HyperlinkControl;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Controls.TextEntry;
-import BritefuryJ.Controls.TextEntry.TextEntryControl;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPProxy;
-import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
+import BritefuryJ.DefaultPerspective.Presentable;
+import BritefuryJ.IncrementalUnit.LiteralUnit;
+import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
-import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Paragraph;
-import BritefuryJ.Pres.Primitive.Primitive;
-import BritefuryJ.Pres.Primitive.Proxy;
 import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.RichText.Heading2;
-import BritefuryJ.StyleSheet.StyleSheet;
-import BritefuryJ.StyleSheet.StyleValues;
 
 public class TextEntryTestPage extends SystemPage
 {
@@ -49,150 +39,86 @@ public class TextEntryTestPage extends SystemPage
 	}
 	
 	
-	private static class EditableLink extends ControlPres
+	private static class TextEntryTest implements Presentable
 	{
-		private static class EditableLinkControl extends Control
+		private LiteralUnit value;
+		private Pattern validationRegex = null;
+		private String validationFailMsg = null;
+		
+		public TextEntryTest(LiteralUnit value, Pattern validationRegex, String validationFailMessage)
 		{
-			private class TextListener extends TextEntry.TextEntryListener
+			this.value = value;
+			this.validationRegex = validationRegex;
+			this.validationFailMsg = validationFailMessage;
+		}
+
+		public TextEntryTest(LiteralUnit value)
+		{
+			this.value = value;
+		}
+
+		@Override
+		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
+		{
+			final LiteralUnit message = new LiteralUnit( new Label( "No change yet..." ) );
+			
+			TextEntry.TextEntryListener listener = new TextEntry.TextEntryListener()
 			{
 				public void onAccept(TextEntry.TextEntryControl textEntry, String text)
 				{
-					link.setText( text );
-					proxy.setChild( link.getElement() );
+					value.setLiteralValue( text );
+					message.setLiteralValue( new Label( "Accepted" ) );
 				}
 	
-				public void onCancel(TextEntry.TextEntryControl textEntry, String originalText)
+				public void onCancel(TextEntry.TextEntryControl textEntry)
 				{
-					proxy.setChild( link.getElement() );
+					message.setLiteralValue( new Label( "Cancelled" ) );
 				}
 				
 				public void onTextInserted(TextEntry.TextEntryControl textEntry, int position, String textInserted)
 				{
-					status.setText( "INSERTED @" + position + " :" +  textInserted );
+					message.setLiteralValue( new Label( "INSERTED @" + position + " :" +  textInserted ) );
 				}
 	
 				public void onTextRemoved(TextEntry.TextEntryControl textEntry, int position, int length)
 				{
-					status.setText( "REMOVED " + position + " to " + ( position + length ) );
+					message.setLiteralValue( new Label( "REMOVED " + position + " to " + ( position + length ) ) );
 				}
 				
 				public void onTextReplaced(TextEntry.TextEntryControl textEntry, int position, int length, String replacementText)
 				{
-					status.setText( "REPLACED " + position + " to " + ( position + length ) + " with: " + replacementText );
+					message.setLiteralValue( new Label( "REPLACED " + position + " to " + ( position + length ) + " with: " + replacementText ) );
 				}
-			}
+			};
 			
-			private class LinkListener implements Hyperlink.LinkListener
+			Pres entry;
+			if ( validationRegex != null )
 			{
-				
-				public void onLinkClicked(Hyperlink.AbstractHyperlinkControl link, PointerButtonClickedEvent event)
-				{
-					status.setText( "" );
-					entry.setText( ((Hyperlink.HyperlinkControl)link).getText() );
-					proxy.setChild( StyleSheet.style( Primitive.rowSpacing.as( 10.0 ) ).applyTo( new Row( new Object[] { entry.getElement(), status } ) ).present( ctx, style ) );
-					entry.grabCaret();
-				}
-			}
-			
-			
-			private DPText status;
-			private Hyperlink.HyperlinkControl link;
-			private TextEntry.TextEntryControl entry;
-			private DPProxy proxy;
-			
-			
-			public EditableLinkControl(PresentationContext ctx, StyleValues style)
-			{
-				super( ctx, style );
-			}
-			
-			
-			LinkListener linkListener()
-			{
-				return new LinkListener();
-			}
-			
-			TextListener entryListener()
-			{
-				return new TextListener();
-			}
-			
-			
-			
-			
-			@Override
-			public DPElement getElement()
-			{
-				return proxy;
-			}
-		}
-		
-		
-		
-		private String initialText;
-		private Pattern validationRegex = null;
-		private String validationFailMsg = null;
-		
-		
-		public EditableLink(String text)
-		{
-			this.initialText = text;
-		}
-		
-		public EditableLink(String text, Pattern validationRegex, String validationFailMessage)
-		{
-			this.initialText = text;
-			this.validationRegex = validationRegex;
-			this.validationFailMsg = validationFailMessage;
-		}
-		
-		
-		@Override
-		public Control createControl(PresentationContext ctx, StyleValues style)
-		{
-			EditableLinkControl ctl = new EditableLinkControl( ctx, style );
-			
-			Label status = new Label( "" );
-			DPText statusElement = (DPText)status.present( ctx, style );
-			
-			AbstractHyperlink link = new Hyperlink( initialText, ctl.linkListener() );
-			TextEntry entry;
-			
-			if ( validationRegex == null )
-			{
-				entry = new TextEntry( initialText, ctl.entryListener() );
+				entry = TextEntry.regexValidated( value, listener, validationRegex, validationFailMsg );
 			}
 			else
 			{
-				entry = new TextEntry( initialText, ctl.entryListener(), validationRegex, validationFailMsg );
+				entry = new TextEntry( value, listener );
 			}
 			
-			Proxy proxy = new Proxy( link );
-			DPProxy proxyElement = (DPProxy)proxy.present( ctx, style );
-			
-			ctl.status = statusElement;
-			ctl.link = (HyperlinkControl)link.createControl( ctx, style );
-			ctl.entry = (TextEntryControl)entry.createControl( ctx, style );
-			ctl.proxy = proxyElement;
-			
-			return ctl;
+			return new Row( new Object[] { entry.padX( 5.0 ),
+					new Row( new Object[] { new Label( "Value: " ), value.valuePresInFragment() } ).padX( 5.0 ),
+					new Row( new Object[] { new Label( "Message: " ), message.valuePresInFragment() } ).padX( 5.0 ) } );
 		}
 	}
-
 	
-
 	
 	protected Pres createContents()
 	{
-		EditableLink hello = new EditableLink( "Hello" );
-		EditableLink world = new EditableLink( "World" );
-		EditableLink identifier = new EditableLink( "abc", Pattern.compile( "[a-zA-Z_][a-zA-Z0-9_]*" ), "Please enter a valid identifier.\n(alphabetic or underscore, followed by alphanumeric or underscore)" );
-		EditableLink integer = new EditableLink( "123", Pattern.compile( "[0-9]+" ), "Please enter a valid integer." );
+		TextEntryTest hello = new TextEntryTest( new LiteralUnit( "Hello" ) );
+		TextEntryTest world = new TextEntryTest( new LiteralUnit( "World" ) );
+		TextEntryTest identifier = new TextEntryTest( new LiteralUnit( "abc" ), Pattern.compile( "[a-zA-Z_][a-zA-Z0-9_]*" ), "Please enter a valid identifier.\n(alphabetic or underscore, followed by alphanumeric or underscore)" );
+		TextEntryTest integer = new TextEntryTest( new LiteralUnit( "123" ), Pattern.compile( "[0-9]+" ), "Please enter a valid integer." );
 		
-		Pres identifierLine = new Paragraph( new Pres[] { new Label( "Identifier: "), identifier } );
-		Pres integerLine = new Paragraph( new Pres[] { new Label( "Integer: "), integer } );
+		Pres identifierLine = new Paragraph( new Object[] { new Label( "Identifier: "), identifier } );
+		Pres integerLine = new Paragraph( new Object[] { new Label( "Integer: "), integer } );
 		
-		Pres entriesBox = new Column( new Pres[] { hello, world, identifierLine, integerLine } );
+		Pres entriesBox = new Column( new Object[] { hello, world, identifierLine, integerLine } );
 		
 		return new Body( new Pres[] { new Heading2( "Text entries" ), entriesBox } );
 	}

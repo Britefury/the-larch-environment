@@ -7,12 +7,9 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import BritefuryJ.Controls.Checkbox;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.Pres.ElementRef;
+import BritefuryJ.IncrementalUnit.LiteralUnit;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Column;
-import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.RichText.Heading2;
 
@@ -34,35 +31,13 @@ public class CheckboxTestPage extends SystemPage
 	}
 	
 	
-	private static class CheckboxTextChanger implements Checkbox.CheckboxListener
-	{
-		private ElementRef textElements;
-		
-		
-		public CheckboxTextChanger(ElementRef textElements)
-		{
-			this.textElements = textElements;
-		}
-
-
-		public void onCheckboxToggled(Checkbox.CheckboxControl checkbox, boolean state)
-		{
-			for (DPElement element: textElements.getElements())
-			{
-				DPText textElement = (DPText)element;
-				textElement.setText( String.valueOf( state ) );
-			}
-		}
-	}
-
-	
-
 	protected Pres createContents()
 	{
-		ElementRef stateTextRef = new Label( "false" ).elementRef();
-		Pres checkbox = Checkbox.checkboxWithLabel( "State", false, new CheckboxTextChanger( stateTextRef ) );
-		Pres checkboxSectionContents = new Column( new Pres[] { stateTextRef, checkbox.padX( 5.0 ) } );
-		
+		LiteralUnit state = new LiteralUnit( false );
+		Pres checkboxA = Checkbox.checkboxWithLabel( "Checkbox A", state );
+		Pres checkboxB = Checkbox.checkboxWithLabel( "Checkbox B (linked to checkbox A)", state );
+		Pres checkboxSectionContents = new Column( new Pres[] { checkboxA.padX( 5.0 ), checkboxB.padX( 5.0 ), state.valuePresInFragment() } );
+
 		return new Body( new Pres[] { new Heading2( "Checkbox" ), checkboxSectionContents } );
 	}
 }

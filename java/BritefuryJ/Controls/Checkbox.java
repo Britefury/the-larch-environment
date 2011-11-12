@@ -10,6 +10,9 @@ import java.awt.Paint;
 
 import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.Incremental.IncrementalMonitor;
+import BritefuryJ.Incremental.IncrementalMonitorListener;
+import BritefuryJ.IncrementalUnit.LiteralUnit;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Bin;
@@ -23,21 +26,13 @@ import BritefuryJ.StyleSheet.StyleValues;
 
 public class Checkbox extends ControlPres
 {
-	public static interface CheckboxListener
-	{
-		public void onCheckboxToggled(CheckboxControl checkbox, boolean state);
-	}
-	
-	
-	
-	public static class CheckboxControl extends Control
+	public static class CheckboxControl extends Control implements IncrementalMonitorListener
 	{
 		private DPElement element, box, check;
-		private CheckboxListener listener;
-		private boolean state;
+		private LiteralUnit state;
 
 		
-		protected CheckboxControl(PresentationContext ctx, StyleValues style, DPElement element, DPElement box, DPElement check, boolean state, CheckboxListener listener, Paint checkForeground)
+		protected CheckboxControl(PresentationContext ctx, StyleValues style, DPElement element, DPElement box, DPElement check, LiteralUnit state, Paint checkForeground)
 		{
 			super( ctx, style );
 			
@@ -46,8 +41,8 @@ public class Checkbox extends ControlPres
 			this.box.addElementInteractor( new CheckboxHelper.CheckboxCheckInteractor( this ) );
 			this.check = check;
 			check.addPainter( new CheckboxHelper.CheckboxCheckPainter( checkForeground, this ) );
-			this.listener = listener;
 			this.state = state;
+			this.state.addListener( this );
 			element.setFixedValue( state );
 		}
 		
@@ -62,52 +57,62 @@ public class Checkbox extends ControlPres
 		
 		public boolean getState()
 		{
-			return state;
+			return (Boolean)state.getStaticValue();
 		}
 		
 		public void setState(boolean state)
 		{
-			if ( state != this.state )
-			{
-				this.state = state;
-				
-				check.queueFullRedraw();
-				
-				element.setFixedValue( state );
-				
-				if ( listener != null )
-				{
-					listener.onCheckboxToggled( this, state );
-				}
-			}
+			this.state.setLiteralValue( state );
 		}
 
 		
 		
 		public void toggle()
 		{
-			setState( !state );
+			boolean value = (Boolean)state.getStaticValue();
+			state.setLiteralValue( !value );
+		}
+
+
+
+		@Override
+		public void onIncrementalMonitorChanged(IncrementalMonitor inc)
+		{
+			// Use getValue() so that @state reports further value changes
+			boolean value = (Boolean)state.getValue();
+			
+			element.setFixedValue( value );
+
+			check.queueFullRedraw();
 		}
 	}
 
 	
 	
 	private Pres child;
-	private CheckboxListener listener;
-	private boolean initialState;
+	private LiteralUnit state;
 
 	
-	public Checkbox(Object child, boolean initialState, CheckboxListener listener)
+	public Checkbox(Object child, LiteralUnit state)
 	{
 		this.child = coerce( child );
-		this.listener = listener;
-		this.initialState = initialState;
+		this.state = state;
+	}
+	
+	public Checkbox(Object child, boolean state)
+	{
+		this( child, new LiteralUnit( state ) );
 	}
 	
 	
-	public static Checkbox checkboxWithLabel(String labelText, boolean initialState, CheckboxListener listener)
+	public static Checkbox checkboxWithLabel(String labelText, LiteralUnit state)
 	{
-		return new Checkbox( new Label( labelText ), initialState, listener );
+		return new Checkbox( new Label( labelText ), state );
+	}
+	
+	public static Checkbox checkboxWithLabel(String labelText, boolean state)
+	{
+		return new Checkbox( new Label( labelText ), state );
 	}
 	
 	
@@ -131,7 +136,7 @@ public class Checkbox extends ControlPres
 		
 		Pres bin = new Bin( rowElement );
 		DPElement element = bin.present( ctx, style );
-		element.setFixedValue( initialState );
-		return new CheckboxControl( ctx, style, element, rowElement, checkElement, initialState, listener, checkForeground );
+		element.setFixedValue( state.getStaticValue() );
+		return new CheckboxControl( ctx, style, element, rowElement, checkElement, state, checkForeground );
 	}
 }

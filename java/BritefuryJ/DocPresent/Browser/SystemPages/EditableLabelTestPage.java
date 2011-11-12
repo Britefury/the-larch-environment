@@ -10,6 +10,7 @@ import java.awt.Color;
 import java.util.regex.Pattern;
 
 import BritefuryJ.Controls.EditableLabel;
+import BritefuryJ.IncrementalUnit.LiteralUnit;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Label;
@@ -42,10 +43,10 @@ public class EditableLabelTestPage extends SystemPage
 	protected Pres createContents()
 	{
 		Pres notSet = notSetStyle.applyTo( new Label( "<not set>" ) );
-		EditableLabel hello = new EditableLabel( "Hello", notSet, null );
-		EditableLabel world = new EditableLabel( "World", notSet, null );
-		EditableLabel identifier = new EditableLabel( "abc", notSet, null, Pattern.compile( "[a-zA-Z_][a-zA-Z0-9_]*" ), "Please enter a valid identifier.\n(alphabetic or underscore, followed by alphanumeric or underscore)" );
-		EditableLabel integer = new EditableLabel( "123", notSet, null, Pattern.compile( "[0-9]+" ), "Please enter a valid integer." );
+		EditableLabel hello = new EditableLabel( new LiteralUnit( "Hello" ), notSet );
+		EditableLabel world = new EditableLabel( new LiteralUnit( "World" ), notSet );
+		EditableLabel identifier = EditableLabel.regexValidated( new LiteralUnit( "abc" ), notSet, Pattern.compile( "[a-zA-Z_][a-zA-Z0-9_]*" ), "Please enter a valid identifier.\n(alphabetic or underscore, followed by alphanumeric or underscore)" );
+		EditableLabel integer = EditableLabel.regexValidated( new LiteralUnit( "123" ), notSet, Pattern.compile( "[0-9]+" ), "Please enter a valid integer." );
 		
 		Pres identifierLine = new Paragraph( new Pres[] { new Label( "Identifier: "), identifier } );
 		Pres integerLine = new Paragraph( new Pres[] { new Label( "Integer: "), integer } );

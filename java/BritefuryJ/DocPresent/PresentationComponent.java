@@ -40,6 +40,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.ImageObserver;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JComponent;
@@ -444,7 +445,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		private DPElement ensureVisibilityElement;
 		
 		
-		protected ArrayList<Runnable> waitingImmediateEvents;			// only initialised when non-empty; otherwise null
+		protected LinkedList<Runnable> waitingImmediateEvents;			// only initialised when non-empty; otherwise null
 		
 		
 		private ElementValueCacheManager valueCacheManager = new ElementValueCacheManager( this );
@@ -670,7 +671,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			
 			if ( waitingImmediateEvents == null )
 			{
-				waitingImmediateEvents = new ArrayList<Runnable>();
+				waitingImmediateEvents = new LinkedList<Runnable>();
 			}
 			
 			if ( !waitingImmediateEvents.contains( event ) )
@@ -700,20 +701,15 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			immediateEventDispatcher = null;
 		}
 		
-		@SuppressWarnings("unchecked")
 		private void emitImmediateEvents()
 		{
-			if ( waitingImmediateEvents != null )
+			while ( waitingImmediateEvents != null  &&  !waitingImmediateEvents.isEmpty() )
 			{
-				List<Runnable> events = (List<Runnable>)waitingImmediateEvents.clone();
-				
-				for (Runnable event: events)
-				{
-					event.run();
-				}
-				
-				waitingImmediateEvents = null;
+				Runnable event = waitingImmediateEvents.removeFirst();
+				event.run();
 			}
+			
+			waitingImmediateEvents = null;
 		}
 		
 		

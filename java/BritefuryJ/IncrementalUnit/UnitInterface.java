@@ -14,6 +14,8 @@ import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.DefaultPerspective.PrimitivePresenter;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.ElementValueFunction;
+import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.ApplyPerspective;
@@ -30,6 +32,31 @@ import BritefuryJ.StyleSheet.StyleValues;
 
 public abstract class UnitInterface implements Presentable
 {
+	protected static class ElementValueFn implements ElementValueFunction
+	{
+		private UnitInterface unit;
+		
+		public ElementValueFn(UnitInterface unit)
+		{
+			this.unit = unit;
+		}
+		
+		public Object computeElementValue(DPElement element)
+		{
+			return unit.getStaticValue();
+		}
+
+		@Override
+		public void addStreamValuePrefixToStream(StreamValueBuilder builder, DPElement element)
+		{
+		}
+
+		@Override
+		public void addStreamValueSuffixToStream(StreamValueBuilder builder, DPElement element)
+		{
+		}
+	}
+	
 	public static class ValuePres extends Pres
 	{
 		private UnitInterface unit;
@@ -72,11 +99,17 @@ public abstract class UnitInterface implements Presentable
 	
 	
 	
-	public abstract Object getLiteralValue();
 	public abstract void setLiteralValue(Object value);
-	public abstract boolean isLiteral();
 	
 	public abstract Object getValue();
+	public abstract Object getStaticValue();
+	
+	
+	
+	public ElementValueFunction elementValueFunction()
+	{
+		return new ElementValueFn( this );
+	}
 	
 	
 	

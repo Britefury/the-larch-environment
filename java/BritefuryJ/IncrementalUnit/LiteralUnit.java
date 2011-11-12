@@ -31,20 +31,10 @@ public class LiteralUnit extends UnitInterface
 	}
 	
 	
-	public Object getLiteralValue()
-	{
-		return value;
-	}
-
 	public void setLiteralValue(Object value)
 	{
 		this.value = value;
 		inc.onChanged();
-	}
-
-	public boolean isLiteral()
-	{
-		return true;
 	}
 
 	
@@ -52,6 +42,11 @@ public class LiteralUnit extends UnitInterface
 	{
 		inc.onAccess();
 		
+		return value;
+	}
+
+	public Object getStaticValue()
+	{
 		return value;
 	}
 
