@@ -17,6 +17,9 @@ import BritefuryJ.DocPresent.Input.Modifier;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.Interactor.DragElementInteractor;
+import BritefuryJ.IncrementalUnit.Unit;
+import BritefuryJ.IncrementalUnit.UnitEvaluator;
+import BritefuryJ.IncrementalUnit.UnitInterface;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
@@ -31,11 +34,6 @@ public abstract class SpinEntry extends ControlPres
 {
 	public abstract static class SpinEntryControl extends Control
 	{
-		protected DPElement element;
-		protected TextEntry.TextEntryControl textEntry;
-		protected DPElement upSpinButton, downSpinButton;
-		
-		
 		protected static class SpinEntryTextListener extends TextEntry.TextEntryListener
 		{
 			private SpinEntryControl spinEntry = null;
@@ -116,11 +114,18 @@ public abstract class SpinEntry extends ControlPres
 		
 		
 		
-		protected SpinEntryControl(PresentationContext ctx, StyleValues style, DPElement element, TextEntry.TextEntryControl textEntry,
+		protected UnitInterface value;
+		protected DPElement element;
+		protected TextEntry.TextEntryControl textEntry;
+		protected DPElement upSpinButton, downSpinButton;
+		
+		
+		protected SpinEntryControl(PresentationContext ctx, StyleValues style, UnitInterface value, DPElement element, TextEntry.TextEntryControl textEntry,
 				DPElement upSpinButton, DPElement downSpinButton, SpinEntryTextListener textListener)
 		{
 			super( ctx, style );
 			
+			this.value = value;
 			this.element = element;
 			this.textEntry = textEntry;
 			this.upSpinButton = upSpinButton;
@@ -147,8 +152,32 @@ public abstract class SpinEntry extends ControlPres
 	}
 	
 	
-	public SpinEntry()
+	private static class TextLiveFn extends UnitEvaluator
 	{
+		private UnitInterface value;
+		
+		
+		public TextLiveFn(UnitInterface value)
+		{
+			this.value = value;
+		}
+		
+		
+		@Override
+		public Object evaluate()
+		{
+			return String.valueOf( value.getValue() );
+		}
+	};
+	
+	
+	
+	private LiveSource valueSource;
+	
+	
+	protected SpinEntry(LiveSource valueSource)
+	{
+		this.valueSource = valueSource;
 	}
 	
 	
@@ -156,6 +185,11 @@ public abstract class SpinEntry extends ControlPres
 	@Override
 	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
+		UnitInterface value = valueSource.getLive();
+		Unit text = new Unit( new TextLiveFn( value ) );
+		
+		
+		
 		StyleSheet arrowStyleSheet = style.get( Controls.spinEntryArrowAttrs, StyleSheet.class );
 		StyleValues arrowStyle = style.withAttrs( arrowStyleSheet );
 		double arrowSize = style.get( Controls.spinEntryArrowSize, Double.class );
@@ -169,21 +203,20 @@ public abstract class SpinEntry extends ControlPres
 		
 		SpinEntryControl.SpinEntryTextListener textListener = new SpinEntryControl.SpinEntryTextListener();
 		
-		TextEntry entry = new TextEntry( getInitialValueString(), textListener, getValidationPattern(), getValidationFailMessage() );
+		TextEntry entry = TextEntry.regexValidated( text, textListener, getValidationPattern(), getValidationFailMessage() );
 		TextEntry.TextEntryControl entryControl = (TextEntryControl)entry.createControl( ctx, style.alignHExpand().alignVRefY() );
 		
 		Pres row = StyleSheet.style( Primitive.rowSpacing.as( hspacing ) ).applyTo( new Row( new Object[] { entryControl.getElement(), arrowsBox } ) );
 		DPElement element = row.present( ctx, style );
 		
-		return createSpinEntryControl( ctx, style, element, entryControl, upArrowElement, downArrowElement, textListener );
+		return createSpinEntryControl( ctx, style, value, element, entryControl, upArrowElement, downArrowElement, textListener );
 	}
 	
 	
-	protected abstract String getInitialValueString();
 	protected abstract Pattern getValidationPattern();
 	protected abstract String getValidationFailMessage();
 	
 	
-	protected abstract SpinEntryControl createSpinEntryControl(PresentationContext ctx, StyleValues style, DPElement element, TextEntry.TextEntryControl entryControl, DPElement upArrow,
+	protected abstract SpinEntryControl createSpinEntryControl(PresentationContext ctx, StyleValues style, UnitInterface value, DPElement element, TextEntry.TextEntryControl entryControl, DPElement upArrow,
 			DPElement downArrow, SpinEntryControl.SpinEntryTextListener textListener);
 }

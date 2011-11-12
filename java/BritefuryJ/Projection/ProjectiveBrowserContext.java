@@ -48,7 +48,7 @@ public class ProjectiveBrowserContext
 			@Override
 			protected Pres presentModel(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 			{
-				return Pres.coerceNonNull( page.getContentsPres() );
+				return Pres.coerceNonNull( DefaultPerspective.instance.applyTo( page.getContentsPres() ) );
 			}
 
 			@Override

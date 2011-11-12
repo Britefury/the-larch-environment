@@ -95,7 +95,7 @@ public abstract class LiteralUnitEditor implements Presentable, IncrementalMonit
 
 	protected <V> V getUnitValue(Class<V> valueClass)
 	{
-		Object v = cell.getLiteralValue();
+		Object v = cell.getStaticValue();
 		
 		if ( v == null )
 		{
@@ -117,7 +117,7 @@ public abstract class LiteralUnitEditor implements Presentable, IncrementalMonit
 	
 	protected <V> V getUnitValueNonNull(Class<V> valueClass, V defaultValue)
 	{
-		Object v = cell.getLiteralValue();
+		Object v = cell.getStaticValue();
 		
 		if ( v == null )
 		{

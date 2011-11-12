@@ -14,7 +14,10 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Interactor.PushElementInteractor;
+import BritefuryJ.Incremental.IncrementalMonitor;
+import BritefuryJ.Incremental.IncrementalMonitorListener;
 import BritefuryJ.IncrementalUnit.LiteralUnit;
+import BritefuryJ.IncrementalUnit.UnitInterface;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Blank;
@@ -30,16 +33,8 @@ public class EditableLabel extends ControlPres
 	
 	
 	
-	public static class EditableLabelControl extends Control
+	public static class EditableLabelControl extends Control implements IncrementalMonitorListener
 	{
-		private DPElement element;
-		private LiteralUnit unit;
-		private String text;
-		private Pres notSet;
-		private EditableLabelListener listener;
-		private TextEntry.TextEntryValidator validator;
-		
-		
 		private PushElementInteractor labelInteractor = new PushElementInteractor()
 		{
 			@Override
@@ -59,30 +54,46 @@ public class EditableLabel extends ControlPres
 		{
 			public void onAccept(TextEntryControl textEntry, String text)
 			{
-				EditableLabelControl.this.text = text;
-				showLabel();
 				if ( listener != null )
 				{
 					listener.onTextChanged( EditableLabelControl.this, text );
 				}
+				showLabel();
 			}
 		};
 
 		
 		
-		public EditableLabelControl(PresentationContext ctx, StyleValues style, DPElement element, LiteralUnit unit, String initialText, Pres notSet,
+		private DPElement element;
+		private LiteralUnit unit;
+		private UnitInterface value;
+		private Pres notSet;
+		private EditableLabelListener listener;
+		private TextEntry.TextEntryValidator validator;
+		
+		
+		public EditableLabelControl(PresentationContext ctx, StyleValues style, DPElement element, LiteralUnit unit, UnitInterface value, Pres notSet,
 				EditableLabelListener listener, TextEntry.TextEntryValidator validator)
 		{
 			super( ctx, style );
 			
 			this.element = element;
 			this.unit = unit;
-			this.text = initialText;
+			this.value = value;
 			this.notSet = notSet;
 			this.listener = listener;
 			this.validator = validator;
 			
-			showLabel();
+			
+			Runnable refresh = new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					showLabel();
+				}
+			};
+			element.queueImmediateEvent( refresh );
 		}
 
 
@@ -95,9 +106,10 @@ public class EditableLabel extends ControlPres
 		
 		
 		
-		private void showLabel()
+		private void buildLabel()
 		{
 			Pres label;
+			String text = (String)value.getValue();
 			if ( text == null )
 			{
 				label = notSet;
@@ -109,38 +121,120 @@ public class EditableLabel extends ControlPres
 			unit.setLiteralValue( label.withStyleSheetFromAttr( Controls.editableLabelHoverAttrs ).withElementInteractor( labelInteractor ) );
 		}
 		
+		private void showLabel()
+		{
+			buildLabel();
+			
+			value.addListener( this );
+		}
+		
 		private void showTextEntry()
 		{
-			TextEntry entry = new TextEntry( text != null  ?  text  :  "", entryListener, validator );
+			TextEntry entry = TextEntry.validated( value, entryListener, validator );
 			entry.grabCaretOnRealise();
 			unit.setLiteralValue( entry );
+			
+			value.removeListener( this );
+		}
+
+
+
+		@Override
+		public void onIncrementalMonitorChanged(IncrementalMonitor inc)
+		{
+			Runnable refresh = new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					buildLabel();
+				}
+			};
+			element.queueImmediateEvent( refresh );
 		}
 	}
 
 	
 	
-	private String initialText;
+	private static class CommitListener implements EditableLabelListener
+	{
+		private UnitInterface value;
+		
+		public CommitListener(UnitInterface value)
+		{
+			this.value = value;
+		}
+		
+		@Override
+		public void onTextChanged(EditableLabelControl editableLabel, String text)
+		{
+			value.setLiteralValue( text );
+		}
+	}
+	
+	
+
+	private LiveSource valueSource;
 	private Pres notSet;
 	private EditableLabelListener listener;
 	private TextEntry.TextEntryValidator validator;
 
 	
-	public EditableLabel(String initialText, Object notSet, EditableLabelListener listener)
+	private EditableLabel(LiveSource valueSource, Object notSet, EditableLabelListener listener, TextEntry.TextEntryValidator validator)
 	{
-		this( initialText, notSet, listener, null );
-	}
-	
-	public EditableLabel(String initialText, Object notSet, EditableLabelListener listener, TextEntry.TextEntryValidator validator)
-	{
-		this.initialText = initialText;
+		this.valueSource = valueSource;
 		this.notSet = Pres.coerce( notSet );
 		this.listener = listener;
 		this.validator = validator;
 	}
 	
-	public EditableLabel(String initialText, Object notSet, EditableLabelListener listener, Pattern validatorRegex, String validationFailMessage)
+	
+	
+	public EditableLabel(String initialText, Object notSet, EditableLabelListener listener)
 	{
-		this( initialText, notSet, listener, new TextEntry.RegexTextEntryValidator( validatorRegex, validationFailMessage ) );
+		this( new LiveSourceValue( initialText ), notSet, listener, null );
+	}
+	
+	public static EditableLabel validated(String initialText, Object notSet, EditableLabelListener listener, TextEntry.TextEntryValidator validator)
+	{
+		return new EditableLabel( new LiveSourceValue( initialText ), notSet, listener, validator );
+	}
+	
+	public static EditableLabel regexValidated(String initialText, Object notSet, EditableLabelListener listener, Pattern validatorRegex, String validationFailMessage)
+	{
+		return new EditableLabel( new LiveSourceValue( initialText ), notSet, listener, new TextEntry.RegexTextEntryValidator( validatorRegex, validationFailMessage ) );
+	}
+	
+	
+	public EditableLabel(UnitInterface value, Object notSet, EditableLabelListener listener)
+	{
+		this( new LiveSourceRef( value ), notSet, listener, null );
+	}
+	
+	public static EditableLabel validated(UnitInterface value, Object notSet, EditableLabelListener listener, TextEntry.TextEntryValidator validator)
+	{
+		return new EditableLabel( new LiveSourceRef( value ), notSet, listener, validator );
+	}
+	
+	public static EditableLabel regexValidated(UnitInterface value, Object notSet, EditableLabelListener listener, Pattern validatorRegex, String validationFailMessage)
+	{
+		return new EditableLabel( new LiveSourceRef( value ), notSet, listener, new TextEntry.RegexTextEntryValidator( validatorRegex, validationFailMessage ) );
+	}
+	
+	
+	public EditableLabel(LiteralUnit value, Object notSet)
+	{
+		this( new LiveSourceRef( value ), notSet, new CommitListener( value ), null );
+	}
+	
+	public static EditableLabel validated(LiteralUnit value, Object notSet, TextEntry.TextEntryValidator validator)
+	{
+		return new EditableLabel( new LiveSourceRef( value ), notSet, new CommitListener( value ), validator );
+	}
+	
+	public static EditableLabel regexValidated(LiteralUnit value, Object notSet, Pattern validatorRegex, String validationFailMessage)
+	{
+		return new EditableLabel( new LiveSourceRef( value ), notSet, new CommitListener( value ), new TextEntry.RegexTextEntryValidator( validatorRegex, validationFailMessage ) );
 	}
 	
 	
@@ -150,9 +244,10 @@ public class EditableLabel extends ControlPres
 		StyleValues usedStyle = Controls.useEditableLabelAttrs( style );
 		
 		LiteralUnit unit = new LiteralUnit( new Blank() );
+		UnitInterface value = valueSource.getLive();
 		
 		Pres unitPres = DefaultPerspective.instance.applyTo( unit.valuePresInFragment() );
 		DPElement element = unitPres.present( ctx, usedStyle );
-		return new EditableLabelControl( ctx, usedStyle, element, unit, initialText, notSet, listener, validator );
+		return new EditableLabelControl( ctx, usedStyle, element, unit, value, notSet, listener, validator );
 	}
 }

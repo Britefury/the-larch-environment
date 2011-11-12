@@ -53,26 +53,9 @@ public class Unit extends UnitInterface
 	
 	
 	
-	public Object getLiteralValue()
-	{
-		if ( evaluator.isLiteral() )
-		{
-			return evaluator.evaluate();
-		}
-		else
-		{
-			return null;
-		}
-	}
-
 	public void setLiteralValue(Object value)
 	{
 		setEval( new UnitEvaluatorLiteral( value ) );
-	}
-
-	public boolean isLiteral()
-	{
-		return evaluator.isLiteral();
 	}
 	
 	
@@ -89,6 +72,13 @@ public class Unit extends UnitInterface
 		refreshValue();
 		
 		inc.onAccess();
+		
+		return valueCache;
+	}
+	
+	public Object getStaticValue()
+	{
+		refreshValue();
 		
 		return valueCache;
 	}

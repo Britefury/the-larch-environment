@@ -9,6 +9,8 @@ package BritefuryJ.Controls;
 import java.util.WeakHashMap;
 
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.IncrementalUnit.LiteralUnit;
+import BritefuryJ.IncrementalUnit.UnitInterface;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -32,6 +34,47 @@ public abstract class ControlPres extends Pres
 		
 		public abstract DPElement getElement();
 	}
+	
+	
+	
+	public static interface LiveSource
+	{
+		public UnitInterface getLive();
+	}
+	
+	public static class LiveSourceRef implements LiveSource
+	{
+		private UnitInterface live;
+		
+		public LiveSourceRef(UnitInterface live)
+		{
+			this.live = live;
+		}
+
+		@Override
+		public UnitInterface getLive()
+		{
+			return live;
+		}
+	}
+	
+	public static class LiveSourceValue implements LiveSource
+	{
+		private Object value;
+		
+		public LiveSourceValue(Object value)
+		{
+			this.value = value;
+		}
+
+		@Override
+		public UnitInterface getLive()
+		{
+			return new LiteralUnit( value );
+		}
+	}
+	
+	
 	
 	
 	public CustomControlActionPres withCustomControlAction(CustomControlActionPres.CustomControlAction action)

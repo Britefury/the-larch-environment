@@ -14,7 +14,6 @@ import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.ElementValueFunction;
 import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.TextEditEventInsert;
 import BritefuryJ.DocPresent.TextEditEventRemove;
@@ -26,7 +25,10 @@ import BritefuryJ.DocPresent.Interactor.KeyElementInteractor;
 import BritefuryJ.DocPresent.Interactor.RealiseElementInteractor;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.TextSelection;
-import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
+import BritefuryJ.Incremental.IncrementalMonitor;
+import BritefuryJ.Incremental.IncrementalMonitorListener;
+import BritefuryJ.IncrementalUnit.LiteralUnit;
+import BritefuryJ.IncrementalUnit.UnitInterface;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Border;
@@ -45,7 +47,7 @@ public class TextEntry extends ControlPres
 		{
 		}
 
-		public void onCancel(TextEntryControl textEntry, String originalText)
+		public void onCancel(TextEntryControl textEntry)
 		{
 		}
 
@@ -100,7 +102,7 @@ public class TextEntry extends ControlPres
 	
 
 	
-	public static class TextEntryControl extends Control
+	public static class TextEntryControl extends Control implements IncrementalMonitorListener
 	{
 		private class TextEntryInteractor implements KeyElementInteractor, RealiseElementInteractor
 		{
@@ -164,21 +166,21 @@ public class TextEntry extends ControlPres
 				{
 					TextEditEventInsert insert = (TextEditEventInsert)event;
 					listener.onTextInserted( TextEntryControl.this, insert.getPosition(), insert.getTextInserted() );
-					validate( getText() );
+					validate( getDisplayedText() );
 					return true;
 				}
 				else if ( event instanceof TextEditEventRemove )
 				{
 					TextEditEventRemove remove = (TextEditEventRemove)event;
 					listener.onTextRemoved( TextEntryControl.this, remove.getPosition(), remove.getLength() );
-					validate( getText() );
+					validate( getDisplayedText() );
 					return true;
 				}
 				else if ( event instanceof TextEditEventReplace )
 				{
 					TextEditEventReplace replace = (TextEditEventReplace)event;
 					listener.onTextReplaced( TextEntryControl.this, replace.getPosition(), replace.getLength(), replace.getReplacement() );
-					validate( getText() );
+					validate( getDisplayedText() );
 					return true;
 				}
 				return false;
@@ -214,38 +216,23 @@ public class TextEntry extends ControlPres
 		}
 		
 		
-		private class ValueFn implements ElementValueFunction
-		{
-			public Object computeElementValue(DPElement element)
-			{
-				return getText();
-			}
-	
-			public void addStreamValuePrefixToStream(StreamValueBuilder builder, DPElement element)
-			{
-			}
-	
-			public void addStreamValueSuffixToStream(StreamValueBuilder builder, DPElement element)
-			{
-			}
-		}
-		
-		
-		
 		private DPBorder outerElement;
 		private DPText textElement;
 		private BritefuryJ.DocPresent.Border.AbstractBorder validBorder, invalidBorder;
 		private TextEntryListener listener;
 		private TextEntryValidator validator;
-		private String originalText;
+		private UnitInterface text;
 		private boolean bGrabCaretOnRealise, bSelectAllOnRealise;
 	
 	
 		
-		protected TextEntryControl(PresentationContext ctx, StyleValues style, DPBorder outerElement, DPRegion region, DPText textElement, TextEntryListener listener, TextEntryValidator validator,
+		protected TextEntryControl(PresentationContext ctx, StyleValues style, UnitInterface text, DPBorder outerElement, DPRegion region, DPText textElement, TextEntryListener listener, TextEntryValidator validator,
 				BritefuryJ.DocPresent.Border.AbstractBorder validBorder, BritefuryJ.DocPresent.Border.AbstractBorder invalidBorder)
 		{
 			super( ctx, style );
+			
+			this.text = text;
+			text.addListener( this );
 			
 			this.outerElement = outerElement;
 			this.textElement = textElement;
@@ -257,13 +244,12 @@ public class TextEntry extends ControlPres
 	
 			this.textElement.addElementInteractor( new TextEntryInteractor() );
 			this.textElement.addTreeEventListener( new TextEntryTreeEventListener() );
-			originalText = textElement.getText();
 			
-			outerElement.setValueFunction( new ValueFn() );
+			outerElement.setValueFunction( text.elementValueFunction() );
 			
 			region.setClipboardHandler( new TextEntryClipboardHandler() );
 			
-			validate( originalText );
+			requestRefresh();
 		}
 		
 		
@@ -273,19 +259,20 @@ public class TextEntry extends ControlPres
 		}
 		
 	
-		public String getText()
+		public String getTextValue()
+		{
+			return (String)text.getStaticValue();
+		}
+		
+		public String getDisplayedText()
 		{
 			return textElement.getText();
 		}
 		
-		public String getOriginalText()
+		public void setDisplayedText(String x)
 		{
-			return originalText;
-		}
-		
-		public void setText(String text)
-		{
-			textElement.setText( text );
+			textElement.setText( x );
+			validate( x );
 		}
 		
 		
@@ -326,9 +313,10 @@ public class TextEntry extends ControlPres
 		
 		public void accept()
 		{
-			if ( validator != null  &&  !validator.validateText( this, getText() ) )
+			String t = getDisplayedText();
+			if ( !validate( t ) )
 			{
-				String failMessage = validator.validationMessage( this, getText() );
+				String failMessage = getValidationMessage( t );
 				if ( failMessage != null )
 				{
 					Tooltip tooltip = new Tooltip( failMessage, 5.0 );
@@ -337,45 +325,135 @@ public class TextEntry extends ControlPres
 				return;
 			}
 			ungrabCaret();
-			listener.onAccept( this, getText() );
+			listener.onAccept( this, t );
 		}
 	
 		public void cancel()
 		{
 			ungrabCaret();
-			listener.onCancel( this, originalText );
+			listener.onCancel( this );
 		}
 		
 		
-		private void validate(String text)
+		private boolean validate(String t)
 		{
-			boolean bValid = validator == null || validator.validateText( this, text );
+			boolean bValid = validator == null || validator.validateText( this, t );
 			outerElement.setBorder( bValid  ?  validBorder  :  invalidBorder );
+			return bValid;
+		}
+		
+		private String getValidationMessage(String t)
+		{
+			if ( validator != null )
+			{
+				return validator.validationMessage( this, t );
+			}
+			else
+			{
+				return null;
+			}
+		}
+
+
+		@Override
+		public void onIncrementalMonitorChanged(IncrementalMonitor inc)
+		{
+			requestRefresh();
+		}
+		
+		private void requestRefresh()
+		{
+			Runnable refresh = new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					String t = (String)text.getValue();
+					t = t != null  ?  t  :  "";
+					setDisplayedText( t );
+				}
+			};
+			outerElement.queueImmediateEvent( refresh );
 		}
 	}
 	
 	
-	private String initialText;
+	private static class CommitListener extends TextEntryListener
+	{
+		private UnitInterface value;
+		
+		public CommitListener(UnitInterface value)
+		{
+			this.value = value;
+		}
+		
+		public void onAccept(TextEntryControl textEntry, String text)
+		{
+			value.setLiteralValue( text );
+		}
+	}
+	
+	
+	private LiveSource valueSource;
 	private TextEntryListener listener;
 	private TextEntry.TextEntryValidator validator;
 	private boolean bGrabCaretOnRealise, bSelectAllOnRealise;
 	
 	
-	public TextEntry(String initialText, TextEntryListener listener)
+	private TextEntry(LiveSource valueSource, TextEntryListener listener, TextEntryValidator validator)
 	{
-		this( initialText, listener, null );
-	}
-	
-	public TextEntry(String initialText, TextEntryListener listener, TextEntryValidator validator)
-	{
-		this.initialText = initialText;
+		this.valueSource = valueSource;
 		this.listener = listener;
 		this.validator = validator;
 	}
 	
-	public TextEntry(String initialText, TextEntryListener listener, Pattern validatorRegex, String validationFailMessage)
+	
+	
+	public TextEntry(String initialText, TextEntryListener listener)
 	{
-		this( initialText, listener, new RegexTextEntryValidator( validatorRegex, validationFailMessage ) );
+		this( new LiveSourceValue( initialText ), listener, null );
+	}
+	
+	public static TextEntry validated(String initialText, TextEntryListener listener, TextEntryValidator validator)
+	{
+		return new TextEntry( new LiveSourceValue( initialText ), listener, validator );
+	}
+	
+	public static TextEntry regexValidated(String initialText, TextEntryListener listener, Pattern validatorRegex, String validationFailMessage)
+	{
+		return new TextEntry( new LiveSourceValue( initialText ), listener, new RegexTextEntryValidator( validatorRegex, validationFailMessage ) );
+	}
+	
+	
+	public TextEntry(UnitInterface value, TextEntryListener listener)
+	{
+		this( new LiveSourceRef( value ), listener, null );
+	}
+	
+	public static TextEntry validated(UnitInterface value, TextEntryListener listener, TextEntryValidator validator)
+	{
+		return new TextEntry( new LiveSourceRef( value ), listener, validator );
+	}
+	
+	public static TextEntry regexValidated(UnitInterface value, TextEntryListener listener, Pattern validatorRegex, String validationFailMessage)
+	{
+		return new TextEntry( new LiveSourceRef( value ), listener, new RegexTextEntryValidator( validatorRegex, validationFailMessage ) );
+	}
+	
+	
+	public TextEntry(LiteralUnit value)
+	{
+		this( new LiveSourceRef( value ), new CommitListener( value ), null );
+	}
+	
+	public static TextEntry validated(LiteralUnit value, TextEntryValidator validator)
+	{
+		return new TextEntry( new LiveSourceRef( value ), new CommitListener( value ), validator );
+	}
+	
+	public static TextEntry regexValidated(LiteralUnit value, Pattern validatorRegex, String validationFailMessage)
+	{
+		return new TextEntry( new LiveSourceRef( value ), new CommitListener( value ), new RegexTextEntryValidator( validatorRegex, validationFailMessage ) );
 	}
 	
 	
@@ -399,14 +477,15 @@ public class TextEntry extends ControlPres
 		BritefuryJ.DocPresent.Border.AbstractBorder validBorder = style.get( Controls.textEntryBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class ); 
 		BritefuryJ.DocPresent.Border.AbstractBorder invalidBorder = style.get( Controls.textEntryInvalidBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class );
 		
-		DPText textElement = (DPText)new Text( initialText ).present( ctx, style );
+		UnitInterface value = valueSource.getLive();
+		DPText textElement = (DPText)new Text( "" ).present( ctx, style );
 		Pres line = new Row( new Pres[] { new Segment( false, false, textElement ) } );
 		Pres region = new Region( line );
 		DPRegion regionElement = (DPRegion)region.present( ctx, style );
 		Pres outer = new Border( regionElement ).alignVRefY();
 		DPBorder outerElement = (DPBorder)outer.present( ctx, style );
 		
-		TextEntryControl control = new TextEntryControl( ctx, style, outerElement, regionElement, textElement, listener, validator, validBorder, invalidBorder );
+		TextEntryControl control = new TextEntryControl( ctx, style, value, outerElement, regionElement, textElement, listener, validator, validBorder, invalidBorder );
 		if ( bSelectAllOnRealise )
 		{
 			control.selectAllOnRealise();

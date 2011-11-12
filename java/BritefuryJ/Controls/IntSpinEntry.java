@@ -9,6 +9,7 @@ package BritefuryJ.Controls;
 import java.util.regex.Pattern;
 
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.IncrementalUnit.UnitInterface;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
 
@@ -23,93 +24,108 @@ public class IntSpinEntry extends SpinEntry
 	
 	public static class IntSpinEntryControl extends SpinEntryControl
 	{
-		private int value, min, max, stepSize, pageSize;
+		private int min, max, stepSize, pageSize;
 		private IntSpinEntryListener listener;
 		
 	
-		protected IntSpinEntryControl(PresentationContext ctx, StyleValues style, DPElement element, TextEntry.TextEntryControl textEntry,
+		protected IntSpinEntryControl(PresentationContext ctx, StyleValues style, UnitInterface value, DPElement element, TextEntry.TextEntryControl textEntry,
 				DPElement upSpinButton, DPElement downSpinButton, SpinEntryTextListener textListener,
-				int value, int min, int max, int stepSize, int pageSize, IntSpinEntryListener listener)
+				int min, int max, int stepSize, int pageSize, IntSpinEntryListener listener)
 		{
-			super( ctx, style, element, textEntry, upSpinButton, downSpinButton, textListener );
+			super( ctx, style, value, element, textEntry, upSpinButton, downSpinButton, textListener );
 			
-			this.value = value;
 			this.min = min;
 			this.max = max;
 			this.stepSize = stepSize;
 			this.pageSize = pageSize;
 			this.listener = listener;
 			
-			element.setFixedValue( value );
+			element.setFixedValue( value.elementValueFunction() );
 		}
 		
 		
 		
 		public int getValue()
 		{
-			return value;
+			return (Integer)value.getStaticValue();
 		}
 		
-		public void setValue(int newValue)
+		
+		private void changeValue(int newValue)
 		{
+			int currentValue = getValue();
 			newValue = Math.min( Math.max( newValue, min ), max );
-			if ( newValue != value )
+			if ( newValue != currentValue )
 			{
-				value = newValue;
-				element.setFixedValue( value );
-				textEntry.setText( String.valueOf( value ) );
-				listener.onSpinEntryValueChanged( this, value );
+				value.setLiteralValue( newValue );
+				if ( listener != null )
+				{
+					listener.onSpinEntryValueChanged( this, newValue );
+				}
 			}
 		}
 		
 		
 		protected void onTextChanged(String text)
 		{
+			int currentValue = getValue();
 			int textValue = Integer.valueOf( text );
 			int newValue = Math.min( Math.max( textValue, min ), max );
-			if ( newValue != value )
+			if ( newValue != currentValue )
 			{
-				value = newValue;
-				element.setFixedValue( value );
-				listener.onSpinEntryValueChanged( this, value );
-			}
-			if ( value != textValue )
-			{
-				textEntry.setText( String.valueOf( value ) );
+				value.setLiteralValue( newValue );
+				listener.onSpinEntryValueChanged( this, newValue );
 			}
 		}
 		
 		protected void onStep(boolean bUp)
 		{
-			setValue( value   +   ( bUp  ?  stepSize  :  -stepSize ) ); 
+			changeValue( getValue()   +   ( bUp  ?  stepSize  :  -stepSize ) ); 
 		}
 		
 		protected void onPage(boolean bUp)
 		{
-			setValue( value   +   ( bUp  ?  pageSize  :  -pageSize ) ); 
+			changeValue( getValue()   +   ( bUp  ?  pageSize  :  -pageSize ) ); 
 		}
 		
 		protected void onDrag(Object startValue, double delta)
 		{
 			Integer start = (Integer)startValue;
-			setValue( start + (int)( delta + 0.5 ) );
+			changeValue( start + (int)( delta + 0.5 ) );
 		}
 		
 		protected Object storeValue()
 		{
-			return value;
+			return getValue();
+		}
+	}
+	
+	
+	private static class CommitListener implements IntSpinEntryListener
+	{
+		private UnitInterface value;
+		
+		public CommitListener(UnitInterface value)
+		{
+			this.value = value;
+		}
+		
+		@Override
+		public void onSpinEntryValueChanged(IntSpinEntryControl spinEntry, int value)
+		{
+			this.value.setLiteralValue( value );
 		}
 	}
 
 
 	
-	private int initialValue, min, max, stepSize, pageSize;
+	private int min, max, stepSize, pageSize;
 	private IntSpinEntryListener listener;
 	
 	
-	public IntSpinEntry(int initialValue, int min, int max, int stepSize, int pageSize, IntSpinEntryListener listener)
+	private IntSpinEntry(LiveSource valueSource, int min, int max, int stepSize, int pageSize, IntSpinEntryListener listener)
 	{
-		this.initialValue = initialValue;
+		super( valueSource );
 		this.min = min;
 		this.max = max;
 		this.stepSize = stepSize;
@@ -117,12 +133,22 @@ public class IntSpinEntry extends SpinEntry
 		this.listener = listener;
 	}
 	
-	
-	
-	protected String getInitialValueString()
+	public IntSpinEntry(int initialValue, int min, int max, int stepSize, int pageSize, IntSpinEntryListener listener)
 	{
-		return String.valueOf( initialValue );
+		this( new LiveSourceValue( initialValue ), min, max, stepSize, pageSize, listener );
 	}
+	
+	public IntSpinEntry(UnitInterface value, int min, int max, int stepSize, int pageSize, IntSpinEntryListener listener)
+	{
+		this( new LiveSourceRef( value ), min, max, stepSize, pageSize, listener );
+	}
+	
+	public IntSpinEntry(UnitInterface value, int min, int max, int stepSize, int pageSize)
+	{
+		this( new LiveSourceRef( value ), min, max, stepSize, pageSize, new CommitListener( value ) );
+	}
+	
+	
 	
 	protected Pattern getValidationPattern()
 	{
@@ -135,9 +161,10 @@ public class IntSpinEntry extends SpinEntry
 	}
 	
 	
-	protected SpinEntryControl createSpinEntryControl(PresentationContext ctx, StyleValues style, DPElement element, TextEntry.TextEntryControl entryControl, DPElement upArrow,
+	@Override
+	protected SpinEntryControl createSpinEntryControl(PresentationContext ctx, StyleValues style, UnitInterface value, DPElement element, TextEntry.TextEntryControl entryControl, DPElement upArrow,
 			DPElement downArrow, SpinEntryControl.SpinEntryTextListener textListener)
 	{
-		return new IntSpinEntryControl( ctx, style, element, entryControl, upArrow, downArrow, textListener, initialValue, min, max, stepSize, pageSize, listener );
+		return new IntSpinEntryControl( ctx, style, value, element, entryControl, upArrow, downArrow, textListener, min, max, stepSize, pageSize, listener );
 	}
 }
