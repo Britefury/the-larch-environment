@@ -8,11 +8,16 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.List;
 
 import BritefuryJ.Controls.TextArea;
-import BritefuryJ.DocPresent.DPColumn;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.IncrementalUnit.LiteralUnit;
+import BritefuryJ.IncrementalUnit.Unit;
+import BritefuryJ.IncrementalUnit.UnitEvaluator;
+import BritefuryJ.IncrementalUnit.UnitInterface;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.Blank;
 import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
@@ -44,14 +49,40 @@ public class TextAreaTestPage extends SystemPage
 
 	private class AreaListener extends TextArea.TextAreaListener
 	{
-		private DPColumn resultArea, eventArea;
+		private LiteralUnit resultArea, eventList;
+		private Unit eventArea;
+		private LiteralUnit text;
+		//private DPColumn resultArea, eventArea;
 		private String prevText;
 		
-		public AreaListener(DPColumn resultArea, DPColumn eventArea, String text)
+		public AreaListener(LiteralUnit text)
 		{
-			this.resultArea = resultArea;
-			this.eventArea = eventArea;
-			this.prevText = text;
+			this.resultArea = new LiteralUnit( new Blank() );
+			this.eventList = new LiteralUnit( new ArrayList<Object>() );
+			UnitEvaluator eventBox = new UnitEvaluator()
+			{
+				@Override
+				public Object evaluate()
+				{
+					@SuppressWarnings("unchecked")
+					List<Object> x = (List<Object>)eventList.getValue();
+					return new Column( x.toArray() );
+				}
+			};
+			eventArea = new Unit( eventBox );
+			this.text = text;
+			this.prevText = (String)text.getStaticValue();
+		}
+		
+		
+		public UnitInterface getResultArea()
+		{
+			return resultArea;
+		}
+		
+		public UnitInterface getEventArea()
+		{
+			return eventArea;
 		}
 		
 		public void onAccept(TextArea.TextAreaControl textArea, String text)
@@ -64,7 +95,11 @@ public class TextAreaTestPage extends SystemPage
 				lineElements.add( new Label( line ).present() );
 			}
 			
-			resultArea.setChildren( lineElements );
+			resultArea.setLiteralValue( new Column( lineElements.toArray() ) );
+			
+			this.text.setLiteralValue( text );
+			
+			prevText = text;
 		}
 		
 		public void onTextInserted(TextArea.TextAreaControl textArea, int position, String textInserted)
@@ -72,9 +107,12 @@ public class TextAreaTestPage extends SystemPage
 			String text = "Inserted text @" + position + ":\n" + textInserted;
 			setEventText( text );
 			prevText = prevText.substring( 0, position ) + textInserted + prevText.substring( position );
-			if ( !prevText.equals( textArea.getText() ) )
+			if ( !prevText.equals( textArea.getDisplayedText() ) )
 			{
-				eventArea.append( redText.applyTo( new Label( "Insert event was invalid" ) ).present() );
+				@SuppressWarnings("unchecked")
+				List<Object> x = (List<Object>)eventList.getValue();
+				x.add( redText.applyTo( new Label( "Insert event was invalid" ) ).present() );
+				eventList.setLiteralValue( x );
 			}
 		}
 
@@ -83,9 +121,12 @@ public class TextAreaTestPage extends SystemPage
 			String text = "Removed " + position + " to " + ( position + length );
 			setEventText( text );
 			prevText = prevText.substring( 0, position ) + prevText.substring( position + length );
-			if ( !prevText.equals( textArea.getText() ) )
+			if ( !prevText.equals( textArea.getDisplayedText() ) )
 			{
-				eventArea.append( redText.applyTo( new Label( "Insert event was invalid" ) ).present() );
+				@SuppressWarnings("unchecked")
+				List<Object> x = (List<Object>)eventList.getValue();
+				x.add( redText.applyTo( new Label( "Insert event was invalid" ) ).present() );
+				eventList.setLiteralValue( x );
 			}
 		}
 		
@@ -94,9 +135,12 @@ public class TextAreaTestPage extends SystemPage
 			String text = "Replaced " + position + " to " + ( position + length ) + " with:\n" + replacementText;
 			setEventText( text );
 			prevText = prevText.substring( 0, position ) + replacementText + prevText.substring( position + length );
-			if ( !prevText.equals( textArea.getText() ) )
+			if ( !prevText.equals( textArea.getDisplayedText() ) )
 			{
-				eventArea.append( redText.applyTo( new Label( "Insert event was invalid" ) ).present() );
+				@SuppressWarnings("unchecked")
+				List<Object> x = (List<Object>)eventList.getValue();
+				x.add( redText.applyTo( new Label( "Insert event was invalid" ) ).present() );
+				eventList.setLiteralValue( x );
 			}
 		}
 		
@@ -110,7 +154,11 @@ public class TextAreaTestPage extends SystemPage
 				lineElements.add( new Label( line ).present() );
 			}
 			
-			eventArea.setChildren( lineElements );
+			@SuppressWarnings("unchecked")
+			List<Object> x = (List<Object>)eventList.getValue();
+			x.clear();
+			x.addAll( lineElements );
+			eventList.setLiteralValue( x );
 		}
 	}
 
@@ -122,11 +170,12 @@ public class TextAreaTestPage extends SystemPage
 	
 	protected Pres createContents()
 	{
-		DPColumn resultArea = (DPColumn)new Column( new Pres[] {} ).present();
-		DPColumn eventArea = (DPColumn)new Column( new Pres[] {} ).present();
-		Pres resultBox = StyleSheet.style( Primitive.columnSpacing.as( 5.0 ) ).applyTo( new Column( new Object[] { new Heading6( "Text:" ), resultArea, new Heading6( "Event:" ), eventArea } ) );
+		LiteralUnit text = new LiteralUnit( testString );
+		AreaListener listener = new AreaListener( text );
+		TextArea area = new TextArea( testString, listener );
 		
-		TextArea area = new TextArea( testString, new AreaListener( resultArea, eventArea, testString ) );
+		Pres resultBox = StyleSheet.style( Primitive.columnSpacing.as( 5.0 ) ).applyTo( new Column( new Object[] { new Heading6( "Text:" ), listener.getResultArea().valuePresInFragment(),
+				new Heading6( "Event:" ), listener.getEventArea().valuePresInFragment() } ) );
 		
 		Pres areaBox = StyleSheet.style( Primitive.columnSpacing.as( 10.0 ) ).applyTo( new Column( new Object[] { area.alignHExpand(), resultBox.alignHExpand() } ) );
 		
