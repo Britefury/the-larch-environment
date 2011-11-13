@@ -99,9 +99,11 @@ _consoleBlockListStyle = StyleSheet.style( Primitive.columnSpacing( 5.0 ) )
 _consoleStyle = StyleSheet.style( Primitive.columnSpacing( 8.0 ) )
 
 
+_varNameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*' )
+
 
 def _dropPrompt(varNameTextEntryListener):
-	textEntry = TextEntry( 'var', varNameTextEntryListener )
+	textEntry = TextEntry.regexValidated( 'var', varNameTextEntryListener, _varNameRegex, 'Please enter a valid identifier' )
 	prompt = Label( 'Place node into a variable named: ' )
 	textEntry.grabCaretOnRealise()
 	textEntry.selectAllOnRealise()
