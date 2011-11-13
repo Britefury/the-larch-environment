@@ -380,9 +380,9 @@ public class TextEntry extends ControlPres
 	
 	private static class CommitListener extends TextEntryListener
 	{
-		private UnitInterface value;
+		private LiteralUnit value;
 		
-		public CommitListener(UnitInterface value)
+		public CommitListener(LiteralUnit value)
 		{
 			this.value = value;
 		}

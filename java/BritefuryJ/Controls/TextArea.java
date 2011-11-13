@@ -8,7 +8,6 @@ package BritefuryJ.Controls;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPColumn;
@@ -28,6 +27,10 @@ import BritefuryJ.DocPresent.Interactor.KeyElementInteractor;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.TextSelection;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
+import BritefuryJ.Incremental.IncrementalMonitor;
+import BritefuryJ.Incremental.IncrementalMonitorListener;
+import BritefuryJ.IncrementalUnit.LiteralUnit;
+import BritefuryJ.IncrementalUnit.UnitInterface;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Border;
@@ -63,7 +66,7 @@ public class TextArea extends ControlPres
 	}
 	
 	
-	public static class TextAreaControl extends Control
+	public static class TextAreaControl extends Control implements IncrementalMonitorListener
 	{
 		private class TextAreaInteractor implements KeyElementInteractor
 		{
@@ -110,9 +113,7 @@ public class TextArea extends ControlPres
 					
 					if ( lineText.contains( "\n" ) )
 					{
-						int caretPos = getCaretIndex();
-	
-						recomputeText( caretPos );
+						recomputeText();
 					}
 	
 					if ( listener != null )
@@ -153,9 +154,7 @@ public class TextArea extends ControlPres
 					
 					if ( !whitespaceElement.getTextRepresentation().equals( "\n" ) )
 					{
-						int caretPos = getCaretIndex();
-	
-						recomputeText( caretPos );
+						recomputeText();
 					}
 	
 					if ( listener != null )
@@ -238,7 +237,7 @@ public class TextArea extends ControlPres
 		{
 			public Object computeElementValue(DPElement element)
 			{
-				return getText();
+				return getDisplayedText();
 			}
 	
 			public void addStreamValuePrefixToStream(StreamValueBuilder builder, DPElement element)
@@ -254,17 +253,19 @@ public class TextArea extends ControlPres
 		
 		private DPElement element;
 		private DPColumn textBox;
+		private UnitInterface value;
 		private TextAreaListener listener;
 		private TextAreaTextLineTreeEventListener textLineTreeEventListener = new TextAreaTextLineTreeEventListener();
 		private TextAreaNewlineTreeEventListener newlineTreeEventListener = new TextAreaNewlineTreeEventListener();
 		
-		private ArrayList<String> textLines = new ArrayList<String>();
 		
 		
-		
-		protected TextAreaControl(PresentationContext ctx, StyleValues style, DPElement element, DPRegion region, DPColumn textBox, TextAreaListener listener, String text)
+		protected TextAreaControl(PresentationContext ctx, StyleValues style, DPElement element, DPRegion region, DPColumn textBox, TextAreaListener listener, UnitInterface value)
 		{
 			super( ctx, style );
+			
+			this.value = value;
+			this.value.addListener( this );
 			
 			this.element = element;
 			this.textBox = textBox;
@@ -275,7 +276,7 @@ public class TextArea extends ControlPres
 			this.textBox.addElementInteractor( new TextAreaInteractor() );
 			region.setClipboardHandler( new TextAreaClipboardHandler() );
 			
-			changeText( text, -1 );
+			queueRebuild();
 		}
 		
 	
@@ -286,12 +287,12 @@ public class TextArea extends ControlPres
 		}
 		
 		
-		public String getText()
+		public String getDisplayedText()
 		{
 			return textBox.getTextRepresentation();
 		}
 		
-		public void setText(String text)
+		public void setDisplayedText(String text)
 		{
 			changeText( text, getCaretIndex() );
 		}
@@ -314,7 +315,7 @@ public class TextArea extends ControlPres
 			ungrabCaret();
 			if ( listener != null )
 			{
-				listener.onAccept( this, getText() );
+				listener.onAccept( this, getDisplayedText() );
 			}
 		}
 	
@@ -383,27 +384,26 @@ public class TextArea extends ControlPres
 			}
 		}
 		
-		private void recomputeText(int caretPos)
+		private void recomputeText()
 		{
-			changeText( textBox.getTextRepresentation(), caretPos );
+			changeText( textBox.getTextRepresentation(), getCaretIndex() );
 		}
 		
 		private void changeText(String text, int caretPos)
 		{
+			String textLines[];
 			if ( text.endsWith( "\n\n" ) )
 			{
 				// This handles the behaviour of String#split, which will not add a final blank line where the text ends with two new line characters.
 				// To correct for this, add a space character, then remove that final artificial line afterwards
 				text = text + " ";
 				String lines[] = text.split( "\\r?\\n" );
-				textLines.clear();
-				textLines.addAll( Arrays.asList( lines ).subList( 0, lines.length - 1 ) );
+				textLines = new String[lines.length-1];
+				System.arraycopy( lines, 0, textLines, 0, lines.length - 1 );
 			}
 			else
 			{
-				String lines[] = text.split( "\\r?\\n" );
-				textLines.clear();
-				textLines.addAll( Arrays.asList( lines ) );
+				textLines = text.split( "\\r?\\n" );
 			}
 			
 			
@@ -430,18 +430,73 @@ public class TextArea extends ControlPres
 				textBox.getRootElement().getCaret().moveToPositionAndBiasWithinSubtree( textBox, caretPos, Marker.Bias.START );
 			}
 		}
+
+
+		@Override
+		public void onIncrementalMonitorChanged(IncrementalMonitor inc)
+		{
+			queueRebuild();
+		}
+		
+		
+		private void queueRebuild()
+		{
+			Runnable event = new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					String text = (String)value.getValue();
+					changeText( text, getCaretIndex() );
+				}
+			};
+			element.queueImmediateEvent( event );
+		}
 	}
 	
 	
-	private String initialText;
+	private static class CommitListener extends TextAreaListener
+	{
+		private LiteralUnit value;
+		
+		public CommitListener(LiteralUnit value)
+		{
+			this.value = value;
+		}
+		
+		@Override
+		public void onAccept(TextAreaControl textEntry, String text)
+		{
+			value.setLiteralValue( text );
+		}
+	}
+	
+	
+	private LiveSource valueSource;
 	private TextAreaListener listener;
 	
 	
-	public TextArea(String initialText, TextAreaListener listener)
+	private TextArea(LiveSource valueSource, TextAreaListener listener)
 	{
-		this.initialText = initialText;
+		this.valueSource = valueSource;
 		this.listener = listener;
 	}
+
+	public TextArea(String initialText, TextAreaListener listener)
+	{
+		this( new LiveSourceValue( initialText ), listener );
+	}
+	
+	public TextArea(UnitInterface value, TextAreaListener listener)
+	{
+		this( new LiveSourceRef( value ), listener );
+	}
+	
+	public TextArea(LiteralUnit value)
+	{
+		this( new LiveSourceRef( value ), new CommitListener( value ) );
+	}
+	
 
 
 	@Override
@@ -452,6 +507,8 @@ public class TextArea extends ControlPres
 		
 		StyleValues textAreaStyle = style.withAttrs( textAreaStyleSheet );
 		
+		UnitInterface value = valueSource.getLive();
+
 		Pres textBoxPres = new Column( new Pres[] {} );
 		DPColumn textBox = (DPColumn)textBoxPres.present( ctx, textAreaStyle );
 		Pres regionPres = new Region( textBox );
@@ -459,6 +516,6 @@ public class TextArea extends ControlPres
 		Pres elementPres = new Border( region );
 		DPBorder element = (DPBorder)elementPres.present( ctx, textAreaStyle );
 		
-		return new TextAreaControl( ctx, style, element, region, textBox, listener, initialText );
+		return new TextAreaControl( ctx, style, element, region, textBox, listener, value );
 	}
 }
