@@ -427,7 +427,6 @@ public class TextArea extends ControlPres
 			
 			if ( caretPos != -1 )
 			{
-				System.out.println( "TextArea.changeText(): moving caret to " + caretPos );
 				textBox.getRootElement().getCaret().moveToPositionAndBiasWithinSubtree( textBox, caretPos, Marker.Bias.START );
 			}
 		}

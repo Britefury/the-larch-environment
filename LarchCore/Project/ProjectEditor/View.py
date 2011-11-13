@@ -292,7 +292,7 @@ class ProjectView (ObjectDispatchView):
 		# Python package name
 		pythonPackageNamePrompt = Label( 'Root Python package name: ' )
 		notSet = _pythonPackageNameNotSetStyle.applyTo( Label( '<not set>' ) )
-		pythonPackageNameLabel = EditableLabel( project.pythonPackageName, notSet, _PythonPackageNameListener(), _pythonPackageNameRegex, 'Please enter a valid dotted identifier' )
+		pythonPackageNameLabel = EditableLabel.regexValidated( project.pythonPackageName, notSet, _PythonPackageNameListener(), _pythonPackageNameRegex, 'Please enter a valid dotted identifier' )
 		if project.pythonPackageName is None:
 			comment = _pythonPackageNameNotSetCommentStyle.applyTo( Label( '(pages will not be importable until this is set)' ) )
 			pythonPackageNameBox = Row( [ pythonPackageNamePrompt, pythonPackageNameLabel, Spacer( 25.0, 0.0 ), comment ] )
@@ -352,7 +352,7 @@ class ProjectView (ObjectDispatchView):
 				nameUnit.setLiteralValue( nameBox )
 
 		def _onRename(menuItem):
-			textEntry = TextEntry( package.name, _RenameListener(), _nameRegex, 'Please enter a valid identifier' )
+			textEntry = TextEntry.regexValidated( package.name, _RenameListener(), _nameRegex, 'Please enter a valid identifier' )
 			textEntry.grabCaretOnRealise()
 			nameUnit.setLiteralValue( textEntry )
 		
@@ -407,7 +407,7 @@ class ProjectView (ObjectDispatchView):
 				nameUnit.setLiteralValue( nameBox )
 
 		def _onRename(menuItem):
-			textEntry = TextEntry( page.name, _RenameListener(), _nameRegex, 'Please enter a valid identifier' )
+			textEntry = TextEntry.regexValidated( page.name, _RenameListener(), _nameRegex, 'Please enter a valid identifier' )
 			textEntry.grabCaretOnRealise()
 			nameUnit.setLiteralValue( textEntry )
 
