@@ -98,7 +98,7 @@ class IntLit (_Literal):
 		self.format = format
 		
 	def build(self):
-		return Py.IntLiteral( value=self.value, format=self.format, numType=self.numType )
+		return Py.IntLiteral( value=repr( self.value ), format=self.format, numType=self.numType )
 
 
 class FloatLit (_Literal):
@@ -106,14 +106,14 @@ class FloatLit (_Literal):
 		self.value = value
 	
 	def build(self):
-		return Py.FloatLiteral( value=self.value )
+		return Py.FloatLiteral( value=repr( self.value ) )
 
 class ImagLit (_Literal):
 	def __init__(self, value):
 		self.value = value
 	
 	def build(self):
-		return Py.ImaginaryLiteral( value=self.value )
+		return Py.ImaginaryLiteral( value=repr( self.value ) )
 
 class ComplexLit (_Literal):
 	def __init__(self, real, imag):

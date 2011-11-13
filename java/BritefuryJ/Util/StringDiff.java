@@ -326,6 +326,11 @@ public class StringDiff
 	
 	public static ArrayList<Operation> diff(String a, String b)
 	{
+		return diff( a, b, -1 );
+	}
+
+	public static ArrayList<Operation> diff(String a, String b, int maxLevenshteinDiff)
+	{
 		ArrayList<Operation> operations = new ArrayList<Operation>();
 
 		int prefixLen = getCommonPrefixLength( a, b );
@@ -380,6 +385,18 @@ public class StringDiff
 		// Add an extra character to each end to give the differencing algorithm a little context to work with.
 		prefixLen = Math.max( prefixLen - 1, 0 );
 		suffixLen = Math.max( suffixLen - 1, 0 );
+		
+		
+		if ( maxLevenshteinDiff != -1 )
+		{
+			int aLevenshtein = a.length() - prefixLen - suffixLen;
+			int bLevenshtein = b.length() - prefixLen - suffixLen;
+			
+			if ( aLevenshtein > maxLevenshteinDiff  ||  bLevenshtein > maxLevenshteinDiff )
+			{
+				return null;
+			}
+		}
 		
 		
 		if ( prefixLen > 0 )

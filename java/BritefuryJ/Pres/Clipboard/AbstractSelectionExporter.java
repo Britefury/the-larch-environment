@@ -109,8 +109,11 @@ abstract public class AbstractSelectionExporter <SelectionContentsType, Selectio
 			throw new RuntimeException( "SelectionExporter.exportDone(): selection is not an instance of " + selectionClass.getName() );
 		}
 		
-		SelectionContentsTransferable<SelectionContentsType, SelectionType> t = (SelectionContentsTransferable<SelectionContentsType, SelectionType>)transferable;
-		
-		exportDone( (SelectionType)selection, target, t.selectionContents, action );
+		if ( transferable != null )
+		{
+			SelectionContentsTransferable<SelectionContentsType, SelectionType> t = (SelectionContentsTransferable<SelectionContentsType, SelectionType>)transferable;
+			
+			exportDone( (SelectionType)selection, target, t.selectionContents, action );
+		}
 	}
 }

@@ -9,6 +9,7 @@ package BritefuryJ.Controls;
 import java.util.regex.Pattern;
 
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.IncrementalUnit.LiteralUnit;
 import BritefuryJ.IncrementalUnit.UnitInterface;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -103,9 +104,9 @@ public class IntSpinEntry extends SpinEntry
 	
 	private static class CommitListener implements IntSpinEntryListener
 	{
-		private UnitInterface value;
+		private LiteralUnit value;
 		
-		public CommitListener(UnitInterface value)
+		public CommitListener(LiteralUnit value)
 		{
 			this.value = value;
 		}
@@ -143,7 +144,7 @@ public class IntSpinEntry extends SpinEntry
 		this( new LiveSourceRef( value ), min, max, stepSize, pageSize, listener );
 	}
 	
-	public IntSpinEntry(UnitInterface value, int min, int max, int stepSize, int pageSize)
+	public IntSpinEntry(LiteralUnit value, int min, int max, int stepSize, int pageSize)
 	{
 		this( new LiveSourceRef( value ), min, max, stepSize, pageSize, new CommitListener( value ) );
 	}
