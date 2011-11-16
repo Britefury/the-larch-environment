@@ -87,7 +87,13 @@ class StrLit (_Literal):
 		self.quotation = quotation
 	
 	def build(self):
-		return Py.StringLiteral( value=self.value, format=self.format, quotation=self.quotation )
+		r = repr( self.value )
+		try:
+			start = r.index( '\'' )
+		except ValueError:
+			start = r.index( "\"" )
+		r = r[start+1:-1]
+		return Py.StringLiteral( value=r, format=self.format, quotation=self.quotation )
 
 	
 	

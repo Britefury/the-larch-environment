@@ -7,7 +7,7 @@
 ##-*************************
 __author__ = 'Geoff'
 
-from BritefuryJ.Controls import IntSpinEntry
+from BritefuryJ.Controls import TextArea
 
 import LarchCore.Languages.Python25.Builder as PyBuilder
 
@@ -16,18 +16,14 @@ from LarchTools.EmbeddedData.Editor import Editor
 
 
 
-class IntEditorSpinEntry (Editor):
-	def __init__(self, model=None, value=0):
-		super( IntEditorSpinEntry, self ).__init__( model, value )
-		self._min = -2048576
-		self._max = 2048576
-		self._step = 1
-		self._page = 10
+class StringEditorTextArea (Editor):
+	def __init__(self, model=None, value=''):
+		super( StringEditorTextArea, self ).__init__( model, value )
 
 
 	def _newModel(self, value):
-		if not isinstance( value, int ):
-			value = 0
+		if not isinstance( value, str )  and  not isinstance( value, unicode) :
+			value = ''
 		return Model( value )
 
 
@@ -36,4 +32,4 @@ class IntEditorSpinEntry (Editor):
 
 
 	def __present__(self, fragment, inheritedState):
-		return IntSpinEntry(self._model.liveValue, self._min, self._max, self._step, self._page)
+		return TextArea(self._model.liveValue)
