@@ -11,18 +11,24 @@ from LarchCore.Languages.Python25.PythonCommands import pythonCommands, makeInse
 	makeWrapSelectedStatementRangeInEmbeddedObjectAction, makeInsertEmbeddedStatementAtCaretAction, chainActions
 
 from LarchTools.EmbeddedData.IntEditorSpinEntry import IntEditorSpinEntry
+from LarchTools.EmbeddedData.StringEditorTextArea import StringEditorTextArea
 
 
 
 def _newIntSpinEntryAtCaret(caret):
 	return IntEditorSpinEntry()
 
-
 _intSpinAtCaret = makeInsertEmbeddedExpressionAtCaretAction( _newIntSpinEntryAtCaret )
-
-
 _intSpinCommand = Command( '&Int &Spin &Entry', _intSpinAtCaret )
 
-_edCommands = CommandSet( 'LarchTools.EmbeddedData', [ _intSpinCommand ] )
+
+def _newTextAreaAtCaret(caret):
+	return StringEditorTextArea()
+
+_textAreaAtCaret = makeInsertEmbeddedExpressionAtCaretAction( _newTextAreaAtCaret )
+_textAreaCommand = Command( '&Text &Area', _textAreaAtCaret )
+
+
+_edCommands = CommandSet( 'LarchTools.EmbeddedData', [ _intSpinCommand, _textAreaCommand ] )
 
 pythonCommands.registerCommandSet( _edCommands )
