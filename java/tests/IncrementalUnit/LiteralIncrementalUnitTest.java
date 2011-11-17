@@ -7,14 +7,14 @@
 //##************************
 package tests.IncrementalUnit;
 
-import BritefuryJ.IncrementalUnit.LiteralUnit;
+import BritefuryJ.Live.LiveValue;
 
 
 public class LiteralIncrementalUnitTest extends IncrementalUnitTest_base
 {
 	public void testLiteral()
 	{
-		LiteralUnit cell = new LiteralUnit( 1 );
+		LiveValue cell = new LiveValue( 1 );
 	
 		assertEquals( cell.getValue(), 1 );
 		
@@ -29,7 +29,7 @@ public class LiteralIncrementalUnitTest extends IncrementalUnitTest_base
 	{
 		assertEquals( getSignalCount( "changed" ), 0 );
 		
-		LiteralUnit cell = new LiteralUnit( 1 );
+		LiveValue cell = new LiveValue( 1 );
 		
 		cell.addListener( makeListener( "" ) );
 		

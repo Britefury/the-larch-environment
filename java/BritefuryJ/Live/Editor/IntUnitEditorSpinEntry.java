@@ -4,10 +4,10 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.IncrementalUnit.Editor;
+package BritefuryJ.Live.Editor;
 
 import BritefuryJ.Controls.IntSpinEntry;
-import BritefuryJ.IncrementalUnit.LiteralUnit;
+import BritefuryJ.Live.LiveValue;
 
 public class IntUnitEditorSpinEntry extends LiteralUnitEditor
 {
@@ -53,7 +53,7 @@ public class IntUnitEditorSpinEntry extends LiteralUnitEditor
 	private int min, max, stepSize, pageSize;
 	
 	
-	public IntUnitEditorSpinEntry(LiteralUnit cell, int min, int max, int stepSize, int pageSize)
+	public IntUnitEditorSpinEntry(LiveValue cell, int min, int max, int stepSize, int pageSize)
 	{
 		super( cell );
 		this.min = min;

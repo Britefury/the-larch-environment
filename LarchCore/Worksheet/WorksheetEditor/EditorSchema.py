@@ -8,7 +8,6 @@
 from BritefuryJ.DocModel import DMObject, DMNode
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
-from BritefuryJ.IncrementalUnit import Unit
 
 from BritefuryJ.Pres import InnerFragment
 

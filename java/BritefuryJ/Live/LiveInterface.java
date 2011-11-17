@@ -5,7 +5,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 1999-2008.
 //##************************
-package BritefuryJ.IncrementalUnit;
+package BritefuryJ.Live;
 
 
 import java.awt.Color;
@@ -30,13 +30,13 @@ import BritefuryJ.StyleSheet.StyleValues;
 
 
 
-public abstract class UnitInterface implements Presentable
+public abstract class LiveInterface implements Presentable
 {
 	protected static class ElementValueFn implements ElementValueFunction
 	{
-		private UnitInterface unit;
+		private LiveInterface unit;
 		
-		public ElementValueFn(UnitInterface unit)
+		public ElementValueFn(LiveInterface unit)
 		{
 			this.unit = unit;
 		}
@@ -59,10 +59,10 @@ public abstract class UnitInterface implements Presentable
 	
 	public static class ValuePres extends Pres
 	{
-		private UnitInterface unit;
+		private LiveInterface unit;
 		
 		
-		private ValuePres(UnitInterface unit)
+		private ValuePres(LiveInterface unit)
 		{
 			this.unit = unit;
 		}

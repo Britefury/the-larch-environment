@@ -10,7 +10,7 @@ from weakref import WeakValueDictionary
 import imp
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
-from BritefuryJ.IncrementalUnit import Unit
+from BritefuryJ.Live import LiveFunction
 
 from BritefuryJ.Pres import InnerFragment
 from BritefuryJ.Pres.Primitive import Primitive
@@ -90,7 +90,7 @@ class WorksheetAbstractView (NodeAbstractView):
 class BodyAbstractView (NodeAbstractView):
 	def __init__(self, worksheet, model):
 		super( BodyAbstractView, self ).__init__( worksheet, model )
-		self._contentsUnit = Unit( self._computeContents )
+		self._contentsLive = LiveFunction( self._computeContents )
 		
 		
 	def refreshResults(self, module):
@@ -99,7 +99,7 @@ class BodyAbstractView (NodeAbstractView):
 		
 		
 	def getContents(self):
-		return self._contentsUnit.getValue()
+		return self._contentsLive.getValue()
 	
 	
 	def _computeContents(self):
@@ -111,11 +111,11 @@ class BodyAbstractView (NodeAbstractView):
 class _TextAbstractView (NodeAbstractView):
 	def __init__(self, worksheet, model):
 		super( _TextAbstractView, self ).__init__( worksheet, model )
-		self._textUnit = Unit( self._computeText )
+		self._textLive = LiveFunction( self._computeText )
 
 
 	def getText(self):
-		return self._textUnit.getValue()
+		return self._textLive.getValue()
 
 
 	def _refreshResults(self, module):
@@ -149,15 +149,15 @@ class ParagraphAbstractView (_TextAbstractView):
 class TextSpanAbstractView (_TextAbstractView):
 	def __init__(self, worksheet, model):
 		super( TextSpanAbstractView, self ).__init__( worksheet, model )
-		self._styleMapUnit = Unit( self.__compute_style_map )
+		self._styleMapLive = LiveFunction( self.__compute_style_map )
 
 		
 	def getStyleAttrs(self):
-		return self._styleMapUnit.getValue()[0]
+		return self._styleMapLive.getValue()[0]
 
 
 	def getStyleSheet(self):
-		return self._styleMapUnit.getValue()[1]
+		return self._styleMapLive.getValue()[1]
 
 
 

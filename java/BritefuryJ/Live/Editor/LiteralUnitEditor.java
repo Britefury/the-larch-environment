@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.IncrementalUnit.Editor;
+package BritefuryJ.Live.Editor;
 
 import java.awt.Color;
 import java.util.WeakHashMap;
@@ -15,8 +15,8 @@ import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
-import BritefuryJ.IncrementalUnit.LiteralUnit;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
@@ -29,7 +29,7 @@ public abstract class LiteralUnitEditor implements Presentable, IncrementalMonit
 	protected abstract class Editor
 	{
 		private boolean bSettingCellValue = false;
-		private LiteralUnit presCell = new LiteralUnit();
+		private LiveValue presCell = new LiveValue();
 		private Pres pres = presCell.defaultPerspectiveValuePresInFragment();
 
 		
@@ -79,11 +79,11 @@ public abstract class LiteralUnitEditor implements Presentable, IncrementalMonit
 	}
 
 
-	protected LiteralUnit cell;
+	protected LiveValue cell;
 	protected WeakHashMap<Editor, Object> editors = new WeakHashMap<Editor, Object>();
 	
 	
-	public LiteralUnitEditor(LiteralUnit cell)
+	public LiteralUnitEditor(LiveValue cell)
 	{
 		this.cell = cell;
 		this.cell.addListener( this );

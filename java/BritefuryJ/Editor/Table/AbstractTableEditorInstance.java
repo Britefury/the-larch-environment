@@ -16,8 +16,7 @@ import BritefuryJ.DocPresent.Interactor.TargetElementInteractor;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.SelectionPoint;
 import BritefuryJ.DocPresent.Target.Target;
-import BritefuryJ.IncrementalUnit.Unit;
-import BritefuryJ.IncrementalUnit.UnitEvaluator;
+import BritefuryJ.Live.LiveFunction;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
@@ -115,7 +114,7 @@ public abstract class AbstractTableEditorInstance <ModelType>
 	protected AbstractTableEditor<ModelType> editor;
 	protected ModelType model;
 	protected boolean editable;
-	protected Unit tableUnit;
+	protected LiveFunction tableUnit;
 	
 	
 	protected AbstractTableEditorInstance(AbstractTableEditor<ModelType> editor, ModelType model, boolean editable)
@@ -124,7 +123,7 @@ public abstract class AbstractTableEditorInstance <ModelType>
 		this.model = model;
 		this.editable = editable;
 		
-		UnitEvaluator eval = new UnitEvaluator()
+		LiveFunction.Function eval = new LiveFunction.Function()
 		{
 			@Override
 			public Object evaluate()
@@ -133,7 +132,7 @@ public abstract class AbstractTableEditorInstance <ModelType>
 			}
 		};
 		
-		tableUnit = new Unit( eval );
+		tableUnit = new LiveFunction( eval );
 	}
 	
 	

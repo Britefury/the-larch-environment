@@ -17,9 +17,8 @@ import BritefuryJ.DocPresent.Input.Modifier;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.Interactor.DragElementInteractor;
-import BritefuryJ.IncrementalUnit.Unit;
-import BritefuryJ.IncrementalUnit.UnitEvaluator;
-import BritefuryJ.IncrementalUnit.UnitInterface;
+import BritefuryJ.Live.LiveFunction;
+import BritefuryJ.Live.LiveInterface;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
@@ -114,13 +113,13 @@ public abstract class SpinEntry extends ControlPres
 		
 		
 		
-		protected UnitInterface value;
+		protected LiveInterface value;
 		protected DPElement element;
 		protected TextEntry.TextEntryControl textEntry;
 		protected DPElement upSpinButton, downSpinButton;
 		
 		
-		protected SpinEntryControl(PresentationContext ctx, StyleValues style, UnitInterface value, DPElement element, TextEntry.TextEntryControl textEntry,
+		protected SpinEntryControl(PresentationContext ctx, StyleValues style, LiveInterface value, DPElement element, TextEntry.TextEntryControl textEntry,
 				DPElement upSpinButton, DPElement downSpinButton, SpinEntryTextListener textListener)
 		{
 			super( ctx, style );
@@ -152,12 +151,12 @@ public abstract class SpinEntry extends ControlPres
 	}
 	
 	
-	private static class TextLiveFn extends UnitEvaluator
+	private static class TextLiveFn implements LiveFunction.Function
 	{
-		private UnitInterface value;
+		private LiveInterface value;
 		
 		
-		public TextLiveFn(UnitInterface value)
+		public TextLiveFn(LiveInterface value)
 		{
 			this.value = value;
 		}
@@ -185,8 +184,8 @@ public abstract class SpinEntry extends ControlPres
 	@Override
 	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
-		UnitInterface value = valueSource.getLive();
-		Unit text = new Unit( new TextLiveFn( value ) );
+		LiveInterface value = valueSource.getLive();
+		LiveFunction text = new LiveFunction( new TextLiveFn( value ) );
 		
 		
 		
@@ -217,6 +216,6 @@ public abstract class SpinEntry extends ControlPres
 	protected abstract String getValidationFailMessage();
 	
 	
-	protected abstract SpinEntryControl createSpinEntryControl(PresentationContext ctx, StyleValues style, UnitInterface value, DPElement element, TextEntry.TextEntryControl entryControl, DPElement upArrow,
+	protected abstract SpinEntryControl createSpinEntryControl(PresentationContext ctx, StyleValues style, LiveInterface value, DPElement element, TextEntry.TextEntryControl entryControl, DPElement upArrow,
 			DPElement downArrow, SpinEntryControl.SpinEntryTextListener textListener);
 }

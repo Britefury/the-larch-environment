@@ -11,8 +11,8 @@ import java.util.regex.Pattern;
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Controls.TextEntry;
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.IncrementalUnit.LiteralUnit;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Label;
@@ -41,18 +41,18 @@ public class TextEntryTestPage extends SystemPage
 	
 	private static class TextEntryTest implements Presentable
 	{
-		private LiteralUnit value;
+		private LiveValue value;
 		private Pattern validationRegex = null;
 		private String validationFailMsg = null;
 		
-		public TextEntryTest(LiteralUnit value, Pattern validationRegex, String validationFailMessage)
+		public TextEntryTest(LiveValue value, Pattern validationRegex, String validationFailMessage)
 		{
 			this.value = value;
 			this.validationRegex = validationRegex;
 			this.validationFailMsg = validationFailMessage;
 		}
 
-		public TextEntryTest(LiteralUnit value)
+		public TextEntryTest(LiveValue value)
 		{
 			this.value = value;
 		}
@@ -60,7 +60,7 @@ public class TextEntryTestPage extends SystemPage
 		@Override
 		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
-			final LiteralUnit message = new LiteralUnit( new Label( "No change yet..." ) );
+			final LiveValue message = new LiveValue( new Label( "No change yet..." ) );
 			
 			TextEntry.TextEntryListener listener = new TextEntry.TextEntryListener()
 			{
@@ -110,10 +110,10 @@ public class TextEntryTestPage extends SystemPage
 	
 	protected Pres createContents()
 	{
-		TextEntryTest hello = new TextEntryTest( new LiteralUnit( "Hello" ) );
-		TextEntryTest world = new TextEntryTest( new LiteralUnit( "World" ) );
-		TextEntryTest identifier = new TextEntryTest( new LiteralUnit( "abc" ), Pattern.compile( "[a-zA-Z_][a-zA-Z0-9_]*" ), "Please enter a valid identifier.\n(alphabetic or underscore, followed by alphanumeric or underscore)" );
-		TextEntryTest integer = new TextEntryTest( new LiteralUnit( "123" ), Pattern.compile( "[0-9]+" ), "Please enter a valid integer." );
+		TextEntryTest hello = new TextEntryTest( new LiveValue( "Hello" ) );
+		TextEntryTest world = new TextEntryTest( new LiveValue( "World" ) );
+		TextEntryTest identifier = new TextEntryTest( new LiveValue( "abc" ), Pattern.compile( "[a-zA-Z_][a-zA-Z0-9_]*" ), "Please enter a valid identifier.\n(alphabetic or underscore, followed by alphanumeric or underscore)" );
+		TextEntryTest integer = new TextEntryTest( new LiveValue( "123" ), Pattern.compile( "[0-9]+" ), "Please enter a valid integer." );
 		
 		Pres identifierLine = new Paragraph( new Object[] { new Label( "Identifier: "), identifier } );
 		Pres integerLine = new Paragraph( new Object[] { new Label( "Integer: "), integer } );

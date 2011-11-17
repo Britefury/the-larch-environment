@@ -14,7 +14,7 @@ from copy import deepcopy
 from BritefuryJ.Command import *
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
-from BritefuryJ.IncrementalUnit import LiteralUnit
+from BritefuryJ.Live import LiveValue
 
 from BritefuryJ.Controls import *
 
@@ -157,26 +157,26 @@ class _FrameValues (object):
 
 	
 class _FrameInteractor (PushElementInteractor):
-	def __init__(self, frame, valuesUnit):
+	def __init__(self, frame, valuesLive):
 		self._frame = frame
-		self._valuesUnit = valuesUnit
+		self._valuesLive = valuesLive
 	
 	def buttonPress(self, element, event):
 		return event.getButton() == 1
 	
 	def buttonRelease(self, element, event):
-		self._valuesUnit.setLiteralValue( self._frame.values )
+		self._valuesLive.setLiteralValue( self._frame.values )
 	
 
 class _FrameBox (object):
-	def __init__(self, frame, valuesUnit):
+	def __init__(self, frame, valuesLive):
 		self._frame = frame
-		self._valuesUnit = valuesUnit
+		self._valuesLive = valuesLive
 
 	def __present__(self, fragment, inheritedState):
-		interactor = _FrameInteractor( self._frame, self._valuesUnit )
+		interactor = _FrameInteractor( self._frame, self._valuesLive )
 		box = Box( 15.0, 5.0 ).withElementInteractor( interactor )
-		if self._valuesUnit.getValue() is self._frame.values:
+		if self._valuesLive.getValue() is self._frame.values:
 			return self._selectedTabFrameStyle.applyTo( box )
 		else:
 			return self._tabFrameStyle.applyTo( box )
@@ -192,10 +192,10 @@ class _Frame (object):
 		self.values = _FrameValues()
 		self.childFrames = []
 	
-	def _presentFrameSubtree(self, valuesUnit):
-		frameBox = _FrameBox( self, valuesUnit )
+	def _presentFrameSubtree(self, valuesLive):
+		frameBox = _FrameBox( self, valuesLive )
 		tab = Pres.coerce( frameBox ).pad( 2.0, 2.0 ).alignVExpand()
-		return Row( [ tab, Column( [ x._presentFrameSubtree( valuesUnit )   for x in self.childFrames ] ) ] )
+		return Row( [ tab, Column( [ x._presentFrameSubtree( valuesLive )   for x in self.childFrames ] ) ] )
 	
 	
 	
@@ -229,9 +229,9 @@ class _TreeView (object):
 	
 	
 	def __present__(self, fragment, inheritedState):
-		valuesUnit = LiteralUnit( Blank() )
-		tree = Column( [ x._presentFrameSubtree( valuesUnit )   for x in self._rootFrames ] )
-		return Column( [ tree, Spacer( 0.0, 10.0 ), valuesUnit.valuePresInFragment() ] )
+		valuesLive = LiveValue( Blank() )
+		tree = Column( [ x._presentFrameSubtree( valuesLive )   for x in self._rootFrames ] )
+		return Column( [ tree, Spacer( 0.0, 10.0 ), valuesLive.valuePresInFragment() ] )
 
 
 
@@ -404,7 +404,7 @@ class NamedValue (object):
 			self._incr.onChanged()
 			
 
-		namePres = EditableLabel( self._name, self._nameNotSetStyle( Label( '<not set>' ) ), _setName, Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*' ), 'Please enter a valid identifier' )
+		namePres = EditableLabel.regexValidated( self._name, self._nameNotSetStyle( Label( '<not set>' ) ), _setName, Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*' ), 'Please enter a valid identifier' )
 		
 		exprPres = self._expr
 		

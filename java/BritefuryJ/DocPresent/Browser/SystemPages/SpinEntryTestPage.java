@@ -8,7 +8,7 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import BritefuryJ.Controls.IntSpinEntry;
 import BritefuryJ.Controls.RealSpinEntry;
-import BritefuryJ.IncrementalUnit.LiteralUnit;
+import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Label;
@@ -39,8 +39,8 @@ public class SpinEntryTestPage extends SystemPage
 	
 	protected Pres createContents()
 	{
-		LiteralUnit realValue = new LiteralUnit( 0.0 );
-		LiteralUnit intValue = new LiteralUnit( 0 );
+		LiveValue realValue = new LiveValue( 0.0 );
+		LiveValue intValue = new LiveValue( 0 );
 		RealSpinEntry realSpinEntry = new RealSpinEntry( realValue, -100.0, 100.0, 1.0, 10.0 );
 		IntSpinEntry intSpinEntry = new IntSpinEntry( intValue, -100, 100, 1, 10 );
 		

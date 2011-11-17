@@ -7,7 +7,7 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import BritefuryJ.Controls.Checkbox;
-import BritefuryJ.IncrementalUnit.LiteralUnit;
+import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.RichText.Body;
@@ -33,7 +33,7 @@ public class CheckboxTestPage extends SystemPage
 	
 	protected Pres createContents()
 	{
-		LiteralUnit state = new LiteralUnit( false );
+		LiveValue state = new LiveValue( false );
 		Pres checkboxA = Checkbox.checkboxWithLabel( "Checkbox A", state );
 		Pres checkboxB = Checkbox.checkboxWithLabel( "Checkbox B (linked to checkbox A)", state );
 		Pres checkboxSectionContents = new Column( new Pres[] { checkboxA.padX( 5.0 ), checkboxB.padX( 5.0 ), state.valuePresInFragment() } );

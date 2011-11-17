@@ -4,12 +4,12 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.IncrementalUnit.Editor;
+package BritefuryJ.Live.Editor;
 
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.IncrementalUnit.LiteralUnit;
 import BritefuryJ.IncrementalView.FragmentData;
+import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.ObjectPres.ObjectBox;
@@ -51,7 +51,7 @@ public class ObjectUnitEditorDropBox extends LiteralUnitEditor
 	}
 
 
-	public ObjectUnitEditorDropBox(LiteralUnit cell)
+	public ObjectUnitEditorDropBox(LiveValue cell)
 	{
 		super( cell );
 	}

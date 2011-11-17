@@ -12,7 +12,7 @@ import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
-import BritefuryJ.IncrementalUnit.LiteralUnit;
+import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Bin;
@@ -29,10 +29,10 @@ public class Checkbox extends ControlPres
 	public static class CheckboxControl extends Control implements IncrementalMonitorListener
 	{
 		private DPElement element, box, check;
-		private LiteralUnit state;
+		private LiveValue state;
 
 		
-		protected CheckboxControl(PresentationContext ctx, StyleValues style, DPElement element, DPElement box, DPElement check, LiteralUnit state, Paint checkForeground)
+		protected CheckboxControl(PresentationContext ctx, StyleValues style, DPElement element, DPElement box, DPElement check, LiveValue state, Paint checkForeground)
 		{
 			super( ctx, style );
 			
@@ -90,10 +90,10 @@ public class Checkbox extends ControlPres
 	
 	
 	private Pres child;
-	private LiteralUnit state;
+	private LiveValue state;
 
 	
-	public Checkbox(Object child, LiteralUnit state)
+	public Checkbox(Object child, LiveValue state)
 	{
 		this.child = coerce( child );
 		this.state = state;
@@ -101,11 +101,11 @@ public class Checkbox extends ControlPres
 	
 	public Checkbox(Object child, boolean state)
 	{
-		this( child, new LiteralUnit( state ) );
+		this( child, new LiveValue( state ) );
 	}
 	
 	
-	public static Checkbox checkboxWithLabel(String labelText, LiteralUnit state)
+	public static Checkbox checkboxWithLabel(String labelText, LiveValue state)
 	{
 		return new Checkbox( new Label( labelText ), state );
 	}

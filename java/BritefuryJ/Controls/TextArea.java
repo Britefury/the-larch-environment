@@ -29,8 +29,8 @@ import BritefuryJ.DocPresent.Selection.TextSelection;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
-import BritefuryJ.IncrementalUnit.LiteralUnit;
-import BritefuryJ.IncrementalUnit.UnitInterface;
+import BritefuryJ.Live.LiveInterface;
+import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Border;
@@ -253,14 +253,14 @@ public class TextArea extends ControlPres
 		
 		private DPElement element;
 		private DPColumn textBox;
-		private UnitInterface value;
+		private LiveInterface value;
 		private TextAreaListener listener;
 		private TextAreaTextLineTreeEventListener textLineTreeEventListener = new TextAreaTextLineTreeEventListener();
 		private TextAreaNewlineTreeEventListener newlineTreeEventListener = new TextAreaNewlineTreeEventListener();
 		
 		
 		
-		protected TextAreaControl(PresentationContext ctx, StyleValues style, DPElement element, DPRegion region, DPColumn textBox, TextAreaListener listener, UnitInterface value)
+		protected TextAreaControl(PresentationContext ctx, StyleValues style, DPElement element, DPRegion region, DPColumn textBox, TextAreaListener listener, LiveInterface value)
 		{
 			super( ctx, style );
 			
@@ -457,9 +457,9 @@ public class TextArea extends ControlPres
 	
 	private static class CommitListener extends TextAreaListener
 	{
-		private LiteralUnit value;
+		private LiveValue value;
 		
-		public CommitListener(LiteralUnit value)
+		public CommitListener(LiveValue value)
 		{
 			this.value = value;
 		}
@@ -487,12 +487,12 @@ public class TextArea extends ControlPres
 		this( new LiveSourceValue( initialText ), listener );
 	}
 	
-	public TextArea(UnitInterface value, TextAreaListener listener)
+	public TextArea(LiveInterface value, TextAreaListener listener)
 	{
 		this( new LiveSourceRef( value ), listener );
 	}
 	
-	public TextArea(LiteralUnit value)
+	public TextArea(LiveValue value)
 	{
 		this( new LiveSourceRef( value ), new CommitListener( value ) );
 	}
@@ -507,7 +507,7 @@ public class TextArea extends ControlPres
 		
 		StyleValues textAreaStyle = style.withAttrs( textAreaStyleSheet );
 		
-		UnitInterface value = valueSource.getLive();
+		LiveInterface value = valueSource.getLive();
 
 		Pres textBoxPres = new Column( new Pres[] {} );
 		DPColumn textBox = (DPColumn)textBoxPres.present( ctx, textAreaStyle );

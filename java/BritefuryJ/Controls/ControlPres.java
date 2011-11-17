@@ -9,8 +9,8 @@ package BritefuryJ.Controls;
 import java.util.WeakHashMap;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.IncrementalUnit.LiteralUnit;
-import BritefuryJ.IncrementalUnit.UnitInterface;
+import BritefuryJ.Live.LiveInterface;
+import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -39,20 +39,20 @@ public abstract class ControlPres extends Pres
 	
 	public static interface LiveSource
 	{
-		public UnitInterface getLive();
+		public LiveInterface getLive();
 	}
 	
 	public static class LiveSourceRef implements LiveSource
 	{
-		private UnitInterface live;
+		private LiveInterface live;
 		
-		public LiveSourceRef(UnitInterface live)
+		public LiveSourceRef(LiveInterface live)
 		{
 			this.live = live;
 		}
 
 		@Override
-		public UnitInterface getLive()
+		public LiveInterface getLive()
 		{
 			return live;
 		}
@@ -68,9 +68,9 @@ public abstract class ControlPres extends Pres
 		}
 
 		@Override
-		public UnitInterface getLive()
+		public LiveInterface getLive()
 		{
-			return new LiteralUnit( value );
+			return new LiveValue( value );
 		}
 	}
 	
