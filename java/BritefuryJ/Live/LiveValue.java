@@ -5,25 +5,25 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 1999-2008.
 //##************************
-package BritefuryJ.IncrementalUnit;
+package BritefuryJ.Live;
 
 import BritefuryJ.Incremental.IncrementalValueMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
 
 
-public class LiteralUnit extends UnitInterface
+public class LiveValue extends LiveInterface
 {
 	private IncrementalValueMonitor inc;
 	private Object value;
 	
 	
 	
-	public LiteralUnit()
+	public LiveValue()
 	{
 		this( null );
 	}
 	
-	public LiteralUnit(Object value)
+	public LiveValue(Object value)
 	{
 		super();
 		inc = new IncrementalValueMonitor( this );

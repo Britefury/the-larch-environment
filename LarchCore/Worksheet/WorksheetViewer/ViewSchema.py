@@ -6,7 +6,6 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
 from BritefuryJ.Incremental import IncrementalValueMonitor
-from BritefuryJ.IncrementalUnit import Unit
 
 from BritefuryJ.Pres import InnerFragment
 

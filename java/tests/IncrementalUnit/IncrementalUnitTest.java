@@ -7,14 +7,13 @@
 //##************************
 package tests.IncrementalUnit;
 
-import BritefuryJ.IncrementalUnit.Unit;
-import BritefuryJ.IncrementalUnit.UnitEvaluator;
+import BritefuryJ.Live.LiveFunction;
 
 public class IncrementalUnitTest extends IncrementalUnitTest_base
 {
 	public void testLiteral()
 	{
-		Unit cell = new Unit();
+		LiveFunction cell = new LiveFunction();
 		
 		cell.setLiteralValue( new Integer( 1 ) );
 	
@@ -31,7 +30,7 @@ public class IncrementalUnitTest extends IncrementalUnitTest_base
 	{
 		assertEquals( getSignalCount( "changed" ), 0 );
 		
-		Unit cell = new Unit();
+		LiveFunction cell = new LiveFunction();
 		
 		cell.setLiteralValue( new Integer( 1 ) );
 		assertEquals( cell.getValue(), 1 );
@@ -48,7 +47,7 @@ public class IncrementalUnitTest extends IncrementalUnitTest_base
 	
 	public void testFunction()
 	{
-		UnitEvaluator evaluator = new UnitEvaluator()
+		LiveFunction.Function evaluator = new LiveFunction.Function()
 		{
 			public Object evaluate()
 			{
@@ -59,14 +58,14 @@ public class IncrementalUnitTest extends IncrementalUnitTest_base
 		
 		assertEquals( getSignalCount( "changed" ), 0 );
 
-		Unit cell = new Unit();
+		LiveFunction cell = new LiveFunction();
 
 		cell.setLiteralValue( new Integer( 1 ) );
 		assertEquals( cell.getValue(), 1 );
 		
 		cell.addListener( makeListener( "" ) );
 		
-		cell.setEvaluator( evaluator );
+		cell.setFunction( evaluator );
 		assertEquals( cell.getValue(), 20 );
 		
 		assertEquals( getSignalCount( "changed" ), 1 );
@@ -75,10 +74,10 @@ public class IncrementalUnitTest extends IncrementalUnitTest_base
 	
 	public void testChain()
 	{
-		final Unit cell1 = new Unit();
-		final Unit cell2 = new Unit();
+		final LiveFunction cell1 = new LiveFunction();
+		final LiveFunction cell2 = new LiveFunction();
 		
-		UnitEvaluator evaluator = new UnitEvaluator()
+		LiveFunction.Function evaluator = new LiveFunction.Function()
 		{
 			public Object evaluate()
 			{
@@ -88,7 +87,7 @@ public class IncrementalUnitTest extends IncrementalUnitTest_base
 		
 		
 		cell1.setLiteralValue( new Integer( 1 ) );
-		cell2.setEvaluator( evaluator );
+		cell2.setFunction( evaluator );
 		
 		assertEquals( cell1.getValue(), 1 );
 		assertEquals( cell2.getValue(), 3 );
@@ -103,10 +102,10 @@ public class IncrementalUnitTest extends IncrementalUnitTest_base
 	public void testValueCache()
 	{
 		final int[] callCount = { 0 };
-		final Unit cell1 = new Unit();
-		final Unit cell2 = new Unit();
+		final LiveFunction cell1 = new LiveFunction();
+		final LiveFunction cell2 = new LiveFunction();
 		
-		UnitEvaluator evaluator = new UnitEvaluator()
+		LiveFunction.Function evaluator = new LiveFunction.Function()
 		{
 			public Object evaluate()
 			{
@@ -118,7 +117,7 @@ public class IncrementalUnitTest extends IncrementalUnitTest_base
 		
 		cell1.setLiteralValue( new Integer( 1 ) );
 
-		cell2.setEvaluator( evaluator );
+		cell2.setFunction( evaluator );
 		
 		assertEquals( callCount[0], 0 );
 		assertEquals( cell1.getValue(), 1 );
@@ -142,11 +141,11 @@ public class IncrementalUnitTest extends IncrementalUnitTest_base
 		assertEquals( getSignalCount( "1changed" ), 0 );
 		assertEquals( getSignalCount( "3changed" ), 0 );
 		
-		final Unit cell1 = new Unit();
-		final Unit cell2 = new Unit();
-		final Unit cell3 = new Unit();
+		final LiveFunction cell1 = new LiveFunction();
+		final LiveFunction cell2 = new LiveFunction();
+		final LiveFunction cell3 = new LiveFunction();
 		
-		UnitEvaluator evaluator2 = new UnitEvaluator()
+		LiveFunction.Function evaluator2 = new LiveFunction.Function()
 		{
 			public Object evaluate()
 			{
@@ -154,7 +153,7 @@ public class IncrementalUnitTest extends IncrementalUnitTest_base
 			}
 		};
 		
-		UnitEvaluator evaluator3 = new UnitEvaluator()
+		LiveFunction.Function evaluator3 = new LiveFunction.Function()
 		{
 			public Object evaluate()
 			{
@@ -164,8 +163,8 @@ public class IncrementalUnitTest extends IncrementalUnitTest_base
 		
 		
 		cell1.setLiteralValue( new Integer( 1 ) );
-		cell2.setEvaluator( evaluator2 );
-		cell3.setEvaluator( evaluator3 );
+		cell2.setFunction( evaluator2 );
+		cell3.setFunction( evaluator3 );
 
 		cell1.addListener( makeListener( "1" ) );
 		cell3.addListener( makeListener( "3" ) );
@@ -185,7 +184,7 @@ public class IncrementalUnitTest extends IncrementalUnitTest_base
 		assertEquals( getSignalCount( "1changed" ), 1 );
 		assertEquals( getSignalCount( "3changed" ), 1 );
 
-		cell3.setEvaluator( evaluator3 );
+		cell3.setFunction( evaluator3 );
 
 		assertEquals( cell1.getValue(), 12 );
 		assertEquals( cell2.getValue(), 36 );

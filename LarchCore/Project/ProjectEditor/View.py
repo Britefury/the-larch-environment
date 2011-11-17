@@ -21,7 +21,7 @@ from Britefury.Dispatch.ObjectMethodDispatch import ObjectDispatchMethod
 from Britefury.Kernel.View.DispatchView import ObjectDispatchView
 
 
-from BritefuryJ.IncrementalUnit import LiteralUnit
+from BritefuryJ.Live import LiveValue
 
 from BritefuryJ.AttributeTable import *
 
@@ -349,12 +349,12 @@ class ProjectView (ObjectDispatchView):
 				package.name = text
 
 			def onCancel(self, textEntry, originalText):
-				nameUnit.setLiteralValue( nameBox )
+				nameLive.setLiteralValue( nameBox )
 
 		def _onRename(menuItem):
 			textEntry = TextEntry.regexValidated( package.name, _RenameListener(), _nameRegex, 'Please enter a valid identifier' )
 			textEntry.grabCaretOnRealise()
-			nameUnit.setLiteralValue( textEntry )
+			nameLive.setLiteralValue( textEntry )
 		
 		def _onDelete(menuItem):
 			if package.parent is not None:
@@ -389,11 +389,11 @@ class ProjectView (ObjectDispatchView):
 		nameBox = nameBox.withDragSource( _dragSource )
 		nameBox = nameBox.withDropDest( _packageDropDest )
 
-		nameUnit = LiteralUnit( nameBox )
+		nameLive = LiveValue( nameBox )
 
 		itemsBox = Column( items )
 
-		return Column( [ nameUnit.defaultPerspectiveValuePresInFragment(), itemsBox.padX( _packageContentsIndentation, 0.0 ).alignHExpand() ] )
+		return Column( [ nameLive.defaultPerspectiveValuePresInFragment(), itemsBox.padX( _packageContentsIndentation, 0.0 ).alignHExpand() ] )
 
 
 
@@ -404,12 +404,12 @@ class ProjectView (ObjectDispatchView):
 				page.name = text
 
 			def onCancel(self, textEntry, originalText):
-				nameUnit.setLiteralValue( nameBox )
+				nameLive.setLiteralValue( nameBox )
 
 		def _onRename(menuItem):
 			textEntry = TextEntry.regexValidated( page.name, _RenameListener(), _nameRegex, 'Please enter a valid identifier' )
 			textEntry.grabCaretOnRealise()
-			nameUnit.setLiteralValue( textEntry )
+			nameLive.setLiteralValue( textEntry )
 
 		def _onDelete(menuItem):
 			if page.parent is not None:
@@ -431,9 +431,9 @@ class ProjectView (ObjectDispatchView):
 		nameBox = nameBox.withDragSource( _dragSource )
 		nameBox = nameBox.withDropDest( _pageDropDest )
 
-		nameUnit = LiteralUnit( nameBox )
+		nameLive = LiveValue( nameBox )
 
-		return nameUnit.defaultPerspectiveValuePresInFragment()
+		return nameLive.defaultPerspectiveValuePresInFragment()
 
 
 

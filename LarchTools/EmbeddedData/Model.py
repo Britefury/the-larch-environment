@@ -6,14 +6,14 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
 from BritefuryJ.Pres import Pres
-from BritefuryJ.IncrementalUnit import LiteralUnit
+from BritefuryJ.Live import LiveValue
 
 __author__ = 'Geoff'
 
 
 class Model (object):
 	def __init__(self, value=None):
-		self._live = LiteralUnit( value )
+		self._live = LiveValue( value )
 
 
 	def __getValue(self):
@@ -37,7 +37,7 @@ class Model (object):
 
 	def __setstate__(self, state):
 		value = state['value']
-		self._live = LiteralUnit( value )
+		self._live = LiveValue( value )
 
 
 

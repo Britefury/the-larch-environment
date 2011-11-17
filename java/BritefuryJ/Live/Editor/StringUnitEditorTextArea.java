@@ -2,34 +2,34 @@
 //##* under the terms of the GNU General Public License version 2 as published by the
 //##* Free Software Foundation. The full text of the GNU General Public License
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
-//##* program. This source code is (C)copyright Geoffrey French 2008-2010.
+//##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.IncrementalUnit.Editor;
+package BritefuryJ.Live.Editor;
 
-import BritefuryJ.Controls.TextEntry;
-import BritefuryJ.IncrementalUnit.LiteralUnit;
+import BritefuryJ.Controls.TextArea;
+import BritefuryJ.Live.LiveValue;
 
-public class StringUnitEditorTextEntry extends LiteralUnitEditor
+public class StringUnitEditorTextArea extends LiteralUnitEditor
 {
 	protected class StringEditor extends Editor
 	{
-		protected class Listener extends TextEntry.TextEntryListener
+		protected class Listener extends TextArea.TextAreaListener
 		{
 			@Override
-			public void onAccept(TextEntry.TextEntryControl textEntry, String text)
+			public void onAccept(TextArea.TextAreaControl textArea, String text)
 			{
 				setUnitValue( text );
 			}
 		}
 		
-		
+
 		public StringEditor()
 		{
 			String value = getUnitValue( String.class );
 			String text = value != null  ?  value  :  "";
 			if ( value != null )
 			{
-				setPres( new TextEntry( text, new Listener() ) );
+				setPres( new TextArea( text, new Listener() ) );
 			}
 			else
 			{
@@ -43,7 +43,7 @@ public class StringUnitEditorTextEntry extends LiteralUnitEditor
 			String text = getUnitValue( String.class );
 			if ( text != null )
 			{
-				setPres( new TextEntry( text, new Listener() ) );
+				setPres( new TextArea( text, new Listener() ) );
 			}
 			else
 			{
@@ -53,7 +53,7 @@ public class StringUnitEditorTextEntry extends LiteralUnitEditor
 	}
 
 
-	public StringUnitEditorTextEntry(LiteralUnit cell)
+	public StringUnitEditorTextArea(LiveValue cell)
 	{
 		super( cell );
 	}

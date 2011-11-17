@@ -17,7 +17,7 @@ from BritefuryJ.DocPresent.Input import ObjectDndHandler
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
 from BritefuryJ.IncrementalView import FragmentData
-from BritefuryJ.IncrementalUnit import LiteralUnit
+from BritefuryJ.Live import LiveValue
 
 from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.Pres.ObjectPres import *
@@ -207,7 +207,7 @@ class LiterateSuite (object):
 		suitePres = self._definition._suite
 
 		nameLabel =  self._nameStyle( Label( self._definition._name ) )
-		nameUnit = LiteralUnit( nameLabel )
+		liveName = LiveValue( nameLabel )
 
 		
 		class _NameEntryListener (TextEntry.TextEntryListener):
@@ -215,19 +215,19 @@ class LiterateSuite (object):
 				self.setName( text )
 
 			def onCancel(listener, textEntry, orignalText):
-				nameUnit.setLiteralValue( nameLabel )
+				liveName.setLiteralValue( nameLabel )
 
 
 		def _onNameButton(button, event):
 			nameEntry = TextEntry( self._definition._name, _NameEntryListener() )
 			nameEntry.grabCaretOnRealise()
 			nameEntry = self._nameStyle( nameEntry )
-			nameUnit.setLiteralValue( nameEntry )
+			liveName.setLiteralValue( nameEntry )
 
 		renameButton = self._nameButtonStyle( Button.buttonWithLabel( '...', _onNameButton ) )
 
 		header = Row( [ self._angleQuoteStyle( Label( u'\u00ab' ) ),
-		                        nameUnit.valuePresInFragment(),
+		                        liveName.valuePresInFragment(),
 					self._angleQuoteStyle( Label( u'\u00bb' ) ),
 					Spacer( 10.0, 0.0 ),
 					renameButton ] ).withDragSource( _dragSource )

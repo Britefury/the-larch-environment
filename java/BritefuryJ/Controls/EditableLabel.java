@@ -16,8 +16,8 @@ import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Interactor.PushElementInteractor;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
-import BritefuryJ.IncrementalUnit.LiteralUnit;
-import BritefuryJ.IncrementalUnit.UnitInterface;
+import BritefuryJ.Live.LiveInterface;
+import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Blank;
@@ -65,14 +65,14 @@ public class EditableLabel extends ControlPres
 		
 		
 		private DPElement element;
-		private LiteralUnit unit;
-		private UnitInterface value;
+		private LiveValue unit;
+		private LiveInterface value;
 		private Pres notSet;
 		private EditableLabelListener listener;
 		private TextEntry.TextEntryValidator validator;
 		
 		
-		public EditableLabelControl(PresentationContext ctx, StyleValues style, DPElement element, LiteralUnit unit, UnitInterface value, Pres notSet,
+		public EditableLabelControl(PresentationContext ctx, StyleValues style, DPElement element, LiveValue unit, LiveInterface value, Pres notSet,
 				EditableLabelListener listener, TextEntry.TextEntryValidator validator)
 		{
 			super( ctx, style );
@@ -158,9 +158,9 @@ public class EditableLabel extends ControlPres
 	
 	private static class CommitListener implements EditableLabelListener
 	{
-		private UnitInterface value;
+		private LiveInterface value;
 		
-		public CommitListener(UnitInterface value)
+		public CommitListener(LiveInterface value)
 		{
 			this.value = value;
 		}
@@ -206,33 +206,33 @@ public class EditableLabel extends ControlPres
 	}
 	
 	
-	public EditableLabel(UnitInterface value, Object notSet, EditableLabelListener listener)
+	public EditableLabel(LiveInterface value, Object notSet, EditableLabelListener listener)
 	{
 		this( new LiveSourceRef( value ), notSet, listener, null );
 	}
 	
-	public static EditableLabel validated(UnitInterface value, Object notSet, EditableLabelListener listener, TextEntry.TextEntryValidator validator)
+	public static EditableLabel validated(LiveInterface value, Object notSet, EditableLabelListener listener, TextEntry.TextEntryValidator validator)
 	{
 		return new EditableLabel( new LiveSourceRef( value ), notSet, listener, validator );
 	}
 	
-	public static EditableLabel regexValidated(UnitInterface value, Object notSet, EditableLabelListener listener, Pattern validatorRegex, String validationFailMessage)
+	public static EditableLabel regexValidated(LiveInterface value, Object notSet, EditableLabelListener listener, Pattern validatorRegex, String validationFailMessage)
 	{
 		return new EditableLabel( new LiveSourceRef( value ), notSet, listener, new TextEntry.RegexTextEntryValidator( validatorRegex, validationFailMessage ) );
 	}
 	
 	
-	public EditableLabel(LiteralUnit value, Object notSet)
+	public EditableLabel(LiveValue value, Object notSet)
 	{
 		this( new LiveSourceRef( value ), notSet, new CommitListener( value ), null );
 	}
 	
-	public static EditableLabel validated(LiteralUnit value, Object notSet, TextEntry.TextEntryValidator validator)
+	public static EditableLabel validated(LiveValue value, Object notSet, TextEntry.TextEntryValidator validator)
 	{
 		return new EditableLabel( new LiveSourceRef( value ), notSet, new CommitListener( value ), validator );
 	}
 	
-	public static EditableLabel regexValidated(LiteralUnit value, Object notSet, Pattern validatorRegex, String validationFailMessage)
+	public static EditableLabel regexValidated(LiveValue value, Object notSet, Pattern validatorRegex, String validationFailMessage)
 	{
 		return new EditableLabel( new LiveSourceRef( value ), notSet, new CommitListener( value ), new TextEntry.RegexTextEntryValidator( validatorRegex, validationFailMessage ) );
 	}
@@ -243,8 +243,8 @@ public class EditableLabel extends ControlPres
 	{
 		StyleValues usedStyle = Controls.useEditableLabelAttrs( style );
 		
-		LiteralUnit unit = new LiteralUnit( new Blank() );
-		UnitInterface value = valueSource.getLive();
+		LiveValue unit = new LiveValue( new Blank() );
+		LiveInterface value = valueSource.getLive();
 		
 		Pres unitPres = DefaultPerspective.instance.applyTo( unit.valuePresInFragment() );
 		DPElement element = unitPres.present( ctx, usedStyle );

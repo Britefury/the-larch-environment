@@ -22,8 +22,7 @@ import BritefuryJ.DocModel.DMIOReader;
 import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
 import BritefuryJ.DocModel.DMList;
 import BritefuryJ.DocModel.DMNode;
-import BritefuryJ.IncrementalUnit.Unit;
-import BritefuryJ.IncrementalUnit.UnitEvaluator;
+import BritefuryJ.Live.LiveFunction;
 
 public class Test_DMList extends TestCase
 {
@@ -122,15 +121,15 @@ public class Test_DMList extends TestCase
 	{
 		final DMList xs = readDMListSX( "[a b c]" );
 		
-		UnitEvaluator eval = new UnitEvaluator()
+		LiveFunction.Function eval = new LiveFunction.Function()
 		{
 			public Object evaluate()
 			{
 				return xs.size();
 			}
 		};
-		Unit yCell = new Unit();
-		yCell.setEvaluator( eval );
+		LiveFunction yCell = new LiveFunction();
+		yCell.setFunction( eval );
 		
 		assertEquals( yCell.getValue(), 3 );
 		

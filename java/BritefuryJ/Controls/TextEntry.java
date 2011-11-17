@@ -27,8 +27,8 @@ import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.TextSelection;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
-import BritefuryJ.IncrementalUnit.LiteralUnit;
-import BritefuryJ.IncrementalUnit.UnitInterface;
+import BritefuryJ.Live.LiveInterface;
+import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Border;
@@ -221,12 +221,12 @@ public class TextEntry extends ControlPres
 		private BritefuryJ.DocPresent.Border.AbstractBorder validBorder, invalidBorder;
 		private TextEntryListener listener;
 		private TextEntryValidator validator;
-		private UnitInterface text;
+		private LiveInterface text;
 		private boolean bGrabCaretOnRealise, bSelectAllOnRealise;
 	
 	
 		
-		protected TextEntryControl(PresentationContext ctx, StyleValues style, UnitInterface text, DPBorder outerElement, DPRegion region, DPText textElement, TextEntryListener listener, TextEntryValidator validator,
+		protected TextEntryControl(PresentationContext ctx, StyleValues style, LiveInterface text, DPBorder outerElement, DPRegion region, DPText textElement, TextEntryListener listener, TextEntryValidator validator,
 				BritefuryJ.DocPresent.Border.AbstractBorder validBorder, BritefuryJ.DocPresent.Border.AbstractBorder invalidBorder)
 		{
 			super( ctx, style );
@@ -380,9 +380,9 @@ public class TextEntry extends ControlPres
 	
 	private static class CommitListener extends TextEntryListener
 	{
-		private LiteralUnit value;
+		private LiveValue value;
 		
-		public CommitListener(LiteralUnit value)
+		public CommitListener(LiveValue value)
 		{
 			this.value = value;
 		}
@@ -425,33 +425,33 @@ public class TextEntry extends ControlPres
 	}
 	
 	
-	public TextEntry(UnitInterface value, TextEntryListener listener)
+	public TextEntry(LiveInterface value, TextEntryListener listener)
 	{
 		this( new LiveSourceRef( value ), listener, null );
 	}
 	
-	public static TextEntry validated(UnitInterface value, TextEntryListener listener, TextEntryValidator validator)
+	public static TextEntry validated(LiveInterface value, TextEntryListener listener, TextEntryValidator validator)
 	{
 		return new TextEntry( new LiveSourceRef( value ), listener, validator );
 	}
 	
-	public static TextEntry regexValidated(UnitInterface value, TextEntryListener listener, Pattern validatorRegex, String validationFailMessage)
+	public static TextEntry regexValidated(LiveInterface value, TextEntryListener listener, Pattern validatorRegex, String validationFailMessage)
 	{
 		return new TextEntry( new LiveSourceRef( value ), listener, new RegexTextEntryValidator( validatorRegex, validationFailMessage ) );
 	}
 	
 	
-	public TextEntry(LiteralUnit value)
+	public TextEntry(LiveValue value)
 	{
 		this( new LiveSourceRef( value ), new CommitListener( value ), null );
 	}
 	
-	public static TextEntry validated(LiteralUnit value, TextEntryValidator validator)
+	public static TextEntry validated(LiveValue value, TextEntryValidator validator)
 	{
 		return new TextEntry( new LiveSourceRef( value ), new CommitListener( value ), validator );
 	}
 	
-	public static TextEntry regexValidated(LiteralUnit value, Pattern validatorRegex, String validationFailMessage)
+	public static TextEntry regexValidated(LiveValue value, Pattern validatorRegex, String validationFailMessage)
 	{
 		return new TextEntry( new LiveSourceRef( value ), new CommitListener( value ), new RegexTextEntryValidator( validatorRegex, validationFailMessage ) );
 	}
@@ -477,7 +477,7 @@ public class TextEntry extends ControlPres
 		BritefuryJ.DocPresent.Border.AbstractBorder validBorder = style.get( Controls.textEntryBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class ); 
 		BritefuryJ.DocPresent.Border.AbstractBorder invalidBorder = style.get( Controls.textEntryInvalidBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class );
 		
-		UnitInterface value = valueSource.getLive();
+		LiveInterface value = valueSource.getLive();
 		DPText textElement = (DPText)new Text( "" ).present( ctx, style );
 		Pres line = new Row( new Pres[] { new Segment( false, false, textElement ) } );
 		Pres region = new Region( line );

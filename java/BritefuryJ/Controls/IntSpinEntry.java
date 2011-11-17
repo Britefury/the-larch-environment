@@ -9,8 +9,8 @@ package BritefuryJ.Controls;
 import java.util.regex.Pattern;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.IncrementalUnit.LiteralUnit;
-import BritefuryJ.IncrementalUnit.UnitInterface;
+import BritefuryJ.Live.LiveInterface;
+import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
 
@@ -29,7 +29,7 @@ public class IntSpinEntry extends SpinEntry
 		private IntSpinEntryListener listener;
 		
 	
-		protected IntSpinEntryControl(PresentationContext ctx, StyleValues style, UnitInterface value, DPElement element, TextEntry.TextEntryControl textEntry,
+		protected IntSpinEntryControl(PresentationContext ctx, StyleValues style, LiveInterface value, DPElement element, TextEntry.TextEntryControl textEntry,
 				DPElement upSpinButton, DPElement downSpinButton, SpinEntryTextListener textListener,
 				int min, int max, int stepSize, int pageSize, IntSpinEntryListener listener)
 		{
@@ -104,9 +104,9 @@ public class IntSpinEntry extends SpinEntry
 	
 	private static class CommitListener implements IntSpinEntryListener
 	{
-		private LiteralUnit value;
+		private LiveValue value;
 		
-		public CommitListener(LiteralUnit value)
+		public CommitListener(LiveValue value)
 		{
 			this.value = value;
 		}
@@ -139,12 +139,12 @@ public class IntSpinEntry extends SpinEntry
 		this( new LiveSourceValue( initialValue ), min, max, stepSize, pageSize, listener );
 	}
 	
-	public IntSpinEntry(UnitInterface value, int min, int max, int stepSize, int pageSize, IntSpinEntryListener listener)
+	public IntSpinEntry(LiveInterface value, int min, int max, int stepSize, int pageSize, IntSpinEntryListener listener)
 	{
 		this( new LiveSourceRef( value ), min, max, stepSize, pageSize, listener );
 	}
 	
-	public IntSpinEntry(LiteralUnit value, int min, int max, int stepSize, int pageSize)
+	public IntSpinEntry(LiveValue value, int min, int max, int stepSize, int pageSize)
 	{
 		this( new LiveSourceRef( value ), min, max, stepSize, pageSize, new CommitListener( value ) );
 	}
@@ -163,7 +163,7 @@ public class IntSpinEntry extends SpinEntry
 	
 	
 	@Override
-	protected SpinEntryControl createSpinEntryControl(PresentationContext ctx, StyleValues style, UnitInterface value, DPElement element, TextEntry.TextEntryControl entryControl, DPElement upArrow,
+	protected SpinEntryControl createSpinEntryControl(PresentationContext ctx, StyleValues style, LiveInterface value, DPElement element, TextEntry.TextEntryControl entryControl, DPElement upArrow,
 			DPElement downArrow, SpinEntryControl.SpinEntryTextListener textListener)
 	{
 		return new IntSpinEntryControl( ctx, style, value, element, entryControl, upArrow, downArrow, textListener, min, max, stepSize, pageSize, listener );

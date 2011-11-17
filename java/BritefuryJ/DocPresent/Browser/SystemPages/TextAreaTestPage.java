@@ -12,10 +12,9 @@ import java.util.List;
 
 import BritefuryJ.Controls.TextArea;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.IncrementalUnit.LiteralUnit;
-import BritefuryJ.IncrementalUnit.Unit;
-import BritefuryJ.IncrementalUnit.UnitEvaluator;
-import BritefuryJ.IncrementalUnit.UnitInterface;
+import BritefuryJ.Live.LiveFunction;
+import BritefuryJ.Live.LiveInterface;
+import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Blank;
 import BritefuryJ.Pres.Primitive.Column;
@@ -49,17 +48,17 @@ public class TextAreaTestPage extends SystemPage
 
 	private class AreaListener extends TextArea.TextAreaListener
 	{
-		private LiteralUnit resultArea, eventList;
-		private Unit eventArea;
-		private LiteralUnit text;
+		private LiveValue resultArea, eventList;
+		private LiveFunction eventArea;
+		private LiveValue text;
 		//private DPColumn resultArea, eventArea;
 		private String prevText;
 		
-		public AreaListener(LiteralUnit text)
+		public AreaListener(LiveValue text)
 		{
-			this.resultArea = new LiteralUnit( new Blank() );
-			this.eventList = new LiteralUnit( new ArrayList<Object>() );
-			UnitEvaluator eventBox = new UnitEvaluator()
+			this.resultArea = new LiveValue( new Blank() );
+			this.eventList = new LiveValue( new ArrayList<Object>() );
+			LiveFunction.Function eventBox = new LiveFunction.Function()
 			{
 				@Override
 				public Object evaluate()
@@ -69,18 +68,18 @@ public class TextAreaTestPage extends SystemPage
 					return new Column( x.toArray() );
 				}
 			};
-			eventArea = new Unit( eventBox );
+			eventArea = new LiveFunction( eventBox );
 			this.text = text;
 			this.prevText = (String)text.getStaticValue();
 		}
 		
 		
-		public UnitInterface getResultArea()
+		public LiveInterface getResultArea()
 		{
 			return resultArea;
 		}
 		
-		public UnitInterface getEventArea()
+		public LiveInterface getEventArea()
 		{
 			return eventArea;
 		}
@@ -170,7 +169,7 @@ public class TextAreaTestPage extends SystemPage
 	
 	protected Pres createContents()
 	{
-		LiteralUnit text = new LiteralUnit( testString );
+		LiveValue text = new LiveValue( testString );
 		AreaListener listener = new AreaListener( text );
 		TextArea area = new TextArea( testString, listener );
 		

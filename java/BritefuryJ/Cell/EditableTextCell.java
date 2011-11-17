@@ -99,7 +99,10 @@ public class EditableTextCell
 			// Since caret crossing (enter/leave) events are now only sent when the caret is valid, and the target is the caret,
 			// (with enter/leave events being sent when the target becomes the caret, or when it is set to something else),
 			// these checks are no longer necessary - in fact they are detrimental.
-			element.postTreeEvent( CommitEvent.instance );
+			if ( element.isRealised() )
+			{
+				element.postTreeEvent( CommitEvent.instance );
+			}
 		}
 	};
 	
