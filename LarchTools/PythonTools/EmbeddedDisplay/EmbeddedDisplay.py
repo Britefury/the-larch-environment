@@ -231,7 +231,7 @@ class _TreeView (object):
 	def __present__(self, fragment, inheritedState):
 		valuesLive = LiveValue( Blank() )
 		tree = Column( [ x._presentFrameSubtree( valuesLive )   for x in self._rootFrames ] )
-		return Column( [ tree, Spacer( 0.0, 10.0 ), valuesLive.valuePresInFragment() ] )
+		return Column( [ tree, Spacer( 0.0, 10.0 ), valuesLive ] )
 
 
 

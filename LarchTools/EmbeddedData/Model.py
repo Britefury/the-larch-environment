@@ -6,6 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
 from BritefuryJ.Pres import Pres
+from BritefuryJ.Pres.ObjectPres import ObjectBox
 from BritefuryJ.Live import LiveValue
 
 __author__ = 'Geoff'
@@ -50,5 +51,5 @@ class Model (object):
 
 
 	def __present__(self, fragment, inheritedState):
-		return self._live.valuePresInFragment()
+		return ObjectBox( 'LarchTools.EmbeddedData.Model', self._live )
 

@@ -36,7 +36,7 @@ public class CheckboxTestPage extends SystemPage
 		LiveValue state = new LiveValue( false );
 		Pres checkboxA = Checkbox.checkboxWithLabel( "Checkbox A", state );
 		Pres checkboxB = Checkbox.checkboxWithLabel( "Checkbox B (linked to checkbox A)", state );
-		Pres checkboxSectionContents = new Column( new Pres[] { checkboxA.padX( 5.0 ), checkboxB.padX( 5.0 ), state.valuePresInFragment() } );
+		Pres checkboxSectionContents = new Column( new Object[] { checkboxA.padX( 5.0 ), checkboxB.padX( 5.0 ), state } );
 
 		return new Body( new Pres[] { new Heading2( "Checkbox" ), checkboxSectionContents } );
 	}

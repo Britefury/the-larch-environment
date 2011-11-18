@@ -8,8 +8,6 @@
 package BritefuryJ.Live;
 
 
-import java.awt.Color;
-
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.DefaultPerspective.PrimitivePresenter;
@@ -23,9 +21,6 @@ import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.ObjectPres.ErrorBox;
-import BritefuryJ.Pres.ObjectPres.ObjectBox;
-import BritefuryJ.Pres.ObjectPres.ObjectPresStyle;
-import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
 
 
@@ -112,25 +107,24 @@ public abstract class LiveInterface implements Presentable
 	}
 	
 	
+	public Object __call__()
+	{
+		return getValue();
+	}
+	
+	
 	
 	@Override
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return unitStyle.applyTo( new ObjectBox( getClass().getName(), new InnerFragment( getValue() ) ) );
+		return new InnerFragment( new ValuePres( this ) );
 	}
 	
 	
 	
 	public Pres valuePresInFragment()
 	{
+		System.err.println( "DEPRACATION WARNING: LiveInterface.valuePresInFragment method is DEPRACATED" );
 		return new InnerFragment( new ValuePres( this ) );
 	}
-	
-	public Pres defaultPerspectiveValuePresInFragment()
-	{
-		return ApplyPerspective.defaultPerspective( new InnerFragment( new ValuePres( this ) ) );
-	}
-
-
-	private static StyleSheet unitStyle = StyleSheet.style( ObjectPresStyle.objectBorderPaint.as( new Color( 0.5f, 0.0f, 0.5f ) ), ObjectPresStyle.objectTitlePaint.as( new Color( 0.5f, 0.0f, 0.5f ) ) );
 }

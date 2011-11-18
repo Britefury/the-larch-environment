@@ -173,8 +173,8 @@ public class TextAreaTestPage extends SystemPage
 		AreaListener listener = new AreaListener( text );
 		TextArea area = new TextArea( testString, listener );
 		
-		Pres resultBox = StyleSheet.style( Primitive.columnSpacing.as( 5.0 ) ).applyTo( new Column( new Object[] { new Heading6( "Text:" ), listener.getResultArea().valuePresInFragment(),
-				new Heading6( "Event:" ), listener.getEventArea().valuePresInFragment() } ) );
+		Pres resultBox = StyleSheet.style( Primitive.columnSpacing.as( 5.0 ) ).applyTo( new Column( new Object[] { new Heading6( "Text:" ), listener.getResultArea(),
+				new Heading6( "Event:" ), listener.getEventArea() } ) );
 		
 		Pres areaBox = StyleSheet.style( Primitive.columnSpacing.as( 10.0 ) ).applyTo( new Column( new Object[] { area.alignHExpand(), resultBox.alignHExpand() } ) );
 		

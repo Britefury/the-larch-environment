@@ -19,4 +19,8 @@ class Editor (object):
 		raise NotImplementedError
 
 
+	def __py_eval__(self, globals, locals, codeGen):
+		return self._model.value
+
+
 	model = property( lambda self: self._model )
