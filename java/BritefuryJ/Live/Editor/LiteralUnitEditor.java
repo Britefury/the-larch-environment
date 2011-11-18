@@ -12,6 +12,7 @@ import java.util.WeakHashMap;
 import javax.swing.SwingUtilities;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.DefaultPerspective.DefaultPerspective;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
@@ -30,7 +31,7 @@ public abstract class LiteralUnitEditor implements Presentable, IncrementalMonit
 	{
 		private boolean bSettingCellValue = false;
 		private LiveValue presCell = new LiveValue();
-		private Pres pres = presCell.defaultPerspectiveValuePresInFragment();
+		private Pres pres = DefaultPerspective.instance.applyTo( presCell );
 
 		
 		
