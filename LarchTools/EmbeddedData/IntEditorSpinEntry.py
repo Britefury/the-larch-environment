@@ -31,9 +31,5 @@ class IntEditorSpinEntry (Editor):
 		return Model( value )
 
 
-	def __py_evalmodel__(self):
-		return PyBuilder.expr( self._model.value ).build()
-
-
 	def __present__(self, fragment, inheritedState):
 		return IntSpinEntry(self._model.liveValue, self._min, self._max, self._step, self._page)

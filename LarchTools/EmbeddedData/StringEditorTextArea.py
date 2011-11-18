@@ -27,9 +27,5 @@ class StringEditorTextArea (Editor):
 		return Model( value )
 
 
-	def __py_evalmodel__(self):
-		return PyBuilder.expr( self._model.value ).build()
-
-
 	def __present__(self, fragment, inheritedState):
 		return TextArea(self._model.liveValue)

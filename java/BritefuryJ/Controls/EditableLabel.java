@@ -246,7 +246,7 @@ public class EditableLabel extends ControlPres
 		LiveValue unit = new LiveValue( new Blank() );
 		LiveInterface value = valueSource.getLive();
 		
-		Pres unitPres = DefaultPerspective.instance.applyTo( unit.valuePresInFragment() );
+		Pres unitPres = DefaultPerspective.instance.applyTo( unit );
 		DPElement element = unitPres.present( ctx, usedStyle );
 		return new EditableLabelControl( ctx, usedStyle, element, unit, value, notSet, listener, validator );
 	}

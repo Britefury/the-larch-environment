@@ -227,7 +227,7 @@ class LiterateSuite (object):
 		renameButton = self._nameButtonStyle( Button.buttonWithLabel( '...', _onNameButton ) )
 
 		header = Row( [ self._angleQuoteStyle( Label( u'\u00ab' ) ),
-		                        liveName.valuePresInFragment(),
+		                        liveName,
 					self._angleQuoteStyle( Label( u'\u00bb' ) ),
 					Spacer( 10.0, 0.0 ),
 					renameButton ] ).withDragSource( _dragSource )

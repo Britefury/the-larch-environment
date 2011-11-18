@@ -102,8 +102,8 @@ public class TextEntryTestPage extends SystemPage
 			}
 			
 			return new Row( new Object[] { entry.padX( 5.0 ),
-					new Row( new Object[] { new Label( "Value: " ), value.valuePresInFragment() } ).padX( 5.0 ),
-					new Row( new Object[] { new Label( "Message: " ), message.valuePresInFragment() } ).padX( 5.0 ) } );
+					new Row( new Object[] { new Label( "Value: " ), value } ).padX( 5.0 ),
+					new Row( new Object[] { new Label( "Message: " ), message } ).padX( 5.0 ) } );
 		}
 	}
 	

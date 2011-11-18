@@ -24,6 +24,8 @@ from BritefuryJ.Live import LiveValue
 
 from BritefuryJ.AttributeTable import *
 
+from BritefuryJ.DefaultPerspective import DefaultPerspective
+
 from BritefuryJ.Controls import TextEntry
 from BritefuryJ.DocPresent.Interactor import KeyElementInteractor
 from BritefuryJ.StyleSheet import *
@@ -164,7 +166,7 @@ class ConsoleView (ObjectDispatchView):
 		m = m.withCustomElementAction( _ensureCurrentModuleVisible )
 		
 		dropPromptLive = LiveValue( Blank() )
-		dropPromptView = dropPromptLive.defaultPerspectiveValuePresInFragment()
+		dropPromptView = DefaultPerspective.instance( dropPromptLive )
 		
 		if len( blocks ) > 0:
 			blockList = _consoleBlockListStyle.applyTo( Column( blocks ) ).alignHExpand()

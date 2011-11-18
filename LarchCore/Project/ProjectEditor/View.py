@@ -25,6 +25,8 @@ from BritefuryJ.Live import LiveValue
 
 from BritefuryJ.AttributeTable import *
 
+from BritefuryJ.DefaultPerspective import DefaultPerspective
+
 from BritefuryJ.DocPresent.Browser import Location
 from BritefuryJ.DocPresent.Border import *
 from BritefuryJ.DocPresent.Painter import *
@@ -393,7 +395,7 @@ class ProjectView (ObjectDispatchView):
 
 		itemsBox = Column( items )
 
-		return Column( [ nameLive.defaultPerspectiveValuePresInFragment(), itemsBox.padX( _packageContentsIndentation, 0.0 ).alignHExpand() ] )
+		return Column( [ DefaultPerspective.instance( nameLive ), itemsBox.padX( _packageContentsIndentation, 0.0 ).alignHExpand() ] )
 
 
 
@@ -433,7 +435,7 @@ class ProjectView (ObjectDispatchView):
 
 		nameLive = LiveValue( nameBox )
 
-		return nameLive.defaultPerspectiveValuePresInFragment()
+		return DefaultPerspective.instance( nameLive )
 
 
 
