@@ -19,6 +19,7 @@ import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 import BritefuryJ.DocPresent.Util.TextVisual;
 import BritefuryJ.Math.Point2;
+import BritefuryJ.Math.Vector2;
 
 public class DPText extends DPContentLeafEditable
 {
@@ -105,7 +106,9 @@ public class DPText extends DPContentLeafEditable
 	
 	public TextHitInfo hitTest(Point2 pos)
 	{
-		return visual.hitTest( pos );
+		LayoutNode layout = getLayoutNode();
+		double deltaY = layout.getAllocationBox().getAllocRefY()  -  layout.getRequisitionBox().getReqRefY();
+		return visual.hitTest( pos.sub( new Vector2( 0.0, deltaY ) ) );
 	}
 	
 	
@@ -186,7 +189,10 @@ public class DPText extends DPContentLeafEditable
 		{
 			throw new RuntimeException( "DPText.drawCaret(): caret marker is out of range; " + index + " is not within the range[0-" + text.length() + "]." );
 		}
+		LayoutNode layout = getLayoutNode();
+		double deltaY = layout.getAllocationBox().getAllocRefY()  -  layout.getRequisitionBox().getReqRefY();
 		AffineTransform current = pushGraphicsTransform( graphics );
+		graphics.translate( 0.0, deltaY );
 		visual.drawCaret( graphics, index );
 		popGraphicsTransform( graphics, current );
 	}
@@ -202,7 +208,10 @@ public class DPText extends DPContentLeafEditable
 	
 	public void drawTextSelection(Graphics2D graphics, int startIndex, int endIndex)
 	{
+		LayoutNode layout = getLayoutNode();
+		double deltaY = layout.getAllocationBox().getAllocRefY()  -  layout.getRequisitionBox().getReqRefY();
 		AffineTransform current = pushGraphicsTransform( graphics );
+		graphics.translate( 0.0, deltaY );
 		visual.drawSelection( graphics, startIndex, endIndex );
 		popGraphicsTransform( graphics, current );
 	}
@@ -235,8 +244,10 @@ public class DPText extends DPContentLeafEditable
 		{
 			throw new RuntimeException( "Marker is not within the bounds of this element" );
 		}
+		LayoutNode layout = getLayoutNode();
+		double deltaY = layout.getAllocationBox().getAllocRefY()  -  layout.getRequisitionBox().getReqRefY();
 		int index = marker.getClampedIndex();
-		return visual.getCharacterBoundaryPosition( index );
+		return visual.getCharacterBoundaryPosition( index ).add( new Vector2( 0.0, deltaY ) );
 	}
 	
 	
