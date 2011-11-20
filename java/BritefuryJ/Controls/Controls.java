@@ -95,9 +95,13 @@ public class Controls
 	public static final InheritedAttributeNonNull editableLabelHoverAttrs = new InheritedAttributeNonNull( controlsNamespace, "editableLabelHoverAttrs", StyleSheet.class,
 		    StyleSheet.style( Primitive.hoverBackground.as( new FilledOutlinePainter( new Color( 0.8f, 0.825f, 0.9f ), new Color( 0.125f, 0.341f, 0.574f ), new BasicStroke( 1.0f ) ) ) ) );
 	public static final InheritedAttributeNonNull editableLabelTextAttrs = new InheritedAttributeNonNull( controlsNamespace, "editableLabelTextAttrs", StyleSheet.class,
-		    StyleSheet.style( Primitive.foreground.as( new Color( 0.0f, 0.0f, 0.5f ) ) ) );
+		    StyleSheet.style( Primitive.foreground.as( new Color( 0.0f, 0.3f, 0.5f ) ), Primitive.cursor.as( new Cursor( Cursor.TEXT_CURSOR ) )  ) );
 	
 	
+	public static final InheritedAttributeNonNull numericLabelTextAttrs = new InheritedAttributeNonNull( controlsNamespace, "numericLabelTextAttrs", StyleSheet.class,
+			    StyleSheet.style( Primitive.foreground.as( new Color( 0.0f, 0.3f, 0.5f ) ), Primitive.cursor.as( new Cursor( Cursor.E_RESIZE_CURSOR ) )  ) );
+		
+		
 	public static final InheritedAttributeNonNull spinEntryArrowSize = new InheritedAttributeNonNull( controlsNamespace, "spinEntryArrowSize", Double.class, 16.0 );
 	public static final InheritedAttributeNonNull spinEntryArrowAttrs = new InheritedAttributeNonNull( controlsNamespace, "spinEntryArrowAttrs", StyleSheet.class,
 		    StyleSheet.style( Primitive.columnSpacing.as( 2.0 ), Primitive.shapePainter.as( new FilledOutlinePainter( new Color( 0.7f, 0.8f, 0.9f ), new Color( 0.0f, 0.25f, 0.5f ), new BasicStroke( 1.0f ) ) ), Primitive.hoverShapePainter.as( new FilledOutlinePainter( new Color( 0.85f, 0.9f, 0.95f ), new Color( 0.0f, 0.5f, 0.75f ), new BasicStroke( 1.0f ) ) ) ) );
