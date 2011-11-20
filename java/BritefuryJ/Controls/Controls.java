@@ -124,6 +124,10 @@ public class Controls
 	public static final InheritedAttributeNonNull scrollBarArrowDragboxRounding = new InheritedAttributeNonNull( controlsNamespace, "scrollBarArrowDragboxRounding", Double.class, 4.0 );
 	public static final InheritedAttributeNonNull scrollBarArrowDragboxMinSize = new InheritedAttributeNonNull( controlsNamespace, "scrollBarArrowDragboxMinSize", Double.class, 9.0 );
 	public static final InheritedAttributeNonNull scrollBarSize = new InheritedAttributeNonNull( controlsNamespace, "scrollBarSize", Double.class, 20.0 );
+	
+	
+	public static final InheritedAttributeNonNull objectDropBoxClassNameStyle = new InheritedAttributeNonNull( controlsNamespace, "objectDropBoxClassNameStyle", StyleSheet.class,
+			    StyleSheet.style( Primitive.fontItalic.as( true ) ) );
 
 	
 	public static final InheritedAttributeNonNull presentationButtonSpacing = new InheritedAttributeNonNull( controlsNamespace, "presentationButtonSpacing", Double.class, 2.0 );
