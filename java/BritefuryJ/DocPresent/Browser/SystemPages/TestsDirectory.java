@@ -84,6 +84,7 @@ public class TestsDirectory extends BrowserPage
 	public static final ExpanderTestPage expander = new ExpanderTestPage();
 	public static final HyperlinkTestPage hyperlink = new HyperlinkTestPage();
 	public static final NumericLabelTestPage numLabel = new NumericLabelTestPage();
+	public static final ObjectDropBoxTestPage objectDrop = new ObjectDropBoxTestPage();
 	public static final OptionMenuTestPage optionMenu = new OptionMenuTestPage();
 	public static final PopupTestPage popup = new PopupTestPage();
 	public static final ScrollBarTestPage scrollBar = new ScrollBarTestPage();
@@ -101,6 +102,7 @@ public class TestsDirectory extends BrowserPage
 		new Hyperlink( "Expander", new Location( "system.tests.expander" ) ),
 		new Hyperlink( "Hyperlink", new Location( "system.tests.hyperlink" ) ),
 		new Hyperlink( "Numeric label", new Location( "system.tests.numLabel" ) ),
+		new Hyperlink( "Object drop box", new Location( "system.tests.objectDrop" ) ),
 		new Hyperlink( "Option menu", new Location( "system.tests.optionMenu" ) ),
 		new Hyperlink( "Popup", new Location( "system.tests.popup" ) ),
 		new Hyperlink( "Scroll bar", new Location( "system.tests.scrollBar" ) ),

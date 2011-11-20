@@ -48,8 +48,8 @@ public class NumericLabelTestPage extends SystemPage
 			    new SpaceBin( realNumLabel.alignHExpand(), 100.0, -1.0 ), realValue } ).padX( 5.0 ) );
 		Pres intLine = StyleSheet.style( Primitive.rowSpacing.as( 20.0 ) ).applyTo( new Row( new Object[] { new Label( "Integer: " ),
 			    new SpaceBin( intNumLabel.alignHExpand(), 100.0, -1.0 ), intValue } ).padX( 5.0 ) );
-		Pres spinEntrySectionContents = new Column( new Pres[] { realLine, intLine } );
+		Pres numericLabelSectionContents = new Column( new Pres[] { realLine, intLine } );
 		
-		return new Body( new Pres[] { new Heading2( "Spin entries" ), spinEntrySectionContents } );
+		return new Body( new Pres[] { new Heading2( "Numeric labels" ), numericLabelSectionContents } );
 	}
 }
