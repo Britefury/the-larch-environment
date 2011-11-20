@@ -65,20 +65,20 @@ public class EditableLabel extends ControlPres
 		
 		
 		private DPElement element;
-		private LiveValue unit;
+		private LiveValue display;
 		private LiveInterface value;
 		private Pres notSet;
 		private EditableLabelListener listener;
 		private TextEntry.TextEntryValidator validator;
 		
 		
-		public EditableLabelControl(PresentationContext ctx, StyleValues style, DPElement element, LiveValue unit, LiveInterface value, Pres notSet,
+		public EditableLabelControl(PresentationContext ctx, StyleValues style, DPElement element, LiveValue display, LiveInterface value, Pres notSet,
 				EditableLabelListener listener, TextEntry.TextEntryValidator validator)
 		{
 			super( ctx, style );
 			
 			this.element = element;
-			this.unit = unit;
+			this.display = display;
 			this.value = value;
 			this.notSet = notSet;
 			this.listener = listener;
@@ -118,7 +118,7 @@ public class EditableLabel extends ControlPres
 			{
 				label = new Label( text ).withStyleSheetFromAttr( Controls.editableLabelTextAttrs );
 			}
-			unit.setLiteralValue( label.withStyleSheetFromAttr( Controls.editableLabelHoverAttrs ).withElementInteractor( labelInteractor ) );
+			display.setLiteralValue( label.withStyleSheetFromAttr( Controls.editableLabelHoverAttrs ).withElementInteractor( labelInteractor ) );
 		}
 		
 		private void showLabel()
@@ -132,7 +132,7 @@ public class EditableLabel extends ControlPres
 		{
 			TextEntry entry = TextEntry.validated( value, entryListener, validator );
 			entry.grabCaretOnRealise();
-			unit.setLiteralValue( entry );
+			display.setLiteralValue( entry );
 			
 			value.removeListener( this );
 		}
@@ -243,11 +243,11 @@ public class EditableLabel extends ControlPres
 	{
 		StyleValues usedStyle = Controls.useEditableLabelAttrs( style );
 		
-		LiveValue unit = new LiveValue( new Blank() );
+		LiveValue display = new LiveValue( new Blank() );
 		LiveInterface value = valueSource.getLive();
 		
-		Pres unitPres = DefaultPerspective.instance.applyTo( unit );
+		Pres unitPres = DefaultPerspective.instance.applyTo( display );
 		DPElement element = unitPres.present( ctx, usedStyle );
-		return new EditableLabelControl( ctx, usedStyle, element, unit, value, notSet, listener, validator );
+		return new EditableLabelControl( ctx, usedStyle, element, display, value, notSet, listener, validator );
 	}
 }
