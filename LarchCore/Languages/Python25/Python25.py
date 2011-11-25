@@ -54,11 +54,20 @@ def isEmptyTopLevel(x):
 
 
 class EmbeddedPython25 (object):
+	class _WithPerspective (object):
+		def __init__(self, embeddedPy, perspective):
+			self._embeddedPy = embeddedPy
+			self._perspective = perspective
+
+		def __present__(self, fragment, inheritedState):
+			return self.perspective( self._embeddedPy.model )
+
+
 	def __init__(self, model):
 		self.model = model
 		self.__change_history__ = None
 		self.model.realiseAsRoot()
-	
+
 	
 	def __getstate__(self):
 		return { 'model' : self.model }
@@ -81,6 +90,10 @@ class EmbeddedPython25 (object):
 	
 	def __present__(self, fragment, inheritedState):
 		return python25EditorPerspective( self.model )
+
+
+	def withPerspective(self, perspective):
+		return self._WithPerspective( self, perspective )
 
 
 	@staticmethod

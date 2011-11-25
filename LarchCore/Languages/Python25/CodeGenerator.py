@@ -176,10 +176,6 @@ class Python25CodeGenerator (object):
 	# Integer literal
 	@DMObjectNodeDispatchMethod( Schema.IntLiteral )
 	def IntLiteral(self, node, format, numType, value):
-		format = format
-		numType = numType
-		value = value
-
 		if numType == 'int':
 			if format == 'decimal':
 				valueString = '%d'  %  int( value )
