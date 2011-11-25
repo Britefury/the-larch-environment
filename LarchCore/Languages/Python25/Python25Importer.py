@@ -310,13 +310,10 @@ class _ExprImporter (_Importer):
 		return _expr( node.value )
 	
 	def Slice(self, node):
-		def _s(x):
-			s = _expr( x )
-			return s   if s is not None   else   None
 		if node.step is None:
-			return Schema.SubscriptSlice( lower=_s( node.lower ), upper=_s( node.upper ) )
+			return Schema.SubscriptSlice( lower=_expr( node.lower ), upper=_expr( node.upper ) )
 		else:
-			return Schema.SubscriptLongSlice( lower=_s( node.lower ), upper=_s( node.upper ), stride=_s( node.step ) )
+			return Schema.SubscriptLongSlice( lower=_expr( node.lower ), upper=_expr( node.upper ), stride=_expr( node.step ) )
 	
 	def ExtSlice(self, node):
 		return Schema.TupleLiteral( values=[ _expr( x )   for x in node.dims ] )

@@ -18,6 +18,15 @@ from LarchCore.Languages.Python25.PythonEditor.Precedence import *
 
 
 
+# Jython 2.5 bugfix
+if _ast.Attribute is _ast.AugAssign:
+	print 'Applying Jython 2.5.2 _ast module bugfix (getting correct value for _ast.Attribute)'
+	expr = compile( 'a.x', '<bugfix>', 'eval', _ast.PyCF_ONLY_AST )
+	attr = expr.body
+	_ast.Attribute = type( attr )
+
+
+
 class Python25ASTGeneratorError (Exception):
 	pass
 
@@ -88,10 +97,13 @@ class Python25ASTGenerator (object):
 
 	# Callable - use document model node method dispatch mechanism
 	def __call__(self, x, lineno, ctx=_ast.Load()):
-		ast = dmObjectNodeMethodDispatch( self, x, lineno, ctx )
-		if ast is not None:
-			ast.lineno = lineno
-		return ast
+		if x is not None:
+			ast = dmObjectNodeMethodDispatch( self, x, lineno, ctx )
+			if ast is not None  and  hasattr( ast, 'lineno' ):
+				ast.lineno = lineno
+			return ast
+		else:
+			return None
 
 
 
@@ -240,6 +252,55 @@ class Python25ASTGenerator (object):
 				ks.append( self( p['key'], lineno, ctx ) )
 				vs.append( self( p['value'], lineno, ctx ) )
 		return _ast.Dict( ks, vs )
+
+
+
+	# Yield expression and yield atom
+	@DMObjectNodeDispatchMethod( Schema.YieldExpr )
+	def YieldExpr(self, lineno, ctx, node, value):
+		if value is not None:
+			return _ast.Yield( self( value, lineno, ctx ) )
+		else:
+			return _ast.Yield( None )
+
+
+
+	# Attribute ref
+	@DMObjectNodeDispatchMethod( Schema.AttributeRef )
+	def AttributeRef(self, lineno, ctx, node, target, name):
+		return _ast.Attribute( self( target, lineno, _load ), name, ctx )
+
+
+
+	# Subscript
+	def _processIndex(self, index, lineno, ctx):
+		if index.isInstanceOf( Schema.SubscriptSlice )  or  index.isInstanceOf( Schema.SubscriptLongSlice )  or  \
+		   index.isInstanceOf( Schema.SubscriptEllipsis )  or  index.isInstanceOf( Schema.SubscriptTuple ):
+			return self( index, lineno, _load )
+		else:
+			return _ast.Index( self( index, lineno, _load ) )
+
+	@DMObjectNodeDispatchMethod( Schema.SubscriptSlice )
+	def SubscriptSlice(self, lineno, ctx, node, lower, upper):
+		return _ast.Slice( self( lower, lineno, _load ), self( upper, lineno, _load ), None )
+
+	@DMObjectNodeDispatchMethod( Schema.SubscriptLongSlice )
+	def SubscriptLongSlice(self, lineno, ctx, node, lower, upper, stride):
+		return _ast.Slice( self( lower, lineno, _load ), self( upper, lineno, _load ), self( stride, lineno, _load ) )
+
+	@DMObjectNodeDispatchMethod( Schema.SubscriptEllipsis )
+	def SubscriptEllipsis(self, lineno, ctx, node):
+		return _ast.Ellipsis()
+
+	@DMObjectNodeDispatchMethod( Schema.SubscriptTuple )
+	def SubscriptTuple(self, lineno, ctx, node, values):
+		return _ast.ExtSlice( [ self._processIndex( v, lineno, _load )   for v in values ] )
+
+	@DMObjectNodeDispatchMethod( Schema.Subscript )
+	def Subscript(self, lineno, ctx, node, target, index):
+		value = self( target, lineno, _load )
+		slice = self._processIndex( index, lineno, _load )
+		return _ast.Subscript( value, slice, ctx )
 
 
 
@@ -403,5 +464,61 @@ class TestCase_Python25ASTGenerator (unittest.TestCase):
 	def test_DictLiteral(self):
 		self._testSX( '(py DictLiteral values=[(py DictKeyValuePair key=(py Load name=a) value=(py Load name=b)) (py DictKeyValuePair key=(py Load name=c) value=(py Load name=d))])',
 			      _ast.Dict( [ _ast.Name( 'a', _load ), _ast.Name( 'c', _load ) ], [ _ast.Name( 'b', _load ), _ast.Name( 'd', _load ) ] ) )
+
+
+	def test_YieldExpr(self):
+		self._testSX( '(py YieldExpr value=(py Load name=a))', _ast.Yield( _ast.Name( 'a', _load ) ) )
+		self._testSX( '(py YieldExpr value=`null`)', _ast.Yield( None ) )
+
+
+	def test_AttributeRef(self):
+		self._testSX( '(py AttributeRef target=(py Load name=a) name=b)', _ast.Attribute( _ast.Name( 'a', _load ), 'b', _load ) )
+
+
+	def test_Subscript(self):
+		self._testSX( '(py Subscript target=(py Load name=a) index=(py Load name=b))', _ast.Subscript( _ast.Name( 'a', _load ), _ast.Index( _ast.Name( 'b', _load ) ), _load ) )
+
+
+	def test_Subscript_Ellipsis(self):
+		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptEllipsis))', _ast.Subscript( _ast.Name( 'a', _load ), _ast.Ellipsis(), _load ) )
+
+
+	def test_subscript_slice(self):
+		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptSlice lower=(py Load name=a) upper=(py Load name=b)))',
+			_ast.Subscript( _ast.Name( 'a', _load ), _ast.Slice( _ast.Name( 'a', _load ), _ast.Name( 'b', _load ), None ), _load ) )
+		self.	_testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptSlice lower=(py Load name=a) upper=`null`))',
+			_ast.Subscript( _ast.Name( 'a', _load ), _ast.Slice( _ast.Name( 'a', _load ), None, None ), _load ) )
+		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptSlice lower=`null` upper=(py Load name=b)))',
+			_ast.Subscript( _ast.Name( 'a', _load ), _ast.Slice( None, _ast.Name( 'b', _load ), None ), _load ) )
+		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptSlice lower=`null` upper=`null`))',
+			_ast.Subscript( _ast.Name( 'a', _load ), _ast.Slice( None, None, None ), _load ) )
+
+
+	def test_subscript_longSlice(self):
+		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=(py Load name=a) upper=(py Load name=b) stride=(py Load name=c)))',
+			_ast.Subscript( _ast.Name( 'a', _load ), _ast.Slice( _ast.Name( 'a', _load ), _ast.Name( 'b', _load ), _ast.Name( 'c', _load ) ), _load ) )
+		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=(py Load name=a) upper=(py Load name=b) stride=`null`))',
+			_ast.Subscript( _ast.Name( 'a', _load ), _ast.Slice( _ast.Name( 'a', _load ), _ast.Name( 'b', _load ), None ), _load ) )
+		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=(py Load name=a) upper=`null` stride=(py Load name=c)))',
+			_ast.Subscript( _ast.Name( 'a', _load ), _ast.Slice( _ast.Name( 'a', _load ), None, _ast.Name( 'c', _load ) ), _load ) )
+		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=(py Load name=a) upper=`null` stride=`null`))',
+			_ast.Subscript( _ast.Name( 'a', _load ), _ast.Slice( _ast.Name( 'a', _load ), None, None ), _load ) )
+		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=`null` upper=(py Load name=b) stride=(py Load name=c)))',
+			_ast.Subscript( _ast.Name( 'a', _load ), _ast.Slice( None, _ast.Name( 'b', _load ), _ast.Name( 'c', _load ) ), _load ) )
+		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=`null` upper=(py Load name=b) stride=`null`))',
+			_ast.Subscript( _ast.Name( 'a', _load ), _ast.Slice( None, _ast.Name( 'b', _load ), None ), _load ) )
+		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=`null` upper=`null` stride=(py Load name=c)))',
+			_ast.Subscript( _ast.Name( 'a', _load ), _ast.Slice( None, None, _ast.Name( 'c', _load ) ), _load ) )
+		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=`null` upper=`null` stride=`null`))',
+			_ast.Subscript( _ast.Name( 'a', _load ), _ast.Slice( None, None, None ), _load ) )
+
+
+	def test_subscript_tuple(self):
+		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptTuple values=[(py Load name=a) (py SubscriptSlice lower=(py Load name=b) upper=(py Load name=c))]))',
+			_ast.Subscript( _ast.Name( 'a', _load ), _ast.ExtSlice( [ _ast.Index( _ast.Name( 'a', _load ) ), _ast.Slice( _ast.Name( 'b', _load ), _ast.Name( 'c', _load ), None ) ] ), _load ) )
+		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptTuple values=[(py Load name=b) (py SubscriptTuple values=[(py Load name=c) (py Load name=d)])]))',
+			_ast.Subscript( _ast.Name( 'a', _load ), _ast.ExtSlice( [ _ast.Index( _ast.Name( 'b', _load ) ), _ast.ExtSlice( [ _ast.Index( _ast.Name( 'c', _load ) ), _ast.Index( _ast.Name( 'd', _load ) ) ] ) ] ), _load ) )
+
+
 
 
