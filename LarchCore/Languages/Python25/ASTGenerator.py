@@ -187,14 +187,14 @@ class Python25ASTGenerator (object):
 		gen = None
 		for x in comprehensionItems:
 			if x.isInstanceOf( Schema.ComprehensionFor ):
-				target = self( lineno, ctx, x['target'] )
-				iter = self( lineno, ctx, x['iter'] )
-				gen = _ast.comprehension( target, iter )
+				target = self( x['target'], lineno, _ast.Store() )
+				iter = self( x['source'], lineno, ctx )
+				gen = _ast.comprehension( target, iter, [] )
 				generators.append( gen )
-			elif x.InstanceOf( Schema.ComprehensionIf ):
+			elif x.isInstanceOf( Schema.ComprehensionIf ):
 				if gen is None:
 					raise Python25ASTGeneratorInvalidStructureError, 'ComprehensionIf must come after ComprehensionFor'
-				expr = self( lineno, ctx, x['condition'] )
+				expr = self( x['condition'], lineno, ctx )
 				gen.ifs.append( expr )
 			else:
 				raise Python25ASTGeneratorInvalidStructureError, 'List comprehensions and generator expressions can only contain comprehension items'
@@ -213,16 +213,33 @@ class Python25ASTGenerator (object):
 
 	@DMObjectNodeDispatchMethod( Schema.ListComp )
 	def ListComp(self, lineno, ctx, node, resultExpr, comprehensionItems):
-		expr = self( lineno, ctx, resultExpr )
+		expr = self( resultExpr, lineno, ctx )
 		generators = self._comprehensionGenerators( lineno, ctx, comprehensionItems )
 		return _ast.ListComp( expr, generators )
 
 	
 	@DMObjectNodeDispatchMethod( Schema.GeneratorExpr )
 	def GeneratorExpr(self, lineno, ctx, node, resultExpr, comprehensionItems):
-		expr = self( lineno, ctx, resultExpr )
+		expr = self( resultExpr, lineno, ctx )
 		generators = self._comprehensionGenerators( lineno, ctx, comprehensionItems )
 		return _ast.GeneratorExp( expr, generators )
+
+
+
+	# Dictionary literal
+	@DMObjectNodeDispatchMethod( Schema.DictKeyValuePair )
+	def DictKeyValuePair(self, lineno, ctx, node, key, value):
+		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned DictKeyValuePair'
+
+	@DMObjectNodeDispatchMethod( Schema.DictLiteral )
+	def DictLiteral(self, lineno, ctx, node, values):
+		ks = []
+		vs = []
+		for p in values:
+			if p.isInstanceOf( Schema.DictKeyValuePair ):
+				ks.append( self( p['key'], lineno, ctx ) )
+				vs.append( self( p['value'], lineno, ctx ) )
+		return _ast.Dict( ks, vs )
 
 
 
@@ -250,8 +267,6 @@ def _astToString(x):
 _load = _ast.Load()
 _store = _ast.Store()
 
-
-print _astToString(compile( '[x for x in y if a]', '<string>', 'eval', _ast.PyCF_ONLY_AST))
 
 
 class TestCase_Python25ASTGenerator (unittest.TestCase):
@@ -364,3 +379,29 @@ class TestCase_Python25ASTGenerator (unittest.TestCase):
 	def test_ListLiteral(self):
 		self._testSX( '(py ListLiteral values=[(py Load name=a) (py Load name=b) (py Load name=c)])',
 				_ast.List( [ _ast.Name( 'a', _load ), _ast.Name( 'b', _load ), _ast.Name( 'c', _load ) ], _load ))
+
+
+	def test_ListComp(self):
+		self._testSX( '(py ListComp resultExpr=(py Load name=a) comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs))])',
+			      _ast.ListComp( _ast.Name( 'a', _load ), [ _ast.comprehension( _ast.Name( 'a', _store ), _ast.Name( 'xs', _load ), [] ) ] ) )
+		self._testSX( '(py ListComp resultExpr=(py Load name=a) comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs)) (py ComprehensionIf condition=(py Load name=a))])',
+			      _ast.ListComp( _ast.Name( 'a', _load ), [ _ast.comprehension( _ast.Name( 'a', _store ), _ast.Name( 'xs', _load ), [ _ast.Name( 'a', _load ) ] ) ] ) )
+		self._testSX( '(py ListComp resultExpr=(py Load name=a) comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs)) (py ComprehensionIf condition=(py Load name=a)) (py ComprehensionIf condition=(py Load name=b))])',
+			      _ast.ListComp( _ast.Name( 'a', _load ), [ _ast.comprehension( _ast.Name( 'a', _store ), _ast.Name( 'xs', _load ), [ _ast.Name( 'a', _load ), _ast.Name( 'b', _load ) ] ) ] ) )
+
+
+	def test_GeneratorExpr(self):
+		self._testSX( '(py GeneratorExpr resultExpr=(py Load name=a) comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs))])',
+			      _ast.GeneratorExp( _ast.Name( 'a', _load ), [ _ast.comprehension( _ast.Name( 'a', _store ), _ast.Name( 'xs', _load ), [] ) ] ) )
+		self._testSX( '(py GeneratorExpr resultExpr=(py Load name=a) comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs)) (py ComprehensionIf condition=(py Load name=a))])',
+			      _ast.GeneratorExp( _ast.Name( 'a', _load ), [ _ast.comprehension( _ast.Name( 'a', _store ), _ast.Name( 'xs', _load ), [ _ast.Name( 'a', _load ) ] ) ] ) )
+		self._testSX( '(py GeneratorExpr resultExpr=(py Load name=a) comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs)) (py ComprehensionIf condition=(py Load name=a)) (py ComprehensionIf condition=(py Load name=b))])',
+			      _ast.GeneratorExp( _ast.Name( 'a', _load ), [ _ast.comprehension( _ast.Name( 'a', _store ), _ast.Name( 'xs', _load ), [ _ast.Name( 'a', _load ), _ast.Name( 'b', _load ) ] ) ] ) )
+
+
+
+	def test_DictLiteral(self):
+		self._testSX( '(py DictLiteral values=[(py DictKeyValuePair key=(py Load name=a) value=(py Load name=b)) (py DictKeyValuePair key=(py Load name=c) value=(py Load name=d))])',
+			      _ast.Dict( [ _ast.Name( 'a', _load ), _ast.Name( 'c', _load ) ], [ _ast.Name( 'b', _load ), _ast.Name( 'd', _load ) ] ) )
+
+
