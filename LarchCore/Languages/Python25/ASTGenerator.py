@@ -48,6 +48,19 @@ class Python25ASTGeneratorInvalidStructureError (Python25ASTGeneratorError):
 
 
 
+_cmpOpTable = { Schema.CmpOpLt : _ast.Lt,
+		Schema.CmpOpLte : _ast.LtE,
+		Schema.CmpOpEq : _ast.Eq,
+		Schema.CmpOpNeq : _ast.NotEq,
+		Schema.CmpOpGt : _ast.Gt,
+		Schema.CmpOpGte : _ast.GtE,
+		Schema.CmpOpIs : _ast.Is,
+		Schema.CmpOpIsNot : _ast.IsNot,
+		Schema.CmpOpIn : _ast.In,
+		Schema.CmpOpNotIn : _ast.NotIn
+		}
+
+
 
 class Python25ASTGenerator (object):
 	__dispatch_num_args__ = 2
@@ -304,7 +317,191 @@ class Python25ASTGenerator (object):
 
 
 
-	
+	# Call
+	@DMObjectNodeDispatchMethod( Schema.CallKWArg )
+	def CallKWArg(self, lineno, ctx, node, name, value):
+		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned CallKWArg'
+
+	@DMObjectNodeDispatchMethod( Schema.CallArgList )
+	def CallArgList(self, lineno, ctx, node, value):
+		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned CallArgList'
+
+	@DMObjectNodeDispatchMethod( Schema.CallKWArgList )
+	def CallKWArgList(self, lineno, ctx, node, value):
+		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned CallKWArgList'
+
+	@DMObjectNodeDispatchMethod( Schema.Call )
+	def Call(self, lineno, ctx, node, target, args):
+		func = self( target, lineno, _load )
+		argvs = []
+		kwargvs = []
+		arglist = None
+		kwarglist = None
+		for a in args:
+			if a.isInstanceOf( Schema.CallKWArg ):
+				if arglist is not None  or  kwarglist is not None:
+					raise Python25ASTGeneratorInvalidStructureError, 'keyword argument after argument list or keyword argument list'
+				kwargvs.append( _ast.keyword( a['name'], self( a['value'], lineno, _load ) ) )
+			elif a.isInstanceOf( Schema.CallArgList ):
+				if kwarglist is not None:
+					raise Python25ASTGeneratorInvalidStructureError, 'argument list after keyword argument list'
+				arglist = self( a['value'], lineno, _load )
+			elif a.isInstanceOf( Schema.CallKWArgList ):
+				kwarglist = self( a['value'], lineno, _load )
+			else:
+				if len( kwargvs ) > 0  or  arglist is not None  or  kwarglist is not None:
+					raise Python25ASTGeneratorInvalidStructureError, 'argument after keyword arguments, argument list or keyword argument list'
+				argvs.append( self( a, lineno, _load ) )
+		return _ast.Call( func, argvs, kwargvs, arglist, kwarglist )
+
+
+
+	# Operators
+	def _prefixOp(self, x, opType, lineno):
+		right = self( x, lineno, _load )
+		op = opType()
+		return _ast.UnaryOp( op, right )
+
+	def _binOp(self, x, y, opType, lineno):
+		left = self( x, lineno, _load )
+		right = self( y, lineno, _load )
+		op = opType()
+		return _ast.BinOp( left, op, right )
+
+	def _boolOp(self, x, y, opType, lineno):
+		left = self( x, lineno, _load )
+		right = self( y, lineno, _load )
+		op = opType()
+		return _ast.BoolOp( left, op, right )
+
+	@DMObjectNodeDispatchMethod( Schema.Pow )
+	def Pow(self, lineno, ctx, node, x, y):
+		return self._binOp( x, y, _ast.Pow, lineno )
+
+
+	@DMObjectNodeDispatchMethod( Schema.Invert )
+	def Invert(self, lineno, ctx, node, x):
+		return self._prefixOp( x, _ast.Invert, lineno )
+
+	@DMObjectNodeDispatchMethod( Schema.Negate )
+	def Negate(self, lineno, ctx, node, x):
+		return self._prefixOp( x, _ast.USub, lineno )
+
+	@DMObjectNodeDispatchMethod( Schema.Pos )
+	def Pos(self, lineno, ctx, node, x):
+		return self._prefixOp( x, _ast.UAdd, lineno )
+
+
+	@DMObjectNodeDispatchMethod( Schema.Mul )
+	def Mul(self, lineno, ctx, node, x, y):
+		return self._binOp( x, y, _ast.Mult, lineno )
+
+	@DMObjectNodeDispatchMethod( Schema.Div )
+	def Div(self, lineno, ctx, node, x, y):
+		return self._binOp( x, y, _ast.Div, lineno )
+
+	@DMObjectNodeDispatchMethod( Schema.Mod )
+	def Mod(self, lineno, ctx, node, x, y):
+		return self._binOp( x, y, _ast.Mod, lineno )
+
+	@DMObjectNodeDispatchMethod( Schema.Add )
+	def Add(self, lineno, ctx, node, x, y):
+		return self._binOp( x, y, _ast.Add, lineno )
+
+	@DMObjectNodeDispatchMethod( Schema.Sub )
+	def Sub(self, lineno, ctx, node, x, y):
+		return self._binOp( x, y, _ast.Sub, lineno )
+
+
+	@DMObjectNodeDispatchMethod( Schema.LShift )
+	def LShift(self, lineno, ctx, node, x, y):
+		return self._binOp( x, y, _ast.LShift, lineno )
+
+	@DMObjectNodeDispatchMethod( Schema.RShift )
+	def RShift(self, lineno, ctx, node, x, y):
+		return self._binOp( x, y, _ast.RShift, lineno )
+
+
+	@DMObjectNodeDispatchMethod( Schema.BitAnd )
+	def BitAnd(self, lineno, ctx, node, x, y):
+		return self._binOp( x, y, _ast.BitAnd, lineno )
+
+	@DMObjectNodeDispatchMethod( Schema.BitXor )
+	def BitXor(self, lineno, ctx, node, x, y):
+		return self._binOp( x, y, _ast.BitXor, lineno )
+
+	@DMObjectNodeDispatchMethod( Schema.BitOr )
+	def BitOr(self, lineno, ctx, node, x, y):
+		return self._binOp( x, y, _ast.BitOr, lineno )
+
+
+	@DMObjectNodeDispatchMethod( Schema.Cmp )
+	def Cmp(self, lineno, ctx, node, x, ops):
+		left = self( x, lineno, _load )
+		opTypes = []
+		comparators = []
+		for op in ops:
+			opClass = op.getDMObjectClass()
+			opTypes.append( _cmpOpTable[opClass]() )
+			comparators.append( self( op['y'], lineno, _load ) )
+		return _ast.Compare( left, opTypes, comparators )
+
+	@DMObjectNodeDispatchMethod( Schema.CmpOpLte )
+	def CmpOpLte(self, lineno, ctx, node, y):
+		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpLte'
+
+	@DMObjectNodeDispatchMethod( Schema.CmpOpLt )
+	def CmpOpLt(self, lineno, ctx, node, y):
+		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpLt'
+
+	@DMObjectNodeDispatchMethod( Schema.CmpOpGte )
+	def CmpOpGte(self, lineno, ctx, node, y):
+		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpGte'
+
+	@DMObjectNodeDispatchMethod( Schema.CmpOpGt )
+	def CmpOpGt(self, lineno, ctx, node, y):
+		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpGt'
+
+	@DMObjectNodeDispatchMethod( Schema.CmpOpEq )
+	def CmpOpEq(self, lineno, ctx, node, y):
+		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpEq'
+
+	@DMObjectNodeDispatchMethod( Schema.CmpOpNeq )
+	def CmpOpNeq(self, lineno, ctx, node, y):
+		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpNeq'
+
+	@DMObjectNodeDispatchMethod( Schema.CmpOpIsNot )
+	def CmpOpIsNot(self, lineno, ctx, node, y):
+		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpIsNot'
+
+	@DMObjectNodeDispatchMethod( Schema.CmpOpIs )
+	def CmpOpIs(self, lineno, ctx, node, y):
+		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpIs'
+
+	@DMObjectNodeDispatchMethod( Schema.CmpOpNotIn )
+	def CmpOpNotIn(self, lineno, ctx, node, y):
+		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpNotIn'
+
+	@DMObjectNodeDispatchMethod( Schema.CmpOpIn )
+	def CmpOpIn(self, lineno, ctx, node, y):
+		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpIn'
+
+
+
+
+	@DMObjectNodeDispatchMethod( Schema.NotTest )
+	def NotTest(self, lineno, ctx, node, x):
+		return self._prefixOp( x, _ast.Not, lineno )
+
+	@DMObjectNodeDispatchMethod( Schema.AndTest )
+	def AndTest(self, lineno, ctx, node, x, y):
+		return self._boolOp( x, y, _ast.And, lineno )
+
+	@DMObjectNodeDispatchMethod( Schema.OrTest )
+	def OrTest(self, lineno, ctx, node, x, y):
+		return self._boolOp( x, y, _ast.Or, lineno )
+
+
 
 
 
@@ -331,7 +528,7 @@ _store = _ast.Store()
 
 
 class TestCase_Python25ASTGenerator (unittest.TestCase):
-	def _testSX(self, sx, expected, ctx=_ast.Load()):
+	def _testSXAST(self, sx, expected, ctx=_load):
 		sx = '{ py=LarchCore.Languages.Python25<5> : ' + sx + ' }'
 		data = DMIOReader.readFromString( sx )
 
@@ -353,7 +550,7 @@ class TestCase_Python25ASTGenerator (unittest.TestCase):
 		self.assert_( resultStr == expectedStr )
 
 
-	def _testGenSX(self, gen, sx, expected, ctx=_ast.Load()):
+	def _testGenSXAST(self, gen, sx, expected, mode):
 		sx = '{ py=LarchCore.Languages.Python25<5> : ' + sx + ' }'
 		data = DMIOReader.readFromString( sx )
 
@@ -372,153 +569,206 @@ class TestCase_Python25ASTGenerator (unittest.TestCase):
 		self.assert_( resultStr == expectedStr )
 
 
+	def _testSX(self, sx, expected, mode):
+		if isinstance( expected, str )  or  isinstance( expected, unicode ):
+			expected = compile( expected, '<test>', mode, _ast.PyCF_ONLY_AST )
+
+		self._testSXAST( sx, expected )
+
+
+	def _testGenSX(self, gen, sx, expected, mode):
+		if isinstance( expected, str )  or  isinstance( expected, unicode ):
+			expected = compile( expected, '<test>', mode, _ast.PyCF_ONLY_AST )
+
+		self._testGenSXAST( gen, sx, expected )
+
+
+	def _testExprSX(self, sx, expected):
+		expectedAST = compile( expected, '<test>', 'eval', _ast.PyCF_ONLY_AST ).body
+
+		self._testSXAST( sx, expectedAST )
+
+
+	def _testExprGenSX(self, gen, sx, expected):
+		expectedAST = compile( expected, '<test>', 'eval', _ast.PyCF_ONLY_AST ).body
+
+		self._testGenSX( gen, sx, expectedAST, 'eval' )
+
+
+	def _testExecSX(self, sx, expected):
+		self._testSX( sx, expected, 'exec' )
+
+
+	def _testExecGenSX(self, gen, sx, expected):
+		self._testGenSX( gen, sx, expected, 'exec' )
+
+
 	def _binOpTest(self, sxOp, expectedOp):
-		self._testSX( '(py %s x=(py Load name=a) y=(py Load name=b))'  %  sxOp,  'a %s b'  %  expectedOp )
+		self._testExprSX( '(py %s x=(py Load name=a) y=(py Load name=b))'  %  sxOp,  'a %s b'  %  expectedOp )
 
 
 
 
 	def test_BlankLine(self):
-		self._testSX( '(py BlankLine)', None )
+		self._testSXAST( '(py BlankLine)', None )
 
 
 	def test_UNPARSED(self):
-		self.assertRaises( Python25ASTGeneratorUnparsedError, lambda: self._testSX( '(py UNPARSED value=Test)', '' ) )
+		self.assertRaises( Python25ASTGeneratorUnparsedError, lambda: self._testSXAST( '(py UNPARSED value=Test)', '' ) )
 
 
 	def test_StringLiteral(self):
-		self._testSX( '(py StringLiteral format=ascii quotation=single value="Hi there")', _ast.Str( 'Hi there' ) )
+		self._testExprSX( '(py StringLiteral format=ascii quotation=single value="Hi there")', "'Hi there'" )
 
 
 	def test_IntLiteral(self):
-		self._testSX( '(py IntLiteral format=decimal numType=int value=123)', _ast.Num( 123 ) )
-		self._testSX( '(py IntLiteral format=hex numType=int value=1a4)', _ast.Num( 0x1a4 ) )
-		self._testSX( '(py IntLiteral format=decimal numType=long value=123)', _ast.Num( 123L ) )
-		self._testSX( '(py IntLiteral format=hex numType=long value=1a4)', _ast.Num( 0x1a4L ) )
-		self.assertRaises( Python25ASTGeneratorInvalidFormatError, lambda: self._testSX( '(py IntLiteral format=foo numType=long value=1a4)', '' ) )
-		self.assertRaises( Python25ASTGeneratorInvalidFormatError, lambda: self._testSX( '(py IntLiteral format=hex numType=foo value=1a4)', '' ) )
+		self._testExprSX( '(py IntLiteral format=decimal numType=int value=123)', '123' )
+		self._testExprSX( '(py IntLiteral format=hex numType=int value=1a4)', '0x1a4' )
+		self._testExprSX( '(py IntLiteral format=decimal numType=long value=123)', '123L' )
+		self._testExprSX( '(py IntLiteral format=hex numType=long value=1a4)', '0x1a4L' )
+		self.assertRaises( Python25ASTGeneratorInvalidFormatError, lambda: self._testSXAST( '(py IntLiteral format=foo numType=long value=1a4)', None ) )
+		self.assertRaises( Python25ASTGeneratorInvalidFormatError, lambda: self._testSXAST( '(py IntLiteral format=hex numType=foo value=1a4)', None ) )
 
 
 	def test_FloatLiteral(self):
-		self._testSX( '(py FloatLiteral value=123.0)', _ast.Num( 123.0 ) )
+		self._testExprSX( '(py FloatLiteral value=123.0)', '123.0' )
 
 
 	def test_ImaginaryLiteral(self):
-		self._testSX( '(py ImaginaryLiteral value=123j)', _ast.Num( 123j ) )
+		self._testExprSX( '(py ImaginaryLiteral value=123j)', '123j' )
 
 
 	def test_SingleTarget(self):
-		self._testSX( '(py SingleTarget name=a)', _ast.Name( 'a', _store ), _store )
+		self._testSXAST( '(py SingleTarget name=a)', _ast.Name( 'a', _store ), _store )
 
 
 	def test_TupleTarget(self):
-		self._testSX( '(py TupleTarget targets=[])', _ast.Tuple( [], _store ), _store )
-		self._testSX( '(py TupleTarget targets=[(py SingleTarget name=a)])', _ast.Tuple( [ _ast.Name( 'a', _store ) ], _store ), _store )
-		self._testSX( '(py TupleTarget targets=[(py SingleTarget name=a) (py SingleTarget name=b) (py SingleTarget name=c)])',
+		self._testSXAST( '(py TupleTarget targets=[])', _ast.Tuple( [], _store ), _store )
+		self._testSXAST( '(py TupleTarget targets=[(py SingleTarget name=a)])', _ast.Tuple( [ _ast.Name( 'a', _store ) ], _store ), _store )
+		self._testSXAST( '(py TupleTarget targets=[(py SingleTarget name=a) (py SingleTarget name=b) (py SingleTarget name=c)])',
 		              _ast.Tuple( [ _ast.Name( 'a', _store ), _ast.Name( 'b', _store ), _ast.Name( 'c', _store ) ], _store ), _store )
-		self._testSX( '(py ListTarget targets=[(py SingleTarget name=a) (py TupleTarget targets=[(py SingleTarget name=a) (py SingleTarget name=b) (py SingleTarget name=c)])])',
+		self._testSXAST( '(py ListTarget targets=[(py SingleTarget name=a) (py TupleTarget targets=[(py SingleTarget name=a) (py SingleTarget name=b) (py SingleTarget name=c)])])',
 		              _ast.List( [ _ast.Name( 'a', _store ), _ast.Tuple( [ _ast.Name( 'a', _store ), _ast.Name( 'b', _store ), _ast.Name( 'c', _store ) ], _store ) ], _store ), _store )
 
 
 	def test_ListTarget(self):
-		self._testSX( '(py ListTarget targets=[(py SingleTarget name=a) (py SingleTarget name=b) (py SingleTarget name=c)])',
+		self._testSXAST( '(py ListTarget targets=[(py SingleTarget name=a) (py SingleTarget name=b) (py SingleTarget name=c)])',
 		               _ast.List( [ _ast.Name( 'a', _store ), _ast.Name( 'b', _store ), _ast.Name( 'c', _store ) ], _store ), _store )
 
 
 	def test_Load(self):
-		self._testSX( '(py Load name=a)', _ast.Name( 'a', _load ) )
+		self._testExprSX( '(py Load name=a)', 'a' )
 
 
 	def test_TupleLiteral(self):
-		self._testSX( '(py TupleLiteral values=[])', _ast.Tuple( [], _load ) )
-		self._testSX( '(py TupleLiteral values=[(py Load name=a)])', _ast.Tuple( [ _ast.Name( 'a', _load ) ], _load ) )
-		self._testSX( '(py TupleLiteral values=[(py Load name=a) (py Load name=b) (py Load name=c)])', _ast.Tuple( [ _ast.Name( 'a', _load ), _ast.Name( 'b', _load ), _ast.Name( 'c', _load ) ], _load ) )
-		self._testSX( '(py ListLiteral values=[(py Load name=a) (py TupleLiteral values=[(py Load name=a) (py Load name=b) (py Load name=c)])])',
-				_ast.List( [ _ast.Name( 'a', _load ), _ast.Tuple( [ _ast.Name( 'a', _load ), _ast.Name( 'b', _load ), _ast.Name( 'c', _load ) ], _load ) ], _load ) )
+		self._testExprSX( '(py TupleLiteral values=[])', '()' )
+		self._testExprSX( '(py TupleLiteral values=[(py Load name=a)])', '( a, )' )
+		self._testExprSX( '(py TupleLiteral values=[(py Load name=a) (py Load name=b) (py Load name=c)])', '( a, b, c )' )
+		self._testExprSX( '(py ListLiteral values=[(py Load name=a) (py TupleLiteral values=[(py Load name=a) (py Load name=b) (py Load name=c)])])', '[ a, ( a, b, c ) ]' )
 
 
 	def test_ListLiteral(self):
-		self._testSX( '(py ListLiteral values=[(py Load name=a) (py Load name=b) (py Load name=c)])',
-				_ast.List( [ _ast.Name( 'a', _load ), _ast.Name( 'b', _load ), _ast.Name( 'c', _load ) ], _load ))
+		self._testExprSX( '(py ListLiteral values=[(py Load name=a) (py Load name=b) (py Load name=c)])', '[ a, b, c ]' )
 
 
 	def test_ListComp(self):
-		self._testSX( '(py ListComp resultExpr=(py Load name=a) comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs))])',
-			      _ast.ListComp( _ast.Name( 'a', _load ), [ _ast.comprehension( _ast.Name( 'a', _store ), _ast.Name( 'xs', _load ), [] ) ] ) )
-		self._testSX( '(py ListComp resultExpr=(py Load name=a) comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs)) (py ComprehensionIf condition=(py Load name=a))])',
-			      _ast.ListComp( _ast.Name( 'a', _load ), [ _ast.comprehension( _ast.Name( 'a', _store ), _ast.Name( 'xs', _load ), [ _ast.Name( 'a', _load ) ] ) ] ) )
-		self._testSX( '(py ListComp resultExpr=(py Load name=a) comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs)) (py ComprehensionIf condition=(py Load name=a)) (py ComprehensionIf condition=(py Load name=b))])',
-			      _ast.ListComp( _ast.Name( 'a', _load ), [ _ast.comprehension( _ast.Name( 'a', _store ), _ast.Name( 'xs', _load ), [ _ast.Name( 'a', _load ), _ast.Name( 'b', _load ) ] ) ] ) )
+		self._testExprSX( '(py ListComp resultExpr=(py Load name=a) comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs))])', '[ a  for a in xs ]' )
+		self._testExprSX( '(py ListComp resultExpr=(py Load name=a) comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs)) (py ComprehensionIf condition=(py Load name=a))])',
+				 '[ a  for a in xs   if a ]' )
+		self._testExprSX( '(py ListComp resultExpr=(py Load name=a) comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs)) (py ComprehensionIf condition=(py Load name=a)) (py ComprehensionIf condition=(py Load name=b))])',
+				 '[ a  for a in xs  if a  if b ]' )
 
 
 	def test_GeneratorExpr(self):
-		self._testSX( '(py GeneratorExpr resultExpr=(py Load name=a) comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs))])',
-			      _ast.GeneratorExp( _ast.Name( 'a', _load ), [ _ast.comprehension( _ast.Name( 'a', _store ), _ast.Name( 'xs', _load ), [] ) ] ) )
-		self._testSX( '(py GeneratorExpr resultExpr=(py Load name=a) comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs)) (py ComprehensionIf condition=(py Load name=a))])',
-			      _ast.GeneratorExp( _ast.Name( 'a', _load ), [ _ast.comprehension( _ast.Name( 'a', _store ), _ast.Name( 'xs', _load ), [ _ast.Name( 'a', _load ) ] ) ] ) )
-		self._testSX( '(py GeneratorExpr resultExpr=(py Load name=a) comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs)) (py ComprehensionIf condition=(py Load name=a)) (py ComprehensionIf condition=(py Load name=b))])',
-			      _ast.GeneratorExp( _ast.Name( 'a', _load ), [ _ast.comprehension( _ast.Name( 'a', _store ), _ast.Name( 'xs', _load ), [ _ast.Name( 'a', _load ), _ast.Name( 'b', _load ) ] ) ] ) )
+		self._testExprSX( '(py GeneratorExpr resultExpr=(py Load name=a) comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs))])', '( a  for a in xs )' )
+		self._testExprSX( '(py GeneratorExpr resultExpr=(py Load name=a) comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs)) (py ComprehensionIf condition=(py Load name=a))])',
+				  '( a  for a in xs   if a )' )
+		self._testExprSX( '(py GeneratorExpr resultExpr=(py Load name=a) comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs)) (py ComprehensionIf condition=(py Load name=a)) (py ComprehensionIf condition=(py Load name=b))])',
+				  '( a  for a in xs  if a  if b )' )
 
 
 
 	def test_DictLiteral(self):
-		self._testSX( '(py DictLiteral values=[(py DictKeyValuePair key=(py Load name=a) value=(py Load name=b)) (py DictKeyValuePair key=(py Load name=c) value=(py Load name=d))])',
-			      _ast.Dict( [ _ast.Name( 'a', _load ), _ast.Name( 'c', _load ) ], [ _ast.Name( 'b', _load ), _ast.Name( 'd', _load ) ] ) )
+		self._testExprSX( '(py DictLiteral values=[(py DictKeyValuePair key=(py Load name=a) value=(py Load name=b)) (py DictKeyValuePair key=(py Load name=c) value=(py Load name=d))])', '{ a:b, c:d }' )
 
 
 	def test_YieldExpr(self):
-		self._testSX( '(py YieldExpr value=(py Load name=a))', _ast.Yield( _ast.Name( 'a', _load ) ) )
-		self._testSX( '(py YieldExpr value=`null`)', _ast.Yield( None ) )
+		self._testExprSX( '(py YieldExpr value=(py Load name=a))', '(yield a)' )
+		self._testExprSX( '(py YieldExpr value=`null`)', '(yield)' )
 
 
 	def test_AttributeRef(self):
-		self._testSX( '(py AttributeRef target=(py Load name=a) name=b)', _ast.Attribute( _ast.Name( 'a', _load ), 'b', _load ) )
+		self._testExprSX( '(py AttributeRef target=(py Load name=a) name=b)', 'a.b' )
 
 
 	def test_Subscript(self):
-		self._testSX( '(py Subscript target=(py Load name=a) index=(py Load name=b))', _ast.Subscript( _ast.Name( 'a', _load ), _ast.Index( _ast.Name( 'b', _load ) ), _load ) )
+		self._testExprSX( '(py Subscript target=(py Load name=a) index=(py Load name=b))', 'a[b]' )
 
 
 	def test_Subscript_Ellipsis(self):
-		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptEllipsis))', _ast.Subscript( _ast.Name( 'a', _load ), _ast.Ellipsis(), _load ) )
+		self._testExprSX( '(py Subscript target=(py Load name=a) index=(py SubscriptEllipsis))', 'a[...]' )
 
 
 	def test_subscript_slice(self):
-		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptSlice lower=(py Load name=a) upper=(py Load name=b)))',
-			_ast.Subscript( _ast.Name( 'a', _load ), _ast.Slice( _ast.Name( 'a', _load ), _ast.Name( 'b', _load ), None ), _load ) )
-		self.	_testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptSlice lower=(py Load name=a) upper=`null`))',
-			_ast.Subscript( _ast.Name( 'a', _load ), _ast.Slice( _ast.Name( 'a', _load ), None, None ), _load ) )
-		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptSlice lower=`null` upper=(py Load name=b)))',
-			_ast.Subscript( _ast.Name( 'a', _load ), _ast.Slice( None, _ast.Name( 'b', _load ), None ), _load ) )
-		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptSlice lower=`null` upper=`null`))',
-			_ast.Subscript( _ast.Name( 'a', _load ), _ast.Slice( None, None, None ), _load ) )
+		self._testExprSX( '(py Subscript target=(py Load name=a) index=(py SubscriptSlice lower=(py Load name=a) upper=(py Load name=b)))', 'a[a:b]' )
+		self._testExprSX( '(py Subscript target=(py Load name=a) index=(py SubscriptSlice lower=(py Load name=a) upper=`null`))', 'a[a:]' )
+		self._testExprSX( '(py Subscript target=(py Load name=a) index=(py SubscriptSlice lower=`null` upper=(py Load name=b)))', 'a[:b]' )
+		self._testExprSX( '(py Subscript target=(py Load name=a) index=(py SubscriptSlice lower=`null` upper=`null`))', 'a[:]' )
 
 
 	def test_subscript_longSlice(self):
-		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=(py Load name=a) upper=(py Load name=b) stride=(py Load name=c)))',
-			_ast.Subscript( _ast.Name( 'a', _load ), _ast.Slice( _ast.Name( 'a', _load ), _ast.Name( 'b', _load ), _ast.Name( 'c', _load ) ), _load ) )
-		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=(py Load name=a) upper=(py Load name=b) stride=`null`))',
-			_ast.Subscript( _ast.Name( 'a', _load ), _ast.Slice( _ast.Name( 'a', _load ), _ast.Name( 'b', _load ), None ), _load ) )
-		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=(py Load name=a) upper=`null` stride=(py Load name=c)))',
-			_ast.Subscript( _ast.Name( 'a', _load ), _ast.Slice( _ast.Name( 'a', _load ), None, _ast.Name( 'c', _load ) ), _load ) )
-		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=(py Load name=a) upper=`null` stride=`null`))',
-			_ast.Subscript( _ast.Name( 'a', _load ), _ast.Slice( _ast.Name( 'a', _load ), None, None ), _load ) )
-		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=`null` upper=(py Load name=b) stride=(py Load name=c)))',
-			_ast.Subscript( _ast.Name( 'a', _load ), _ast.Slice( None, _ast.Name( 'b', _load ), _ast.Name( 'c', _load ) ), _load ) )
-		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=`null` upper=(py Load name=b) stride=`null`))',
-			_ast.Subscript( _ast.Name( 'a', _load ), _ast.Slice( None, _ast.Name( 'b', _load ), None ), _load ) )
-		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=`null` upper=`null` stride=(py Load name=c)))',
-			_ast.Subscript( _ast.Name( 'a', _load ), _ast.Slice( None, None, _ast.Name( 'c', _load ) ), _load ) )
-		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=`null` upper=`null` stride=`null`))',
-			_ast.Subscript( _ast.Name( 'a', _load ), _ast.Slice( None, None, None ), _load ) )
+		self._testExprSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=(py Load name=a) upper=(py Load name=b) stride=(py Load name=c)))', 'a[a:b:c]' )
+		self._testExprSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=(py Load name=a) upper=(py Load name=b) stride=`null`))', 'a[a:b]' )
+		self._testExprSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=(py Load name=a) upper=`null` stride=(py Load name=c)))', 'a[a::c]' )
+		self._testExprSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=(py Load name=a) upper=`null` stride=`null`))', 'a[a:]' )
+		self._testExprSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=`null` upper=(py Load name=b) stride=(py Load name=c)))', 'a[:b:c]' )
+		self._testExprSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=`null` upper=(py Load name=b) stride=`null`))', 'a[:b]' )
+		self._testExprSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=`null` upper=`null` stride=(py Load name=c)))', 'a[::c]' )
+		self._testExprSX( '(py Subscript target=(py Load name=a) index=(py SubscriptLongSlice lower=`null` upper=`null` stride=`null`))', 'a[:]' )
 
 
 	def test_subscript_tuple(self):
-		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptTuple values=[(py Load name=a) (py SubscriptSlice lower=(py Load name=b) upper=(py Load name=c))]))',
-			_ast.Subscript( _ast.Name( 'a', _load ), _ast.ExtSlice( [ _ast.Index( _ast.Name( 'a', _load ) ), _ast.Slice( _ast.Name( 'b', _load ), _ast.Name( 'c', _load ), None ) ] ), _load ) )
-		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptTuple values=[(py Load name=b) (py SubscriptTuple values=[(py Load name=c) (py Load name=d)])]))',
+		self._testExprSX( '(py Subscript target=(py Load name=a) index=(py SubscriptTuple values=[(py Load name=a) (py SubscriptSlice lower=(py Load name=b) upper=(py Load name=c))]))', 'a[a, b:c]' )
+		self._testExprSX( '(py Subscript target=(py Load name=a) index=(py TupleLiteral values=[(py Load name=b) (py TupleLiteral values=[(py Load name=c) (py Load name=d)])]))', 'a[b, (c,d)]' )
+		self._testSXAST( '(py Subscript target=(py Load name=a) index=(py SubscriptTuple values=[(py Load name=b) (py SubscriptTuple values=[(py Load name=c) (py Load name=d)])]))',
 			_ast.Subscript( _ast.Name( 'a', _load ), _ast.ExtSlice( [ _ast.Index( _ast.Name( 'b', _load ) ), _ast.ExtSlice( [ _ast.Index( _ast.Name( 'c', _load ) ), _ast.Index( _ast.Name( 'd', _load ) ) ] ) ] ), _load ) )
 
 
+	def test_call(self):
+		self._testExprSX( '(py Call target=(py Load name=x) args=[(py Load name=a) (py Load name=b) (py CallKWArg name=c value=(py Load name=d)) (py CallKWArg name=e value=(py Load name=f)) (py CallArgList value=(py Load name=g)) (py CallKWArgList value=(py Load name=h))])',
+				  'x( a, b, c=d, e=f, *g, **h )' )
+
+
+	def test_operators(self):
+		self._binOpTest( 'Pow', '**' )
+		self._testExprSX( '(py Invert x=(py Load name=a))', '~a' )
+		self._testExprSX( '(py Negate x=(py Load name=a))', '-a' )
+		self._testExprSX( '(py Pos x=(py Load name=a))', '+a' )
+		self._binOpTest( 'Mul', '*' )
+		self._binOpTest( 'Div', '/' )
+		self._binOpTest( 'Mod', '%' )
+		self._binOpTest( 'Add', '+' )
+		self._binOpTest( 'Sub', '-' )
+		self._binOpTest( 'LShift', '<<' )
+		self._binOpTest( 'RShift', '>>' )
+		self._binOpTest( 'BitAnd', '&' )
+		self._binOpTest( 'BitXor', '^' )
+		self._binOpTest( 'BitOr', '|' )
+		self._testExprSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpLte y=(py Load name=b))])',  'a <= b' )
+		self._testExprSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpLt y=(py Load name=b))])',  'a < b' )
+		self._testExprSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpGte y=(py Load name=b))])',  'a >= b' )
+		self._testExprSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpGt y=(py Load name=b))])',  'a > b' )
+		self._testExprSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpEq y=(py Load name=b))])',  'a == b' )
+		self._testExprSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpNeq y=(py Load name=b))])',  'a != b' )
+		self._testExprSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpIsNot y=(py Load name=b))])',  'a is not b' )
+		self._testExprSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpIs y=(py Load name=b))])',  'a is b' )
+		self._testExprSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpNotIn y=(py Load name=b))])',  'a not in b' )
+		self._testExprSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpIn y=(py Load name=b))])',  'a in b' )
+		self._testExprSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpLt y=(py Load name=b)) (py CmpOpGt y=(py Load name=c))])',  'a < b > c' )
+		self._testExprSX( '(py NotTest x=(py Load name=a))', 'not a' )
+		self._binOpTest( 'AndTest', 'and' )
+		self._binOpTest( 'OrTest', 'or' )
+		self._testExprSX( '(py Mul x=(py Load name=a) y=(py Add x=(py Load name=b) y=(py Load name=c)))', 'a * (b + c)' )
+		self._testExprSX( '(py Add x=(py Load name=a) y=(py Mul x=(py Load name=b) y=(py Load name=c)))', 'a + b * c' )
 
 

@@ -316,7 +316,7 @@ class _ExprImporter (_Importer):
 			return Schema.SubscriptLongSlice( lower=_expr( node.lower ), upper=_expr( node.upper ), stride=_expr( node.step ) )
 	
 	def ExtSlice(self, node):
-		return Schema.TupleLiteral( values=[ _expr( x )   for x in node.dims ] )
+		return Schema.SubscriptTuple( values=[ _expr( x )   for x in node.dims ] )
 	
 	def Ellipsis(self, node):
 		return Schema.SubscriptEllipsis()
@@ -986,8 +986,10 @@ class ImporterTestCase (unittest.TestCase):
 		self._exprTest( 'a[b:c:]',  Schema.Subscript( target=Schema.Load( name='a' ), index=Schema.SubscriptLongSlice( lower=Schema.Load( name='b' ), upper=Schema.Load( name='c' ), stride=Schema.Load( name='None' ) ) ) )
 		self._exprTest( 'a[b::d]',  Schema.Subscript( target=Schema.Load( name='a' ), index=Schema.SubscriptLongSlice( lower=Schema.Load( name='b' ), upper=None, stride=Schema.Load( name='d' ) ) ) )
 		self._exprTest( 'a[:c:d]',  Schema.Subscript( target=Schema.Load( name='a' ), index=Schema.SubscriptLongSlice( lower=None, upper=Schema.Load( name='c' ), stride=Schema.Load( name='d' ) ) ) )
-		self._exprTest( 'a[b:c,d:e]',  Schema.Subscript( target=Schema.Load( name='a' ), index=Schema.TupleLiteral( values=[ Schema.SubscriptSlice( lower=Schema.Load( name='b' ), upper=Schema.Load( name='c' ) ), Schema.SubscriptSlice( lower=Schema.Load( name='d' ), upper=Schema.Load( name='e' ) ) ] ) ) )
-		self._exprTest( 'a[b:c,d:e:f]',  Schema.Subscript( target=Schema.Load( name='a' ), index=Schema.TupleLiteral( values=[ Schema.SubscriptSlice( lower=Schema.Load( name='b' ), upper=Schema.Load( name='c' ) ), Schema.SubscriptLongSlice( lower=Schema.Load( name='d' ), upper=Schema.Load( name='e' ), stride=Schema.Load( name='f' ) ) ] ) ) )
+		self._exprTest( 'a[b:c,d:e]',  Schema.Subscript( target=Schema.Load( name='a' ), index=Schema.SubscriptTuple( values=[ Schema.SubscriptSlice( lower=Schema.Load( name='b' ), upper=Schema.Load( name='c' ) ),
+															  Schema.SubscriptSlice( lower=Schema.Load( name='d' ), upper=Schema.Load( name='e' ) ) ] ) ) )
+		self._exprTest( 'a[b:c,d:e:f]',  Schema.Subscript( target=Schema.Load( name='a' ), index=Schema.SubscriptTuple( values=[ Schema.SubscriptSlice( lower=Schema.Load( name='b' ), upper=Schema.Load( name='c' ) ),
+																	 Schema.SubscriptLongSlice( lower=Schema.Load( name='d' ), upper=Schema.Load( name='e' ), stride=Schema.Load( name='f' ) ) ] ) ) )
 		
 	def testEllipsis(self):
 		self._exprTest( 'a[...]',  Schema.Subscript( target=Schema.Load( name='a' ), index=Schema.SubscriptEllipsis() ) )
