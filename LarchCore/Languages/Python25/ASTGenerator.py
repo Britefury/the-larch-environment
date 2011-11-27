@@ -368,12 +368,6 @@ class Python25ASTGenerator (object):
 		op = opType()
 		return _ast.BinOp( left, op, right )
 
-	def _boolOp(self, x, y, opType, lineno):
-		left = self( x, lineno, _load )
-		right = self( y, lineno, _load )
-		op = opType()
-		return _ast.BoolOp( left, op, right )
-
 	@DMObjectNodeDispatchMethod( Schema.Pow )
 	def Pow(self, lineno, ctx, node, x, y):
 		return self._binOp( x, y, _ast.Pow, lineno )
@@ -493,13 +487,21 @@ class Python25ASTGenerator (object):
 	def NotTest(self, lineno, ctx, node, x):
 		return self._prefixOp( x, _ast.Not, lineno )
 
+	def _joinBoolOp(self, lineno, ctx, x, nodeCls):
+		if x.isInstanceOf( nodeCls ):
+			return self._joinBoolOp( lineno, ctx, x['x'], nodeCls )  +  self._joinBoolOp( lineno, ctx, x['y'], nodeCls )
+		else:
+			return [ x ]
+
 	@DMObjectNodeDispatchMethod( Schema.AndTest )
 	def AndTest(self, lineno, ctx, node, x, y):
-		return self._boolOp( x, y, _ast.And, lineno )
+		xs = [ self( a, lineno, _load )   for a in self._joinBoolOp( lineno, ctx, node, Schema.AndTest ) ]
+		return _ast.BoolOp( _ast.And(), xs )
 
 	@DMObjectNodeDispatchMethod( Schema.OrTest )
 	def OrTest(self, lineno, ctx, node, x, y):
-		return self._boolOp( x, y, _ast.Or, lineno )
+		xs = [ self( a, lineno, _load )   for a in self._joinBoolOp( lineno, ctx, node, Schema.OrTest ) ]
+		return _ast.BoolOp( _ast.Or(), xs )
 
 
 
@@ -768,6 +770,9 @@ class TestCase_Python25ASTGenerator (unittest.TestCase):
 		self._testExprSX( '(py NotTest x=(py Load name=a))', 'not a' )
 		self._binOpTest( 'AndTest', 'and' )
 		self._binOpTest( 'OrTest', 'or' )
+		self._testExprSX( '(py AndTest x=(py AndTest x=(py AndTest x=(py Load name=a) y=(py Load name=b)) y=(py Load name=c)) y=(py Load name=d))', 'a and b and c and d' )
+		self._testExprSX( '(py OrTest x=(py OrTest x=(py OrTest x=(py Load name=a) y=(py Load name=b)) y=(py Load name=c)) y=(py Load name=d))', 'a or b or c or d' )
+		self._testExprSX( '(py OrTest x=(py OrTest x=(py AndTest x=(py Load name=a) y=(py Load name=b)) y=(py Load name=c)) y=(py Load name=d))', 'a and b or c or d' )
 		self._testExprSX( '(py Mul x=(py Load name=a) y=(py Add x=(py Load name=b) y=(py Load name=c)))', 'a * (b + c)' )
 		self._testExprSX( '(py Add x=(py Load name=a) y=(py Mul x=(py Load name=b) y=(py Load name=c)))', 'a + b * c' )
 
