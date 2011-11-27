@@ -8,7 +8,7 @@
 
 from BritefuryJ.Parser import *
 from BritefuryJ.Parser.Utils import *
-from BritefuryJ.Parser.Utils.OperatorParser import PrefixLevel, SuffixLevel, InfixLeftLevel, InfixRightLevel, InfixChainLevel, OperatorTable, UnaryOperator, BinaryOperator, ChainOperator
+from BritefuryJ.Parser.Utils.OperatorParser import PrefixLevel, SuffixLevel, InfixLeftLevel, InfixRightLevel, InfixChainLevel, InfixUniformChainLevel, OperatorTable, UnaryOperator, BinaryOperator, ChainOperator
 from BritefuryJ.Parser.Utils.Tokens import identifier
 
 
@@ -383,6 +383,20 @@ _unitTestSpecification = """
 			a < b <> c				->	[ic a ["<" b] ["<>" c]]
 			a < b > c <> d			->	[ic a ["<" b] [">" c] ["<>" d]]
 			a <> b > c < d			->	[ic a ["<>" b] [">" c] ["<" d]]
+
+
+-- infix_uniform_chain :				[ self._infixUniformChainLvl( '*', '*' ),   self._infixUniformChainLvl( '+', '+' ) ]
+		       a			->			a
+		       a * b			->			[* a b]
+		       a * b * c		->			[* a b c]
+		       a * b * c * d	->			[* a b c d]
+		       a + b			->			[+ a b]
+		       a + b + c		->			[+ a b c]
+		       a + b + c + d	->			[+ a b c d]
+		       a * b + c + d	->			[+ [* a b] c d]
+		       a + b * c + d	->			[+ a [* b c] d]
+		       a + b + c * d	->			[+ a b [* c d]]
+		       a * b + c * d	->			[+ [* a b] [* c d]]
 """
 
 
@@ -516,6 +530,9 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 	def _infixChainLvl(self, prefix, xs):
 		return InfixChainLevel( xs, lambda input, begin, end, x, ys: [ prefix, x ] + ys )
 	
+	def _infixUniformChainLvl(self, prefix, operator):
+		return InfixUniformChainLevel( operator, lambda input, begin, end, xs: [ prefix ] + xs )
+
 	def _unOp(self, x):
 		return UnaryOperator( x, lambda input, begin, end, subexp: [ x, subexp ] )
 	
