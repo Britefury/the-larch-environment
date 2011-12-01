@@ -298,25 +298,34 @@ public abstract class DPContentLeaf extends DPElement
 	
 	public void insertText(int index, String x)
 	{
+		boolean start = index == 0, end = index == textRepresentation.length();
+		DPContentLeaf prev = start ? getPreviousEditableLeaf() : null;
+		DPContentLeaf next = end ? getNextEditableLeaf() : null;
 		textRepresentation = textRepresentation.substring( 0, index ) + x + textRepresentation.substring( index );
 		notifyTextInserted( index, x.length() );
-		textRepresentationChanged( new TextEditEventInsert( this, index, x ) );
+		textRepresentationChanged( new TextEditEventInsert( this, prev, next, index, x ) );
 	}
 
 	public void removeText(int index, int length)
 	{
+		boolean start = index == 0, end = ( index + length ) >= textRepresentation.length();
+		DPContentLeaf prev = start ? getPreviousEditableLeaf() : null;
+		DPContentLeaf next = end ? getNextEditableLeaf() : null;
 		String textRemoved = textRepresentation.substring( index, index + length );
 		textRepresentation = textRepresentation.substring( 0, index ) + textRepresentation.substring( index + length );
 		notifyTextRemoved( index, length );
-		textRepresentationChanged( new TextEditEventRemove( this, index, textRemoved ) );
+		textRepresentationChanged( new TextEditEventRemove( this, prev, next, index, textRemoved ) );
 	}
 	
 	public void replaceText(int index, int length, String x)
 	{
+		boolean start = index == 0, end = ( index + length ) >= textRepresentation.length();
+		DPContentLeaf prev = start ? getPreviousEditableLeaf() : null;
+		DPContentLeaf next = end ? getNextEditableLeaf() : null;
 		String oldText = textRepresentation.substring( index, index + length );
 		textRepresentation = textRepresentation.substring( 0, index )  +  x  +  textRepresentation.substring( index + length );
 		notifyTextReplaced( index, length, x.length() );
-		textRepresentationChanged( new TextEditEventReplace( this, index, oldText, x ) );
+		textRepresentationChanged( new TextEditEventReplace( this, prev, next, index, oldText, x ) );
 	}
 	
 	
@@ -342,7 +351,7 @@ public abstract class DPContentLeaf extends DPElement
 			String oldText = textRepresentation;
 			textRepresentation = "";
 			notifyTextRemoved( 0, length );
-			textRepresentationChanged( new TextEditEventRemove( this, 0, oldText ) );
+			textRepresentationChanged( new TextEditEventRemove( this, getPreviousEditableLeaf(), getNextEditableLeaf(), 0, oldText ) );
 			return true;
 		}
 		else

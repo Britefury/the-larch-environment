@@ -31,6 +31,7 @@ public class BreakableStructuralItem extends Pres
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
 		DPElement element = child.present( ctx, style );
+		element.addTreeEventListener( SequentialEditor.getClearNeighbouringStructuralValueListener() );
 		element.setFixedValue( value );
 		element.addTreeEventListener( editor.getClearStructuralValueListener() );
 		return element;

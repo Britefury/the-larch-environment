@@ -507,7 +507,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 
 		notifyTextReplaced( 0, oldLength, newLength );
 		
-		textRepresentationChanged( new TextEditEventReplace( this, 0, oldText, newTextRepresentation ) );
+		textRepresentationChanged( new TextEditEventReplace( this, getPreviousEditableLeaf(), getNextEditableLeaf(), 0, oldText, newTextRepresentation ) );
 	}
 	
 	

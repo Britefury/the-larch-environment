@@ -11,9 +11,9 @@ public class TextEditEventRemove extends TextEditEvent
 	protected int position;
 	protected String textRemoved;
 	
-	public TextEditEventRemove(DPContentLeaf leaf, int position, String textRemoved)
+	public TextEditEventRemove(DPContentLeaf leaf, DPContentLeaf prevNeighbour, DPContentLeaf nextNeighbour, int position, String textRemoved)
 	{
-		super( leaf );
+		super( leaf, prevNeighbour, nextNeighbour );
 		
 		this.position = position;
 		this.textRemoved = textRemoved;

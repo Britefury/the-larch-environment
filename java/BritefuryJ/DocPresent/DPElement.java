@@ -1168,6 +1168,40 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		}
 	}
 	
+	public static DPElement getCommonAncestor(DPElement w0, DPElement w1)
+	{
+		if ( w0 == w1 )
+		{
+			return w0;
+		}
+		else
+		{
+			ArrayList<DPElement> p0 = w0.getElementPathFromRoot();
+			ArrayList<DPElement> p1 = w1.getElementPathFromRoot();
+			
+			int minLength = Math.min( p0.size(), p1.size() );
+			
+			if ( p0.get( 0 ) != p1.get( 0 ) )
+			{
+				throw new RuntimeException( "Bad path" );
+			}
+			
+			DPElement commonAncestor = null;
+			
+			for (int i = 0; i < minLength; i++)
+			{
+				if ( p0.get( i ) != p1.get( i ) )
+				{
+					break;
+				}
+
+				commonAncestor = p0.get( i );
+			}
+			
+			return commonAncestor;
+		}
+	}
+	
 	public static boolean areElementsInOrder(DPElement w0, DPElement w1)
 	{
 		ArrayList<DPElement> path0 = new ArrayList<DPElement>();
@@ -2313,9 +2347,14 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	public boolean postTreeEventToParent(Object event)
 	{
+		return postTreeEventToParentUntil( event, null );
+	}
+	
+	public boolean postTreeEventToParentUntil(Object event, DPElement stopBefore)
+	{
 		if ( parent != null )
 		{
-			return parent.treeEvent( new TreeEvent( this, event ) );
+			return parent.treeEvent( new TreeEvent( this, event ), stopBefore );
 		}
 		else
 		{
@@ -2325,27 +2364,35 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	public boolean postTreeEvent(Object event)
 	{
-		return treeEvent( new TreeEvent( this, event ) );
+		return treeEvent( new TreeEvent( this, event ), null );
+	}
+	
+	public boolean postTreeEventUntil(Object event, DPElement stopBefore)
+	{
+		return treeEvent( new TreeEvent( this, event ), stopBefore );
 	}
 	
 	
-	protected boolean treeEvent(TreeEvent event)
+	protected boolean treeEvent(TreeEvent event, DPElement stopBefore)
 	{
-		ArrayList<TreeEventListener> listeners = getTreeEventListeners();
-		if ( listeners != null )
+		if ( this != stopBefore )
 		{
-			for (TreeEventListener listener: listeners)
+			ArrayList<TreeEventListener> listeners = getTreeEventListeners();
+			if ( listeners != null )
 			{
-				if ( listener.onTreeEvent( this, event.sourceElement, event.value ) )
+				for (TreeEventListener listener: listeners)
 				{
-					return true;
+					if ( listener.onTreeEvent( this, event.sourceElement, event.value ) )
+					{
+						return true;
+					}
 				}
 			}
-		}
-		
-		if ( parent != null )
-		{
-			return parent.treeEvent( event );
+			
+			if ( parent != null )
+			{
+				return parent.treeEvent( event, stopBefore );
+			}
 		}
 		
 		return false;

@@ -10,7 +10,18 @@ import BritefuryJ.DocPresent.StreamValue.SequentialStreamValueVisitor;
 
 public abstract class EditEvent
 {
-	private SequentialStreamValueVisitor streamValueVisitor = new SequentialStreamValueVisitor();
+	private SequentialStreamValueVisitor streamValueVisitor;
+	
+	
+	protected EditEvent()
+	{
+		streamValueVisitor = new SequentialStreamValueVisitor();
+	}
+	
+	protected EditEvent(SequentialStreamValueVisitor streamValueVisitor)
+	{
+		this.streamValueVisitor = streamValueVisitor;
+	}
 	
 	
 	public SequentialStreamValueVisitor getStreamValueVisitor()

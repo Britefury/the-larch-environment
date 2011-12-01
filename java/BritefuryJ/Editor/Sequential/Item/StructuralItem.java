@@ -10,6 +10,7 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.TreeEventListener;
+import BritefuryJ.Editor.Sequential.SequentialEditor;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -47,6 +48,7 @@ public class StructuralItem extends Pres
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
 		DPElement element = child.present( ctx, style );
+		element.addTreeEventListener( SequentialEditor.getClearNeighbouringStructuralValueListener() );
 		element.setFixedValue( value );
 		if ( editListeners != null )
 		{
