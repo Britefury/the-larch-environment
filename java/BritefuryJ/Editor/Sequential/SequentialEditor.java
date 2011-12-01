@@ -12,6 +12,7 @@ import BritefuryJ.DocPresent.TextEditEvent;
 import BritefuryJ.DocPresent.TreeEventListener;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.TextSelection;
+import BritefuryJ.DocPresent.StreamValue.SequentialStreamValueVisitor;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.Editor.Sequential.EditListener.HandleEditResult;
 import BritefuryJ.IncrementalView.FragmentView;
@@ -31,6 +32,15 @@ public abstract class SequentialEditor
 	
 	
 	
+	protected static class ClearNeighbourEditEvent extends EditEvent
+	{
+		protected ClearNeighbourEditEvent(SequentialStreamValueVisitor streamValueVisitor)
+		{
+			super( streamValueVisitor );
+		}
+	}
+	
+	
 	protected class ClearStructuralValueListener implements TreeEventListener
 	{
 		@Override
@@ -39,7 +49,7 @@ public abstract class SequentialEditor
 			if ( event instanceof EditEvent )
 			{
 				EditEvent editEvent = (EditEvent)event;
-				if ( event instanceof TextEditEvent  ||  isSelectionEditEvent( editEvent )  ||  isEditEvent( editEvent ) )
+				if ( event instanceof TextEditEvent  ||  isSelectionEditEvent( editEvent )  ||  isEditEvent( editEvent )  ||  event instanceof ClearNeighbourEditEvent )
 				{
 					// If event is a selection edit event, and its source element is @element, then @element has had its fixed value
 					// set by a SequentialClipboardHandler - so don't clear it.
@@ -48,6 +58,36 @@ public abstract class SequentialEditor
 					{
 						editEvent.getStreamValueVisitor().ignoreElementFixedValue( element );
 					}
+				}
+			}
+			return false;
+		}
+	}
+	
+	
+	
+	protected static class ClearNeighbouringStructuralValueListener implements TreeEventListener
+	{
+		@Override
+		public boolean onTreeEvent(DPElement element, DPElement sourceElement, Object event)
+		{
+			if ( event instanceof TextEditEvent )
+			{
+				TextEditEvent editEvent = (TextEditEvent)event;
+				
+				DPElement prevNeighbourCommonAncestor = editEvent.getPrevNeighbourCommonAncestor();
+				DPElement nextNeighbourCommonAncestor = editEvent.getNextNeighbourCommonAncestor();
+				
+				ClearNeighbourEditEvent clearEvent = new ClearNeighbourEditEvent( editEvent.getStreamValueVisitor() );
+				
+				if ( prevNeighbourCommonAncestor != null  &&  prevNeighbourCommonAncestor.isInSubtreeRootedAt( element ) )
+				{
+					editEvent.getPrevNeighbour().postTreeEventUntil( clearEvent, element );
+				}
+
+				if ( nextNeighbourCommonAncestor != null  &&  nextNeighbourCommonAncestor.isInSubtreeRootedAt( element ) )
+				{
+					editEvent.getNextNeighbour().postTreeEventUntil( clearEvent, element );
 				}
 			}
 			return false;
@@ -114,6 +154,7 @@ public abstract class SequentialEditor
 	
 	
 	protected ClearStructuralValueListener clearListener = new ClearStructuralValueListener();
+	protected static ClearNeighbouringStructuralValueListener clearNeighbourListener = new ClearNeighbouringStructuralValueListener();
 	protected SequentialClipboardHandler clipboardHandler;
 	
 	
@@ -139,6 +180,11 @@ public abstract class SequentialEditor
 	public ClearStructuralValueListener getClearStructuralValueListener()
 	{
 		return clearListener;
+	}
+	
+	public static ClearNeighbouringStructuralValueListener getClearNeighbouringStructuralValueListener()
+	{
+		return clearNeighbourListener;
 	}
 	
 	

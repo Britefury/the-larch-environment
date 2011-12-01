@@ -11,9 +11,9 @@ public class TextEditEventReplace extends TextEditEvent
 	protected int position;
 	protected String originalText, replacement;
 	
-	public TextEditEventReplace(DPContentLeaf leaf, int position, String originalText, String replacement)
+	public TextEditEventReplace(DPContentLeaf leaf, DPContentLeaf prevNeighbour, DPContentLeaf nextNeighbour, int position, String originalText, String replacement)
 	{
-		super( leaf );
+		super( leaf, prevNeighbour, nextNeighbour );
 		
 		this.position = position;
 		this.originalText = originalText;

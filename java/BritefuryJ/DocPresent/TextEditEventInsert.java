@@ -11,9 +11,9 @@ public class TextEditEventInsert extends TextEditEvent
 	protected int position;
 	protected String textInserted;
 	
-	public TextEditEventInsert(DPContentLeaf leaf, int position, String textInserted)
+	public TextEditEventInsert(DPContentLeaf leaf, DPContentLeaf prevNeighbour, DPContentLeaf nextNeighbour, int position, String textInserted)
 	{
-		super( leaf );
+		super( leaf, prevNeighbour, nextNeighbour );
 		
 		this.position = position;
 		this.textInserted = textInserted;
