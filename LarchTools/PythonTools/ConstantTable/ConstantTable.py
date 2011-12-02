@@ -23,15 +23,15 @@ from Britefury.Util.TrackedList import TrackedListProperty
 
 import LarchCore.Languages.Python25.Schema as Py
 from LarchCore.Languages.Python25.PythonCommands import pythonCommands, makeInsertEmbeddedStatementAtCaretAction
-from LarchCore.Languages.Python25.Python25 import EmbeddedPython25
+from LarchCore.Languages.Python25.Python25 import EmbeddedPython25Target, EmbeddedPython25Expr
 from LarchCore.Languages.Python25.PythonEditor.View import perspective as pyPerspective
 
 
 
 class ConstantDefinition (object):
 	def __init__(self):
-		self._target = EmbeddedPython25.target()
-		self._value = EmbeddedPython25.expression()
+		self._target = EmbeddedPython25Target()
+		self._value = EmbeddedPython25Expr()
 		self._incr = IncrementalValueMonitor()
 		self.__change_history__ = None
 		
@@ -156,16 +156,16 @@ class ConstantTable (object):
 
 
 def _targetFromText(text):
-	return EmbeddedPython25.targetFromText( text )
+	return EmbeddedPython25Target.fromText( text )
 
 def _defaultTarget():
-	return EmbeddedPython25.target()
+	return EmbeddedPython25Target()
 
 def _valueFromText(text):
-	return EmbeddedPython25.expressionFromText( text )
+	return EmbeddedPython25Expr.fromText( text )
 
 def _defaultValue():
-	return EmbeddedPython25.expression()
+	return EmbeddedPython25Expr()
 
 
 _targetColumn = AttributeColumn( 'Name', 'target', _targetFromText, _defaultTarget )

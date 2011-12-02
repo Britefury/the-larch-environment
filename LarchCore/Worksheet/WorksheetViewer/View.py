@@ -42,7 +42,6 @@ from BritefuryJ.Projection import Perspective, Subject
 
 from LarchCore.Languages.Python25 import Python25
 from LarchCore.Languages.Python25.CodeGenerator import compileForModuleExecution
-from LarchCore.Languages.Python25.Execution.ExecutionPresCombinators import executionResultBox, minimalExecutionResultBox
 
 from LarchCore.Worksheet import Schema
 from LarchCore.Worksheet.WorksheetViewer import ViewSchema
@@ -142,18 +141,13 @@ class WorksheetViewer (ObjectDispatchView):
 			executionResultView = None
 			executionResult = node.getResult()
 			if executionResult is not None:
-				if node.isResultVisible():
-					stdout = executionResult.getStdOut()
-					result = executionResult.getResult()
-				else:
-					stdout = None
-					result = None
-				exc = executionResult.getCaughtException()
+				if not node.isResultVisible():
+					executionResult = executionResult.suppressStdOut().suppressResult()
 				if node.isCodeVisible():
-					executionResultView = executionResultBox( stdout, executionResult.getStdErr(), exc, result, True, True )
+					executionResultView = executionResult.view()
 				else:
-					executionResultView = minimalExecutionResultBox( stdout, executionResult.getStdErr(), exc, result, True, True )
-			
+					executionResultView = executionResult.minimalView()
+
 			if node.isResultMinimal():
 				return executionResultView.alignHExpand()   if executionResultView is not None   else Blank()
 			else:

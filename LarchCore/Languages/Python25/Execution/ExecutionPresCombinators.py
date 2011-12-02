@@ -62,11 +62,11 @@ def _streamLines(labelText, stream, textStyleAttribute, bUseDefaultPerspectiveFo
 	return Column( [ label, Column( lines ).padX( 5.0, 0.0 ) ] )
 
 
-def execStdout(text, bUseDefaultPerspectiveForResult):
-	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdOutStyle, Border( _streamLines( 'STDOUT:', text, ExecutionStyle.stdOutStyle, bUseDefaultPerspectiveForResult ).alignHExpand() ).alignHExpand() )
+def execStdout(stream, bUseDefaultPerspectiveForResult):
+	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdOutStyle, Border( _streamLines( 'STDOUT:', stream, ExecutionStyle.stdOutStyle, bUseDefaultPerspectiveForResult ).alignHExpand() ).alignHExpand() )
 
-def execStderr(text, bUseDefaultPerspectiveForResult):
-	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdErrStyle, Border( _streamLines( 'STDERR:', text, ExecutionStyle.stdErrStyle, bUseDefaultPerspectiveForResult ).alignHExpand() ).alignHExpand() )
+def execStderr(stream, bUseDefaultPerspectiveForResult):
+	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdErrStyle, Border( _streamLines( 'STDERR:', stream, ExecutionStyle.stdErrStyle, bUseDefaultPerspectiveForResult ).alignHExpand() ).alignHExpand() )
 	
 def execException(exceptionView):
 	label = ApplyStyleSheetFromAttribute( ExecutionStyle.labelStyle, StaticText( 'EXCEPTION:' ) )
@@ -99,8 +99,8 @@ def executionResultBox(stdoutStream, stderrStream, exception, resultInTuple, bUs
 		return None
 
 
-def minimalExecutionResultBox(stdoutText, stderrText, exception, resultInTuple, bUseDefaultPerspecitveForException, bUseDefaultPerspectiveForResult):
-	if stdoutText is None  and  stderrText is None  and  exception is None:
+def minimalExecutionResultBox(stdoutStream, stderrStream, exception, resultInTuple, bUseDefaultPerspecitveForException, bUseDefaultPerspectiveForResult):
+	if stdoutStream is None  and  stderrStream is None  and  exception is None:
 		if resultInTuple is None:
 			return None
 		else:
@@ -110,15 +110,15 @@ def minimalExecutionResultBox(stdoutText, stderrText, exception, resultInTuple, 
 			return Paragraph( [ resultView ] ).alignHExpand()
 	else:
 		boxContents = []
-		if stderrText is not None:
-			boxContents.append( execStderr( stderrText, bUseDefaultPerspectiveForResult ) )
+		if stderrStream is not None:
+			boxContents.append( execStderr( stderrStream, bUseDefaultPerspectiveForResult ) )
 		if exception is not None:
 			exceptionView = InnerFragment( exception )
 			if bUseDefaultPerspecitveForException:
 				exceptionView = ApplyPerspective.defaultPerspective( exceptionView )
 			boxContents.append( execException( exceptionView ) )
-		if stdoutText is not None:
-			boxContents.append( execStdout( stdoutText, bUseDefaultPerspectiveForResult ) )
+		if stdoutStream is not None:
+			boxContents.append( execStdout( stdoutStream, bUseDefaultPerspectiveForResult ) )
 		if resultInTuple is not None:
 			resultView = InnerFragment( resultInTuple[0] ).alignHPack()
 			if bUseDefaultPerspectiveForResult:
