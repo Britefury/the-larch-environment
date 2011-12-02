@@ -1071,7 +1071,11 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 
 	
 	
-	
+
+def compileForEvaluation(pythonExpression, filename):
+	return Python25CodeGenerator( filename ).compileForEvaluation( pythonExpression )
+
+
 def compileForExecution(pythonModule, filename):
 	return Python25CodeGenerator( filename ).compileForExecution( pythonModule )
 

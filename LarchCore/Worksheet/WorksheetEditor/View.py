@@ -49,7 +49,6 @@ from BritefuryJ.Editor.Sequential import SequentialEditorPerspective
 from BritefuryJ.Editor.Sequential.Item import *
 
 from LarchCore.Languages.Python25 import Python25
-from LarchCore.Languages.Python25.Execution.ExecutionPresCombinators import executionResultBox, minimalExecutionResultBox
 
 from LarchCore.Worksheet.WorksheetEditor import EditorSchema
 from LarchCore.Worksheet.WorksheetEditor.RichTextEditor import WorksheetRichTextEditor
@@ -408,14 +407,9 @@ class WorksheetEditor (ObjectDispatchView):
 		executionResultView = None
 		executionResult = node.getResult()
 		if executionResult is not None:
-			if node.isResultVisible():
-				stdout = executionResult.getStdOut()
-				result = executionResult.getResult()
-			else:
-				stdout = None
-				result = None
-			exc = executionResult.getCaughtException()
-			executionResultView = executionResultBox( stdout, executionResult.getStdErr(), exc, result, True, True )
+			if not node.isResultVisible():
+				executionResult = executionResult.suppressStdOut().suppressResult()
+			executionResultView = executionResult.view()
 			
 			
 		optionTexts = [ 'Minimal result', 'Result', 'Code with result', 'Code', 'Editable code with result', 'Editable code', 'Hidden' ]

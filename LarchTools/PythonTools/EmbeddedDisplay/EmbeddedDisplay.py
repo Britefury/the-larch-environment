@@ -31,14 +31,14 @@ from BritefuryJ.StyleSheet import *
 
 from LarchCore.Languages.Python25.PythonCommands import pythonCommands, makeInsertEmbeddedExpressionAtCaretAction, makeWrapSelectionInEmbeddedExpressionAction,	\
 	makeWrapSelectedStatementRangeInEmbeddedObjectAction, chainActions
-from LarchCore.Languages.Python25.Python25 import EmbeddedPython25
+from LarchCore.Languages.Python25.Python25 import EmbeddedPython25Expr, EmbeddedPython25Suite
 from LarchCore.Languages.Python25 import Schema
 
 
 
 class EmbeddedDisplay (object):
 	def __init__(self):
-		self._expr = EmbeddedPython25.expression()
+		self._expr = EmbeddedPython25Expr()
 		self._code = None
 		self._values = []
 		self._incr = IncrementalValueMonitor()
@@ -237,7 +237,7 @@ class _TreeView (object):
 
 class EmbeddedSuiteDisplay (object):
 	def __init__(self):
-		self._suite = EmbeddedPython25.suite()
+		self._suite = EmbeddedPython25Suite()
 		self._code = None
 		self._incr = IncrementalValueMonitor()
 		self.__change_history__ = None
@@ -356,7 +356,7 @@ class NamedValue (object):
 	
 	def __init__(self):
 		self._name = 'value'
-		self._expr = EmbeddedPython25.expression()
+		self._expr = EmbeddedPython25Expr()
 		self._suite = None
 		self._code = None
 		self._incr = IncrementalValueMonitor()

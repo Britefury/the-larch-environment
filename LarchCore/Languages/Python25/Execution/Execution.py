@@ -14,6 +14,7 @@ from BritefuryJ.DocPresent.StreamValue import StreamValueBuilder
 from BritefuryJ.Util import InvokePyFunction
 
 from LarchCore.Languages.Python25 import CodeGenerator
+from LarchCore.Languages.Python25.Execution import ExecutionPresCombinators
 
 
 class _OutputStream (object):
@@ -45,7 +46,20 @@ class ExecutionResult (object):
 		self._stderr = stderr
 		self._caughtException = caughtException
 		self._result = result
-		
+
+
+	def suppressStdOut(self):
+		return ExecutionResult( None, self._stderr, self._caughtException, self._result )
+
+	def suppressStdErr(self):
+		return ExecutionResult( self._stdout, None, self._caughtException, self._result )
+
+	def suppressCaughtException(self):
+		return ExecutionResult( self._stdout, self._stderr, None, self._result )
+
+	def suppressResult(self):
+		return ExecutionResult( self._stdout, self._stderr, self._caughtException, None )
+
 		
 		
 	def getStdOut(self):
@@ -61,11 +75,19 @@ class ExecutionResult (object):
 		return self._result
 
 
+	def view(self, bUseDefaultPerspecitveForException=True, bUseDefaultPerspectiveForResult=True):
+		return ExecutionPresCombinators.executionResultBox( self._stdout, self._stderr, self._caughtException, self._result, bUseDefaultPerspecitveForException, bUseDefaultPerspectiveForResult )
+
+
+	def minimalView(self, bUseDefaultPerspecitveForException=True, bUseDefaultPerspectiveForResult=True):
+		return ExecutionPresCombinators.minimalExecutionResultBox( self._stdout, self._stderr, self._caughtException, self._result, bUseDefaultPerspecitveForException, bUseDefaultPerspectiveForResult )
+
+
 
 	
 	
 	
-def executePythonModule(pythonModule, module, bEvaluate):
+def executeWithinModule(pythonModule, module, bEvaluate):
 	stdout = _OutputStream()
 	stderr = _OutputStream()
 	
