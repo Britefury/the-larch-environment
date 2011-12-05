@@ -327,7 +327,7 @@ def joinStreamsForInsertion(commonRootCtx, before, insertion, after):
 
 class _InsertSpecialFormTreeEvent (TextEditEvent):
 	def __init__(self, leaf):
-		super( _InsertSpecialFormTreeEvent, self ).__init__( leaf )
+		super( _InsertSpecialFormTreeEvent, self ).__init__( leaf, None, None )
 
 
 def insertSpecialFormAtMarker(marker, specialForm):

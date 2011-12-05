@@ -392,6 +392,9 @@ class TestCase_JavaGrammar (ParserTestCase.ParserTestCase):
 		self._parseStringTest( g.typeExpression(), 'Vector<ArrayList<Integer>>', Schema.GenericTypeExp( target='Vector', args=[ Schema.GenericTypeExp( target='ArrayList', args=[ Schema.ClassOrInterfaceTypeRef( name='Integer' ) ] ) ] ) )
 		self._parseStringTest( g.typeExpression(), 'ArrayList<Integer[]>', Schema.GenericTypeExp( target='ArrayList', args=[ Schema.ArrayTypeExp( itemTypeExp=Schema.ClassOrInterfaceTypeRef( name='Integer' ) ) ] ) )
 		self._parseStringTest( g.typeExpression(), 'ArrayList<int[]>', Schema.GenericTypeExp( target='ArrayList', args=[ Schema.ArrayTypeExp( itemTypeExp=Schema.IntTypeRef() ) ] ) )
+		self._parseStringTest( g.typeExpression(), 'ArrayList<? extends Q>', Schema.GenericTypeExp( target='ArrayList', args=[ Schema.WildCardTypeArgument( extendsOrSuper='extends', typeExp=Schema.ClassOrInterfaceTypeRef( name='Q' ) ) ] ) )
+		self._parseStringTest( g.typeExpression(), 'ArrayList<? super Q>', Schema.GenericTypeExp( target='ArrayList', args=[ Schema.WildCardTypeArgument( extendsOrSuper='super', typeExp=Schema.ClassOrInterfaceTypeRef( name='Q' ) ) ] ) )
+		self._parseStringTest( g.typeExpression(), 'ArrayList<?>', Schema.GenericTypeExp( target='ArrayList', args=[ Schema.WildCardTypeArgument( extendsOrSuper='super', typeExp=Schema.ClassOrInterfaceTypeRef( name='Q' ) ) ] ) )
 		self._parseStringFailTest( g.typeExpression(), 'ArrayList<int>' )
 
 		
@@ -400,6 +403,7 @@ class TestCase_JavaGrammar (ParserTestCase.ParserTestCase):
 		self._parseStringTest( g.typeExpression(), 'float []', Schema.ArrayTypeExp( itemTypeExp=Schema.FloatTypeRef() ) )
 		self._parseStringTest( g.typeExpression(), 'float [][]', Schema.ArrayTypeExp( itemTypeExp=Schema.ArrayTypeExp( itemTypeExp=Schema.FloatTypeRef() ) ) )
 		self._parseStringTest( g.typeExpression(), 'ArrayList []', Schema.ArrayTypeExp( itemTypeExp=Schema.ClassOrInterfaceTypeRef( name='ArrayList' ) ) )
+		self._parseStringTest( g.typeExpression(), 'ArrayList<Integer> []', Schema.ArrayTypeExp( itemTypeExp=Schema.GenericTypeExp( target='ArrayList', args=[ Schema.ClassOrInterfaceTypeRef( name='Integer' ) ] ) ) )
 		self._parseStringTest( g.typeExpression(), 'java.util.List []', Schema.ArrayTypeExp( itemTypeExp=Schema.MemberTypeExp( target=Schema.MemberTypeExp( target=Schema.ClassOrInterfaceTypeRef( name='java' ), member=Schema.ClassOrInterfaceTypeRef( name='util' ) ), member=Schema.ClassOrInterfaceTypeRef( name='List' ) ) ) )
 		
 		

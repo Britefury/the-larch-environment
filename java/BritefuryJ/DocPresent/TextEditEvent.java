@@ -20,6 +20,11 @@ public abstract class TextEditEvent extends EditEvent
 		this.nextNeighbour = nextNeighbour;
 	}
 	
+	public TextEditEvent(DPContentLeaf leaf)
+	{
+		this( leaf, null, null );
+	}
+	
 	
 	public DPContentLeaf getLeaf()
 	{

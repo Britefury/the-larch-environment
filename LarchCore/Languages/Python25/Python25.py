@@ -63,7 +63,7 @@ class EmbeddedPython25 (object):
 			self._perspective = perspective
 
 		def __present__(self, fragment, inheritedState):
-			return self.perspective( self._embeddedPy.model )
+			return self._perspective( self._embeddedPy.model )
 
 
 	def __init__(self, model):
@@ -159,7 +159,7 @@ class EmbeddedPython25Expr (EmbeddedPython25):
 
 
 	def evaluate(self, globals, locals):
-		return eval( self.compileForEvaluation( '<expr>', globals, locals ) )
+		return eval( self.compileForEvaluation( '<expr>' ), globals, locals )
 
 
 	@staticmethod
@@ -180,13 +180,21 @@ class EmbeddedPython25Executable (EmbeddedPython25):
 		return CodeGenerator.compileForExecution( self.model, filename )
 
 	def compileForExecutionAndEvaluation(self, filename):
-		return CodeGenerator.compileForExecution( self.model, filename )
+		return CodeGenerator.compileForExecutionAndEvaluation( self.model, filename )
 
-	def compileForModuleExecution(self, module, filename):
-		return CodeGenerator.compileForExecution( module, self.model, filename )
+	def compileForModuleExecution(self, module, filename=None):
+		if filename is None:
+			filename = module.__file__
+		if filename is None:
+			filename = self.__python_code_type__
+		return CodeGenerator.compileForModuleExecution( module, self.model, filename )
 
-	def compileForModuleExecutionAndEvaluation(self, module, filename):
-		return CodeGenerator.compileForExecution( module, self.model, filename )
+	def compileForModuleExecutionAndEvaluation(self, module, filename=None):
+		if filename is None:
+			filename = module.__file__
+		if filename is None:
+			filename = self.__python_code_type__
+		return CodeGenerator.compileForModuleExecutionAndEvaluation( module, self.model, filename )
 
 
 	def executeWithinModule(self, module):

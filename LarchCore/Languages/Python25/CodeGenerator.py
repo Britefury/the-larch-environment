@@ -929,16 +929,6 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 	# Quote and Unquote
 	@DMObjectNodeDispatchMethod( Schema.Quote )
 	def Quote(self, node, value):
-		if isinstance( value, DMObject ):
-			if value.isInstanceOf( Schema.PythonExpression ):
-				value = value['expr']
-			elif value.isInstanceOf( Schema.PythonSuite ):
-				value = value['suite']
-			else:
-				raise TypeError, 'Contents of \'quote\' should be a PythonExpression or a PythonSuite'
-		else:
-			raise TypeError, 'Value of \'quote\' should be a DMObject'
-
 		return self._quotedNode( value )
 	
 	
