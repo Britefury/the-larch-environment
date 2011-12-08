@@ -9,8 +9,6 @@ __author__ = 'Geoff'
 
 from BritefuryJ.Controls import RealSpinEntry
 
-import LarchCore.Languages.Python25.Builder as PyBuilder
-
 from LarchTools.EmbeddedData.Model import Model
 from LarchTools.EmbeddedData.Editor import Editor
 

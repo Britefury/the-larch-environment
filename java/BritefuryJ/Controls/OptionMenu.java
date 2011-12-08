@@ -8,7 +8,6 @@ package BritefuryJ.Controls;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Event.AbstractPointerButtonEvent;
@@ -18,6 +17,9 @@ import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Interactor.ClickElementInteractor;
 import BritefuryJ.DocPresent.Interactor.HoverElementInteractor;
 import BritefuryJ.DocPresent.Painter.Painter;
+import BritefuryJ.Live.LiveFunction;
+import BritefuryJ.Live.LiveInterface;
+import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Arrow;
@@ -95,23 +97,21 @@ public class OptionMenu extends ControlPres
 
 		private DPBorder element;
 		private BritefuryJ.DocPresent.Border.AbstractBorder optionMenuBorder, optionMenuHoverBorder;
-		private DPBin choiceContainer;
 		private PopupMenu choiceMenu;
 		private Pres choices[];
-		private int currentChoice;
+		private LiveInterface currentChoice;
 		private OptionMenuListener listener;
 		
 		
-		protected OptionMenuControl(PresentationContext ctx, StyleValues style, DPBorder element, DPBin choiceContainer, Pres choices[], int initialChoice, OptionMenuListener listener,
+		protected OptionMenuControl(PresentationContext ctx, StyleValues style, DPBorder element, Pres choices[], LiveInterface currentChoice, OptionMenuListener listener,
 				BritefuryJ.DocPresent.Border.AbstractBorder optionMenuBorder, BritefuryJ.DocPresent.Border.AbstractBorder optionMenuHoverBorder)
 		{
 			super( ctx, style );
 			this.element = element;
 			this.optionMenuBorder = optionMenuBorder;
 			this.optionMenuHoverBorder = optionMenuHoverBorder;
-			this.choiceContainer = choiceContainer;
 			this.choices = choices;
-			currentChoice = initialChoice;
+			this.currentChoice = currentChoice;
 			this.listener = listener;
 			
 			element.addElementInteractor( new OptionMenuInteractor() );
@@ -145,23 +145,17 @@ public class OptionMenu extends ControlPres
 		
 		public int getChoice()
 		{
-			return currentChoice;
+			return (Integer)currentChoice.getStaticValue();
 		}
 		
-		public void setChoice(int choice)
+		private void setChoice(int choice)
 		{
-			if ( choice != currentChoice )
+			int current = getChoice();
+			if ( choice != current )
 			{
-				int oldChoice = currentChoice;
-				currentChoice = choice;
-				
-				Pres newChoiceContainer = new Bin( choices[currentChoice] );
-				DPBin newChoiceContainerElement = (DPBin)newChoiceContainer.present( ctx, style );
-				choiceContainer.replaceWith( newChoiceContainerElement );
-				choiceContainer = newChoiceContainerElement;
-				
-				element.setFixedValue( currentChoice );
-				listener.onOptionMenuChoice( this, oldChoice, currentChoice );
+				int oldChoice = current;
+				currentChoice.setLiteralValue( choice );
+				listener.onOptionMenuChoice( this, oldChoice, choice );
 			}
 		}
 	}
@@ -169,19 +163,42 @@ public class OptionMenu extends ControlPres
 	
 	
 	
+	private static class CommitListener implements OptionMenuListener
+	{
+		private LiveValue value;
+		
+		public CommitListener(LiveValue value)
+		{
+			this.value = value;
+		}
+		
+		@Override
+		public void onOptionMenuChoice(OptionMenuControl optionMenu, int previousChoice, int choice)
+		{
+			value.setLiteralValue( choice );
+		}
+	}
+	
+	
 
 	private Pres choices[];
-	private int initialChoice;
+	private LiveSource valueSource;
 	private OptionMenuListener listener;
 	
 	
 	
+	private OptionMenu(Pres choices[], LiveSource valueSource, OptionMenuListener listener)
+	{
+		this.choices = choices;
+		this.valueSource = valueSource;
+		this.listener = listener;
+	}
+
+	
 	
 	private OptionMenu(Pres choices[], int initialChoice, OptionMenuListener listener)
 	{
-		this.choices = choices;
-		this.initialChoice = initialChoice;
-		this.listener = listener;
+		this( choices, new LiveSourceValue( initialChoice ), listener );
 	}
 
 	public OptionMenu(List<Object> choices, int initialChoice, OptionMenuListener listener)
@@ -195,29 +212,74 @@ public class OptionMenu extends ControlPres
 	}
 	
 	
+	private OptionMenu(Pres choices[], LiveInterface value, OptionMenuListener listener)
+	{
+		this( choices, new LiveSourceRef( value ), listener );
+	}
+
+	public OptionMenu(List<Object> choices, LiveInterface value, OptionMenuListener listener)
+	{
+		this( mapCoerce( choices ), value, listener );
+	}
+
+	public OptionMenu(Object choices[], LiveInterface value, OptionMenuListener listener)
+	{
+		this( mapCoerce( choices ), value, listener );
+	}
+	
+	
+	private OptionMenu(Pres choices[], LiveValue value)
+	{
+		this( choices, new LiveSourceRef( value ), new CommitListener( value ) );
+	}
+
+	public OptionMenu(List<Object> choices, LiveValue value)
+	{
+		this( mapCoerce( choices ), value );
+	}
+
+	public OptionMenu(Object choices[], LiveValue value)
+	{
+		this( mapCoerce( choices ), value );
+	}
+	
+	
 	
 	
 	
 	@Override
 	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
-		StyleValues usedStyle = Controls.useOptionMenuAttrs( style );
+		final StyleValues usedStyle = Controls.useOptionMenuAttrs( style );
 
 		StyleSheet arrowStyle = StyleSheet.style( Primitive.shapePainter.as( style.get( Controls.optionMenuArrowPainter, Painter.class ) ) );
 		double arrowSize = style.get( Controls.optionMenuArrowSize, Double.class );
 		Pres arrow = arrowStyle.applyTo( new Arrow( Arrow.Direction.DOWN, arrowSize ) );
 		
-		Pres choiceBin = new Bin( new Bin( choices[initialChoice] ) );
-		DPBin choiceContainer = (DPBin)choiceBin.present( ctx, usedStyle );
+		final LiveInterface value = valueSource.getLive();
+
+		LiveFunction.Function optionCurrentFn = new LiveFunction.Function()
+		{
+			@Override
+			public Object evaluate()
+			{
+				int val = (Integer)value.getValue();
+				Pres p = usedStyle.applyTo( new Bin( choices[val] ) );
+				p = p.withFixedValue( val );
+				return p;
+			}
+		};
+		
+		LiveFunction optionCurrentLive = new LiveFunction( optionCurrentFn );
 		
 		BritefuryJ.DocPresent.Border.AbstractBorder border = style.get( Controls.optionMenuBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class );
 		BritefuryJ.DocPresent.Border.AbstractBorder hoverBorder = style.get( Controls.optionMenuHoverBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class );
 		StyleSheet optionStyle = StyleSheet.style( Primitive.rowSpacing.as( style.get( Controls.optionMenuContentsSpacing, Double.class ) ), Primitive.border.as( border ) );
-		Pres optionContents = new Row( new Pres[] { coerce( choiceContainer ).alignHExpand(), arrow.alignHPack().alignVCentre() } );
+		Pres optionContents = new Row( new Pres[] { coerce( optionCurrentLive ).alignHExpand(), arrow.alignHPack().alignVCentre() } );
 		Pres optionMenu = optionStyle.applyTo( new Border( optionContents ) ); 
 		DPBorder optionMenuElement = (DPBorder)optionMenu.present( ctx, style );
 		
 		
-		return new OptionMenuControl( ctx, style, optionMenuElement, choiceContainer, choices, initialChoice, listener, border, hoverBorder );
+		return new OptionMenuControl( ctx, style, optionMenuElement, choices, value, listener, border, hoverBorder );
 	}
 }

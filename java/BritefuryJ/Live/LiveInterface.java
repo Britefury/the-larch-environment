@@ -8,15 +8,13 @@
 package BritefuryJ.Live;
 
 
-import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.DefaultPerspective.PrimitivePresenter;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementValueFunction;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
-import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.ApplyPerspective;
+import BritefuryJ.Pres.CompositePres;
 import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
@@ -25,7 +23,7 @@ import BritefuryJ.StyleSheet.StyleValues;
 
 
 
-public abstract class LiveInterface implements Presentable
+public abstract class LiveInterface extends CompositePres
 {
 	protected static class ElementValueFn implements ElementValueFunction
 	{
@@ -115,7 +113,7 @@ public abstract class LiveInterface implements Presentable
 	
 	
 	@Override
-	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
+	public Pres pres(PresentationContext ctx, StyleValues style)
 	{
 		return new InnerFragment( new ValuePres( this ) );
 	}
