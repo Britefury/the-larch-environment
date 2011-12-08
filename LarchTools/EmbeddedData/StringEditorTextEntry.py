@@ -7,16 +7,16 @@
 ##-*************************
 __author__ = 'Geoff'
 
-from BritefuryJ.Controls import TextArea
+from BritefuryJ.Controls import TextEntry
 
 from LarchTools.EmbeddedData.Model import Model
 from LarchTools.EmbeddedData.Editor import Editor
 
 
 
-class StringEditorTextArea (Editor):
+class StringEditorTextEntry (Editor):
 	def __init__(self, model=None, value=''):
-		super( StringEditorTextArea, self ).__init__( model, value )
+		super( StringEditorTextEntry, self ).__init__( model, value )
 
 
 	def _newModel(self, value):
@@ -26,4 +26,4 @@ class StringEditorTextArea (Editor):
 
 
 	def __present__(self, fragment, inheritedState):
-		return TextArea(self._model.liveValue)
+		return TextEntry(self._model.liveValue)

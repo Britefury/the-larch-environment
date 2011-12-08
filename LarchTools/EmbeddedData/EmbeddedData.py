@@ -12,6 +12,7 @@ from LarchCore.Languages.Python25.PythonCommands import pythonCommands, makeInse
 
 from LarchTools.EmbeddedData.IntEditorSpinEntry import IntEditorSpinEntry
 from LarchTools.EmbeddedData.RealEditorSpinEntry import RealEditorSpinEntry
+from LarchTools.EmbeddedData.StringEditorTextEntry import StringEditorTextEntry
 from LarchTools.EmbeddedData.StringEditorTextArea import StringEditorTextArea
 
 
@@ -20,7 +21,7 @@ def _newIntSpinEntryAtCaret(caret):
 	return IntEditorSpinEntry()
 
 _intSpinAtCaret = makeInsertEmbeddedExpressionAtCaretAction( _newIntSpinEntryAtCaret )
-_intSpinCommand = Command( '&Int &Spin &Entry', _intSpinAtCaret )
+_intSpinCommand = Command( '&Integer &Spin &Entry', _intSpinAtCaret )
 
 
 def _newRealSpinEntryAtCaret(caret):
@@ -30,6 +31,13 @@ _realSpinAtCaret = makeInsertEmbeddedExpressionAtCaretAction( _newRealSpinEntryA
 _realSpinCommand = Command( '&Real &Spin &Entry', _realSpinAtCaret )
 
 
+def _newTextEntryAtCaret(caret):
+	return StringEditorTextEntry()
+
+_textEntryAtCaret = makeInsertEmbeddedExpressionAtCaretAction( _newTextEntryAtCaret )
+_textEntryCommand = Command( '&Text &Entry', _textEntryAtCaret )
+
+
 def _newTextAreaAtCaret(caret):
 	return StringEditorTextArea()
 
@@ -37,6 +45,6 @@ _textAreaAtCaret = makeInsertEmbeddedExpressionAtCaretAction( _newTextAreaAtCare
 _textAreaCommand = Command( '&Text &Area', _textAreaAtCaret )
 
 
-_edCommands = CommandSet( 'LarchTools.EmbeddedData', [ _intSpinCommand, _realSpinCommand, _textAreaCommand ] )
+_edCommands = CommandSet( 'LarchTools.EmbeddedData', [ _intSpinCommand, _realSpinCommand, _textEntryCommand, _textAreaCommand ] )
 
 pythonCommands.registerCommandSet( _edCommands )

@@ -7,12 +7,12 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import BritefuryJ.Controls.OptionMenu;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.Pres.ElementRef;
+import BritefuryJ.Live.LiveFunction;
+import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Label;
+import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Pres.Primitive.SpaceBin;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.RichText.Heading2;
@@ -33,38 +33,28 @@ public class OptionMenuTestPage extends SystemPage
 	{
 		return "Option menu control: choose from a list";
 	}
-	
-	
-	private static class OptionMenuTextChanger implements OptionMenu.OptionMenuListener
-	{
-		private ElementRef textElementRef;
-		
-		
-		public OptionMenuTextChanger(ElementRef textElementRef)
-		{
-			this.textElementRef = textElementRef;
-		}
-
-
-		public void onOptionMenuChoice(OptionMenu.OptionMenuControl optionMenu, int previousChoice, int choice)
-		{
-			for (DPElement element: textElementRef.getElements())
-			{
-				((DPText)element).setText( String.valueOf( choice ) );
-			}
-		}
-	}
 
 	
 
 	protected Pres createContents()
 	{
-		ElementRef choiceTextRef = new Label( "0" ).elementRef();
+		final LiveValue value = new LiveValue( 0 );
+		LiveFunction.Function fn = new LiveFunction.Function()
+		{
+			@Override
+			public Object evaluate()
+			{
+				return new Label( value.getValue().toString() );
+			}
+		};
+		
+		LiveFunction f = new LiveFunction( fn );
+		
+		
 		Pres choices[] = new Pres[] { new Label( "Zero" ), new Label( "One" ), new Label( "Two" ), new Label( "Three" ), new Label( "Four" ) };
-		OptionMenuTextChanger listener = new OptionMenuTextChanger( choiceTextRef );
-		OptionMenu optionMenu = new OptionMenu( choices, 0, listener );
+		OptionMenu optionMenu = new OptionMenu( choices, value );
 		Pres optionMenuBox = new SpaceBin( optionMenu.alignHExpand(), 100.0, -1.0 ).padX( 5.0 );
-		Pres optionMenuSectionContents = new Column( new Pres[] { choiceTextRef, optionMenuBox } );
+		Pres optionMenuSectionContents = new Column( new Object[] { new Row( new Object[] { new Label( "Value = " ), f } ), optionMenuBox } );
 		
 		return new Body( new Pres[] { new Heading2( "Option menu" ), optionMenuSectionContents } );
 	}
