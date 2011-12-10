@@ -73,7 +73,7 @@ class ProjectDrag (Object):
 
 
 def _getModelOfPackageOrPageNameElement(element):
-	return element.getFragmentContext().getParent().getModel()
+	return element.getFragmentContext().getParent().getParent().getModel()
 
 def _getModelOfProjectNameElement(element):
 	return element.getFragmentContext().getModel()
