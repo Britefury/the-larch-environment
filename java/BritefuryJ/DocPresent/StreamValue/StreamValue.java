@@ -15,16 +15,15 @@ import org.python.core.PySlice;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
+import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;
-import BritefuryJ.Pres.ObjectPres.ObjectPresStyle;
 import BritefuryJ.Pres.ObjectPres.ObjectBox;
+import BritefuryJ.Pres.ObjectPres.ObjectPresStyle;
 import BritefuryJ.Pres.ObjectPres.UnescapedStringAsSpan;
-import BritefuryJ.Pres.Primitive.Border;
 import BritefuryJ.Pres.Primitive.Paragraph;
-import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleSheet;
 
 public class StreamValue implements Presentable
@@ -224,11 +223,11 @@ public class StreamValue implements Presentable
 		@Override
 		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
-			return borderStyle.applyTo( new Border( new InnerFragment( structuralValue ) ) );
+			return itemBorder.surround( new InnerFragment( structuralValue ) );
 		}
 
 
-		private static StyleSheet borderStyle = StyleSheet.style( Primitive.border.as( new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.15f, 0.25f, 0.75f ), null ) ) );
+		private static AbstractBorder itemBorder = new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.15f, 0.25f, 0.75f ), null );
 	}
 	
 	

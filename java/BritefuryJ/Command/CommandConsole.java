@@ -18,6 +18,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.PageController;
 import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.TreeEventListener;
+import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.Browser.BrowserPage;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
@@ -27,7 +28,6 @@ import BritefuryJ.DocPresent.Target.Target;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.Pres.Pres;
-import BritefuryJ.Pres.Primitive.Border;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Row;
@@ -171,7 +171,7 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			Pres contents = new Row( new Object[] { new Label( name + " FAILED  " ), new Hyperlink( "SHOW ERROR", listener ) } );
-			return new Row( new Object[] { cmdFailStyle.applyTo( new Border( contents ) ), new Text( "" ) } );
+			return new Row( new Object[] { cmdFailBorder.surround( cmdFailStyle.applyTo( contents ) ), new Text( "" ) } );
 		}
 	}
 	
@@ -219,7 +219,7 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		listeners = PresentationStateListenerList.addListener( listeners, fragment );
-		Pres prompt = promptStyle.applyTo( new Border( new Label( "Cmd:" ) ) );
+		Pres prompt = promptBorder.surround( new Label( "Cmd:" ) );
 		
 		return cmdRowStyle.applyTo( new Row( new Object[] { prompt, contents } ).alignHPack().alignVRefY().withTreeEventListener( treeEventListener ) );
 	}
@@ -367,7 +367,8 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 	}
 
 
-	private static final StyleSheet promptStyle = StyleSheet.style( Primitive.border.as( Command.cmdBorder( new Color( 0.5f, 0.5f, 0.5f ), new Color( 0.9f, 0.9f, 0.9f ) ) ) );
-	private static final StyleSheet cmdFailStyle = StyleSheet.style( Primitive.border.as( Command.cmdBorder( new Color( 1.0f, 0.0f, 0.0f ), new Color( 1.0f, 0.85f, 0.85f ) ) ), Primitive.foreground.as( new Color( 0.7f, 0.0f, 0.0f ) ) );
+	private static final AbstractBorder promptBorder = Command.cmdBorder( new Color( 0.5f, 0.5f, 0.5f ), new Color( 0.9f, 0.9f, 0.9f ) );
+	private static final AbstractBorder cmdFailBorder = Command.cmdBorder( new Color( 1.0f, 0.0f, 0.0f ), new Color( 1.0f, 0.85f, 0.85f ) );
+	private static final StyleSheet cmdFailStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.7f, 0.0f, 0.0f ) ) );
 	private static final StyleSheet cmdRowStyle = StyleSheet.style( Primitive.rowSpacing.as( 7.0 ) );
 }

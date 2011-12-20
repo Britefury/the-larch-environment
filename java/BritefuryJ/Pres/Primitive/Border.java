@@ -8,6 +8,7 @@ package BritefuryJ.Pres.Primitive;
 
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.Pres.Pres;
@@ -17,11 +18,18 @@ import BritefuryJ.StyleSheet.StyleValues;
 public class Border extends Pres
 {
 	private Pres child;
+	private AbstractBorder border;
 	
+	
+	public Border(Object child, AbstractBorder border)
+	{
+		this.child = coerce( child );
+		this.border = border;
+	}
 	
 	public Border(Object child)
 	{
-		this.child = coerce( child );
+		this( child, null );
 	}
 	
 
@@ -29,9 +37,19 @@ public class Border extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPBorder border = new DPBorder( Primitive.getBorderParams( style ), Primitive.containerParams.get( style ) );
-		StyleValues childStyle = Primitive.useContainerParams.get( Primitive.useBorderParams.get( style ) );
-		border.setChild( child.present( ctx, childStyle ).layoutWrap( childStyle.get( Primitive.hAlign, HAlignment.class ), childStyle.get( Primitive.vAlign, VAlignment.class ) ) );
-		return border;
+		if ( border != null )
+		{
+			DPBorder element = new DPBorder( border, Primitive.containerParams.get( style ) );
+			StyleValues childStyle = Primitive.useContainerParams.get( Primitive.useBorderParams.get( style ) );
+			element.setChild( child.present( ctx, childStyle ).layoutWrap( childStyle.get( Primitive.hAlign, HAlignment.class ), childStyle.get( Primitive.vAlign, VAlignment.class ) ) );
+			return element;
+		}
+		else
+		{
+			DPBorder element = new DPBorder( Primitive.getBorderParams( style ), Primitive.containerParams.get( style ) );
+			StyleValues childStyle = Primitive.useContainerParams.get( Primitive.useBorderParams.get( style ) );
+			element.setChild( child.present( ctx, childStyle ).layoutWrap( childStyle.get( Primitive.hAlign, HAlignment.class ), childStyle.get( Primitive.vAlign, VAlignment.class ) ) );
+			return element;
+		}
 	}
 }

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPProxy;
+import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
@@ -20,7 +21,6 @@ import BritefuryJ.Math.Point2;
 import BritefuryJ.Pres.ElementRef;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Bin;
-import BritefuryJ.Pres.Primitive.Border;
 import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Fraction;
 import BritefuryJ.Pres.Primitive.Label;
@@ -40,7 +40,7 @@ public class DndTestPage extends SystemPage
 	private static StyleSheet mathStyle = StyleSheet.style( Primitive.fontSize.as( 16 ), Primitive.editable.as( false ) );
 	private static StyleSheet paletteTitleStyle = mainStyle.withValues( Primitive.fontFace.as( "Serif" ), Primitive.fontBold.as( true ), Primitive.fontSize.as( 28 ) );
 	private static StyleSheet paletteSectionStyle = mainStyle.withValues( Primitive.fontFace.as( "Serif" ), Primitive.fontSize.as( 18 ) );
-	private static StyleSheet outlineStyle = mainStyle.withValues( Primitive.border.as( new SolidBorder( 2.0, 10.0, new Color( 0.6f, 0.7f, 0.8f ), null ) ) );
+	private static AbstractBorder outlineBorder = new SolidBorder( 2.0, 10.0, new Color( 0.6f, 0.7f, 0.8f ), null );
 
 	private static StyleSheet placeHolderStyle = mainStyle.withValues( Primitive.background.as( new FillPainter( new Color( 1.0f, 0.9f, 0.75f ) ) ) );
 	private static StyleSheet sourceStyle = mainStyle.withValues( Primitive.background.as( new FillPainter( new Color( 0.75f, 0.85f, 1.0f ) ) ) );
@@ -144,7 +144,7 @@ public class DndTestPage extends SystemPage
 		
 		Pres column = mainStyle.withValues( Primitive.columnSpacing.as( 10.0 ) ).applyTo( new Column( new Pres[] { title, textSection.alignHPack(), mathSection.alignHPack() } ) );
 		
-		return outlineStyle.applyTo( new Border( column ) ).pad( 20.0, 5.0 ).alignHExpand().alignVRefY();
+		return outlineBorder.surround( column ).pad( 20.0, 5.0 ).alignHExpand().alignVRefY();
 	}
 	
 	protected Pres makeFormula()

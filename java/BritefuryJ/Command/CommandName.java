@@ -10,11 +10,9 @@ import java.awt.Color;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
+import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
-import BritefuryJ.Pres.Primitive.Border;
-import BritefuryJ.Pres.Primitive.Primitive;
-import BritefuryJ.StyleSheet.StyleSheet;
 
 public class CommandName extends CommandMnemonic implements Presentable
 {
@@ -34,9 +32,9 @@ public class CommandName extends CommandMnemonic implements Presentable
 	@Override
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return cmdBorderStyle.applyTo( new Border( completePres ) );
+		return cmdBorder.surround( completePres );
 	}
 
 
-	private static final StyleSheet cmdBorderStyle = StyleSheet.style( Primitive.border.as( Command.cmdBorder( new Color( 0.0f, 0.7f, 0.0f ), new Color( 0.85f, 0.95f, 0.85f ) ) ) );
+	private static final AbstractBorder cmdBorder = Command.cmdBorder( new Color( 0.0f, 0.7f, 0.0f ), new Color( 0.85f, 0.95f, 0.85f ) );
 }

@@ -349,7 +349,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	
 	
-	public void markerInsert(int position, int length)
+	private void markerInsert(int position, int length)
 	{
 		WeakIdentityHashMap<Marker, Object> markers = getMarkersForLeaf();
 		if ( markers != null )
@@ -373,7 +373,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		}
 	}
 	
-	public void markerRemove(int position, int length)
+	private void markerRemove(int position, int length)
 	{
 		WeakIdentityHashMap<Marker, Object> markers = getMarkersForLeaf();
 		if ( markers != null )
@@ -561,11 +561,11 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	{
 		if ( newLength > originalLength )
 		{
-			markerInsert( originalLength, newLength - originalLength );
+			markerInsert( index + originalLength, newLength - originalLength );
 		}
 		else if ( newLength < originalLength )
 		{
-			markerRemove( newLength, originalLength - newLength );
+			markerRemove( index + newLength, originalLength - newLength );
 		}
 	}
 

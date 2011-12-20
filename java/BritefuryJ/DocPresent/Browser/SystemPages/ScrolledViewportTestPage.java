@@ -9,10 +9,10 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 
 import BritefuryJ.Controls.ScrolledViewport;
+import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.Pres.Pres;
-import BritefuryJ.Pres.Primitive.Border;
 import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
@@ -44,12 +44,12 @@ public class ScrolledViewportTestPage extends SystemPage
 	{
 		StyleSheet blackText = StyleSheet.style( Primitive.fontSize.as( 12 ), Primitive.foreground.as( Color.black ) );
 
-		StyleSheet borderStyle = StyleSheet.style( Primitive.border.as( new SolidBorder( 2.0, 2.0, 5.0, 5.0, Color.black, null ) ) );
+		AbstractBorder b = new SolidBorder( 2.0, 2.0, 5.0, 5.0, Color.black, null );
 		
 		Pres b2 = blackText.applyTo( new NormalText( textBlock ) );
 		
 		Pres viewport = new SpaceBin( new ScrolledViewport( b2, 0.0, 0.0, new PersistentState() ), 0.0, 200.0 );
-		Pres border = borderStyle.applyTo( new Border( viewport ) );
+		Pres border = b.surround( viewport );
 		Pres column = StyleSheet.style( Primitive.columnSpacing.as( 5.0 ) ).applyTo( new Column( new Pres[] { new Label( "Viewport:" ).alignHPack().alignVRefY(), border } ) );
 		return column.pad( 50.0, 50.0 ).alignHExpand().alignVExpand();
 	}

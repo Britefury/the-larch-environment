@@ -8,10 +8,10 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 
+import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.Pres.Pres;
-import BritefuryJ.Pres.Primitive.Border;
 import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
@@ -36,12 +36,12 @@ public class ColumnTestPage extends SystemPage
 	}
 
 	
-	StyleSheet styleSheet = StyleSheet.instance;
-	StyleSheet outlineStyleSheet = styleSheet.withValues( Primitive.border.as( new SolidBorder( 1.0, 0.0, new Color( 0.0f, 0.3f, 0.7f ), null ) ) );
-	StyleSheet textOnGreyStyle = styleSheet.withValues( Primitive.background.as( new FillPainter( new Color( 0.8f, 0.8f, 0.8f ) ) ) );
-	StyleSheet t12Style = styleSheet.withValues( Primitive.fontSize.as( 12 ) );
-	StyleSheet t18Style = styleSheet.withValues( Primitive.fontSize.as( 18 ), Primitive.foreground.as( new Color( 0.0f, 0.3f, 0.6f ) ) );
-	StyleSheet t24Style = styleSheet.withValues( Primitive.fontSize.as( 24 ) );
+	private StyleSheet styleSheet = StyleSheet.instance;
+	private AbstractBorder outlineBorder = new SolidBorder( 1.0, 0.0, new Color( 0.0f, 0.3f, 0.7f ), null );
+	private StyleSheet textOnGreyStyle = styleSheet.withValues( Primitive.background.as( new FillPainter( new Color( 0.8f, 0.8f, 0.8f ) ) ) );
+	private StyleSheet t12Style = styleSheet.withValues( Primitive.fontSize.as( 12 ) );
+	private StyleSheet t18Style = styleSheet.withValues( Primitive.fontSize.as( 18 ), Primitive.foreground.as( new Color( 0.0f, 0.3f, 0.6f ) ) );
+	private StyleSheet t24Style = styleSheet.withValues( Primitive.fontSize.as( 24 ) );
 
 	
 	
@@ -79,8 +79,8 @@ public class ColumnTestPage extends SystemPage
 		
 		
 		return new Body( new Pres[] {
-				outlineStyleSheet.applyTo( new Border( columnTest ) ),
-				outlineStyleSheet.applyTo( new Border( hAlignTest ) ),
-				outlineStyleSheet.applyTo( new Border( refPointAlignTest ) ) } );
+				outlineBorder.surround( columnTest ),
+				outlineBorder.surround( hAlignTest ),
+				outlineBorder.surround( refPointAlignTest ) } );
 	}
 }
