@@ -11,18 +11,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import BritefuryJ.Controls.Hyperlink;
+import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.BrowserPage;
+import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.Pres.Pres;
-import BritefuryJ.Pres.Primitive.Border;
 import BritefuryJ.Pres.Primitive.Column;
-import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.RichText.Heading2;
 import BritefuryJ.Pres.RichText.Heading4;
-import BritefuryJ.StyleSheet.StyleSheet;
 
 public class TestsDirectory extends BrowserPage
 {
@@ -125,7 +123,7 @@ public class TestsDirectory extends BrowserPage
 	}
 
 
-	private static StyleSheet outlineStyle = StyleSheet.style( Primitive.border.as( new SolidBorder( 2.0, 10.0, new Color( 0.6f, 0.7f, 0.8f ), null ) ) );
+	private static AbstractBorder outlineBorder = new SolidBorder( 2.0, 10.0, new Color( 0.6f, 0.7f, 0.8f ), null );
 
 	
 	
@@ -144,7 +142,7 @@ public class TestsDirectory extends BrowserPage
 
 		Collections.addAll( testBoxChildren, links );
 		
-		return outlineStyle.applyTo( new Border( new Column( testBoxChildren ).alignVRefY() ) );
+		return outlineBorder.surround( new Column( testBoxChildren ).alignVRefY() );
 	}
 	
 	protected Pres createContents()

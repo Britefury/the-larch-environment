@@ -46,7 +46,7 @@ from LarchCore.MainApp import DocumentManagement
 from LarchCore.Project.ProjectRoot import ProjectRoot
 from LarchCore.Project.ProjectPackage import ProjectPackage
 from LarchCore.Project.ProjectPage import ProjectPage
-from LarchCore.Project.ProjectEditor import ModuleFinder
+from LarchCore.Project.ProjectNode import ProjectNode
 from LarchCore.Project import PageData
 
 
@@ -72,11 +72,26 @@ class ProjectDrag (Object):
 		self.source = source
 
 
+def _getProjectModelOfElement(element):
+	ctx = element.fragmentContext
+	model = ctx.model
+	while not isinstance( model, ProjectNode ):
+		ctx = ctx.parent
+		model = ctx.model
+	return model
+
+
 def _getModelOfPackageOrPageNameElement(element):
-	return element.getFragmentContext().getParent().getParent().getModel()
+	model = _getProjectModelOfElement(element)
+	if not isinstance( model, ProjectPackage )  and  not isinstance( model, ProjectPage ):
+		raise TypeError, 'model is not a project package or a page, it is a %s' % type( model )
+	return model
 
 def _getModelOfProjectNameElement(element):
-	return element.getFragmentContext().getModel()
+	model = _getProjectModelOfElement(element)
+	if not isinstance( model, ProjectRoot ):
+		raise TypeError, 'model is not a project root, it is a %s' % type( model )
+	return model
 
 
 def _dragSourceCreateSourceData(element, aspect):
@@ -101,19 +116,21 @@ def _isChildOf(node, package):
 def _performDrop(data, action, newParent, index):
 	changeHistory = newParent.__change_history__
 	changeHistory.freeze()
-	source = copy.deepcopy( data.source )   if action == ObjectDndHandler.COPY   else data.source
+	item = copy.deepcopy( data.source )   if action == ObjectDndHandler.COPY   else data.source
 
 	if action == ObjectDndHandler.MOVE:
-		sourceParent = data.source.parent
-		indexOfSource = sourceParent.indexOfById( data.source )
-		del sourceParent[indexOfSource]
-		if index is not None  and  newParent is sourceParent  and  index > indexOfSource:
+		# Remove from existing parent
+		itemToRemove = data.source
+		currentParent = itemToRemove.parent
+		indexOfItem = currentParent.indexOfById( itemToRemove )
+		del currentParent[indexOfItem]
+		if index is not None  and  newParent is currentParent  and  index > indexOfItem:
 			index -= 1
 
 	if index is None:
-		newParent.append( source )
+		newParent.append( item )
 	else:
-		newParent.insert( index, source )
+		newParent.insert( index, item )
 	changeHistory.thaw()
 
 
@@ -141,15 +158,17 @@ def _pageDrop(element, targetPos, data, action):
 
 def _getDestPackageAndIndex(element, targetPos):
 	targetPackage = _getModelOfPackageOrPageNameElement( element )
+	assert isinstance( targetPackage, ProjectPackage )
 	if targetPos.x > ( element.getActualWidth() * 0.5 ):
+		# Drop as child of package
 		return targetPackage, len( targetPackage )
 	else:
-		parent1 = targetPackage.parent
-		parent2 = parent1.parent
-		index = parent1.indexOfById( targetPackage )
+		# Drop as sibling of package
+		parent = targetPackage.parent
+		index = parent.indexOfById( targetPackage )
 		if targetPos.y > ( element.getActualHeight() * 0.5 ):
 			index += 1
-		return parent2, index
+		return parent, index
 
 
 def _packageCanDrop(element, targetPos, data, action):
@@ -395,7 +414,7 @@ class ProjectView (ObjectDispatchView):
 
 		itemsBox = Column( items )
 
-		return Column( [ DefaultPerspective.instance( nameLive ), itemsBox.padX( _packageContentsIndentation, 0.0 ).alignHExpand() ] )
+		return Column( [ nameLive, itemsBox.padX( _packageContentsIndentation, 0.0 ).alignHExpand() ] )
 
 
 
@@ -435,7 +454,7 @@ class ProjectView (ObjectDispatchView):
 
 		nameLive = LiveValue( nameBox )
 
-		return DefaultPerspective.instance( nameLive )
+		return nameLive
 
 
 

@@ -62,12 +62,12 @@ class ExecutionResult (object):
 
 		
 		
-	def getStdOut(self):
+	def getStdOutStream(self):
 		return self._stdout
 	
-	def getStdErr(self):
+	def getStdErrStream(self):
 		return self._stderr
-	
+
 	def getCaughtException(self):
 		return self._caughtException
 	

@@ -74,7 +74,7 @@ class CurrentModuleInteractor (KeyElementInteractor):
 				return True
 		return False
 	
-	def keyReleasedw(self, element, event):
+	def keyReleased(self, element, event):
 		return False
 
 
@@ -184,20 +184,20 @@ class ConsoleView (ObjectDispatchView):
 		
 		caughtException = executionResult.getCaughtException()
 		result = executionResult.getResult()
-		stdout = executionResult.getStdOut()
-		stderr = executionResult.getStdErr()
+		stdoutStream = executionResult.getStdOutStream()
+		stderrStream = executionResult.getStdErrStream()
 		
 		moduleView = StyleSheet.style( Primitive.editable( False ) ).applyTo( Python25.python25EditorPerspective.applyTo( InnerFragment( pythonModule ) ) )
 		caughtExceptionView = ApplyPerspective.defaultPerspective( InnerFragment( caughtException ) )   if caughtException is not None   else None
 		resultView = ApplyPerspective.defaultPerspective( InnerFragment( result[0] ) )   if result is not None   else None
 			
 		blockContents = [ _pythonModuleBorderStyle.applyTo( Border( moduleView.alignHExpand() ).alignHExpand() ) ]
-		if stderr is not None:
-			blockContents.append( execStderr( stderr, True ) )
+		if stderrStream is not None:
+			blockContents.append( execStderr( stderrStream, True ) )
 		if caughtExceptionView is not None:
 			blockContents.append( execException( caughtExceptionView ) )
-		if stdout is not None:
-			blockContents.append( execStdout( stdout, True ) )
+		if stdoutStream is not None:
+			blockContents.append( execStdout( stdoutStream, True ) )
 		if resultView is not None:
 			blockContents.append( execResult( resultView ) )
 		blockColumn = Column( blockContents ).alignHExpand()

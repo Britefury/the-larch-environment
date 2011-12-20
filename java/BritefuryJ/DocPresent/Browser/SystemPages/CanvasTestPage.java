@@ -24,7 +24,6 @@ import BritefuryJ.Math.Point2;
 import BritefuryJ.Pres.ElementRef;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Bin;
-import BritefuryJ.Pres.Primitive.Border;
 import BritefuryJ.Pres.Primitive.Canvas;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
@@ -198,7 +197,7 @@ public class CanvasTestPage extends SystemPage
 	protected Pres createContents()
 	{
 		Pres canvas = new Canvas( createClockFace().translate( 320.0, 240.0 ), 640.0, 480.0, false, false );
-		Pres diagram = StyleSheet.style( Primitive.border.as( new SolidBorder( 1.0, 3.0, 2.0, 2.0, Color.black, null ) ) ).applyTo( new Border( canvas ) );
+		Pres diagram = new SolidBorder( 1.0, 3.0, 2.0, 2.0, Color.black, null ).surround( canvas );
 		
 		DataModel model = new DataModel();
 		

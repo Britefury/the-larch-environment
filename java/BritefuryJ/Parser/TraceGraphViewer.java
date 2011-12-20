@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import BritefuryJ.Controls.AspectRatioScrolledViewport;
+import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
@@ -21,9 +22,6 @@ import BritefuryJ.ParserHelpers.ParseResultInterface;
 import BritefuryJ.ParserHelpers.TraceNode;
 import BritefuryJ.ParserHelpers.TracedParseResultInterface;
 import BritefuryJ.Pres.Pres;
-import BritefuryJ.Pres.Primitive.Border;
-import BritefuryJ.Pres.Primitive.Primitive;
-import BritefuryJ.StyleSheet.StyleSheet;
 
 public class TraceGraphViewer
 {
@@ -251,9 +249,9 @@ public class TraceGraphViewer
 		
 		Object view = GraphViz.dot( dot );
 		Pres viewport = new AspectRatioScrolledViewport( view, 0.0, ASPECT_RATIO, viewportState );
-		return viewportBorderStyle.applyTo( new Border( viewport ) ).alignHExpand().alignVExpand();
+		return viewportBorder.surround( viewport ).alignHExpand().alignVExpand();
 	}
 
 
-	private final static StyleSheet viewportBorderStyle = StyleSheet.style( Primitive.border.as( new SolidBorder( 2.0, 2.0, 5.0, 5.0, Color.black, null ) ) );
+	private final static AbstractBorder viewportBorder = new SolidBorder( 2.0, 2.0, 5.0, 5.0, Color.black, null );
 }

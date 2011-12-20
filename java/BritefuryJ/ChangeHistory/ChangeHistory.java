@@ -24,7 +24,6 @@ import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.ObjectPres.ObjectBox;
 import BritefuryJ.Pres.Primitive.Arrow;
-import BritefuryJ.Pres.Primitive.Border;
 import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
@@ -553,12 +552,12 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 		Pres pastTitleTop = pastTitleStyle.applyTo( new Row( new Pres[] { new Arrow( Arrow.Direction.DOWN, 14.0 ).alignVCentre(), new Label( "Past" ) } ) );
 		Pres pastContents = new Column( Pres.mapCoerce( past ) );
 		Pres pastTitleBottom = pastTitleStyle.applyTo( new Row( new Pres[] { new Arrow( Arrow.Direction.UP, 14.0 ).alignVCentre(), new Label( "Past" ) } ) );
-		Pres pastBox = pastBorderStyle.applyTo( new Border( listBoxStyle.applyTo( new Column( new Pres[] { pastTitleTop, pastContents, pastTitleBottom } ) ) ) );
+		Pres pastBox = pastBorder.surround( listBoxStyle.applyTo( new Column( new Pres[] { pastTitleTop, pastContents, pastTitleBottom } ) ) );
 
 		Pres futureTitleTop = futureTitleStyle.applyTo( new Row( new Pres[] { new Arrow( Arrow.Direction.DOWN, 14.0 ).alignVCentre(), new Label( "Future" ) } ) );
 		Pres futureContents = new Column( Pres.mapCoerce( future ) );
 		Pres futureTitleBottom = futureTitleStyle.applyTo( new Row( new Pres[] { new Arrow( Arrow.Direction.UP, 14.0 ).alignVCentre(), new Label( "Future" ) } ) );
-		Pres futureBox = futureBorderStyle.applyTo( new Border( listBoxStyle.applyTo( new Column( new Pres[] { futureTitleTop, futureContents, futureTitleBottom } ) ) ) );
+		Pres futureBox = futureBorder.surround( listBoxStyle.applyTo( new Column( new Pres[] { futureTitleTop, futureContents, futureTitleBottom } ) ) );
 		
 		Pres mainBox = changeHistoryColumnStyle.applyTo( new Column( new Pres[] { pastBox, futureBox } ) );
 		
@@ -568,8 +567,8 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 
 	private static final StyleSheet pastTitleStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.5f, 0.0f, 0.5f ) ), Primitive.shapePainter.as( new FillPainter( new Color( 0.5f, 0.0f, 0.5f ) ) ), Primitive.fontFace.as( "Serif" ), Primitive.fontSmallCaps.as( true ) );
 	private static final StyleSheet futureTitleStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.0f, 0.25f, 0.5f ) ), Primitive.shapePainter.as( new FillPainter( new Color( 0.0f, 0.25f, 0.5f ) ) ), Primitive.fontFace.as( "Serif" ), Primitive.fontSmallCaps.as( true ) );
-	private static final StyleSheet pastBorderStyle = StyleSheet.style( Primitive.border.as( new SolidBorder( 2.0, 3.0, 10.0, 10.0, new Color( 0.5f, 0.0f, 0.5f ), null ) ) );
-	private static final StyleSheet futureBorderStyle = StyleSheet.style( Primitive.border.as( new SolidBorder( 2.0, 3.0, 10.0, 10.0, new Color( 0.0f, 0.25f, 0.5f ), null ) ) );
+	private static final SolidBorder pastBorder = new SolidBorder( 2.0, 3.0, 10.0, 10.0, new Color( 0.5f, 0.0f, 0.5f ), null );
+	private static final SolidBorder futureBorder = new SolidBorder( 2.0, 3.0, 10.0, 10.0, new Color( 0.0f, 0.25f, 0.5f ), null );
 	private static final StyleSheet listBoxStyle = StyleSheet.style( Primitive.columnSpacing.as( 10.0 ) );
 	private static final StyleSheet changeHistoryColumnStyle = StyleSheet.style( Primitive.columnSpacing.as( 20.0 ) );
 }

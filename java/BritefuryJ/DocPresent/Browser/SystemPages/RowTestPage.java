@@ -9,9 +9,9 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.Pres.Pres;
-import BritefuryJ.Pres.Primitive.Border;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Row;
@@ -36,14 +36,13 @@ public class RowTestPage extends SystemPage
 	}
 
 	
-	private static StyleSheet styleSheet = StyleSheet.instance;
-	private static StyleSheet outlineStyleSheet = styleSheet.withValues( Primitive.border.as( new SolidBorder( 1.0, 0.0, new Color( 0.0f, 0.3f, 0.7f ), null ) ) );
+	private static AbstractBorder outlineBorder = new SolidBorder( 1.0, 0.0, new Color( 0.0f, 0.3f, 0.7f ), null );
 
 	
 	protected Pres makeText(String text, int size)
 	{
 		StyleSheet styleSheet = StyleSheet.style( Primitive.fontBold.as( true ), Primitive.fontSize.as( size ) );
-		return outlineStyleSheet.applyTo( new Border( styleSheet.applyTo( new Label( text ) ) ) );
+		return outlineBorder.surround( styleSheet.applyTo( new Label( text ) ) );
 	}
 	
 	
@@ -60,7 +59,7 @@ public class RowTestPage extends SystemPage
 		children.add( makeText( "v_bottom", 18 ).alignVBottom() );
 		children.add( makeText( "v_expand", 18 ).alignVExpand() );
 		
-		return outlineStyleSheet.applyTo( new Border( new Row( children ) ) );
+		return outlineBorder.surround( new Row( children ) );
 	}
 
 	protected Pres createRow2()
@@ -72,7 +71,7 @@ public class RowTestPage extends SystemPage
 		children.add( makeText( "h_right", 18 ).alignHRight() );
 		children.add( makeText( "h_expand", 18 ).alignHExpand() );
 		
-		return outlineStyleSheet.applyTo( new Border( new Row( children ) ) ).pad( 10.0, 20.0 );
+		return outlineBorder.surround( new Row( children ) ).pad( 10.0, 20.0 );
 	}
 
 	

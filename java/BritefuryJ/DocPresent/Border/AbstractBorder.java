@@ -33,15 +33,9 @@ public abstract class AbstractBorder implements Presentable
 	}
 	
 	
-	private StyleSheet style = null;
-	
 	public Pres surround(Object x)
 	{
-		if ( style == null )
-		{
-			style = StyleSheet.style( Primitive.border.as( this ) );
-		}
-		return style.applyTo( new Border( x ) );
+		return new Border( x, this );
 	}
 	
 	public Pres __call__(Object x)
