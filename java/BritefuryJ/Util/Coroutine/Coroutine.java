@@ -89,7 +89,7 @@ public class Coroutine extends CoroutineBase
 
 	
 	@Override
-	public boolean isRunning()
+	public boolean hasStarted()
 	{
 		return thread != null;
 	}
@@ -103,7 +103,7 @@ public class Coroutine extends CoroutineBase
 	
 	public void terminate()
 	{
-		if ( !isFinished()  &&  isRunning() )
+		if ( !isFinished()  &&  hasStarted() )
 		{
 			// Set the terminated flag and resume
 			terminated = true;

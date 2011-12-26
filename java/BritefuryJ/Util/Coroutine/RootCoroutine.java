@@ -39,7 +39,7 @@ public class RootCoroutine extends CoroutineBase
 	
 	
 	@Override
-	public boolean isRunning()
+	public boolean hasStarted()
 	{
 		return true;
 	}

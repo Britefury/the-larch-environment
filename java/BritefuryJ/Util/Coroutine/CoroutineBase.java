@@ -58,7 +58,7 @@ public abstract class CoroutineBase
 		if ( !source.isRoot() )
 		{
 			// CONTEXT:
-			// this = the source coroutine  -  THE ONE WHICH WE ARE RUNNING RIGHT NOW
+			// source = the source coroutine  -  THE ONE WHICH WE ARE RUNNING RIGHT NOW
 			// target = the target coroutine
 			
 			CoroutineBase target = null;
@@ -232,7 +232,7 @@ public abstract class CoroutineBase
 	protected abstract Thread getThread();
 	protected abstract boolean isRoot();
 	
-	public abstract boolean isRunning();
+	public abstract boolean hasStarted();
 	public abstract boolean isFinished();
 	
 	

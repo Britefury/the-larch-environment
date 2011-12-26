@@ -106,9 +106,9 @@ public class Test_Coroutine_2 extends TestCase
 		assertEquals( "1", x );
 		b.append( "F" );
 		
-		assertTrue( coA.isRunning() );
-		assertTrue( coB.isRunning() );
-		assertTrue( coC.isRunning() );
+		assertTrue( coA.hasStarted() );
+		assertTrue( coB.hasStarted() );
+		assertTrue( coC.hasStarted() );
 		assertFalse( coA.isFinished() );
 		assertFalse( coB.isFinished() );
 		assertFalse( coC.isFinished() );
@@ -118,9 +118,9 @@ public class Test_Coroutine_2 extends TestCase
 		b.append( "L" );
 
 		assertEquals( "ABCDEFGHIJKL", b.toString() );
-		assertFalse( coA.isRunning() );
-		assertFalse( coB.isRunning() );
-		assertFalse( coC.isRunning() );
+		assertFalse( coA.hasStarted() );
+		assertFalse( coB.hasStarted() );
+		assertFalse( coC.hasStarted() );
 		assertTrue( coA.isFinished() );
 		assertTrue( coB.isFinished() );
 		assertTrue( coC.isFinished() );
