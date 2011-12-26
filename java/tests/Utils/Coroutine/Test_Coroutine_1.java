@@ -117,18 +117,18 @@ public class Test_Coroutine_1 extends TestCase
 	public void test_nothing()
 	{
 		assertEquals( "", b.toString() );
-		assertFalse( coA.isRunning() );
-		assertFalse( coB.isRunning() );
-		assertFalse( coC.isRunning() );
+		assertFalse( coA.hasStarted() );
+		assertFalse( coB.hasStarted() );
+		assertFalse( coC.hasStarted() );
 	}
 
 	public void test_startAtA()
 	{
 		coA.yieldTo();
 		assertEquals( "ABCDEFGHIJKLMNOPQ", b.toString() );
-		assertFalse( coA.isRunning() );
-		assertFalse( coB.isRunning() );
-		assertFalse( coC.isRunning() );
+		assertFalse( coA.hasStarted() );
+		assertFalse( coB.hasStarted() );
+		assertFalse( coC.hasStarted() );
 		assertTrue( coA.isFinished() );
 		assertTrue( coB.isFinished() );
 		assertTrue( coC.isFinished() );
