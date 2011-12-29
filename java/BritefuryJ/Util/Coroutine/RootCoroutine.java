@@ -15,7 +15,14 @@ public class RootCoroutine extends CoroutineBase
 	
 	private RootCoroutine()
 	{
-		super( "<root>" );
+		super( "<root>", null );
+	}
+	
+	
+	
+	public static RootCoroutine getRootCoroutine()
+	{
+		return root;
 	}
 	
 	

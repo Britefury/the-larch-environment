@@ -26,19 +26,11 @@ public class Test_Coroutine_1 extends TestCase
 				
 				coB.yieldTo();
 				
+				b.append( "E" );
+				
+				coC.yieldTo();
+				
 				b.append( "G" );
-				
-				coC.yieldTo();
-				
-				b.append( "I" );
-				
-				coC.yieldTo();
-				
-				b.append( "M" );
-				
-				coB.yieldTo();
-				
-				b.append( "Q" );
 			}
 		};
 
@@ -53,21 +45,7 @@ public class Test_Coroutine_1 extends TestCase
 				
 				b.append( "D" );
 				
-				coC.yieldTo();
-
-				b.append( "F" );
-				
-				Coroutine.yieldToParent();
-				
-				b.append( "K" );
-				
-				Coroutine.yieldToParent();
-				
-				b.append( "N" );
-				
-				coC.yieldTo();
-				
-				b.append( "P" );
+				coA.yieldTo();
 			}
 		};
 
@@ -78,25 +56,11 @@ public class Test_Coroutine_1 extends TestCase
 			{
 				b.append( "C" );
 				
-				Coroutine.yieldToParent();
-				
-				b.append( "E" );
-				
-				Coroutine.yieldToParent();
-
-				b.append( "H" );
-				
-				Coroutine.yieldToParent();
-
-				b.append( "J" );
-				
 				coB.yieldTo();
-
-				b.append( "L" );
 				
-				Coroutine.yieldToParent();
+				b.append( "F" );
 				
-				b.append( "O" );
+				coA.yieldTo();
 			}
 		};
 		
@@ -125,10 +89,22 @@ public class Test_Coroutine_1 extends TestCase
 	public void test_startAtA()
 	{
 		coA.yieldTo();
-		assertEquals( "ABCDEFGHIJKLMNOPQ", b.toString() );
-		assertFalse( coA.hasStarted() );
-		assertFalse( coB.hasStarted() );
-		assertFalse( coC.hasStarted() );
+		assertEquals( "ABCDEFG", b.toString() );
+		assertTrue( coA.hasStarted() );
+		assertTrue( coB.hasStarted() );
+		assertTrue( coC.hasStarted() );
+		assertTrue( coA.isFinished() );
+		assertFalse( coB.isFinished() );
+		assertFalse( coC.isFinished() );
+		
+		coB.yieldTo();
+
+		assertTrue( coA.isFinished() );
+		assertTrue( coB.isFinished() );
+		assertFalse( coC.isFinished() );
+		
+		coC.yieldTo();
+
 		assertTrue( coA.isFinished() );
 		assertTrue( coB.isFinished() );
 		assertTrue( coC.isFinished() );

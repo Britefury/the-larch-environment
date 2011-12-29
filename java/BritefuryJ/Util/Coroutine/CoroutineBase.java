@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.Util.Coroutine;
 
-import java.util.LinkedList;
 import java.util.concurrent.Semaphore;
 
 
@@ -28,89 +27,42 @@ public abstract class CoroutineBase
 	}
 	
 	
-	protected static LinkedList<CoroutineBase> coStack = new LinkedList<CoroutineBase>();
-	
 	private Semaphore lock;
 	private Object value;
+	private CoroutineBase parent;
+	private static CoroutineBase current;
 	protected String name;
 	protected RuntimeException throwOnResume;
 
 	
 	
 	
-	public CoroutineBase(String name)
+	public CoroutineBase(String name, CoroutineBase parent)
 	{
 		lock = new Semaphore( 0 );
 		this.name = name;
+		this.parent = parent;
 	}
 
 	
 	
-	public static Object yieldToParent()
+	public Object yieldToParent()
 	{
 		return yieldToParent( null );
 	}
 	
-	public static Object yieldToParent(Object x)
+	public Object yieldToParent(Object x)
 	{
-		CoroutineBase source = getCurrent();
-
-		if ( !source.isRoot() )
+		if ( parent != null )
 		{
-			// CONTEXT:
-			// source = the source coroutine  -  THE ONE WHICH WE ARE RUNNING RIGHT NOW
-			// target = the target coroutine
-			
-			CoroutineBase target = null;
-			synchronized( coStack )
-			{
-				coStack.removeLast();
-				if ( coStack.isEmpty() )
-				{
-					target = RootCoroutine.forThread( Thread.currentThread() );
-				}
-				else
-				{
-					target = coStack.peekLast();
-				}
-			}
-			
-			// Send the value @x to the target coroutine
-			target.setValue( x );
-			
-			// Resume the target coroutine
-			target.resume();
-			
-			// Halt the source coroutine
-			source.halt();
-			
-			// CONTEXT
-			// source.halt() has returned :-
-			// The source coroutine has resumed, and now has control			
-			
-			// The halt() method has returned - the source coroutine has been resumed - check if it needs to be terminated
-			if ( source.isTerminated() )
-			{
-				// Throw a terminate exception, which is caught by the run-method
-				throw new TerminateException();
-			}
-			
-			// Retrieve any exception that is to be passed up
-			RuntimeException t = source.consumeExceptionToThrowOnResume();
-			if ( t != null )
-			{
-				throw t;
-			}
-			
-			// Return the value within the source co-routine
-			return source.getValue();
+			return parent.yieldTo( x );
 		}
 		else
 		{
-			throw new RuntimeException( "Cannot yield to parent coroutine when current coroutine is root" );
+			throw new RuntimeException( "Cannot yield to parent - no parent co-routine" );
 		}
 	}
-
+	
 	
 	public Object yieldTo()
 	{
@@ -120,12 +72,6 @@ public abstract class CoroutineBase
 	public Object yieldTo(Object x)
 	{
 		// This method is invoked on the target coroutine (this), from within the source coroutine
-		
-		// Ensure that @this is not already on the coroutine stack
-		if ( isLive() )
-		{
-			throw new RecursiveYieldException( "Attempting to yield to live coroutine" );
-		}
 		
 		// Get the source coroutine
 		CoroutineBase source = getCurrent();
@@ -146,11 +92,8 @@ public abstract class CoroutineBase
 			// Send the value @x to the target coroutine
 			setValue( x );
 			
-			// Push the target thread on the coroutine stack. If the target thread is a root coroutine, clear the stack.
-			synchronized( coStack )
-			{
-				coStack.add( this );
-			}
+			// Set the current coroutine
+			current = this;
 			
 			// Resume the target coroutine
 			resume();
@@ -189,25 +132,17 @@ public abstract class CoroutineBase
 			throw new RuntimeException( "Finishing non-current co-routine" );
 		}
 		
-		// Keep popping co-routines off the stack until we find one that is not finished yet
-		CoroutineBase newCurrent = null;
-		synchronized( coStack )
+		// Switch to the parent co-routine
+		CoroutineBase newCurrent = c.parent;
+		if ( newCurrent == null )
 		{
-			coStack.removeLast();
-				
-			if ( coStack.isEmpty() )
-			{
-				newCurrent = RootCoroutine.forThread( Thread.currentThread() );
-			}
-			else
-			{
-				newCurrent = coStack.peekLast();
-			}
+			throw new RuntimeException( "coFinish: @c has not parent" );
 		}
 			
 		// Resume it - this thread will continue to run, and terminate
 		newCurrent.setValue( null );
 		newCurrent.throwOnResume( caughtException );
+		current = newCurrent;
 		newCurrent.resume();
 	}
 	
@@ -227,6 +162,11 @@ public abstract class CoroutineBase
 	
 	
 	
+	public CoroutineBase getParent()
+	{
+		return parent;
+	}
+	
 	
 	protected abstract void initialise();
 	protected abstract Thread getThread();
@@ -234,12 +174,6 @@ public abstract class CoroutineBase
 	
 	public abstract boolean hasStarted();
 	public abstract boolean isFinished();
-	
-	
-	public boolean isLive()
-	{
-		return this == RootCoroutine.root  ||  coStack.contains( this );
-	}
 	
 	
 	protected abstract boolean isTerminated();
@@ -284,22 +218,11 @@ public abstract class CoroutineBase
 	{
 		Thread t = Thread.currentThread();
 
-		synchronized( coStack )
+		if ( current == null )
 		{
-			if ( coStack.isEmpty() )
-			{
-				return RootCoroutine.forThread( t );
-			}
-			else
-			{
-				CoroutineBase current = coStack.peekLast();
-				if ( current.getThread() != t )
-				{
-					throw new RuntimeException( "Current coroutine thread is not the current system thread" );
-				}
-		
-				return current;
-			}
+			current = RootCoroutine.forThread( t );
 		}
+		
+		return current;
 	}
 }
