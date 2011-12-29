@@ -31,10 +31,13 @@ public class Test_Coroutine_2 extends TestCase
 				
 				b.append( "E" );
 				
-				x = Coroutine.yieldToParent( "1" ); // -> root
+				x = coA.yieldToParent( "1" ); // -> root
 				assertEquals( "2", x );
 				
 				b.append( "I" );
+				
+				x = coB.yieldTo( "1" );
+				assertEquals( "0", x );
 			}
 		};
 
@@ -52,15 +55,18 @@ public class Test_Coroutine_2 extends TestCase
 				
 				b.append( "D" );
 				
-				x = Coroutine.yieldToParent( "2" ); // -> A
+				x = coA.yieldTo( "2" ); // -> A
 				assertEquals( "3", x );
 				
 				b.append( "H" );
 				
 				x = coA.yieldTo( "2" );
-				assertEquals( null, x );
+				assertEquals( "1", x );
 				
 				b.append( "J" );
+				
+				x = coC.yieldTo( "2" );
+				assertEquals( "0", x );
 			}
 		};
 
@@ -73,13 +79,13 @@ public class Test_Coroutine_2 extends TestCase
 
 				b.append( "C" );
 				
-				x = Coroutine.yieldToParent( "3" ); // -> B
+				x = coB.yieldTo( "3" ); // -> B
 				assertEquals( "0", x );
 				
 				b.append( "G" );
 				
 				x = coB.yieldTo( "3" );
-				assertEquals( null, x );
+				assertEquals( "2", x );
 				
 				b.append( "K" );
 			}
@@ -118,9 +124,23 @@ public class Test_Coroutine_2 extends TestCase
 		b.append( "L" );
 
 		assertEquals( "ABCDEFGHIJKL", b.toString() );
-		assertFalse( coA.hasStarted() );
-		assertFalse( coB.hasStarted() );
-		assertFalse( coC.hasStarted() );
+		assertTrue( coA.hasStarted() );
+		assertTrue( coB.hasStarted() );
+		assertTrue( coC.hasStarted() );
+		assertFalse( coA.isFinished() );
+		assertFalse( coB.isFinished() );
+		assertTrue( coC.isFinished() );
+		
+		x = coA.yieldTo( "0" );
+		assertEquals( null, x );
+
+		assertTrue( coA.isFinished() );
+		assertFalse( coB.isFinished() );
+		assertTrue( coC.isFinished() );
+		
+		x = coB.yieldTo( "0" );
+		assertEquals( null, x );
+
 		assertTrue( coA.isFinished() );
 		assertTrue( coB.isFinished() );
 		assertTrue( coC.isFinished() );

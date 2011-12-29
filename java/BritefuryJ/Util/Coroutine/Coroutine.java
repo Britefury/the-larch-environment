@@ -10,7 +10,7 @@ package BritefuryJ.Util.Coroutine;
 public class Coroutine extends CoroutineBase
 {
 	private Runnable run = null;
-	private boolean finished, terminated;
+	private boolean started, finished, terminated;
 	private Thread thread = null;
 	
 	
@@ -51,9 +51,9 @@ public class Coroutine extends CoroutineBase
 	
 	public Coroutine(Runnable run, String name)
 	{
-		super( name );
+		super( name, getCurrent() );
 		this.run = run;
-		finished = false;
+		started = finished = false;
 		terminated = false;
 	}
 
@@ -72,6 +72,7 @@ public class Coroutine extends CoroutineBase
 		{
 			thread = new Thread( myRun );
 			thread.start();
+			started = true;
 		}
 	}
 	
@@ -91,7 +92,7 @@ public class Coroutine extends CoroutineBase
 	@Override
 	public boolean hasStarted()
 	{
-		return thread != null;
+		return started;
 	}
 	
 	@Override

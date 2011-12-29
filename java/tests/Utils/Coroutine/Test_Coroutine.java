@@ -6,8 +6,9 @@
 //##************************
 package tests.Utils.Coroutine;
 
-import BritefuryJ.Util.Coroutine.Coroutine;
 import junit.framework.TestCase;
+import BritefuryJ.Util.Coroutine.Coroutine;
+import BritefuryJ.Util.Coroutine.RootCoroutine;
 
 public class Test_Coroutine extends TestCase
 {
@@ -24,6 +25,24 @@ public class Test_Coroutine extends TestCase
 		Coroutine co = new Coroutine( run );
 		
 		co.yieldTo();
+	}
+
+	public void test_parent()
+	{
+		Runnable run = new Runnable()
+		{
+			@Override
+			public void run()
+			{
+			}
+		};
+		
+		Coroutine co = new Coroutine( run );
+		
+		co.yieldTo();
+		
+		assertSame( RootCoroutine.getRootCoroutine(), co.getParent() );
+		assertSame( RootCoroutine.getRootCoroutine(), Coroutine.getCurrent() );
 	}
 
 	public void test_excpetion_passing()
@@ -60,7 +79,7 @@ public class Test_Coroutine extends TestCase
 			@Override
 			public void run()
 			{
-				Coroutine.yieldToParent();
+				Coroutine.getCurrent().yieldToParent();
 			}
 		};
 		
@@ -76,7 +95,7 @@ public class Test_Coroutine extends TestCase
 			@Override
 			public void run()
 			{
-				Coroutine.yieldToParent();
+				Coroutine.getCurrent().yieldToParent();
 			}
 		};
 		
@@ -94,8 +113,8 @@ public class Test_Coroutine extends TestCase
 			@Override
 			public void run()
 			{
-				Coroutine.yieldToParent();
-				Coroutine.yieldToParent();
+				Coroutine.getCurrent().yieldToParent();
+				Coroutine.getCurrent().yieldToParent();
 				throw new RuntimeException();
 			}
 		};
@@ -112,8 +131,8 @@ public class Test_Coroutine extends TestCase
 			@Override
 			public void run()
 			{
-				Coroutine.yieldToParent();
-				Coroutine.yieldToParent();
+				Coroutine.getCurrent().yieldToParent();
+				Coroutine.getCurrent().yieldToParent();
 				throw new RuntimeException();
 			}
 		};
