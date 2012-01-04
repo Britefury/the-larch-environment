@@ -165,21 +165,30 @@ public class TextEntry extends ControlPres
 				if ( event instanceof TextEditEventInsert )
 				{
 					TextEditEventInsert insert = (TextEditEventInsert)event;
-					listener.onTextInserted( TextEntryControl.this, insert.getPosition(), insert.getTextInserted() );
+					if ( listener != null )
+					{
+						listener.onTextInserted( TextEntryControl.this, insert.getPosition(), insert.getTextInserted() );
+					}
 					validate( getDisplayedText() );
 					return true;
 				}
 				else if ( event instanceof TextEditEventRemove )
 				{
 					TextEditEventRemove remove = (TextEditEventRemove)event;
-					listener.onTextRemoved( TextEntryControl.this, remove.getPosition(), remove.getLength() );
+					if ( listener != null )
+					{
+						listener.onTextRemoved( TextEntryControl.this, remove.getPosition(), remove.getLength() );
+					}
 					validate( getDisplayedText() );
 					return true;
 				}
 				else if ( event instanceof TextEditEventReplace )
 				{
 					TextEditEventReplace replace = (TextEditEventReplace)event;
-					listener.onTextReplaced( TextEntryControl.this, replace.getPosition(), replace.getLength(), replace.getReplacement() );
+					if ( listener != null )
+					{
+						listener.onTextReplaced( TextEntryControl.this, replace.getPosition(), replace.getLength(), replace.getReplacement() );
+					}
 					validate( getDisplayedText() );
 					return true;
 				}

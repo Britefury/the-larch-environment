@@ -7,6 +7,8 @@
 ##-*************************
 from copy import deepcopy
 
+import java.util.List
+
 from BritefuryJ.DocModel import DMNode
 
 from LarchCore.Languages.Python25 import Schema
@@ -135,7 +137,16 @@ class EmbeddedPython25 (object):
 
 class EmbeddedPython25Target (EmbeddedPython25):
 	def __init__(self, model=None):
-		super(EmbeddedPython25Target, self).__init__( _py25NewTarget()   if model is None   else model )
+		if isinstance( model, DMNode )  and  model.isInstanceOf( Schema.PythonTarget ):
+			pass
+		elif model is None:
+			model = _py25NewTarget()
+		elif isinstance( model, DMNode ):
+			model = Schema.PythonTarget( target=model )
+		else:
+			raise TypeError, 'Cannot construct EmbeddedPython25Target from %s' % model
+
+		super(EmbeddedPython25Target, self).__init__( model )
 
 
 	@staticmethod
@@ -151,7 +162,16 @@ class EmbeddedPython25Target (EmbeddedPython25):
 
 class EmbeddedPython25Expr (EmbeddedPython25):
 	def __init__(self, model=None):
-		super(EmbeddedPython25Expr, self).__init__( _py25NewExpr()   if model is None   else model )
+		if isinstance( model, DMNode )  and  model.isInstanceOf( Schema.PythonExpression ):
+			pass
+		elif model is None:
+			model = _py25NewExpr()
+		elif isinstance( model, DMNode ):
+			model = Schema.PythonExpression( expr=model )
+		else:
+			raise TypeError, 'Cannot construct EmbeddedPython25Expr from %s' % model
+
+		super(EmbeddedPython25Expr, self).__init__( model )
 
 
 	def compileForEvaluation(self, filename):
@@ -210,7 +230,16 @@ class EmbeddedPython25Suite (EmbeddedPython25Executable):
 	__python_code_type__ = '<larch_suite>'
 
 	def __init__(self, model=None):
-		super(EmbeddedPython25Suite, self).__init__( _py25NewSuite()   if model is None   else model )
+		if isinstance( model, DMNode )  and  model.isInstanceOf( Schema.PythonSuite ):
+			pass
+		elif model is None:
+			model = _py25NewSuite()
+		elif isinstance( model, list )  or  isinstance( model, java.util.List ):
+			model = Schema.PythonSuite( suite=model )
+		else:
+			raise TypeError, 'Cannot construct EmbeddedPython25Suite from %s' % model
+
+		super(EmbeddedPython25Suite, self).__init__( model )
 
 
 
@@ -219,7 +248,16 @@ class EmbeddedPython25Module (EmbeddedPython25Executable):
 	__python_code_type__ = '<larch_module>'
 
 	def __init__(self, model=None):
-		super(EmbeddedPython25Module, self).__init__( _py25NewModule()   if model is None   else model )
+		if isinstance( model, DMNode )  and  model.isInstanceOf( Schema.PythonModule ):
+			pass
+		elif model is None:
+			model = _py25NewModule()
+		elif isinstance( model, list )  or  isinstance( model, java.util.List ):
+			model = Schema.PythoModule( suite=model )
+		else:
+			raise TypeError, 'Cannot construct EmbeddedPython25Module from %s' % model
+
+		super(EmbeddedPython25Module, self).__init__( model )
 
 
 
