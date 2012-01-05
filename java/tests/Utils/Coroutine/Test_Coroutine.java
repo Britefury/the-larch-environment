@@ -90,20 +90,34 @@ public class Test_Coroutine extends TestCase
 	
 	public void test_terminate()
 	{
+		final int x[] = new int[] { 0 };
+		
 		Runnable run = new Runnable()
 		{
 			@Override
 			public void run()
 			{
+				x[0] = 1;
 				Coroutine.getCurrent().yieldToParent();
+				x[0] = 2;
 			}
 		};
 		
 		Coroutine co = new Coroutine( run );
 		
+		assertFalse( co.hasStarted() );
+		
+		assertEquals( 0, x[0] );
+		
 		co.yieldTo();
 		
+		assertEquals( 1, x[0] );
+		
 		co.terminate();
+
+		assertEquals( 1, x[0] );
+		
+		assertTrue( co.isFinished() );
 	}
 	
 	public void test_serial_coroutines()

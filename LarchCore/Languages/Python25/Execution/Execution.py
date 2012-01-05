@@ -84,19 +84,17 @@ class ExecutionResult (object):
 
 
 
-	
-	
-	
-def executeWithinModule(pythonModule, module, bEvaluate):
+
+def execute(pythonModule, filename, bEvaluate):
 	stdout = _OutputStream()
 	stderr = _OutputStream()
-	
+
 	def _compileForEval():
-		return CodeGenerator.compileForModuleExecutionAndEvaluation( module, pythonModule, module.__name__ )
-	
+		return CodeGenerator.compileForExecutionAndEvaluation( pythonModule, filename )
+
 	def _compileForExec():
-		return CodeGenerator.compileForModuleExecution( module, pythonModule, module.__name__ )
-	
+		return CodeGenerator.compileForExecution( pythonModule, filename )
+
 	evalCode = execCode = None
 	caughtException = None
 	result = None
@@ -106,14 +104,56 @@ def executeWithinModule(pythonModule, module, bEvaluate):
 			execCode, evalCode = r
 	else:
 		execCode, caughtException = InvokePyFunction.invoke( _compileForExec )
+
+	globals = {}
+	if execCode is not None  or  evalCode is not None:
+		savedStdout, savedStderr = sys.stdout, sys.stderr
+		sys.stdout = stdout
+		sys.stderr = stderr
+		globals['display'] = stdout.display
+		globals['displayerr'] = stderr.display
+
+		def _exec():
+			exec execCode in globals
+			if evalCode is not None:
+				return [ eval( evalCode,globals ) ]
+			else:
+				return None
+
+		result, caughtException = InvokePyFunction.invoke( _exec )
+
+		sys.stdout, sys.stderr = savedStdout, savedStderr
+
+	return ExecutionResult( stdout.getStream(), stderr.getStream(), caughtException, result )
+
+
+def executeWithinModule(pythonModule, module, bEvaluate):
+	stdout = _OutputStream()
+	stderr = _OutputStream()
+
+	def _compileForEval():
+		return CodeGenerator.compileForModuleExecutionAndEvaluation( module, pythonModule, module.__name__ )
 	
+	def _compileForExec():
+		return CodeGenerator.compileForModuleExecution( module, pythonModule, module.__name__ )
+
+	evalCode = execCode = None
+	caughtException = None
+	result = None
+	if bEvaluate:
+		r, caughtException = InvokePyFunction.invoke( _compileForEval )
+		if r is not None:
+			execCode, evalCode = r
+	else:
+		execCode, caughtException = InvokePyFunction.invoke( _compileForExec )
+
 	if execCode is not None  or  evalCode is not None:
 		savedStdout, savedStderr = sys.stdout, sys.stderr
 		sys.stdout = stdout
 		sys.stderr = stderr
 		setattr( module, 'display', stdout.display )
 		setattr( module, 'displayerr', stderr.display )
-		
+
 		def _exec():
 			exec execCode in module.__dict__
 			if evalCode is not None:
@@ -122,8 +162,7 @@ def executeWithinModule(pythonModule, module, bEvaluate):
 				return None
 
 		result, caughtException = InvokePyFunction.invoke( _exec )
-	
+
 		sys.stdout, sys.stderr = savedStdout, savedStderr
-	
+
 	return ExecutionResult( stdout.getStream(), stderr.getStream(), caughtException, result )
-	

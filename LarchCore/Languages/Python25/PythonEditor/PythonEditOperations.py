@@ -330,7 +330,7 @@ class _InsertSpecialFormTreeEvent (TextEditEvent):
 		super( _InsertSpecialFormTreeEvent, self ).__init__( leaf, None, None )
 
 
-def insertSpecialFormAtMarker(marker, specialForm):
+def _insertSpecialFormAtMarker(marker, specialForm):
 	element = marker.getElement()
 	index = marker.getIndex()
 	assert isinstance( element, DPText )
@@ -349,15 +349,19 @@ def insertSpecialFormAtMarker(marker, specialForm):
 	element.postTreeEvent( event )
 
 
-def insertSpecialFormAtCaret(caret, specialForm):
-	return insertSpecialFormAtMarker( caret.getMarker(), specialForm )
 
 
+def insertSpecialFormExpressionAtMarker(marker, specialForm):
+	_insertSpecialFormAtMarker( marker, specialForm )
+
+
+def insertSpecialFormExpressionAtCaret(caret, specialForm):
+	return insertSpecialFormExpressionAtMarker( caret.getMarker(), specialForm )
 
 
 
 def insertSpecialFormStatementAtMarker(marker, specialForm):
-	insertSpecialFormAtMarker( marker, Schema._temp_SpecialFormStmtWrapper( value=specialForm ) )
+	_insertSpecialFormAtMarker( marker, Schema._temp_SpecialFormStmtWrapper( value=specialForm ) )
 
 
 def insertSpecialFormStatementAtCaret(caret, specialForm):
