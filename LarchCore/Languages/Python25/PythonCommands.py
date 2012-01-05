@@ -9,12 +9,13 @@ from BritefuryJ.Command import CommandSetRegistry
 
 from BritefuryJ.DocPresent.Selection import TextSelection
 
-from LarchCore.Languages.Python25.PythonEditor.PythonEditOperations import insertSpecialFormAtCaret, pyReplaceNode, pyReplaceStatementRangeWithStatement, getSelectedExpression, getSelectedStatement, getSelectedStatementRange
+from LarchCore.Languages.Python25.PythonEditor.PythonEditOperations import insertSpecialFormExpressionAtCaret, insertSpecialFormStatementAtCaret, pyReplaceStatementRangeWithStatement, \
+	getSelectedExpression, getSelectedStatement, getSelectedStatementRange
 from LarchCore.Languages.Python25.Builder import embeddedExpression, embeddedStatement
 
 
 
-def _makeInsertEmbeddedObjectAtCaretAction(valueAtCaretFactory, embedFn):
+def _makeInsertEmbeddedObjectAtCaretAction(valueAtCaretFactory, embedFn, insertSpecialFormAtCaretFn):
 	"""
 	valueAtCaretFactory - function( caret )  ->  value
 	embedFn - function( value )  ->  AST node
@@ -22,20 +23,40 @@ def _makeInsertEmbeddedObjectAtCaretAction(valueAtCaretFactory, embedFn):
 	def _action(context):
 		element = context
 		rootElement = element.getRootElement()
-		
+
 		caret = rootElement.getCaret()
 		if caret.isValid()  and  caret.isEditable():
 			value = valueAtCaretFactory( caret )
 			if value is not None:
 				specialForm = embedFn( value )
-				insertSpecialFormAtCaret( caret, specialForm )
+				insertSpecialFormAtCaretFn( caret, specialForm )
 				return True
-		
+
 		return False
-	
+
 	return _action
 
-			
+
+
+
+def _makeInsertEmbeddedObjectExprAtCaretAction(valueAtCaretFactory, embedFn):
+	"""
+	valueAtCaretFactory - function( caret )  ->  value
+	embedFn - function( value )  ->  AST node
+	"""
+	return _makeInsertEmbeddedObjectAtCaretAction(valueAtCaretFactory, embedFn, insertSpecialFormExpressionAtCaret)
+
+
+
+
+def _makeInsertEmbeddedObjectStmtAtCaretAction(valueAtCaretFactory, embedFn):
+	"""
+	valueAtCaretFactory - function( caret )  ->  value
+	embedFn - function( value )  ->  AST node
+	"""
+	return _makeInsertEmbeddedObjectAtCaretAction(valueAtCaretFactory, embedFn, insertSpecialFormStatementAtCaret)
+
+
 
 
 def _makeWrapSelectionInEmbeddedObjectAction(getSelectedNodeFn, valueAtSelectionFactory, embedFn):
@@ -69,13 +90,13 @@ def makeInsertEmbeddedExpressionAtCaretAction(valueAtCaretFactory):
 	"""
 	valueAtCaretFactory - function( caret )  ->  value
 	"""
-	return _makeInsertEmbeddedObjectAtCaretAction( valueAtCaretFactory, embeddedExpression )
+	return _makeInsertEmbeddedObjectExprAtCaretAction( valueAtCaretFactory, embeddedExpression )
 			
 def makeInsertEmbeddedStatementAtCaretAction(valueAtCaretFactory):
 	"""
 	valueAtCaretFactory - function( caret )  ->  value
 	"""
-	return _makeInsertEmbeddedObjectAtCaretAction( valueAtCaretFactory, embeddedStatement )
+	return _makeInsertEmbeddedObjectStmtAtCaretAction( valueAtCaretFactory, embeddedStatement )
 
 			
 

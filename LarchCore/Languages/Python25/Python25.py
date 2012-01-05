@@ -217,6 +217,12 @@ class EmbeddedPython25Executable (EmbeddedPython25):
 		return CodeGenerator.compileForModuleExecutionAndEvaluation( module, self.model, filename )
 
 
+	def execute(self, filename):
+		return Execution.execute( self.model, filename, False )
+
+	def executeAndEvaluate(self, filename):
+		return Execution.execute( self.model, filename, True )
+
 	def executeWithinModule(self, module):
 		return Execution.executeWithinModule( self.model, module, False )
 

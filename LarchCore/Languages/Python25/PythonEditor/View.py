@@ -173,7 +173,7 @@ def _onDrop_embeddedObject(element, pos, data, action):
 			else:
 				if modelType is Schema.Expr:
 					expr = Schema.EmbeddedObjectExpr( embeddedValue=embeddedValue )
-					insertSpecialFormAtMarker( marker, expr )
+					insertSpecialFormExpressionAtMarker( marker, expr )
 				elif modelType is Schema.Stmt:
 					stmt = Schema.EmbeddedObjectStmt( embeddedValue=embeddedValue )
 					insertSpecialFormStatementAtMarker( marker, stmt )
@@ -260,19 +260,19 @@ def _pythonModuleContextMenuFactory(element, menu):
 		caret = rootElement.getCaret()
 		if caret.isValid():
 			pyExpr = Schema.Quote( value=Schema.PythonExpression( expr=Schema.Load( name='None' ) ) )
-			insertSpecialFormAtCaret( caret, pyExpr )
+			insertSpecialFormExpressionAtCaret( caret, pyExpr )
 
 	def _onQuoteSuite(item):
 		caret = rootElement.getCaret()
 		if caret.isValid():
 			pyExpr = Schema.Quote( value=Schema.PythonSuite( suite=[] ) )
-			insertSpecialFormAtCaret( caret, pyExpr )
+			insertSpecialFormExpressionAtCaret( caret, pyExpr )
 
 	def _onUnquote(item):
 		caret = rootElement.getCaret()
 		if caret.isValid():
 			pyExpr = Schema.Unquote( value=Schema.PythonExpression( expr=Schema.Load( name='None' ) ) )
-			insertSpecialFormAtCaret( caret, pyExpr )
+			insertSpecialFormExpressionAtCaret( caret, pyExpr )
 
 
 	menu.add( MenuItem.menuItemWithLabel( 'Quote expression', _onQuoteExpr ) )
