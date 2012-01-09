@@ -156,7 +156,7 @@ class StepperBreakpoint (object):
 
 _stepperRegistry = {}
 
-def _regsiterStepper(coroutine, stepper):
+def _registerStepper(coroutine, stepper):
 	_stepperRegistry[coroutine] = stepper
 
 def _unregisterStepper(coroutine):
@@ -170,9 +170,12 @@ def _getStepperForCoroutine(coroutine):
 class Stepper (object):
 	def __init__(self, suite=None):
 		self._code = StepperCode( self, suite )
+		self._compiledCode = None
+		self._scope = {}
 		self._stepButton = StepperButtonStep( self )
 		self._runButton = StepperButtonRun( self )
 		self._co = None
+		self._finished = False
 		self.__currentBreakpoint = None
 		self.__change_history__ = None
 
@@ -189,9 +192,12 @@ class Stepper (object):
 
 	def __setstate__(self, state):
 		self._code = state['code']
+		self._compiledCode = None
+		self._scope = {}
 		self._stepButton = state['stepButton']
 		self._runButton = state['runButton']
 		self._co = None
+		self._finished = False
 		self.__currentBreakpoint = None
 		self.__change_history__ = None
 
@@ -204,9 +210,10 @@ class Stepper (object):
 		if self._co is None:
 			def _run():
 				module = imp.new_module( '<python_stepper>' )
-				self._code._suite.executeWithinModule( module )
+				module.__dict__.update( self._scope )
+				exec self._compiledCode in module.__dict__
 			self._co = Coroutine( _run )
-			_regsiterStepper(self._co, self)
+			_registerStepper( self._co, self )
 			self._setCurrentBreakpoint( None )
 
 
@@ -214,34 +221,45 @@ class Stepper (object):
 		return deepcopy( self._code._suite.model['suite'] )
 
 
-	def __py_exec__(self, globals, locals, codeGen):
-		pass
+	def __py_compile_visit__(self, codeGen):
+		self._compiledCode = codeGen.compileForExecution( self._code._suite.model )
+
+
+	def __py_exec__(self, globalVars, localVars, codeGen):
+		self._scope = {}
+		self._scope.update( globalVars )
+		self._scope.update( localVars )
 
 
 	def reset(self):
 		self._co = None
+		self._finished = False
 		self.__initCoroutine()
 
 
 	def _onStep(self):
-		self.__initCoroutine()
-		bpAndState = self._co.yieldTo( self )
-		if bpAndState is not None:
-			breakPoint, stateView = bpAndState
-			self._setCurrentBreakpoint( breakPoint )
-			self._setStateView( stateView )
-		else:
-			self._setCurrentBreakpoint( None )
-			self._setStateView( None )
-		if self._co.isFinished():
-			_unregisterStepper( self._co )
+		if not self._finished:
+			self.__initCoroutine()
+			bpAndState = self._co.yieldTo( self )
+			if bpAndState is not None:
+				breakPoint, stateView = bpAndState
+				self._setCurrentBreakpoint( breakPoint )
+				self._setStateView( stateView )
+			else:
+				self._setCurrentBreakpoint( None )
+				self._setStateView( None )
+			if self._co.isFinished()  and  not self._finished:
+				_unregisterStepper( self._co )
+				self._finished = True
 
 
 	def _onRun(self):
-		self.__initCoroutine()
-		while not self._co.isFinished():
-			self._co.yieldTo( self )
-		_unregisterStepper( self._co )
+		if not self._finished:
+			self.__initCoroutine()
+			while not self._co.isFinished():
+				self._co.yieldTo( self )
+			_unregisterStepper( self._co )
+			self._finished = True
 
 
 	def _setCurrentBreakpoint(self, breakPoint):
