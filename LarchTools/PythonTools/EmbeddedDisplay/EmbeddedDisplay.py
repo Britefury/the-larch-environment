@@ -109,15 +109,37 @@ class _TableSchema (object):
 
 
 class _TableView (object):
-	def __init__(self, schema):
+	def __init__(self):
 		self._incr = IncrementalValueMonitor()
+		self._schema = None
+		self._tableEditor = None
+		self._tableContent = None
+		self._tableRow = None
+		self._numTableRows = None
+
+
+	def initialise(self, schema):
 		self._schema = schema
 		self._tableEditor = GenericTableEditor( [ v._name   for v in schema._monitoredExpressions ], True, True, False, False )
 		self._tableContent = GenericTableModel( lambda: '', lambda x: x )
 		self._tableRow = None
 		self._numTableRows = None
-	
-	
+
+
+	def __getstate__(self):
+		return { None : None }
+
+
+	def __setstate__(self, state):
+		self._incr = IncrementalValueMonitor()
+		self._schema = None
+		self._tableEditor = None
+		self._tableContent = None
+		self._tableRow = None
+		self._numTableRows = None
+
+
+
 	def begin(self):
 		state = self._tableRow
 		self._numTableRows = self._numTableRows + 1   if self._numTableRows is not None   else   0
@@ -201,11 +223,30 @@ class _Frame (object):
 	
 class _TreeView (object):
 	def __init__(self):
+		self._incr = IncrementalValueMonitor()
+		self.initialise()
+
+
+
+	def __getstate__(self):
+		return { None : None }
+
+
+	def __setstate__(self, state):
+		self._incr = IncrementalValueMonitor()
+		self.initialise()
+
+
+
+	def initialise(self):
+		self._incr.onChanged()
 		self._rootFrames = []
 		self._currentFrame = None
 
+
 		
 	def begin(self):
+		self._incr.onChanged()
 		# Open a new frame
 		prevFrame = self._currentFrame
 		
@@ -224,11 +265,13 @@ class _TreeView (object):
 	
 	
 	def logValue(self, monitoredExpression, value):
+		self._incr.onChanged()
 		if self._currentFrame is not None:
 			self._currentFrame.values.logValue( monitoredExpression, value )
 	
 	
 	def __present__(self, fragment, inheritedState):
+		self._incr.onAccess()
 		valuesLive = LiveValue( Blank() )
 		tree = Column( [ x._presentFrameSubtree( valuesLive )   for x in self._rootFrames ] )
 		return Column( [ tree, Spacer( 0.0, 10.0 ), valuesLive ] )
@@ -243,25 +286,24 @@ class EmbeddedSuiteDisplay (object):
 		self.__change_history__ = None
 		
 		self._tableSchema = None
-		self._tableView = None
+		self._tableView = _TableView()
 		
-		self._treeView = None
+		self._treeView = _TreeView()
 		
 		
 	def __getstate__(self):
-		return { 'suite' : self._suite }
+		return { 'suite' : self._suite, 'tableView' : self._tableView, 'treeView' : self._treeView }
 	
 	def __setstate__(self, state):
 		self._suite = state['suite']
+		self._tableView = state.get( 'tableView', _TableView() )
+		self._treeView = state.get( 'treeView', _TreeView() )
 		self._code = None
 		self._incr = IncrementalValueMonitor()
 		self.__change_history__ = None
 		
 		self._tableSchema = None
-		self._tableView = None
-		
-		self._treeView = None
-	
+
 	
 	def __get_trackable_contents__(self):
 		return [ self._suite ]
@@ -271,12 +313,12 @@ class EmbeddedSuiteDisplay (object):
 		self._tableSchema = _TableSchema()
 	
 	def _initTableView(self):
-		self._tableView = _TableView( self._tableSchema )
+		self._tableView.initialise( self._tableSchema )
 		self._incr.onChanged()
 	
 	
 	def _initTreeView(self):
-		self._treeView = _TreeView()
+		self._treeView.initialise()
 		self._incr.onChanged()
 	
 	
@@ -337,13 +379,7 @@ class EmbeddedSuiteDisplay (object):
 		self._incr.onAccess()
 		suitePres = self._suite
 		
-		treeLabel = Label( 'Tree' )
-		treePres = self._treeView   if self._treeView is not None   else   Blank()
-
-		tableLabel = Label( 'Table' )
-		tablePres = self._tableView   if self._tableView is not None   else   Blank()
-
-		valuesPres = TabbedBox( [ [ treeLabel, treePres ],  [ tableLabel, tablePres ] ], None )
+		valuesPres = TabbedBox( [ [ Label( 'Tree' ), self._treeView ],  [ Label( 'Table' ), self._tableView ] ], None )
 		
 		contents = Column( [ suitePres, valuesPres ] )
 		return ObjectBox( 'Embedded suite display', contents ).withContextMenuInteractor( _embeddedDisplayMenu ).withCommands( _mxCommands )
