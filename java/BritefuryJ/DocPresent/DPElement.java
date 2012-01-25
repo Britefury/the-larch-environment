@@ -2768,8 +2768,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	
 	
-	
-	
 	//
 	// Meta-element
 	//

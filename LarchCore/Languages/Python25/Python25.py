@@ -18,6 +18,7 @@ from LarchCore.Languages.Python25.Python25Importer import importPy25File
 from LarchCore.Languages.Python25.PythonEditor.View import perspective as python25EditorPerspective
 from LarchCore.Languages.Python25.PythonEditor.Subject import Python25Subject
 from LarchCore.Languages.Python25.PythonEditor.Parser import Python25Grammar
+from LarchCore.Languages.Python25.PythonEditor.PythonEditOperations import requestRemoveEmbeddedObjectContainingElement
 
 
 from LarchCore.Project.PageData import PageData, registerPageFactory, registerPageImporter
@@ -264,6 +265,11 @@ class EmbeddedPython25Module (EmbeddedPython25Executable):
 			raise TypeError, 'Cannot construct EmbeddedPython25Module from %s' % model
 
 		super(EmbeddedPython25Module, self).__init__( model )
+
+
+
+def removeEmbeddedObjectContainingElement(element):
+	return requestRemoveEmbeddedObjectContainingElement( element )
 
 
 

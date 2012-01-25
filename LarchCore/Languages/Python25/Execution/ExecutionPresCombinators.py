@@ -80,13 +80,13 @@ def executionResultBox(stdoutStream, stderrStream, exception, resultInTuple, bUs
 	boxContents = []
 	if stderrStream is not None:
 		boxContents.append( execStderr( stderrStream, bUseDefaultPerspectiveForResult ) )
+	if stdoutStream is not None:
+		boxContents.append( execStdout( stdoutStream, bUseDefaultPerspectiveForResult ) )
 	if exception is not None:
 		exceptionView = InnerFragment( exception ).alignHPack()
 		if bUseDefaultPerspecitveForException:
 			exceptionView = ApplyPerspective.defaultPerspective( exceptionView )
 		boxContents.append( execException( exceptionView ) )
-	if stdoutStream is not None:
-		boxContents.append( execStdout( stdoutStream, bUseDefaultPerspectiveForResult ) )
 	if resultInTuple is not None:
 		resultView = InnerFragment( resultInTuple[0] ).alignHPack()
 		if bUseDefaultPerspectiveForResult:

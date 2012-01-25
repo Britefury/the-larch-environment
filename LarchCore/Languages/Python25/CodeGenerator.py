@@ -87,6 +87,16 @@ class Python25CodeGenerator (object):
 		super( Python25CodeGenerator, self ).__init__()
 		self._filename = filename
 		self._bErrorChecking = bErrorChecking
+
+
+	@property
+	def filename(self):
+		return self._filename
+
+
+	@property
+	def module(self):
+		return None
 			
 		
 	def compileForEvaluation(self, pythonExpression):
@@ -879,6 +889,13 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 		self._resourceValueIdToIndex = {}
 		for i, x in enumerate( self._resourceMap ):
 			self._resourceValueIdToIndex[id(x)] = i
+
+		self._module = module
+
+
+	@property
+	def module(self):
+		return self._module
 			
 			
 			
@@ -1066,22 +1083,22 @@ def compileForEvaluation(pythonExpression, filename):
 	return Python25CodeGenerator( filename ).compileForEvaluation( pythonExpression )
 
 
-def compileForExecution(pythonModule, filename):
-	return Python25CodeGenerator( filename ).compileForExecution( pythonModule )
+def compileForExecution(pythonCode, filename):
+	return Python25CodeGenerator( filename ).compileForExecution( pythonCode )
 
 
-def compileForExecutionAndEvaluation(pythonModule, filename):
-	return Python25CodeGenerator( filename ).compileForExecutionAndEvaluation( pythonModule )
+def compileForExecutionAndEvaluation(pythonCode, filename):
+	return Python25CodeGenerator( filename ).compileForExecutionAndEvaluation( pythonCode )
 
 				
 				
 				
-def compileForModuleExecution(module, pythonModule, filename):
-	return Python25ModuleCodeGenerator( module, filename ).compileForExecution( pythonModule )
+def compileForModuleExecution(module, pythonCode, filename):
+	return Python25ModuleCodeGenerator( module, filename ).compileForExecution( pythonCode )
 
 
-def compileForModuleExecutionAndEvaluation(module, pythonModule, filename):
-	return Python25ModuleCodeGenerator( module, filename ).compileForExecutionAndEvaluation( pythonModule )
+def compileForModuleExecutionAndEvaluation(module, pythonCode, filename):
+	return Python25ModuleCodeGenerator( module, filename ).compileForExecutionAndEvaluation( pythonCode )
 
 				
 				

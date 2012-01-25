@@ -194,10 +194,10 @@ class ConsoleView (ObjectDispatchView):
 		blockContents = [ _pythonModuleBorderStyle.applyTo( Border( moduleView.alignHExpand() ).alignHExpand() ) ]
 		if stderrStream is not None:
 			blockContents.append( execStderr( stderrStream, True ) )
-		if caughtExceptionView is not None:
-			blockContents.append( execException( caughtExceptionView ) )
 		if stdoutStream is not None:
 			blockContents.append( execStdout( stdoutStream, True ) )
+		if caughtExceptionView is not None:
+			blockContents.append( execException( caughtExceptionView ) )
 		if resultView is not None:
 			blockContents.append( execResult( resultView ) )
 		blockColumn = Column( blockContents ).alignHExpand()
