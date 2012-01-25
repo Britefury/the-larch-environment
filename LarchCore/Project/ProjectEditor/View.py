@@ -136,13 +136,13 @@ def _performDrop(data, action, newParent, index):
 
 
 
-def _pageCanDrop(element, targetPos, data, action):
+def _canDropOntoPage(element, targetPos, data, action):
 	if action & ObjectDndHandler.COPY_OR_MOVE  !=  0:
 		model = _getModelOfPackageOrPageNameElement( element )
 		return model is not data.source
 	return False
 
-def _pageDrop(element, targetPos, data, action):
+def _dropOntoPage(element, targetPos, data, action):
 	if action & ObjectDndHandler.COPY_OR_MOVE  !=  0:
 		destPage = _getModelOfPackageOrPageNameElement( element )
 		parent = destPage.parent
@@ -171,14 +171,14 @@ def _getDestPackageAndIndex(element, targetPos):
 		return parent, index
 
 
-def _packageCanDrop(element, targetPos, data, action):
+def _canDropOntoPackage(element, targetPos, data, action):
 	if action & ObjectDndHandler.COPY_OR_MOVE  !=  0:
 		destPackage, index = _getDestPackageAndIndex( element, targetPos )
 		if action == ObjectDndHandler.COPY  or  not _isChildOf( data.source, destPackage ):
 			return True
 	return False
 
-def _packageDrop(element, targetPos, data, action):
+def _dropOntoPackage(element, targetPos, data, action):
 	if action & ObjectDndHandler.COPY_OR_MOVE  !=  0:
 		destPackage, index = _getDestPackageAndIndex( element, targetPos )
 		if action == ObjectDndHandler.MOVE  and _isChildOf( data.source, destPackage ):
@@ -209,8 +209,8 @@ def _projectIndexDrop(element, targetPos, data, action):
 	return False
 
 
-_pageDropDest = ObjectDndHandler.DropDest( ProjectDrag, _pageCanDrop, _pageDrop )
-_packageDropDest = ObjectDndHandler.DropDest( ProjectDrag, _packageCanDrop, _packageDrop )
+_pageDropDest = ObjectDndHandler.DropDest( ProjectDrag, _canDropOntoPage, _dropOntoPage )
+_packageDropDest = ObjectDndHandler.DropDest( ProjectDrag, _canDropOntoPackage, _dropOntoPackage )
 _projectIndexDropDest = ObjectDndHandler.DropDest( ProjectDrag, _projectIndexDrop )
 
 
@@ -406,9 +406,15 @@ class ProjectView (ObjectDispatchView):
 		icon = Image( 'LarchCore/Project/icons/Package.png' )
 		nameElement = _packageNameStyle.applyTo( StaticText( package.name ) )
 		nameBox = _itemHoverHighlightStyle.applyTo( Row( [ icon.padX( 5.0 ).alignHPack().alignVCentre(), nameElement.alignVCentre() ] ) )
+
+		# Set drop destination and place in box that is h-packed, otherwise attempting to drop items as children could require the user to
+		# drop somewhere off to the right of the package, since the h-expand applied further up the presentation tree will expand it beyond
+		# its visible bounds
+		nameBox = nameBox.withDropDest( _packageDropDest )
+		nameBox = Bin( nameBox ).alignHPack()
+
 		nameBox = nameBox.withContextMenuInteractor( _packageContextMenuFactory )
 		nameBox = nameBox.withDragSource( _dragSource )
-		nameBox = nameBox.withDropDest( _packageDropDest )
 
 		nameLive = LiveValue( nameBox )
 

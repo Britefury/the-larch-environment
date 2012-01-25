@@ -351,7 +351,7 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	}
 
 	
-	private static class ViewProfile implements ObjectListInterface, Presentable
+	public static class ViewProfile implements ObjectListInterface, Presentable
 	{
 		private ArrayList<ProfileMeasurement> measurements = new ArrayList<ProfileMeasurement>();
 		private IncrementalValueMonitor incr = new IncrementalValueMonitor();
@@ -751,13 +751,11 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	
 	public void enableProfiling()
 	{
-		System.out.println( "IncrementalView.enableProfiling" );
 		profile = new ViewProfile();
 	}
 	
 	public void disableProfiling()
 	{
-		System.out.println( "IncrementalView.disableProfiling" );
 		profile = null;
 	}
 	

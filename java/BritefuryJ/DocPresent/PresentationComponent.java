@@ -40,6 +40,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.ImageObserver;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -49,6 +50,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.TransferHandler;
 
+import org.python.core.Py;
+
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.DocPresent.Clipboard.DataTransfer;
@@ -72,11 +77,15 @@ import BritefuryJ.DocPresent.Selection.SelectionManager;
 import BritefuryJ.DocPresent.Selection.TextSelection;
 import BritefuryJ.DocPresent.Target.Target;
 import BritefuryJ.DocPresent.Target.TargetListener;
-import BritefuryJ.Logging.Log;
-import BritefuryJ.Logging.LogEntry;
+import BritefuryJ.Editor.Table.ObjectList.AttributeColumn;
+import BritefuryJ.Editor.Table.ObjectList.ObjectListInterface;
+import BritefuryJ.Editor.Table.ObjectList.ObjectListTableEditor;
+import BritefuryJ.Incremental.IncrementalValueMonitor;
+import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
+import BritefuryJ.Pres.Pres;
 import BritefuryJ.Util.WeakIdentityHashMap;
 
 public class PresentationComponent extends JComponent implements ComponentListener, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, HierarchyListener, FocusListener
@@ -410,6 +419,108 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	
 	
 
+
+	//
+	//
+	// TYPESETTING SYSTEM PROFILING
+	//
+	//
+		
+	public static class TypesetProfileMeasurement
+	{
+		private double typesetTime;
+		
+		public TypesetProfileMeasurement()
+		{
+		}
+		
+		public TypesetProfileMeasurement(double typesetTime)
+		{
+			this.typesetTime = typesetTime;
+		}
+		
+		
+		public double getTypesetTime()
+		{
+			return typesetTime;
+		}
+	}
+	
+	
+	private static AttributeColumn typesetTimeColumn = new AttributeColumn( "Typeset", Py.newString( "typesetTime" ) );
+	
+	private static ObjectListTableEditor typesetProfileTableEditor = null;
+	
+	
+	
+	private static ObjectListTableEditor getTypesetProfileTableEditor()
+	{
+		if ( typesetProfileTableEditor == null )
+		{
+			typesetProfileTableEditor = new ObjectListTableEditor(
+					Arrays.asList( new Object[] { typesetTimeColumn } ),
+					TypesetProfileMeasurement.class, true, true, false, false );
+		}
+		return typesetProfileTableEditor;
+	}
+
+	
+	public static class TypesetProfile implements ObjectListInterface, Presentable
+	{
+		private ArrayList<TypesetProfileMeasurement> measurements = new ArrayList<TypesetProfileMeasurement>();
+		private IncrementalValueMonitor incr = new IncrementalValueMonitor();
+		
+		
+		public TypesetProfile()
+		{
+		}
+		
+		
+		public void addMeasurement(TypesetProfileMeasurement m)
+		{
+			measurements.add( m );
+			incr.onChanged();
+		}
+		
+
+		@Override
+		public int size()
+		{
+			incr.onAccess();
+			return measurements.size();
+		}
+
+		@Override
+		public Object get(int i)
+		{
+			incr.onAccess();
+			return measurements.get( i );
+		}
+
+		@Override
+		public void append(Object x)
+		{
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void removeRange(int start, int end)
+		{
+			throw new UnsupportedOperationException();
+		}
+
+
+		@Override
+		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
+		{
+			return getTypesetProfileTableEditor().editTable( this );
+		}
+	}
+	
+	
+
+
+	
 	
 	
 	public static class RootElement extends DPBin implements SelectionListener, DndController
@@ -461,8 +572,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		protected PageController pageController = null;
 		
 		
-		private Log log;
-
+		private TypesetProfile profile;
 		
 		
 		
@@ -531,13 +641,6 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		public PageController getPageController()
 		{
 			return pageController;
-		}
-		
-		
-		
-		public void setLog(Log log)
-		{
-			this.log = log;
 		}
 		
 		
@@ -790,9 +893,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				long t2 = System.nanoTime();
 				double typesetTime = (double)(t2-t1) * 1.0e-9;
 				System.out.println( "RootElement.performAllocation(): TYPESET TIME = " + typesetTime  +  ", used memory = "  + ( Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() ) );
-				if ( log != null  &&  log.isRecording() )
+				if ( profile != null )
 				{
-					log.log( new LogEntry( "PresentationTypesetPerformance" ).hItem( "typesetTime", typesetTime ) );
+					profile.addMeasurement( new TypesetProfileMeasurement( typesetTime ) );
 				}
 				
 				if ( ensureVisibilityElement != null )
@@ -1694,6 +1797,29 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		protected DefaultTextRepresentationManager getDefaultTextRepresentationManager()
 		{
 			return defaultTextRepresentationManager;
+		}
+		
+		
+		
+		//
+		//
+		// TYPESET PROFILE METHODS
+		//
+		//
+		
+		public void enableTypesetProfiling()
+		{
+			profile = new TypesetProfile();
+		}
+		
+		public void disableTypesetProfiling()
+		{
+			profile = null;
+		}
+		
+		public TypesetProfile getTypesetProfile()
+		{
+			return profile;
 		}
 	}
 

@@ -232,20 +232,29 @@ class _ExprImporter (_Importer):
 			else:
 				return Schema.Add( x=Schema.FloatLiteral( value=repr( value.real ) ), y=Schema.ImaginaryLiteral( value=repr( value.imag ) + 'j' ) )
 		else:
-			print 'Const: could not handle value', value
-			raise ValueError
-		
+			raise ValueError, 'Num: could not handle value %s' % value
+
 	
 	# String literal
 	def Str(self, node):
 		value = node.s
 		if isinstance( value, str ):
-			return Schema.StringLiteral( format='ascii', quotation='single', value=repr( value )[1:-1] )
+			format = 'ascii'
+			r = repr( value )
 		elif isinstance( value, unicode ):
-			return Schema.StringLiteral( format='unicode', quotation='single', value=repr( value )[2:-1] )
+			format = 'unicode'
+			r = repr( value )[1:]
 		else:
-			print 'Const: could not handle value', value
-			raise ValueError
+			raise ValueError, 'Str: could not determine format of %s' % value
+		q = r[0]
+		if q == '\'':
+			quotation = 'single'
+		elif q == '"':
+			quotation = 'double'
+		else:
+			raise ValueError, 'Str: could not determine quotation of %s, with repr %s' % ( value, r )
+		return Schema.StringLiteral( format=format, quotation=quotation, value=r[1:-1] )
+
 
 		
 		

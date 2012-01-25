@@ -14,6 +14,8 @@ from java.util import List
 from BritefuryJ.Parser import ParserExpression
 
 from Britefury.Kernel.View.DispatchView import ObjectNodeDispatchView
+from Britefury.Kernel.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch
+from Britefury.Dispatch.ObjectMethodDispatch import ObjectDispatchMethod
 
 
 from BritefuryJ.DocModel import DMObjectClass
@@ -199,24 +201,68 @@ _embeddedObject_dropDest = ObjectDndHandler.DropDest( FragmentData, _onDrop_embe
 
 
 
+def _removeEmbeddedObjectExpr(model):
+	value = model['embeddedValue'].getValue()
+
+	try:
+		replacementFn = value.__py_replacement__
+	except AttributeError:
+		replacementFn = None
+
+	if replacementFn is not None:
+		replacement = replacementFn()
+		pyReplaceNode( model, replacement )
+	else:
+		pyReplaceNode( model, Schema.Load( name='None' ) )
+
+
+def _removeEmbeddedObjectStmt(model):
+	value = model['embeddedValue'].getValue()
+
+	try:
+		replacementFn = value.__py_replacement__
+	except AttributeError:
+		replacementFn = None
+
+	if replacementFn is not None:
+		replacement = replacementFn()
+		if isinstance( replacement, list )  or  isinstance( replacement, tuple )  or  isinstance( replacement, List ):
+			pyReplaceStatementWithStatementRange( model, replacement )
+		else:
+			pyReplaceNode( model, replacement )
+	else:
+		pyReplaceNode( model, Schema.BlankLine() )
+
+
+
+class _EmbeddedObjectExprTreeEventListener (TreeEventListenerObjectDispatch):
+	@ObjectDispatchMethod( RemoveEmbeddedObjectTreeEvent )
+	def _removeEmbeddedObjectTreeEvent(self, element, sourceElement, event):
+		model = element.getFragmentContext().getModel()
+		_removeEmbeddedObjectExpr( model )
+		return True
+
+_EmbeddedObjectExprTreeEventListener.instance = _EmbeddedObjectExprTreeEventListener()
+
+
+
+class _EmbeddedObjectStmtTreeEventListener (TreeEventListenerObjectDispatch):
+	@ObjectDispatchMethod( RemoveEmbeddedObjectTreeEvent )
+	def _removeEmbeddedObjectTreeEvent(self, element, sourceElement, event):
+		model = element.getFragmentContext().getModel()
+		_removeEmbeddedObjectStmt( model )
+		return True
+
+_EmbeddedObjectStmtTreeEventListener.instance = _EmbeddedObjectStmtTreeEventListener()
+
+
 
 def _embeddedObjectExprContextMenuFactory(element, menu):
 	fragment = element.getFragmentContext()
 	model = fragment.getModel()
 
 	def _onDelete(item):
-		value = model['embeddedValue'].getValue()
-		
-		try:
-			replacementFn = value.__py_replacement__
-		except AttributeError:
-			replacementFn = None
-		
-		if replacementFn is not None:
-			replacement = replacementFn()
-			pyReplaceNode( model, replacement )
-		else:
-			pyReplaceNode( model, Schema.Load( name='None' ) )
+		_removeEmbeddedObjectExpr( model )
 
 	menu.add( MenuItem.menuItemWithLabel( 'Delete embedded object', _onDelete ) )
 
@@ -228,21 +274,7 @@ def _embeddedObjectStmtContextMenuFactory(element, menu):
 	model = fragment.getModel()
 
 	def _onDelete(item):
-		value = model['embeddedValue'].getValue()
-		
-		try:
-			replacementFn = value.__py_replacement__
-		except AttributeError:
-			replacementFn = None
-			
-		if replacementFn is not None:
-			replacement = replacementFn()
-			if isinstance( replacement, list )  or  isinstance( replacement, tuple )  or  isinstance( replacement, List ):
-				pyReplaceStatementWithStatementRange( model, replacement )
-			else:
-				pyReplaceNode( model, replacement )
-		else:
-			pyReplaceNode( model, Schema.BlankLine() )
+		_removeEmbeddedObjectStmt( model )
 
 	menu.add( MenuItem.menuItemWithLabel( 'Delete embedded object', _onDelete ) )
 
@@ -1013,13 +1045,13 @@ class Python25View (ObjectNodeDispatchView):
 		if expansionFn is None:
 			# Standard view
 			view = embeddedObject( valueView )
-			return view.withContextMenuInteractor( _embeddedObjectExprContextMenuFactory )
+			return view.withContextMenuInteractor( _embeddedObjectExprContextMenuFactory ).withTreeEventListener( _EmbeddedObjectExprTreeEventListener.instance )
 		else:
 			# Macro view
 			def createExpansionView():
 				return Pres.coerce( expansionFn() )
 			view = embeddedObjectMacro( valueView, LazyPres( createExpansionView ) )
-			return view.withContextMenuInteractor( _embeddedObjectExprContextMenuFactory )
+			return view.withContextMenuInteractor( _embeddedObjectExprContextMenuFactory ).withTreeEventListener( _EmbeddedObjectExprTreeEventListener.instance )
 
 
 	# Embedded object statement
@@ -1033,13 +1065,13 @@ class Python25View (ObjectNodeDispatchView):
 		if expansionFn is None:
 			# Standard view
 			view = embeddedObject( valueView )
-			return view.withContextMenuInteractor( _embeddedObjectStmtContextMenuFactory )
+			return view.withContextMenuInteractor( _embeddedObjectStmtContextMenuFactory ).withTreeEventListener( _EmbeddedObjectStmtTreeEventListener.instance )
 		else:
 			# Macro view
 			def createExpansionView():
 				return Pres.coerce( expansionFn() )
 			view = embeddedObjectMacro( valueView, LazyPres( createExpansionView ) )
-			return view.withContextMenuInteractor( _embeddedObjectStmtContextMenuFactory )
+			return view.withContextMenuInteractor( _embeddedObjectStmtContextMenuFactory ).withTreeEventListener( _EmbeddedObjectStmtTreeEventListener.instance )
 
 
 

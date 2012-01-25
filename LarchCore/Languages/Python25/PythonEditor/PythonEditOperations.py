@@ -371,6 +371,18 @@ def insertSpecialFormStatementAtCaret(caret, specialForm):
 
 
 
+# Embedded object removal
+
+class RemoveEmbeddedObjectTreeEvent (object):
+	pass
+
+def requestRemoveEmbeddedObjectContainingElement(element):
+	return element.postTreeEvent( RemoveEmbeddedObjectTreeEvent() )
+
+
+
+
+
 #
 #
 # SELECTION / TARGET ACQUISITION
