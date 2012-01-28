@@ -300,7 +300,7 @@ class WorksheetEditor (ObjectDispatchView):
 		viewLocation = fragment.getSubjectContext()['viewLocation']
 		
 		homeLink = Hyperlink( 'HOME PAGE', Location( '' ) )
-		viewLink = Hyperlink( 'View this worksheet', viewLocation )
+		viewLink = Hyperlink( 'Switch to user mode', viewLocation )
 		linkHeader = SplitLinkHeaderBar( [ viewLink ], [ homeLink ] )
 
 		
@@ -536,7 +536,7 @@ class WorksheetEditorSubject (Subject):
 		return perspective2
 	
 	def getTitle(self):
-		return self._title + ' [WsEdit2]'
+		return self._title + ' [Ws-Devel]'
 	
 	def getSubjectContext(self):
 		return self._enclosingSubject.getSubjectContext().withAttrs( location=self._location )
