@@ -81,7 +81,7 @@ class WorksheetViewer (ObjectDispatchView):
 		editLocation = fragment.getSubjectContext()['editLocation']
 
 		homeLink = Hyperlink( 'HOME PAGE', Location( '' ) )
-		editLink = Hyperlink( 'Edit this worksheet', editLocation )
+		editLink = Hyperlink( 'Switch to developer mode', editLocation )
 		linkHeader = SplitLinkHeaderBar( [ editLink ], [ homeLink ] )
 		
 		w = Page( [ linkHeader, bodyView ] )
@@ -262,7 +262,7 @@ class WorksheetViewerSubject (Subject):
 		return perspective
 	
 	def getTitle(self):
-		return self._title + ' [WsView]'
+		return self._title + ' [Ws-User]'
 	
 	def getSubjectContext(self):
 		return self._enclosingSubject.getSubjectContext().withAttrs( location=self._location, editLocation=self._editLocation, viewLocation=self._location )
