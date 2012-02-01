@@ -7,23 +7,18 @@
 ##-*************************
 from BritefuryJ.IncrementalView import ViewFragmentFunction
 
-from BritefuryJ.Dispatch import DMObjectNodeDispatchViewFragmentFunction, ObjectDispatchViewFragmentFunction
-
-from Britefury.Dispatch.DMObjectNodeMethodDispatch import dmObjectNodeMethodDispatch, dmObjectNodeMethodDispatchAndGetName
-from Britefury.Dispatch.ObjectMethodDispatch import objectMethodDispatch, objectMethodDispatchAndGetName
-
-import time
+from BritefuryJ.Dispatch import PyMethodDispatchViewFragmentFunction
+from Britefury.Dispatch.MethodDispatch import ObjectDispatchMethod, DMObjectNodeDispatchMethod
 
 
-			
-		
-		
-class ObjectNodeDispatchView (object):
+
+
+class MethodDispatchView (object):
 	__dispatch_num_args__ = 2
-	
-	
+
+
 	def __init__(self):
-		self.fragmentViewFunction = DMObjectNodeDispatchViewFragmentFunction( self )
+		self.fragmentViewFunction = PyMethodDispatchViewFragmentFunction( self )
 
 
 	def _startProfiling(self):
@@ -40,15 +35,6 @@ class ObjectNodeDispatchView (object):
 
 	def _getProfileResults(self):
 		return self.fragmentViewFunction.getProfileResults()
-		
-	
-		
-
-	
-class ObjectDispatchView (object):
-	def __init__(self):
-		self.fragmentViewFunction = ObjectDispatchViewFragmentFunction( self )
-
 
 
 

@@ -14,9 +14,9 @@ from java.util.regex import Pattern
 
 from javax.swing import JPopupMenu
 
-from Britefury.Dispatch.ObjectMethodDispatch import ObjectDispatchMethod
+from Britefury.Dispatch.MethodDispatch import ObjectDispatchMethod
 
-from Britefury.Kernel.View.DispatchView import ObjectDispatchView
+from Britefury.Kernel.View.DispatchView import MethodDispatchView
 from Britefury.Kernel.Document import Document
 
 
@@ -113,7 +113,7 @@ def _dropPrompt(varNameTextEntryListener):
 	
 
 
-class ConsoleView (ObjectDispatchView):
+class ConsoleView (MethodDispatchView):
 	@ObjectDispatchMethod( Schema.Console )
 	def Console(self, ctx, state, node):
 		blocks = InnerFragment.map( node.getBlocks() )

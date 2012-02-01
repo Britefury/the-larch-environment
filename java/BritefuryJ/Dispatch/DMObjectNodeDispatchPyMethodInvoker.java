@@ -10,21 +10,18 @@ import java.util.List;
 
 import org.python.core.Py;
 import org.python.core.PyObject;
-import org.python.core.PyString;
-import org.python.core.__builtin__;
 
 import BritefuryJ.DocModel.DMObject;
 
-public class DMObjectNodeDispatchPyMethodInvoker
+public class DMObjectNodeDispatchPyMethodInvoker extends DispatchPyMethodInvoker
 {
-	private PyObject function;
 	private int indices[];
 	
 	
 	
 	public DMObjectNodeDispatchPyMethodInvoker(PyObject function, List<Integer> indices)
 	{
-		this.function = function;
+		super( function );
 		this.indices = new int[indices.size()];
 		for (int i = 0; i < indices.size(); i++)
 		{
@@ -32,8 +29,12 @@ public class DMObjectNodeDispatchPyMethodInvoker
 		}
 	}
 	
-	public PyObject invoke(DMObject node, PyObject dispatchSelf, PyObject args[])
+	
+	@Override
+	public PyObject invoke(Object node, PyObject dispatchSelf, PyObject args[])
 	{
+		DMObject dmNode = (DMObject)node;
+		
 		int numCallARgs = 1  +  args.length  +  1  +  indices.length;
 		PyObject callArgs[] = new PyObject[numCallARgs];
 		callArgs[0] = dispatchSelf;
@@ -41,15 +42,8 @@ public class DMObjectNodeDispatchPyMethodInvoker
 		callArgs[args.length+1] = Py.java2py( node );
 		for (int i = 0; i < indices.length; i++)
 		{
-			callArgs[args.length+2+i] = Py.java2py( node.get( indices[i] ) );
+			callArgs[args.length+2+i] = Py.java2py( dmNode.get( indices[i] ) );
 		}
 		return function.__call__( callArgs );
-	}
-	
-	
-	private static final PyString __name__ = Py.newString( "__name__" );
-	public String getName()
-	{
-		return __builtin__.getattr( function, __name__ ).asString(); 
 	}
 }

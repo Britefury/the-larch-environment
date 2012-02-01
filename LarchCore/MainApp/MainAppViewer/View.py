@@ -19,9 +19,9 @@ from javax.swing import AbstractAction
 from javax.swing import JPopupMenu, JOptionPane, JFileChooser
 from javax.swing.filechooser import FileNameExtensionFilter
 
-from Britefury.Dispatch.ObjectMethodDispatch import ObjectDispatchMethod
+from Britefury.Dispatch.MethodDispatch import ObjectDispatchMethod
 
-from Britefury.Kernel.View.DispatchView import ObjectDispatchView
+from Britefury.Kernel.View.DispatchView import MethodDispatchView
 from Britefury.Kernel.Document import Document
 
 
@@ -105,7 +105,7 @@ def _contentsList(controls, contentsLists, title):
 						
 						
 						
-class AppView (ObjectDispatchView):
+class AppView (MethodDispatchView):
 	@ObjectDispatchMethod( Application.AppState )
 	def AppState(self, fragment, state, node):
 		def _onNewDoc(link, event):

@@ -8,23 +8,26 @@ package BritefuryJ.Dispatch;
 
 import org.python.core.Py;
 import org.python.core.PyObject;
+import org.python.core.PyString;
+import org.python.core.__builtin__;
 
-public class ObjectDispatchPyMethodInvoker extends DispatchPyMethodInvoker
+public abstract class DispatchPyMethodInvoker
 {
-	public ObjectDispatchPyMethodInvoker(PyObject function)
+	protected PyObject function;
+	
+	
+	
+	public DispatchPyMethodInvoker(PyObject function)
 	{
-		super( function );
+		this.function = function;
 	}
 	
+	public abstract PyObject invoke(Object node, PyObject dispatchSelf, PyObject args[]);
 	
-	@Override
-	public PyObject invoke(Object node, PyObject dispatchSelf, PyObject args[])
+	
+	private static final PyString __name__ = Py.newString( "__name__" );
+	public String getName()
 	{
-		int numCallARgs = args.length + 2;
-		PyObject callArgs[] = new PyObject[numCallARgs];
-		callArgs[0] = dispatchSelf;
-		System.arraycopy( args, 0, callArgs, 1, args.length );
-		callArgs[args.length+1] = Py.java2py( node );
-		return function.__call__( callArgs );
+		return __builtin__.getattr( function, __name__ ).asString(); 
 	}
 }

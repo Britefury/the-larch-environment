@@ -13,9 +13,9 @@ from java.util import List
 
 from BritefuryJ.Parser import ParserExpression
 
-from Britefury.Kernel.View.DispatchView import ObjectNodeDispatchView
+from Britefury.Kernel.View.DispatchView import MethodDispatchView
 from Britefury.Kernel.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch
-from Britefury.Dispatch.ObjectMethodDispatch import ObjectDispatchMethod
+from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, ObjectDispatchMethod
 
 
 from BritefuryJ.DocModel import DMObjectClass
@@ -403,7 +403,7 @@ def SpecialFormStatement(method):
 
 
 
-class Python25View (ObjectNodeDispatchView):
+class Python25View (MethodDispatchView):
 	def __init__(self, grammar):
 		super( Python25View, self ).__init__()
 		self._parser = grammar

@@ -11,8 +11,7 @@ import sys
 import Britefury.Tests.BritefuryJ.Parser.Utils.Operators
 import Britefury.Tests.BritefuryJ.Isolation.Test_IsolationPickle
 import Britefury.Tests.Britefury.Grammar.Grammar
-import Britefury.Tests.Britefury.Dispatch.TestObjectMethodDispatch
-import Britefury.Tests.Britefury.Dispatch.TestDMObjectNodeMethodDispatch
+import Britefury.Tests.Britefury.Dispatch.TestMethodDispatch
 import Britefury.Tests.Britefury.Util.Test_TrackedList
 #import Britefury.Tests.Britefury.AttributeVisitor.TestAttributeVisitor
 import LarchCore.Languages.Python25.CodeGenerator
@@ -25,8 +24,7 @@ import LarchCore.Languages.Java.JavaEditor.Parser
 testModules = [ Britefury.Tests.BritefuryJ.Parser.Utils.Operators,
 		Britefury.Tests.BritefuryJ.Isolation.Test_IsolationPickle,
 		Britefury.Tests.Britefury.Grammar.Grammar,
-		Britefury.Tests.Britefury.Dispatch.TestObjectMethodDispatch,
-		Britefury.Tests.Britefury.Dispatch.TestDMObjectNodeMethodDispatch,
+		Britefury.Tests.Britefury.Dispatch.TestMethodDispatch,
 		Britefury.Tests.Britefury.Util.Test_TrackedList,
 		#Britefury.Tests.Britefury.AttributeVisitor.TestAttributeVisitor,
 		LarchCore.Languages.Python25.CodeGenerator,
