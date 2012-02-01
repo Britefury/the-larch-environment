@@ -11,7 +11,7 @@ import _ast
 
 from BritefuryJ.DocModel import DMObject, DMList, DMEmbeddedObject, DMEmbeddedIsolatedObject
 
-from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod, dmObjectNodeMethodDispatch
+from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, methodDispatch
 
 from LarchCore.Languages.Python25 import Schema
 from LarchCore.Languages.Python25.PythonEditor.Precedence import *
@@ -111,7 +111,7 @@ class Python25ASTGenerator (object):
 	# Callable - use document model node method dispatch mechanism
 	def __call__(self, x, lineno, ctx=_ast.Load()):
 		if x is not None:
-			ast = dmObjectNodeMethodDispatch( self, x, lineno, ctx )
+			ast = methodDispatch( self, x, lineno, ctx )
 			if ast is not None  and  hasattr( ast, 'lineno' ):
 				ast.lineno = lineno
 			return ast

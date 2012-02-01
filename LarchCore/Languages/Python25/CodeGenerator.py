@@ -9,7 +9,7 @@ from copy import deepcopy
 
 from BritefuryJ.DocModel import DMObject, DMList, DMEmbeddedObject, DMEmbeddedIsolatedObject
 
-from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod, dmObjectNodeMethodDispatch
+from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, methodDispatch
 
 from LarchCore.Languages.Python25 import Schema
 from LarchCore.Languages.Python25.PythonEditor.Precedence import *
@@ -137,7 +137,7 @@ class Python25CodeGenerator (object):
 	
 	# Callable - use document model node method dispatch mechanism
 	def __call__(self, x, outerPrec=PRECEDENCE_NONE):
-		s = dmObjectNodeMethodDispatch( self, x )
+		s = methodDispatch( self, x )
 		if parensRequired[x]:
 			prec = nodePrecedence[x]
 			if prec != -1  and  outerPrec != -1  and  prec > outerPrec:

@@ -18,9 +18,9 @@ from javax.swing import AbstractAction
 from javax.swing import JPopupMenu, JOptionPane, JFileChooser
 from javax.swing.filechooser import FileNameExtensionFilter
 
-from Britefury.Dispatch.ObjectMethodDispatch import ObjectDispatchMethod
+from Britefury.Dispatch.MethodDispatch import ObjectDispatchMethod
 
-from Britefury.Kernel.View.DispatchView import ObjectDispatchView
+from Britefury.Kernel.View.DispatchView import MethodDispatchView
 
 
 from BritefuryJ.AttributeTable import *
@@ -73,7 +73,7 @@ def _worksheetContextMenuFactory(element, menu):
 
 
 
-class WorksheetViewer (ObjectDispatchView):
+class WorksheetViewer (MethodDispatchView):
 	@ObjectDispatchMethod( ViewSchema.WorksheetView )
 	def Worksheet(self, fragment, inheritedState, node):
 		bodyView = InnerFragment( node.getBody() )

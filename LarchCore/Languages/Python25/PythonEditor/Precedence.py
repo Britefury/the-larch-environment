@@ -9,8 +9,6 @@ from java.util import List
 
 from BritefuryJ.DocModel import DMObjectInterface, DMListInterface, DMClassAttribute
 
-from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod, dmObjectNodeMethodDispatch
-
 from LarchCore.Languages.Python25 import Schema
 
 

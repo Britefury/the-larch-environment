@@ -23,7 +23,7 @@ import BritefuryJ.Editor.Table.ObjectList.ObjectListTableEditor;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 
-public class DispatchViewFragmentFunction
+public abstract class DispatchViewFragmentFunction
 {
 	public static class ProfileTiming
 	{

@@ -16,9 +16,9 @@ from java.awt.event import KeyEvent
 
 from java.util.regex import Pattern
 
-from Britefury.Dispatch.ObjectMethodDispatch import ObjectDispatchMethod
+from Britefury.Dispatch.MethodDispatch import ObjectDispatchMethod
 
-from Britefury.Kernel.View.DispatchView import ObjectDispatchView
+from Britefury.Kernel.View.DispatchView import MethodDispatchView
 
 
 from BritefuryJ.Live import LiveValue
@@ -235,7 +235,7 @@ _pythonPackageNameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*(\\.[a-zA-Z_][
 
 
 
-class ProjectView (ObjectDispatchView):
+class ProjectView (MethodDispatchView):
 	@ObjectDispatchMethod( ProjectRoot )
 	def ProjectRoot(self, fragment, inheritedState, project):
 		# Save and Save As

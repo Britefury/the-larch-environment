@@ -10,7 +10,7 @@ from BritefuryJ.Incremental import IncrementalValueMonitor
 from BritefuryJ.Pres import InnerFragment
 
 
-from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod, dmObjectNodeMethodDispatch
+from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, methodDispatch
 
 from LarchCore.Worksheet import Schema
 from LarchCore.Worksheet import AbstractViewSchema
@@ -24,7 +24,7 @@ class _Projection (object):
 	
 
 	def __call__(self, node, worksheet):
-		return dmObjectNodeMethodDispatch( self, node, worksheet )
+		return methodDispatch( self, node, worksheet )
 
 	@DMObjectNodeDispatchMethod( Schema.Worksheet )
 	def worksheet(self, worksheet, node):

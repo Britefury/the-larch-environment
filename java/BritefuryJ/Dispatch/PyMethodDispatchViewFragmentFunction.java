@@ -10,33 +10,27 @@ import org.python.core.Py;
 import org.python.core.PyObject;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.IncrementalView.ViewFragmentFunction;
 import BritefuryJ.Pres.Pres;
 
-public class DMObjectNodeDispatchViewFragmentFunction extends DispatchViewFragmentFunction implements ViewFragmentFunction
+public class PyMethodDispatchViewFragmentFunction extends DispatchViewFragmentFunction implements ViewFragmentFunction
 {
 	private PyObject dispatchInstance;
 	
 	
-	public DMObjectNodeDispatchViewFragmentFunction(PyObject dispatchInstance)
+	public PyMethodDispatchViewFragmentFunction(PyObject dispatchInstance)
 	{
 		this.dispatchInstance = dispatchInstance;
 	}
 	
-	
+
 	@Override
 	public Pres createViewFragment(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		if ( !( x instanceof DMObject ) )
-		{
-			throw new RuntimeException( "DMObjectNodeDispatchViewFragmentFunction can only present DMObject instances - not instances of " + x.getClass().getName() );
-		}
-		DMObject obj = (DMObject)x;
 		String name[] = { "" };
 		long startTime = profile_start();
-		PyObject pyPres = DMObjectNodePyMethodDispatch.dmObjectNodeMethodDispatchAndGetNameFromJava( dispatchInstance, obj, new Object[] { fragment, inheritedState }, name );
+		PyObject pyPres = PyMethodDispatch.methodDispatchAndGetNameFromJava( dispatchInstance, x, new Object[] { fragment, inheritedState }, name );
 		profile_stop( name[0], startTime );
 		Pres pres = Py.tojava( pyPres, Pres.class );
 		return pres.setDebugName( name[0] );

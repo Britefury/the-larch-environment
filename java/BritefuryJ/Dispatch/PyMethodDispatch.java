@@ -16,45 +16,103 @@ import org.python.core.PyType;
 import org.python.core.__builtin__;
 
 import BritefuryJ.DocModel.DMObject;
+import BritefuryJ.DocModel.DMPolymorphicMap;
 import BritefuryJ.Util.PolymorphicMap;
 
-public class ObjectPyMethodDispatch
+public class PyMethodDispatch
 {
-	private static HashMap<PyType, PolymorphicMap<ObjectDispatchPyMethodInvoker>> dispatchTableByType = new HashMap<PyType, PolymorphicMap<ObjectDispatchPyMethodInvoker>>();
+	private static HashMap<PyType, PolymorphicMap<ObjectDispatchPyMethodInvoker>> objectDispatchTableByType = new HashMap<PyType, PolymorphicMap<ObjectDispatchPyMethodInvoker>>();
+	private static HashMap<PyType, DMPolymorphicMap<DMObjectNodeDispatchPyMethodInvoker>> dmObjectdispatchTableByType = new HashMap<PyType, DMPolymorphicMap<DMObjectNodeDispatchPyMethodInvoker>>();
 	
+	
+	//
+	//
+	// Get method invoker for objects or DMObjects
+	//
+	//
 	@SuppressWarnings("unchecked")
-	public static ObjectDispatchPyMethodInvoker getMethodInvokerForNode(PyObject dispatchInstance, Object node)
+	public static DispatchPyMethodInvoker getMethodInvokerForObject(PyObject dispatchInstance, Object node)
 	{
 		// Get the type (class)
 		PyType type = dispatchInstance.getType();
 		
-		PolymorphicMap<ObjectDispatchPyMethodInvoker> dispatchTable = dispatchTableByType.get( type );
-		
-		if ( dispatchTable == null )
+		// Determine which dispatch table we want to access  --  DMObject or Object
+		if ( node instanceof DMObject )
 		{
-			dispatchTable = Py.tojava( getCreateDispatchTableFn().__call__( type ), PolymorphicMap.class );
-			dispatchTableByType.put( type, dispatchTable );
+			// Access the DMObject dispatch table
+			DMPolymorphicMap<DMObjectNodeDispatchPyMethodInvoker> dispatchTable = dmObjectdispatchTableByType.get( type );
+			
+			if ( dispatchTable == null )
+			{
+				dispatchTable = Py.tojava( getCreateDMObjectDispatchTableFn().__call__( type ), DMPolymorphicMap.class );
+				dmObjectdispatchTableByType.put( type, dispatchTable );
+			}
+			
+			return dispatchTable.get( (DMObject)node );
 		}
-		
-		return dispatchTable.getForInstance( node );
+		else
+		{
+			// Access the Object dispatch table
+			PolymorphicMap<ObjectDispatchPyMethodInvoker> dispatchTable = objectDispatchTableByType.get( type );
+			
+			if ( dispatchTable == null )
+			{
+				dispatchTable = Py.tojava( getCreateObjectDispatchTableFn().__call__( type ), PolymorphicMap.class );
+				objectDispatchTableByType.put( type, dispatchTable );
+			}
+			
+			return dispatchTable.getForInstance( node );
+		}
 	}
+	
+	
+	
+	//
+	//
+	// Get dispatch table creation functions (from Python)
+	//
+	//	
+	
+	private static PyObject _createObjectDispatchTableFn;
+	
+	public static PyObject getCreateObjectDispatchTableFn()
+	{
+		if ( _createObjectDispatchTableFn == null )
+		{
+		        PyObject fromlist = new PyTuple( Py.newString("__doc__") );
+			PyModule ObjectMethodDispatch_base = (PyModule)__builtin__.__import__( "Britefury.Dispatch.ObjectMethodDispatch_base", Py.None, Py.None, fromlist );
+			_createObjectDispatchTableFn = ObjectMethodDispatch_base.__getattr__( "createDispatchTableForClass" );
+		}
+		return _createObjectDispatchTableFn;
+	}
+	
+	
+	
+	private static PyObject _createDMObjectDispatchTableFn;
+	
+	public static PyObject getCreateDMObjectDispatchTableFn()
+	{
+		if ( _createDMObjectDispatchTableFn == null )
+		{
+		        PyObject fromlist = new PyTuple( Py.newString("__doc__") );
+			PyModule DMObjectNodeMethodDispatch_base = (PyModule)__builtin__.__import__( "Britefury.Dispatch.DMObjectNodeMethodDispatch_base", Py.None, Py.None, fromlist );
+			_createDMObjectDispatchTableFn = DMObjectNodeMethodDispatch_base.__getattr__( "createDispatchTableForClass" );
+		}
+		return _createDMObjectDispatchTableFn;
+	}
+	
 
 	
 	
-	private static PyObject _createDispatchTableFn;
 	
-	public static PyObject getCreateDispatchTableFn()
-	{
-		if ( _createDispatchTableFn == null )
-		{
-		        PyObject fromlist = new PyTuple( Py.newString("__doc__") );
-			PyModule DMObjectNodeMethodDispatch_base = (PyModule)__builtin__.__import__( "Britefury.Dispatch.ObjectMethodDispatch_base", Py.None, Py.None, fromlist );
-			_createDispatchTableFn = DMObjectNodeMethodDispatch_base.__getattr__( "createDispatchTableForClass" );
-		}
-		return _createDispatchTableFn;
-	}
 	
-	public static PyObject objectMethodDispatch(PyObject values[])
+	//
+	//
+	// Dispatch
+	//
+	//
+	
+	public static PyObject methodDispatch(PyObject values[])
 	{
 		if ( values.length < 2 )
 		{
@@ -66,7 +124,7 @@ public class ObjectPyMethodDispatch
 		PyObject args[] = new PyObject[values.length-2];
 		System.arraycopy( values, 2, args, 0, values.length - 2 );
 		
-		ObjectDispatchPyMethodInvoker invoker = getMethodInvokerForNode( dispatchInstance, node );
+		DispatchPyMethodInvoker invoker = getMethodInvokerForObject( dispatchInstance, node );
 		if ( invoker == null )
 		{
 			throw new DispatchError( "objectMethodDispatch(): could not find method for nodes of type " +
@@ -75,7 +133,7 @@ public class ObjectPyMethodDispatch
 		return invoker.invoke( node, dispatchInstance, argsFromJava( args ) );
 	}
 
-	public static PyObject objectMethodDispatchAndGetName(PyObject values[])
+	public static PyObject methodDispatchAndGetName(PyObject values[])
 	{
 		if ( values.length < 2 )
 		{
@@ -87,7 +145,7 @@ public class ObjectPyMethodDispatch
 		PyObject args[] = new PyObject[values.length-2];
 		System.arraycopy( values, 2, args, 0, values.length - 2 );
 
-		ObjectDispatchPyMethodInvoker invoker = getMethodInvokerForNode( dispatchInstance, node );
+		DispatchPyMethodInvoker invoker = getMethodInvokerForObject( dispatchInstance, node );
 		if ( invoker == null )
 		{
 			throw new DispatchError( "objectMethodDispatchAndGetName(): could not find method for nodes of type " +
@@ -110,9 +168,9 @@ public class ObjectPyMethodDispatch
 		return pyArgs;
 	}
 	
-	public static PyObject objectMethodDispatchFromJava(PyObject dispatchInstance, Object node, Object args[])
+	public static PyObject methodDispatchFromJava(PyObject dispatchInstance, Object node, Object args[])
 	{
-		ObjectDispatchPyMethodInvoker invoker = getMethodInvokerForNode( dispatchInstance, node );
+		DispatchPyMethodInvoker invoker = getMethodInvokerForObject( dispatchInstance, node );
 		if ( invoker == null )
 		{
 			throw new DispatchError( "objectMethodDispatchFromJava(): could not find method for nodes of type " +
@@ -122,9 +180,9 @@ public class ObjectPyMethodDispatch
 	}
 
 
-	public static PyObject objectMethodDispatchAndGetNameFromJava(PyObject dispatchInstance, Object node, Object args[], String name[])
+	public static PyObject methodDispatchAndGetNameFromJava(PyObject dispatchInstance, Object node, Object args[], String name[])
 	{
-		ObjectDispatchPyMethodInvoker invoker = getMethodInvokerForNode( dispatchInstance, node );
+		DispatchPyMethodInvoker invoker = getMethodInvokerForObject( dispatchInstance, node );
 		if ( invoker == null )
 		{
 			throw new DispatchError( "objectMethodDispatchAndGetNameFromJava(): could not find method for nodes of type " +

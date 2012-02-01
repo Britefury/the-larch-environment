@@ -7,7 +7,7 @@
 ##-*************************
 from BritefuryJ.DocPresent import TreeEventListener
 from BritefuryJ.Dispatch import DispatchError
-from Britefury.Dispatch.ObjectMethodDispatch import objectMethodDispatch, objectMethodDispatchAndGetName, ObjectDispatchMethod
+from Britefury.Dispatch.MethodDispatch import methodDispatch, methodDispatchAndGetName, ObjectDispatchMethod
 
 
 		
@@ -16,7 +16,7 @@ class TreeEventListenerObjectDispatch (TreeEventListener):
 	
 	def onTreeEvent(self, element, sourceElement, event):
 		try:
-			return objectMethodDispatch( self, event, element, sourceElement )
+			return methodDispatch( self, event, element, sourceElement )
 		except DispatchError:
 			return False
 
