@@ -22,7 +22,7 @@ import BritefuryJ.DocPresent.StyleParams.FractionStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 import BritefuryJ.Math.Point2;
 
-public class DPFraction extends DPContainer
+public class DPFraction extends DPContainerNonOverlayed
 {
 	public static class DPFractionBar extends DPContentLeafEditable
 	{

@@ -16,7 +16,7 @@ import java.util.List;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeMathRoot;
 import BritefuryJ.DocPresent.StyleParams.MathRootStyleParams;
 
-public class DPMathRoot extends DPContainer
+public class DPMathRoot extends DPContainerNonOverlayed
 {
 	protected DPElement child;
 	

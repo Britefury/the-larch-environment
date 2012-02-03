@@ -366,6 +366,47 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 			}
 		}
 	}
+	
+	
+	protected DPElement getChildLeafClosestToLocalPointOverlay(List<DPElement> searchList, Point2 localPos, ElementFilter filter)
+	{
+		if ( searchList.size() == 0 )
+		{
+			return null;
+		}
+		else if ( searchList.size() == 1 )
+		{
+			return getLeafClosestToLocalPointFromChild( searchList.get( 0 ), localPos, filter );
+		}
+		else
+		{
+			DPElement leaf = null;
+			double sqrDistance = Double.MAX_VALUE;
+			for (int i = searchList.size() - 1; i >= 0; i--)
+			{
+				DPElement child = searchList.get( i );
+				DPElement l = getLeafClosestToLocalPointFromChild( child, localPos, filter );
+				if ( l != null )
+				{
+					Xform2 x = l.getLocalToAncestorXform( this.getElement() );
+					double sqrD = x.transform( l.getLocalAABox() ).sqrDistanceTo( localPos );
+					if ( sqrD == 0.0 )
+					{
+						// Distance to target leaf is zero - we have found the best leaf
+						return l;
+					}
+					if ( sqrD < sqrDistance  ||  leaf == null )
+					{
+						sqrDistance = sqrD;
+						leaf = l;
+					}
+				}
+			}
+			
+			return leaf;
+		}
+	}
+	
 
 
 

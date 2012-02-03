@@ -24,7 +24,7 @@ import BritefuryJ.DocPresent.LayoutTree.LayoutNodeTable;
 import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
 import BritefuryJ.Math.Point2;
 
-public class DPTable extends DPContainer implements TableElement
+public class DPTable extends DPContainerNonOverlayed implements TableElement
 {
 	private static class TableChildEntry extends TableLayout.TablePackingParams
 	{

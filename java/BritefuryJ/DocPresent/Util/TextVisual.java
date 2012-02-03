@@ -36,7 +36,7 @@ import BritefuryJ.Util.HashUtils;
 
 public class TextVisual
 {
-	private static final float SMALL_CAPS_FONT_SCALE = 0.77f;
+	private static final float SMALL_CAPS_FONT_SCALE = 0.8f;
 	
 
 	private static class Key

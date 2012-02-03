@@ -15,7 +15,7 @@ import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 
-public class DPProxy extends DPContainer
+public class DPProxy extends DPContainerNonOverlayed
 {
 	protected final static int FLAGS_PROXY_END = FLAGS_CONTAINER_END * 0x4;
 

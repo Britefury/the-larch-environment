@@ -6,8 +6,6 @@
 //##************************
 package BritefuryJ.StyleSheet;
 
-import java.util.HashMap;
-
 import org.python.core.Py;
 import org.python.core.PyObject;
 
@@ -80,11 +78,6 @@ public class StyleSheet extends AttributeTable
 		return (StyleSheet)super.withAttr( attribute, value );
 	}
 	
-	public StyleSheet withAttrs(HashMap<AttributeBase, Object> valuesMap)
-	{
-		return (StyleSheet)super.withAttrs( valuesMap );
-	}
-		
 	public StyleSheet withAttrs(AttributeTable attribs)
 	{
 		return (StyleSheet)super.withAttrs( attribs );
@@ -112,12 +105,5 @@ public class StyleSheet extends AttributeTable
 	
 	
 	
-	public static StyleSheet fromAttrs(HashMap<AttributeBase, Object> valuesMap)
-	{
-		return instance.withAttrs( valuesMap );
-	}
-
-
-
 	public static final StyleSheet instance = new StyleSheet();
 }

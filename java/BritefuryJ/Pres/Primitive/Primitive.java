@@ -298,6 +298,26 @@ public class Primitive
 	
 	
 	
+	protected static DerivedValueTable<ContainerStyleParams> overlayParams = new DerivedValueTable<ContainerStyleParams>( primitiveNamespace )
+	{
+		protected ContainerStyleParams evaluate(AttributeTable attribs)
+		{
+			return new ContainerStyleParams(
+					attribs.get( hAlign, HAlignment.class ),
+					attribs.get( vAlign, VAlignment.class ),
+					attribs.get( background, Painter.class ),
+					attribs.get( hoverBackground, Painter.class ),
+					attribs.get( cursor, Cursor.class ) );
+		}
+	};
+	
+	protected static StyleValues useOverlayParams(StyleValues style)
+	{
+		return style.useAttr( hAlign ).useAttr( vAlign ).useAttr( background ).useAttr( hoverBackground ).useAttr( cursor );
+	}
+
+	
+	
 	protected static DerivedValueTable<ParagraphStyleParams> paragraphParams = new DerivedValueTable<ParagraphStyleParams>( primitiveNamespace )
 	{
 		protected ParagraphStyleParams evaluate(AttributeTable attribs)
