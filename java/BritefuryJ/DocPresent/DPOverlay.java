@@ -1,35 +1,37 @@
-//##************************
 //##* This program is free software; you can use it, redistribute it and/or modify it
 //##* under the terms of the GNU General Public License version 2 as published by the
 //##* Free Software Foundation. The full text of the GNU General Public License
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
-//##* program. This source code is (C)copyright Geoffrey French 1999-2008.
+//##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
 import org.python.core.PySlice;
 
-import BritefuryJ.DocPresent.Layout.LAllocV;
+import BritefuryJ.DocPresent.LayoutTree.LayoutNodeOverlay;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.JythonInterface.JythonIndex;
 import BritefuryJ.JythonInterface.JythonSlice;
+import BritefuryJ.Math.AABox2;
 
-
-
-abstract public class DPContainerSequence extends DPContainerNonOverlayed
+public class DPOverlay extends DPContainer
 {
-	public DPContainerSequence()
+	public DPOverlay()
 	{
 		this( ContainerStyleParams.defaultStyleParams );
 	}
 
-	public DPContainerSequence(ContainerStyleParams styleParams)
+	public DPOverlay(ContainerStyleParams styleParams)
 	{
-		super(styleParams);
+		super( styleParams );
+		
+		layoutNode = new LayoutNodeOverlay( this );
 	}
 
 
@@ -158,12 +160,6 @@ abstract public class DPContainerSequence extends DPContainerNonOverlayed
 	
 	
 	
-	public int indexOf(DPElement child)
-	{
-		return registeredChildren.indexOf( child );
-	}
-	
-	
 	public DPElement get(int index)
 	{
 		return registeredChildren.get( index );
@@ -243,102 +239,8 @@ abstract public class DPContainerSequence extends DPContainerNonOverlayed
 	}
 	
 	
-	public void __delitem__(int index)
-	{
-		index = JythonIndex.pyIndexToJava( index, size(), "BranchElement assignment index out of range" );
-
-		DPElement child = registeredChildren.get( index );
-		unregisterChild( child );
-		registeredChildren.remove( index );
-		
-		onChildListModified();
-		queueResize();
-	}
-	
-	public void __delitem__(PySlice slice)
-	{
-		DPElement[] in = registeredChildren.toArray( new DPElement[registeredChildren.size()] );
-		
-		DPElement[] removedArray = (DPElement[])JythonSlice.arrayGetSlice( in, slice );
-		
-		DPElement[] newChildEntriesArray = (DPElement[])JythonSlice.arrayDelSlice( in, slice );
-		
-		for (DPElement child: removedArray)
-		{
-			unregisterChild( child );
-		}
-
-		registeredChildren.clear();
-		registeredChildren.addAll( Arrays.asList( newChildEntriesArray ) );
-		
-		onChildListModified();
-		queueResize();
-	}
-	
-	
-	
-	
-	public void append(DPElement child)
-	{
-		assert !hasChild( child );
-		
-		registeredChildren.add( child );
-		registerChild( child );
-		onChildListModified();
-		queueResize();
-	}
 
 	
-	public void extend(List<DPElement> children)
-	{
-		for (DPElement child: children)
-		{
-			assert !hasChild( child );
-		}
-		
-		int start = registeredChildren.size();
-		registeredChildren.ensureCapacity( start + children.size() );
-		for (int i = 0; i < children.size(); i++)
-		{
-			DPElement child = children.get( i );
-			registeredChildren.add( child );
-			registerChild( child );
-		}
-
-		onChildListModified();
-		queueResize();
-	}
-	
-	public void extend(DPElement[] children)
-	{
-		extend( Arrays.asList( children ) );
-	}
-	
-	
-	public void insert(int index, DPElement child)
-	{
-		assert !hasChild( child );
-		
-		registeredChildren.add( index, child );
-		registerChild( child );
-		onChildListModified();
-		queueResize();
-	}
-	
-	
-	public void remove(DPElement child)
-	{
-		assert hasChild( child );
-		
-		unregisterChild( child );
-		registeredChildren.remove( child );
-		
-		onChildListModified();
-		queueResize();
-	}
-		
-
-
 	protected void replaceChildWithEmpty(DPElement child)
 	{
 		int index = registeredChildren.indexOf( child );
@@ -364,52 +266,39 @@ abstract public class DPContainerSequence extends DPContainerNonOverlayed
 
 
 
-	protected double[] getChildrenAllocationX(List<DPElement> nodes)
+
+	@Override
+	protected void handleDrawBackground(Graphics2D graphics, AABox2 areaBox)
 	{
-		double[] values = new double[nodes.size()];
-		for (int i = 0; i < nodes.size(); i++)
+	}
+	
+	@Override
+	protected void handleDraw(Graphics2D graphics, AABox2 areaBox)
+	{
+		super.handleDrawBackground( graphics, areaBox );
+		super.handleDraw( graphics, areaBox );
+
+		
+		AABox2 clipBox = getLocalClipBox();
+		if ( clipBox != null )
 		{
-			values[i] = nodes.get( i ).getAllocWidth();
+			areaBox = areaBox.intersection( clipBox );
 		}
-		return values;
-	}
-
-	protected double[] getChildrenAllocationX()
-	{
-		return getChildrenAllocationX( registeredChildren );
-	}
-
-
-
-	protected double[] getChildrenAllocationY(List<DPElement> nodes)
-	{
-		double[] values = new double[nodes.size()];
-		for (int i = 0; i < nodes.size(); i++)
+		
+		if ( !areaBox.isEmpty() )
 		{
-			values[i] = nodes.get( i ).getAllocHeight();
+			AffineTransform currentTransform = graphics.getTransform();
+			for (DPElement child: registeredChildren)
+			{
+				if ( child.getAABoxInParentSpace().intersects( areaBox ) )
+				{
+					child.getLocalToParentXform().apply( graphics );
+					AABox2 childBox = child.getParentToLocalXform().transform( areaBox );
+					child.handleDrawBackground( graphics, childBox );
+					child.handleDraw( graphics, childBox );
+					graphics.setTransform( currentTransform );
+				}
+			}
 		}
-		return values;
-	}
-
-	protected double[] getChildrenAllocationY()
-	{
-		return getChildrenAllocationY( registeredChildren );
-	}
-
-
-
-	protected LAllocV[] getChildrenAllocV(List<DPElement> nodes)
-	{
-		LAllocV[] values = new LAllocV[nodes.size()];
-		for (int i = 0; i < nodes.size(); i++)
-		{
-			values[i] = nodes.get( i ).getAllocV();
-		}
-		return values;
-	}
-
-	protected LAllocV[] getChildrenAllocV()
-	{
-		return getChildrenAllocV( registeredChildren );
 	}
 }

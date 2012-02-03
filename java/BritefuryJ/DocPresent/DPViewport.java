@@ -24,7 +24,7 @@ import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 import BritefuryJ.Math.Xform2;
 
-public class DPViewport extends DPContainer implements FiniteViewportBehaviour.FiniteViewport
+public class DPViewport extends DPContainerNonOverlayed implements FiniteViewportBehaviour.FiniteViewport
 {
 	private static class ViewportNavigationInteractor implements NavigationElementInteractor
 	{

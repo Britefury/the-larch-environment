@@ -83,6 +83,32 @@ public class AABox2 implements Serializable
 	}
 	
 	
+	public double sqrDistanceTo(Point2 p)
+	{
+		double dx = 0.0, dy = 0.0;
+
+		if ( p.x < lowerX )
+		{
+			dx = lowerX - p.x;
+		}
+		else if ( p.x > upperX )
+		{
+			dx = p.x - upperX;
+		}
+
+		if ( p.y < lowerY )
+		{
+			dy = lowerY - p.y;
+		}
+		else if ( p.y > upperY )
+		{
+			dy = p.y - upperY;
+		}
+		
+		return dx * dx  +  dy * dy;
+	}
+	
+	
 	public void addPoint(double x, double y)
 	{
 		if ( isEmpty() )

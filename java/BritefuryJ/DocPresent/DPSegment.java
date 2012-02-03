@@ -15,7 +15,7 @@ import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 
-public class DPSegment extends DPContainer
+public class DPSegment extends DPContainerNonOverlayed
 {
 	//
 	// Utility classes

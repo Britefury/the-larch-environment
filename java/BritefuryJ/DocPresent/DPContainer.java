@@ -7,8 +7,6 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -411,59 +409,7 @@ public abstract class DPContainer extends DPElement
 		super.handleUnrealise( unrealiseRoot );
 	}
 	
-	
-	
-	protected void handleDrawBackground(Graphics2D graphics, AABox2 areaBox)
-	{
-		super.handleDrawBackground( graphics, areaBox );
 		
-		AABox2 clipBox = getLocalClipBox();
-		if ( clipBox != null )
-		{
-			areaBox = areaBox.intersection( clipBox );
-		}
-		
-		if ( !areaBox.isEmpty() )
-		{
-			AffineTransform currentTransform = graphics.getTransform();
-			for (DPElement child: registeredChildren)
-			{
-				if ( child.getAABoxInParentSpace().intersects( areaBox ) )
-				{
-					child.getLocalToParentXform().apply( graphics );
-					child.handleDrawBackground( graphics, child.getParentToLocalXform().transform( areaBox ) );
-					graphics.setTransform( currentTransform );
-				}
-			}
-		}
-	}
-	
-	protected void handleDraw(Graphics2D graphics, AABox2 areaBox)
-	{
-		super.handleDraw( graphics, areaBox );
-		
-		AABox2 clipBox = getLocalClipBox();
-		if ( clipBox != null )
-		{
-			areaBox = areaBox.intersection( clipBox );
-		}
-		
-		if ( !areaBox.isEmpty() )
-		{
-			AffineTransform currentTransform = graphics.getTransform();
-			for (DPElement child: registeredChildren)
-			{
-				if ( child.getAABoxInParentSpace().intersects( areaBox ) )
-				{
-					child.getLocalToParentXform().apply( graphics );
-					child.handleDraw( graphics, child.getParentToLocalXform().transform( areaBox ) );
-					graphics.setTransform( currentTransform );
-				}
-			}
-		}
-	}
-	
-	
 	
 	
 	protected void setRootElement(PresentationComponent.RootElement area)

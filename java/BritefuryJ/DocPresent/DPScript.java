@@ -16,7 +16,7 @@ import BritefuryJ.DocPresent.StyleParams.ScriptStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 
 
-public class DPScript extends DPContainer
+public class DPScript extends DPContainerNonOverlayed
 {
 	public static int LEFTSUPER = 0;
 	public static int LEFTSUB = 1;

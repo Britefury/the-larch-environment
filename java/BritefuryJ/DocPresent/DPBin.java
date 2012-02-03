@@ -13,7 +13,7 @@ import BritefuryJ.DocPresent.LayoutTree.LayoutNodeBin;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 
 
-public class DPBin extends DPContainer
+public class DPBin extends DPContainerNonOverlayed
 {
 	public DPBin()
 	{
