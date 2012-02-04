@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.util.List;
+
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.TextSelection;
 
@@ -131,7 +133,7 @@ public abstract class AbstractTextRepresentationManager
 		@Override
 		protected boolean shouldVisitChildrenOfElement(DPElement e, boolean completeVisit)
 		{
-			return !cache.containsKey( e );
+			return !completeVisit  ||  !cache.containsKey( e );
 		}
 	}
 	
@@ -143,10 +145,29 @@ public abstract class AbstractTextRepresentationManager
 	}
 	
 	
-	protected abstract class FinderVisitor extends ElementTreeVisitor
+	protected class FindLeafAtPositionVisitor extends ElementTreeVisitor
 	{
+		private int queryPosition;
+		private DPContentLeaf leaf = null;
+
 		protected int position = 0;
+		private int elementsVisited = 0;
 		
+		
+		
+		
+		public FindLeafAtPositionVisitor(int queryPosition)
+		{
+			this.queryPosition = queryPosition;
+		}
+		
+
+		public DPContentLeaf getLeaf()
+		{
+			return leaf;
+		}
+		
+	
 		
 		//
 		// VISITOR METHODS
@@ -169,18 +190,48 @@ public abstract class AbstractTextRepresentationManager
 		@Override
 		protected void inOrderCompletelyVisitElement(DPElement e)
 		{
-			// DO NOT ATTEMPT TO USE THE CACHE IN FINDERS, AS CHILD ELEMENTS MUST BE VISITED
-			int length = getElementContentLength( e );
-			if ( length != -1 )
-			{
-				position += length;
-			}
 		}
 
 		@Override
 		protected void postOrderVisitElement(DPElement e, boolean complete)
 		{
+			if ( complete )
+			{
+				// Perform in-order visit as a first step of the post-order, otherwise we muck up the position,
+				// preventing shouldVisitChildrenOfElement() from working properly
+				elementsVisited++;
+				int length = getElementContentLength( e );
+				if ( length != -1 )
+				{
+					position += length;
+				}
+				else
+				{
+					String value = cache.get( e );
+					if ( value != null )
+					{
+						// If the query position is within the bounds of the cached value,
+						// we must visit the children, since the element we are looking for resides
+						// within the subtree rooted at @e
+						// Otherwise we can hop over them.
+						length = value.length();
+						int end = position + length;
+						if ( queryPosition > end )
+						{
+							position = end;
+						}
+					}
+				}
+			}
+			
+			
+			
 			append( getElementSuffixLength( e, complete ) );
+			if ( queryPosition < position  &&  e instanceof DPContentLeaf )
+			{
+				leaf = (DPContentLeaf)e;
+				throw new FoundException();
+			}
 		}
 
 		@Override
@@ -192,8 +243,28 @@ public abstract class AbstractTextRepresentationManager
 		@Override
 		protected boolean shouldVisitChildrenOfElement(DPElement e, boolean completeVisit)
 		{
-			// DO NOT ATTEMPT TO USE THE CACHE IN FINDERS, AS CHILD ELEMENTS MUST BE VISITED
-			return true;
+			if ( !completeVisit )
+			{
+				return true;
+			}
+			else
+			{
+				String value = cache.get( e );
+				if ( value != null )
+				{
+					// If the query position is within the bounds of the cached value,
+					// we must visit the children, since the element we are looking for resides
+					// within the subtree rooted at @e
+					// Otherwise we can hop over them.
+					int end = position + value.length();
+					return queryPosition <= end;
+				}
+				else
+				{
+					// No cached value - must visit children
+					return true;
+				}
+			}
 		}
 
 		@Override
@@ -246,87 +317,7 @@ public abstract class AbstractTextRepresentationManager
 	}
 	
 	
-	protected class FindPositionOfElementVisitor extends FinderVisitor
-	{
-		private DPElement elementToFind;
-		private int positionOfElement = -1;
-		
-		
-		
-		public FindPositionOfElementVisitor(DPElement elementToFind)
-		{
-			this.elementToFind = elementToFind;
-		}
-		
-		
-		public int getPosition()
-		{
-			return positionOfElement;
-		}
-		
-		
-		
-		private void testElement(DPElement e)
-		{
-			if ( e == elementToFind )
-			{
-				positionOfElement = position;
-				throw new FoundException();
-			}
-		}
-		
-		
-		@Override
-		protected void inOrderCompletelyVisitElement(DPElement e)
-		{
-			testElement( e );
-			super.inOrderCompletelyVisitElement( e );
-		}
 
-		
-		@Override
-		protected void inOrderVisitPartialContentLeafEditable(DPContentLeafEditable e, int startIndex, int endIndex)
-		{
-			testElement( e );
-			super.inOrderVisitPartialContentLeafEditable( e, startIndex, endIndex );
-		}
-	}
-
-	
-	
-	protected class FindLeafAtPositionVisitor extends FinderVisitor
-	{
-		private int queryPosition;
-		private DPContentLeaf leaf = null;
-		
-		
-		
-		public FindLeafAtPositionVisitor(int queryPosition)
-		{
-			this.queryPosition = queryPosition;
-		}
-		
-		
-		public DPContentLeaf getLeaf()
-		{
-			return leaf;
-		}
-		
-		
-		@Override
-		protected void postOrderVisitElement(DPElement e, boolean complete)
-		{
-			super.postOrderVisitElement( e, complete );
-			if ( queryPosition < position  &&  e instanceof DPContentLeaf )
-			{
-				leaf = (DPContentLeaf)e;
-				throw new FoundException();
-			}
-		}
-	}
-
-	
-	
 	
 	protected ElementValueCache<String> cache;
 
@@ -391,9 +382,34 @@ public abstract class AbstractTextRepresentationManager
 	
 	public int getPositionOfElementInSubtree(DPContainer subtreeRoot, DPElement e)
 	{
-		FindPositionOfElementVisitor visitor = new FindPositionOfElementVisitor( e );
-		visitor.visitSubtree( subtreeRoot );
-		return visitor.getPosition();
+		int position = 0;
+		
+		while ( e != subtreeRoot )
+		{
+			DPContainer parent = e.getParent();
+			
+			if ( parent == null )
+			{
+				throw new DPElement.IsNotInSubtreeException();
+			}
+			
+			List<DPElement> children = parent.getChildrenInSequentialOrder();
+			int index = children.indexOf( e );
+			
+			if ( index == -1 )
+			{
+				throw new RuntimeException( "ERROR (should not happen): Could not find @e in list of children" );
+			}
+			
+			for (int i = index - 1; i >= 0; i--)
+			{
+				position += getTextRepresentationOf( children.get( i ) ).length();
+			}
+			
+			e = parent;
+		}
+		
+		return position;
 	}
 	
 	

@@ -772,7 +772,9 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	{
 		if ( elementChangeListener != null )
 		{
+			profile_startHandleContentChange();
 			elementChangeListener.begin( this );
+			profile_stopHandleContentChange();
 		}
 	}
 
@@ -781,7 +783,9 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	{
 		if ( elementChangeListener != null )
 		{
+			profile_startHandleContentChange();
 			elementChangeListener.end( this );
+			profile_stopHandleContentChange();
 		}
 	}
 
