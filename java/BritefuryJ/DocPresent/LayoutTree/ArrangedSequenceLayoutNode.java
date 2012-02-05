@@ -8,6 +8,7 @@ package BritefuryJ.DocPresent.LayoutTree;
 
 import java.util.Arrays;
 import java.util.IdentityHashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPContainer;
@@ -23,7 +24,57 @@ import BritefuryJ.Math.Point2;
 
 public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 {
-	protected DPElement leaves[], branches[];
+	private class VisibilityCulledBranchIterator implements Iterator<DPContainer>
+	{
+		private int rangeStart, rangeEnd;
+		private int nextBranchIndex;
+		
+		public VisibilityCulledBranchIterator(int rangeStart, int rangeEnd)
+		{
+			this.rangeStart = rangeStart;
+			this.rangeEnd = rangeEnd;
+			nextBranchIndex = findNext( 0 );
+		}
+		
+		
+		@Override
+		public boolean hasNext()
+		{
+			return nextBranchIndex != -1;
+		}
+
+		@Override
+		public DPContainer next()
+		{
+			DPContainer branch = branches[nextBranchIndex];
+			nextBranchIndex = findNext( nextBranchIndex + 1 );
+			return branch;
+		}
+
+		@Override
+		public void remove()
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		
+		private int findNext(int start)
+		{
+			for (int i = start; i < branches.length; i++)
+			{
+				if ( rangeEnd > branchRanges[i*2]  &&  rangeStart < branchRanges[i*2+1] )
+				{
+					return i;
+				}
+			}
+			return -1;
+		}
+	}
+	
+	
+	
+	protected DPElement leaves[];
+	protected DPContainer branches[];
 	protected int branchRanges[];				// Stored as an array of pairs; each pair is of the form (start_index, end_index)
 	protected IdentityHashMap<DPContainer, AABox2[]> branchBoundsCache;
 	
@@ -70,7 +121,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 			{
 				int branchIndex = indices[1]++;
 				int start = indices[0];
-				branches[branchIndex] = e;
+				branches[branchIndex] = (DPContainer)e;
 				gatherItems( (DPContainer)e, indices );
 				int end = indices[0];
 				branchRanges[branchIndex*2] = start;
@@ -88,7 +139,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 			gatherCount( (DPContainer)element, counts );
 			
 			leaves = new DPElement[counts[0]];
-			branches = new DPElement[counts[1]];
+			branches = new DPContainer[counts[1]];
 			branchRanges = new int[counts[1]*2];
 			
 			counts[0] = 0;
@@ -140,7 +191,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 	
 	
 	
-	public DPContentLeaf getLeftContentLeafWithinElement(DPElement withinElement)
+	public DPContentLeaf getLeftContentLeafWithinLayoutlessElement(DPElement withinElement)
 	{
 		refreshSubtree();
 		int branchIndex = indexOfBranch( withinElement );
@@ -160,7 +211,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 		return null;
 	}
 	
-	public DPContentLeaf getRightContentLeafWithinElement(DPElement withinElement)
+	public DPContentLeaf getRightContentLeafWithinLayoutlessElement(DPElement withinElement)
 	{
 		refreshSubtree();
 		int branchIndex = indexOfBranch( withinElement );
@@ -200,7 +251,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 		return null;
 	}
 	
-	public DPContentLeafEditable getRightEditableContentLeafWithinElement(DPElement withinElement)
+	public DPContentLeafEditable getRightEditableContentLeafWithinLayoutlessElement(DPElement withinElement)
 	{
 		refreshSubtree();
 		int branchIndex = indexOfBranch( withinElement );
@@ -220,7 +271,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 		return null;
 	}
 	
-	public DPContentLeaf getContentLeafToLeftOfElement(DPElement inElement)
+	public DPContentLeaf getContentLeafToLeftOfLayoutlessElement(DPElement inElement)
 	{
 		refreshSubtree();
 		int branchIndex = indexOfBranch( inElement );
@@ -240,7 +291,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 		return null;
 	}
 	
-	public DPContentLeaf getContentLeafToRightOfElement(DPElement inElement)
+	public DPContentLeaf getContentLeafToRightOfLayoutlessElement(DPElement inElement)
 	{
 		refreshSubtree();
 		int branchIndex = indexOfBranch( inElement );
@@ -260,7 +311,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 		return null;
 	}
 	
-	public DPContentLeafEditable getTopOrBottomEditableContentLeafWithinElement(DPElement withinElement, boolean bBottom, Point2 cursorPosInRootSpace)
+	public DPContentLeafEditable getTopOrBottomEditableContentLeafWithinLayoutlessElement(DPElement withinElement, boolean bBottom, Point2 cursorPosInRootSpace)
 	{
 		refreshSubtree();
 		int branchIndex = indexOfBranch( withinElement );
@@ -353,6 +404,13 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 
 
 
+	public List<DPContainer> getBranches()
+	{
+		refreshSubtree();
+		return Arrays.asList( branches );
+	}
+	
+
 	public List<DPElement> getLeaves()
 	{
 		refreshSubtree();
@@ -436,5 +494,43 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 			child.getLayoutNode().refreshAllocationY( prevAllocV[i] );
 			i++;
 		}
+	}
+	
+	
+	
+	//
+	//
+	// VISIBILITY CULLING
+	//
+	//
+	
+	public Object[] getVisibilityCulledBranchAndLeafLists(AABox2 localBox)
+	{
+		refreshSubtree();
+		
+		int range[] = getVisibilityCullingRange( localBox );
+		final int rangeStart = range[0], rangeEnd = range[1]; 
+		if ( rangeStart == 0  &&  rangeEnd == leaves.length )
+		{
+			return new Object[] { getBranches(), getLeaves() };
+		}
+		else
+		{
+			Iterable<DPContainer> culledBranches = new Iterable<DPContainer>()
+			{
+				@Override
+				public Iterator<DPContainer> iterator()
+				{
+					return new VisibilityCulledBranchIterator( rangeStart, rangeEnd );
+				}
+			};
+			Iterable<DPElement> culledLeaves = getLeaves().subList( rangeStart, rangeEnd );
+			return new Object[] { culledBranches, culledLeaves };
+		}
+	}
+	
+	protected int[] getVisibilityCullingRange(AABox2 localBox)
+	{
+		return new int[] { 0, leaves.length };
 	}
 }

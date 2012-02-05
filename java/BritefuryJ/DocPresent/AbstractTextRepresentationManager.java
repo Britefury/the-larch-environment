@@ -151,7 +151,6 @@ public abstract class AbstractTextRepresentationManager
 		private DPContentLeaf leaf = null;
 
 		protected int position = 0;
-		private int elementsVisited = 0;
 		
 		
 		
@@ -199,7 +198,6 @@ public abstract class AbstractTextRepresentationManager
 			{
 				// Perform in-order visit as a first step of the post-order, otherwise we muck up the position,
 				// preventing shouldVisitChildrenOfElement() from working properly
-				elementsVisited++;
 				int length = getElementContentLength( e );
 				if ( length != -1 )
 				{

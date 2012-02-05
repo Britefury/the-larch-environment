@@ -7,6 +7,8 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -14,14 +16,19 @@ import java.util.List;
 import org.python.core.PySlice;
 
 import BritefuryJ.DocPresent.Layout.LAllocV;
+import BritefuryJ.DocPresent.LayoutTree.ArrangedSequenceLayoutNode;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.JythonInterface.JythonIndex;
 import BritefuryJ.JythonInterface.JythonSlice;
+import BritefuryJ.Math.AABox2;
 
 
 
 abstract public class DPContainerSequence extends DPContainerNonOverlayed
 {
+	protected static final int VISIBILITY_CULLING_THRESHHOLD = 16;
+	
+	
 	public DPContainerSequence()
 	{
 		this( ContainerStyleParams.defaultStyleParams );
@@ -411,5 +418,123 @@ abstract public class DPContainerSequence extends DPContainerNonOverlayed
 	protected LAllocV[] getChildrenAllocV()
 	{
 		return getChildrenAllocV( registeredChildren );
+	}
+	
+	
+	
+	//
+	//
+	// DRAWING
+	//
+	//
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	protected void handleDrawBackground(Graphics2D graphics, AABox2 areaBox)
+	{
+		handleDrawSelfBackground( graphics, areaBox );
+		
+		AABox2 clipBox = getLocalClipBox();
+		if ( clipBox != null )
+		{
+			areaBox = areaBox.intersection( clipBox );
+		}
+		
+		if ( !areaBox.isEmpty() )
+		{
+			AffineTransform currentTransform = graphics.getTransform();
+
+			ArrangedSequenceLayoutNode seqLayout = (ArrangedSequenceLayoutNode)layoutNode;
+			
+			// Visibility culling can be expensive - only perform it if there are more than a certain number of child elements
+			Iterable<DPContainer> culledBranches;
+			Iterable<DPElement> culledLeaves;
+			
+			// Draw branches
+			if ( seqLayout.getNumLeaves() <= VISIBILITY_CULLING_THRESHHOLD )
+			{
+				culledBranches = seqLayout.getBranches();
+				culledLeaves = seqLayout.getLeaves();
+			}
+			else
+			{
+				Object culledBranchesAndLeaves[] = seqLayout.getVisibilityCulledBranchAndLeafLists( areaBox );
+				culledBranches = (Iterable<DPContainer>)culledBranchesAndLeaves[0];
+				culledLeaves = (Iterable<DPElement>)culledBranchesAndLeaves[1];
+			}
+			for (DPElement child: culledBranches)
+			{
+				if ( child.getAABoxInParentSpace().intersects( areaBox ) )
+				{
+					child.getLocalToParentXform().apply( graphics );
+					child.handleDrawSelfBackground( graphics, child.getParentToLocalXform().transform( areaBox ) );
+					graphics.setTransform( currentTransform );
+				}
+			}
+			for (DPElement child: culledLeaves)
+			{
+				if ( child.getAABoxInParentSpace().intersects( areaBox ) )
+				{
+					child.getLocalToParentXform().apply( graphics );
+					child.handleDrawBackground( graphics, child.getParentToLocalXform().transform( areaBox ) );
+					graphics.setTransform( currentTransform );
+				}
+			}
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	protected void handleDraw(Graphics2D graphics, AABox2 areaBox)
+	{
+		handleDrawSelf( graphics, areaBox );
+		
+		AABox2 clipBox = getLocalClipBox();
+		if ( clipBox != null )
+		{
+			areaBox = areaBox.intersection( clipBox );
+		}
+		
+		if ( !areaBox.isEmpty() )
+		{
+			AffineTransform currentTransform = graphics.getTransform();
+
+			ArrangedSequenceLayoutNode seqLayout = (ArrangedSequenceLayoutNode)layoutNode;
+			
+			// Visibility culling can be expensive - only perform it if there are more than a certain number of child elements
+			Iterable<DPContainer> culledBranches;
+			Iterable<DPElement> culledLeaves;
+			
+			// Draw branches
+			if ( seqLayout.getNumLeaves() <= VISIBILITY_CULLING_THRESHHOLD )
+			{
+				culledBranches = seqLayout.getBranches();
+				culledLeaves = seqLayout.getLeaves();
+			}
+			else
+			{
+				Object culledBranchesAndLeaves[] = seqLayout.getVisibilityCulledBranchAndLeafLists( areaBox );
+				culledBranches = (Iterable<DPContainer>)culledBranchesAndLeaves[0];
+				culledLeaves = (Iterable<DPElement>)culledBranchesAndLeaves[1];
+			}
+			for (DPElement child: culledBranches)
+			{
+				if ( child.getAABoxInParentSpace().intersects( areaBox ) )
+				{
+					child.getLocalToParentXform().apply( graphics );
+					child.handleDrawSelf( graphics, child.getParentToLocalXform().transform( areaBox ) );
+					graphics.setTransform( currentTransform );
+				}
+			}
+			for (DPElement child: culledLeaves)
+			{
+				if ( child.getAABoxInParentSpace().intersects( areaBox ) )
+				{
+					child.getLocalToParentXform().apply( graphics );
+					child.handleDraw( graphics, child.getParentToLocalXform().transform( areaBox ) );
+					graphics.setTransform( currentTransform );
+				}
+			}
+		}
 	}
 }
