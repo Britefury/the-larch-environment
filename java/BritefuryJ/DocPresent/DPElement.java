@@ -1490,8 +1490,8 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	{
 		graphics.clip( new Rectangle2D.Double( 0.0, 0.0, getActualWidth(), getActualHeight() ) );
 	}
-
-	protected void handleDrawBackground(Graphics2D graphics, AABox2 areaBox)
+	
+	protected void handleDrawSelfBackground(Graphics2D graphics, AABox2 areaBox)
 	{
 		drawBackground( graphics );
 		List<ElementPainter> painters = getPainters();
@@ -1511,7 +1511,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		}
 	}
 	
-	protected void handleDraw(Graphics2D graphics, AABox2 areaBox)
+	protected void handleDrawSelf(Graphics2D graphics, AABox2 areaBox)
 	{
 		draw( graphics );
 		List<ElementPainter> painters = getPainters();
@@ -1531,6 +1531,18 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		}
 	}
 	
+	
+	protected void handleDrawBackground(Graphics2D graphics, AABox2 areaBox)
+	{
+		handleDrawSelfBackground( graphics, areaBox );
+	}
+
+		
+	protected void handleDraw(Graphics2D graphics, AABox2 areaBox)
+	{
+		handleDrawSelf( graphics, areaBox );
+	}
+
 	
 	public void drawToGraphics(Graphics2D graphics, AABox2 areaBox)
 	{
@@ -2097,7 +2109,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		else
 		{
 			ArrangedSequenceLayoutNode branchLayout = (ArrangedSequenceLayoutNode)getValidLayoutNodeOfClass( ArrangedSequenceLayoutNode.class );
-			return branchLayout.getLeftContentLeafWithinElement( this );
+			return branchLayout.getLeftContentLeafWithinLayoutlessElement( this );
 		}
 	}
 	
@@ -2110,7 +2122,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		else
 		{
 			ArrangedSequenceLayoutNode branchLayout = (ArrangedSequenceLayoutNode)getValidLayoutNodeOfClass( ArrangedSequenceLayoutNode.class );
-			return branchLayout.getRightContentLeafWithinElement( this );
+			return branchLayout.getRightContentLeafWithinLayoutlessElement( this );
 		}
 	}
 	
@@ -2136,7 +2148,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		else
 		{
 			ArrangedSequenceLayoutNode branchLayout = (ArrangedSequenceLayoutNode)getValidLayoutNodeOfClass( ArrangedSequenceLayoutNode.class );
-			return branchLayout.getRightEditableContentLeafWithinElement( this );
+			return branchLayout.getRightEditableContentLeafWithinLayoutlessElement( this );
 		}
 	}
 	
@@ -2149,7 +2161,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		else
 		{
 			ArrangedSequenceLayoutNode branchLayout = (ArrangedSequenceLayoutNode)getValidLayoutNodeOfClass( ArrangedSequenceLayoutNode.class );
-			return branchLayout.getContentLeafToLeftOfElement( this );
+			return branchLayout.getContentLeafToLeftOfLayoutlessElement( this );
 		}
 	}
 	
@@ -2162,7 +2174,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		else
 		{
 			ArrangedSequenceLayoutNode branchLayout = (ArrangedSequenceLayoutNode)getValidLayoutNodeOfClass( ArrangedSequenceLayoutNode.class );
-			return branchLayout.getContentLeafToRightOfElement( this );
+			return branchLayout.getContentLeafToRightOfLayoutlessElement( this );
 		}
 	}
 	
@@ -2175,7 +2187,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		else
 		{
 			ArrangedSequenceLayoutNode branchLayout = (ArrangedSequenceLayoutNode)getValidLayoutNodeOfClass( ArrangedSequenceLayoutNode.class );
-			return branchLayout.getTopOrBottomEditableContentLeafWithinElement( this, bBottom, cursorPosInRootSpace );
+			return branchLayout.getTopOrBottomEditableContentLeafWithinLayoutlessElement( this, bBottom, cursorPosInRootSpace );
 		}
 	}
 

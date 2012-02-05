@@ -6,6 +6,9 @@
 //##************************
 package BritefuryJ.DocPresent.LayoutTree;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPContainer;
@@ -23,6 +26,40 @@ import BritefuryJ.Math.Point2;
 
 public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 {
+	@SuppressWarnings("rawtypes")
+	private static final Comparator visibilityStartComparator = new Comparator()
+	{
+		@Override
+		public int compare(Object arg0, Object arg1)
+		{
+			ParagraphLayout.Line line = (ParagraphLayout.Line)arg0;
+			Double y = (Double)arg1;
+			
+			LAllocBox allocBox = line.getLineAllocBox();
+			double lineBottomEdge = allocBox.getAllocPositionInParentSpaceY() + allocBox.getAllocHeight();
+			
+			return ((Double)lineBottomEdge).compareTo( y );
+		}
+	};
+	
+	@SuppressWarnings("rawtypes")
+	private static final Comparator visibilityEndComparator = new Comparator()
+	{
+		@Override
+		public int compare(Object arg0, Object arg1)
+		{
+			ParagraphLayout.Line line = (ParagraphLayout.Line)arg0;
+			Double y = (Double)arg1;
+			
+			double lineTopEdge = line.getLineAllocBox().getAllocPositionInParentSpaceY();
+			
+			return ((Double)lineTopEdge).compareTo( y );
+		}
+	};
+
+	
+	
+	
 	private ParagraphLayout.Line lines[];
 
 	
@@ -31,6 +68,13 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 		super( element );
 
 		lines = new ParagraphLayout.Line[0];
+	}
+	
+	
+	
+	public List<ParagraphLayout.Line> getLines()
+	{
+		return Arrays.asList( lines );
 	}
 
 
@@ -479,6 +523,38 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 	public List<DPElement> horizontalNavigationList()
 	{
 		return getLeaves();
+	}
+	
+	
+	
+	//
+	//
+	// VISIBILITY CULLING
+	//
+	//
+	
+	protected int[] getVisibilityCullingRange(AABox2 localBox)
+	{
+		refreshSubtree();
+		
+		// Need to find the start point
+		@SuppressWarnings("unchecked")
+		int lineStartIndex = Collections.binarySearch( Arrays.asList( lines ), localBox.getLowerY(), visibilityStartComparator );
+		if ( lineStartIndex < 0 )
+		{
+			lineStartIndex = -( lineStartIndex + 1 );
+		}
+		@SuppressWarnings("unchecked")
+		int lineEndIndex = Collections.binarySearch( Arrays.asList( lines ), localBox.getUpperY(), visibilityEndComparator );
+		if ( lineEndIndex < 0 )
+		{
+			lineEndIndex = -( lineEndIndex + 1 );
+		}
+		
+		int rangeStart = lines[lineStartIndex].getRangeStart();
+		int rangeEnd = lines[lineEndIndex - 1].getRangeEnd();
+		
+		return new int[] { rangeStart, rangeEnd };
 	}
 	
 	

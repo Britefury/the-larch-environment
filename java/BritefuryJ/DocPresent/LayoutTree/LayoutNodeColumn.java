@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.DocPresent.LayoutTree;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPColumn;
@@ -20,6 +22,39 @@ import BritefuryJ.Math.Point2;
 
 public class LayoutNodeColumn extends LayoutNodeAbstractBox
 {
+	@SuppressWarnings("rawtypes")
+	private static final Comparator visibilityStartComparator = new Comparator()
+	{
+		@Override
+		public int compare(Object arg0, Object arg1)
+		{
+			DPElement child = (DPElement)arg0;
+			Double y = (Double)arg1;
+			
+			double childBottomEdge = child.getAABoxInParentSpace().getUpperY();
+			
+			return ((Double)childBottomEdge).compareTo( y );
+		}
+	};
+	
+	@SuppressWarnings("rawtypes")
+	private static final Comparator visibilityEndComparator = new Comparator()
+	{
+		@Override
+		public int compare(Object arg0, Object arg1)
+		{
+			DPElement child = (DPElement)arg0;
+			Double y = (Double)arg1;
+			
+			double childTopEdge = child.getAABoxInParentSpace().getLowerY();
+			
+			return ((Double)childTopEdge).compareTo( y );
+		}
+	};
+
+	
+	
+	
 	public LayoutNodeColumn(DPColumn element)
 	{
 		super( element );
@@ -170,5 +205,32 @@ public class LayoutNodeColumn extends LayoutNodeAbstractBox
 	public List<DPElement> verticalNavigationList()
 	{
 		return getLeaves();
+	}
+
+
+
+	//
+	// Visibility
+	//
+	
+	protected int[] getVisibilityCullingRange(AABox2 localBox)
+	{
+		List<DPElement> elements = getLeaves();
+		
+		// Need to find the start point
+		@SuppressWarnings("unchecked")
+		int startPoint = Collections.binarySearch( elements, localBox.getLowerY(), visibilityStartComparator );
+		if ( startPoint < 0 )
+		{
+			startPoint = -( startPoint + 1 );
+		}
+		@SuppressWarnings("unchecked")
+		int endPoint = Collections.binarySearch( elements, localBox.getUpperY(), visibilityEndComparator );
+		if ( endPoint < 0 )
+		{
+			endPoint = -( endPoint + 1 );
+		}
+		
+		return new int[] { startPoint, endPoint };
 	}
 }

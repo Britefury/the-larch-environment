@@ -33,7 +33,7 @@ public abstract class DPContainerNonOverlayed extends DPContainer
 	@Override
 	protected void handleDrawBackground(Graphics2D graphics, AABox2 areaBox)
 	{
-		super.handleDrawBackground( graphics, areaBox );
+		handleDrawSelfBackground( graphics, areaBox );
 		
 		AABox2 clipBox = getLocalClipBox();
 		if ( clipBox != null )
@@ -44,6 +44,7 @@ public abstract class DPContainerNonOverlayed extends DPContainer
 		if ( !areaBox.isEmpty() )
 		{
 			AffineTransform currentTransform = graphics.getTransform();
+			// Visibility culling can be expensive - only perform it if there are more than a certain number of child elements
 			for (DPElement child: registeredChildren)
 			{
 				if ( child.getAABoxInParentSpace().intersects( areaBox ) )
@@ -59,7 +60,7 @@ public abstract class DPContainerNonOverlayed extends DPContainer
 	@Override
 	protected void handleDraw(Graphics2D graphics, AABox2 areaBox)
 	{
-		super.handleDraw( graphics, areaBox );
+		handleDrawSelf( graphics, areaBox );
 		
 		AABox2 clipBox = getLocalClipBox();
 		if ( clipBox != null )

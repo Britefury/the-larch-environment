@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.DocPresent.LayoutTree;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPRow;
@@ -20,6 +22,39 @@ import BritefuryJ.Math.Point2;
 
 public class LayoutNodeRow extends LayoutNodeAbstractBox
 {
+	@SuppressWarnings("rawtypes")
+	private static final Comparator visiblityStartComparator = new Comparator()
+	{
+		@Override
+		public int compare(Object arg0, Object arg1)
+		{
+			DPElement child = (DPElement)arg0;
+			Double x = (Double)arg1;
+			
+			double childRightEdge = child.getAABoxInParentSpace().getUpperX();
+			
+			return ((Double)childRightEdge).compareTo( x );
+		}
+	};
+	
+	@SuppressWarnings("rawtypes")
+	private static final Comparator visibilityEndComparator = new Comparator()
+	{
+		@Override
+		public int compare(Object arg0, Object arg1)
+		{
+			DPElement child = (DPElement)arg0;
+			Double x = (Double)arg1;
+			
+			double childLeftEdge = child.getAABoxInParentSpace().getLowerX();
+			
+			return ((Double)childLeftEdge).compareTo( x );
+		}
+	};
+
+	
+	
+	
 	public LayoutNodeRow(DPRow element)
 	{
 		super( element );
@@ -120,5 +155,34 @@ public class LayoutNodeRow extends LayoutNodeAbstractBox
 	public List<DPElement> horizontalNavigationList()
 	{
 		return getLeaves();
+	}
+
+
+
+
+	//
+	//
+	// Visibility
+	//
+	//
+	
+	protected int[] getVisibilityCullingRange(AABox2 localBox)
+	{
+		List<DPElement> elements = getLeaves();
+		
+		@SuppressWarnings("unchecked")
+		int startPoint = Collections.binarySearch( elements, localBox.getLowerX(), visiblityStartComparator );
+		if ( startPoint < 0 )
+		{
+			startPoint = -( startPoint + 1 );
+		}
+		@SuppressWarnings("unchecked")
+		int endPoint = Collections.binarySearch( elements, localBox.getUpperX(), visibilityEndComparator );
+		if ( endPoint < 0 )
+		{
+			endPoint = -( endPoint + 1 );
+		}
+		
+		return new int[] { startPoint, endPoint };
 	}
 }

@@ -72,7 +72,7 @@ public class ParagraphLayout
 		}
 		
 		
-		public LReqBox getLineBox()
+		public LReqBox getLineReqBox()
 		{
 			return lineReqBox;
 		}
@@ -82,7 +82,7 @@ public class ParagraphLayout
 			return lineAllocBox;
 		}
 		
-		public LReqBoxInterface[] getChildBoxes()
+		public LReqBoxInterface[] getChildReqBoxes()
 		{
 			return children;
 		}
