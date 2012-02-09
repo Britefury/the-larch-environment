@@ -151,9 +151,9 @@ public class IncrementalView extends IncrementalTree implements Presentable
 					Pres exceptionView = DefaultPerspective.instance.presentObject( t, fragmentView, inheritedState );
 					fragment = new ErrorBox( "Presentation error - exception during presentation", exceptionView );
 					view.profile_stopPresBuild();
-					view.profile_startPresRealise();
+					view.profile_startPresToElements();
 					Object result = fragment.present( new PresentationContext( fragmentView, DefaultPerspective.instance, inheritedState ), style );
-					view.profile_stopPresRealise();
+					view.profile_stopPresToElements();
 					return result;
 				}
 				catch (Exception e2)
@@ -164,20 +164,20 @@ public class IncrementalView extends IncrementalTree implements Presentable
 							labelStyle.applyTo( new Label( "While trying to display exception:" ) ),
 							exceptionStyle.applyTo( new StaticText( t.toString() ) ).padX( 15.0, 0.0 )   } ) );
 					view.profile_stopPresBuild();
-					view.profile_startPresRealise();
+					view.profile_startPresToElements();
 					Object result = fragment.present( new PresentationContext( fragmentView, DefaultPerspective.instance, inheritedState ), style );
-					view.profile_stopPresRealise();
+					view.profile_stopPresToElements();
 					return result;
 				}
 			}
 			
 			view.profile_stopPresBuild();
-			view.profile_startPresRealise();
+			view.profile_startPresToElements();
 			Object nodeResult;
 			
 			try
 			{
-				nodeResult = fragment.present( new PresentationContext( fragmentView, perspective, inheritedState ), style );
+				nodeResult = presToElements( fragment, fragmentView );
 			}
 			catch (Throwable t)
 			{
@@ -198,7 +198,15 @@ public class IncrementalView extends IncrementalTree implements Presentable
 				}
 			}
 			
-			view.profile_stopPresRealise();
+			view.profile_stopPresToElements();
+			return nodeResult;
+		}
+
+
+		private Object presToElements(Pres fragment, FragmentView fragmentView)
+		{
+			Object nodeResult;
+			nodeResult = fragment.present( new PresentationContext( fragmentView, perspective, inheritedState ), style );
 			return nodeResult;
 		}
 
@@ -277,21 +285,21 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	
 	public static class ProfileMeasurement
 	{
-		private double refreshTime, viewTime, presBuildTime, presRealiseTime, handleContentChangeTime, commitFragmentElementTime;
+		private double refreshTime, modelViewMapping, presBuildTime, presToElementsTime, handleContentChangeTime, modifyPresTreeTime;
 		
 		public ProfileMeasurement()
 		{
 		}
 		
-		public ProfileMeasurement(double refreshTime, double viewTime, double presBuildTime, double presRealiseTime,
-							double handleContentChangeTime, double commitFragmentElementTime)
+		public ProfileMeasurement(double refreshTime, double modelViewMapping, double presBuildTime, double presToElementsTime,
+							double handleContentChangeTime, double modifyPresTreeTime)
 		{
 			this.refreshTime = refreshTime;
-			this.viewTime = viewTime;
+			this.modelViewMapping = modelViewMapping;
 			this.presBuildTime = presBuildTime;
-			this.presRealiseTime = presRealiseTime;
+			this.presToElementsTime = presToElementsTime;
 			this.handleContentChangeTime = handleContentChangeTime;
-			this.commitFragmentElementTime = commitFragmentElementTime;
+			this.modifyPresTreeTime = modifyPresTreeTime;
 		}
 		
 		
@@ -300,9 +308,9 @@ public class IncrementalView extends IncrementalTree implements Presentable
 			return refreshTime;
 		}
 		
-		public double getViewTime()
+		public double getModelViewMappingTime()
 		{
-			return viewTime;
+			return modelViewMapping;
 		}
 		
 		public double getPresBuildTime()
@@ -310,9 +318,9 @@ public class IncrementalView extends IncrementalTree implements Presentable
 			return presBuildTime;
 		}
 		
-		public double getPresRealiseTime()
+		public double getPresToElementsTime()
 		{
-			return presRealiseTime;
+			return presToElementsTime;
 		}
 		
 		public double getHandleContentChangeTime()
@@ -320,19 +328,19 @@ public class IncrementalView extends IncrementalTree implements Presentable
 			return handleContentChangeTime;
 		}
 		
-		public double getCommitFragmentElementTime()
+		public double getModifyPresTreeTime()
 		{
-			return commitFragmentElementTime;
+			return modifyPresTreeTime;
 		}
 	}
 	
 	
 	private static AttributeColumn refreshTimeColumn = new AttributeColumn( "Complete refresh", Py.newString( "refreshTime" ) );
-	private static AttributeColumn viewTimeColumn = new AttributeColumn( "View", Py.newString( "viewTime" ) );
+	private static AttributeColumn modelViewMappingTimeColumn = new AttributeColumn( "Model-view mapping", Py.newString( "modelViewMappingTime" ) );
 	private static AttributeColumn presBuildTimeColumn = new AttributeColumn( "Pres construction", Py.newString( "presBuildTime" ) );
-	private static AttributeColumn presRealiseTimeColumn = new AttributeColumn( "Pres realise", Py.newString( "presRealiseTime" ) );
+	private static AttributeColumn presRealiseTimeColumn = new AttributeColumn( "Pres to elems", Py.newString( "presToElementsTime" ) );
 	private static AttributeColumn handleContentChangeTimeColumn = new AttributeColumn( "Handle content change", Py.newString( "handleContentChangeTime" ) );
-	private static AttributeColumn commitFragmentElementTimeColumn = new AttributeColumn( "Commit fragment element", Py.newString( "commitFragmentElementTime" ) );
+	private static AttributeColumn commitFragmentElementTimeColumn = new AttributeColumn( "Modify pres. tree", Py.newString( "modifyPresTreeTime" ) );
 	
 	private static ObjectListTableEditor profileTableEditor = null;
 	
@@ -343,7 +351,7 @@ public class IncrementalView extends IncrementalTree implements Presentable
 		if ( profileTableEditor == null )
 		{
 			profileTableEditor = new ObjectListTableEditor(
-					Arrays.asList( new Object[] { refreshTimeColumn, viewTimeColumn, presBuildTimeColumn, presRealiseTimeColumn,
+					Arrays.asList( new Object[] { refreshTimeColumn, modelViewMappingTimeColumn, presBuildTimeColumn, presRealiseTimeColumn,
 							handleContentChangeTimeColumn, commitFragmentElementTimeColumn } ),
 					ProfileMeasurement.class, true, true, false, false );
 		}
@@ -416,11 +424,11 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	
 	
 	private boolean takePerformanceMeasurements = false;
-	private ProfileTimer viewTimer = new ProfileTimer();
+	private ProfileTimer modelViewMappingTimer = new ProfileTimer();
 	private ProfileTimer presBuildTimer = new ProfileTimer();
-	private ProfileTimer presRealiseTimer = new ProfileTimer();
+	private ProfileTimer presToElementsTimer = new ProfileTimer();
 	private ProfileTimer handleContentChangeTimer = new ProfileTimer();
-	private ProfileTimer commitFragmentElementTimer = new ProfileTimer();
+	private ProfileTimer modifyPresTreeTimer = new ProfileTimer();
 	private ViewProfile profile = null;
 	
 	
@@ -564,14 +572,14 @@ public class IncrementalView extends IncrementalTree implements Presentable
 		}
 
 		
-		profile_startView();
+		profile_startModelViewMapping();
 		// <<< PROFILING
 		
 		super.performRefresh();
 		stateStoreToLoad = null;
 		
 		// >>> PROFILING
-		profile_stopView();
+		profile_stopModelViewMapping();
 	
 	
 		if ( profile != null )
@@ -580,14 +588,14 @@ public class IncrementalView extends IncrementalTree implements Presentable
 			endProfiling();
 			ProfileTimer.shutdownProfiling();
 			double deltaT = ( t2 - t1 )  *  1.0e-9;
-			ProfileMeasurement m = new ProfileMeasurement( deltaT, getViewTime(), getPresBuildTime(), getPresRealiseTime(), getHandleContentChangeTime(), getCommitFragmentElementTime() );
+			ProfileMeasurement m = new ProfileMeasurement( deltaT, getModelViewMappingTime(), getPresBuildTime(), getPresToElementsTime(), getHandleContentChangeTime(), getModifyPresTreeTime() );
 			profile.addMeasurement( m );
 			System.out.println( "IncrementalView: REFRESH TIME = " + deltaT );
-			System.out.println( "IncrementalView: PROFILE -- view: " + getViewTime() +
+			System.out.println( "IncrementalView: PROFILE -- view: " + getModelViewMappingTime() +
 					",  pres build: " + getPresBuildTime() +
-					",  pres realise: " + getPresRealiseTime() +
+					",  pres realise: " + getPresToElementsTime() +
 					",  handle content change: " + getHandleContentChangeTime() +
-					",  commit fragment element: " + getCommitFragmentElementTime() );
+					",  commit fragment element: " + getModifyPresTreeTime() );
 		}
 		
 		if ( ENABLE_DISPLAY_TREESIZES )
@@ -636,36 +644,36 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	}
 
 	
-	public void profile_startPresRealise()
+	public void profile_startPresToElements()
 	{
 		if ( takePerformanceMeasurements )
 		{
-			presRealiseTimer.start();
+			presToElementsTimer.start();
 		}
 	}
 	
-	public void profile_stopPresRealise()
+	public void profile_stopPresToElements()
 	{
 		if ( takePerformanceMeasurements )
 		{
-			presRealiseTimer.stop();
+			presToElementsTimer.stop();
 		}
 	}
 
 	
-	public void profile_startView()
+	public void profile_startModelViewMapping()
 	{
 		if ( takePerformanceMeasurements )
 		{
-			viewTimer.start();
+			modelViewMappingTimer.start();
 		}
 	}
 	
-	public void profile_stopView()
+	public void profile_stopModelViewMapping()
 	{
 		if ( takePerformanceMeasurements )
 		{
-			viewTimer.stop();
+			modelViewMappingTimer.stop();
 		}
 	}
 	
@@ -688,19 +696,19 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	
 	
 	
-	public void profile_startCommitFragmentElement()
+	public void profile_startModifyPresTree()
 	{
 		if ( takePerformanceMeasurements )
 		{
-			commitFragmentElementTimer.start();
+			modifyPresTreeTimer.start();
 		}
 	}
 	
-	public void profile_stopCommitFragmentElement()
+	public void profile_stopModifyPresTree()
 	{
 		if ( takePerformanceMeasurements )
 		{
-			commitFragmentElementTimer.stop();
+			modifyPresTreeTimer.stop();
 		}
 	}
 	
@@ -711,10 +719,10 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	{
 		takePerformanceMeasurements = true;
 		presBuildTimer.reset();
-		presRealiseTimer.reset();
-		viewTimer.reset();
+		presToElementsTimer.reset();
+		modelViewMappingTimer.reset();
 		handleContentChangeTimer.reset();
-		commitFragmentElementTimer.reset();
+		modifyPresTreeTimer.reset();
 	}
 
 	private void endProfiling()
@@ -727,14 +735,14 @@ public class IncrementalView extends IncrementalTree implements Presentable
 		return presBuildTimer.getTime();
 	}
 
-	private double getPresRealiseTime()
+	private double getPresToElementsTime()
 	{
-		return presRealiseTimer.getTime();
+		return presToElementsTimer.getTime();
 	}
 
-	private double getViewTime()
+	private double getModelViewMappingTime()
 	{
-		return viewTimer.getTime();
+		return modelViewMappingTimer.getTime();
 	}
 
 	private double getHandleContentChangeTime()
@@ -742,9 +750,9 @@ public class IncrementalView extends IncrementalTree implements Presentable
 		return handleContentChangeTimer.getTime();
 	}
 	
-	private double getCommitFragmentElementTime()
+	private double getModifyPresTreeTime()
 	{
-		return commitFragmentElementTimer.getTime();
+		return modifyPresTreeTimer.getTime();
 	}
 	
 	

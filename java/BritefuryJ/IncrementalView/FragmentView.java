@@ -182,15 +182,15 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 	
 	protected Object computeNodeResult()
 	{
-		getView().profile_startView();
+		getView().profile_startModelViewMapping();
 		Object result = super.computeNodeResult();
-		getView().profile_stopView();
+		getView().profile_stopModelViewMapping();
 		return result;
 	}
 
 	protected void updateNodeResult(Object r)
 	{
-		getView().profile_startCommitFragmentElement();
+		getView().profile_startModifyPresTree();
 		if ( r != element )
 		{
 			if ( r != null )
@@ -207,7 +207,7 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 			}
 			stateListeners = PresentationStateListenerList.onPresentationStateChanged( stateListeners, this );
 		}
-		getView().profile_stopCommitFragmentElement();
+		getView().profile_stopModifyPresTree();
 	}
 	
 	
