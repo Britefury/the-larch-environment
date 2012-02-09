@@ -226,6 +226,7 @@ class Stepper (object):
 
 
 	def __py_exec__(self, globalVars, localVars, codeGen):
+		self.reset()
 		self._scope = {}
 		self._scope.update( globalVars )
 		self._scope.update( localVars )
