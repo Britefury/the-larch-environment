@@ -333,8 +333,9 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	protected final static int FLAG_ENSURE_VISIBLE_QUEUED = 0x20;
 	protected final static int FLAG_HAS_FIXED_VALUE = 0x40;
 	protected final static int FLAG_HAS_CACHED_VALUES = 0x80;
+	protected final static int FLAG_HAS_WAITING_IMMEDIATE_EVENTS = 0x100;
 
-	protected final static int _ALIGN_SHIFT = 8;
+	protected final static int _ALIGN_SHIFT = 9;
 	protected final static int _ALIGN_MASK = ElementAlignment._ELEMENTALIGN_MASK  <<  _ALIGN_SHIFT;
 	protected final static int _HALIGN_MASK = ElementAlignment._HALIGN_MASK  <<  _ALIGN_SHIFT;
 	protected final static int _VALIGN_MASK = ElementAlignment._VALIGN_MASK  <<  _ALIGN_SHIFT;
@@ -1235,14 +1236,17 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 			rootElement = root;
 			if ( rootElement != null )
 			{
-				ArrayList<Runnable> waitingImmediateEvents = waitingImmediateEventsByElement.get( this );
-				if ( waitingImmediateEvents != null )
+				if ( testFlag( FLAG_HAS_WAITING_IMMEDIATE_EVENTS ) )
 				{
-					for (Runnable event: waitingImmediateEvents)
+					ArrayList<Runnable> waitingImmediateEvents = waitingImmediateEventsByElement.get( this );
+					if ( waitingImmediateEvents != null )
 					{
-						rootElement.queueImmediateEvent( event );
+						for (Runnable event: waitingImmediateEvents)
+						{
+							rootElement.queueImmediateEvent( event );
+						}
+						waitingImmediateEventsByElement.remove( this );
 					}
-					waitingImmediateEventsByElement.remove( this );
 				}
 			}
 		}
@@ -1281,6 +1285,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 			{
 				waitingImmediateEvents = new ArrayList<Runnable>();
 				waitingImmediateEventsByElement.put( this, waitingImmediateEvents );
+				setFlag( FLAG_HAS_WAITING_IMMEDIATE_EVENTS );
 			}
 			if ( !waitingImmediateEvents.contains( event ) )
 			{
@@ -1306,6 +1311,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 				{
 					waitingImmediateEvents = null;
 					waitingImmediateEventsByElement.remove( this );
+					clearFlag( FLAG_HAS_WAITING_IMMEDIATE_EVENTS );
 				}
 			}
 		}
