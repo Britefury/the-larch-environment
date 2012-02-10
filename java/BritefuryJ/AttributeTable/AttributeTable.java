@@ -162,6 +162,7 @@ public class AttributeTable implements Presentable
 	protected HashMap<AttributeValuesMultiple, WeakReference<AttributeTable>> multiValueDerivedAttributeTables = new HashMap<AttributeValuesMultiple, WeakReference<AttributeTable>>();
 	protected IdentityHashMap<AttributeTable, WeakReference<AttributeTable>> attribTableDerivedAttributeTables = new IdentityHashMap<AttributeTable, WeakReference<AttributeTable>>();
 	protected HashMap<DelAttribute, WeakReference<AttributeTable>> delDerivedAttributeTables = new HashMap<DelAttribute, WeakReference<AttributeTable>>();
+	private IdentityHashMap<DerivedValueTable<?>, Object[]> derivedValues;
 	
 	
 
@@ -414,6 +415,29 @@ public class AttributeTable implements Presentable
 	private AttributeValuesMultiple allValues()
 	{
 		return new AttributeValuesMultiple( values );
+	}
+	
+	
+	@SuppressWarnings("unchecked")
+	protected <T> T getDerivedValuesForTable(DerivedValueTable<T> t)
+	{
+		if ( derivedValues != null )
+		{
+			Object[] valueHolder = derivedValues.get( t );
+			
+			if ( valueHolder != null )
+			{
+				return (T)valueHolder[0];
+			}
+		}
+		else
+		{
+			derivedValues = new IdentityHashMap<DerivedValueTable<?>, Object[]>();
+		}
+		
+		T value = t.evaluate( this );
+		derivedValues.put( t, new Object[] { value } );
+		return value;
 	}
 	
 	

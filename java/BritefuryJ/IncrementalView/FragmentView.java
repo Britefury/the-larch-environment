@@ -2,12 +2,13 @@
 //##* under the terms of the GNU General Public License version 2 as published by the
 //##* Free Software Foundation. The full text of the GNU General Public License
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
-//##* program. This source code is (C)copyright Geoffrey French 2008.
+//##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
 package BritefuryJ.IncrementalView;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.DefaultPerspective;
@@ -25,7 +26,10 @@ import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
 import BritefuryJ.Incremental.IncrementalFunctionMonitor;
 import BritefuryJ.Incremental.IncrementalMonitor;
-import BritefuryJ.IncrementalTree.IncrementalTreeNode;
+import BritefuryJ.Incremental.IncrementalMonitorListener;
+import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.IncrementalView.IncrementalView;
 import BritefuryJ.ObjectPresentation.PresentationStateListener;
 import BritefuryJ.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.Pres.Pres;
@@ -40,8 +44,66 @@ import BritefuryJ.Projection.Subject;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
 
-public class FragmentView extends IncrementalTreeNode implements FragmentContext, PresentationStateListener, Presentable
+public class FragmentView implements IncrementalMonitorListener, FragmentContext, PresentationStateListener, Presentable
 {
+	public static class CannotChangeModelException extends Exception
+	{
+		private static final long serialVersionUID = 1L;
+	}
+	
+	public static class ChildrenIterator implements Iterator<FragmentView>
+	{
+		private FragmentView current;
+		
+		
+		
+		private ChildrenIterator(FragmentView childrenHead)
+		{
+			current = childrenHead;
+		}
+
+		
+		@Override
+		public boolean hasNext()
+		{
+			return current != null;
+		}
+
+		@Override
+		public FragmentView next()
+		{
+			FragmentView res = current;
+			current = current.nextSibling;
+			return res;
+		}
+
+		@Override
+		public void remove()
+		{
+			throw new UnsupportedOperationException();
+		}
+	}
+	
+	
+	public static class ChildrenIterable implements Iterable<FragmentView>
+	{
+		private FragmentView node;
+		
+		private ChildrenIterable(FragmentView node)
+		{
+			this.node = node;
+		}
+		
+		
+		@Override
+		public Iterator<FragmentView> iterator()
+		{
+			return new ChildrenIterator( node.childrenHead );
+		}
+	}
+	
+	
+	
 	private static final ObjectDndHandler.SourceDataFn fragmentDragSourceFn = new ObjectDndHandler.SourceDataFn()
 	{
 		@Override
@@ -59,24 +121,55 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 	
 	
 	
-	public static class CannotChangeDocNodeException extends Exception
-	{
-		private static final long serialVersionUID = 1L;
-	}
+	
 
+	
+	protected final static int FLAG_SUBTREE_REFRESH_REQUIRED = 0x1;
+	protected final static int FLAG_NODE_REFRESH_REQUIRED = 0x2;
+	protected final static int FLAG_NODE_REFRESH_IN_PROGRESS = 0x4;
+	
+	protected final static int FLAGS_INCREMENTALTREENODE_END = 0x8;
+
+	
+	
+	private IncrementalView incView;
+	private Object model;
+	
+	private IncrementalFunctionMonitor incr;
+	protected IncrementalView.FragmentFactory fragmentFactory;
+	
+	private FragmentView parent, nextSibling;
+	private FragmentView childrenHead, childrenTail;
+	
+	private int flags;
 	
 	private DPFragment fragmentElement;
 	private DPElement element;
 	private PersistentStateTable persistentState;
 	private PresentationStateListenerList stateListeners;
-	
 
 	
 	
 	
-	public FragmentView(Object modelNode, IncrementalView view, PersistentStateTable persistentState)
+	
+	public FragmentView(Object model, IncrementalView view, PersistentStateTable persistentState)
 	{
-		super( view, modelNode );
+		setFlag( FLAG_SUBTREE_REFRESH_REQUIRED );
+		setFlag( FLAG_NODE_REFRESH_REQUIRED );
+
+		this.incView = view;
+		this.model = model;
+		
+		parent = null;
+		nextSibling = null;
+		childrenHead = childrenTail = null;
+		
+		
+		fragmentFactory = null;
+
+		incr = new IncrementalFunctionMonitor( this );
+		incr.addListener( this );
+		
 		
 		// Fragment element, with null context, initially; later set in @setContext method
 		fragmentElement = new DPFragment( this );
@@ -85,11 +178,18 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 		this.persistentState = persistentState;
 	}
 	
+	protected void dispose()
+	{
+		incr.removeListener( this );
+	}
+	
+	
+	
 	
 	
 	//
 	//
-	// Result acquisition methods
+	// Element acquisition methods
 	//
 	//
 	
@@ -111,12 +211,6 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 	}
 	
 	
-	protected Object getResultNoRefresh()
-	{
-		return fragmentElement;
-	}
-	
-
 	
 	
 	public boolean isActive()
@@ -124,53 +218,107 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 		return getParent() != null;
 	}
 	
-	protected ChildrenIterable getChildren()
-	{
-		return super.getChildren();
-	}
-
 	
-	protected IncrementalView.ViewFragmentContextAndResultFactory getNodeResultFactory()
-	{
-		return (IncrementalView.ViewFragmentContextAndResultFactory)resultFactory;
-	}
-
+	
 	
 	
 	//
 	//
-	// Document view and node / tree methods
+	// Structure / model methods
 	//
 	//
 	
 	public IncrementalView getView()
 	{
-		return (IncrementalView)getIncrementalTree();
+		return incView;
 	}
 	
-	
-	
-	
-	//
-	//
-	// Fragment context methods
-	//
-	//
-	
-	@Override
-	public PresentationContext createPresentationContext()
+	public FragmentView getParent()
 	{
-		IncrementalView.ViewFragmentContextAndResultFactory f = getNodeResultFactory();
-		return new PresentationContext( this, f.perspective, f.inheritedState );
+		return parent;
 	}
 	
-	@Override
+	protected ChildrenIterable getChildren()
+	{
+		return new ChildrenIterable( this );
+	}
+	
+
+	public Object getModel()
+	{
+		return model;
+	}
+	
+	
+	public int computeSubtreeSize()
+	{
+		int subtreeSize = 1;
+		FragmentView child = childrenHead;
+		while ( child != null )
+		{
+			subtreeSize += child.computeSubtreeSize();
+			child = child.nextSibling;
+		}
+		return subtreeSize;
+	}
+	
+	
+	
+
+	
+	//
+	//
+	// Context methods
+	//
+	//
+	
 	public StyleValues getStyleValues()
 	{
-		IncrementalView.ViewFragmentContextAndResultFactory f = getNodeResultFactory();
+		IncrementalView.FragmentFactory f = getFragmentFactory();
 		return f.style;
 	}
 	
+	public ProjectiveBrowserContext getBrowserContext()
+	{
+		return incView.getBrowserContext();
+	}
+	
+	
+	public SimpleAttributeTable getSubjectContext()
+	{
+		return getFragmentFactory().subjectContext;
+	}
+	
+	public AbstractPerspective getPerspective()
+	{
+		return getFragmentFactory().perspective;
+	}
+	
+	public PresentationContext createPresentationContext()
+	{
+		IncrementalView.FragmentFactory f = getFragmentFactory();
+		return new PresentationContext( this, f.perspective, f.inheritedState );
+	}
+	
+	
+	
+	
+	//
+	// Set the fragment factory
+	//
+	protected void setFragmentFactory(IncrementalView.FragmentFactory factory)
+	{
+		if ( factory != fragmentFactory )
+		{
+			fragmentFactory = factory;
+			incr.onChanged();
+		}
+	}
+	
+	protected IncrementalView.FragmentFactory getFragmentFactory()
+	{
+		return fragmentFactory;
+	}
 	
 	
 	
@@ -180,17 +328,168 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 	//
 	//
 	
-	protected Object computeNodeResult()
+	public void refresh()
 	{
-		getView().profile_startModelViewMapping();
-		Object result = super.computeNodeResult();
-		getView().profile_stopModelViewMapping();
-		return result;
+		if ( testFlag( FLAG_SUBTREE_REFRESH_REQUIRED ) )
+		{
+			refreshSubtree();
+			clearFlag( FLAG_SUBTREE_REFRESH_REQUIRED );
+		}
+	}
+	
+	public void queueRefresh()
+	{
+		incr.onChanged();
+	}
+	
+	
+
+	
+	private void refreshSubtree()
+	{
+		setFlag( FLAG_NODE_REFRESH_IN_PROGRESS );
+		
+		incView.onElementChangeFrom( this, fragmentElement );
+
+		DPElement newElement = fragmentElement;
+		if ( testFlag( FLAG_NODE_REFRESH_REQUIRED ) )
+		{
+			// Compute the result for this node, and refresh all children
+			Object refreshState = incr.onRefreshBegin();
+			if ( refreshState != null )
+			{
+				newElement = computeFragmentElement();
+			}
+			incr.onRefreshEnd( refreshState );
+		}
+		
+		// Refresh each child
+		FragmentView child = childrenHead;
+		while ( child != null )
+		{
+			child.refresh();
+			child = child.nextSibling;
+		}
+		
+		if ( testFlag( FLAG_NODE_REFRESH_REQUIRED ) )
+		{
+			incr.onAccess();
+			// Set the node result
+			updateNodeResult( newElement );
+		}
+		
+		
+		incView.onElementChangeTo( this, newElement );
+		clearFlag( FLAG_NODE_REFRESH_REQUIRED );
+
+		clearFlag( FLAG_NODE_REFRESH_IN_PROGRESS );
+	}
+	
+	
+	private DPElement computeFragmentElement()
+	{
+		incView.profile_startModelViewMapping();
+
+		// Unregister existing child relationships
+		FragmentView child = childrenHead;
+		while ( child != null )
+		{
+			FragmentView next = child.nextSibling;
+
+			incView.nodeTable.unrefFragment( child );
+			child.parent = null;
+			child.nextSibling = null;
+			
+			child = next;
+		}
+		childrenHead = childrenTail = null;
+		onComputeNodeResultBegin();
+		
+		if ( fragmentFactory != null )
+		{
+			DPElement r = fragmentFactory.createFragmentElement( incView, this, model );
+			
+			onComputeNodeResultEnd();
+			incView.profile_stopModelViewMapping();
+			return r;
+		}
+		else
+		{
+			onComputeNodeResultEnd();
+			incView.profile_stopModelViewMapping();
+			return null;
+		}
+	}
+	
+	
+	
+	//
+	//
+	// Child / parent relationship methods
+	//
+	//
+	
+	private void registerChild(FragmentView child)
+	{
+		assert child.parent == null  ||  child.parent == this;
+
+		// Append child to the list of children
+		if ( childrenTail != null )
+		{
+			childrenTail.nextSibling = child;
+		}
+
+		if ( childrenHead == null )
+		{
+			childrenHead = child;
+		}
+		
+		childrenTail = child;
+
+		child.parent = this;
+
+		// Ref the node, so that it is kept around
+		incView.nodeTable.refFragment( child );
 	}
 
+
+	
+
+
+
+
+	//
+	//
+	// Child notifications
+	//
+	//
+	
+	private void requestSubtreeRefresh()
+	{
+		if ( !testFlag( FLAG_SUBTREE_REFRESH_REQUIRED ) )
+		{
+			setFlag( FLAG_SUBTREE_REFRESH_REQUIRED );
+			if ( parent != null )
+			{
+				parent.requestSubtreeRefresh();
+			}
+			
+			incView.onNodeRequestRefresh( this );
+		}
+	}
+
+
+
+
+	//
+	//
+	// Refresh methods
+	//
+	//
+	
 	protected void updateNodeResult(Object r)
 	{
-		getView().profile_startModifyPresTree();
+		incView.profile_startModifyPresTree();
 		if ( r != element )
 		{
 			if ( r != null )
@@ -207,7 +506,7 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 			}
 			stateListeners = PresentationStateListenerList.onPresentationStateChanged( stateListeners, this );
 		}
-		getView().profile_stopModifyPresTree();
+		incView.profile_stopModifyPresTree();
 	}
 	
 	
@@ -256,84 +555,13 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 
 
 
-	@Override
-	public ProjectiveBrowserContext getBrowserContext()
-	{
-		return getView().getBrowserContext();
-	}
+	//
+	// Inner fragment presentation
+	//
 	
-	
-	public SimpleAttributeTable getSubjectContext()
-	{
-		return getNodeResultFactory().subjectContext;
-	}
-	
-	
-	public AbstractPerspective getPerspective()
-	{
-		return getNodeResultFactory().perspective;
-	}
-	
-	
-	
-	
-	protected void registerIncrementalNodeRelationship(IncrementalTreeNode childNode)
-	{
-		registerChild( childNode );
-	}
-
-
-	
-	private DPElement presentInnerFragment(Object model, AbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
-	{
-		if ( model == null )
-		{
-			return PrimitivePresenter.presentNull().present( new PresentationContext( this, perspective, inheritedState ), style );
-		}
-		
-		
-		if ( inheritedState == null )
-		{
-			throw new RuntimeException( "FragmentView.presentInnerFragment(): @inheritedState cannot be null" );
-		}
-
-		// A call to DocNode.buildNodeView builds the view, and puts it in the DocView's table
-		IncrementalView view = getView();
-		FragmentView incrementalNode = (FragmentView)view.buildIncrementalTreeNodeResult( model, view.makeNodeResultFactory( perspective, subjectContext, style, inheritedState ) );
-		
-		
-		// Register the parent <-> child relationship before refreshing the node, so that the relationship is 'available' during (re-computation)
-		registerIncrementalNodeRelationship( incrementalNode );
-
-		// We don't need to refresh the child node - this is done by incremental view after the fragments contents have been computed
-
-		// If a refresh is in progress, we do not need to refresh the child node, as all child nodes will be refreshed by IncrementalTreeNode.refreshSubtree()
-		// Otherwise, we are constructing a presentation of a child node, outside the normal process, in which case, a refresh is required.
-		if ( !testFlag( FLAG_NODE_REFRESH_IN_PROGRESS ) )
-		{
-			// Block access tracking to prevent the contents of this node being dependent upon the child node being refreshed,
-			// and refresh the view node
-			// Refreshing the child node will ensure that when its contents are inserted into outer elements, its full element tree
-			// is up to date and available.
-			// Blocking the access tracking prevents an inner node from causing all parent/grandparent/etc nodes from requiring a
-			// refresh.
-			IncrementalFunctionMonitor currentComputation = IncrementalMonitor.blockAccessTracking();
-			incrementalNode.refresh();
-			IncrementalMonitor.unblockAccessTracking( currentComputation );
-		}
-		
-		return incrementalNode.getFragmentElement();
-	}
-	
-	protected static DPElement perspectiveFragmentRegion(DPElement fragmentContents, AbstractPerspective perspective)
-	{
-		return new Region( fragmentContents, perspective.getClipboardHandler() ).present();
-	}
-	
-
 	public DPElement presentInnerFragment(Object x, AbstractPerspective perspective, StyleValues style, SimpleAttributeTable inheritedState)
 	{
-		IncrementalView.ViewFragmentContextAndResultFactory factory = getNodeResultFactory();
+		IncrementalView.FragmentFactory factory = getFragmentFactory();
 		DPElement e = presentInnerFragment( x, perspective, factory.subjectContext, style, inheritedState );
 		if ( perspective != factory.perspective )
 		{
@@ -362,6 +590,58 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 	}
 	
 	
+	protected static DPElement perspectiveFragmentRegion(DPElement fragmentContents, AbstractPerspective perspective)
+	{
+		return new Region( fragmentContents, perspective.getClipboardHandler() ).present();
+	}
+	
+
+
+	private DPElement presentInnerFragment(Object model, AbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
+	{
+		if ( model == null )
+		{
+			return PrimitivePresenter.presentNull().present( new PresentationContext( this, perspective, inheritedState ), style );
+		}
+		
+		
+		if ( inheritedState == null )
+		{
+			throw new RuntimeException( "FragmentView2.presentInnerFragment(): @inheritedState cannot be null" );
+		}
+
+		// A call to DocNode.buildNodeView builds the view, and puts it in the DocView's table
+		FragmentView incrementalNode = incView.buildFragment( model, incView.getUniqueFragmentFactory( perspective, subjectContext, style, inheritedState ) );
+		
+		
+		// Register the parent <-> child relationship before refreshing the node, so that the relationship is 'available' during (re-computation)
+		registerChild( incrementalNode );
+
+		// We don't need to refresh the child node - this is done by incremental view after the fragments contents have been computed
+
+		// If a refresh is in progress, we do not need to refresh the child node, as all child nodes will be refreshed by FragmentView2.refreshSubtree()
+		// Otherwise, we are constructing a presentation of a child node, outside the normal process, in which case, a refresh is required.
+		if ( !testFlag( FLAG_NODE_REFRESH_IN_PROGRESS ) )
+		{
+			// Block access tracking to prevent the contents of this node being dependent upon the child node being refreshed,
+			// and refresh the view node
+			// Refreshing the child node will ensure that when its contents are inserted into outer elements, its full element tree
+			// is up to date and available.
+			// Blocking the access tracking prevents an inner node from causing all parent/grandparent/etc nodes from requiring a
+			// refresh.
+			IncrementalFunctionMonitor currentComputation = IncrementalMonitor.blockAccessTracking();
+			incrementalNode.refresh();
+			IncrementalMonitor.unblockAccessTracking( currentComputation );
+		}
+		
+		return incrementalNode.getFragmentElement();
+	}
+	
+	
+	
+	//
+	// Complex structure methods
+	//
 	
 	public ArrayList<FragmentView> getNodeViewInstancePathFromRoot()
 	{
@@ -395,14 +675,6 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 		return null;
 	}
 
-	
-	
-	public void onPresentationStateChanged(Object x)
-	{
-		queueRefresh();
-	}
-	
-	
 	
 	public static FragmentView getEnclosingFragment(DPElement element, FragmentViewFilter filter)
 	{
@@ -480,7 +752,78 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 	}
 
 
+	
+	//
+	//
+	// Incremental monitor notifications
+	//
+	//
+	
+	public void onIncrementalMonitorChanged(IncrementalMonitor inc)
+	{
+		if ( !testFlag( FLAG_NODE_REFRESH_REQUIRED ) )
+		{
+			setFlag( FLAG_NODE_REFRESH_REQUIRED );
+			requestSubtreeRefresh();
+		}
+	}
 
+	
+	
+	//
+	// Presentation state listener list notification
+	//
+	
+	@Override
+	public void onPresentationStateChanged(Object x)
+	{
+		queueRefresh();
+	}
+	
+	
+	
+
+	//
+	//
+	// Flag methods
+	//
+	//
+	
+	protected void clearFlag(int flag)
+	{
+		flags &= ~flag;
+	}
+	
+	protected void setFlag(int flag)
+	{
+		flags |= flag;
+	}
+	
+	protected void setFlagValue(int flag, boolean value)
+	{
+		if ( value )
+		{
+			flags |= flag;
+		}
+		else
+		{
+			flags &= ~flag;
+		}
+	}
+	
+	protected boolean testFlag(int flag)
+	{
+		return ( flags & flag )  !=  0;
+	}
+	
+	
+	
+	
+	//
+	// Presentation
+	//
+	
+	
 	@Override
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
@@ -500,7 +843,7 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 		
 		
 		ArrayList<Object> childNodes = new ArrayList<Object>();
-		for (IncrementalTreeNode childTreeNode: getChildren())
+		for (FragmentView childTreeNode: getChildren())
 		{
 			childNodes.add( childTreeNode );
 		}
@@ -514,4 +857,5 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 
 	private static final StyleSheet nameStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.0f ) ) );
 	private static final StyleSheet noNameStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.0f, 0.0f, 0.5f ) ) );
+	
 }
