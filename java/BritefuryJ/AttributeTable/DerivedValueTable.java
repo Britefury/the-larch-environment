@@ -6,12 +6,10 @@
 //##************************
 package BritefuryJ.AttributeTable;
 
-import java.util.WeakHashMap;
 
 public abstract class DerivedValueTable <V>
 {
 	private AttributeNamespace namespace;
-	private WeakHashMap<AttributeTable, Object[]> values = new WeakHashMap<AttributeTable, Object[]>();
 	
 	
 	public DerivedValueTable(AttributeNamespace namespace)
@@ -26,20 +24,9 @@ public abstract class DerivedValueTable <V>
 	}
 	
 	
-	@SuppressWarnings("unchecked")
 	public V get(AttributeTable attribs)
 	{
-		Object valueHolder[] = values.get( attribs );
-		if ( valueHolder != null )
-		{
-			return (V)valueHolder[0];
-		}
-		else
-		{
-			V value = evaluate( attribs );
-			values.put( attribs, new Object[] { value } );
-			return value;
-		}
+		return attribs.getDerivedValuesForTable( this );
 	}
 	
 	

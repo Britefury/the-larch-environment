@@ -2,7 +2,7 @@
 //##* under the terms of the GNU General Public License version 2 as published by the
 //##* Free Software Foundation. The full text of the GNU General Public License
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
-//##* program. This source code is (C)copyright Geoffrey French 2008.
+//##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
 package BritefuryJ.IncrementalView;
 
@@ -29,8 +29,6 @@ import BritefuryJ.Editor.Table.ObjectList.AttributeColumn;
 import BritefuryJ.Editor.Table.ObjectList.ObjectListInterface;
 import BritefuryJ.Editor.Table.ObjectList.ObjectListTableEditor;
 import BritefuryJ.Incremental.IncrementalValueMonitor;
-import BritefuryJ.IncrementalTree.IncrementalTree;
-import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
@@ -50,7 +48,7 @@ import BritefuryJ.Util.HashUtils;
 import BritefuryJ.Util.WeakIdentityHashMap;
 import BritefuryJ.Util.Profile.ProfileTimer;
 
-public class IncrementalView extends IncrementalTree implements Presentable
+public class IncrementalView
 {
 	//
 	//
@@ -113,25 +111,56 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	
 	
 	
-	protected static class ViewFragmentContextAndResultFactory implements IncrementalTreeNode.NodeResultFactory
+	protected static class FragmentFactory
 	{
-		protected IncrementalView view;
 		protected AbstractPerspective perspective;
 		protected SimpleAttributeTable subjectContext;
 		protected StyleValues style;
 		protected SimpleAttributeTable inheritedState;
+		protected int hash;
 		
-		public ViewFragmentContextAndResultFactory(IncrementalView view, AbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
+		public FragmentFactory(IncrementalView view, AbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
 		{
-			this.view = view;
+			if ( style == null )
+			{
+				throw new RuntimeException( "style == null" );
+			}
 			this.perspective = perspective;
 			this.subjectContext = subjectContext;
 			this.style = style;
 			this.inheritedState = inheritedState;
+			hash = HashUtils.nHash( new int[] { System.identityHashCode( perspective ), style.hashCode(), inheritedState.hashCode(), subjectContext.hashCode() } );
 		}
 
 
-		public Object createNodeResult(IncrementalTreeNode incrementalNode, Object model)
+		@Override
+		public int hashCode()
+		{
+			return hash;
+		}
+		
+		@Override
+		public boolean equals(Object x)
+		{
+			if ( x == this )
+			{
+				return true;
+			}
+			
+			if ( x instanceof FragmentFactory )
+			{
+				FragmentFactory fx = (FragmentFactory)x;
+				return perspective == fx.perspective  &&  style.equals( fx.style )  &&  inheritedState == fx.inheritedState  &&  subjectContext == fx.subjectContext;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		
+		
+		public DPElement createFragmentElement(IncrementalView view, FragmentView incrementalNode, Object model)
 		{
 			view.profile_startPresBuild();
 
@@ -152,9 +181,9 @@ public class IncrementalView extends IncrementalTree implements Presentable
 					fragment = new ErrorBox( "Presentation error - exception during presentation", exceptionView );
 					view.profile_stopPresBuild();
 					view.profile_startPresToElements();
-					Object result = fragment.present( new PresentationContext( fragmentView, DefaultPerspective.instance, inheritedState ), style );
+					DPElement element = fragment.present( new PresentationContext( fragmentView, DefaultPerspective.instance, inheritedState ), style );
 					view.profile_stopPresToElements();
-					return result;
+					return element;
 				}
 				catch (Exception e2)
 				{
@@ -165,19 +194,19 @@ public class IncrementalView extends IncrementalTree implements Presentable
 							exceptionStyle.applyTo( new StaticText( t.toString() ) ).padX( 15.0, 0.0 )   } ) );
 					view.profile_stopPresBuild();
 					view.profile_startPresToElements();
-					Object result = fragment.present( new PresentationContext( fragmentView, DefaultPerspective.instance, inheritedState ), style );
+					DPElement element = fragment.present( new PresentationContext( fragmentView, DefaultPerspective.instance, inheritedState ), style );
 					view.profile_stopPresToElements();
-					return result;
+					return element;
 				}
 			}
 			
 			view.profile_stopPresBuild();
 			view.profile_startPresToElements();
-			Object nodeResult;
+			DPElement element;
 			
 			try
 			{
-				nodeResult = presToElements( fragment, fragmentView );
+				element = presToElements( fragment, fragmentView );
 			}
 			catch (Throwable t)
 			{
@@ -199,66 +228,18 @@ public class IncrementalView extends IncrementalTree implements Presentable
 			}
 			
 			view.profile_stopPresToElements();
-			return nodeResult;
+			return element;
 		}
 
 
-		private Object presToElements(Pres fragment, FragmentView fragmentView)
+		private DPElement presToElements(Pres fragment, FragmentView fragmentView)
 		{
-			Object nodeResult;
-			nodeResult = fragment.present( new PresentationContext( fragmentView, perspective, inheritedState ), style );
-			return nodeResult;
+			return fragment.present( new PresentationContext( fragmentView, perspective, inheritedState ), style );
 		}
 
 	
 		private static final StyleSheet labelStyle = StyleSheet.instance;
 		private static final StyleSheet exceptionStyle = StyleSheet.style( Primitive.foreground.as( new Color( 1.0f, 0.2f, 0.0f ) ) );
-	}
-	
-	
-	protected static class ViewFragmentContextAndResultFactoryKey
-	{
-		private AbstractPerspective perspective;
-		private SimpleAttributeTable subjectContext;
-		private StyleValues style;
-		private SimpleAttributeTable inheritedState;
-		
-		
-		public ViewFragmentContextAndResultFactoryKey(AbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
-		{
-			this.perspective = perspective;
-			this.style = style;
-			this.inheritedState = inheritedState;
-			this.subjectContext = subjectContext;
-		}
-		
-		
-		public int hashCode()
-		{
-			if ( style == null )
-			{
-				throw new RuntimeException( "style == null" );
-			}
-			return HashUtils.nHash( new int[] { System.identityHashCode( perspective ), style.hashCode(), inheritedState.hashCode(), subjectContext.hashCode() } );
-		}
-		
-		public boolean equals(Object x)
-		{
-			if ( x == this )
-			{
-				return true;
-			}
-			
-			if ( x instanceof ViewFragmentContextAndResultFactoryKey )
-			{
-				ViewFragmentContextAndResultFactoryKey kx = (ViewFragmentContextAndResultFactoryKey)x;
-				return perspective == kx.perspective  &&  style.equals( kx.style )  &&  inheritedState == kx.inheritedState  &&  subjectContext == kx.subjectContext;
-			}
-			else
-			{
-				return false;
-			}
-		}
 	}
 	
 	
@@ -268,12 +249,12 @@ public class IncrementalView extends IncrementalTree implements Presentable
 		@Override
 		public DPElement present(PresentationContext ctx, StyleValues style)
 		{
-			FragmentView.NodeResultFactory resultFactory = makeNodeResultFactory( rootPerspective, subjectContext, style, SimpleAttributeTable.instance );
-			setRootNodeResultFactory( resultFactory );
+			FragmentFactory fragmentFactory = getUniqueFragmentFactory( rootPerspective, subjectContext, style, SimpleAttributeTable.instance );
+			setRootFragmentFactory( fragmentFactory );
 			
 			refresh();
 			
-			FragmentView rootView = (FragmentView)getRootIncrementalTreeNode();
+			FragmentView rootView = (FragmentView)getRootFragment();
 			rootElement = rootView.getRefreshedFragmentElement();
 			
 			return rootElement;
@@ -283,144 +264,32 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	
 	
 	
-	public static class ProfileMeasurement
-	{
-		private double refreshTime, modelViewMapping, presBuildTime, presToElementsTime, handleContentChangeTime, modifyPresTreeTime;
-		
-		public ProfileMeasurement()
-		{
-		}
-		
-		public ProfileMeasurement(double refreshTime, double modelViewMapping, double presBuildTime, double presToElementsTime,
-							double handleContentChangeTime, double modifyPresTreeTime)
-		{
-			this.refreshTime = refreshTime;
-			this.modelViewMapping = modelViewMapping;
-			this.presBuildTime = presBuildTime;
-			this.presToElementsTime = presToElementsTime;
-			this.handleContentChangeTime = handleContentChangeTime;
-			this.modifyPresTreeTime = modifyPresTreeTime;
-		}
-		
-		
-		public double getRefreshTime()
-		{
-			return refreshTime;
-		}
-		
-		public double getModelViewMappingTime()
-		{
-			return modelViewMapping;
-		}
-		
-		public double getPresBuildTime()
-		{
-			return presBuildTime;
-		}
-		
-		public double getPresToElementsTime()
-		{
-			return presToElementsTime;
-		}
-		
-		public double getHandleContentChangeTime()
-		{
-			return handleContentChangeTime;
-		}
-		
-		public double getModifyPresTreeTime()
-		{
-			return modifyPresTreeTime;
-		}
-	}
 	
-	
-	private static AttributeColumn refreshTimeColumn = new AttributeColumn( "Complete refresh", Py.newString( "refreshTime" ) );
-	private static AttributeColumn modelViewMappingTimeColumn = new AttributeColumn( "Model-view mapping", Py.newString( "modelViewMappingTime" ) );
-	private static AttributeColumn presBuildTimeColumn = new AttributeColumn( "Pres construction", Py.newString( "presBuildTime" ) );
-	private static AttributeColumn presRealiseTimeColumn = new AttributeColumn( "Pres to elems", Py.newString( "presToElementsTime" ) );
-	private static AttributeColumn handleContentChangeTimeColumn = new AttributeColumn( "Handle content change", Py.newString( "handleContentChangeTime" ) );
-	private static AttributeColumn commitFragmentElementTimeColumn = new AttributeColumn( "Modify pres. tree", Py.newString( "modifyPresTreeTime" ) );
-	
-	private static ObjectListTableEditor profileTableEditor = null;
-	
-	
-	
-	private static ObjectListTableEditor getProfileTableEditor()
-	{
-		if ( profileTableEditor == null )
-		{
-			profileTableEditor = new ObjectListTableEditor(
-					Arrays.asList( new Object[] { refreshTimeColumn, modelViewMappingTimeColumn, presBuildTimeColumn, presRealiseTimeColumn,
-							handleContentChangeTimeColumn, commitFragmentElementTimeColumn } ),
-					ProfileMeasurement.class, true, true, false, false );
-		}
-		return profileTableEditor;
-	}
+	private Subject subject;
+	private ProjectiveBrowserContext browserContext;
+	private SimpleAttributeTable subjectContext;
+	private AbstractPerspective rootPerspective;
+	protected Object modelRootNode;
 
-	
-	public static class ViewProfile implements ObjectListInterface, Presentable
-	{
-		private ArrayList<ProfileMeasurement> measurements = new ArrayList<ProfileMeasurement>();
-		private IncrementalValueMonitor incr = new IncrementalValueMonitor();
-		
-		
-		public ViewProfile()
-		{
-		}
-		
-		
-		public void addMeasurement(ProfileMeasurement m)
-		{
-			measurements.add( m );
-			incr.onChanged();
-		}
-		
-
-		@Override
-		public int size()
-		{
-			incr.onAccess();
-			return measurements.size();
-		}
-
-		@Override
-		public Object get(int i)
-		{
-			incr.onAccess();
-			return measurements.get( i );
-		}
-
-		@Override
-		public void append(Object x)
-		{
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public void removeRange(int start, int end)
-		{
-			throw new UnsupportedOperationException();
-		}
-
-
-		@Override
-		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
-		{
-			return getProfileTableEditor().editTable( this );
-		}
-	}
-	
-	
-
-
-	
+	protected IncrementalViewTable nodeTable;
+	private FragmentView rootFragment;
+	private boolean bRefreshRequired;
+	private FragmentFactory rootFragmentFactory;
 	
 	
 	private NodeElementChangeListener elementChangeListener = null;
 	//private DPColumn rootBox = null;
 	
 	private StateStore stateStoreToLoad;
+	
+	private ChangeHistory changeHistory;
+
+	private Pres viewPres;
+	private DPElement rootElement;
+	
+	protected Log log;
+	
+	
 	
 	
 	private boolean takePerformanceMeasurements = false;
@@ -433,43 +302,33 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	
 	
 	
-	private ProjectiveBrowserContext browserContext;
-
-	private AbstractPerspective rootPerspective;
-	private SimpleAttributeTable subjectContext;
-	private ChangeHistory changeHistory;
-	private Subject subject;
-
-	private Pres viewPres;
 	
-	protected Log log;
-	
-	private DPElement rootElement;
-	
-	
-
-	private HashMap<ViewFragmentContextAndResultFactoryKey, ViewFragmentContextAndResultFactory> viewFragmentContextAndResultFactories =
-		new HashMap<ViewFragmentContextAndResultFactoryKey, ViewFragmentContextAndResultFactory>();
+	private HashMap<FragmentFactory, FragmentFactory> uniqueFragmentFactories = new HashMap<FragmentFactory, FragmentFactory>();
 	
 	
 	
 	
 	public IncrementalView(Subject subject, ProjectiveBrowserContext browserContext, PersistentStateStore persistentState)
 	{
-		super( subject.getFocus(), DuplicatePolicy.ALLOW_DUPLICATES );
-		
 		this.subject = subject;
+		this.browserContext = browserContext;
+
+		this.modelRootNode = subject.getFocus();
 		
 		this.rootPerspective = subject.getPerspective();
 		if ( this.rootPerspective == null )
 		{
 			this.rootPerspective = DefaultPerspective.instance;
 		}
+
 		this.subjectContext = subject.getSubjectContext();
 		this.changeHistory = subject.getChangeHistory();
 		
-		this.browserContext = browserContext;
 	
+		nodeTable = new IncrementalViewTable();
+		bRefreshRequired = false;
+	
+		
 		log = new Log( "View log" );
 		
 		if ( persistentState != null  &&  persistentState instanceof StateStore )
@@ -478,45 +337,23 @@ public class IncrementalView extends IncrementalTree implements Presentable
 		}
 		
 		
-		setElementChangeListener( new NodeElementChangeListenerDiff( this ) );
+		elementChangeListener = new NodeElementChangeListenerDiff( this );
 
 		RootPres rootPres = new RootPres();
-		viewPres = new Column( new Pres[] { new Region( rootPres, getRootPerspective().getClipboardHandler() ) } );
+		viewPres = new Column( new Pres[] { new Region( rootPres, rootPerspective.getClipboardHandler() ) } );
 	}
+	
 	
 	public IncrementalView(Subject subject, ProjectiveBrowserContext browserContext)
 	{
 		this( subject, browserContext, null );
 	}
-	
-	
-	public void setElementChangeListener(NodeElementChangeListener elementChangeListener)
-	{
-		this.elementChangeListener = elementChangeListener;
-	}
-	
-	
-	
-	
-	protected FragmentView.NodeResultFactory makeNodeResultFactory(AbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
-	{
-		// Memoise the contents factory, keyed by  @nodeViewFunction and @state
-		ViewFragmentContextAndResultFactoryKey key = new ViewFragmentContextAndResultFactoryKey( perspective, subjectContext, style, inheritedState );
-		
-		ViewFragmentContextAndResultFactory factory = viewFragmentContextAndResultFactories.get( key );
-		
-		if ( factory == null )
-		{
-			factory = new ViewFragmentContextAndResultFactory( this, perspective, subjectContext, style, inheritedState );
-			viewFragmentContextAndResultFactories.put( key, factory );
-		}
-		
-		return factory;
-	}
 
 	
 	
-	
+	//
+	// View
+	//
 	
 	public Pres getViewPres()
 	{
@@ -524,43 +361,109 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	}
 	
 	
-	
-	public PersistentStateStore storePersistentState()
+	public PresentationComponent.RootElement getPresentationRootElement()
 	{
-		StateStore store = new StateStore();
-		
-		LinkedList<IncrementalTreeNode> nodeQueue = new LinkedList<IncrementalTreeNode>();
-		nodeQueue.push( getRootIncrementalTreeNode() );
-		
-		while ( !nodeQueue.isEmpty() )
-		{
-			IncrementalTreeNode node = nodeQueue.removeFirst();
-			
-			// Get the persistent state, if any, and store it
-			FragmentView viewNode = (FragmentView)node;
-			PersistentStateTable stateTable = viewNode.getPersistentStateTable();
-			if ( stateTable != null )
-			{
-				store.addPersistentState( node.getModel(), stateTable );
-			}
-			
-			// Add the children using an interator; that means that they will be inserted at the beginning
-			// of the queue so that they appear *in order*, hence they will be removed in order.
-			ListIterator<IncrementalTreeNode> iterator = nodeQueue.listIterator();
-			for (IncrementalTreeNode child: ((FragmentView)node).getChildren())
-			{
-				iterator.add( child );
-			}
-		}
-		
-		
-		return store;
+		return rootElement != null  ?  rootElement.getRootElement()  :  null;
+	}
+	
+	public Caret getCaret()
+	{
+		PresentationComponent.RootElement elementTree = getPresentationRootElement();
+		return elementTree != null  ?  elementTree.getCaret()  :  null;
+	}
+	
+	public Selection getSelection()
+	{
+		PresentationComponent.RootElement elementTree = getPresentationRootElement();
+		return elementTree != null  ?  elementTree.getSelection()  :  null;
 	}
 	
 	
 	
-	@Override
-	protected void performRefresh()
+	//
+	// Model root
+	//
+	
+	public Object getModelRoot()
+	{
+		return modelRootNode;
+	}
+	
+	
+	//
+	// Contexts, logs, etc
+	//
+	
+	public ProjectiveBrowserContext getBrowserContext()
+	{
+		return browserContext;
+	}
+	
+	public ChangeHistory getChangeHistory()
+	{
+		return changeHistory;
+	}
+	
+	public Log getLog()
+	{
+		return log;
+	}
+	
+	public Subject getSubject()
+	{
+		return subject;
+	}
+	
+	
+	
+	
+	
+	
+	//
+	// Refreshing
+	//
+	
+	public void refresh()
+	{
+		if ( bRefreshRequired )
+		{
+			bRefreshRequired = false;
+			performRefresh();
+		}
+	}
+	
+
+	public void queueRefresh()
+	{
+		if ( !bRefreshRequired )
+		{
+			bRefreshRequired = true;
+			Runnable r = new Runnable()
+			{
+				public void run()
+				{
+					refresh();
+				}
+			};
+			if ( rootElement != null )
+			{
+				rootElement.queueImmediateEvent( r );
+			}
+		}
+	}
+	
+	
+	
+	protected void onNodeRequestRefresh(FragmentView node)
+	{
+		if ( node == rootFragment )
+		{
+			queueRefresh();
+		}
+	}
+	
+	
+	private void performRefresh()
 	{
 		// >>> PROFILING
 		long t1 = 0;
@@ -575,7 +478,17 @@ public class IncrementalView extends IncrementalTree implements Presentable
 		profile_startModelViewMapping();
 		// <<< PROFILING
 		
-		super.performRefresh();
+		onViewRefreshBegin();
+		FragmentView node = getRootFragment();
+		if ( node != null )
+		{
+			node.refresh();
+		}
+		onViewRefreshEnd();
+		
+		// Clear unused entries from the node table
+		nodeTable.clean();
+
 		stateStoreToLoad = null;
 		
 		// >>> PROFILING
@@ -600,15 +513,197 @@ public class IncrementalView extends IncrementalTree implements Presentable
 		
 		if ( ENABLE_DISPLAY_TREESIZES )
 		{
-			FragmentView rootView = (FragmentView)getRootIncrementalTreeNode();
+			FragmentView rootView = (FragmentView)getRootFragment();
 			int presTreeSize = rootView.getRefreshedFragmentElement().computeSubtreeSize();
 			int numFragments = rootView.computeSubtreeSize();
-			System.out.println( "DocView.performRefresh(): presentation tree size=" + presTreeSize + ", # fragments=" + numFragments );
+			System.out.println( "IncrementalView.performRefresh(): presentation tree size=" + presTreeSize + ", # fragments=" + numFragments );
 		}
 		// <<< PROFILING
 	}
 	
 
+	
+	
+	//
+	// Result change handling
+	//
+	
+	protected void onViewRefreshBegin()
+	{
+		if ( elementChangeListener != null )
+		{
+			profile_startHandleContentChange();
+			elementChangeListener.begin( this );
+			profile_stopHandleContentChange();
+		}
+	}
+
+	protected void onViewRefreshEnd()
+	{
+		if ( elementChangeListener != null )
+		{
+			profile_startHandleContentChange();
+			elementChangeListener.end( this );
+			profile_stopHandleContentChange();
+		}
+	}
+
+	protected void onElementChangeFrom(FragmentView node, DPElement result)
+	{
+		if ( elementChangeListener != null )
+		{
+			profile_startHandleContentChange();
+			elementChangeListener.elementChangeFrom( node, result );
+			profile_stopHandleContentChange();
+		}
+	}
+
+	protected void onElementChangeTo(FragmentView node, DPElement result)
+	{
+		if ( elementChangeListener != null )
+		{
+			profile_startHandleContentChange();
+			elementChangeListener.elementChangeTo( node, result );
+			profile_stopHandleContentChange();
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//
+	// Fragment building and acquisition
+	//
+	
+	private FragmentView getRootFragment()
+	{
+		if ( rootFragmentFactory == null )
+		{
+			throw new RuntimeException( "No root node result factory set" );
+		}
+		
+		
+		if ( rootFragment != null )
+		{
+			nodeTable.unrefFragment( rootFragment );
+		}
+		if ( rootFragment == null )
+		{
+			rootFragment = buildFragment( modelRootNode, rootFragmentFactory );
+		}
+		if ( rootFragment != null )
+		{
+			nodeTable.refFragment( rootFragment );
+		}
+		return rootFragment;
+	}
+	
+	
+	protected FragmentView buildFragment(Object model, FragmentFactory fragmentFactory)
+	{
+		if ( model == null )
+		{
+			return null;
+		}
+		else
+		{
+			// Try asking the table for an unused incremental tree node for the document node
+			FragmentView fragment = nodeTable.getUnrefedFragmentForModel( model, fragmentFactory );
+			
+			if ( fragment == null )
+			{
+				// No existing incremental tree node could be acquired.
+				// Create a new one and add it to the table
+				fragment = new FragmentView( model, this, persistentStateForNode( model ) );
+			}
+			
+			fragment.setFragmentFactory( fragmentFactory );
+			
+			return fragment;
+		}
+	}
+	
+	
+	
+	
+	//
+	// Fragment factories
+	//
+	
+	private void setRootFragmentFactory(FragmentFactory fragmentFactory)
+	{
+		if ( fragmentFactory != rootFragmentFactory )
+		{
+			rootFragmentFactory = fragmentFactory;
+			queueRefresh();
+		}
+	}
+	
+	protected FragmentFactory getUniqueFragmentFactory(AbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
+	{
+		FragmentFactory factory = new FragmentFactory( this, perspective, subjectContext, style, inheritedState );
+		
+		FragmentFactory uniqueFactory = uniqueFragmentFactories.get( factory );
+		
+		if ( uniqueFactory == null )
+		{
+			uniqueFragmentFactories.put( factory, factory );
+			uniqueFactory = factory;
+		}
+		
+		return uniqueFactory;
+	}
+
+	
+	
+	
+	
+	//
+	// Persistent state
+	//
+	
+	
+	public PersistentStateStore storePersistentState()
+	{
+		StateStore store = new StateStore();
+		
+		LinkedList<FragmentView> nodeQueue = new LinkedList<FragmentView>();
+		nodeQueue.push( getRootFragment() );
+		
+		while ( !nodeQueue.isEmpty() )
+		{
+			FragmentView node = nodeQueue.removeFirst();
+			
+			// Get the persistent state, if any, and store it
+			FragmentView viewNode = (FragmentView)node;
+			PersistentStateTable stateTable = viewNode.getPersistentStateTable();
+			if ( stateTable != null )
+			{
+				store.addPersistentState( node.getModel(), stateTable );
+			}
+			
+			// Add the children using an interator; that means that they will be inserted at the beginning
+			// of the queue so that they appear *in order*, hence they will be removed in order.
+			ListIterator<FragmentView> iterator = nodeQueue.listIterator();
+			for (FragmentView child: ((FragmentView)node).getChildren())
+			{
+				iterator.add( child );
+			}
+		}
+		
+		
+		return store;
+	}
+	
+	
+	
 	private PersistentStateTable persistentStateForNode(Object node)
 	{
 		PersistentStateTable persistentState = null;
@@ -619,13 +714,11 @@ public class IncrementalView extends IncrementalTree implements Presentable
 		return persistentState;
 	}
 	
-	protected IncrementalTreeNode createIncrementalTreeNode(Object node)
-	{
-		return new FragmentView( node, this, persistentStateForNode( node ) );
-	}
-
 	
 	
+	//
+	// Profiling methods
+	//
 	
 	public void profile_startPresBuild()
 	{
@@ -775,133 +868,18 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	
 	
 
-	@Override
-	protected void onResultChangeTreeRefreshBegin()
-	{
-		if ( elementChangeListener != null )
-		{
-			profile_startHandleContentChange();
-			elementChangeListener.begin( this );
-			profile_stopHandleContentChange();
-		}
-	}
-
-	@Override
-	protected void onResultChangeTreeRefreshEnd()
-	{
-		if ( elementChangeListener != null )
-		{
-			profile_startHandleContentChange();
-			elementChangeListener.end( this );
-			profile_stopHandleContentChange();
-		}
-	}
-
-	@Override
-	protected void onResultChangeFrom(IncrementalTreeNode node, Object result)
-	{
-		if ( elementChangeListener != null )
-		{
-			profile_startHandleContentChange();
-			elementChangeListener.elementChangeFrom( (FragmentView)node, (DPElement)result );
-			profile_stopHandleContentChange();
-		}
-	}
-
-	@Override
-	protected void onResultChangeTo(IncrementalTreeNode node, Object result)
-	{
-		if ( elementChangeListener != null )
-		{
-			profile_startHandleContentChange();
-			elementChangeListener.elementChangeTo( (FragmentView)node, (DPElement)result );
-			profile_stopHandleContentChange();
-		}
-	}
+	//
+	//
+	// Presentation
+	//
+	//
 	
 	
-	
-	
-	
-	
-	public PresentationComponent.RootElement getPresentationRootElement()
-	{
-		return rootElement != null  ?  rootElement.getRootElement()  :  null;
-	}
-	
-	public Caret getCaret()
-	{
-		PresentationComponent.RootElement elementTree = getPresentationRootElement();
-		return elementTree != null  ?  elementTree.getCaret()  :  null;
-	}
-	
-	public Selection getSelection()
-	{
-		PresentationComponent.RootElement elementTree = getPresentationRootElement();
-		return elementTree != null  ?  elementTree.getSelection()  :  null;
-	}
-	
-	
-	
-	
-	public Object getDocRootNode()
-	{
-		return modelRootNode;
-	}
-	
-	
-	
-	public ProjectiveBrowserContext getBrowserContext()
-	{
-		return browserContext;
-	}
-	
-	public ChangeHistory getChangeHistory()
-	{
-		return changeHistory;
-	}
-	
-	public Log getLog()
-	{
-		return log;
-	}
-	
-	public Subject getSubject()
-	{
-		return subject;
-	}
-	
-	
-	@Override
-	public void onRequestRefresh()
-	{
-		Runnable r = new Runnable()
-		{
-			public void run()
-			{
-				refresh();
-			}
-		};
-		if ( rootElement != null )
-		{
-			rootElement.queueImmediateEvent( r );
-		}
-	}
-	
-	
-	
-	private AbstractPerspective getRootPerspective()
-	{
-		return rootPerspective;
-	}
-
-
-
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		Pres title = titleStyle.applyTo( new Label( "View" ) );
 		
-		FragmentView rootFragment = (FragmentView)getRootIncrementalTreeNode();
+		FragmentView rootFragment = (FragmentView)getRootFragment();
 		
 		Pres boxContents = contentsStyle.applyTo( new Column( new Object[] { title, rootFragment } ) );
 
@@ -911,4 +889,145 @@ public class IncrementalView extends IncrementalTree implements Presentable
 
 	private static final StyleSheet titleStyle = StyleSheet.style( Primitive.fontSize.as( 14 ), Primitive.fontBold.as( true ) );
 	private static final StyleSheet contentsStyle = StyleSheet.style( Primitive.columnSpacing.as( 5.0 ) );
+
+
+
+	//
+	//
+	// PROFILING
+	//
+	//
+
+
+
+
+	public static class ProfileMeasurement
+	{
+		private double refreshTime, modelViewMapping, presBuildTime, presToElementsTime, handleContentChangeTime, modifyPresTreeTime;
+		
+		public ProfileMeasurement()
+		{
+		}
+		
+		public ProfileMeasurement(double refreshTime, double modelViewMapping, double presBuildTime, double presToElementsTime,
+							double handleContentChangeTime, double modifyPresTreeTime)
+		{
+			this.refreshTime = refreshTime;
+			this.modelViewMapping = modelViewMapping;
+			this.presBuildTime = presBuildTime;
+			this.presToElementsTime = presToElementsTime;
+			this.handleContentChangeTime = handleContentChangeTime;
+			this.modifyPresTreeTime = modifyPresTreeTime;
+		}
+		
+		
+		public double getRefreshTime()
+		{
+			return refreshTime;
+		}
+		
+		public double getModelViewMappingTime()
+		{
+			return modelViewMapping;
+		}
+		
+		public double getPresBuildTime()
+		{
+			return presBuildTime;
+		}
+		
+		public double getPresToElementsTime()
+		{
+			return presToElementsTime;
+		}
+		
+		public double getHandleContentChangeTime()
+		{
+			return handleContentChangeTime;
+		}
+		
+		public double getModifyPresTreeTime()
+		{
+			return modifyPresTreeTime;
+		}
+	}
+	
+	
+	private static AttributeColumn refreshTimeColumn = new AttributeColumn( "Complete refresh", Py.newString( "refreshTime" ) );
+	private static AttributeColumn modelViewMappingTimeColumn = new AttributeColumn( "Model-view mapping", Py.newString( "modelViewMappingTime" ) );
+	private static AttributeColumn presBuildTimeColumn = new AttributeColumn( "Pres construction", Py.newString( "presBuildTime" ) );
+	private static AttributeColumn presRealiseTimeColumn = new AttributeColumn( "Pres to elems", Py.newString( "presToElementsTime" ) );
+	private static AttributeColumn handleContentChangeTimeColumn = new AttributeColumn( "Handle content change", Py.newString( "handleContentChangeTime" ) );
+	private static AttributeColumn commitFragmentElementTimeColumn = new AttributeColumn( "Modify pres. tree", Py.newString( "modifyPresTreeTime" ) );
+	
+	private static ObjectListTableEditor profileTableEditor = null;
+	
+	
+	
+	private static ObjectListTableEditor getProfileTableEditor()
+	{
+		if ( profileTableEditor == null )
+		{
+			profileTableEditor = new ObjectListTableEditor(
+					Arrays.asList( new Object[] { refreshTimeColumn, modelViewMappingTimeColumn, presBuildTimeColumn, presRealiseTimeColumn,
+							handleContentChangeTimeColumn, commitFragmentElementTimeColumn } ),
+					ProfileMeasurement.class, true, true, false, false );
+		}
+		return profileTableEditor;
+	}
+
+	
+	
+	
+	public static class ViewProfile implements ObjectListInterface, Presentable
+	{
+		private ArrayList<ProfileMeasurement> measurements = new ArrayList<ProfileMeasurement>();
+		private IncrementalValueMonitor incr = new IncrementalValueMonitor();
+		
+		
+		public ViewProfile()
+		{
+		}
+		
+		
+		public void addMeasurement(ProfileMeasurement m)
+		{
+			measurements.add( m );
+			incr.onChanged();
+		}
+		
+
+		@Override
+		public int size()
+		{
+			incr.onAccess();
+			return measurements.size();
+		}
+
+		@Override
+		public Object get(int i)
+		{
+			incr.onAccess();
+			return measurements.get( i );
+		}
+
+		@Override
+		public void append(Object x)
+		{
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void removeRange(int start, int end)
+		{
+			throw new UnsupportedOperationException();
+		}
+
+
+		@Override
+		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
+		{
+			return getProfileTableEditor().editTable( this );
+		}
+	}
 }

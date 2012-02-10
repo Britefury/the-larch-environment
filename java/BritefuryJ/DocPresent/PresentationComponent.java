@@ -41,6 +41,7 @@ import java.awt.image.ImageObserver;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -540,8 +541,8 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		private boolean bAllocationRequired;
 		
 		
-		protected WeakIdentityHashMap<DPContentLeafEditable, WeakIdentityHashMap<Marker, Object>> markersByLeaf =
-			new WeakIdentityHashMap<DPContentLeafEditable, WeakIdentityHashMap<Marker, Object>>();
+		protected HashMap<DPContentLeafEditable, WeakIdentityHashMap<Marker, Object>> markersByLeaf =
+			new HashMap<DPContentLeafEditable, WeakIdentityHashMap<Marker, Object>>();
 		
 		private Caret caret;
 		private DPContentLeafEditable currentCaretLeaf = null;
