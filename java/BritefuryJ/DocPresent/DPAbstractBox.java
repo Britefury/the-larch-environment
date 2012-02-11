@@ -12,13 +12,6 @@ import BritefuryJ.DocPresent.StyleParams.AbstractBoxStyleParams;
 
 abstract public class DPAbstractBox extends DPContainerSequence
 {
-	public static class CouldNotFindInsertionPointException extends RuntimeException
-	{
-		private static final long serialVersionUID = 1L;
-	}
-
-	
-	
 	public DPAbstractBox()
 	{
 		this( AbstractBoxStyleParams.defaultStyleParams );
