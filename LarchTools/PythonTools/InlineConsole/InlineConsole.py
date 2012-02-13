@@ -27,7 +27,7 @@ from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.StyleSheet import *
 
 from LarchCore.Languages.Python25.PythonCommands import pythonCommands, makeWrapSelectedStatementRangeInEmbeddedObjectAction, makeInsertEmbeddedStatementAtCaretAction, chainActions
-from LarchCore.Languages.Python25.Python25 import EmbeddedPython25Suite, removeEmbeddedObjectContainingElement
+from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Suite, removeEmbeddedObjectContainingElement
 from LarchCore.Languages.Python25.Execution import Execution
 
 
@@ -113,7 +113,7 @@ class InlineConsole (object):
 
 	def _refresh(self):
 		if self._module is not None:
-			self._execResult = Execution.executeInScopeWithinModule( self._suite.model, copy( self._scopeGlobals ), copy( self._scopeLocals ), self._module, True )
+			self._execResult = Execution.getResultOfExecutionInScopeWithinModule( self._suite.model, copy( self._scopeGlobals ), copy( self._scopeLocals ), self._module, True )
 			self._incr.onChanged()
 
 

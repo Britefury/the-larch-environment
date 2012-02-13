@@ -31,7 +31,7 @@ from BritefuryJ.StyleSheet import *
 
 from LarchCore.Languages.Python25.PythonCommands import pythonCommands, makeInsertEmbeddedExpressionAtCaretAction, makeWrapSelectionInEmbeddedExpressionAction,\
 makeWrapSelectedStatementRangeInEmbeddedObjectAction, chainActions
-from LarchCore.Languages.Python25.Python25 import EmbeddedPython25Expr, EmbeddedPython25Suite
+from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Expr, EmbeddedPython25Suite
 from LarchCore.Languages.Python25 import Schema
 
 

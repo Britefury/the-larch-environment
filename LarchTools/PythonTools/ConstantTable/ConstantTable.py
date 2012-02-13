@@ -23,8 +23,7 @@ from Britefury.Util.TrackedList import TrackedListProperty
 
 import LarchCore.Languages.Python25.Schema as Py
 from LarchCore.Languages.Python25.PythonCommands import pythonCommands, makeInsertEmbeddedStatementAtCaretAction
-from LarchCore.Languages.Python25.Python25 import EmbeddedPython25Target, EmbeddedPython25Expr
-from LarchCore.Languages.Python25.PythonEditor.View import perspective as pyPerspective
+from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Target, EmbeddedPython25Expr
 
 
 
