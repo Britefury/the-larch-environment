@@ -30,7 +30,7 @@ from BritefuryJ.Editor.Table.Generic import *
 from BritefuryJ.StyleSheet import *
 
 from LarchCore.Languages.Python25.PythonCommands import pythonCommands, makeInsertEmbeddedExpressionAtCaretAction, makeWrapSelectionInEmbeddedExpressionAction, chainActions
-from LarchCore.Languages.Python25.Python25 import EmbeddedPython25Expr
+from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Expr
 
 
 

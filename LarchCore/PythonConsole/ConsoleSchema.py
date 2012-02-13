@@ -96,12 +96,12 @@ class Console (object):
 	def execute(self, bEvaluate=True):
 		module = self.getCurrentPythonModule()
 		if not Python25.isEmptyTopLevel(module):
-			execResult = Execution.executeWithinModule( module, self._module, bEvaluate )
+			execResult = Execution.getResultOfExecutionWithinModule( module, self._module, bEvaluate )
 			self._commit( module, execResult )
 					
 	def executeModule(self, module, bEvaluate=True):
 		if not Python25.isEmptyTopLevel(module):
-			execResult = Execution.executeWithinModule( module, self._module, bEvaluate )
+			execResult = Execution.getResultOfExecutionWithinModule( module, self._module, bEvaluate )
 			self._commit( module, execResult )
 					
 		

@@ -84,56 +84,13 @@ class ExecutionResult (object):
 
 
 
-
-def execute(pythonCode, filename, bEvaluate):
-	stdout = _OutputStream()
-	stderr = _OutputStream()
-
-	def _compileForEval():
-		return CodeGenerator.compileForExecutionAndEvaluation( pythonCode, filename )
-
-	def _compileForExec():
-		return CodeGenerator.compileForExecution( pythonCode, filename )
-
-	evalCode = execCode = None
-	caughtException = None
-	result = None
-	if bEvaluate:
-		r, caughtException = InvokePyFunction.invoke( _compileForEval )
-		if r is not None:
-			execCode, evalCode = r
-	else:
-		execCode, caughtException = InvokePyFunction.invoke( _compileForExec )
-
-	globals = {}
-	if execCode is not None  or  evalCode is not None:
-		savedStdout, savedStderr = sys.stdout, sys.stderr
-		sys.stdout = stdout
-		sys.stderr = stderr
-		globals['display'] = stdout.display
-		globals['displayerr'] = stderr.display
-
-		def _exec():
-			exec execCode in globals
-			if evalCode is not None:
-				return [ eval( evalCode, globals ) ]
-			else:
-				return None
-
-		result, caughtException = InvokePyFunction.invoke( _exec )
-
-		sys.stdout, sys.stderr = savedStdout, savedStderr
-
-	return ExecutionResult( stdout.getStream(), stderr.getStream(), caughtException, result )
-
-
-def executeWithinModule(pythonCode, module, bEvaluate):
+def getResultOfExecutionWithinModule(pythonCode, module, bEvaluate):
 	stdout = _OutputStream()
 	stderr = _OutputStream()
 
 	def _compileForEval():
 		return CodeGenerator.compileForModuleExecutionAndEvaluation( module, pythonCode, module.__name__ )
-	
+
 	def _compileForExec():
 		return CodeGenerator.compileForModuleExecution( module, pythonCode, module.__name__ )
 
@@ -168,7 +125,7 @@ def executeWithinModule(pythonCode, module, bEvaluate):
 	return ExecutionResult( stdout.getStream(), stderr.getStream(), caughtException, result )
 
 
-def executeInScopeWithinModule(pythonCode, globals, locals, module, bEvaluate):
+def getResultOfExecutionInScopeWithinModule(pythonCode, globals, locals, module, bEvaluate):
 	stdout = _OutputStream()
 	stderr = _OutputStream()
 
@@ -212,3 +169,49 @@ def executeInScopeWithinModule(pythonCode, globals, locals, module, bEvaluate):
 		sys.stdout, sys.stderr = savedStdout, savedStderr
 
 	return ExecutionResult( stdout.getStream(), stderr.getStream(), caughtException, result )
+
+
+
+
+
+def executeWithinModule(pythonCode, module, bEvaluate):
+	if bEvaluate:
+		execCode, evalCode = CodeGenerator.compileForModuleExecutionAndEvaluation( module, pythonCode, module.__name__ )
+	else:
+		execCode = CodeGenerator.compileForModuleExecution( module, pythonCode, module.__name__ )
+		evalCode = None
+
+	if execCode is not None  or  evalCode is not None:
+		setattr( module, 'display', stdout.display )
+		setattr( module, 'displayerr', stderr.display )
+
+		exec execCode in module.__dict__
+		if evalCode is not None:
+			return [ eval( evalCode, module.__dict__ ) ]
+		else:
+			return None
+	return None
+
+
+def executeInScopeWithinModule(pythonCode, globals, locals, module, bEvaluate):
+	if bEvaluate:
+		execCode, evalCode = CodeGenerator.compileForModuleExecutionAndEvaluation( module, pythonCode, module.__name__ )
+	else:
+		execCode = CodeGenerator.compileForModuleExecution( module, pythonCode, module.__name__ )
+		evalCode = None
+
+	if globals is None:
+		globals = module.__dict__
+	if locals is None:
+		locals = module.__dict__
+
+	if execCode is not None  or  evalCode is not None:
+		setattr( module, 'display', stdout.display )
+		setattr( module, 'displayerr', stderr.display )
+
+		exec execCode in globals, locals
+		if evalCode is not None:
+			return [ eval( evalCode, globals, locals ) ]
+		else:
+			return None
+	return None

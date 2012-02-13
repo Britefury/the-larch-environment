@@ -28,7 +28,7 @@ from BritefuryJ.Util.Coroutine import Coroutine
 from BritefuryJ.Live import LiveValue
 
 from LarchCore.Languages.Python25.PythonCommands import pythonCommands, makeWrapSelectedStatementRangeInEmbeddedObjectAction, makeInsertEmbeddedStatementAtCaretAction, chainActions
-from LarchCore.Languages.Python25.Python25 import EmbeddedPython25Suite
+from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Suite
 from LarchCore.Languages.Python25.Execution import Execution
 
 

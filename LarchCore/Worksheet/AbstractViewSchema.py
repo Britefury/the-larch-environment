@@ -261,7 +261,7 @@ class PythonCodeAbstractView (NodeAbstractView):
 		
 		
 	def _refreshResults(self, module):
-		self._result = Execution.executeWithinModule( self.getCode(), module, self.isResultVisible() )
+		self._result = Execution.getResultOfExecutionWithinModule( self.getCode(), module, self.isResultVisible() )
 		self._incr.onChanged()
 
 	
