@@ -182,9 +182,6 @@ def executeWithinModule(pythonCode, module, bEvaluate):
 		evalCode = None
 
 	if execCode is not None  or  evalCode is not None:
-		setattr( module, 'display', stdout.display )
-		setattr( module, 'displayerr', stderr.display )
-
 		exec execCode in module.__dict__
 		if evalCode is not None:
 			return [ eval( evalCode, module.__dict__ ) ]
@@ -206,9 +203,6 @@ def executeInScopeWithinModule(pythonCode, globals, locals, module, bEvaluate):
 		locals = module.__dict__
 
 	if execCode is not None  or  evalCode is not None:
-		setattr( module, 'display', stdout.display )
-		setattr( module, 'displayerr', stderr.display )
-
 		exec execCode in globals, locals
 		if evalCode is not None:
 			return [ eval( evalCode, globals, locals ) ]
