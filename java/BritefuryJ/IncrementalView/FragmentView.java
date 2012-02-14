@@ -453,6 +453,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 			
 			child = next;
 		}
+		childrenHead = childrenTail = null;
 		
 		if ( !testFlag( FLAG_NODE_REFRESH_REQUIRED ) )
 		{
