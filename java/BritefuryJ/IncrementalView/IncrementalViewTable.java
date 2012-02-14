@@ -234,6 +234,7 @@ public class IncrementalViewTable
 	
 	protected void refFragment(FragmentView node)
 	{
+		node.setRefStateRefed();
 		Object model = node.getModel();
 		TableForModel subTable = table.get( model );
 		if ( subTable == null )
@@ -247,6 +248,7 @@ public class IncrementalViewTable
 
 	protected void unrefFragment(FragmentView node)
 	{
+		node.setRefStateUnrefed();
 		Object key = node.getModel();
 		TableForModel subTable = table.get( key );
 		if ( subTable == null )

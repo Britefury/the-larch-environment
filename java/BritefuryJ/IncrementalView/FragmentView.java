@@ -7,6 +7,7 @@
 package BritefuryJ.IncrementalView;
 
 import java.awt.Color;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -27,9 +28,6 @@ import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
 import BritefuryJ.Incremental.IncrementalFunctionMonitor;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
-import BritefuryJ.IncrementalView.FragmentView;
-import BritefuryJ.IncrementalView.FragmentView;
-import BritefuryJ.IncrementalView.IncrementalView;
 import BritefuryJ.ObjectPresentation.PresentationStateListener;
 import BritefuryJ.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.Pres.Pres;
@@ -128,7 +126,12 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	protected final static int FLAG_NODE_REFRESH_REQUIRED = 0x2;
 	protected final static int FLAG_NODE_REFRESH_IN_PROGRESS = 0x4;
 	
-	protected final static int FLAGS_INCREMENTALTREENODE_END = 0x8;
+	protected final static int FLAG_REFSTATE_NONE = 0x0;
+	protected final static int FLAG_REFSTATE_REFED = 0x8;
+	protected final static int FLAG_REFSTATE_UNREFED = 0x10;
+	protected final static int _FLAG_REFSTATEMASK = 0x18;
+	
+	protected final static int FLAGS_INCREMENTALTREENODE_END = 0x20;
 
 	
 	
@@ -386,6 +389,79 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	}
 	
 	
+	private static void unrefSubtree(IncrementalView incView, FragmentView fragment)
+	{
+		ArrayDeque<FragmentView> q = new ArrayDeque<FragmentView>();
+		
+		q.addLast( fragment );
+		
+		while ( !q.isEmpty() )
+		{
+			FragmentView f = q.removeFirst();
+			
+			if ( f.getRefState() != FLAG_REFSTATE_UNREFED )
+			{
+				incView.nodeTable.unrefFragment( f );
+				
+				FragmentView child = f.childrenHead;
+				while ( child != null )
+				{
+					q.addLast( child );
+					
+					child = child.nextSibling;
+				}
+			}
+		}
+	}
+	
+	private static void refSubtree(IncrementalView incView, FragmentView fragment)
+	{
+		ArrayDeque<FragmentView> q = new ArrayDeque<FragmentView>();
+		
+		q.addLast( fragment );
+		
+		while ( !q.isEmpty() )
+		{
+			FragmentView f = q.removeFirst();
+			
+			if ( f.getRefState() != FLAG_REFSTATE_REFED )
+			{
+				incView.nodeTable.refFragment( f );
+				
+				FragmentView child = f.childrenHead;
+				while ( child != null )
+				{
+					q.addLast( child );
+					
+					child = child.nextSibling;
+				}
+			}
+		}
+	}
+	
+	protected void childDisconnected()
+	{
+		// ONLY INVOKE AGAINST A NOTE WHICH HAS BEEN UNREFED, AND DURING A REFRESH
+		
+		FragmentView child = childrenHead;
+		while ( child != null )
+		{
+			FragmentView next = child.nextSibling;
+
+			child.parent = null;
+			child.nextSibling = null;
+			
+			child = next;
+		}
+		
+		if ( !testFlag( FLAG_NODE_REFRESH_REQUIRED ) )
+		{
+			setFlag( FLAG_NODE_REFRESH_REQUIRED );
+			requestSubtreeRefresh();
+		}
+	}
+	
+	
 	private DPElement computeFragmentElement()
 	{
 		incView.profile_startModelViewMapping();
@@ -396,7 +472,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 		{
 			FragmentView next = child.nextSibling;
 
-			incView.nodeTable.unrefFragment( child );
+			unrefSubtree( incView, child );
 			child.parent = null;
 			child.nextSibling = null;
 			
@@ -431,7 +507,11 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	
 	private void registerChild(FragmentView child)
 	{
-		assert child.parent == null  ||  child.parent == this;
+		if ( child.parent != null  &&  child.parent != this )
+		{
+			child.parent.childDisconnected();
+		}
+		//assert child.parent == null  ||  child.parent == this;
 
 		// Append child to the list of children
 		if ( childrenTail != null )
@@ -449,7 +529,10 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 		child.parent = this;
 
 		// Ref the node, so that it is kept around
-		incView.nodeTable.refFragment( child );
+		
+		// We need to disconnect it from any parent node
+		//incView.nodeTable.refFragment( child );
+		refSubtree( incView, child );
 	}
 
 
@@ -619,7 +702,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 
 		// We don't need to refresh the child node - this is done by incremental view after the fragments contents have been computed
 
-		// If a refresh is in progress, we do not need to refresh the child node, as all child nodes will be refreshed by FragmentView2.refreshSubtree()
+		// If a refresh is in progress, we do not need to refresh the child node, as all child nodes will be refreshed by FragmentView.refreshSubtree()
 		// Otherwise, we are constructing a presentation of a child node, outside the normal process, in which case, a refresh is required.
 		if ( !testFlag( FLAG_NODE_REFRESH_IN_PROGRESS ) )
 		{
@@ -814,6 +897,26 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	protected boolean testFlag(int flag)
 	{
 		return ( flags & flag )  !=  0;
+	}
+	
+	protected int getRefState()
+	{
+		return flags & _FLAG_REFSTATEMASK;
+	}
+	
+	protected void setRefState(int state)
+	{
+		flags = ( flags & ~_FLAG_REFSTATEMASK ) | state;
+	}
+	
+	protected void setRefStateRefed()
+	{
+		setRefState( FLAG_REFSTATE_REFED );
+	}
+	
+	protected void setRefStateUnrefed()
+	{
+		setRefState( FLAG_REFSTATE_UNREFED );
 	}
 	
 	
