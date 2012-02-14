@@ -600,7 +600,7 @@ public class IncrementalView
 		}
 		if ( rootFragment != null )
 		{
-			rootFragment.setRefStateRefed();
+			nodeTable.refFragment( rootFragment );
 		}
 		return rootFragment;
 	}

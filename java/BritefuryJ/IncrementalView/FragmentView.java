@@ -126,8 +126,8 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	protected final static int FLAG_NODE_REFRESH_REQUIRED = 0x2;
 	protected final static int FLAG_NODE_REFRESH_IN_PROGRESS = 0x4;
 	
-	protected final static int FLAG_REFSTATE_NONE = 0x0;
-	protected final static int FLAG_REFSTATE_REFED = 0x8;
+	protected final static int FLAG_REFSTATE_NONE = 0x00;
+	protected final static int FLAG_REFSTATE_REFED = 0x08;
 	protected final static int FLAG_REFSTATE_UNREFED = 0x10;
 	protected final static int _FLAG_REFSTATEMASK = 0x18;
 	
@@ -144,7 +144,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	private FragmentView parent, nextSibling;
 	private FragmentView childrenHead, childrenTail;
 	
-	private int flags;
+	private int flags = 0;
 	
 	private DPFragment fragmentElement;
 	private DPElement element;
