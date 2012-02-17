@@ -33,11 +33,15 @@ public class ScriptLayout
 		{
 			columnBoxes[0].maxRequisitionX( leftSub );
 		}
+		columnBoxes[0].minWidth = columnBoxes[0].minHAdvance = Math.max( columnBoxes[0].minWidth, columnBoxes[0].minHAdvance );
+		columnBoxes[0].prefWidth = columnBoxes[0].prefHAdvance = Math.max( columnBoxes[0].prefWidth, columnBoxes[0].prefHAdvance );
 		
 		if ( main != null )
 		{
 			columnBoxes[1].setRequisitionX( main );
 		}
+		columnBoxes[1].minWidth = columnBoxes[1].minHAdvance = Math.max( columnBoxes[1].minWidth, columnBoxes[1].minHAdvance );
+		columnBoxes[1].prefWidth = columnBoxes[1].prefHAdvance = Math.max( columnBoxes[1].prefWidth, columnBoxes[1].prefHAdvance );
 		
 		if ( rightSuper != null )
 		{
@@ -47,8 +51,10 @@ public class ScriptLayout
 		{
 			columnBoxes[2].maxRequisitionX( rightSub );
 		}
+		columnBoxes[2].minWidth = columnBoxes[2].minHAdvance = Math.max( columnBoxes[2].minWidth, columnBoxes[2].minHAdvance );
+		columnBoxes[2].prefWidth = columnBoxes[2].prefHAdvance = Math.max( columnBoxes[2].prefWidth, columnBoxes[2].prefHAdvance );
 
-		LReqBox leftColumn = columnBoxes[0], rightColumn = columnBoxes[2];
+		LReqBox leftColumn = columnBoxes[0], mainColumn = columnBoxes[1], rightColumn = columnBoxes[2];
 		
 		// Compute the spacing that is placed between the columns
 		double leftSpacing = 0.0, mainSpacing = 0.0;
@@ -64,41 +70,39 @@ public class ScriptLayout
 		
 		
 		// Compute the overall width and spacing
-		double minW = 0.0, prefW = 0.0, minAdv = 0.0, prefAdv = 0.0;
+		double minW = 0.0, prefW = 0.0;
 		if ( ( leftSuper != null  ||  leftSub != null )  &&  ( main == null  &&  rightSuper == null  &&  rightSub == null ) )
 		{
 			// Has a left column, no main or right columns
 			
-			minW = leftColumn.getReqMinWidth();
-			prefW = leftColumn.getReqPrefWidth();
-			minAdv = leftColumn.getReqMinHAdvance();
-			prefAdv = leftColumn.getReqPrefHAdvance();
+			minW = leftColumn.minWidth;
+			prefW = leftColumn.prefWidth;
 		}
 		if ( main != null   &&   ( rightSuper == null  &&  rightSub == null ) )
 		{
 			// Has a main column, no right column
+			// may also have a left column
 			
-			double minX = Math.max( leftColumn.minWidth, leftColumn.minHAdvance )  +  leftSpacing;
-			double prefX = Math.max( leftColumn.prefWidth, leftColumn.prefHAdvance )  +  leftSpacing;
-			minW = minX + main.getReqMinWidth();
-			prefW = prefX + main.getReqPrefWidth();
-			minAdv = minX + main.getReqMinHAdvance();
-			prefAdv = prefX + main.getReqPrefHAdvance();
+			// If there is no left column, then leftColumn entries and leftSpacing will be 0.0
+			double minX = leftColumn.minWidth  +  leftSpacing;
+			double prefX = leftColumn.prefWidth  +  leftSpacing;
+			minW = minX + mainColumn.minWidth;
+			prefW = prefX + mainColumn.prefWidth;
 		}
 		else
 		{
 			double mainMinW = main != null  ?  Math.max( main.getReqMinWidth(), main.getReqMinHAdvance() )  :  0.0;
 			double mainPrefW = main != null  ?  Math.max( main.getReqPrefWidth(), main.getReqPrefHAdvance() )  :  0.0;  
-			minAdv = minW = Math.max( leftColumn.minWidth, leftColumn.minHAdvance )  +  leftSpacing  +
+			minW = leftColumn.minWidth  +  leftSpacing  +
 					mainMinW  +  mainSpacing  +
-					Math.max( rightColumn.minWidth, rightColumn.minHAdvance );
-			prefAdv = prefW = Math.max( leftColumn.prefWidth, leftColumn.prefHAdvance )  +  leftSpacing  +
+					rightColumn.minWidth;
+			prefW = leftColumn.prefWidth  +  leftSpacing  +
 					mainPrefW  +  mainSpacing  +
-					Math.max( rightColumn.prefWidth, rightColumn.prefHAdvance );
+					rightColumn.prefWidth;
 		}
 		
 		// Set the requisition
-		box.setRequisitionX( minW, prefW, minAdv, prefAdv );
+		box.setRequisitionX( minW, prefW, minW, prefW );
 	}
 
 
@@ -280,14 +284,24 @@ public class ScriptLayout
 			t = 1.0;
 		}
 		
-		LReqBox leftColumn = columnBoxes[0], mainColumn = columnBoxes[1];
+		double leftSpacing = 0.0, mainSpacing = 0.0;
+		if ( ( leftSuper != null  ||  leftSub != null )   &&   ( main != null  ||  rightSuper != null  ||  rightSub != null ) )
+		{
+			leftSpacing = columnSpacing;
+		}
 		
-		double overallWidth = boxReqMinWidth  +  ( boxReqPrefWidth - boxReqMinWidth ) * t;
+		if ( main != null   &&   ( rightSuper != null  ||  rightSub != null ) )
+		{
+			mainSpacing = columnSpacing;
+		}
+		
+		LReqBox leftColumn = columnBoxes[0], mainColumn = columnBoxes[1], rightColumn = columnBoxes[2];
+		
 		double leftWidth = leftColumn.minWidth  +  ( leftColumn.prefWidth - leftColumn.minWidth ) * t;
-		double leftHAdvance = leftColumn.minHAdvance  +  ( leftColumn.prefHAdvance - leftColumn.minHAdvance ) * t;
 		double mainWidth = mainColumn.minWidth  +  ( mainColumn.prefWidth - mainColumn.minWidth ) * t;
-		double mainHAdvance = mainColumn.minHAdvance  +  ( mainColumn.prefHAdvance - mainColumn.minHAdvance ) * t;
-	
+		double rightWidth = rightColumn.minWidth  +  ( rightColumn.prefWidth - rightColumn.minWidth ) * t;
+		double overallWidth = leftWidth + leftSpacing + mainWidth + mainSpacing + rightWidth;
+		
 		double padding = Math.max( ( allocAllocationX - overallWidth )  *  0.5, 0.0 );
 		double x = padding;
 		
@@ -305,7 +319,7 @@ public class ScriptLayout
 		
 		if ( leftSuper != null  ||  leftSub != null )
 		{
-			x += Math.max( leftWidth, leftHAdvance )  +  columnSpacing;
+			x += leftWidth + columnSpacing;
 		}
 		
 		
@@ -313,7 +327,7 @@ public class ScriptLayout
 		if ( main != null )
 		{
 			LAllocHelper.allocateChildX( mainAlloc, x, mainWidth, mainWidth );
-			x += Math.max( mainWidth, mainHAdvance )  +  columnSpacing;
+			x += mainWidth + columnSpacing;
 		}
 		
 		

@@ -8,12 +8,11 @@ package BritefuryJ.Controls;
 
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Event.AbstractPointerButtonEvent;
-import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
+import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.DocPresent.Interactor.ClickElementInteractor;
 import BritefuryJ.DocPresent.Interactor.HoverElementInteractor;
+import BritefuryJ.DocPresent.Interactor.PushElementInteractor;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Border;
@@ -26,13 +25,13 @@ public class Button extends ControlPres
 {
 	public static interface ButtonListener
 	{
-		public void onButtonClicked(ButtonControl button, PointerButtonClickedEvent event);
+		public void onButtonClicked(ButtonControl button, PointerButtonEvent event);
 	}
 	
 	
 	public static class ButtonControl extends Control
 	{
-		private class ButtonInteractor implements ClickElementInteractor, HoverElementInteractor
+		private class ButtonInteractor implements PushElementInteractor, HoverElementInteractor
 		{
 			private ButtonInteractor()
 			{
@@ -40,13 +39,7 @@ public class Button extends ControlPres
 			
 			
 			@Override
-			public boolean testClickEvent(PointerInputElement element, AbstractPointerButtonEvent event)
-			{
-				return true;
-			}
-
-			@Override
-			public boolean buttonClicked(PointerInputElement element, PointerButtonClickedEvent event)
+			public boolean buttonPress(PointerInputElement element, PointerButtonEvent event)
 			{
 				DPElement buttonElement = (DPElement)element;
 				if ( buttonElement.isRealised() )
@@ -65,6 +58,10 @@ public class Button extends ControlPres
 				return false;
 			}
 
+			@Override
+			public void buttonRelease(PointerInputElement element, PointerButtonEvent event)
+			{
+			}
 
 			@Override
 			public void pointerEnter(PointerInputElement element, PointerMotionEvent event)

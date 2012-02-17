@@ -55,13 +55,13 @@ public class IncrementalBench
 
 	public static void main(String[] args)
 	{
-//		IncrementalValueMonitor[] values = createValues(MONITORS);
-//		IncrementalFunctionMonitor[] functions = createFunctions(MONITORS);
+		IncrementalValueMonitor[] values = createValues(MONITORS);
+		IncrementalFunctionMonitor[] functions = createFunctions(MONITORS);
 		
 		for (int i = 0; i < WARMUP; i++)
 		{
-			IncrementalValueMonitor[] values = createValues(MONITORS);
-			IncrementalFunctionMonitor[] functions = createFunctions(MONITORS);
+//			IncrementalValueMonitor[] values = createValues(MONITORS);
+//			IncrementalFunctionMonitor[] functions = createFunctions(MONITORS);
 			refreshFunctions(values, functions);
 			changeValues(values);
 		}
@@ -70,8 +70,8 @@ public class IncrementalBench
 		
 		for (int i = 0; i < REPEATS; i++)
 		{
-			IncrementalValueMonitor[] values = createValues(MONITORS);
-			IncrementalFunctionMonitor[] functions = createFunctions(MONITORS);
+//			IncrementalValueMonitor[] values = createValues(MONITORS);
+//			IncrementalFunctionMonitor[] functions = createFunctions(MONITORS);
 			refreshFunctions(values, functions);
 			changeValues(values);
 		}
