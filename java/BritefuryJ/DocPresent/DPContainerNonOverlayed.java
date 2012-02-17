@@ -14,6 +14,8 @@ import BritefuryJ.Math.AABox2;
 
 public abstract class DPContainerNonOverlayed extends DPContainer
 {
+	protected final static int FLAGS_CONTAINERNONOVERLAYED_END = FLAGS_CONTAINER_END;
+
 	//
 	// Constructors
 	//

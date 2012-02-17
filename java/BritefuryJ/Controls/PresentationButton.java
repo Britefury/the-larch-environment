@@ -9,7 +9,7 @@ package BritefuryJ.Controls;
 import BritefuryJ.Controls.Button.ButtonControl;
 import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
+import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.Pres.Pres;
@@ -35,7 +35,7 @@ public class PresentationButton extends ControlPres
 		private PresentationButtonControl control;
 		
 		@Override
-		public void onButtonClicked(ButtonControl button, PointerButtonClickedEvent event)
+		public void onButtonClicked(ButtonControl button, PointerButtonEvent event)
 		{
 			control.displayPres();
 		}

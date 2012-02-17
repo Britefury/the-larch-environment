@@ -17,7 +17,7 @@ import BritefuryJ.Math.Point2;
 
 public class DPProxy extends DPContainerNonOverlayed
 {
-	protected final static int FLAGS_PROXY_END = FLAGS_CONTAINER_END * 0x4;
+	protected final static int FLAGS_PROXY_END = FLAGS_CONTAINERNONOVERLAYED_END * 0x1;
 
 	
 	

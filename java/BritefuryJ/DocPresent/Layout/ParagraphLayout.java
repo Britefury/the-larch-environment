@@ -256,6 +256,15 @@ public class ParagraphLayout
 		
 		minWidth = Math.max( minWidth, lineWidth );
 		minAdvance = Math.max( minAdvance, lineAdvance );
+		
+		// Line breaks in combination with indentation can result in subsequent lines whose width is greater than the preferred width of the layout,
+		// in which all elements are arranged into a horizontal row.
+		// In these cases, simply arranging them horizontally would make more sense, so do this:
+		if ( minWidth > prefWidth )
+		{
+			minWidth = prefWidth;
+			minAdvance = prefAdvance;
+		}
 
 		box.setRequisitionX( minWidth, prefWidth, minAdvance, prefAdvance );
 	}

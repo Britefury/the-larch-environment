@@ -39,11 +39,15 @@ public class DPSegment extends DPContainerNonOverlayed
 
 	
 	
+	protected final static int FLAGS_SEGMENT_BEGIN = FLAGS_CONTAINERNONOVERLAYED_END;
+	protected final static int FLAG_GUARD_BEGIN = FLAGS_SEGMENT_BEGIN * 0x1;
+	protected final static int FLAG_GUARD_END = FLAGS_SEGMENT_BEGIN * 0x2;
+	protected final static int FLAG_GUARDS_REFRESHING = FLAGS_SEGMENT_BEGIN * 0x4;
+
+	
 	protected TextStyleParams textStyleParams;
-	protected boolean bGuardBegin, bGuardEnd;
 	protected DPElement beginGuard, endGuard;
 	protected DPElement child;
-	protected boolean bGuardsRefreshing;
 	
 	
 	//
@@ -59,19 +63,19 @@ public class DPSegment extends DPContainerNonOverlayed
 	{
 		super( styleParams );
 		this.textStyleParams = textStyleParams;
-		this.bGuardBegin = bGuardBegin;
-		this.bGuardEnd = bGuardEnd;
-		bGuardsRefreshing = false;
+		setFlagValue( FLAG_GUARD_BEGIN, bGuardBegin );
+		setFlagValue( FLAG_GUARD_END, bGuardEnd );
+		clearFlag( FLAG_GUARDS_REFRESHING );
 	}
 	
 	
 	
 	public void setGuardPolicy(boolean bGuardBegin, boolean bGuardEnd)
 	{
-		if ( bGuardBegin != this.bGuardBegin  ||  bGuardEnd != this.bGuardEnd )
+		if ( bGuardBegin != testFlag( FLAG_GUARD_BEGIN )  ||  bGuardEnd != testFlag( FLAG_GUARD_END ) )
 		{
-			this.bGuardBegin = bGuardBegin;
-			this.bGuardEnd = bGuardEnd;
+			setFlagValue( FLAG_GUARD_BEGIN, bGuardBegin );
+			setFlagValue( FLAG_GUARD_END, bGuardEnd );
 			refreshGuards();
 		}
 	}
@@ -152,7 +156,7 @@ public class DPSegment extends DPContainerNonOverlayed
 	private void refreshGuards()
 	{
 		// Set the flag to indicate that the guard elements are being refreshed
-		bGuardsRefreshing = true;
+		setFlag( FLAG_GUARDS_REFRESHING );
 		boolean bBegin = false, bEnd = false;
 		
 		if ( child != null )
@@ -167,7 +171,7 @@ public class DPSegment extends DPContainerNonOverlayed
 			}
 		}
 		
-		if ( bGuardBegin )
+		if ( testFlag( FLAG_GUARD_BEGIN ) )
 		{
 			if ( bBegin  &&  !( beginGuard instanceof DPText ) )
 			{
@@ -190,7 +194,7 @@ public class DPSegment extends DPContainerNonOverlayed
 		}
 		
 		
-		if ( bGuardEnd )
+		if ( testFlag( FLAG_GUARD_END ) )
 		{
 			if ( bEnd  &&  !( endGuard instanceof DPText ) )
 			{
@@ -212,7 +216,7 @@ public class DPSegment extends DPContainerNonOverlayed
 			endGuard = null;
 		}
 		// Clear the flag to indicate that the guard elements are no longer being refreshed
-		bGuardsRefreshing = false;
+		clearFlag( FLAG_GUARDS_REFRESHING );
 	}
 	
 	
@@ -259,7 +263,7 @@ public class DPSegment extends DPContainerNonOverlayed
 	{
 		super.onSubtreeStructureChanged();
 		
-		if ( !bGuardsRefreshing )
+		if ( !testFlag( FLAG_GUARDS_REFRESHING ) )
 		{
 			refreshGuards();
 		}

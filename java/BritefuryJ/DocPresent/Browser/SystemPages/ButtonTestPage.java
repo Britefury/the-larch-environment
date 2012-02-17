@@ -11,7 +11,7 @@ import java.awt.Color;
 import BritefuryJ.Controls.Button;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPProxy;
-import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
+import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.Pres.ElementRef;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Column;
@@ -54,7 +54,7 @@ public class ButtonTestPage extends SystemPage
 		}
 
 
-		public void onButtonClicked(Button.ButtonControl button, PointerButtonClickedEvent event)
+		public void onButtonClicked(Button.ButtonControl button, PointerButtonEvent event)
 		{
 			for (DPElement element: parentElement.getElements())
 			{
