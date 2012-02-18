@@ -9,7 +9,6 @@ package BritefuryJ.DocPresent;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Stroke;
-import java.awt.geom.Line2D;
 import java.util.BitSet;
 import java.util.List;
 
@@ -216,35 +215,13 @@ public class DPRGrid extends DPContainerSequence implements TableElement
 		if ( cellPaint != null )
 		{
 			LayoutNodeRGrid layout = (LayoutNodeRGrid)getLayoutNode();
-			double columnLines[][] = layout.getColumnLines();
-			double rowLines[][] = layout.getRowLines();
 			
 			Paint prevPaint = graphics.getPaint();
 			graphics.setPaint( cellPaint );
 			Stroke prevStroke = graphics.getStroke();
 			graphics.setStroke( getCellBoundaryStroke() );
 			
-			for (double col[]: columnLines)
-			{
-				double x = col[0];
-				for (int i = 1; i < col.length; i += 2)
-				{
-					double y1 = col[i], y2 = col[i+1];
-					Line2D.Double line = new Line2D.Double( x, y1, x, y2 );
-					graphics.draw( line );
-				}
-			}
-			
-			for (double row[]: rowLines)
-			{
-				double y = row[0];
-				for (int i = 1; i < row.length; i += 2)
-				{
-					double x1 = row[i], x2 = row[i+1];
-					Line2D.Double line = new Line2D.Double( x1, y, x2, y );
-					graphics.draw( line );
-				}
-			}
+			layout.drawCellLines( graphics );
 			
 			graphics.setPaint( prevPaint );
 			graphics.setStroke( prevStroke );

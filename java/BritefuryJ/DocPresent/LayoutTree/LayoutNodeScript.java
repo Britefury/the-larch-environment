@@ -381,10 +381,9 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 				}
 				else
 				{
-					double distToPrev = localPos.y - ( prev.getPositionInParentSpaceY() + prev.getActualHeightInParentSpace() );
-					double distToNext = next.getPositionInParentSpaceY() - localPos.y;
-					
-					return distToPrev > distToNext  ?  prev  :  next;
+					double sqrDistToPrev = prev.getLocalToAncestorXform( element ).transform( prev.getLocalAABox() ).sqrDistanceTo( localPos );
+					double sqrDistToNext = next.getLocalToAncestorXform( element ).transform( next.getLocalAABox() ).sqrDistanceTo( localPos );
+					return sqrDistToPrev > sqrDistToNext  ?  prev  :  next;
 				}
 			}
 		}

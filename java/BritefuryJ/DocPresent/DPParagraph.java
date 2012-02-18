@@ -13,14 +13,6 @@ import BritefuryJ.DocPresent.StyleParams.ParagraphStyleParams;
 
 public class DPParagraph extends DPContainerSequence
 {
-	public static class CouldNotFindInsertionPointException extends RuntimeException
-	{
-		private static final long serialVersionUID = 1L;
-	}
-
-
-
-	
 	public DPParagraph()
 	{
 		this( ParagraphStyleParams.defaultStyleParams);

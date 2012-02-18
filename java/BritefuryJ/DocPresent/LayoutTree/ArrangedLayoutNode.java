@@ -230,25 +230,21 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 			else
 			{
 				DPElement next = null;
-				DPElement nextC = null;
 				for (int j = startIndex + 1; j < searchList.size(); j++)
 				{
-					nextC = getLeafClosestToLocalPointFromChild( searchList.get( j ), localPos, filter );
-					if ( nextC != null )
+					next = getLeafClosestToLocalPointFromChild( searchList.get( j ), localPos, filter );
+					if ( next != null )
 					{
-						next = searchList.get( j );
 						break;
 					}
 				}
 
 				DPElement prev = null;
-				DPElement prevC = null;
 				for (int j = startIndex - 1; j >= 0; j--)
 				{
-					prevC = getLeafClosestToLocalPointFromChild( searchList.get( j ), localPos, filter );
-					if ( prevC != null )
+					prev = getLeafClosestToLocalPointFromChild( searchList.get( j ), localPos, filter );
+					if ( prev != null )
 					{
-						prev = searchList.get( j );
 						break;
 					}
 				}
@@ -260,18 +256,17 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 				}
 				else if ( prev == null  &&  next != null )
 				{
-					return nextC;
+					return next;
 				}
 				else if ( prev != null  &&  next == null )
 				{
-					return prevC;
+					return prev;
 				}
 				else
 				{
-					double distToPrev = localPos.x - ( prev.getPositionInParentSpace().x + prev.getActualWidthInParentSpace() );
-					double distToNext = next.getPositionInParentSpace().x - localPos.x;
-					
-					return distToPrev > distToNext  ?  prevC  :  nextC;
+					double sqrDistToPrev = prev.getLocalToAncestorXform( element ).transform( prev.getLocalAABox() ).sqrDistanceTo( localPos );
+					double sqrDistToNext = next.getLocalToAncestorXform( element ).transform( next.getLocalAABox() ).sqrDistanceTo( localPos );
+					return sqrDistToPrev > sqrDistToNext  ?  prev  :  next;
 				}
 			}
 		}
@@ -358,10 +353,9 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 				}
 				else
 				{
-					double distToPrev = localPos.y - ( prev.getPositionInParentSpaceY() + prev.getActualHeightInParentSpace() );
-					double distToNext = next.getPositionInParentSpaceY() - localPos.y;
-					
-					return distToPrev > distToNext  ?  prev  :  next;
+					double sqrDistToPrev = prev.getLocalToAncestorXform( element ).transform( prev.getLocalAABox() ).sqrDistanceTo( localPos );
+					double sqrDistToNext = next.getLocalToAncestorXform( element ).transform( next.getLocalAABox() ).sqrDistanceTo( localPos );
+					return sqrDistToPrev > sqrDistToNext  ?  prev  :  next;
 				}
 			}
 		}
@@ -388,7 +382,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 				DPElement l = getLeafClosestToLocalPointFromChild( child, localPos, filter );
 				if ( l != null )
 				{
-					Xform2 x = l.getLocalToAncestorXform( this.getElement() );
+					Xform2 x = l.getLocalToAncestorXform( getElement() );
 					double sqrD = x.transform( l.getLocalAABox() ).sqrDistanceTo( localPos );
 					if ( sqrD == 0.0 )
 					{

@@ -27,6 +27,6 @@ public class ScrolledViewport extends AbstractScrolledViewport
 	@Override
 	protected Pres createViewportBin(DPElement viewport)
 	{
-		return new SpaceBin( viewport, minWidth, minHeight );
+		return new SpaceBin( minWidth, minHeight, viewport );
 	}
 }

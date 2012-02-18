@@ -953,12 +953,12 @@ public class IncrementalView
 	}
 	
 	
-	private static AttributeColumn refreshTimeColumn = new AttributeColumn( "Complete refresh", Py.newString( "refreshTime" ) );
-	private static AttributeColumn modelViewMappingTimeColumn = new AttributeColumn( "Model-view mapping", Py.newString( "modelViewMappingTime" ) );
-	private static AttributeColumn presBuildTimeColumn = new AttributeColumn( "Pres construction", Py.newString( "presBuildTime" ) );
-	private static AttributeColumn presRealiseTimeColumn = new AttributeColumn( "Pres to elems", Py.newString( "presToElementsTime" ) );
-	private static AttributeColumn handleContentChangeTimeColumn = new AttributeColumn( "Handle content change", Py.newString( "handleContentChangeTime" ) );
-	private static AttributeColumn commitFragmentElementTimeColumn = new AttributeColumn( "Modify pres. tree", Py.newString( "modifyPresTreeTime" ) );
+	private static AttributeColumn refreshTimeColumn;
+	private static AttributeColumn modelViewMappingTimeColumn;
+	private static AttributeColumn presBuildTimeColumn;
+	private static AttributeColumn presRealiseTimeColumn;
+	private static AttributeColumn handleContentChangeTimeColumn;
+	private static AttributeColumn commitFragmentElementTimeColumn;
 	
 	private static ObjectListTableEditor profileTableEditor = null;
 	
@@ -968,6 +968,13 @@ public class IncrementalView
 	{
 		if ( profileTableEditor == null )
 		{
+			refreshTimeColumn = new AttributeColumn( "Complete refresh", Py.newString( "refreshTime" ) );
+			modelViewMappingTimeColumn = new AttributeColumn( "Model-view mapping", Py.newString( "modelViewMappingTime" ) );
+			presBuildTimeColumn = new AttributeColumn( "Pres construction", Py.newString( "presBuildTime" ) );
+			presRealiseTimeColumn = new AttributeColumn( "Pres to elems", Py.newString( "presToElementsTime" ) );
+			handleContentChangeTimeColumn = new AttributeColumn( "Handle content change", Py.newString( "handleContentChangeTime" ) );
+			commitFragmentElementTimeColumn = new AttributeColumn( "Modify pres. tree", Py.newString( "modifyPresTreeTime" ) );
+			
 			profileTableEditor = new ObjectListTableEditor(
 					Arrays.asList( new Object[] { refreshTimeColumn, modelViewMappingTimeColumn, presBuildTimeColumn, presRealiseTimeColumn,
 							handleContentChangeTimeColumn, commitFragmentElementTimeColumn } ),

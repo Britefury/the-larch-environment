@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.DocPresent.LayoutTree;
 
+import java.awt.Graphics2D;
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -36,6 +38,30 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 	}
 
 
+	protected static void drawCellLines(Graphics2D graphics, double[][] columnLines, double[][] rowLines)
+	{
+		for (double col[]: columnLines)
+		{
+			double x = col[0];
+			for (int i = 1; i < col.length; i += 2)
+			{
+				double y1 = col[i], y2 = col[i+1];
+				Line2D.Double line = new Line2D.Double( x, y1, x, y2 );
+				graphics.draw( line );
+			}
+		}
+		
+		for (double row[]: rowLines)
+		{
+			double y = row[0];
+			for (int i = 1; i < row.length; i += 2)
+			{
+				double x1 = row[i], x2 = row[i+1];
+				Line2D.Double line = new Line2D.Double( x1, y, x2, y );
+				graphics.draw( line );
+			}
+		}
+	}
 
 
 	protected void updateRequisitionX()
@@ -542,18 +568,6 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 		}
 	}
 	
-	public double[][] getColumnLines()
-	{
-		refreshBoundaries();
-		return columnLines;
-	}
-
-	public double[][] getRowLines()
-	{
-		refreshBoundaries();
-		return rowLines;
-	}
-
 	private static int[] getSpanFromBitSet(BitSet bits, int startIndex)
 	{
 		int start = bits.nextSetBit( startIndex );
@@ -570,6 +584,40 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 	}
 	
 	
+
+	protected static void drawTableCellLines(Graphics2D graphics, double[][] columnLines, double[][] rowLines)
+	{
+		for (double col[]: columnLines)
+		{
+			double x = col[0];
+			for (int i = 1; i < col.length; i += 2)
+			{
+				double y1 = col[i], y2 = col[i+1];
+				Line2D.Double line = new Line2D.Double( x, y1, x, y2 );
+				graphics.draw( line );
+			}
+		}
+		
+		for (double row[]: rowLines)
+		{
+			double y = row[0];
+			for (int i = 1; i < row.length; i += 2)
+			{
+				double x1 = row[i], x2 = row[i+1];
+				Line2D.Double line = new Line2D.Double( x1, y, x2, y );
+				graphics.draw( line );
+			}
+		}
+	}
+	
+	
+	public void drawCellLines(Graphics2D graphics)
+	{
+		refreshBoundaries();
+		drawTableCellLines( graphics, columnLines, rowLines );
+	}
+
+
 
 	//
 	//

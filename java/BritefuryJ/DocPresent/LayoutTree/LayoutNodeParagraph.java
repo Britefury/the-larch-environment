@@ -81,14 +81,16 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 
 
 
+	@Override
 	protected void updateRequisitionX()
 	{
 		refreshSubtree();
 		
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
-		ParagraphLayout.computeRequisitionX( layoutReqBox, getLeavesRefreshedRequisitonXBoxes(), getIndentation(), getSpacing() );
+		ParagraphLayout.computeRequisitionX( layoutReqBox, getLeavesRefreshedRequisitionXBoxes(), getIndentation(), getSpacing() );
 	}
 
+	@Override
 	protected void updateRequisitionY()
 	{
 		for (DPElement child: leaves)
@@ -102,6 +104,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 	
 
 	
+	@Override
 	protected void updateAllocationX()
 	{
 		super.updateAllocationX();
@@ -119,6 +122,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 	
 	
 	
+	@Override
 	protected void updateAllocationY()
 	{
 		super.updateAllocationY();
@@ -284,10 +288,9 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 				}
 				else
 				{
-					double distToPrev = localPos.x - ( prev.getPositionInParentSpaceX() + prev.getActualWidthInParentSpace() );
-					double distToNext = next.getPositionInParentSpaceX() - localPos.x;
-					
-					return distToPrev > distToNext  ?  prev  :  next;
+					double sqrDistToPrev = prev.getLocalToAncestorXform( element ).transform( prev.getLocalAABox() ).sqrDistanceTo( localPos );
+					double sqrDistToNext = next.getLocalToAncestorXform( element ).transform( next.getLocalAABox() ).sqrDistanceTo( localPos );
+					return sqrDistToPrev > sqrDistToNext  ?  prev  :  next;
 				}
 			}
 		}

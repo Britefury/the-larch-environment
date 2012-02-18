@@ -424,13 +424,13 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 	}
 
 
-	LReqBoxInterface[] getLeavesRefreshedRequisitonXBoxes()
+	LReqBoxInterface[] getLeavesRefreshedRequisitionXBoxes()
 	{
 		refreshSubtree();
 		return getChildrenRefreshedRequistionXBoxes( Arrays.asList( leaves ) );
 	}
 
-	LReqBoxInterface[] getLeavesRefreshedRequistionYBoxes()
+	LReqBoxInterface[] getLeavesRefreshedRequisitionYBoxes()
 	{
 		refreshSubtree();
 		return getChildrenRefreshedRequistionYBoxes( Arrays.asList( leaves ) );

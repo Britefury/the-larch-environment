@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent.LayoutTree;
 
+import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -54,7 +55,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 			if ( child instanceof DPGridRow )
 			{
 				DPGridRow row = (DPGridRow)child;
-				childBoxes[i] = ((LayoutNodeGridRow)row.getLayoutNode()).getLeavesRefreshedRequisitonXBoxes();
+				childBoxes[i] = ((LayoutNodeGridRow)row.getLayoutNode()).getLeavesRefreshedRequisitionXBoxes();
 				bRowIsGridRow[i] = true;
 			}
 			else
@@ -89,7 +90,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 		//refreshSubtree();   -- unnecessary since this is done in updateRequisitionX()
 
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
-		rowBoxes = getLeavesRefreshedRequistionYBoxes();
+		rowBoxes = getLeavesRefreshedRequisitionYBoxes();
 		
 		GridLayout.computeRequisitionY( layoutReqBox, rowBoxes, getRowSpacing() );
 
@@ -342,6 +343,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 	
 	private void refreshBoundaries()
 	{
+		refreshSubtree();
 		DPRGrid grid = (DPRGrid)element;
 		if ( ( columnLines == null  ||  rowLines == null ) )
 		{
@@ -568,16 +570,10 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 	}
 
 	
-	public double[][] getColumnLines()
+	public void drawCellLines(Graphics2D graphics)
 	{
 		refreshBoundaries();
-		return columnLines;
-	}
-
-	public double[][] getRowLines()
-	{
-		refreshBoundaries();
-		return rowLines;
+		LayoutNodeTable.drawTableCellLines( graphics, columnLines, rowLines );
 	}
 
 	

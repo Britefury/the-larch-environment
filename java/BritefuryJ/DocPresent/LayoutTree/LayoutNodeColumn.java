@@ -91,7 +91,7 @@ public class LayoutNodeColumn extends LayoutNodeAbstractBox
 		refreshSubtree();
 		
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
-		VerticalLayout.computeRequisitionX( layoutReqBox, getLeavesRefreshedRequisitonXBoxes() );
+		VerticalLayout.computeRequisitionX( layoutReqBox, getLeavesRefreshedRequisitionXBoxes() );
 	}
 
 	protected void updateRequisitionY()
@@ -109,7 +109,7 @@ public class LayoutNodeColumn extends LayoutNodeAbstractBox
 			refPointIndex = -1;
 		}
 		
-		VerticalLayout.computeRequisitionY( layoutReqBox, getLeavesRefreshedRequistionYBoxes(), refPointIndex, getSpacing() );
+		VerticalLayout.computeRequisitionY( layoutReqBox, getLeavesRefreshedRequisitionYBoxes(), refPointIndex, getSpacing() );
 	}
 
 

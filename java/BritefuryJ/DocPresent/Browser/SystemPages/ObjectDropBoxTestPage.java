@@ -42,7 +42,7 @@ public class ObjectDropBoxTestPage extends SystemPage
 		ObjectDropBox objectDrop = new ObjectDropBox( value );
 		
 		Pres dropLine = StyleSheet.style( Primitive.rowSpacing.as( 20.0 ) ).applyTo( new Row( new Object[] { new Label( "Object: " ),
-			    new SpaceBin( objectDrop.alignHExpand(), 100.0, -1.0 ), value } ).padX( 5.0 ) );
+			    new SpaceBin( 100.0, -1.0, objectDrop.alignHExpand() ), value } ).padX( 5.0 ) );
 		
 		return new Body( new Pres[] { new Heading2( "Object drop box" ), dropLine } );
 	}
