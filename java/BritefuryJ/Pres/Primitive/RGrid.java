@@ -8,10 +8,8 @@ package BritefuryJ.Pres.Primitive;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRGrid;
-import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.SequentialPres;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -34,17 +32,7 @@ public class RGrid extends SequentialPres
 	{
 		DPRGrid grid = new DPRGrid( Primitive.tableParams.get( style ) );
 		grid.setChildren( mapPresent( ctx, Primitive.useTableParams( style ), children ) );
-
-		AbstractBorder tableBorder = style.get( Primitive.tableBorder, AbstractBorder.class );
-		if ( tableBorder != null )
-		{
-			DPBorder border = new DPBorder( tableBorder );
-			border.setChild( grid );
-			return border;
-		}
-		else
-		{
-			return grid;
-		}
+		
+		return Table.applyTableBorder( style, grid );
 	}
 }

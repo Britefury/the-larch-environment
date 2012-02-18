@@ -45,9 +45,9 @@ public class SpinEntryTestPage extends SystemPage
 		IntSpinEntry intSpinEntry = new IntSpinEntry( intValue, -100, 100, 1, 10 );
 		
 		Pres realLine = StyleSheet.style( Primitive.rowSpacing.as( 20.0 ) ).applyTo( new Row( new Object[] { new Label( "Real number: " ),
-			    new SpaceBin( realSpinEntry.alignHExpand(), 100.0, -1.0 ), realValue } ).padX( 5.0 ) );
+			    new SpaceBin( 100.0, -1.0, realSpinEntry.alignHExpand() ), realValue } ).padX( 5.0 ) );
 		Pres intLine = StyleSheet.style( Primitive.rowSpacing.as( 20.0 ) ).applyTo( new Row( new Object[] { new Label( "Integer: " ),
-			    new SpaceBin( intSpinEntry.alignHExpand(), 100.0, -1.0 ), intValue } ).padX( 5.0 ) );
+			    new SpaceBin( 100.0, -1.0, intSpinEntry.alignHExpand() ), intValue } ).padX( 5.0 ) );
 		Pres spinEntrySectionContents = new Column( new Pres[] { realLine, intLine } );
 		
 		return new Body( new Pres[] { new Heading2( "Spin entries" ), spinEntrySectionContents } );

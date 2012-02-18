@@ -32,13 +32,13 @@ public class LayoutNodeGridRow extends ArrangedSequenceLayoutNode
 		refreshSubtree();
 		
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
-		HorizontalLayout.computeRequisitionX( layoutReqBox, getLeavesRefreshedRequisitonXBoxes(), 0.0 );
+		HorizontalLayout.computeRequisitionX( layoutReqBox, getLeavesRefreshedRequisitionXBoxes(), 0.0 );
 	}
 
 	protected void updateRequisitionY()
 	{
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
-		GridLayout.computeRowRequisitionY( layoutReqBox, getLeavesRefreshedRequistionYBoxes(), getLeavesAlignmentFlags() );
+		GridLayout.computeRowRequisitionY( layoutReqBox, getLeavesRefreshedRequisitionYBoxes(), getLeavesAlignmentFlags() );
 	}
 	
 

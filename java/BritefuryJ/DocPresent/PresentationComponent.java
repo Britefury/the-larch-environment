@@ -448,7 +448,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	}
 	
 	
-	private static AttributeColumn typesetTimeColumn = new AttributeColumn( "Typeset", Py.newString( "typesetTime" ) );
+	private static AttributeColumn typesetTimeColumn = null;
 	
 	private static ObjectListTableEditor typesetProfileTableEditor = null;
 	
@@ -458,6 +458,8 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	{
 		if ( typesetProfileTableEditor == null )
 		{
+			typesetTimeColumn = new AttributeColumn( "Typeset", Py.newString( "typesetTime" ) );
+			
 			typesetProfileTableEditor = new ObjectListTableEditor(
 					Arrays.asList( new Object[] { typesetTimeColumn } ),
 					TypesetProfileMeasurement.class, true, true, false, false );

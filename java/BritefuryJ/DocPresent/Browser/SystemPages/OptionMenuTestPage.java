@@ -53,7 +53,7 @@ public class OptionMenuTestPage extends SystemPage
 		
 		Pres choices[] = new Pres[] { new Label( "Zero" ), new Label( "One" ), new Label( "Two" ), new Label( "Three" ), new Label( "Four" ) };
 		OptionMenu optionMenu = new OptionMenu( choices, value );
-		Pres optionMenuBox = new SpaceBin( optionMenu.alignHExpand(), 100.0, -1.0 ).padX( 5.0 );
+		Pres optionMenuBox = new SpaceBin( 100.0, -1.0, optionMenu.alignHExpand() ).padX( 5.0 );
 		Pres optionMenuSectionContents = new Column( new Object[] { new Row( new Object[] { new Label( "Value = " ), f } ), optionMenuBox } );
 		
 		return new Body( new Pres[] { new Heading2( "Option menu" ), optionMenuSectionContents } );

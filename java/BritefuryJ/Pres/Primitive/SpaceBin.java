@@ -20,7 +20,7 @@ public class SpaceBin extends Pres
 	private double minWidth, minHeight;
 	
 	
-	public SpaceBin(Object child, double minWidth, double minHeight)
+	public SpaceBin(double minWidth, double minHeight, Object child)
 	{
 		this.child = coerce( child );
 		this.minWidth = minWidth;

@@ -34,7 +34,7 @@ public class GridTestPage extends SystemPage
 
 	protected String getDescription()
 	{
-		return "The grid element arranges is children in a grid.";
+		return "The grid element arranges its children in a grid.";
 	}
 
 	private static final StyleSheet styleSheet = StyleSheet.instance;

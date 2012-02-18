@@ -67,18 +67,19 @@ public class LayoutNodeRow extends LayoutNodeAbstractBox
 		refreshSubtree();
 		
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
-		HorizontalLayout.computeRequisitionX( layoutReqBox, getLeavesRefreshedRequisitonXBoxes(), getSpacing() );
+		HorizontalLayout.computeRequisitionX( layoutReqBox, getLeavesRefreshedRequisitionXBoxes(), getSpacing() );
 	}
 
 	protected void updateRequisitionY()
 	{
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
-		HorizontalLayout.computeRequisitionY( layoutReqBox, getLeavesRefreshedRequistionYBoxes(), getLeavesAlignmentFlags() );
+		HorizontalLayout.computeRequisitionY( layoutReqBox, getLeavesRefreshedRequisitionYBoxes(), getLeavesAlignmentFlags() );
 	}
 	
 
 	
 
+	@Override
 	protected void updateAllocationX()
 	{
 		super.updateAllocationX();
@@ -96,6 +97,7 @@ public class LayoutNodeRow extends LayoutNodeAbstractBox
 	
 	
 	
+	@Override
 	protected void updateAllocationY()
 	{
 		super.updateAllocationY();

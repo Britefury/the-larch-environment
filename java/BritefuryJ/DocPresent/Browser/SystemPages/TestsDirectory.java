@@ -30,6 +30,7 @@ public class TestsDirectory extends BrowserPage
 	public static final ColumnTestPage column = new ColumnTestPage();
 	public static final ClipboardTestPage clipboard = new ClipboardTestPage();
 	public static final DndTestPage dnd = new DndTestPage();
+	public static final FlowGridTestPage flowGrid = new FlowGridTestPage();
 	public static final FractionTestPage fraction = new FractionTestPage();
 	public static final GridTestPage grid = new GridTestPage();
 	public static final ImageTestPage image = new ImageTestPage();
@@ -54,6 +55,7 @@ public class TestsDirectory extends BrowserPage
 		new Hyperlink( "Column", new Location( "system.tests.column" ) ),
 		new Hyperlink( "Clipboard", new Location( "system.tests.clipboard" ) ),
 		new Hyperlink( "Drag and drop", new Location( "system.tests.dnd" ) ),
+		new Hyperlink( "Flow grid", new Location( "system.tests.flowGrid" ) ),
 		new Hyperlink( "Fraction", new Location( "system.tests.fraction" ) ),
 		new Hyperlink( "Grid", new Location( "system.tests.grid" ) ),
 		new Hyperlink( "Image", new Location( "system.tests.image" ) ),

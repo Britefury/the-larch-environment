@@ -188,6 +188,12 @@ public class Table extends Pres
 			}
 			table.setCells( elemCells );
 		}
+		
+		return applyTableBorder( style, table );
+	}
+
+	protected static DPElement applyTableBorder(StyleValues style, DPElement table)
+	{
 		AbstractBorder tableBorder = style.get( Primitive.tableBorder, AbstractBorder.class );
 		if ( tableBorder != null )
 		{

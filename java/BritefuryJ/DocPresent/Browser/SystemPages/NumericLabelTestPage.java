@@ -45,9 +45,9 @@ public class NumericLabelTestPage extends SystemPage
 		IntNumericLabel intNumLabel = new IntNumericLabel( intValue, -100, 100 );
 		
 		Pres realLine = StyleSheet.style( Primitive.rowSpacing.as( 20.0 ) ).applyTo( new Row( new Object[] { new Label( "Real number: " ),
-			    new SpaceBin( realNumLabel.alignHExpand(), 100.0, -1.0 ), realValue } ).padX( 5.0 ) );
+			    new SpaceBin( 100.0, -1.0, realNumLabel.alignHExpand() ), realValue } ).padX( 5.0 ) );
 		Pres intLine = StyleSheet.style( Primitive.rowSpacing.as( 20.0 ) ).applyTo( new Row( new Object[] { new Label( "Integer: " ),
-			    new SpaceBin( intNumLabel.alignHExpand(), 100.0, -1.0 ), intValue } ).padX( 5.0 ) );
+			    new SpaceBin( 100.0, -1.0, intNumLabel.alignHExpand() ), intValue } ).padX( 5.0 ) );
 		Pres numericLabelSectionContents = new Column( new Pres[] { realLine, intLine } );
 		
 		return new Body( new Pres[] { new Heading2( "Numeric labels" ), numericLabelSectionContents } );

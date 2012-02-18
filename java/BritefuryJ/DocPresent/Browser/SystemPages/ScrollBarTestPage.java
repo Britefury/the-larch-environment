@@ -39,7 +39,7 @@ public class ScrollBarTestPage extends SystemPage
 		ScrollBar horizontal = new HScrollBar( range );
 		ScrollBar vertical = new VScrollBar( range );
 		
-		return new Body( new Pres[] { new Heading2( "Horizontal scroll bar" ), new SpaceBin( horizontal.alignHExpand(), 300.0, -1.0 ),
-				new Heading2( "Vertical scroll bar" ), new SpaceBin( vertical.alignVExpand(), -1.0, 300.0 ).padX( 20.0 ) } );
+		return new Body( new Pres[] { new Heading2( "Horizontal scroll bar" ), new SpaceBin( 300.0, -1.0, horizontal.alignHExpand() ),
+				new Heading2( "Vertical scroll bar" ), new SpaceBin( -1.0, 300.0, vertical.alignVExpand() ).padX( 20.0 ) } );
 	}
 }
