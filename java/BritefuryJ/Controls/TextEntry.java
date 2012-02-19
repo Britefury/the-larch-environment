@@ -227,7 +227,7 @@ public class TextEntry extends ControlPres
 		
 		private DPBorder outerElement;
 		private DPText textElement;
-		private BritefuryJ.DocPresent.Border.AbstractBorder validBorder, invalidBorder;
+		private BritefuryJ.Graphics.AbstractBorder validBorder, invalidBorder;
 		private TextEntryListener listener;
 		private TextEntryValidator validator;
 		private LiveInterface text;
@@ -236,7 +236,7 @@ public class TextEntry extends ControlPres
 	
 		
 		protected TextEntryControl(PresentationContext ctx, StyleValues style, LiveInterface text, DPBorder outerElement, DPRegion region, DPText textElement, TextEntryListener listener, TextEntryValidator validator,
-				BritefuryJ.DocPresent.Border.AbstractBorder validBorder, BritefuryJ.DocPresent.Border.AbstractBorder invalidBorder)
+				BritefuryJ.Graphics.AbstractBorder validBorder, BritefuryJ.Graphics.AbstractBorder invalidBorder)
 		{
 			super( ctx, style );
 			
@@ -483,8 +483,8 @@ public class TextEntry extends ControlPres
 	{
 		style = style.withAttr( Primitive.editable, true );
 
-		BritefuryJ.DocPresent.Border.AbstractBorder validBorder = style.get( Controls.textEntryBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class ); 
-		BritefuryJ.DocPresent.Border.AbstractBorder invalidBorder = style.get( Controls.textEntryInvalidBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class );
+		BritefuryJ.Graphics.AbstractBorder validBorder = style.get( Controls.textEntryBorder, BritefuryJ.Graphics.AbstractBorder.class ); 
+		BritefuryJ.Graphics.AbstractBorder invalidBorder = style.get( Controls.textEntryInvalidBorder, BritefuryJ.Graphics.AbstractBorder.class );
 		
 		LiveInterface value = valueSource.getLive();
 		DPText textElement = (DPText)new Text( "" ).present( ctx, style );

@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 import org.python.core.Py;
 
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.DocPresent.Border.SolidBorder;
+import BritefuryJ.Graphics.SolidBorder;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.ObjectPres.ObjectBox;

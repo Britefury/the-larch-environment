@@ -9,10 +9,10 @@ package BritefuryJ.DocPresent;
 
 import java.awt.Graphics2D;
 
-import BritefuryJ.DocPresent.Border.AbstractBorder;
-import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeBorder;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
+import BritefuryJ.Graphics.AbstractBorder;
+import BritefuryJ.Graphics.FilledBorder;
 
 
 public class DPBorder extends DPBin

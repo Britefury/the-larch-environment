@@ -10,9 +10,9 @@ import java.util.HashMap;
 
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
+import BritefuryJ.Graphics.FilledBorder;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleValues;
 import BritefuryJ.Util.HashUtils;

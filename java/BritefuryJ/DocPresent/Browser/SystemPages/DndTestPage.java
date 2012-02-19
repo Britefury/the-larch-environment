@@ -11,12 +11,12 @@ import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPProxy;
-import BritefuryJ.DocPresent.Border.AbstractBorder;
-import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.DocPresent.Painter.FillPainter;
+import BritefuryJ.Graphics.AbstractBorder;
+import BritefuryJ.Graphics.FillPainter;
+import BritefuryJ.Graphics.SolidBorder;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Pres.ElementRef;
 import BritefuryJ.Pres.Pres;

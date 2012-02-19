@@ -26,7 +26,7 @@ import org.python.core.PyString;
 import org.python.core.PyTuple;
 import org.python.core.PyUnicode;
 
-import BritefuryJ.DocPresent.Painter.FillPainter;
+import BritefuryJ.Graphics.FillPainter;
 import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.ObjectPres.UnescapedStringAsSpan;

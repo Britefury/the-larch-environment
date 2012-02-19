@@ -23,7 +23,7 @@ from Britefury.Windows.WindowManager import WindowManager
 
 
 
-def main():
+if __name__ == '__main__':
 	UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() )
 	app.appInit()
 
@@ -40,7 +40,7 @@ def main():
 					print 'Failed to load document from %s'  %  filename
 			except:
 				print 'Failed to load %s'  %  filename
-		
+
 	def _onClose(wm):
 		app.appShutdown()
 
@@ -48,9 +48,3 @@ def main():
 	wm.setCloseLastWindowListener( _onClose )
 
 	wm.showRootWindow()
-
-
-
-
-if __name__ == '__main__':
-	main()

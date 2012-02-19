@@ -8,7 +8,7 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 
-import BritefuryJ.DocPresent.Painter.FillPainter;
+import BritefuryJ.Graphics.FillPainter;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Box;
 import BritefuryJ.Pres.Primitive.Column;

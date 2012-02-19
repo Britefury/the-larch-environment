@@ -12,7 +12,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DocPresent.Painter.FillPainter;
+import BritefuryJ.Graphics.FillPainter;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.ObjectPresentation.ObjectPresenterRegistry;
 import BritefuryJ.ObjectPresentation.ObjectPresenter;

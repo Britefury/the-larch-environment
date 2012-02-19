@@ -16,8 +16,8 @@ import org.python.core.__builtin__;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.Painter.FillPainter;
+import BritefuryJ.Graphics.FillPainter;
+import BritefuryJ.Graphics.SolidBorder;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.Pres.InnerFragment;

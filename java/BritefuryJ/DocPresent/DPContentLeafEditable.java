@@ -12,10 +12,10 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleParams.ContentLeafEditableStyleParams;
+import BritefuryJ.Graphics.SolidBorder;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;

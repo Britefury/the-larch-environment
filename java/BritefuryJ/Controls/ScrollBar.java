@@ -7,8 +7,8 @@
 package BritefuryJ.Controls;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Painter.Painter;
 import BritefuryJ.DocPresent.Util.Range;
+import BritefuryJ.Graphics.Painter;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleSheet;

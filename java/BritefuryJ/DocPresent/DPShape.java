@@ -15,8 +15,8 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeShape;
-import BritefuryJ.DocPresent.Painter.Painter;
 import BritefuryJ.DocPresent.StyleParams.ShapeStyleParams;
+import BritefuryJ.Graphics.Painter;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;

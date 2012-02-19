@@ -16,7 +16,7 @@ import BritefuryJ.AttributeTable.InheritedAttribute;
 import BritefuryJ.AttributeTable.InheritedAttributeNonNull;
 import BritefuryJ.DocPresent.TableBackgroundPainter;
 import BritefuryJ.DocPresent.TableElement;
-import BritefuryJ.DocPresent.Border.SolidBorder;
+import BritefuryJ.Graphics.SolidBorder;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;

@@ -78,15 +78,15 @@ public class Button extends ControlPres
 		
 		
 		
-		private BritefuryJ.DocPresent.Border.AbstractBorder buttonBorder, highlightBorder;
+		private BritefuryJ.Graphics.AbstractBorder buttonBorder, highlightBorder;
 		private DPBorder buttonElement;
 		private ButtonListener listener;
 		private boolean bClosePopupOnActivate;
 	
 	
 		
-		protected ButtonControl(PresentationContext ctx, StyleValues style, DPBorder buttonElement, BritefuryJ.DocPresent.Border.AbstractBorder buttonBorder,
-				BritefuryJ.DocPresent.Border.AbstractBorder highlightBorder, ButtonListener listener, boolean bClosePopupOnActivate)
+		protected ButtonControl(PresentationContext ctx, StyleValues style, DPBorder buttonElement, BritefuryJ.Graphics.AbstractBorder buttonBorder,
+				BritefuryJ.Graphics.AbstractBorder highlightBorder, ButtonListener listener, boolean bClosePopupOnActivate)
 		{
 			super( ctx, style );
 			this.buttonElement = buttonElement;
@@ -132,8 +132,8 @@ public class Button extends ControlPres
 	@Override
 	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
-		BritefuryJ.DocPresent.Border.AbstractBorder border = style.get( Controls.buttonBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class );
-		BritefuryJ.DocPresent.Border.AbstractBorder highlightBorder = style.get( Controls.buttonHighlightBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class );
+		BritefuryJ.Graphics.AbstractBorder border = style.get( Controls.buttonBorder, BritefuryJ.Graphics.AbstractBorder.class );
+		BritefuryJ.Graphics.AbstractBorder highlightBorder = style.get( Controls.buttonHighlightBorder, BritefuryJ.Graphics.AbstractBorder.class );
 		boolean bClosePopupOnActivate = style.get( Controls.bClosePopupOnActivate, Boolean.class );
 		
 		Pres childElement = presentAsCombinator( ctx, Controls.useButtonAttrs( style ), child );

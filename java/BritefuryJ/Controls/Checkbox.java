@@ -8,8 +8,8 @@ package BritefuryJ.Controls;
 
 import java.awt.Paint;
 
-import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.Graphics.AbstractBorder;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
 import BritefuryJ.Live.LiveValue;

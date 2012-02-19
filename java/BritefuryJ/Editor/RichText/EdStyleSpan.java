@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DocPresent.Painter.FillPainter;
+import BritefuryJ.Graphics.FillPainter;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Border;

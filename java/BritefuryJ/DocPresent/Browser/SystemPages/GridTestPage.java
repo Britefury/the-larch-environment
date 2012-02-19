@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.Border.SolidBorder;
+import BritefuryJ.Graphics.SolidBorder;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.GridRow;
 import BritefuryJ.Pres.Primitive.Primitive;

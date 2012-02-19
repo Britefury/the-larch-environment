@@ -17,7 +17,7 @@ from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from BritefuryJ.Controls import Hyperlink
 
-from BritefuryJ.DocPresent.Border import *
+from BritefuryJ.Graphics import *
 
 from BritefuryJ.Pres import *
 from BritefuryJ.Pres.Primitive import *

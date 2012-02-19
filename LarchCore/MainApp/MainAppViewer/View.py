@@ -29,7 +29,7 @@ from BritefuryJ.AttributeTable import *
 
 from BritefuryJ.StyleSheet import *
 from BritefuryJ.DocPresent.Browser import Location
-from BritefuryJ.DocPresent.Border import *
+from BritefuryJ.Graphics import *
 
 from BritefuryJ.Controls import *
 from BritefuryJ.Pres import *

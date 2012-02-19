@@ -10,8 +10,8 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeBox;
-import BritefuryJ.DocPresent.Painter.Painter;
 import BritefuryJ.DocPresent.StyleParams.ShapeStyleParams;
+import BritefuryJ.Graphics.Painter;
 
 public class DPBox extends DPContentLeaf
 {

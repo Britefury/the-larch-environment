@@ -17,7 +17,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Interactor.PushElementInteractor;
-import BritefuryJ.DocPresent.Painter.FillPainter;
+import BritefuryJ.Graphics.FillPainter;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.ObjectPresentation.ObjectPresenter;
 import BritefuryJ.ObjectPresentation.ObjectPresenterRegistry;

@@ -11,7 +11,6 @@ import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Canvas.DrawingNode;
 import BritefuryJ.DocPresent.Canvas.GroupNode;
 import BritefuryJ.DocPresent.Canvas.ShapeNode;
@@ -19,7 +18,8 @@ import BritefuryJ.DocPresent.Canvas.TextNode;
 import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.DocPresent.Painter.FillPainter;
+import BritefuryJ.Graphics.FillPainter;
+import BritefuryJ.Graphics.SolidBorder;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Pres.ElementRef;
 import BritefuryJ.Pres.Pres;
