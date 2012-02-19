@@ -10,8 +10,8 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.Painter.FilledOutlinePainter;
-import BritefuryJ.DocPresent.Painter.OutlinePainter;
+import BritefuryJ.Graphics.FilledOutlinePainter;
+import BritefuryJ.Graphics.OutlinePainter;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Paragraph;
 import BritefuryJ.Pres.Primitive.Primitive;

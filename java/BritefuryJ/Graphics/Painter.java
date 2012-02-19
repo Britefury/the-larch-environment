@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.Painter;
+package BritefuryJ.Graphics;
 
 import java.awt.Graphics2D;
 import java.awt.Shape;

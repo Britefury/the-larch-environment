@@ -8,8 +8,8 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 
-import BritefuryJ.DocPresent.Border.FilledBorder;
-import BritefuryJ.DocPresent.Border.SolidBorder;
+import BritefuryJ.Graphics.FilledBorder;
+import BritefuryJ.Graphics.SolidBorder;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Border;
 import BritefuryJ.Pres.Primitive.Label;

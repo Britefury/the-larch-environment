@@ -8,10 +8,10 @@ package BritefuryJ.DocPresent.LayoutTree;
 
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.Layout.LAllocHelper;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
+import BritefuryJ.Graphics.AbstractBorder;
 
 public class LayoutNodeBorder extends LayoutNodeBin
 {

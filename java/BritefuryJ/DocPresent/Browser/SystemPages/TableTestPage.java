@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.TableBackgroundPainter;
 import BritefuryJ.DocPresent.TableElement;
-import BritefuryJ.DocPresent.Border.SolidBorder;
+import BritefuryJ.Graphics.SolidBorder;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Border;
 import BritefuryJ.Pres.Primitive.Primitive;

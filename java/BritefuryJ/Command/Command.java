@@ -8,7 +8,7 @@ package BritefuryJ.Command;
 
 import java.awt.Color;
 
-import BritefuryJ.DocPresent.Border.SolidBorder;
+import BritefuryJ.Graphics.SolidBorder;
 
 public class Command
 {

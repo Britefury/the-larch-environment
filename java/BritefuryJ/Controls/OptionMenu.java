@@ -16,7 +16,7 @@ import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Interactor.ClickElementInteractor;
 import BritefuryJ.DocPresent.Interactor.HoverElementInteractor;
-import BritefuryJ.DocPresent.Painter.Painter;
+import BritefuryJ.Graphics.Painter;
 import BritefuryJ.Live.LiveFunction;
 import BritefuryJ.Live.LiveInterface;
 import BritefuryJ.Live.LiveValue;
@@ -96,7 +96,7 @@ public class OptionMenu extends ControlPres
 		
 
 		private DPBorder element;
-		private BritefuryJ.DocPresent.Border.AbstractBorder optionMenuBorder, optionMenuHoverBorder;
+		private BritefuryJ.Graphics.AbstractBorder optionMenuBorder, optionMenuHoverBorder;
 		private PopupMenu choiceMenu;
 		private Pres choices[];
 		private LiveInterface currentChoice;
@@ -104,7 +104,7 @@ public class OptionMenu extends ControlPres
 		
 		
 		protected OptionMenuControl(PresentationContext ctx, StyleValues style, DPBorder element, Pres choices[], LiveInterface currentChoice, OptionMenuListener listener,
-				BritefuryJ.DocPresent.Border.AbstractBorder optionMenuBorder, BritefuryJ.DocPresent.Border.AbstractBorder optionMenuHoverBorder)
+				BritefuryJ.Graphics.AbstractBorder optionMenuBorder, BritefuryJ.Graphics.AbstractBorder optionMenuHoverBorder)
 		{
 			super( ctx, style );
 			this.element = element;
@@ -272,8 +272,8 @@ public class OptionMenu extends ControlPres
 		
 		LiveFunction optionCurrentLive = new LiveFunction( optionCurrentFn );
 		
-		BritefuryJ.DocPresent.Border.AbstractBorder border = style.get( Controls.optionMenuBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class );
-		BritefuryJ.DocPresent.Border.AbstractBorder hoverBorder = style.get( Controls.optionMenuHoverBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class );
+		BritefuryJ.Graphics.AbstractBorder border = style.get( Controls.optionMenuBorder, BritefuryJ.Graphics.AbstractBorder.class );
+		BritefuryJ.Graphics.AbstractBorder hoverBorder = style.get( Controls.optionMenuHoverBorder, BritefuryJ.Graphics.AbstractBorder.class );
 		StyleSheet optionStyle = StyleSheet.style( Primitive.rowSpacing.as( style.get( Controls.optionMenuContentsSpacing, Double.class ) ), Primitive.border.as( border ) );
 		Pres optionContents = new Row( new Pres[] { coerce( optionCurrentLive ).alignHExpand(), arrow.alignHPack().alignVCentre() } );
 		Pres optionMenu = optionStyle.applyTo( new Border( optionContents ) ); 

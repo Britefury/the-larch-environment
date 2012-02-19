@@ -29,7 +29,7 @@ from BritefuryJ.DefaultPerspective import DefaultPerspective
 from BritefuryJ.Controls import TextEntry
 from BritefuryJ.DocPresent.Interactor import KeyElementInteractor
 from BritefuryJ.StyleSheet import *
-from BritefuryJ.DocPresent.Border import *
+from BritefuryJ.Graphics import *
 from BritefuryJ.DocPresent.Browser import Location
 from BritefuryJ.DocPresent.Input import ObjectDndHandler
 

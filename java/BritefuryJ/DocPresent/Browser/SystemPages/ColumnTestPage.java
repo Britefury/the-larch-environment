@@ -8,9 +8,9 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 
-import BritefuryJ.DocPresent.Border.AbstractBorder;
-import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.Painter.FillPainter;
+import BritefuryJ.Graphics.AbstractBorder;
+import BritefuryJ.Graphics.FillPainter;
+import BritefuryJ.Graphics.SolidBorder;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Label;

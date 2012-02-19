@@ -15,7 +15,7 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
-import BritefuryJ.DocPresent.Painter.Painter;
+import BritefuryJ.Graphics.Painter;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.ObjectPres.HorizontalField;
 

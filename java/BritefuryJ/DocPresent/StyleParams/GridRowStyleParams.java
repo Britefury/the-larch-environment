@@ -10,7 +10,7 @@ import java.awt.Cursor;
 
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
-import BritefuryJ.DocPresent.Painter.Painter;
+import BritefuryJ.Graphics.Painter;
 
 public class GridRowStyleParams extends ContainerStyleParams
 {

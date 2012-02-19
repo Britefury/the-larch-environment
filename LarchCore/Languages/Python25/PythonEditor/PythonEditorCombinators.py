@@ -12,8 +12,7 @@ from Britefury.Util.Lerp import lerp, lerpColour
 from BritefuryJ.AttributeTable import *
 from BritefuryJ.Controls import *
 from BritefuryJ.StyleSheet import *
-from BritefuryJ.DocPresent.Border import *
-from BritefuryJ.DocPresent.Painter import *
+from BritefuryJ.Graphics import *
 from BritefuryJ.Pres import *
 from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.Pres.RichText import *

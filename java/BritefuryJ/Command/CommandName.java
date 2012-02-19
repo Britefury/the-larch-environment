@@ -10,7 +10,7 @@ import java.awt.Color;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.DocPresent.Border.AbstractBorder;
+import BritefuryJ.Graphics.AbstractBorder;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 

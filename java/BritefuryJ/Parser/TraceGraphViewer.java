@@ -12,12 +12,12 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import BritefuryJ.Controls.AspectRatioScrolledViewport;
-import BritefuryJ.DocPresent.Border.AbstractBorder;
-import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
 import BritefuryJ.GraphViz.GraphViz;
+import BritefuryJ.Graphics.AbstractBorder;
+import BritefuryJ.Graphics.SolidBorder;
 import BritefuryJ.ParserHelpers.ParseResultInterface;
 import BritefuryJ.ParserHelpers.TraceNode;
 import BritefuryJ.ParserHelpers.TracedParseResultInterface;

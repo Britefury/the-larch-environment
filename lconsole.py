@@ -29,7 +29,7 @@ from LarchCore.Languages.Python25.Python25Importer import importPy25File
 
 
 
-def main():
+if __name__ == '__main__':
 	UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() )
 	app.appInit()
 
@@ -62,5 +62,3 @@ def main():
 	wm.showRootWindow()
 
 
-if __name__ == '__main__':
-	main()

@@ -19,7 +19,7 @@ from BritefuryJ.Live import LiveValue
 from BritefuryJ.Controls import *
 
 from BritefuryJ.DocPresent.Interactor import *
-from BritefuryJ.DocPresent.Painter import *
+from BritefuryJ.Graphics import *
 
 from BritefuryJ.Pres import *
 from BritefuryJ.Pres.Primitive import *

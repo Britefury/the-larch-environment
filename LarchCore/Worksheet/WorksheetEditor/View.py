@@ -27,9 +27,8 @@ from BritefuryJ.Pres import InnerFragment, LocationAsInnerFragment
 
 from BritefuryJ.Controls import *
 from BritefuryJ.DocPresent import *
-from BritefuryJ.DocPresent.Border import *
+from BritefuryJ.Graphics import *
 from BritefuryJ.DocPresent.Input import ObjectDndHandler
-from BritefuryJ.DocPresent.Painter import *
 from BritefuryJ.DocPresent.Browser import Location
 from BritefuryJ.DocPresent.Selection import TextSelection
 from BritefuryJ.StyleSheet import StyleSheet

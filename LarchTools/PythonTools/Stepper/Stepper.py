@@ -14,8 +14,7 @@ from java.awt import Color
 
 from BritefuryJ.Command import Command, CommandSet
 
-from BritefuryJ.DocPresent.Border import *
-from BritefuryJ.DocPresent.Painter import *
+from BritefuryJ.Graphics import *
 
 from BritefuryJ.Controls import *
 

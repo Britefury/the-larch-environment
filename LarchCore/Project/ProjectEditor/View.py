@@ -28,8 +28,7 @@ from BritefuryJ.AttributeTable import *
 from BritefuryJ.DefaultPerspective import DefaultPerspective
 
 from BritefuryJ.DocPresent.Browser import Location
-from BritefuryJ.DocPresent.Border import *
-from BritefuryJ.DocPresent.Painter import *
+from BritefuryJ.Graphics import *
 from BritefuryJ.StyleSheet import StyleSheet
 from BritefuryJ.DocPresent.Input import ObjectDndHandler
 from BritefuryJ.DocPresent.Interactor import ClickElementInteractor
