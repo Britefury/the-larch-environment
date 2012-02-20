@@ -32,10 +32,10 @@ from LarchCore.Languages.Python25.Execution import Execution
 
 
 
-_headerStyle = StyleSheet.style( Primitive.fontBold( True ), Primitive.background( FillPainter( Color(1.0, 0.8, 0.9 ) ) ), Primitive.rowSpacing( 5.0 ) )
+_headerStyle = StyleSheet.style( Primitive.fontBold( True ), Primitive.background( FillPainter( Color(1.0, 0.95, 0.8 ) ) ), Primitive.rowSpacing( 5.0 ) )
 _forwardArrow = Arrow( Arrow.Direction.RIGHT, 12.0 )
-_codeBorder = SolidBorder( 1.0, 2.0, 8.0, 8.0, Color( 0.75, 0.25, 0.375 ), None )
-_stepperBorder = SolidBorder( 2.0, 2.0, 8.0, 8.0, Color( 0.5, 0.15, 0.25 ), None )
+_codeBorder = SolidBorder( 1.0, 2.0, 8.0, 8.0, Color( 0.75, 0.737, 0.675 ), None )
+_stepperBorder = SolidBorder( 2.0, 2.0, 8.0, 8.0, Color( 0.55, 0.52, 0.4 ), None )
 _breakPointBorder = SolidBorder( 1.0, 1.0, 5.0, 5.0, Color( 0.3, 0.3, 0.3 ), Color( 0.85, 0.85, 0.85 ) )
 _breakPointCurrentBorder = SolidBorder( 1.0, 1.0, 5.0, 5.0, Color( 0.0, 0.4, 0.0 ), Color( 0.85, 1.0, 0.85 ) )
 _breakPointStyle = StyleSheet.style( Primitive.fontSize( 10 ) )
@@ -278,7 +278,7 @@ class Stepper (object):
 
 	def __present__(self, fragment, inheritedState):
 		title = Label( 'Code stepper' )
-		header = _headerStyle( Row( [ title.alignVCentre(), self._stepButton, self._runButton ] ) )
+		header = _headerStyle( Row( [ title.alignVCentre().alignHPack(), Pres.coerce( self._stepButton ).alignHPack(), Pres.coerce( self._runButton ).alignHPack() ] ) ).alignHExpand()
 		main = Column( [ header, Pres.coerce( self._code ).alignHExpand() ] )
 		return _stepperBorder.surround( main ).withCommands( _stepperCommands )
 
