@@ -19,6 +19,7 @@ import LarchCore.Languages.Python25.ASTGenerator
 import LarchCore.Languages.Python25.Python25Importer
 import LarchCore.Languages.Python25.PythonEditor.Parser
 import LarchCore.Languages.Java.JavaEditor.Parser
+import LarchTools.PythonTools.SWYN.Parser
 
 
 testModules = [ Britefury.Tests.BritefuryJ.Parser.Utils.Operators,
@@ -31,7 +32,8 @@ testModules = [ Britefury.Tests.BritefuryJ.Parser.Utils.Operators,
 		LarchCore.Languages.Python25.ASTGenerator,
 		LarchCore.Languages.Python25.Python25Importer,
 		LarchCore.Languages.Python25.PythonEditor.Parser,
-		LarchCore.Languages.Java.JavaEditor.Parser
+		LarchCore.Languages.Java.JavaEditor.Parser,
+		LarchTools.PythonTools.SWYN.Parser
 		]
 
 

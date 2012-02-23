@@ -146,7 +146,14 @@ public class ParserState
 	public ParserState(String junkRegex, ParseAction delegateAction)
 	{
 		this.table = new HashMap<SourceKey, HashMap<MemoKey, MemoEntry>>();
-		junkPattern = Pattern.compile( junkRegex );
+		if ( junkRegex != null )
+		{
+			junkPattern = Pattern.compile( junkRegex );
+		}
+		else
+		{
+			junkPattern = null;
+		}
 		dependencies = null;
 		this.delegateAction = delegateAction;
 	}
@@ -154,7 +161,7 @@ public class ParserState
 	
 	public int skipJunkChars(String input, int start)
 	{
-		if ( start < input.length() )
+		if ( junkPattern != null  &&  start < input.length() )
 		{
 			Matcher m = junkPattern.matcher( input.subSequence( start, input.length() ) );
 			if ( m.lookingAt() )
@@ -168,7 +175,7 @@ public class ParserState
 	
 	public int skipJunkChars(StreamValueAccessor input, int start)
 	{
-		if ( start <= input.length() )
+		if ( junkPattern != null  &&  start <= input.length() )
 		{
 			return input.skipRegEx( start, junkPattern );
 		}
