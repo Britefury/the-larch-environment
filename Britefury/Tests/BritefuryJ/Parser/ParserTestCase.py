@@ -23,22 +23,26 @@ def _deepList(xs):
 		return xs
 
 class ParserTestCase (unittest.TestCase):
+	__junk_regex__ = _whitespaceRegex
+
 	def __init__(self, *args, **kwargs):
 		super( ParserTestCase, self ).__init__( *args, **kwargs )
-				
-	
-	
-	
-	def _parseStringTest(self, parser, input, expected, ignoreChars=_whitespaceRegex):
+
+
+
+
+	def _parseStringTest(self, parser, input, expected, ignoreChars=None):
+		if ignoreChars is None:
+			ignoreChars = self.__junk_regex__
 		result = parser.traceParseStringChars( input, ignoreChars )
-		
+
 		if not result.isValid():
 			print 'PARSE FAILURE while parsing %s, stopped at %d: %s'  %  ( input, result.end, input[:result.end] )
 			print 'EXPECTED:'
 			print expected
 			self._onError( result )
 		self.assert_( result.isValid() )
-		
+
 		value = DMNode.coerce( result.value )
 		expected = DMNode.coerce( expected )
 
@@ -65,11 +69,13 @@ class ParserTestCase (unittest.TestCase):
 
 
 
-	def _parseStringTestSX(self, parser, input, expectedSX, ignoreChars=_whitespaceRegex):
+	def _parseStringTestSX(self, parser, input, expectedSX, ignoreChars=None):
+		if ignoreChars is None:
+			ignoreChars = self.__junk_regex__
 		result = parser.traceParseStringChars( input, ignoreChars )
 
 		expected = DMIOReader.readFromString( expectedSX )
-		
+
 		if not result.isValid():
 			print 'PARSE FAILURE while parsing', input
 			print 'EXPECTED:'
@@ -101,10 +107,12 @@ class ParserTestCase (unittest.TestCase):
 			self._onError( result )
 		self.assert_( bSame )
 
-		
-	def _parseStringFailTest(self, parser, input, ignoreChars=_whitespaceRegex):
+
+	def _parseStringFailTest(self, parser, input, ignoreChars=None):
+		if ignoreChars is None:
+			ignoreChars = self.__junk_regex__
 		result = parser.traceParseStringChars( input, ignoreChars )
-		
+
 		if result.isValid()   and   result.end == len( input ):
 			print 'While parsing', input
 			print 'EXPECTED:'
@@ -116,19 +124,21 @@ class ParserTestCase (unittest.TestCase):
 			self._onError( result )
 		self.assert_( not result.isValid()  or  result.end != len( input ) )
 
-		
-		
-		
-	def _parseNodeTest(self, parser, input, expected, ignoreChars=_whitespaceRegex):
+
+
+
+	def _parseNodeTest(self, parser, input, expected, ignoreChars=None):
+		if ignoreChars is None:
+			ignoreChars = self.__junk_regex__
 		result = parser.traceParseNode( input, ignoreChars )
-		
+
 		if not result.isValid():
 			print 'PARSE FAILURE while parsing %s'  %  ( input, )
 			print 'EXPECTED:'
 			print expected
 			self._onError( result )
 		self.assert_( result.isValid() )
-		
+
 		value = DMNode.coerce( result.value )
 		expected = DMNode.coerce( expected )
 
@@ -145,10 +155,12 @@ class ParserTestCase (unittest.TestCase):
 
 
 
-	def _parseNodeTestSX(self, parser, inputXS, expectedSX, ignoreChars=_whitespaceRegex):
+	def _parseNodeTestSX(self, parser, inputXS, expectedSX, ignoreChars=None):
+		if ignoreChars is None:
+			ignoreChars = self.__junk_regex__
 		input = DMIOReader.readFromString( inputXS )
 		expected = DMIOReader.readFromString( expectedSX )
-		
+
 		result = parser.traceParseNode( input, ignoreChars )
 
 		if not result.isValid():
@@ -172,10 +184,12 @@ class ParserTestCase (unittest.TestCase):
 			self._onError( result )
 		self.assert_( bSame )
 
-		
-	def _parseNodeFailTest(self, parser, input, ignoreChars=_whitespaceRegex):
+
+	def _parseNodeFailTest(self, parser, input, ignoreChars=None):
+		if ignoreChars is None:
+			ignoreChars = self.__junk_regex__
 		result = parser.traceParseNode( input, ignoreChars )
-		
+
 		if result.isValid()   and   result.end == len( input ):
 			print 'While parsing', input
 			print 'EXPECTED:'
@@ -187,12 +201,14 @@ class ParserTestCase (unittest.TestCase):
 			self._onError( result )
 		self.assert_( not result.isValid()  or  result.end != len( input ) )
 
-		
-	def _parseNodeFailTestSX(self, parser, inputSX, ignoreChars=_whitespaceRegex):
+
+	def _parseNodeFailTestSX(self, parser, inputSX, ignoreChars=None):
+		if ignoreChars is None:
+			ignoreChars = self.__junk_regex__
 		input = DMIOReader.readFromString( inputXS )
-	
+
 		result = parser.traceParseNode( input, ignoreChars )
-		
+
 		if result.isValid()   and   result.end == len( input ):
 			print 'While parsing', input
 			print 'EXPECTED:'
@@ -204,20 +220,22 @@ class ParserTestCase (unittest.TestCase):
 			self._onError( result )
 		self.assert_( not result.isValid()  or  result.end != len( input ) )
 
-		
-		
-		
-		
-	def _parseListTest(self, parser, input, expected, ignoreChars=_whitespaceRegex):
+
+
+
+
+	def _parseListTest(self, parser, input, expected, ignoreChars=None):
+		if ignoreChars is None:
+			ignoreChars = self.__junk_regex__
 		result = parser.traceParseListItems( input, ignoreChars )
-		
+
 		if not result.isValid():
 			print 'PARSE FAILURE while parsing %s, stopped at %d: %s'  %  ( input, result.end, input[:result.end] )
 			print 'EXPECTED:'
 			print expected
 			self._onError( result )
 		self.assert_( result.isValid() )
-		
+
 		value = DMNode.coerce( result.value )
 		expected = DMNode.coerce( expected )
 
@@ -244,10 +262,12 @@ class ParserTestCase (unittest.TestCase):
 
 
 
-	def _parseListTestSX(self, parser, inputSX, expectedSX, ignoreChars=_whitespaceRegex):
+	def _parseListTestSX(self, parser, inputSX, expectedSX, ignoreChars=None):
+		if ignoreChars is None:
+			ignoreChars = self.__junk_regex__
 		input = DMIOReader.readFromString( inputSX )
 		expected = DMIOReader.readFromString( expectedSX )
-		
+
 		result = parser.traceParseListItems( input, ignoreChars )
 
 		if not result.isValid():
@@ -281,10 +301,12 @@ class ParserTestCase (unittest.TestCase):
 			self._onError( result )
 		self.assert_( bSame )
 
-		
-	def _parseListFailTest(self, parser, input, ignoreChars=_whitespaceRegex):
+
+	def _parseListFailTest(self, parser, input, ignoreChars=None):
+		if ignoreChars is None:
+			ignoreChars = self.__junk_regex__
 		result = parser.traceParseListItems( input, ignoreChars )
-		
+
 		if result.isValid()   and   result.end == len( input ):
 			print 'While parsing', input
 			print 'EXPECTED:'
@@ -296,13 +318,15 @@ class ParserTestCase (unittest.TestCase):
 			self._onError( result )
 		self.assert_( not result.isValid()  or  result.end != len( input ) )
 
-		
-		
-	def _parseListFailTestSX(self, parser, inputSX, ignoreChars=_whitespaceRegex):
+
+
+	def _parseListFailTestSX(self, parser, inputSX, ignoreChars=None):
+		if ignoreChars is None:
+			ignoreChars = self.__junk_regex__
 		input = DMIOReader.readFromString( inputSX )
 
 		result = parser.traceParseListItems( input, ignoreChars )
-		
+
 		if result.isValid()   and   result.end == len( input ):
 			print 'While parsing', input
 			print 'EXPECTED:'
@@ -314,22 +338,24 @@ class ParserTestCase (unittest.TestCase):
 			self._onError( result )
 		self.assert_( not result.isValid()  or  result.end != len( input ) )
 
-		
-		
 
-		
-		
-		
-	def _parseStreamTest(self, parser, input, expected, ignoreChars=_whitespaceRegex):
+
+
+
+
+
+	def _parseStreamTest(self, parser, input, expected, ignoreChars=None):
+		if ignoreChars is None:
+			ignoreChars = self.__junk_regex__
 		result = parser.traceParseStreamItems( input, ignoreChars )
-		
+
 		if not result.isValid():
 			print 'PARSE FAILURE while parsing %s, stopped at %d: %s'  %  ( input, result.end, input[:result.end] )
 			print 'EXPECTED:'
 			print expected
 			self._onError( result )
 		self.assert_( result.isValid() )
-		
+
 		value = DMNode.coerce( result.value )
 		expected = DMNode.coerce( expected )
 
@@ -356,9 +382,11 @@ class ParserTestCase (unittest.TestCase):
 
 
 
-	def _parseStreamTestSX(self, parser, input, expectedSX, ignoreChars=_whitespaceRegex):
+	def _parseStreamTestSX(self, parser, input, expectedSX, ignoreChars=None):
+		if ignoreChars is None:
+			ignoreChars = self.__junk_regex__
 		expected = DMIOReader.readFromString( expectedSX )
-		
+
 		result = parser.traceParseListItems( input, ignoreChars )
 
 		if not result.isValid():
@@ -392,8 +420,10 @@ class ParserTestCase (unittest.TestCase):
 			self._onError( result )
 		self.assert_( bSame )
 
-		
-	def _parseStreamFailTest(self, parser, input, ignoreChars=_whitespaceRegex):
+
+	def _parseStreamFailTest(self, parser, input, ignoreChars=None):
+		if ignoreChars is None:
+			ignoreChars = self.__junk_regex__
 		result = parser.traceParseListItems( input, ignoreChars )
 		
 		if result.isValid()   and   result.end == len( input ):
