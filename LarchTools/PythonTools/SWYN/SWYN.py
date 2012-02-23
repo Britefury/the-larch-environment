@@ -5,3 +5,42 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
+import re
+
+from BritefuryJ.DocModel import DMNode
+
+from LarchTools.PythonTools.SWYN import Schema
+from LarchTools.PythonTools.SWYN.Parser import SWYNGrammar
+from LarchTools.PythonTools.SWYN.View import perspective as SWYNPerspective
+
+
+class SWYN (object):
+	def __init__(self, regex=None):
+		if regex is None:
+			regex = Schema.SWYNRegEx( expr= Schema.UNPARSED( value=[ '' ] ) )
+
+		if isinstance( regex, re._pattern_type ):
+			# Extract pattern string
+			regex = regex.pattern
+
+		if isinstance( regex, str )  or  isinstance( regex, unicode ):
+			# Convert to structural form
+			g = SWYNGrammar()
+			x = g.regex().parseStringChars( regex, None )
+			regex = Schema.SWYNRegEx( expr=x.value )
+
+		if isinstance( regex, DMNode ):
+			if not regex.isInstanceOf( Schema.SWYNRegEx ):
+				if regex.isInstanceOf( Schema.Node ):
+					regex = Schema.SWYNRegEx( expr=regex )
+				else:
+					raise TypeError, 'Wrong schema'
+
+			self.regex = regex
+		else:
+			raise TypeError, 'Invalid regular expression type'
+
+
+
+	def __present__(self, fragment, inherited_state):
+		return SWYNPerspective( self.regex )

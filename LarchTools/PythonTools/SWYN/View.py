@@ -27,7 +27,7 @@ from BritefuryJ.DocModel import DMObjectClass, DMObject
 from BritefuryJ.AttributeTable import *
 from BritefuryJ.Controls import *
 from BritefuryJ.DocPresent import ElementValueFunction, TextEditEvent, DPText
-from BritefuryJ.DocPresent.Border import *
+from BritefuryJ.Graphics import *
 from BritefuryJ.DocPresent.Interactor import KeyElementInteractor
 from BritefuryJ.DocPresent.StreamValue import StreamValueBuilder
 from BritefuryJ.DocPresent.Input import ObjectDndHandler
@@ -45,7 +45,7 @@ from BritefuryJ.IncrementalView import FragmentView, FragmentData
 from BritefuryJ.Editor.Sequential import SequentialEditorPerspective
 from BritefuryJ.Editor.Sequential.Item import *
 from BritefuryJ.Editor.SyntaxRecognizing.Precedence import PrecedenceHandler
-from BritefuryJ.Editor.SyntaxRecognizing import SREInnerFragment
+from BritefuryJ.Editor.SyntaxRecognizing import SREInnerFragment, ParsingEditListener
 from BritefuryJ.Editor.SyntaxRecognizing.SRFragmentEditor import EditMode
 
 from BritefuryJ.ModelAccess.DocModel import *
@@ -147,7 +147,10 @@ _charSetBorder = SolidBorder( 1.0, 6.0, 4.0, 4.0, Color.BLACK, Color( 0.7, 0.7, 
 _groupParenStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.5, 0.0 ) ), Primitive.fontBold( True ) )
 _groupBorder = SolidBorder( 1.0, 6.0, 4.0, 4.0, Color( 1.0, 0.7, 0.0 ), Color( 1.0, 1.0, 0.8 ) )
 _notificationStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.0, 0.0, 0.5 ) ) )
+_repeatBorder = SolidBorder( 1.0, 6.0, 4.0, 4.0, Color( 0.0, 0.7, 0.0 ), Color( 0.8, 1.0, 0.8 ) )
+_choiceBorder = SolidBorder( 1.0, 6.0, 4.0, 4.0, Color.BLACK, Color( 0.8, 0.4, 1.0 ) )
 
+_swynBorder = SolidBorder( 3.0, 10.0, 10.0, 10.0, Color( 0.8, 1.0, 0.8 ), None )
 
 def unparseableText(text):
 	return _unparsedTextStyle( Text( text ) )
@@ -183,13 +186,37 @@ def group(subexp, capturing):
 	contents = [ _notificationStyle( Text( '?:' ) ), subexp ]   if capturing   else [ subexp ]
 	return _groupBorder.surround( Row( [ _groupParenStyle( Text( '(' ) ) ] + contents + [ _groupParenStyle( Text( '(' ) ) ] ) )
 
+def _repetition(subexp, repetitions):
+	return ScriptRSuper( _repeatBorder.surround( Row( [ subexp ] ) ), repetitions )
+
+def repeat(subexp, repetitions):
+	return _repetition( subexp, Text( '{' + repetitions + '}' ) )
+
+def zeroOrMore(subexp, greedy):
+	return _repetition( subexp, Text( '*?'   if greedy   else '*' ) )
+
+def oneOrMore(subexp, greedy):
+	return _repetition( subexp, Text( '+?'   if greedy   else '+' ) )
+
+def optional(subexp, greedy):
+	return _repetition( subexp, Text( '??'   if greedy   else '?' ) )
+
+def repeatRange(subexp, min, max, greedy):
+	return _repetition( subexp, Text( '{%s,%s}' % ( min, max )  + ( ''   if greedy   else '?' ) ) )
+
+def sequence(subexps):
+	return Paragraph( subexps )
+
+def choice(subexps):
+	rows = [ [ subexp, Text( '|' ) ]   for s in subexps[:-1] ]  +  [ [ subexps[-1], None ] ]
+	return _choiceBorder.surround( Table( rows ) )
 
 
 
 def _displayChar(char):
 	if isinstance( char, DMObject ):
 		if char.isInstanceOf( Schema.Node ):
-			return SREInnerFragment( expr, PRECEDENCE_NONE, EditMode.DISPLAY )
+			return SREInnerFragment( char, PRECEDENCE_NONE, EditMode.DISPLAY )
 		else:
 			raise TypeError, 'unknown node type'
 	else:
@@ -204,14 +231,14 @@ class SWYNView (MethodDispatchView):
 
 		editor = SWYNSyntaxRecognizingEditor.instance
 
-		self._expr = editor.parsingNodeEditListener( 'Expression', grammar.expression(), swynReplaceNode )
+		self._expr = editor.parsingNodeEditListener( 'Expression', grammar.regex(), swynReplaceNode )
 		self._exprOuter = SWYNExpressionEditListener( grammar.regex() )
 		self._topLevel = editor.topLevelNodeEditListener()
 
 		self._exprUnparsed = editor.unparsedNodeEditListener( 'Unparsed expression', _isValidUnparsedValue, _commitUnparsed, _commitInnerUnparsed )
 
 
-		self._expressionFragmentEditor = editor.fragmentEditor( False, _pythonPrecedenceHandler, [ self._expr ] )
+		self._expressionFragmentEditor = editor.fragmentEditor( False, [ self._expr ] )
 		self._unparsedFragmentEditor = editor.fragmentEditor( False, [ self._expr ] )
 
 
@@ -223,8 +250,8 @@ class SWYNView (MethodDispatchView):
 		exprView = SREInnerFragment( expr, PRECEDENCE_NONE, EditMode.DISPLAY )
 		seg = Segment( exprView )
 		e = Paragraph( [ seg ] ).alignHPack().alignVRefY()
-		e = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._exprOuter, self._topLevel ],  model,  e )
-		return e
+		e = EditableStructuralItem( SWYNSyntaxRecognizingEditor.instance, [ self._exprOuter, self._topLevel ],  model,  e )
+		return _swynBorder.surround( Row( [ e ] ) )
 
 
 	@DMObjectNodeDispatchMethod( Schema.UNPARSED )
@@ -295,6 +322,57 @@ class SWYNView (MethodDispatchView):
 	def Group(self, fragment, inheritedState, model, subexp, capturing):
 		subexpView = SREInnerFragment( subexp, PRECEDENCE_NONE, EditMode.DISPLAY )
 		return group( subexpView, capturing is not None )
+
+
+
+	@DMObjectNodeDispatchMethod( Schema.Repeat )
+	@Expression
+	def Repeat(self, fragment, inheritedState, model, subexp, repetitions):
+		subexpView = SREInnerFragment( subexp, PRECEDENCE_NONE, EditMode.DISPLAY )
+		return repeat( subexpView, repetitions )
+
+
+	@DMObjectNodeDispatchMethod( Schema.ZeroOrMore )
+	@Expression
+	def ZeroOrMore(self, fragment, inheritedState, model, subexp, greedy):
+		subexpView = SREInnerFragment( subexp, PRECEDENCE_NONE, EditMode.DISPLAY )
+		return zeroOrMore( subexpView, greedy is not None )
+
+
+	@DMObjectNodeDispatchMethod( Schema.OneOrMore )
+	@Expression
+	def OneOrMore(self, fragment, inheritedState, model, subexp, greedy):
+		subexpView = SREInnerFragment( subexp, PRECEDENCE_NONE, EditMode.DISPLAY )
+		return oneOrMore( subexpView, greedy is not None )
+
+
+	@DMObjectNodeDispatchMethod( Schema.Optional )
+	@Expression
+	def Optional(self, fragment, inheritedState, model, subexp, greedy):
+		subexpView = SREInnerFragment( subexp, PRECEDENCE_NONE, EditMode.DISPLAY )
+		return optional( subexpView, greedy is not None )
+
+
+	@DMObjectNodeDispatchMethod( Schema.RepeatRange )
+	@Expression
+	def RepeatRange(self, fragment, inheritedState, model, subexp, min, max, greedy):
+		subexpView = SREInnerFragment( subexp, PRECEDENCE_NONE, EditMode.DISPLAY )
+		return repeatRange( subexpView, min, max, greedy is not None )
+
+
+
+	@DMObjectNodeDispatchMethod( Schema.Sequence )
+	@Expression
+	def Sequence(self, fragment, inheritedState, model, subexps):
+		subexpViews = [ SREInnerFragment( subexp, PRECEDENCE_NONE, EditMode.DISPLAY )   for subexp in subexps ]
+		return sequence( subexpViews )
+
+
+	@DMObjectNodeDispatchMethod( Schema.Choice )
+	@Expression
+	def Choice(self, fragment, inheritedState, model, subexps):
+		subexpViews = [ SREInnerFragment( subexp, PRECEDENCE_NONE, EditMode.DISPLAY )   for subexp in subexps ]
+		return choice( subexpViews )
 
 
 
