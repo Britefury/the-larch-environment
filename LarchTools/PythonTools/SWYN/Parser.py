@@ -36,7 +36,7 @@ class SWYNGrammar (Grammar):
 	# Literal Character - escaped or not escaped
 	@Rule
 	def literalChar(self):
-		return self.escapedChar() | RegEx( '[^\\.^$\\[\\\\(|+*?]' )
+		return self.escapedChar() | RegEx( '[^\\.^$\\[\\\\()|+*?]' ).action( lambda input, begin, end, x, bindings: Schema.LiteralChar( char=x ) )
 
 
 
@@ -69,7 +69,7 @@ class SWYNGrammar (Grammar):
 	# Character set
 	@Rule
 	def charSetChar(self):
-		return self.escapedChar() | RegEx( '[^\\]\\-\\\\]' )
+		return self.escapedChar() | RegEx( '[^\\]\\-\\\\]' ).action( lambda input, begin, end, x, bindings: Schema.LiteralChar( char=x ) )
 
 	@Rule
 	def charSetItemChar(self):
@@ -99,7 +99,7 @@ class SWYNGrammar (Grammar):
 	# Parentheses
 	@Rule
 	def group(self):
-		return ( Literal( '(' ) + self.choice() + Literal( ')' ) ).action( lambda input, begin, end, x, bindings: Schema.Group( capturing='1', flags=x[1] ) )
+		return ( Literal( '(' ) + self.choice() + Literal( ')' ) ).action( lambda input, begin, end, x, bindings: Schema.Group( capturing='1', subexp=x[1] ) )
 
 	@Rule
 	def setFlags(self):
@@ -107,11 +107,11 @@ class SWYNGrammar (Grammar):
 
 	@Rule
 	def nonCapturingGroup(self):
-		return ( Literal( '(?:' ) + self.choice() + Literal( ')' ) ).action( lambda input, begin, end, x, bindings: Schema.Group( capturing=None, flags=x[1] ) )
+		return ( Literal( '(?:' ) + self.choice() + Literal( ')' ) ).action( lambda input, begin, end, x, bindings: Schema.Group( capturing=None, subexp=x[1] ) )
 
 	@Rule
 	def defineNamedGroup(self):
-		return ( Literal( '(?P<' ) + Tokens.identifier + Literal( '>' ) + self.choice() + Literal( ')' ) ).action( lambda input, begin, end, x, bindings: Schema.DefineNamedGroup( name=x[1], flags=x[3] ) )
+		return ( Literal( '(?P<' ) + Tokens.identifier + Literal( '>' ) + self.choice() + Literal( ')' ) ).action( lambda input, begin, end, x, bindings: Schema.DefineNamedGroup( name=x[1], subexp=x[3] ) )
 
 	@Rule
 	def matchNamedGroup(self):
@@ -198,7 +198,7 @@ class TestCase_ReParser (ParserTestCase):
 
 	def test_literalChar(self):
 		g = SWYNGrammar()
-		self._parseStringTest( g.literalChar(), 'a', 'a' )
+		self._parseStringTest( g.literalChar(), 'a', Schema.LiteralChar( char='a' ) )
 		self._parseStringTest( g.literalChar(), '\\.', Schema.EscapedChar( char='.' ) )
 		self._parseStringTest( g.literalChar(), '\\^', Schema.EscapedChar( char='^' ) )
 		self._parseStringTest( g.literalChar(), '\\$', Schema.EscapedChar( char='$' ) )
@@ -245,54 +245,79 @@ class TestCase_ReParser (ParserTestCase):
 	def test_charSet(self):
 		g = SWYNGrammar()
 		self._parseStringFailTest( g.charSet(), '[]' )
-		self._parseStringTest( g.charSet(), '[abc]', Schema.CharSet( items=[ Schema.CharSetChar( char='a' ), Schema.CharSetChar( char='b' ), Schema.CharSetChar( char='c' ) ] ) )
-		self._parseStringTest( g.charSet(), '[^abc]', Schema.CharSet( invert='1', items=[ Schema.CharSetChar( char='a' ), Schema.CharSetChar( char='b' ), Schema.CharSetChar( char='c' ) ] ) )
-		self._parseStringTest( g.charSet(), '[a-z]', Schema.CharSet( items=[ Schema.CharSetRange( min='a', max='z' ) ] ) )
-		self._parseStringTest( g.charSet(), '[a-zA-Z0-9_]', Schema.CharSet( items=[ Schema.CharSetRange( min='a', max='z' ), Schema.CharSetRange( min='A', max='Z' ),
-											    Schema.CharSetRange( min='0', max='9' ), Schema.CharSetChar( char='_' ) ] ) )
-		self._parseStringTest( g.charSet(), '[^^]', Schema.CharSet( invert='1', items=[ Schema.CharSetChar( char='^' ) ] ) )
+		self._parseStringTest( g.charSet(), '[abc]', Schema.CharSet( items=[ Schema.CharSetChar( char=Schema.LiteralChar( char='a' ) ),
+										     Schema.CharSetChar( char=Schema.LiteralChar( char='b' ) ),
+										     Schema.CharSetChar( char=Schema.LiteralChar( char='c' ) ) ] ) )
+		self._parseStringTest( g.charSet(), '[^abc]', Schema.CharSet( invert='1', items=[ Schema.CharSetChar( char=Schema.LiteralChar( char='a' ) ),
+												  Schema.CharSetChar( char=Schema.LiteralChar( char='b' ) ),
+												  Schema.CharSetChar( char=Schema.LiteralChar( char='c' ) ) ] ) )
+		self._parseStringTest( g.charSet(), '[a-z]', Schema.CharSet( items=[ Schema.CharSetRange( min=Schema.LiteralChar( char='a' ), max=Schema.LiteralChar( char='z' ) ) ] ) )
+		self._parseStringTest( g.charSet(), '[a-zA-Z0-9_]', Schema.CharSet( items=[ Schema.CharSetRange( min=Schema.LiteralChar( char='a' ), max=Schema.LiteralChar( char='z' ) ),
+											    Schema.CharSetRange( min=Schema.LiteralChar( char='A' ), max=Schema.LiteralChar( char='Z' ) ),
+											    Schema.CharSetRange( min=Schema.LiteralChar( char='0' ), max=Schema.LiteralChar( char='9' ) ),
+											    Schema.CharSetChar( char=Schema.LiteralChar( char='_' ) ) ] ) )
+		self._parseStringTest( g.charSet(), '[^^]', Schema.CharSet( invert='1', items=[ Schema.CharSetChar( char=Schema.LiteralChar( char='^' ) ) ] ) )
+
+
+	def test_group(self):
+		g = SWYNGrammar()
+		self._parseStringTest( g.item(), '(a)', Schema.Group( capturing='1', subexp=Schema.LiteralChar( char='a' ) ) )
+		self._parseStringTest( g.item(), '(?i)', Schema.SetFlags( flags='i' ) )
+		self._parseStringTest( g.item(), '(?:a)', Schema.Group( subexp=Schema.LiteralChar( char='a' ) ) )
+		self._parseStringTest( g.item(), '(?P<id>a)', Schema.DefineNamedGroup( subexp=Schema.LiteralChar( char='a' ), name='id' ) )
+		self._parseStringTest( g.item(), '(?P=id)', Schema.MatchNamedGroup( name='id' ) )
+		self._parseStringTest( g.item(), '(?#abc)', Schema.Comment( text='abc' ) )
+		self._parseStringTest( g.item(), '(?=a)', Schema.Lookahead( subexp=Schema.LiteralChar( char='a' ) ) )
+		self._parseStringTest( g.item(), '(?!a)', Schema.NegativeLookahead( subexp=Schema.LiteralChar( char='a' ) ) )
+		self._parseStringTest( g.item(), '(?<=a)', Schema.Lookbehind( subexp=Schema.LiteralChar( char='a' ) ) )
+		self._parseStringTest( g.item(), '(?<!a)', Schema.NegativeLookbehind( subexp=Schema.LiteralChar( char='a' ) ) )
 
 
 	def test_repetition(self):
 		g = SWYNGrammar()
-		self._parseStringTest( g.repeatedItem(), 'a*', Schema.ZeroOrMore( subexp='a' ) )
-		self._parseStringTest( g.repeatedItem(), 'a*?', Schema.ZeroOrMore( subexp='a', greedy='1' ) )
-		self._parseStringTest( g.repeatedItem(), 'a+', Schema.OneOrMore( subexp='a' ) )
-		self._parseStringTest( g.repeatedItem(), 'a+?', Schema.OneOrMore( subexp='a', greedy='1' ) )
-		self._parseStringTest( g.repeatedItem(), 'a?', Schema.Optional( subexp='a' ) )
-		self._parseStringTest( g.repeatedItem(), 'a??', Schema.Optional( subexp='a', greedy='1' ) )
-		self._parseStringTest( g.repeatedItem(), 'a{5}', Schema.Repeat( subexp='a', repetitions='5' ) )
-		self._parseStringTest( g.repeatedItem(), 'a{1,2}', Schema.RepeatRange( subexp='a', min='1', max='2', greedy='1' ) )
-		self._parseStringTest( g.repeatedItem(), 'a{1,2}?', Schema.RepeatRange( subexp='a', min='1', max='2' ) )
+		self._parseStringTest( g.repeatedItem(), 'a*', Schema.ZeroOrMore( subexp=Schema.LiteralChar( char='a' ) ) )
+		self._parseStringTest( g.repeatedItem(), 'a*?', Schema.ZeroOrMore( subexp=Schema.LiteralChar( char='a' ), greedy='1' ) )
+		self._parseStringTest( g.repeatedItem(), 'a+', Schema.OneOrMore( subexp=Schema.LiteralChar( char='a' ) ) )
+		self._parseStringTest( g.repeatedItem(), 'a+?', Schema.OneOrMore( subexp=Schema.LiteralChar( char='a' ), greedy='1' ) )
+		self._parseStringTest( g.repeatedItem(), 'a?', Schema.Optional( subexp=Schema.LiteralChar( char='a' ) ) )
+		self._parseStringTest( g.repeatedItem(), 'a??', Schema.Optional( subexp=Schema.LiteralChar( char='a' ), greedy='1' ) )
+		self._parseStringTest( g.repeatedItem(), 'a{5}', Schema.Repeat( subexp=Schema.LiteralChar( char='a' ), repetitions='5' ) )
+		self._parseStringTest( g.repeatedItem(), 'a{1,2}', Schema.RepeatRange( subexp=Schema.LiteralChar( char='a' ), min='1', max='2', greedy='1' ) )
+		self._parseStringTest( g.repeatedItem(), 'a{1,2}?', Schema.RepeatRange( subexp=Schema.LiteralChar( char='a' ), min='1', max='2' ) )
 
 
 	def test_sequence(self):
 		g = SWYNGrammar()
-		self._parseStringTest( g.sequence(), 'abc', Schema.Sequence( subexps=[ 'a', 'b', 'c' ] ) )
-		self._parseStringTest( g.sequence(), 'a*bc', Schema.Sequence( subexps=[ Schema.ZeroOrMore( subexp='a' ), 'b', 'c' ] ) )
-		self._parseStringTest( g.sequence(), 'ab*c', Schema.Sequence( subexps=[ 'a', Schema.ZeroOrMore( subexp='b' ), 'c' ] ) )
-		self._parseStringTest( g.sequence(), 'abc*', Schema.Sequence( subexps=[ 'a', 'b', Schema.ZeroOrMore( subexp='c' ) ] ) )
-		self._parseStringTest( g.sequence(), '[a-z]bc', Schema.Sequence( subexps=[ Schema.CharSet( items=[ Schema.CharSetRange( min='a', max='z' ) ] ), 'b', 'c' ] ) )
-		self._parseStringTest( g.sequence(), '\\wbc*', Schema.Sequence( subexps=[ Schema.CharClass( cls='w' ), 'b', Schema.ZeroOrMore( subexp='c' ) ] ) )
+		self._parseStringTest( g.sequence(), 'abc', Schema.Sequence( subexps=[ Schema.LiteralChar( char='a' ), Schema.LiteralChar( char='b' ), Schema.LiteralChar( char='c' ) ] ) )
+		self._parseStringTest( g.sequence(), 'a*bc', Schema.Sequence( subexps=[ Schema.ZeroOrMore( subexp=Schema.LiteralChar( char='a' ) ), Schema.LiteralChar( char='b' ), Schema.LiteralChar( char='c' ) ] ) )
+		self._parseStringTest( g.sequence(), 'ab*c', Schema.Sequence( subexps=[ Schema.LiteralChar( char='a' ), Schema.ZeroOrMore( subexp=Schema.LiteralChar( char='b' ) ), Schema.LiteralChar( char='c' ) ] ) )
+		self._parseStringTest( g.sequence(), 'abc*', Schema.Sequence( subexps=[ Schema.LiteralChar( char='a' ), Schema.LiteralChar( char='b' ), Schema.ZeroOrMore( subexp=Schema.LiteralChar( char='c' ) ) ] ) )
+		self._parseStringTest( g.sequence(), '[a-z]bc', Schema.Sequence( subexps=[ Schema.CharSet( items=[ Schema.CharSetRange( min=Schema.LiteralChar( char='a' ), max=Schema.LiteralChar( char='z' ) ) ] ),
+											   Schema.LiteralChar( char='b' ), Schema.LiteralChar( char='c' ) ] ) )
+		self._parseStringTest( g.sequence(), '\\wbc*', Schema.Sequence( subexps=[ Schema.CharClass( cls='w' ), Schema.LiteralChar( char='b' ), Schema.ZeroOrMore( subexp=Schema.LiteralChar( char='c' ) ) ] ) )
 
 
 	def test_choice(self):
 		g = SWYNGrammar()
-		self._parseStringTest( g.choice(), 'abc|def', Schema.Choice( subexps=[ Schema.Sequence( subexps=[ 'a', 'b', 'c' ] ), Schema.Sequence( subexps=[ 'd', 'e', 'f' ] ) ] ) )
+		self._parseStringTest( g.choice(), 'abc|def', Schema.Choice( subexps=[ Schema.Sequence( subexps=[ Schema.LiteralChar( char='a' ), Schema.LiteralChar( char='b' ), Schema.LiteralChar( char='c' ) ] ),
+										       Schema.Sequence( subexps=[ Schema.LiteralChar( char='d' ), Schema.LiteralChar( char='e' ), Schema.LiteralChar( char='f' ) ] ) ] ) )
 
 
 	def test_regex(self):
 		g = SWYNGrammar()
-		self._parseStringTest( g.regex(), 'a', 'a' )
-		self._parseStringTest( g.regex(), 'abc|def', Schema.Choice( subexps=[ Schema.Sequence( subexps=[ 'a', 'b', 'c' ] ), Schema.Sequence( subexps=[ 'd', 'e', 'f' ] ) ] ) )
+		self._parseStringTest( g.regex(), 'a', Schema.LiteralChar( char='a' ) )
+		self._parseStringTest( g.regex(), 'abc|def', Schema.Choice( subexps=[ Schema.Sequence( subexps=[ Schema.LiteralChar( char='a' ), Schema.LiteralChar( char='b' ), Schema.LiteralChar( char='c' ) ] ),
+										      Schema.Sequence( subexps=[ Schema.LiteralChar( char='d' ), Schema.LiteralChar( char='e' ), Schema.LiteralChar( char='f' ) ] ) ] ) )
 		self._parseStringTest( g.regex(), r'[\w\-][\w\-\.]+@[\w\-][\w\-\.]+[a-zA-Z]{1,4}',
 				       Schema.Sequence( subexps=[
 					       			Schema.CharSet( items=[ Schema.CharSetChar( char=Schema.CharClass( cls='w' ) ), Schema.CharSetChar( char=Schema.EscapedChar( char='-' ) ) ] ),
 								Schema.OneOrMore( subexp=Schema.CharSet( items=[ Schema.CharSetChar( char=Schema.CharClass( cls='w' ) ), Schema.CharSetChar( char=Schema.EscapedChar( char='-' ) ),
 											  Schema.CharSetChar( char=Schema.EscapedChar( char='.' ) ) ] ) ),
-								'@',
+								Schema.LiteralChar( char='@' ),
 								Schema.CharSet( items=[ Schema.CharSetChar( char=Schema.CharClass( cls='w' ) ), Schema.CharSetChar( char=Schema.EscapedChar( char='-' ) ) ] ),
 								Schema.OneOrMore( subexp=Schema.CharSet( items=[ Schema.CharSetChar( char=Schema.CharClass( cls='w' ) ), Schema.CharSetChar( char=Schema.EscapedChar( char='-' ) ),
 														 Schema.CharSetChar( char=Schema.EscapedChar( char='.' ) ) ] ) ),
-								Schema.RepeatRange( subexp=Schema.CharSet( items=[ Schema.CharSetRange( min='a', max='z' ), Schema.CharSetRange( min='A', max='Z' ) ] ), min='1', max='4', greedy='1' )
+								Schema.RepeatRange( subexp=Schema.CharSet( items=[ Schema.CharSetRange( min=Schema.LiteralChar( char='a' ), max=Schema.LiteralChar( char='z' ) ),
+														   Schema.CharSetRange( min=Schema.LiteralChar( char='A' ), max=Schema.LiteralChar( char='Z' ) ) ] ), min='1', max='4',
+										    greedy='1' )
 								] ) )
