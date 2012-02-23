@@ -24,6 +24,7 @@ UNPARSED = schema.newClass( 'UNPARSED', Node, [ 'value' ] )
 
 
 EscapedChar = schema.newClass( 'EscapedChar', Node, [ 'char' ] )
+LiteralChar = schema.newClass( 'LiteralChar', Node, [ 'char' ] )
 
 
 AnyChar = schema.newClass( 'AnyChar', Node, [] )

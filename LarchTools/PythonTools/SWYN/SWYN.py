@@ -7,11 +7,16 @@
 ##-*************************
 import re
 
+from BritefuryJ.Command import *
+
 from BritefuryJ.DocModel import DMNode
+
+from LarchCore.Languages.Python25.PythonCommands import pythonCommands, makeInsertEmbeddedExpressionAtCaretAction, chainActions
 
 from LarchTools.PythonTools.SWYN import Schema
 from LarchTools.PythonTools.SWYN.Parser import SWYNGrammar
 from LarchTools.PythonTools.SWYN.View import perspective as SWYNPerspective
+
 
 
 class SWYN (object):
@@ -44,3 +49,17 @@ class SWYN (object):
 
 	def __present__(self, fragment, inherited_state):
 		return SWYNPerspective( self.regex )
+
+
+
+def _newSWYNAtCaret(caret):
+	return SWYN()
+
+_exprAtCaret = makeInsertEmbeddedExpressionAtCaretAction( _newSWYNAtCaret )
+
+
+_swynCommand = Command( '&S&W&Y&N', _exprAtCaret )
+
+_swynCommands = CommandSet( 'LarchTools.PythonTools.SWYN', [ _swynCommand ] )
+
+pythonCommands.registerCommandSet( _swynCommands )

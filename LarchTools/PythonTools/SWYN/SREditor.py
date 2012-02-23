@@ -7,6 +7,8 @@
 ##-*************************
 from copy import deepcopy
 
+from BritefuryJ.DocModel import DMNode
+
 from BritefuryJ.DocPresent.Clipboard import *
 from BritefuryJ.DocPresent.Selection import TextSelection
 from BritefuryJ.DocPresent.StyleParams import *
@@ -24,7 +26,8 @@ from LarchTools.PythonTools.SWYN import Schema
 
 
 def isTopLevelFragment(fragment):
-	raise NotImplementedError
+	model = fragment.model
+	return isinstance( model, DMNode )  and  model.isInstanceOf( Schema.SWYNRegEx )
 
 
 class SWYNSyntaxRecognizingEditor (SyntaxRecognizingEditor):

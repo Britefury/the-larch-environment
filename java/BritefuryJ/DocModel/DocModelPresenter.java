@@ -203,6 +203,31 @@ public class DocModelPresenter
 	}
 	
 	
+	public static Pres presentDMNode(DMNode node, FragmentView fragment, SimpleAttributeTable inheritedState)
+	{
+		if ( node instanceof DMObject )
+		{
+			return presentDMObject( (DMObject)node, fragment, inheritedState );
+		}
+		else if ( node instanceof DMList )
+		{
+			return presentDMList( (DMList)node, fragment, inheritedState );
+		}
+		if ( node instanceof DMEmbeddedObject )
+		{
+			return presentDMEmbeddedObject( (DMEmbeddedObject)node, fragment, inheritedState );
+		}
+		if ( node instanceof DMEmbeddedIsolatedObject )
+		{
+			return presentDMEmbeddedIsolatedObject( (DMEmbeddedIsolatedObject)node, fragment, inheritedState );
+		}
+		else
+		{
+			throw new RuntimeException( "Unknown DMNode type" );
+		}
+	}
+	
+	
 	private static class ValuePres extends CompositePres
 	{
 		private DMEmbeddedPyObjectInterface embed;

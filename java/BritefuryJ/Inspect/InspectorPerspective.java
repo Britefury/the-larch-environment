@@ -11,6 +11,8 @@ import org.python.core.PyType;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.PrimitivePresenter;
+import BritefuryJ.DocModel.DMNode;
+import BritefuryJ.DocModel.DocModelPresenter;
 import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
@@ -47,6 +49,10 @@ public class InspectorPerspective extends AbstractPerspective
 
 			result.setDebugName( pyX.getType().getName() );
 			return result;
+		}
+		else if ( x instanceof DMNode )
+		{
+			return DocModelPresenter.presentDMNode( (DMNode)x, fragment, inheritedState );
 		}
 		else
 		{
