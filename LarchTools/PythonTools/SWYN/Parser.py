@@ -102,10 +102,6 @@ class SWYNGrammar (Grammar):
 		return ( Literal( '(' ) + self.choice() + Literal( ')' ) ).action( lambda input, begin, end, x, bindings: Schema.Group( capturing='1', subexp=x[1] ) )
 
 	@Rule
-	def setFlags(self):
-		return ( Literal( '(?' ) + RegEx( '[iLmsux]' ) + Literal( ')' ) ).action( lambda input, begin, end, x, bindings: Schema.SetFlags( flags=x[1] ) )
-
-	@Rule
 	def nonCapturingGroup(self):
 		return ( Literal( '(?:' ) + self.choice() + Literal( ')' ) ).action( lambda input, begin, end, x, bindings: Schema.Group( capturing=None, subexp=x[1] ) )
 
@@ -118,24 +114,28 @@ class SWYNGrammar (Grammar):
 		return ( Literal( '(?P=' ) + Tokens.identifier + Literal( ')' ) ).action( lambda input, begin, end, x, bindings: Schema.MatchNamedGroup( name=x[1] ) )
 
 	@Rule
-	def comment(self):
-		return ( Literal( '(?#' ) + RegEx( '[^)]*' ) + Literal( ')' ) ).action( lambda input, begin, end, x, bindings: Schema.Comment( text=x[1] ) )
-
-	@Rule
 	def lookahead(self):
-		return ( Literal( '(?=' ) + self.choice() + Literal( ')' ) ).action( lambda input, begin, end, x, bindings: Schema.Lookahead( subexp=x[1] ) )
+		return ( Literal( '(?=' ) + self.choice() + Literal( ')' ) ).action( lambda input, begin, end, x, bindings: Schema.Lookahead( subexp=x[1], positive='1' ) )
 
 	@Rule
 	def negativeLookahead(self):
-		return ( Literal( '(?!' ) + self.choice() + Literal( ')' ) ).action( lambda input, begin, end, x, bindings: Schema.NegativeLookahead( subexp=x[1] ) )
+		return ( Literal( '(?!' ) + self.choice() + Literal( ')' ) ).action( lambda input, begin, end, x, bindings: Schema.Lookahead( subexp=x[1] ) )
 
 	@Rule
 	def lookbehind(self):
-		return ( Literal( '(?<=' ) + self.choice() + Literal( ')' ) ).action( lambda input, begin, end, x, bindings: Schema.Lookbehind( subexp=x[1] ) )
+		return ( Literal( '(?<=' ) + self.choice() + Literal( ')' ) ).action( lambda input, begin, end, x, bindings: Schema.Lookbehind( subexp=x[1], positive='1' ) )
 
 	@Rule
 	def negativeLookbehind(self):
-		return ( Literal( '(?<!' ) + self.choice() + Literal( ')' ) ).action( lambda input, begin, end, x, bindings: Schema.NegativeLookbehind( subexp=x[1] ) )
+		return ( Literal( '(?<!' ) + self.choice() + Literal( ')' ) ).action( lambda input, begin, end, x, bindings: Schema.Lookbehind( subexp=x[1] ) )
+
+	@Rule
+	def setFlags(self):
+		return ( Literal( '(?' ) + RegEx( '[iLmsux]' ) + Literal( ')' ) ).action( lambda input, begin, end, x, bindings: Schema.SetFlags( flags=x[1] ) )
+
+	@Rule
+	def comment(self):
+		return ( Literal( '(?#' ) + RegEx( '[^)]*' ) + Literal( ')' ) ).action( lambda input, begin, end, x, bindings: Schema.Comment( text=x[1] ) )
 
 
 
@@ -267,10 +267,10 @@ class TestCase_ReParser (ParserTestCase):
 		self._parseStringTest( g.item(), '(?P<id>a)', Schema.DefineNamedGroup( subexp=Schema.LiteralChar( char='a' ), name='id' ) )
 		self._parseStringTest( g.item(), '(?P=id)', Schema.MatchNamedGroup( name='id' ) )
 		self._parseStringTest( g.item(), '(?#abc)', Schema.Comment( text='abc' ) )
-		self._parseStringTest( g.item(), '(?=a)', Schema.Lookahead( subexp=Schema.LiteralChar( char='a' ) ) )
-		self._parseStringTest( g.item(), '(?!a)', Schema.NegativeLookahead( subexp=Schema.LiteralChar( char='a' ) ) )
-		self._parseStringTest( g.item(), '(?<=a)', Schema.Lookbehind( subexp=Schema.LiteralChar( char='a' ) ) )
-		self._parseStringTest( g.item(), '(?<!a)', Schema.NegativeLookbehind( subexp=Schema.LiteralChar( char='a' ) ) )
+		self._parseStringTest( g.item(), '(?=a)', Schema.Lookahead( subexp=Schema.LiteralChar( char='a' ), positive='1' ) )
+		self._parseStringTest( g.item(), '(?!a)', Schema.Lookahead( subexp=Schema.LiteralChar( char='a' ) ) )
+		self._parseStringTest( g.item(), '(?<=a)', Schema.Lookbehind( subexp=Schema.LiteralChar( char='a' ), positive='1' ) )
+		self._parseStringTest( g.item(), '(?<!a)', Schema.Lookbehind( subexp=Schema.LiteralChar( char='a' ) ) )
 
 
 	def test_repetition(self):

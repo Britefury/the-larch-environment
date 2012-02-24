@@ -41,16 +41,15 @@ CharSetRange = schema.newClass( 'CharSetRange', Node, [ 'min', 'max' ] )
 
 
 Group = schema.newClass( 'Group', Node, [ 'subexp', 'capturing' ] )
-SetFlags = schema.newClass( 'SetFlags', Node, [ 'flags' ] )
 DefineNamedGroup = schema.newClass( 'DefineNamedGroup', Node, [ 'subexp', 'name' ] )
 MatchNamedGroup = schema.newClass( 'MatchNamedGroup', Node, [ 'name' ] )
-Comment = schema.newClass( 'Comment', Node, [ 'text' ] )
 
-Look = schema.newClass( 'Look', Node, [ 'subexp' ] )
+Look = schema.newClass( 'Look', Node, [ 'subexp', 'positive' ] )
 Lookahead = schema.newClass( 'Lookahead', Look, [] )
-NegativeLookahead = schema.newClass( 'NegativeLookahead', Look, [] )
 Lookbehind = schema.newClass( 'Lookbehind', Look, [] )
-NegativeLookbehind = schema.newClass( 'NegativeLookbehind', Look, [] )
+
+SetFlags = schema.newClass( 'SetFlags', Node, [ 'flags' ] )
+Comment = schema.newClass( 'Comment', Node, [ 'text' ] )
 
 
 Repetition = schema.newClass( 'Repetition', Node, [ 'subexp' ] )
