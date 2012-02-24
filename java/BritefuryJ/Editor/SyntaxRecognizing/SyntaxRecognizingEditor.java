@@ -192,7 +192,7 @@ public abstract class SyntaxRecognizingEditor extends SequentialStreamEditor
 		}
 
 		@Override
-		protected boolean applyToInnerFragment(DPElement element, DPElement sourceElement, FragmentView fragment,
+		protected boolean shouldApplyToInnerFragment(DPElement element, DPElement sourceElement, FragmentView fragment,
 				EditEvent event, Object model, StreamValue value)
 		{
 			return innerCommit != null;

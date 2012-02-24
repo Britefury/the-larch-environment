@@ -140,20 +140,35 @@ def Expression(method):
 
 
 
+
+
 _unparsedTextStyle = StyleSheet.style( Primitive.textSquiggleUnderlinePaint( Color.RED ) )
 _controlCharStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.0, 0.0, 0.5 ) ) )
-_specialCharStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.0, 0.0, 0.5 ) ) )
-_charClassStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.25, 0.25 ) ) )
+
+_specialCharStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.5, 0.0, 0.5 ) ), Primitive.fontSize( 10 ) )
+_specialCharPurposeStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.5, 0.0 ) ), Primitive.fontSize( 10 ) )
+_specialBorder = SolidBorder( 1.0, 1.0, 4.0, 4.0, Color( 0.0, 0.8, 0.0 ), Color( 0.9, 1.0, 0.9 ) )
+
+_charClassStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.25, 0.5 ) ) )
+_charClassEscapeStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.25, 0.5, 0.5 ) ) )
+_charClassBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 0.0, 0.25, 0.5 ), Color( 0.8, 0.9, 1.0 ) )
+
+_groupNameStyle = StyleSheet.style( Primitive.fontItalic( True ) )
+_commentStyle = StyleSheet.style( Primitive.foreground( Color( 0.2, 0.2, 0.2, 0.5 ) ) )
+_flagsStyle = StyleSheet.style( Primitive.foreground( Color( 1.0, 0.5, 0.0 ) ) )
 
 _escapeBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color.BLACK, Color( 1.0, 0.85, 0.75 ) )
-_specialBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color.BLACK, Color( 1.0, 1.0, 0.75 ) )
-_charClassBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color.BLACK, Color( 0.7, 0.8, 1.0 ) )
 _charSetBorder = SolidBorder( 1.0, 6.0, 4.0, 4.0, Color.BLACK, Color( 0.7, 0.7, 0.7 ) )
 _groupBorder = SolidBorder( 1.0, 6.0, 4.0, 4.0, Color( 1.0, 0.7, 0.0 ), Color( 1.0, 1.0, 0.8 ) )
 _repeatBorder = SolidBorder( 1.0, 6.0, 4.0, 4.0, Color( 0.0, 0.7, 0.0 ), Color( 0.8, 1.0, 0.8 ) )
 _choiceBorder = SolidBorder( 1.0, 6.0, 4.0, 4.0, Color.BLACK, Color( 0.8, 0.6, 1.0 ) )
 
+_commentBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 0.4, 0.4, 0.4 ), Color( 0.9, 0.9, 0.9 ) )
+_flagsBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 1.0, 0.6, 0.2 ), Color( 1.0, 1.0, 0.8 ) )
+
 _swynBorder = SolidBorder( 3.0, 10.0, 10.0, 10.0, Color( 0.8, 1.0, 0.8 ), None )
+
+
 
 def unparseableText(text):
 	return _unparsedTextStyle( Text( text ) )
@@ -168,16 +183,16 @@ def escapedChar(char):
 	return _escapeBorder.surround( Row( [ _controlCharStyle( Text( '\\' ) ), Text( char ) ] ) )
 
 def anyChar():
-	return _specialBorder.surround( Text( '.' ) )
+	return _specialBorder.surround( Row( [ _specialCharStyle( Text( '.' ) ), _specialCharPurposeStyle( Label( ' ANY' ) ) ] ) )
 
 def startOfLine():
-	return _specialBorder.surround( Text( '^' ) )
+	return _specialBorder.surround( Row( [ _specialCharStyle( Text( '^' ) ), _specialCharPurposeStyle( Label( ' SOL' ) ) ] ) )
 
 def endOfLine():
-	return _specialBorder.surround( Text( '$' ) )
+	return _specialBorder.surround( Row( [ _specialCharStyle( Text( '$' ) ), _specialCharPurposeStyle( Label( ' EOL' ) ) ] ) )
 
 def charClass(cls):
-	return _charClassBorder.surround( _charClassStyle( Text( cls ) ) )
+	return _charClassBorder.surround( Row( [ _charClassEscapeStyle( Text( '\\' ) ), _charClassStyle( Text( cls ) ) ] ) )
 
 def charSetChar(char):
 	return char
@@ -191,6 +206,28 @@ def charSet(items):
 def group(subexp, capturing):
 	contents = [ subexp ]   if capturing   else [ _controlCharStyle( Text( '?:' ) ), subexp ]
 	return _groupBorder.surround( Row( [ _controlCharStyle( Text( '(' ) ) ] + contents + [ _controlCharStyle( Text( ')' ) ) ] ) )
+
+def defineNamedGroup(subexp, name):
+	groupName = _groupNameStyle( Text( '<' + name + '>' ) )
+	return _groupBorder.surround( Row( [ _controlCharStyle( Text( '(?P' ) ), groupName, subexp, _controlCharStyle( Text( ')' ) ) ] ) )
+
+def matchNamedGroup(name):
+	groupName = _groupNameStyle( Text( name ) )
+	return _groupBorder.surround( Row( [ _controlCharStyle( Text( '(?P=' ) ), groupName, _controlCharStyle( Text( ')' ) ) ] ) )
+
+def lookahead(subexp, positive):
+	return _groupBorder.surround( Row( [ _controlCharStyle( Text( '(?='   if positive   else '(?!' ) ), subexp, _controlCharStyle( Text( ')' ) ) ] ) )
+
+def lookbehind(subexp, positive):
+	return _groupBorder.surround( Row( [ _controlCharStyle( Text( '(?<='   if positive   else '(?<!' ) ), subexp, _controlCharStyle( Text( ')' ) ) ] ) )
+
+def setFlags(flags):
+	flagsText = _flagsStyle( Text( flags ) )
+	return _flagsBorder.surround( Row( [ _controlCharStyle( Text( '(?' ) ), flagsText, _controlCharStyle( Text( ')' ) ) ] ) )
+
+def comment(text):
+	commentText = _commentStyle( Text( text ) )
+	return _commentBorder.surround( Row( [ _controlCharStyle( Text( '(?#' ) ), commentText, _controlCharStyle( Text( ')' ) ) ] ) )
 
 def _repetition(subexp, repetitions):
 	return Script.scriptRSuper( _repeatBorder.surround( Row( [ subexp ] ) ), repetitions )
@@ -224,7 +261,7 @@ def _displayNode(char):
 
 
 
-def _editNode(char):
+def _editTopLevelNode(char):
 	return SREInnerFragment( char, PRECEDENCE_NONE, EditMode.EDIT )
 
 
@@ -252,7 +289,7 @@ class SWYNView (MethodDispatchView):
 
 	@DMObjectNodeDispatchMethod( Schema.SWYNRegEx )
 	def SWYNRegEx(self, fragment, inheritedState, model, expr):
-		exprView =_editNode( expr )
+		exprView =_editTopLevelNode( expr )
 		seg = Segment( exprView )
 		e = Paragraph( [ seg ] ).alignHPack().alignVRefY()
 		e = _swynBorder.surround( e )
@@ -280,6 +317,7 @@ class SWYNView (MethodDispatchView):
 		return unparsedElements( views )
 
 
+
 	@DMObjectNodeDispatchMethod( Schema.EscapedChar )
 	@Expression
 	def EscapedChar(self, fragment, inheritedState, model, char):
@@ -290,6 +328,7 @@ class SWYNView (MethodDispatchView):
 	@Expression
 	def LiteralChar(self, fragment, inheritedState, model, char):
 		return literalChar( char )
+
 
 
 	@DMObjectNodeDispatchMethod( Schema.AnyChar )
@@ -310,10 +349,12 @@ class SWYNView (MethodDispatchView):
 		return endOfLine()
 
 
+
 	@DMObjectNodeDispatchMethod( Schema.CharClass )
 	@Expression
 	def CharClass(self, fragment, inheritedState, model, cls):
 		return charClass( cls )
+
 
 
 	@DMObjectNodeDispatchMethod( Schema.CharSetChar )
@@ -331,50 +372,91 @@ class SWYNView (MethodDispatchView):
 	@DMObjectNodeDispatchMethod( Schema.CharSet )
 	@Expression
 	def CharSet(self, fragment, inheritedState, model, items):
-		itemViews = [ _editNode( item )   for item in items ]
+		itemViews = [ _displayNode( item )   for item in items ]
 		return charSet( itemViews )
+
 
 
 	@DMObjectNodeDispatchMethod( Schema.Group )
 	@Expression
 	def Group(self, fragment, inheritedState, model, subexp, capturing):
-		subexpView = _editNode( subexp )
+		subexpView = _displayNode( subexp )
 		return group( subexpView, capturing is not None )
+
+
+	@DMObjectNodeDispatchMethod( Schema.DefineNamedGroup )
+	@Expression
+	def DefineNamedGroup(self, fragment, inheritedState, model, subexp, name):
+		subexpView = _displayNode( subexp )
+		return defineNamedGroup( subexpView, name )
+
+
+	@DMObjectNodeDispatchMethod( Schema.MatchNamedGroup )
+	@Expression
+	def MatchNamedGroup(self, fragment, inheritedState, model, name):
+		return matchNamedGroup( name )
+
+
+
+	@DMObjectNodeDispatchMethod( Schema.Lookahead )
+	@Expression
+	def Lookahead(self, fragment, inheritedState, model, subexp, positive):
+		subexpView = _displayNode( subexp )
+		return lookahead( subexpView, positive is not None )
+
+
+	@DMObjectNodeDispatchMethod( Schema.Lookbehind )
+	@Expression
+	def Lookbehind(self, fragment, inheritedState, model, subexp, positive):
+		subexpView = _displayNode( subexp )
+		return lookbehind( subexpView, positive is not None )
+
+
+
+	@DMObjectNodeDispatchMethod( Schema.SetFlags )
+	@Expression
+	def SetFlags(self, fragment, inheritedState, model, flags):
+		return setFlags( flags )
+
+	@DMObjectNodeDispatchMethod( Schema.Comment )
+	@Expression
+	def Comment(self, fragment, inheritedState, model, text):
+		return comment( text )
 
 
 
 	@DMObjectNodeDispatchMethod( Schema.Repeat )
 	@Expression
 	def Repeat(self, fragment, inheritedState, model, subexp, repetitions):
-		subexpView = _editNode( subexp )
+		subexpView = _displayNode( subexp )
 		return repeat( subexpView, repetitions )
 
 
 	@DMObjectNodeDispatchMethod( Schema.ZeroOrMore )
 	@Expression
 	def ZeroOrMore(self, fragment, inheritedState, model, subexp, greedy):
-		subexpView = _editNode( subexp )
+		subexpView = _displayNode( subexp )
 		return zeroOrMore( subexpView, greedy is not None )
 
 
 	@DMObjectNodeDispatchMethod( Schema.OneOrMore )
 	@Expression
 	def OneOrMore(self, fragment, inheritedState, model, subexp, greedy):
-		subexpView = _editNode( subexp )
+		subexpView = _displayNode( subexp )
 		return oneOrMore( subexpView, greedy is not None )
 
 
 	@DMObjectNodeDispatchMethod( Schema.Optional )
 	@Expression
 	def Optional(self, fragment, inheritedState, model, subexp, greedy):
-		subexpView = _editNode( subexp )
+		subexpView = _displayNode( subexp )
 		return optional( subexpView, greedy is not None )
 
 
 	@DMObjectNodeDispatchMethod( Schema.RepeatRange )
 	@Expression
 	def RepeatRange(self, fragment, inheritedState, model, subexp, min, max, greedy):
-		subexpView = _editNode( subexp )
+		subexpView = _displayNode( subexp )
 		return repeatRange( subexpView, min, max, greedy is not None )
 
 
@@ -382,14 +464,14 @@ class SWYNView (MethodDispatchView):
 	@DMObjectNodeDispatchMethod( Schema.Sequence )
 	@Expression
 	def Sequence(self, fragment, inheritedState, model, subexps):
-		subexpViews = [ _editNode( subexp )   for subexp in subexps ]
+		subexpViews = [ _displayNode( subexp )   for subexp in subexps ]
 		return sequence( subexpViews )
 
 
 	@DMObjectNodeDispatchMethod( Schema.Choice )
 	@Expression
 	def Choice(self, fragment, inheritedState, model, subexps):
-		subexpViews = [ _editNode( subexp )   for subexp in subexps ]
+		subexpViews = [ _displayNode( subexp )   for subexp in subexps ]
 		return choice( subexpViews )
 
 
