@@ -422,6 +422,19 @@ public abstract class DPContentLeaf extends DPElement
 	
 	
 	
+	//
+	//
+	// WHITESPACE METHODS
+	//
+	//
+	
+	protected boolean isWhitespace()
+	{
+		return false;
+	}
+	
+	
+	
 	
 	//
 	// Meta element methods

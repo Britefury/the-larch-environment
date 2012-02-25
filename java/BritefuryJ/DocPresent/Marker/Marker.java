@@ -386,6 +386,12 @@ public class Marker
 			
 			if ( leaf instanceof DPContentLeafEditable  &&  ( leafFilter == null  ||  leafFilter.testElement( leaf ) ) )
 			{
+				int range = ((DPContentLeafEditable)leaf).getMarkerRange();
+				leafPosition = Math.max( 0, Math.min( range, leafPosition ) );
+				if ( leafPosition == range )
+				{
+					newBias = Bias.START;
+				}
 				return ( (DPContentLeafEditable)leaf ).marker( leafPosition, newBias );
 			}
 			else

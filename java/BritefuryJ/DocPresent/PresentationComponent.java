@@ -2001,7 +2001,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	{
 		if ( !isMinimumSizeSet()  ||  !isPreferredSizeSet()  ||  !isMaximumSizeSet()  ||  isPopup() )
 		{
-			revalidate();
+			invalidate();
 		}
 	}
 	

@@ -47,6 +47,7 @@ public class DPBlank extends DPElement
 	//
 	//
 	
+	@Override
 	public Object getDefaultValue()
 	{
 		return null;

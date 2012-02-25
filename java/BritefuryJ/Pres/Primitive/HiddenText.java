@@ -7,17 +7,17 @@
 package BritefuryJ.Pres.Primitive;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPHiddenContent;
+import BritefuryJ.DocPresent.DPHiddenText;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
 
-public class HiddenContent extends Pres
+public class HiddenText extends Pres
 {
 	private String textRepresentation;
 	
 	
-	public HiddenContent(String textRepresentation)
+	public HiddenText(String textRepresentation)
 	{
 		this.textRepresentation = textRepresentation;
 	}
@@ -26,6 +26,6 @@ public class HiddenContent extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		return new DPHiddenContent( textRepresentation );
+		return new DPHiddenText( textRepresentation );
 	}
 }
