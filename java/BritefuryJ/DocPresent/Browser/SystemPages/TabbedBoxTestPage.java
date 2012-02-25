@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import BritefuryJ.Controls.TabbedBox;
 import BritefuryJ.Controls.TabbedBox.TabbedBoxControl;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPText;
+import BritefuryJ.DocPresent.DPLabel;
 import BritefuryJ.Pres.ElementRef;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Column;
@@ -54,7 +54,7 @@ public class TabbedBoxTestPage extends SystemPage
 			String text = "Tab " + String.valueOf( tab + 1 );
 			for (DPElement element: textElementRef.getElements())
 			{
-				((DPText)element).setText( text, "" );
+				((DPLabel)element).setText( text );
 			}
 		}
 	}
