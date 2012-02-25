@@ -10,7 +10,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPText;
+import BritefuryJ.DocPresent.DPLabel;
 import BritefuryJ.DocPresent.Canvas.DrawingNode;
 import BritefuryJ.DocPresent.Canvas.GroupNode;
 import BritefuryJ.DocPresent.Canvas.ShapeNode;
@@ -151,7 +151,7 @@ public class CanvasTestPage extends SystemPage
 				String textValue = data.toString();
 				for (DPElement textElem: text.getElements())
 				{
-					((DPText)textElem).setText( textValue );
+					((DPLabel)textElem).setText( textValue );
 				}
 				model.value = (Integer)data;
 				return true;
@@ -174,7 +174,7 @@ public class CanvasTestPage extends SystemPage
 				String textValue = data.toString();
 				for (DPElement textElem: text.getElements())
 				{
-					((DPText)textElem).setText( textValue );
+					((DPLabel)textElem).setText( textValue );
 				}
 				return true;
 			}

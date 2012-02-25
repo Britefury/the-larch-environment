@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import BritefuryJ.Controls.DropDownExpander;
 import BritefuryJ.Controls.Expander;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPText;
+import BritefuryJ.DocPresent.DPLabel;
 import BritefuryJ.Pres.ElementRef;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Border;
@@ -53,7 +53,7 @@ public class ExpanderTestPage extends SystemPage
 			String text = bExpanded  ?  "expanded"  :  "collapsed";
 			for (DPElement element: textElementRef.getElements())
 			{
-				((DPText)element).setText( text, "" );
+				((DPLabel)element).setText( text );
 			}
 		}
 	}
