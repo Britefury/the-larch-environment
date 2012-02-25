@@ -27,6 +27,7 @@ import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ContentLeafStyleParams;
 import BritefuryJ.DocPresent.StyleParams.FractionStyleParams;
 import BritefuryJ.DocPresent.StyleParams.GridRowStyleParams;
+import BritefuryJ.DocPresent.StyleParams.LabelStyleParams;
 import BritefuryJ.DocPresent.StyleParams.MathRootStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ParagraphStyleParams;
 import BritefuryJ.DocPresent.StyleParams.RegionStyleParams;
@@ -444,18 +445,16 @@ public class Primitive
 
 	
 	
-	protected static DerivedValueTable<TextStyleParams> labelTextParams = new DerivedValueTable<TextStyleParams>( primitiveNamespace )
+	protected static DerivedValueTable<LabelStyleParams> labelTextParams = new DerivedValueTable<LabelStyleParams>( primitiveNamespace )
 	{
-		protected TextStyleParams evaluate(AttributeTable attribs)
+		protected LabelStyleParams evaluate(AttributeTable attribs)
 		{
-			return new TextStyleParams(
+			return new LabelStyleParams(
 					attribs.get( hAlign, HAlignment.class ),
 					attribs.get( vAlign, VAlignment.class ),
 					attribs.get( background, Painter.class ),
 					attribs.get( hoverBackground, Painter.class ),
 					attribs.get( cursor, Cursor.class ),
-					false,
-					false,
 					font.get( attribs ),
 					attribs.get( foreground, Paint.class ),
 					attribs.get( hoverForeground, Paint.class ),

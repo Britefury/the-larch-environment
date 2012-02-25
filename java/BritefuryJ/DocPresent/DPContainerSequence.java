@@ -349,7 +349,7 @@ abstract public class DPContainerSequence extends DPContainerNonOverlayed
 	protected void replaceChildWithEmpty(DPElement child)
 	{
 		int index = registeredChildren.indexOf( child );
-		set( index, new DPHiddenContent() );
+		set( index, new DPBlank() );
 	}
 		
 	protected void replaceChild(DPElement child, DPElement replacement)

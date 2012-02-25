@@ -599,9 +599,17 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 			else
 			{
 				boolean bNonEditableContentCleared = false;
+				boolean deleting = true;
 				while ( !left.isEditable()  ||  left.getTextRepresentationLength() == 0 )
 				{
-					bNonEditableContentCleared |= left.deleteText();
+					if ( deleting )
+					{
+						bNonEditableContentCleared |= left.deleteText();
+					}
+					if ( !left.isWhitespace() )
+					{
+						deleting = false;
+					}
 					if ( !isRealised() )
 					{
 						// Bail out if a response to the deletion of the text is this element becoming unrealised
@@ -646,9 +654,17 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 			else
 			{
 				boolean bNonEditableContentCleared = false;
+				boolean deleting = true;
 				while ( !right.isEditable()  ||  right.getTextRepresentationLength() == 0 )
 				{
-					bNonEditableContentCleared |= right.deleteText();
+					if ( deleting )
+					{
+						bNonEditableContentCleared |= right.deleteText();
+					}
+					if ( !right.isWhitespace() )
+					{
+						deleting = false;
+					}
 					if ( !isRealised() )
 					{
 						// Bail out if a response to the deletion of the text is this element becoming unrealised

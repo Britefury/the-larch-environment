@@ -77,4 +77,17 @@ public class DPWhitespace extends DPContentLeaf
 		graphics.fill( shape );
 		popGraphicsTransform( graphics, current );
 	}
+	
+	
+	
+	//
+	//
+	// WHITESPACE METHODS
+	//
+	//
+	
+	protected boolean isWhitespace()
+	{
+		return true;
+	}
 }

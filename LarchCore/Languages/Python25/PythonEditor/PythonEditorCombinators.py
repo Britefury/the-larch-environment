@@ -935,10 +935,10 @@ def blankLine():
 #
 
 def indentElement():
-	return HiddenContent( '' )
+	return Blank()
 
 def dedentElement():
-	return HiddenContent( '' )
+	return Blank()
 
 @PyPresCombinatorFn
 def indentedBlock(ctx, style, indentElement, lines, dedentElement):

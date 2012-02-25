@@ -145,13 +145,16 @@ def Expression(method):
 _unparsedTextStyle = StyleSheet.style( Primitive.textSquiggleUnderlinePaint( Color.RED ) )
 _controlCharStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.0, 0.0, 0.5 ) ) )
 
-_specialCharStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.5, 0.0, 0.5 ) ), Primitive.fontSize( 10 ) )
-_specialCharPurposeStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.5, 0.0 ) ), Primitive.fontSize( 10 ) )
+_specialCharStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.5, 0.0 ) ), Primitive.fontSize( 10 ) )
 _specialBorder = SolidBorder( 1.0, 1.0, 4.0, 4.0, Color( 0.0, 0.8, 0.0 ), Color( 0.9, 1.0, 0.9 ) )
 
-_charClassStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.25, 0.5 ) ) )
-_charClassEscapeStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.25, 0.5, 0.5 ) ) )
-_charClassBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 0.0, 0.25, 0.5 ), Color( 0.8, 0.9, 1.0 ) )
+_charClassStyle = StyleSheet.style( Primitive.foreground( Color( 0.25, 0.5, 0.0 ) ), Primitive.fontSize( 10 ) )
+_charClassBorder = SolidBorder( 1.0, 1.0, 4.0, 4.0, Color( 0.4, 0.8, 0.0 ), Color( 0.95, 1.0, 0.9 ) )
+
+
+#_charClassStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.25, 0.5 ) ) )
+#_charClassEscapeStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.25, 0.5, 0.5 ) ) )
+#_charClassBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 0.0, 0.25, 0.5 ), Color( 0.8, 0.9, 1.0 ) )
 
 _groupNameStyle = StyleSheet.style( Primitive.fontItalic( True ) )
 _commentStyle = StyleSheet.style( Primitive.foreground( Color( 0.2, 0.2, 0.2, 0.5 ) ) )
@@ -169,6 +172,19 @@ _flagsBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 1.0, 0.6, 0.2 ), Color( 1
 _swynBorder = SolidBorder( 3.0, 10.0, 10.0, 10.0, Color( 0.8, 1.0, 0.8 ), None )
 
 
+_charClasses = {
+	'A' : 'START',
+	'b' : 'WORD-START',
+	'B' : '!WORD-START',
+	'd' : 'DEC',
+	'D' : '!DEC',
+	's' : 'WS',
+	'S' : '!WS',
+	'w' : 'WORD',
+	'W' : '!WORD',
+	'Z' : 'END'
+}
+
 
 def unparseableText(text):
 	return _unparsedTextStyle( Text( text ) )
@@ -182,17 +198,21 @@ def literalChar(char):
 def escapedChar(char):
 	return _escapeBorder.surround( Row( [ _controlCharStyle( Text( '\\' ) ), Text( char ) ] ) )
 
+def _specialChar(char, name):
+	return _specialBorder.surround( _specialCharStyle( Row( [ HiddenText( char ), Label( name ), Text( '' ) ] ) ) )
+
 def anyChar():
-	return _specialBorder.surround( Row( [ _specialCharStyle( Text( '.' ) ), _specialCharPurposeStyle( Label( ' ANY' ) ) ] ) )
+	return _specialChar( '.', 'ANY' )
 
 def startOfLine():
-	return _specialBorder.surround( Row( [ _specialCharStyle( Text( '^' ) ), _specialCharPurposeStyle( Label( ' SOL' ) ) ] ) )
+	return _specialChar( '^', 'SOL' )
 
 def endOfLine():
-	return _specialBorder.surround( Row( [ _specialCharStyle( Text( '$' ) ), _specialCharPurposeStyle( Label( ' EOL' ) ) ] ) )
+	return _specialChar( '$', 'EOL' )
 
 def charClass(cls):
-	return _charClassBorder.surround( Row( [ _charClassEscapeStyle( Text( '\\' ) ), _charClassStyle( Text( cls ) ) ] ) )
+	name = _charClasses[cls]
+	return _charClassBorder.surround( _charClassStyle( Row( [ HiddenText( '\\' + cls ), Label( name ), Text( '' ) ] ) ) )
 
 def charSetChar(char):
 	return char
