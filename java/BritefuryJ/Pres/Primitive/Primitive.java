@@ -36,6 +36,7 @@ import BritefuryJ.DocPresent.StyleParams.ScriptStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ShapeStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
+import BritefuryJ.DocPresent.Util.FontMap;
 import BritefuryJ.Graphics.AbstractBorder;
 import BritefuryJ.Graphics.FillPainter;
 import BritefuryJ.Graphics.Painter;
@@ -51,7 +52,7 @@ public class Primitive
 	public static final InheritedAttributeNonNull hAlign = new InheritedAttributeNonNull( primitiveNamespace, "hAlign", HAlignment.class, HAlignment.PACK );
 	public static final InheritedAttributeNonNull vAlign = new InheritedAttributeNonNull( primitiveNamespace, "vAlign", VAlignment.class, VAlignment.REFY );
 
-	public static final InheritedAttributeNonNull fontFace = new InheritedAttributeNonNull( primitiveNamespace, "fontFace", String.class, "Sans serif" );
+	public static final InheritedAttributeNonNull fontFace = new InheritedAttributeNonNull( primitiveNamespace, "fontFace", String.class, "DejaVu Sans; SansSerif" );
 	public static final InheritedAttributeNonNull fontBold = new InheritedAttributeNonNull( primitiveNamespace, "fontBold", Boolean.class, false );
 	public static final InheritedAttributeNonNull fontItalic = new InheritedAttributeNonNull( primitiveNamespace, "fontItalic", Boolean.class, false );
 	public static final InheritedAttributeNonNull fontUnderline = new InheritedAttributeNonNull( primitiveNamespace, "fontUnderline", Boolean.class, false );
@@ -101,12 +102,15 @@ public class Primitive
 		protected Font evaluate(AttributeTable attribs)
 		{
 			String face = attribs.get( fontFace, String.class );
+			
+			String availableFontFace = FontMap.getAvailableFontName( face );
+			
 			boolean bBold = attribs.get( fontBold, Boolean.class );
 			boolean bItalic = attribs.get( fontItalic, Boolean.class );
 			int size = attribs.get( fontSize, Integer.class );
 			double scale = attribs.get( fontScale, Double.class );
 			int flags = ( bBold ? Font.BOLD : 0 )  |  ( bItalic ? Font.ITALIC : 0 );
-			return new Font( face, flags, size ).deriveFont( (float)( size * scale ) );
+			return new Font( availableFontFace, flags, size ).deriveFont( (float)( size * scale ) );
 		}
 	};
 	

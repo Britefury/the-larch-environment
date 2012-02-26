@@ -11,7 +11,7 @@ import java.util.List;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
-import BritefuryJ.Pres.Primitive.Border;
+import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -41,8 +41,11 @@ public class SplitLinkHeaderBar extends Pres
 		Pres left[] = mapCoerce( mapPresent( ctx, RichText.useLinkHeaderAttrs( style ), leftChildren ) );
 		Pres right[] = mapCoerce( mapPresent( ctx, RichText.useLinkHeaderAttrs( style ), rightChildren ) );
 		StyleSheet linkHeaderStyle = RichText.linkHeaderStyle( style );
-		return linkHeaderStyle.applyTo( 
-				new Border( new Row( new Pres[] { linkHeaderStyle.applyTo( new Row( left ).alignHLeft() ),
-						linkHeaderStyle.applyTo( new Row( right ).alignHRight() ) } ) ).pad( padding, padding ).alignHExpand() ).present( ctx, style );
+		
+		Pres contents = new Row( new Pres[] { linkHeaderStyle.applyTo( new Row( left ).alignHLeft() ),
+				linkHeaderStyle.applyTo( new Row( right ).alignHRight() ) } ).pad( padding, padding );
+		Pres rule = Rule.hrule();
+		Pres header = new Column( new Pres[] { contents, rule } );
+		return RichText.linkHeaderStyle( style ).applyTo( header.alignHExpand() ).present( ctx, style );
 	}
 }

@@ -23,43 +23,46 @@ from BritefuryJ.Pres.Sequence import *
 class PythonEditorStyle (object):
 	pythonEditor = AttributeNamespace( 'pythonEditor' )
 
+	_pythonCodeFont = 'Trebuchet MS; SansSerif'
+
 	#keywordStyle = InheritedAttributeNonNull( pythonEditor, 'keywordStyle', StyleSheet,
-							#StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.fontBold( True ),
+							#StyleSheet.style( Primitive.fontFace( _pythonCodeFont ), Primitive.fontSize( 14 ), Primitive.fontBold( True ),
 							#Primitive.foreground( Color( 0.25, 0.0, 0.5 ) ), Primitive.fontSmallCaps( True ) )
+
 	keywordStyle = InheritedAttributeNonNull( pythonEditor, 'keywordStyle', StyleSheet,
-	                                          StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.fontBold( True ),
+	                                          StyleSheet.style( Primitive.fontFace( _pythonCodeFont ), Primitive.fontSize( 14 ), Primitive.fontBold( True ),
 	                                          Primitive.foreground( Color( 0.25, 0.0, 0.5 ) ) ) )
 	literalFormatStyle = InheritedAttributeNonNull( pythonEditor, 'literalFormatStyle', StyleSheet,
-	                                                StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.0, 0.25, 0.25 ) ) ) )
+	                                                StyleSheet.style( Primitive.fontFace( _pythonCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.0, 0.25, 0.25 ) ) ) )
 	quotationStyle = InheritedAttributeNonNull( pythonEditor, 'quotationStyle', StyleSheet,
-	                                            StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.0, 0.0, 0.5 ) ) ) )
+	                                            StyleSheet.style( Primitive.fontFace( _pythonCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.0, 0.0, 0.5 ) ) ) )
 	stringLiteralStyle = InheritedAttributeNonNull( pythonEditor, 'stringLiteralStyle', StyleSheet,
-	                                                StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.25, 0.0, 0.5 ) ) ) )
+	                                                StyleSheet.style( Primitive.fontFace( _pythonCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.25, 0.0, 0.5 ) ) ) )
 	numLiteralStyle = InheritedAttributeNonNull( pythonEditor, 'numLiteralStyle', StyleSheet,
-	                                             StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.0, 0.5, 0.5 ) ) ) )
+	                                             StyleSheet.style( Primitive.fontFace( _pythonCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.0, 0.5, 0.5 ) ) ) )
 	punctuationStyle = InheritedAttributeNonNull( pythonEditor, 'punctuationStyle', StyleSheet,
-	                                              StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.0, 0.0, 1.0 ) ) ) )
+	                                              StyleSheet.style( Primitive.fontFace( _pythonCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.0, 0.0, 1.0 ) ) ) )
 	delimStyle = InheritedAttributeNonNull( pythonEditor, 'delimStyle', StyleSheet,
-	                                        StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.0, 0.0, 1.0 ) ) ) )
+	                                        StyleSheet.style( Primitive.fontFace( _pythonCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.0, 0.0, 1.0 ) ) ) )
 	targetStyle = InheritedAttributeNonNull( pythonEditor, 'targetStyle', StyleSheet,
-	                                         StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.foreground( Color.black ) ) )
+	                                         StyleSheet.style( Primitive.fontFace( _pythonCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color.black ) ) )
 	varStyle = InheritedAttributeNonNull( pythonEditor, 'varStyle', StyleSheet,
-	                                      StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.foreground( Color.black ) ) )
+	                                      StyleSheet.style( Primitive.fontFace( _pythonCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color.black ) ) )
 	attributeStyle = InheritedAttributeNonNull( pythonEditor, 'attributeStyle', StyleSheet,
-	                                            StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.foreground( Color.black ) ) )
+	                                            StyleSheet.style( Primitive.fontFace( _pythonCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color.black ) ) )
 	kwNameStyle = InheritedAttributeNonNull( pythonEditor, 'kwNameStyle', StyleSheet,
-	                                         StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.foreground( Color.black ) ) )
+	                                         StyleSheet.style( Primitive.fontFace( _pythonCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color.black ) ) )
 	operatorStyle = InheritedAttributeNonNull( pythonEditor, 'operatorStyle', StyleSheet,
-	                                           StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontBold( True ), Primitive.fontSize( 14 ),
+	                                           StyleSheet.style( Primitive.fontFace( _pythonCodeFont ), Primitive.fontBold( True ), Primitive.fontSize( 14 ),
 						   Primitive.foreground( Color( 0.0, 0.5, 0.0 ) ) ) )
 	paramStyle = InheritedAttributeNonNull( pythonEditor, 'paramStyle', StyleSheet,
-	                                        StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.foreground( Color.black ) ) )
+	                                        StyleSheet.style( Primitive.fontFace( _pythonCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color.black ) ) )
 	importStyle = InheritedAttributeNonNull( pythonEditor, 'importStyle', StyleSheet,
-	                                         StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.foreground( Color.black ) ) )
+	                                         StyleSheet.style( Primitive.fontFace( _pythonCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color.black ) ) )
 	commentStyle = InheritedAttributeNonNull( pythonEditor, 'commentStyle', StyleSheet,
-	                                          StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.4, 0.4, 0.4 ) ) ) )
+	                                          StyleSheet.style( Primitive.fontFace( _pythonCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.4, 0.4, 0.4 ) ) ) )
 	unparseableStyle = InheritedAttributeNonNull( pythonEditor, 'unparseableStyle', StyleSheet,
-	                                              StyleSheet.style( Primitive.fontFace( 'Sans serif' ), Primitive.fontSize( 14 ),
+	                                              StyleSheet.style( Primitive.fontFace( _pythonCodeFont ), Primitive.fontSize( 14 ),
 	                                              Primitive.foreground( Color.black ), Primitive.textSquiggleUnderlinePaint( Color.red ) ) )
 
 	sequenceStyle = InheritedAttributeNonNull( pythonEditor, 'sequenceStyle', StyleSheet,
