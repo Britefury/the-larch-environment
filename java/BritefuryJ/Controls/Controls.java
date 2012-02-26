@@ -39,7 +39,7 @@ public class Controls
 	
 	
 	public static final InheritedAttributeNonNull hyperlinkAttrs = new InheritedAttributeNonNull( controlsNamespace, "hyperlinkAttrs", StyleSheet.class,
-		    StyleSheet.style( Primitive.editable.as( false ), Primitive.foreground.as( Color.blue ), Primitive.hoverForeground.as( Color.red ), Primitive.cursor.as( new Cursor( Cursor.HAND_CURSOR ) ) ) );
+		    StyleSheet.style( Primitive.editable.as( false ), Primitive.foreground.as( new Color( 222, 92, 66 ) ), Primitive.hoverForeground.as( Color.red ), Primitive.cursor.as( new Cursor( Cursor.HAND_CURSOR ) ) ) );
 
 	public static final InheritedAttributeNonNull checkboxHoverBackground = new InheritedAttributeNonNull( controlsNamespace, "checkboxHoverBackground", Painter.class,
 			new OutlinePainter( new Color( 0.5f, 0.625f, 0.75f ) ) );

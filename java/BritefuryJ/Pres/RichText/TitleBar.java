@@ -11,7 +11,7 @@ import java.util.List;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
-import BritefuryJ.Pres.Primitive.Border;
+import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class TitleBar extends Pres
@@ -38,9 +38,8 @@ public class TitleBar extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		Pres titleBackground = new Border( title.alignHCentre() );
 		double borderWidth = style.get( RichText.titleBorderWidth, Double.class );
-		return RichText.titleStyle.get( style ).applyTo(
-				titleBackground.pad( borderWidth, borderWidth ).alignHExpand() ).present( ctx, style );
+		Pres titlePres = title.alignHCentre().pad( borderWidth, borderWidth );
+		return new Column( new Pres[] { titlePres, Rule.hrule() } ).alignHExpand().present( ctx, style );
 	}
 }
