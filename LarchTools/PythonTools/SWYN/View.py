@@ -160,11 +160,14 @@ _groupNameStyle = StyleSheet.style( Primitive.fontItalic( True ) )
 _commentStyle = StyleSheet.style( Primitive.foreground( Color( 0.2, 0.2, 0.2, 0.5 ) ) )
 _flagsStyle = StyleSheet.style( Primitive.foreground( Color( 1.0, 0.5, 0.0 ) ) )
 
-_escapeBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color.BLACK, Color( 1.0, 0.85, 0.75 ) )
-_charSetBorder = SolidBorder( 1.0, 6.0, 4.0, 4.0, Color.BLACK, Color( 0.7, 0.7, 0.7 ) )
-_groupBorder = SolidBorder( 1.0, 6.0, 4.0, 4.0, Color( 1.0, 0.7, 0.0 ), Color( 1.0, 1.0, 0.8 ) )
-_repeatBorder = SolidBorder( 1.0, 6.0, 4.0, 4.0, Color( 0.0, 0.7, 0.0 ), Color( 0.8, 1.0, 0.8 ) )
-_choiceBorder = SolidBorder( 1.0, 6.0, 4.0, 4.0, Color.BLACK, Color( 0.8, 0.6, 1.0 ) )
+_escapeBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 0.75, 0.65, 0.55 ), Color( 1.0, 0.85, 0.75 ) )
+
+_charSetBorder = SolidBorder( 1.0, 4.0, 3.0, 3.0,Color( 0.5, 0.5, 0.6 ), Color( 0.7, 0.7, 0.8 ) )
+_charSetItemBorder = FilledBorder( 1.0, 1.0, 1.0, 1.0, Color( 0.9, 0.9, 0.9 ) )
+
+_groupBorder = SolidBorder( 1.0, 4.0, 3.0, 3.0, Color( 1.0, 0.7, 0.4 ), Color( 1.0, 1.0, 0.8 ) )
+_repeatBorder = SolidBorder( 1.0, 1.0, 3.0, 3.0, Color( 0.0, 0.7, 0.0 ), Color( 0.85, 1.0, 0.85 ) )
+_choiceBorder = SolidBorder( 1.0, 4.0, 3.0, 3.0, Color.BLACK, Color( 0.8, 0.6, 1.0 ) )
 
 _commentBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 0.4, 0.4, 0.4 ), Color( 0.9, 0.9, 0.9 ) )
 _flagsBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 1.0, 0.6, 0.2 ), Color( 1.0, 1.0, 0.8 ) )
@@ -215,17 +218,19 @@ def charClass(cls):
 	return _charClassBorder.surround( _charClassStyle( Row( [ HiddenText( '\\' + cls ), Label( name ), Text( '' ) ] ) ) )
 
 def charSetChar(char):
-	return char
+	return _charSetItemBorder.surround( char )
 
 def charSetRange(min, max):
-	return Row( [ min, _controlCharStyle( Text( '-' ) ), max ] )
+	return _charSetItemBorder.surround( Row( [ min, _controlCharStyle( Text( '-' ) ), max ] ) )
 
 def charSet(items):
-	return _charSetBorder.surround( Row( [ _controlCharStyle( Text( '[' ) ), Column( items ), _controlCharStyle( Text( ']' ) ) ] ) )
+	items = [ Row( [ Segment( item ) ] )   for item in items ]
+	itemsColumn = Column( items, 0 )   if len( items ) == 1  else Column( items )
+	return _charSetBorder.surround( Row( [ _controlCharStyle( Text( '[' ) ), itemsColumn, _controlCharStyle( Text( ']' ) ) ] ) )
 
 def group(subexp, capturing):
 	contents = [ subexp ]   if capturing   else [ _controlCharStyle( Text( '?:' ) ), subexp ]
-	return _groupBorder.surround( Row( [ _controlCharStyle( Text( '(' ) ) ] + contents + [ _controlCharStyle( Text( ')' ) ) ] ) )
+	return _groupBorder.surround( Row( [ Segment( Span( [ _controlCharStyle( Text( '(' ) ) ] + contents + [ _controlCharStyle( Text( ')' ) ) ] ) ) ] ) )
 
 def defineNamedGroup(subexp, name):
 	groupName = _groupNameStyle( Text( '<' + name + '>' ) )
@@ -250,7 +255,7 @@ def comment(text):
 	return _commentBorder.surround( Row( [ _controlCharStyle( Text( '(?#' ) ), commentText, _controlCharStyle( Text( ')' ) ) ] ) )
 
 def _repetition(subexp, repetitions):
-	return Script.scriptRSuper( _repeatBorder.surround( Row( [ subexp ] ) ), repetitions )
+	return Script.scriptRSuper( Row( [ subexp ] ), _repeatBorder.surround( repetitions ) )
 
 def repeat(subexp, repetitions):
 	return _repetition( subexp, Text( '{' + repetitions + '}' ) )
