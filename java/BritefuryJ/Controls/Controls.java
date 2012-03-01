@@ -38,8 +38,11 @@ public class Controls
 			new SolidBorder( 2.0, 2.0, 10.0, 10.0, new Color( 0.65f, 0.75f, 0.85f ), new Color( 0.95f, 0.975f, 1.0f ) ) );
 	
 	
+//	public static final InheritedAttributeNonNull hyperlinkAttrs = new InheritedAttributeNonNull( controlsNamespace, "hyperlinkAttrs", StyleSheet.class,
+//		    StyleSheet.style( Primitive.editable.as( false ), Primitive.foreground.as( new Color( 222, 92, 66 ) ), Primitive.hoverForeground.as( Color.red ), Primitive.cursor.as( new Cursor( Cursor.HAND_CURSOR ) ) ) );
+
 	public static final InheritedAttributeNonNull hyperlinkAttrs = new InheritedAttributeNonNull( controlsNamespace, "hyperlinkAttrs", StyleSheet.class,
-		    StyleSheet.style( Primitive.editable.as( false ), Primitive.foreground.as( new Color( 222, 92, 66 ) ), Primitive.hoverForeground.as( Color.red ), Primitive.cursor.as( new Cursor( Cursor.HAND_CURSOR ) ) ) );
+			    StyleSheet.style( Primitive.editable.as( false ), Primitive.foreground.as( new Color( 0, 111, 128 ) ), Primitive.hoverForeground.as( Color.red ), Primitive.cursor.as( new Cursor( Cursor.HAND_CURSOR ) ) ) );
 
 	public static final InheritedAttributeNonNull checkboxHoverBackground = new InheritedAttributeNonNull( controlsNamespace, "checkboxHoverBackground", Painter.class,
 			new OutlinePainter( new Color( 0.5f, 0.625f, 0.75f ) ) );

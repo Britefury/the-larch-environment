@@ -14,6 +14,7 @@ from LarchTools.EmbeddedData.IntEditorSpinEntry import IntEditorSpinEntry
 from LarchTools.EmbeddedData.RealEditorSpinEntry import RealEditorSpinEntry
 from LarchTools.EmbeddedData.StringEditorTextEntry import StringEditorTextEntry
 from LarchTools.EmbeddedData.StringEditorTextArea import StringEditorTextArea
+from LarchTools.EmbeddedData.ColourEditorPicker import ColourEditorPicker
 
 
 
@@ -45,6 +46,14 @@ _textAreaAtCaret = makeInsertEmbeddedExpressionAtCaretAction( _newTextAreaAtCare
 _textAreaCommand = Command( '&Text &Area', _textAreaAtCaret )
 
 
-_edCommands = CommandSet( 'LarchTools.EmbeddedData', [ _intSpinCommand, _realSpinCommand, _textEntryCommand, _textAreaCommand ] )
+def _newColourPickerAtcaret(caret):
+	return ColourEditorPicker()
+
+_colourPickerAtCaret = makeInsertEmbeddedExpressionAtCaretAction( _newColourPickerAtcaret )
+_colourPickerCommand = Command( '&C&o&lour picker', _colourPickerAtCaret )
+
+
+_edCommands = CommandSet( 'LarchTools.EmbeddedData', [ _intSpinCommand, _realSpinCommand, _textEntryCommand, _textAreaCommand,
+                                                       _colourPickerCommand] )
 
 pythonCommands.registerCommandSet( _edCommands )

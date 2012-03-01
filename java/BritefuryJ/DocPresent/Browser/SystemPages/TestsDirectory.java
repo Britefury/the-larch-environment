@@ -79,6 +79,7 @@ public class TestsDirectory extends BrowserPage
 	
 	public static final ButtonTestPage button = new ButtonTestPage();
 	public static final CheckboxTestPage checkbox = new CheckboxTestPage();
+	public static final ColourPickerTestPage colourPicker = new ColourPickerTestPage();
 	public static final CommandConsoleTestPage commandConsole = new CommandConsoleTestPage();
 	public static final EditableLabelTestPage editableLabel = new EditableLabelTestPage();
 	public static final ExpanderTestPage expander = new ExpanderTestPage();
@@ -97,6 +98,7 @@ public class TestsDirectory extends BrowserPage
 	private static final Hyperlink controlsLinks[] = {
 		new Hyperlink( "Button", new Location( "system.tests.button" ) ),
 		new Hyperlink( "Check box", new Location( "system.tests.checkbox" ) ),
+		new Hyperlink( "Colour picker", new Location( "system.tests.colourPicker" ) ),
 		new Hyperlink( "Command console", new Location( "system.tests.commandConsole" ) ),
 		new Hyperlink( "Editable label", new Location( "system.tests.editableLabel" ) ),
 		new Hyperlink( "Expander", new Location( "system.tests.expander" ) ),

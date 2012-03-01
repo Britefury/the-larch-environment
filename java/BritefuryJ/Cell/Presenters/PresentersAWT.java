@@ -7,24 +7,15 @@
 package BritefuryJ.Cell.Presenters;
 
 import java.awt.Color;
-import java.awt.Cursor;
-
-import javax.swing.JColorChooser;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Cell.CellEditPerspective;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
-import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.DocPresent.Interactor.PushElementInteractor;
-import BritefuryJ.Graphics.FillPainter;
+import BritefuryJ.Controls.ColourPicker;
+import BritefuryJ.Controls.ColourPicker.ColourPickerControl;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.ObjectPresentation.ObjectPresenter;
 import BritefuryJ.ObjectPresentation.ObjectPresenterRegistry;
 import BritefuryJ.Pres.Pres;
-import BritefuryJ.Pres.Primitive.Box;
-import BritefuryJ.Pres.Primitive.Primitive;
-import BritefuryJ.StyleSheet.StyleSheet;
 
 public class PresentersAWT extends ObjectPresenterRegistry
 {
@@ -40,32 +31,17 @@ public class PresentersAWT extends ObjectPresenterRegistry
 		{
 			final Color colour = (Color)x;
 			
-			PushElementInteractor interactor = new PushElementInteractor()
+			ColourPicker.ColourPickerListener listener = new ColourPicker.ColourPickerListener()
 			{
-				
 				@Override
-				public void buttonRelease(PointerInputElement element, PointerButtonEvent event)
+				public void onColourChanged(ColourPickerControl colourPicker, Color colour)
 				{
-					DPElement cellElement = (DPElement)element;
-					
-					Color newColour = JColorChooser.showDialog( cellElement.getRootElement().getComponent(), "Choose colour", colour );
-					
-					if ( newColour != null )
-					{
-						CellEditPerspective.notifySetCellValue( cellElement, newColour );
-					}
-				}
-				
-				@Override
-				public boolean buttonPress(PointerInputElement element, PointerButtonEvent event)
-				{
-					return event.getButton() == 1;
+					CellEditPerspective.notifySetCellValue( colourPicker.getElement(), colour );
 				}
 			};
-
-			StyleSheet swatchStyle = StyleSheet.style( Primitive.shapePainter.as( new FillPainter( colour ) ), Primitive.cursor.as( new Cursor( Cursor.HAND_CURSOR ) ) );
-			Pres swatch = swatchStyle.applyTo( new Box( 25.0, 10.0 ) );
-			return swatch.withElementInteractor( interactor ).alignVRefYExpand();
+			
+			Pres control = new ColourPicker( colour, listener );
+			return control.alignVRefYExpand();
 		}
 	};
 }
