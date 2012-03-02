@@ -25,6 +25,31 @@ import BritefuryJ.StyleSheet.StyleValues;
 
 public class RichText
 {
+	// Blue theme
+	private static final Color blueH1Colour = new Color( 0.1f, 0.2f, 0.3f );
+	private static final Color blueH2Colour = new Color( 0.15f, 0.3f, 0.45f );
+	private static final Color blueH3Colour = new Color( 0.2f, 0.4f, 0.6f );
+	private static final Color blueH4Colour = new Color( 0.15f, 0.3f, 0.45f );
+	private static final Color blueH5Colour = new Color( 0.2f, 0.4f, 0.6f );
+	private static final Color blueH6Colour = Color.BLACK;
+	
+	// Green theme
+	private static final Color greenH1Colour = new Color( 109, 140, 91 );
+	private static final Color greenH2Colour = new Color( 85, 115, 69 );
+	private static final Color greenH3Colour = new Color( 64, 89, 49 );
+	private static final Color greenH4Colour = new Color( 99, 128, 83 );
+	private static final Color greenH5Colour = new Color( 76, 102, 61 );
+	private static final Color greenH6Colour = new Color( 55, 76, 42 );
+	
+	// Burgundy theme
+	private static final Color burgundyH1Colour = new Color( 115, 42, 96 );
+	private static final Color burgundyH2Colour = new Color( 89, 29, 73 );
+	private static final Color burgundyH3Colour = new Color( 64, 17, 52 );
+	private static final Color burgundyH4Colour = new Color( 102, 37, 85 );
+	private static final Color burgundyH5Colour = new Color( 76, 24, 63 );
+	private static final Color burgundyH6Colour = new Color( 51, 14, 41 );
+	
+	
 	public static final AttributeNamespace richTextNamespace = new AttributeNamespace( "richtext" );
 	
 	public static final InheritedAttributeNonNull ruleThickness = new InheritedAttributeNonNull( richTextNamespace, "ruleThickness", Double.class, 2.0 ); 
@@ -52,17 +77,17 @@ public class RichText
 	public static final InheritedAttributeNonNull headingTextAttrs = new InheritedAttributeNonNull( richTextNamespace, "headingTextAttrs", StyleSheet.class,
 		    StyleSheet.style( Primitive.fontFace.as( "Perpetua; Serif" ) ) );
 	public static final InheritedAttributeNonNull h1TextAttrs = new InheritedAttributeNonNull( richTextNamespace, "h1TextAttrs", StyleSheet.class,
-		    StyleSheet.style( Primitive.fontSize.as( 28 ), Primitive.fontBold.as( true ), Primitive.foreground.as( new Color( 161, 157, 146 ) ) ) );
+		    StyleSheet.style( Primitive.fontSize.as( 28 ), Primitive.fontBold.as( true ), Primitive.foreground.as( blueH1Colour ) ) );
 	public static final InheritedAttributeNonNull h2TextAttrs = new InheritedAttributeNonNull( richTextNamespace, "h2TextAttrs", StyleSheet.class,
-		    StyleSheet.style( Primitive.fontSize.as( 26 ), Primitive.fontBold.as( true ), Primitive.foreground.as( new Color( 0.15f, 0.3f, 0.45f ) ) ) );
+		    StyleSheet.style( Primitive.fontSize.as( 26 ), Primitive.fontBold.as( true ), Primitive.foreground.as( blueH2Colour ) ) );
 	public static final InheritedAttributeNonNull h3TextAttrs = new InheritedAttributeNonNull( richTextNamespace, "h3TextAttrs", StyleSheet.class,
-		    StyleSheet.style( Primitive.fontSize.as( 24 ), Primitive.fontBold.as( true ), Primitive.foreground.as( new Color( 0.2f, 0.4f, 0.6f ) ) ) );
+		    StyleSheet.style( Primitive.fontSize.as( 24 ), Primitive.fontBold.as( true ), Primitive.foreground.as( blueH3Colour) ) );
 	public static final InheritedAttributeNonNull h4TextAttrs = new InheritedAttributeNonNull( richTextNamespace, "h4TextAttrs", StyleSheet.class,
-		    StyleSheet.style( Primitive.fontSize.as( 22 ), Primitive.fontItalic.as( true ), Primitive.foreground.as( new Color( 0.15f, 0.3f, 0.45f ) ) ) );
+		    StyleSheet.style( Primitive.fontSize.as( 22 ), Primitive.fontItalic.as( true ), Primitive.foreground.as( blueH4Colour ) ) );
 	public static final InheritedAttributeNonNull h5TextAttrs = new InheritedAttributeNonNull( richTextNamespace, "h5TextAttrs", StyleSheet.class,
-		    StyleSheet.style( Primitive.fontSize.as( 18 ), Primitive.fontItalic.as( true ), Primitive.foreground.as( new Color( 0.2f, 0.4f, 0.6f ) ) ) );
+		    StyleSheet.style( Primitive.fontSize.as( 18 ), Primitive.fontItalic.as( true ), Primitive.foreground.as( blueH5Colour ) ) );
 	public static final InheritedAttributeNonNull h6TextAttrs = new InheritedAttributeNonNull( richTextNamespace, "h6TextAttrs", StyleSheet.class,
-		    StyleSheet.style( Primitive.fontSize.as( 16 ), Primitive.fontItalic.as( true ), Primitive.foreground.as( Color.black ) ) );
+		    StyleSheet.style( Primitive.fontSize.as( 16 ), Primitive.fontItalic.as( true ), Primitive.foreground.as( blueH6Colour ) ) );
 	public static final InheritedAttributeNonNull separatorPainter = new InheritedAttributeNonNull( richTextNamespace, "separatorPainter", Painter.class, new FillPainter( new Color( 32, 87, 147 ) ) );
 	public static final InheritedAttributeNonNull separatorMajorPadding = new InheritedAttributeNonNull( richTextNamespace, "separatorMajorPadding", Double.class, 15.0 );
 	public static final InheritedAttributeNonNull separatorMinorPadding = new InheritedAttributeNonNull( richTextNamespace, "separatorMinorPadding", Double.class, 3.0 );

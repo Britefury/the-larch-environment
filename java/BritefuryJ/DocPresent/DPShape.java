@@ -110,7 +110,7 @@ public class DPShape extends DPContentLeaf
 			ShapeStyleParams p = (ShapeStyleParams)styleParams;
 			
 			Painter painter;
-			if ( testFlag( FLAG_HOVER ) )
+			if ( isHoverActive() )
 			{
 				Painter hoverPainter = p.getHoverPainter();
 				painter = hoverPainter != null  ?  hoverPainter  :  p.getPainter();

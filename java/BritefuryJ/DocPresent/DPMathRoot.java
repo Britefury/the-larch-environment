@@ -118,7 +118,7 @@ public class DPMathRoot extends DPContainerNonOverlayed
 
 			MathRootStyleParams s = (MathRootStyleParams)styleParams;
 			Paint symbolPaint;
-			if ( testFlag( FLAG_HOVER ) )
+			if ( isHoverActive() )
 			{
 				Paint hoverSymbolPaint = s.getHoverSymbolPaint();
 				symbolPaint = hoverSymbolPaint != null  ?  hoverSymbolPaint  :  s.getSymbolPaint();

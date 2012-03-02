@@ -11,6 +11,7 @@ import BritefuryJ.DocPresent.Util.Range;
 import BritefuryJ.Graphics.Painter;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
+import BritefuryJ.Pres.Primitive.Bin;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
 
@@ -24,8 +25,8 @@ public abstract class ScrollBar extends ControlPres
 		
 		
 		
-		public ScrollBarControl(PresentationContext ctx, StyleValues style, Range range, DPElement element, DPElement decArrow, DPElement incArrow, DPElement dragBox, ScrollBarHelper.Axis axis,
-				double dragBoxPadding, double dragBoxRounding, double dragBoxMinSize, Painter dragBoxPainter)
+		public ScrollBarControl(PresentationContext ctx, StyleValues style, Range range, DPElement element, DPElement dragBox, ScrollBarHelper.Axis axis,
+				double dragBoxPadding, double dragBoxRounding, double dragBoxMinSize, Painter dragBoxPainter, Painter dragBoxHoverPainter)
 		{
 			super( ctx, style );
 			
@@ -33,10 +34,8 @@ public abstract class ScrollBar extends ControlPres
 			this.element = element;
 			element.setFixedValue( range );
 			
-			decArrow.addElementInteractor( new ScrollBarHelper.ScrollBarArrowInteractor( ScrollBarHelper.ScrollBarArrowInteractor.Direction.DECREASE, range ) );
-			incArrow.addElementInteractor( new ScrollBarHelper.ScrollBarArrowInteractor( ScrollBarHelper.ScrollBarArrowInteractor.Direction.INCREASE, range ) );
 			ScrollBarHelper.ScrollBarDragBarInteractor dragBoxInteractor = new ScrollBarHelper.ScrollBarDragBarInteractor( dragBox, axis, range,
-					dragBoxPadding, dragBoxRounding, dragBoxMinSize, dragBoxPainter );
+					dragBoxPadding, dragBoxRounding, dragBoxMinSize, dragBoxPainter, dragBoxHoverPainter );
 			dragBox.addElementInteractor( dragBoxInteractor );
 			dragBox.addPainter( dragBoxInteractor );
 		}
@@ -68,31 +67,23 @@ public abstract class ScrollBar extends ControlPres
 	@Override
 	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
-		double arrowPadding = style.get( Controls.scrollBarArrowPadding, Double.class ); 
-		double arrowSpacing = style.get( Controls.scrollBarArrowSpacing, Double.class ); 
 		double scrollBarSize = style.get( Controls.scrollBarSize, Double.class ); 
 		double dragBoxPadding = style.get( Controls.scrollBarArrowDragboxPadding, Double.class ); 
 		double dragBoxRounding = style.get( Controls.scrollBarArrowDragboxRounding, Double.class );
 		double dragBoxMinSize = style.get( Controls.scrollBarArrowDragboxMinSize, Double.class );
-		double arrowSize = scrollBarSize - arrowPadding * 2.0;
 		Painter dragBoxPainter = style.get( Controls.scrollBarDragBoxPainter, Painter.class );
+		Painter dragBoxHoverPainter = style.get( Controls.scrollBarDragBoxHoverPainter, Painter.class );
 		
-		StyleSheet arrowStyle = Controls.scrollBarArrowStyle.get( style );
 		StyleSheet dragBoxStyle = Controls.scrollBarDragBoxStyle.get( style );
-		
-		Pres decArrow = arrowStyle.applyTo( createDecArrow( arrowSize ) ).pad( arrowPadding, arrowPadding );
-		DPElement decArrowElement = decArrow.present( ctx, style );
-		Pres incArrow = arrowStyle.applyTo( createIncArrow( arrowSize ) ).pad( arrowPadding, arrowPadding );
-		DPElement incArrowElement = incArrow.present( ctx, style );
 		
 		
 		Pres dragBar = dragBoxStyle.applyTo( createDragBox( scrollBarSize ) );
 		DPElement dragBarElement = dragBar.present( ctx, style );
-		Pres p = createScrollBarPres( arrowSpacing, decArrowElement, dragBarElement, incArrowElement );
+		Pres p = new Bin( Pres.coerce( dragBarElement ) );
 		
 		DPElement element = p.present( ctx, style );
 		
-		return new ScrollBarControl( ctx, style, range, element, decArrowElement, incArrowElement, dragBarElement, getAxis(), dragBoxPadding, dragBoxRounding, dragBoxMinSize, dragBoxPainter );
+		return new ScrollBarControl( ctx, style, range, element, dragBarElement, getAxis(), dragBoxPadding, dragBoxRounding, dragBoxMinSize, dragBoxPainter, dragBoxHoverPainter );
 	}
 	
 	
@@ -100,5 +91,4 @@ public abstract class ScrollBar extends ControlPres
 	protected abstract Pres createDecArrow(double arrowSize);
 	protected abstract Pres createIncArrow(double arrowSize);
 	protected abstract Pres createDragBox(double scrollBarSize);
-	protected abstract Pres createScrollBarPres(double spacing, DPElement decArrowElement, DPElement dragBarElement, DPElement incArrowElement);
 }
