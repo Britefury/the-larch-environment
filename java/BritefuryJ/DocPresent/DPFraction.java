@@ -52,7 +52,7 @@ public class DPFraction extends DPContainerNonOverlayed
 			Paint curPaint = graphics.getPaint();
 
 			Paint barPaint;
-			if ( testFlag( FLAG_HOVER ) )
+			if ( isHoverActive() )
 			{
 				Paint hoverBarPaint = getHoverBarPaint();
 				barPaint = hoverBarPaint != null  ?  hoverBarPaint  :  getBarPaint();

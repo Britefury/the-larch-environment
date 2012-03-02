@@ -31,64 +31,19 @@ class ScrollBarHelper
 	}
 
 
-	protected static class ScrollBarArrowInteractor implements PushElementInteractor
-	{
-		public enum Direction
-		{
-			INCREASE,
-			DECREASE
-		}
-
-
-		private Direction direction;
-		private Range range;
-		
-		
-		public ScrollBarArrowInteractor(Direction direction, Range range)
-		{
-			this.direction = direction;
-			this.range = range;
-		}
-		
-		
-		public boolean buttonPress(PointerInputElement element, PointerButtonEvent event)
-		{
-			if ( event.getButton() == 1 )
-			{
-				if ( direction == Direction.INCREASE )
-				{
-					range.move( range.getStepSize() );
-				}
-				else if ( direction == Direction.DECREASE )
-				{
-					range.move( -range.getStepSize() );
-				}
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-
-		@Override
-		public void buttonRelease(PointerInputElement element, PointerButtonEvent event)
-		{
-		}
-	}
-
 	protected static class ScrollBarDragBarInteractor implements PushElementInteractor, DragElementInteractor, ElementPainter, Range.RangeListener
 	{
 		private DPElement element;
 		private Axis axis;
 		private Range range;
 		private double padding, rounding, minSize;
-		private Painter dragBoxPainter;
+		private Painter dragBoxPainter, dragBoxHoverPainter;
 		private double dragStartValue = 0.0;
-		private AABox2 dragBox = null;
+		private double[] dragBoxBounds = null;
+		private AABox2 visibleDragBox = null;
 		
 		
-		public ScrollBarDragBarInteractor(DPElement element, Axis axis, Range range, double padding, double rounding, double minSize, Painter dragBoxPainter)
+		public ScrollBarDragBarInteractor(DPElement element, Axis axis, Range range, double padding, double rounding, double minSize, Painter dragBoxPainter, Painter dragBoxHoverPainter)
 		{
 			this.element = element;
 			this.axis = axis;
@@ -97,6 +52,7 @@ class ScrollBarHelper
 			this.rounding = rounding;
 			this.minSize = minSize;
 			this.dragBoxPainter = dragBoxPainter;
+			this.dragBoxHoverPainter = dragBoxHoverPainter;
 			range.addListener( this );
 		}
 		
@@ -107,16 +63,16 @@ class ScrollBarHelper
 		{
 			if ( event.getButton() == 1 )
 			{
-				AABox2 dragBox = getRefreshedDragBox();
+				refreshDragBox();
 				
 				Point2 localPos = event.getPointer().getLocalPos();
 				
-				if ( axis == Axis.HORIZONTAL  &&  localPos.x < dragBox.getLowerX()    ||  axis == Axis.VERTICAL  &&  localPos.y < dragBox.getLowerY() )
+				if ( axis == Axis.HORIZONTAL  &&  localPos.x < dragBoxBounds[0]    ||  axis == Axis.VERTICAL  &&  localPos.y < dragBoxBounds[0] )
 				{
 					range.move( -range.getPageSize() );
 					return true;
 				}
-				else if ( axis == Axis.HORIZONTAL  &&  localPos.x > dragBox.getUpperX()    ||  axis == Axis.VERTICAL  &&  localPos.y > dragBox.getUpperY() )
+				else if ( axis == Axis.HORIZONTAL  &&  localPos.x > dragBoxBounds[1]    ||  axis == Axis.VERTICAL  &&  localPos.y > dragBoxBounds[1] )
 				{
 					range.move( range.getPageSize() );
 					return true;
@@ -138,11 +94,12 @@ class ScrollBarHelper
 		{
 			if ( event.getButton() == 1 )
 			{
-				AABox2 dragBox = getRefreshedDragBox();
+				refreshDragBox();
 				
 				Point2 localPos = event.getPointer().getLocalPos();
 				
-				if ( dragBox.containsPoint( localPos ) )
+				if ( ( axis == Axis.HORIZONTAL  &&  localPos.x >= dragBoxBounds[0]  &&  localPos.x <= dragBoxBounds[1] )   ||
+						( axis == Axis.VERTICAL  &&  localPos.y >= dragBoxBounds[0]  &&  localPos.y <= dragBoxBounds[1] ) )
 				{
 					dragStartValue = range.getBegin();
 					return true;
@@ -195,38 +152,45 @@ class ScrollBarHelper
 		@Override
 		public void draw(DPElement element, Graphics2D graphics)
 		{
-			AABox2 dragBox = getRefreshedDragBox();
+			refreshDragBox();
 			
-			RoundRectangle2D.Double shape = new RoundRectangle2D.Double( dragBox.getLowerX(), dragBox.getLowerY(), dragBox.getWidth(), dragBox.getHeight(), rounding, rounding );
+			RoundRectangle2D.Double shape = new RoundRectangle2D.Double( visibleDragBox.getLowerX(), visibleDragBox.getLowerY(), visibleDragBox.getWidth(), visibleDragBox.getHeight(),
+					rounding, rounding );
 			
-			dragBoxPainter.drawShape( graphics, shape );
+			if ( element.isHoverActive() )
+			{
+				dragBoxHoverPainter.drawShape( graphics, shape );
+			}
+			else
+			{
+				dragBoxPainter.drawShape( graphics, shape );
+			}
 		}
 		
 		
-		private AABox2 getRefreshedDragBox()
+		private void refreshDragBox()
 		{
-			if ( dragBox == null )
+			if ( dragBoxBounds == null )
 			{
 				AABox2 dragBarBox = element.getLocalAABox();
-				double bounds[] = { 0.0, 0.0 };
+				dragBoxBounds = new double[] { 0.0, 0.0 };
 				if ( axis == Axis.HORIZONTAL )
 				{
 					double visibleRange = dragBarBox.getWidth()  -  padding * 2.0;
-					computeDragBoxBounds( visibleRange, bounds );
-					dragBox = new AABox2( padding + bounds[0], padding, padding + bounds[1], dragBarBox.getUpperY() - padding );
+					computeDragBoxBounds( visibleRange, dragBoxBounds );
+					visibleDragBox = new AABox2( padding + dragBoxBounds[0], padding, padding + dragBoxBounds[1], dragBarBox.getUpperY() - padding );
 				}
 				else if ( axis == Axis.VERTICAL )
 				{
 					double visibleRange = dragBarBox.getHeight()  -  padding * 2.0;
-					computeDragBoxBounds( visibleRange, bounds );
-					dragBox = new AABox2( padding, padding + bounds[0], dragBarBox.getUpperX() - padding, padding + bounds[1] );
+					computeDragBoxBounds( visibleRange, dragBoxBounds );
+					visibleDragBox = new AABox2( padding, padding + dragBoxBounds[0], dragBarBox.getUpperX() - padding, padding + dragBoxBounds[1] );
 				}
 				else
 				{
 					throw new RuntimeException( "Invalid direction" );
 				}
 			}
-			return dragBox;
 		}
 		
 		
@@ -259,7 +223,8 @@ class ScrollBarHelper
 		@Override
 		public void onRangeModified(Range r)
 		{
-			dragBox = null;
+			dragBoxBounds = null;
+			visibleDragBox = null;
 			element.queueFullRedraw();
 		}
 	}

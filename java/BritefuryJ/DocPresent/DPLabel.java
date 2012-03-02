@@ -124,7 +124,7 @@ public class DPLabel extends DPElement
 
 
 		Paint textPaint;
-		if ( testFlag( FLAG_HOVER ) )
+		if ( isHoverActive() )
 		{
 			Paint hoverSymbolPaint = textStyleParams.getHoverTextPaint();
 			textPaint = hoverSymbolPaint != null  ?  hoverSymbolPaint  :  textStyleParams.getTextPaint();

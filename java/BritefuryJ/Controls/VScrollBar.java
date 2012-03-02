@@ -6,14 +6,10 @@
 //##************************
 package BritefuryJ.Controls;
 
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Util.Range;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Arrow;
 import BritefuryJ.Pres.Primitive.Box;
-import BritefuryJ.Pres.Primitive.Column;
-import BritefuryJ.Pres.Primitive.Primitive;
-import BritefuryJ.StyleSheet.StyleSheet;
 
 public class VScrollBar extends ScrollBar
 {
@@ -41,11 +37,5 @@ public class VScrollBar extends ScrollBar
 	protected Pres createDragBox(double scrollBarSize)
 	{
 		return new Box( scrollBarSize, 0.0 ).alignHCentre().alignVExpand();
-	}
-
-	protected Pres createScrollBarPres(double spacing, DPElement decArrowElement, DPElement dragBarElement, DPElement incArrowElement)
-	{
-		return StyleSheet.style( Primitive.columnSpacing.as( spacing ) ).applyTo( new Column( new Object[] {
-			    decArrowElement, dragBarElement, incArrowElement } ) );
 	}
 }

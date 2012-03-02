@@ -1657,6 +1657,11 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		}
 	}
 	
+	public boolean isHoverActive()
+	{
+		return testFlag( FLAG_HOVER );
+	}
+	
 
 	
 	
