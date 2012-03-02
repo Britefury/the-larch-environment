@@ -33,16 +33,16 @@ public class Controls
 	
 	
 	public static final InheritedAttributeNonNull buttonBorder = new InheritedAttributeNonNull( controlsNamespace, "buttonBorder", AbstractBorder.class,
-			new SolidBorder( 2.0, 2.0, 10.0, 10.0, new Color( 0.45f, 0.55f, 0.65f ), new Color( 0.85f, 0.9f, 0.95f  ) ) );
-	public static final InheritedAttributeNonNull buttonHighlightBorder = new InheritedAttributeNonNull( controlsNamespace, "buttonHighlightBorder", AbstractBorder.class,
-			new SolidBorder( 2.0, 2.0, 10.0, 10.0, new Color( 0.65f, 0.75f, 0.85f ), new Color( 0.95f, 0.975f, 1.0f ) ) );
+			new SolidBorder( 1.5, 2.0, 8.0, 8.0, new Color( 0.7f, 0.7f, 0.7f ), new Color( 0.925f, 0.925f, 0.925f  ), new Color( 0.6f, 0.6f, 0.6f ), new Color( 0.875f, 0.875f, 0.875f ) ) );
+	public static final InheritedAttributeNonNull buttonAttrs = new InheritedAttributeNonNull( controlsNamespace, "buttonAttrs", StyleSheet.class,
+			    StyleSheet.style( Primitive.foreground.as( new Color( 0, 111, 128 ) ) ) );
 	
 	
 //	public static final InheritedAttributeNonNull hyperlinkAttrs = new InheritedAttributeNonNull( controlsNamespace, "hyperlinkAttrs", StyleSheet.class,
 //		    StyleSheet.style( Primitive.editable.as( false ), Primitive.foreground.as( new Color( 222, 92, 66 ) ), Primitive.hoverForeground.as( Color.red ), Primitive.cursor.as( new Cursor( Cursor.HAND_CURSOR ) ) ) );
 
 	public static final InheritedAttributeNonNull hyperlinkAttrs = new InheritedAttributeNonNull( controlsNamespace, "hyperlinkAttrs", StyleSheet.class,
-			    StyleSheet.style( Primitive.editable.as( false ), Primitive.foreground.as( new Color( 0, 111, 128 ) ), Primitive.hoverForeground.as( Color.red ), Primitive.cursor.as( new Cursor( Cursor.HAND_CURSOR ) ) ) );
+			    StyleSheet.style( Primitive.editable.as( false ), Primitive.foreground.as( new Color( 0, 111, 128 ) ), Primitive.hoverForeground.as( new Color( 0.0f, 0.5f, 0.0f ) ), Primitive.cursor.as( new Cursor( Cursor.HAND_CURSOR ) ) ) );
 
 	public static final InheritedAttributeNonNull checkboxHoverBackground = new InheritedAttributeNonNull( controlsNamespace, "checkboxHoverBackground", Painter.class,
 			new OutlinePainter( new Color( 0.5f, 0.625f, 0.75f ) ) );
@@ -66,7 +66,9 @@ public class Controls
 	public static final InheritedAttributeNonNull dropDownExpanderHeaderContentsSpacing = new InheritedAttributeNonNull( controlsNamespace, "dropDownExpanderHeaderContentsSpacing", Double.class, 5.0 );
 	public static final InheritedAttributeNonNull dropDownExpanderHeaderArrowSize = new InheritedAttributeNonNull( controlsNamespace, "dropDownExpanderHeaderArrowSize", Double.class, 12.0 );
 	public static final InheritedAttributeNonNull dropDownExpanderHeaderArrowPainter = new InheritedAttributeNonNull( controlsNamespace, "dropDownExpanderHeaderArrowPainter", Painter.class,
-			new FilledOutlinePainter( new Color( 0.7f, 0.8f, 0.9f ), new Color( 0.0f, 0.25f, 0.5f ), new BasicStroke( 1.0f ) ) );
+			new FillPainter( new Color( 0, 111, 128 ) ) );
+	public static final InheritedAttributeNonNull dropDownExpanderHeaderBorder = new InheritedAttributeNonNull( controlsNamespace, "dropDownExpanderHeaderBorder", AbstractBorder.class,
+			new SolidBorder( 1.0, 2.0, 4.0, 4.0, new Color( 0.75f, 0.75f, 0.75f ), new Color( 0.95f, 0.95f, 0.95f ), new Color( 0.7f, 0.7f, 0.7f ), new Color( 0.9f, 0.9f, 0.9f ) ) );
 	public static final InheritedAttributeNonNull dropDownExpanderPadding = new InheritedAttributeNonNull( controlsNamespace, "dropDownExpanderPadding", Double.class, 21.0 );
 	
 	
@@ -164,7 +166,7 @@ public class Controls
 	
 	public static StyleValues useButtonAttrs(StyleValues style)
 	{
-		return style.useAttr( buttonBorder ).useAttr( buttonHighlightBorder );
+		return style.useAttr( buttonBorder ).useAttr( buttonAttrs );
 	}
 	
 	

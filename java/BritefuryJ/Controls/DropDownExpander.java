@@ -11,6 +11,7 @@ import BritefuryJ.DocPresent.Event.AbstractPointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Interactor.ClickElementInteractor;
+import BritefuryJ.Graphics.AbstractBorder;
 import BritefuryJ.Graphics.Painter;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
@@ -84,17 +85,21 @@ public class DropDownExpander extends Expander
 		StyleSheet arrowStyle = StyleSheet.style( Primitive.shapePainter.as( style.get( Controls.dropDownExpanderHeaderArrowPainter, Painter.class ) ) );
 		double arrowSize = style.get( Controls.dropDownExpanderHeaderArrowSize, Double.class );
 		double padding = style.get( Controls.dropDownExpanderPadding, Double.class );
+		AbstractBorder headerBorder = style.get( Controls.dropDownExpanderHeaderBorder, AbstractBorder.class );
+		
 		Pres expandedArrow = arrowStyle.applyTo( new Arrow( Arrow.Direction.DOWN, arrowSize ) );
 		Pres contractedArrow = arrowStyle.applyTo( new Arrow( Arrow.Direction.RIGHT, arrowSize ) );
 		
 		DropDownExpanderInteractor headerInteractor = new DropDownExpanderInteractor();
 
-		StyleSheet headerStyle = StyleSheet.style( Primitive.rowSpacing.as( style.get( Controls.dropDownExpanderHeaderContentsSpacing, Double.class ) ) );
+		StyleSheet headerRowStyle = StyleSheet.style( Primitive.rowSpacing.as( style.get( Controls.dropDownExpanderHeaderContentsSpacing, Double.class ) ) );
 		
-		Pres expandedHeader = headerStyle.applyTo( new Row( new Pres[] { expandedArrow.alignHPack().alignVCentre(), header.alignHExpand() } ) ).withElementInteractor( headerInteractor );
+		Pres expandedHeader = headerBorder.surround( headerRowStyle.applyTo( new Row( 
+				new Pres[] { expandedArrow.alignHPack().alignVCentre(), header.alignHExpand() } ) ) ).withElementInteractor( headerInteractor );
 		Pres expanded = new Column( new Pres[] { expandedHeader, contents.padX( padding ) } );
 
-		Pres contracted = headerStyle.applyTo( new Row( new Pres[] { contractedArrow.alignHPack().alignVCentre(), header.alignHExpand() } ) ).withElementInteractor( headerInteractor );
+		Pres contracted = headerBorder.surround( headerRowStyle.applyTo( new Row(
+				new Pres[] { contractedArrow.alignHPack().alignVCentre(),header.alignHExpand() } ) ) ).withElementInteractor( headerInteractor );
 
 		Pres expander = new Bin( initialState  ?  expanded  :  contracted );
 		DPBin expanderElement = (DPBin)expander.present( ctx, usedStyle );

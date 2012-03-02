@@ -6,18 +6,13 @@
 //##************************
 package BritefuryJ.Controls;
 
-import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
-import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.DocPresent.Interactor.HoverElementInteractor;
 import BritefuryJ.DocPresent.Interactor.PushElementInteractor;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
-import BritefuryJ.Pres.Primitive.Border;
 import BritefuryJ.Pres.Primitive.Label;
-import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
 
@@ -31,7 +26,7 @@ public class Button extends ControlPres
 	
 	public static class ButtonControl extends Control
 	{
-		private class ButtonInteractor implements PushElementInteractor, HoverElementInteractor
+		private class ButtonInteractor implements PushElementInteractor
 		{
 			private ButtonInteractor()
 			{
@@ -62,36 +57,20 @@ public class Button extends ControlPres
 			public void buttonRelease(PointerInputElement element, PointerButtonEvent event)
 			{
 			}
-
-			@Override
-			public void pointerEnter(PointerInputElement element, PointerMotionEvent event)
-			{
-				buttonElement.setBorder( highlightBorder );
-			}
-
-			@Override
-			public void pointerLeave(PointerInputElement element, PointerMotionEvent event)
-			{
-				buttonElement.setBorder( buttonBorder );
-			}
 		}
 		
 		
 		
-		private BritefuryJ.Graphics.AbstractBorder buttonBorder, highlightBorder;
-		private DPBorder buttonElement;
+		private DPElement buttonElement;
 		private ButtonListener listener;
 		private boolean bClosePopupOnActivate;
 	
 	
 		
-		protected ButtonControl(PresentationContext ctx, StyleValues style, DPBorder buttonElement, BritefuryJ.Graphics.AbstractBorder buttonBorder,
-				BritefuryJ.Graphics.AbstractBorder highlightBorder, ButtonListener listener, boolean bClosePopupOnActivate)
+		protected ButtonControl(PresentationContext ctx, StyleValues style, DPElement buttonElement, ButtonListener listener, boolean bClosePopupOnActivate)
 		{
 			super( ctx, style );
 			this.buttonElement = buttonElement;
-			this.buttonBorder = buttonBorder;
-			this.highlightBorder = highlightBorder;
 			this.listener = listener;
 			this.buttonElement.addElementInteractor( new ButtonInteractor() );
 		}
@@ -100,11 +79,6 @@ public class Button extends ControlPres
 		public DPElement getElement()
 		{
 			return buttonElement;
-		}
-		
-		public void setContents(DPElement contents)
-		{
-			buttonElement.setChild( contents );
 		}
 	}
 
@@ -133,12 +107,11 @@ public class Button extends ControlPres
 	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
 		BritefuryJ.Graphics.AbstractBorder border = style.get( Controls.buttonBorder, BritefuryJ.Graphics.AbstractBorder.class );
-		BritefuryJ.Graphics.AbstractBorder highlightBorder = style.get( Controls.buttonHighlightBorder, BritefuryJ.Graphics.AbstractBorder.class );
 		boolean bClosePopupOnActivate = style.get( Controls.bClosePopupOnActivate, Boolean.class );
 		
-		Pres childElement = presentAsCombinator( ctx, Controls.useButtonAttrs( style ), child );
-		DPBorder borderElement = (DPBorder)StyleSheet.style( Primitive.border.as( border ) ).applyTo( new Border( childElement.alignHCentre() ) ).present( ctx, style );
+		Pres childElement = presentAsCombinator( ctx, Controls.useButtonAttrs( style.withAttrs( style.get( Controls.buttonAttrs, StyleSheet.class ) ) ), child );
+		DPElement borderElement = border.surround( childElement.alignHCentre() ).present( ctx, style );
 		
-		return new ButtonControl( ctx, style, borderElement, border, highlightBorder, listener, bClosePopupOnActivate );
+		return new ButtonControl( ctx, style, borderElement, listener, bClosePopupOnActivate );
 	}
 }

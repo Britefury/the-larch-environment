@@ -13,9 +13,7 @@ import java.awt.geom.AffineTransform;
 
 import BritefuryJ.DocPresent.LayoutTree.LayoutNode;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeLabel;
-import BritefuryJ.DocPresent.LayoutTree.LayoutNodeText;
 import BritefuryJ.DocPresent.StyleParams.LabelStyleParams;
-import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 import BritefuryJ.DocPresent.Util.TextVisual;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -69,13 +67,13 @@ public class DPLabel extends DPElement
 	
 	private void onTextModified(String text)
 	{
-		TextStyleParams textStyleParams = (TextStyleParams) styleParams;
+		LabelStyleParams textStyleParams = (LabelStyleParams)styleParams;
 
 		TextVisual v = TextVisual.getTextVisual( text, textStyleParams.getFont(), textStyleParams.getUnderline(), textStyleParams.getStrikethrough(), textStyleParams.getMixedSizeCaps() );
 		if ( v != visual )
 		{
 			visual = v;
-			LayoutNodeText layout = (LayoutNodeText)getLayoutNode();
+			LayoutNodeLabel layout = (LayoutNodeLabel)getLayoutNode();
 			layout.setVisual( visual );
 			
 			queueResize();

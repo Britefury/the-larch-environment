@@ -27,7 +27,9 @@ public abstract class AbstractBorder implements Presentable
 	public abstract double getTopMargin();
 	public abstract double getBottomMargin();
 	
-	public void draw(Graphics2D graphics, double x, double y, double w, double h)
+	public abstract boolean isHighlightable();
+	
+	public void draw(Graphics2D graphics, double x, double y, double w, double h, boolean highlight)
 	{
 	}
 	
@@ -52,7 +54,7 @@ public abstract class AbstractBorder implements Presentable
 
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return new ObjectBox( getClass().getName(), StyleSheet.style( Primitive.border.as( this ) ).applyTo( new Border( presentationSwatch() ) ) );
+		return new ObjectBox( getClass().getName(), surround( presentationSwatch() ) );
 	}
 	
 	

@@ -14,40 +14,55 @@ import java.awt.geom.RoundRectangle2D;
 public class FilledBorder extends AbstractBorder
 {
 	private double leftMargin, rightMargin, topMargin, bottomMargin, roundingX, roundingY;
-	private Paint backgroundPaint;
+	private Paint backgroundPaint, highlightBackgroundPaint;
 	
 	
 	public FilledBorder()
 	{
-		this( 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, null );
-	}
-	
-	public FilledBorder(Paint backgroundPaint)
-	{
-		this( 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, backgroundPaint );
-	}
-	
-	public FilledBorder(double roundingX, double roundingY, Paint backgroundPaint)
-	{
-		this( 0.0, 0.0, 0.0, 0.0, roundingX, roundingY, backgroundPaint );
+		this( 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, null, null );
 	}
 	
 	public FilledBorder(double leftMargin, double rightMargin, double topMargin, double bottomMargin)
 	{
-		this( leftMargin, rightMargin, topMargin, bottomMargin, 0.0, 0.0, null );
+		this( leftMargin, rightMargin, topMargin, bottomMargin, 0.0, 0.0, null, null );
 	}
 	
-	public FilledBorder(double leftMargin, double rightMargin, double topMargin, double bottomMargin, double roundingX, double roundingY)
+	public FilledBorder(Paint backgroundPaint)
 	{
-		this( leftMargin, rightMargin, topMargin, bottomMargin, roundingX, roundingY, null );
+		this( 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, backgroundPaint, null );
+	}
+	
+	public FilledBorder(double roundingX, double roundingY, Paint backgroundPaint)
+	{
+		this( 0.0, 0.0, 0.0, 0.0, roundingX, roundingY, backgroundPaint, null );
 	}
 	
 	public FilledBorder(double leftMargin, double rightMargin, double topMargin, double bottomMargin, Paint backgroundPaint)
 	{
-		this( leftMargin, rightMargin, topMargin, bottomMargin, 0.0, 0.0, backgroundPaint );
+		this( leftMargin, rightMargin, topMargin, bottomMargin, 0.0, 0.0, backgroundPaint, null );
 	}
 	
 	public FilledBorder(double leftMargin, double rightMargin, double topMargin, double bottomMargin, double roundingX, double roundingY, Paint backgroundPaint)
+	{
+		this( leftMargin, rightMargin, topMargin, bottomMargin, roundingX, roundingY, backgroundPaint, null );
+	}
+
+	public FilledBorder(Paint backgroundPaint, Paint highlightBackgroundPaint)
+	{
+		this( 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, backgroundPaint, highlightBackgroundPaint );
+	}
+	
+	public FilledBorder(double roundingX, double roundingY, Paint backgroundPaint, Paint highlightBackgroundPaint)
+	{
+		this( 0.0, 0.0, 0.0, 0.0, roundingX, roundingY, backgroundPaint, highlightBackgroundPaint );
+	}
+	
+	public FilledBorder(double leftMargin, double rightMargin, double topMargin, double bottomMargin, Paint backgroundPaint, Paint highlightBackgroundPaint)
+	{
+		this( leftMargin, rightMargin, topMargin, bottomMargin, 0.0, 0.0, backgroundPaint, highlightBackgroundPaint );
+	}
+	
+	public FilledBorder(double leftMargin, double rightMargin, double topMargin, double bottomMargin, double roundingX, double roundingY, Paint backgroundPaint, Paint highlightBackgroundPaint)
 	{
 		this.leftMargin = leftMargin;
 		this.rightMargin = rightMargin;
@@ -56,6 +71,7 @@ public class FilledBorder extends AbstractBorder
 		this.roundingX = roundingX;
 		this.roundingY = roundingY;
 		this.backgroundPaint = backgroundPaint;
+		this.highlightBackgroundPaint = highlightBackgroundPaint;
 	}
 	
 	
@@ -79,13 +95,22 @@ public class FilledBorder extends AbstractBorder
 	{
 		return bottomMargin;
 	}
-
-	public void draw(Graphics2D graphics, double x, double y, double w, double h)
+	
+	
+	@Override
+	public boolean isHighlightable()
 	{
-		if ( backgroundPaint != null )
+		return highlightBackgroundPaint != null;
+	}
+
+	@Override
+	public void draw(Graphics2D graphics, double x, double y, double w, double h, boolean highlight)
+	{
+		Paint p = highlight  &&  highlightBackgroundPaint != null   ?   highlightBackgroundPaint   :   backgroundPaint;
+		if ( p != null )
 		{
 			Paint prevPaint = graphics.getPaint();
-			graphics.setPaint( backgroundPaint );
+			graphics.setPaint( p );
 			if ( roundingX != 0.0  ||  roundingY != 0.0 )
 			{
 				graphics.fill( new RoundRectangle2D.Double( x, y, w, h, roundingX, roundingY ) );
@@ -101,6 +126,6 @@ public class FilledBorder extends AbstractBorder
 	
 	public String toString()
 	{
-		return "FilledBorder( " + leftMargin + ", " + rightMargin + ", " + topMargin + ", " + bottomMargin + ", " + roundingX + ", " + roundingY + ", " + backgroundPaint + " )";
+		return "FilledBorder( " + leftMargin + ", " + rightMargin + ", " + topMargin + ", " + bottomMargin + ", " + roundingX + ", " + roundingY + ", " + backgroundPaint + ", " + highlightBackgroundPaint +" )";
 	}
 }

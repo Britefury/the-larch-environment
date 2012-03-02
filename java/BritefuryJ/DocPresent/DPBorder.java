@@ -86,9 +86,14 @@ public class DPBorder extends DPBin
 	}
 	
 	
+	public boolean isRedrawRequiredOnHover()
+	{
+		return super.isRedrawRequiredOnHover()  ||  border.isHighlightable();
+	}
+	
 	
 	protected void drawBackground(Graphics2D graphics)
 	{
-		border.draw( graphics, 0.0, 0.0, getActualWidth(), getActualHeight() );
+		border.draw( graphics, 0.0, 0.0, getActualWidth(), getActualHeight(), isHoverActive() );
 	}
 }

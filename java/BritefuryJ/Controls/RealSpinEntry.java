@@ -153,7 +153,7 @@ public class RealSpinEntry extends SpinEntry
 	
 	protected Pattern getValidationPattern()
 	{
-		return Pattern.compile( "[\\-]?(([0-9]+\\.[0-9]*)|(\\.[0-9]+))(e[\\-]?[0-9]+)?" );
+		return Pattern.compile( "([\\-]?(([0-9]+\\.[0-9]*)|(\\.[0-9]+))(e[\\-]?[0-9]+)?)|([0-9]+)" );
 	}
 	
 	protected String getValidationFailMessage()
