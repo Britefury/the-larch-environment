@@ -34,20 +34,20 @@ public class RichText
 	private static final Color blueH6Colour = Color.BLACK;
 	
 	// Green theme
-	private static final Color greenH1Colour = new Color( 109, 140, 91 );
+	/*private static final Color greenH1Colour = new Color( 109, 140, 91 );
 	private static final Color greenH2Colour = new Color( 85, 115, 69 );
 	private static final Color greenH3Colour = new Color( 64, 89, 49 );
 	private static final Color greenH4Colour = new Color( 99, 128, 83 );
 	private static final Color greenH5Colour = new Color( 76, 102, 61 );
-	private static final Color greenH6Colour = new Color( 55, 76, 42 );
+	private static final Color greenH6Colour = new Color( 55, 76, 42 );*/
 	
 	// Burgundy theme
-	private static final Color burgundyH1Colour = new Color( 115, 42, 96 );
+	/*private static final Color burgundyH1Colour = new Color( 115, 42, 96 );
 	private static final Color burgundyH2Colour = new Color( 89, 29, 73 );
 	private static final Color burgundyH3Colour = new Color( 64, 17, 52 );
 	private static final Color burgundyH4Colour = new Color( 102, 37, 85 );
 	private static final Color burgundyH5Colour = new Color( 76, 24, 63 );
-	private static final Color burgundyH6Colour = new Color( 51, 14, 41 );
+	private static final Color burgundyH6Colour = new Color( 51, 14, 41 );*/
 	
 	
 	public static final AttributeNamespace richTextNamespace = new AttributeNamespace( "richtext" );

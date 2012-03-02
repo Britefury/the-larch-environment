@@ -119,16 +119,18 @@ public class Controls
 			new FilledOutlinePainter( new Color( 1.0f, 1.0f, 1.0f ), new Color( 0.5f, 0.5f, 0.5f ), new BasicStroke( 1.0f ) ) );*/
 	public static final InheritedAttributeNonNull scrollBarDragBoxPainter = new InheritedAttributeNonNull( controlsNamespace, "scrollBarDragBoxPainter", Painter.class,
 			new FilledOutlinePainter( new Color( 0.9f, 0.9f, 0.9f ), new Color( 0.8f, 0.8f, 0.8f ), new BasicStroke( 1.0f ) ) );
+	/*public static final InheritedAttributeNonNull scrollBarDragBoxHoverPainter = new InheritedAttributeNonNull( controlsNamespace, "scrollBarDragBoxHoverPainter", Painter.class,
+			new FillPainter( new Color( 201, 45, 7 ) ) );*/
 	public static final InheritedAttributeNonNull scrollBarDragBoxHoverPainter = new InheritedAttributeNonNull( controlsNamespace, "scrollBarDragBoxHoverPainter", Painter.class,
-			new FillPainter( new Color( 201, 45, 7 ) ) );
+			new FillPainter( new Color( 0, 111, 128 ) ) );
 	public static final InheritedAttributeNonNull scrollBarDragBarBackgroundPainter = new InheritedAttributeNonNull( controlsNamespace, "scrollBarDragBarBackgroundPainter", Painter.class,
 			new FillPainter( Color.WHITE ) );
 	public static final InheritedAttribute scrollBarDragBackgroundHoverPainter = new InheritedAttribute( controlsNamespace, "scrollBarDragBackgroundHoverPainter", Painter.class,
 			new FilledOutlinePainter( Color.WHITE, new Color( 0.75f, 0.75f, 0.75f ), new BasicStroke( 1.0f ) ) );
-	public static final InheritedAttributeNonNull scrollBarArrowDragboxPadding = new InheritedAttributeNonNull( controlsNamespace, "scrollBarArrowDragboxPadding", Double.class, 3.0 );
+	public static final InheritedAttributeNonNull scrollBarArrowDragboxPadding = new InheritedAttributeNonNull( controlsNamespace, "scrollBarArrowDragboxPadding", Double.class, 2.0 );
 	public static final InheritedAttributeNonNull scrollBarArrowDragboxRounding = new InheritedAttributeNonNull( controlsNamespace, "scrollBarArrowDragboxRounding", Double.class, 4.0 );
 	public static final InheritedAttributeNonNull scrollBarArrowDragboxMinSize = new InheritedAttributeNonNull( controlsNamespace, "scrollBarArrowDragboxMinSize", Double.class, 9.0 );
-	public static final InheritedAttributeNonNull scrollBarSize = new InheritedAttributeNonNull( controlsNamespace, "scrollBarSize", Double.class, 17.0 );
+	public static final InheritedAttributeNonNull scrollBarSize = new InheritedAttributeNonNull( controlsNamespace, "scrollBarSize", Double.class, 16.0 );
 	
 	
 	public static final InheritedAttributeNonNull objectDropBoxClassNameStyle = new InheritedAttributeNonNull( controlsNamespace, "objectDropBoxClassNameStyle", StyleSheet.class,
