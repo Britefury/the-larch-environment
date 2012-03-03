@@ -6,10 +6,10 @@
 //##************************
 package BritefuryJ.Controls;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
-import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.DocPresent.Interactor.PushElementInteractor;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Event.PointerButtonEvent;
+import BritefuryJ.LSpace.Input.PointerInputElement;
+import BritefuryJ.LSpace.Interactor.PushElementInteractor;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Label;
@@ -36,7 +36,7 @@ public class Button extends ControlPres
 			@Override
 			public boolean buttonPress(PointerInputElement element, PointerButtonEvent event)
 			{
-				DPElement buttonElement = (DPElement)element;
+				LSElement buttonElement = (LSElement)element;
 				if ( buttonElement.isRealised() )
 				{
 					if ( listener != null )
@@ -61,13 +61,13 @@ public class Button extends ControlPres
 		
 		
 		
-		private DPElement buttonElement;
+		private LSElement buttonElement;
 		private ButtonListener listener;
 		private boolean bClosePopupOnActivate;
 	
 	
 		
-		protected ButtonControl(PresentationContext ctx, StyleValues style, DPElement buttonElement, ButtonListener listener, boolean bClosePopupOnActivate)
+		protected ButtonControl(PresentationContext ctx, StyleValues style, LSElement buttonElement, ButtonListener listener, boolean bClosePopupOnActivate)
 		{
 			super( ctx, style );
 			this.buttonElement = buttonElement;
@@ -76,7 +76,7 @@ public class Button extends ControlPres
 		}
 		
 		
-		public DPElement getElement()
+		public LSElement getElement()
 		{
 			return buttonElement;
 		}
@@ -110,7 +110,7 @@ public class Button extends ControlPres
 		boolean bClosePopupOnActivate = style.get( Controls.bClosePopupOnActivate, Boolean.class );
 		
 		Pres childElement = presentAsCombinator( ctx, Controls.useButtonAttrs( style.withAttrs( style.get( Controls.buttonAttrs, StyleSheet.class ) ) ), child );
-		DPElement borderElement = border.surround( childElement.alignHCentre() ).present( ctx, style );
+		LSElement borderElement = border.surround( childElement.alignHCentre() ).present( ctx, style );
 		
 		return new ButtonControl( ctx, style, borderElement, listener, bClosePopupOnActivate );
 	}
