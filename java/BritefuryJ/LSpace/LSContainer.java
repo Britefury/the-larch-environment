@@ -14,7 +14,6 @@ import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.LSpace.Event.PointerMotionEvent;
 import BritefuryJ.LSpace.LayoutTree.BranchLayoutNode;
-import BritefuryJ.LSpace.Marker.Marker;
 import BritefuryJ.LSpace.StyleParams.ContainerStyleParams;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
@@ -221,57 +220,6 @@ public abstract class LSContainer extends LSElement
 		return 0;
 	}
 	
-	
-	
-	
-	//
-	//
-	// MARKER METHODS
-	//
-	//
-	
-	public Marker markerAtStart()
-	{
-		for (LSElement child: getChildren())
-		{
-			Marker m = child.markerAtStart();
-			if ( m != null )
-			{
-				return m;
-			}
-		}
-		
-		return super.markerAtStart();
-	}
-	
-	public Marker markerAtEnd()
-	{
-		List<LSElement> children = getChildren();
-		for (int i = children.size() - 1; i >= 0; i--)
-		{
-			LSElement child = children.get( i );
-			Marker m = child.markerAtEnd();
-			if ( m != null )
-			{
-				return m;
-			}
-		}
-		
-		return super.markerAtEnd();
-	}
-	
-	
-	@Override
-	public void moveMarkerToStart(Marker m)
-	{
-		m.moveTo( markerAtStart() );
-	}
-	
-	@Override
-	public void moveMarkerToEnd(Marker m)
-	{
-		m.moveTo( markerAtEnd() );
-	}
 	
 	
 	

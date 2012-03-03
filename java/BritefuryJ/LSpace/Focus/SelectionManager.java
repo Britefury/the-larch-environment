@@ -56,8 +56,8 @@ public class SelectionManager
 	
 	public void selectElement(LSElement element)
 	{
-		Marker start = element.markerAtStart();
-		Marker end = element.markerAtEnd();
+		Marker start = Marker.atStartOf( element, false );
+		Marker end = Marker.atEndOf( element, false );
 		if ( start != null  &&  start.isValid()  &&  end != null  &&  end.isValid() )
 		{
 			initialPoint = new TextSelectionPoint( start );

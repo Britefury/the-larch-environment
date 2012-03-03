@@ -9,9 +9,9 @@ package BritefuryJ.IncrementalView;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 
-import BritefuryJ.LSpace.LSContentLeaf;
-import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.ElementFilter;
+import BritefuryJ.LSpace.LSContentLeafEditable;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Focus.Selection;
 import BritefuryJ.LSpace.Marker.Marker;
 import BritefuryJ.LSpace.Marker.Marker.Bias;
@@ -26,7 +26,7 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 	
 	
 	
-	public static class MonitoredMarker
+	public class MonitoredMarker
 	{
 		private Marker marker;
 		private ElementFilter leafFilter;
@@ -50,7 +50,7 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 		{
 			if ( canReposition() )
 			{
-				return Marker.markerAtPositionAndBiasWithinSubtree( state.subtree, state.position, state.bias, leafFilter );
+				return Marker.markerAtPositionAndBiasWithinSubtree( state.subtree, view.getPresentationRootElement().getDefaultTextRepresentationManager(), state.position, state.bias, leafFilter );
 			}
 			else
 			{
@@ -315,10 +315,12 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 	private ArrayList<MonitoredMarker> markers = new ArrayList<MonitoredMarker>();
 	
 	private MonitoredMarker caretMon, selStartMon, selEndMon;
+	private IncrementalView view;
 	
 	
 	public NodeElementChangeListenerDiff(IncrementalView view)
 	{
+		this.view = view;
 	}
 	
 	
@@ -336,7 +338,7 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 		Caret caret = view.getCaret();
 		if ( caret != null  &&  caret.isValid() )
 		{
-			caretMon = monitorMarker( caret.getMarker(), new LSContentLeaf.EditableLeafElementFilter() );
+			caretMon = monitorMarker( caret.getMarker(), LSContentLeafEditable.editableRealisedLeafElementFilter );
 		}
 		
 		Selection selection = view.getSelection();

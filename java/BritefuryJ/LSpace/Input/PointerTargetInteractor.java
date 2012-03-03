@@ -88,7 +88,7 @@ public class PointerTargetInteractor
 				{
 					// Attempt to position the caret
 					Point2 windowPos = event.getLocalPointerPos();
-					Marker editableMarker = rootElement.getEditableMarkerClosestToLocalPoint( windowPos );
+					Marker editableMarker = Marker.atPointIn( rootElement, windowPos, true );
 					
 					if ( editableMarker != null )
 					{
@@ -99,7 +99,7 @@ public class PointerTargetInteractor
 						bHandled = true;
 					}
 		
-					Marker selectableMarker = rootElement.getSelectableMarkerClosestToLocalPoint( windowPos );
+					Marker selectableMarker = Marker.atPointIn( rootElement, windowPos, false );
 					if ( selectableMarker != null )
 					{
 						startPoint = new TextSelectionPoint( selectableMarker );
@@ -156,7 +156,7 @@ public class PointerTargetInteractor
 				// Drag the caret and text selection
 
 				Point2 windowPos = event.getLocalPointerPos();
-				Marker editableMarker = rootElement.getEditableMarkerClosestToLocalPoint( windowPos );
+				Marker editableMarker = Marker.atPointIn( rootElement, windowPos, true );
 				if ( editableMarker != null )
 				{
 					Caret caret = rootElement.getCaret();
@@ -164,7 +164,7 @@ public class PointerTargetInteractor
 					caret.makeCurrentTarget();
 				}
 
-				Marker selectableMarker = rootElement.getSelectableMarkerClosestToLocalPoint( windowPos );
+				Marker selectableMarker = Marker.atPointIn( rootElement, windowPos, false );
 				if ( selectableMarker != null )
 				{
 					selCurrent = new TextSelectionPoint( selectableMarker );
@@ -208,7 +208,7 @@ public class PointerTargetInteractor
 						Caret caret = rootElement.getCaret();
 						SelectionManager selectionManager = rootElement.getSelectionManager();
 						
-						caret.moveTo( elementToSelect.markerAtEnd() );
+						caret.moveTo( Marker.atEndOf( elementToSelect, true ) );
 						caret.makeCurrentTarget();
 						selectionManager.selectElement( elementToSelect );
 						return true;

@@ -17,38 +17,6 @@ import BritefuryJ.Pres.ObjectPres.UnescapedStringAsRow;
 
 public abstract class LSContentLeaf extends LSElement
 {
-	public static class EditableLeafElementFilter implements ElementFilter
-	{
-		public boolean testElement(LSElement element)
-		{
-			if ( element instanceof LSContentLeaf )
-			{
-				return ((LSContentLeaf)element).isEditable();
-			}
-			else
-			{
-				return false;
-			}
-		}
-	}
-	
-	public static class SelectableLeafElementFilter implements ElementFilter
-	{
-		public boolean testElement(LSElement element)
-		{
-			if ( element instanceof LSContentLeaf )
-			{
-				return ((LSContentLeaf)element).isSelectable();
-			}
-			else
-			{
-				return false;
-			}
-		}
-	}
-	
-	
-	
 	public static class CannotCreateMarkerWithEmptyContent extends RuntimeException
 	{
 		static final long serialVersionUID = 0L;
@@ -120,17 +88,6 @@ public abstract class LSContentLeaf extends LSElement
 
 	
 
-	public LSContentLeaf getPreviousLeaf()
-	{
-		return getPreviousLeaf( null, null, null );
-	}
-
-	public LSContentLeaf getNextLeaf()
-	{
-		return getNextLeaf( null, null, null );
-	}
-
-
 	public LSContentLeaf getPreviousLeaf(ElementFilter subtreeRootFilter, ElementFilter branchFilter, ElementFilter leafFilter)
 	{
 		if ( parent != null )
@@ -156,45 +113,56 @@ public abstract class LSContentLeaf extends LSElement
 	}
 	
 	
-	public LSContentLeaf getPreviousEditableLeaf(ElementFilter subtreeRootFilter, ElementFilter branchFilter)
+	public LSContentLeaf getPreviousLeaf()
 	{
-		return getPreviousLeaf( subtreeRootFilter, branchFilter, new LSContentLeafEditable.EditableLeafElementFilter() );
+		return getPreviousLeaf( null, null, null );
 	}
 
-	public LSContentLeaf getNextEditableLeaf(ElementFilter subtreeRootFilter, ElementFilter branchFilter)
+	public LSContentLeaf getNextLeaf()
 	{
-		return getNextLeaf( subtreeRootFilter, branchFilter, new LSContentLeafEditable.EditableLeafElementFilter() );
+		return getNextLeaf( null, null, null );
+	}
+
+	
+	public LSContentLeafEditable getPreviousEditableLeaf(ElementFilter subtreeRootFilter, ElementFilter branchFilter)
+	{
+		return (LSContentLeafEditable)getPreviousLeaf( subtreeRootFilter, branchFilter, LSContentLeafEditable.editableLeafElementFilter );
+	}
+
+	public LSContentLeafEditable getNextEditableLeaf(ElementFilter subtreeRootFilter, ElementFilter branchFilter)
+	{
+		return (LSContentLeafEditable)getNextLeaf( subtreeRootFilter, branchFilter, LSContentLeafEditable.editableLeafElementFilter );
 	}
 
 
-	public LSContentLeaf getPreviousEditableLeaf()
+	public LSContentLeafEditable getPreviousEditableLeaf()
 	{
 		return getPreviousEditableLeaf( null, null );
 	}
 
-	public LSContentLeaf getNextEditableLeaf()
+	public LSContentLeafEditable getNextEditableLeaf()
 	{
 		return getNextEditableLeaf( null, null );
 	}
 
 	
-	public LSContentLeaf getPreviousSelectableLeaf(ElementFilter subtreeRootFilter, ElementFilter branchFilter)
+	public LSContentLeafEditable getPreviousSelectableLeaf(ElementFilter subtreeRootFilter, ElementFilter branchFilter)
 	{
-		return getPreviousLeaf( subtreeRootFilter, branchFilter, new LSContentLeafEditable.SelectableLeafElementFilter() );
+		return (LSContentLeafEditable)getPreviousLeaf( subtreeRootFilter, branchFilter, LSContentLeafEditable.selectableLeafElementFilter );
 	}
 
-	public LSContentLeaf getNextSelectableLeaf(ElementFilter subtreeRootFilter, ElementFilter branchFilter)
+	public LSContentLeafEditable getNextSelectableLeaf(ElementFilter subtreeRootFilter, ElementFilter branchFilter)
 	{
-		return getNextLeaf( subtreeRootFilter, branchFilter, new LSContentLeafEditable.SelectableLeafElementFilter() );
+		return (LSContentLeafEditable)getNextLeaf( subtreeRootFilter, branchFilter, LSContentLeafEditable.selectableLeafElementFilter );
 	}
 
 
-	public LSContentLeaf getPreviousSelectableLeaf()
+	public LSContentLeafEditable getPreviousSelectableLeaf()
 	{
 		return getPreviousSelectableLeaf( null, null );
 	}
 
-	public LSContentLeaf getNextSelectableLeaf()
+	public LSContentLeafEditable getNextSelectableLeaf()
 	{
 		return getNextSelectableLeaf( null, null );
 	}

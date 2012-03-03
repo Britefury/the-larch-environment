@@ -12,6 +12,7 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.event.KeyEvent;
 
+import BritefuryJ.LSpace.AbstractTextRepresentationManager;
 import BritefuryJ.LSpace.LSContentLeaf;
 import BritefuryJ.LSpace.LSContentLeafEditable;
 import BritefuryJ.LSpace.LSElement;
@@ -20,6 +21,7 @@ import BritefuryJ.LSpace.PresentationComponent;
 import BritefuryJ.LSpace.Focus.SelectionPoint;
 import BritefuryJ.LSpace.Focus.Target;
 import BritefuryJ.LSpace.Marker.Marker;
+import BritefuryJ.LSpace.Marker.Marker.CannotFindLeafInSubtreeException;
 import BritefuryJ.LSpace.Marker.MarkerListener;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Util.AnimUtils;
@@ -239,7 +241,14 @@ public class Caret extends Target implements MarkerListener
 				LSContentLeafEditable current = getElement(); 
 				if ( current == null  ||  !current.isInSubtreeRootedAt( grabElement ) )
 				{
-					grabElement.moveMarkerToStart( marker );
+					try
+					{
+						marker.moveToStartOf( grabElement, true );
+					}
+					catch (CannotFindLeafInSubtreeException e)
+					{
+						System.err.println( "Caret.grab(): could not find element to move caret into" );
+					}
 				}
 			}
 		}
@@ -280,7 +289,7 @@ public class Caret extends Target implements MarkerListener
 	{
 		LSContentLeafEditable leaf = marker.getElement();
 		
-		if ( leaf.isMarkerAtStart( marker ) )
+		if ( marker.isAtStartOf( leaf ) )
 		{
 			LSContentLeaf left = leaf.getContentLeafToLeft();
 			boolean bSkippedLeaves = false;
@@ -297,17 +306,17 @@ public class Caret extends Target implements MarkerListener
 				LSContentLeafEditable editableLeft = (LSContentLeafEditable)left;
 				if ( bSkippedLeaves )
 				{
-					editableLeft.moveMarkerToEnd( marker );
+					marker.moveToEndOfLeaf( editableLeft );
 				}
 				else
 				{
-					editableLeft.moveMarkerToEndMinusOne( marker );
+					marker.moveToEndOfLeafMinusOne( editableLeft );
 				}
 			}
 		}
 		else
 		{
-			leaf.moveMarker( marker, marker.getIndex() - 1, Marker.Bias.START );
+			marker.moveTo( leaf, marker.getIndex() - 1, Marker.Bias.START );
 		}
 	}
 
@@ -316,7 +325,7 @@ public class Caret extends Target implements MarkerListener
 	{
 		LSContentLeafEditable leaf = marker.getElement();
 		
-		if ( leaf.isMarkerAtEnd( marker ) )
+		if ( marker.isAtEndOf( leaf ) )
 		{
 			LSContentLeaf right = leaf.getContentLeafToRight();
 			boolean bSkippedLeaves = false;
@@ -333,17 +342,17 @@ public class Caret extends Target implements MarkerListener
 				LSContentLeafEditable editableRight = (LSContentLeafEditable)right;
 				if ( bSkippedLeaves )
 				{
-					editableRight.moveMarkerToStart( marker );
+					marker.moveToStartOfLeaf( editableRight );
 				}
 				else
 				{
-					editableRight.moveMarkerToStartPlusOne( marker );
+					marker.moveToStartOfLeafPlusOne( editableRight );
 				}
 			}
 		}
 		else
 		{
-			leaf.moveMarker( marker, marker.getIndex(), Marker.Bias.END );
+			marker.moveTo( leaf, marker.getIndex(), Marker.Bias.END );
 		}
 	}
 	
@@ -358,7 +367,7 @@ public class Caret extends Target implements MarkerListener
 		{
 			Point2 cursorPosInAbove = leaf.getLocalPointRelativeTo( above, cursorPos );
 			int contentPos = above.getMarkerPositonForPoint( cursorPosInAbove );
-			above.moveMarker( marker, contentPos, Marker.Bias.START );
+			marker.moveTo( above, contentPos, Marker.Bias.START );
 		}
 	}
 	
@@ -373,7 +382,7 @@ public class Caret extends Target implements MarkerListener
 		{
 			Point2 cursorPosInBelow = leaf.getLocalPointRelativeTo( below, cursorPos );
 			int contentPos = below.getMarkerPositonForPoint( cursorPosInBelow );
-			below.moveMarker( marker, contentPos, Marker.Bias.START );
+			marker.moveTo( below, contentPos, Marker.Bias.START );
 		}
 	}
 	
@@ -387,7 +396,7 @@ public class Caret extends Target implements MarkerListener
 		LSContentLeaf homeElement = null;
 		segment = leaf.getSegment();
 		homeElement = segment != null  ?  segment.getFirstEditableLeafInSubtree()  :  null;
-		if ( segment != null  &&  leaf == homeElement  &&  leaf.isMarkerAtStart( marker ) )
+		if ( segment != null  &&  leaf == homeElement  &&  marker.isAtStartOf( leaf ) )
 		{
 			segment = segment.getParent().getSegment();
 			homeElement = segment != null  ?  segment.getFirstEditableLeafInSubtree()  :  null;
@@ -415,7 +424,7 @@ public class Caret extends Target implements MarkerListener
 		LSContentLeaf endElement = null;
 		segment = leaf.getSegment();
 		endElement = segment != null  ?  segment.getLastEditableLeafInSubtree()  :  null;
-		if ( segment != null  &&  leaf == endElement  &&  leaf.isMarkerAtEnd( marker ) )
+		if ( segment != null  &&  leaf == endElement  &&  marker.isAtEndOf( leaf ) )
 		{
 			segment = segment.getParent().getSegment();
 			endElement = segment != null  ?  segment.getLastEditableLeafInSubtree()  :  null;
@@ -457,14 +466,14 @@ public class Caret extends Target implements MarkerListener
 		{
 			if ( leaf.isEditable() )
 			{
-				moveTo( leaf.markerAtStart() );
+				moveTo( Marker.atStartOfLeaf( leaf ) );
 			}
 			else
 			{
-				LSContentLeaf right = leaf.getNextLeaf( new LSElement.SubtreeElementFilter( element ), null, new LSContentLeaf.EditableLeafElementFilter() );
+				LSContentLeafEditable right = (LSContentLeafEditable)leaf.getNextLeaf( new LSElement.SubtreeElementFilter( element ), null, LSContentLeafEditable.editableRealisedLeafElementFilter );
 				if ( right != null  &&  right.isRealised() )
 				{
-					moveTo( right.markerAtStart() );
+					moveTo( Marker.atStartOfLeaf( right ) );
 				}
 			}
 		}
@@ -478,23 +487,23 @@ public class Caret extends Target implements MarkerListener
 		{
 			if ( leaf.isEditable() )
 			{
-				moveTo( leaf.markerAtEnd() );
+				moveTo( Marker.atEndOfLeaf( leaf ) );
 			}
 			else
 			{
-				LSContentLeaf left = leaf.getPreviousLeaf( new LSElement.SubtreeElementFilter( element ), null, new LSContentLeaf.EditableLeafElementFilter() );
+				LSContentLeafEditable left = (LSContentLeafEditable)leaf.getPreviousLeaf( new LSElement.SubtreeElementFilter( element ), null, LSContentLeafEditable.editableRealisedLeafElementFilter );
 				if ( left != null  &&  left.isRealised() )
 				{
-					moveTo( left.markerAtEnd() );
+					moveTo( Marker.atEndOfLeaf( left ) );
 				}
 			}
 		}
 	}
 	
 	
-	public void moveToPositionAndBiasWithinSubtree(LSElement subtree, int newPosition, Marker.Bias newBias)
+	public void moveToPositionAndBiasWithinSubtree(LSElement subtree, AbstractTextRepresentationManager textRepManager, int newPosition, Marker.Bias newBias)
 	{
-		marker.moveToPositionAndBiasWithinSubtree( subtree, newPosition, newBias, new LSContentLeaf.EditableLeafElementFilter() );
+		marker.moveToPositionAndBiasWithinSubtree( subtree, textRepManager, newPosition, newBias, LSContentLeafEditable.editableRealisedLeafElementFilter );
 	}
 
 
@@ -504,7 +513,7 @@ public class Caret extends Target implements MarkerListener
 		{
 			LSContentLeafEditable leaf = marker.getElement();
 			
-			if ( leaf.isMarkerAtEnd( marker ) )
+			if ( marker.isAtEndOf( leaf ) )
 			{
 				LSContentLeaf right = leaf.getContentLeafToRight();
 				
@@ -516,12 +525,12 @@ public class Caret extends Target implements MarkerListener
 				if ( right != null  &&  isElementWithinGrabSubtree( right ) )
 				{
 					LSContentLeafEditable editableRight = (LSContentLeafEditable)right;
-					editableRight.moveMarkerToStart( marker );
+					marker.moveToStartOfLeaf( editableRight );
 				}
 			}
 			else
 			{
-				leaf.moveMarker( marker, marker.getIndex(), Marker.Bias.START );
+				marker.moveTo( leaf, marker.getIndex(), Marker.Bias.START );
 			}
 		}
 	}
