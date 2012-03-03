@@ -8,7 +8,7 @@ package BritefuryJ.Pres.RichText;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Column;
@@ -36,7 +36,7 @@ public class TitleBar extends Pres
 
 
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		double borderWidth = style.get( RichText.titleBorderWidth, Double.class );
 		Pres titlePres = title.alignHCentre().pad( borderWidth, borderWidth );

@@ -19,16 +19,16 @@ import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.ChangeHistory.ChangeHistory;
 import BritefuryJ.DefaultPerspective.DefaultPerspective;
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.PresentationComponent;
-import BritefuryJ.DocPresent.Caret.Caret;
-import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
-import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
-import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.Editor.Table.ObjectList.AttributeColumn;
 import BritefuryJ.Editor.Table.ObjectList.ObjectListInterface;
 import BritefuryJ.Editor.Table.ObjectList.ObjectListTableEditor;
 import BritefuryJ.Incremental.IncrementalValueMonitor;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.PresentationComponent;
+import BritefuryJ.LSpace.Caret.Caret;
+import BritefuryJ.LSpace.PersistentState.PersistentStateStore;
+import BritefuryJ.LSpace.PersistentState.PersistentStateTable;
+import BritefuryJ.LSpace.Selection.Selection;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
@@ -63,8 +63,8 @@ public class IncrementalView
 	{
 		public void begin(IncrementalView view);
 		public void end(IncrementalView view);
-		public void elementChangeFrom(FragmentView node, DPElement e);
-		public void elementChangeTo(FragmentView node, DPElement e);
+		public void elementChangeFrom(FragmentView node, LSElement e);
+		public void elementChangeTo(FragmentView node, LSElement e);
 	}
 	
 	
@@ -160,7 +160,7 @@ public class IncrementalView
 
 		
 		
-		public DPElement createFragmentElement(IncrementalView view, FragmentView incrementalNode, Object model)
+		public LSElement createFragmentElement(IncrementalView view, FragmentView incrementalNode, Object model)
 		{
 			view.profile_startPresBuild();
 
@@ -181,7 +181,7 @@ public class IncrementalView
 					fragment = new ErrorBox( "Presentation error - exception during presentation", exceptionView );
 					view.profile_stopPresBuild();
 					view.profile_startPresToElements();
-					DPElement element = fragment.present( new PresentationContext( fragmentView, DefaultPerspective.instance, inheritedState ), style );
+					LSElement element = fragment.present( new PresentationContext( fragmentView, DefaultPerspective.instance, inheritedState ), style );
 					view.profile_stopPresToElements();
 					return element;
 				}
@@ -194,7 +194,7 @@ public class IncrementalView
 							exceptionStyle.applyTo( new StaticText( t.toString() ) ).padX( 15.0, 0.0 )   } ) );
 					view.profile_stopPresBuild();
 					view.profile_startPresToElements();
-					DPElement element = fragment.present( new PresentationContext( fragmentView, DefaultPerspective.instance, inheritedState ), style );
+					LSElement element = fragment.present( new PresentationContext( fragmentView, DefaultPerspective.instance, inheritedState ), style );
 					view.profile_stopPresToElements();
 					return element;
 				}
@@ -202,7 +202,7 @@ public class IncrementalView
 			
 			view.profile_stopPresBuild();
 			view.profile_startPresToElements();
-			DPElement element;
+			LSElement element;
 			
 			try
 			{
@@ -232,7 +232,7 @@ public class IncrementalView
 		}
 
 
-		private DPElement presToElements(Pres fragment, FragmentView fragmentView)
+		private LSElement presToElements(Pres fragment, FragmentView fragmentView)
 		{
 			return fragment.present( new PresentationContext( fragmentView, perspective, inheritedState ), style );
 		}
@@ -247,7 +247,7 @@ public class IncrementalView
 	private class RootPres extends Pres
 	{
 		@Override
-		public DPElement present(PresentationContext ctx, StyleValues style)
+		public LSElement present(PresentationContext ctx, StyleValues style)
 		{
 			FragmentFactory fragmentFactory = getUniqueFragmentFactory( rootPerspective, subjectContext, style, SimpleAttributeTable.instance );
 			setRootFragmentFactory( fragmentFactory );
@@ -285,7 +285,7 @@ public class IncrementalView
 	private ChangeHistory changeHistory;
 
 	private Pres viewPres;
-	private DPElement rootElement;
+	private LSElement rootElement;
 	
 	protected Log log;
 	
@@ -548,7 +548,7 @@ public class IncrementalView
 		}
 	}
 
-	protected void onElementChangeFrom(FragmentView node, DPElement result)
+	protected void onElementChangeFrom(FragmentView node, LSElement result)
 	{
 		if ( elementChangeListener != null )
 		{
@@ -558,7 +558,7 @@ public class IncrementalView
 		}
 	}
 
-	protected void onElementChangeTo(FragmentView node, DPElement result)
+	protected void onElementChangeTo(FragmentView node, LSElement result)
 	{
 		if ( elementChangeListener != null )
 		{

@@ -8,9 +8,9 @@ package BritefuryJ.Pres.Primitive;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPFlowGrid;
-import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSFlowGrid;
+import BritefuryJ.LSpace.Layout.HAlignment;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.SequentialPres;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -46,9 +46,9 @@ public class FlowGrid extends SequentialPres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPFlowGrid grid = new DPFlowGrid( Primitive.tableParams.get( style ), targetNumColumns );
+		LSFlowGrid grid = new LSFlowGrid( Primitive.tableParams.get( style ), targetNumColumns );
 		grid.setChildren( mapPresent( ctx, Primitive.useTableParams( style ).withAttr( Primitive.hAlign, HAlignment.PACK ), children ) );
 		// TODO:
 		// Problem is: the border element expands to take full width, since the preferred width is normally more than is availble.

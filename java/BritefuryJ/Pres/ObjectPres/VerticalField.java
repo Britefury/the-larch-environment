@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Pres.ObjectPres;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Column;
@@ -28,12 +28,12 @@ public class VerticalField extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		StyleSheet fieldStyle = style.get( ObjectPresStyle.objectFieldStyle, StyleSheet.class );
 		double indentation = style.get( ObjectPresStyle.objectFieldIndentation, Double.class );
 		
-		DPElement valueElement = value.alignHExpand().padX( indentation, 0.0 ).present( ctx, ObjectPresStyle.useObjectFieldAttrs( style ) );
+		LSElement valueElement = value.alignHExpand().padX( indentation, 0.0 ).present( ctx, ObjectPresStyle.useObjectFieldAttrs( style ) );
 		
 		return fieldStyle.applyTo( new Column( new Object[] { new Label( title ), valueElement } ).alignHExpand() ).present( ctx, style );
 	}

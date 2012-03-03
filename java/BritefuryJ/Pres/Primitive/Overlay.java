@@ -8,8 +8,8 @@ package BritefuryJ.Pres.Primitive;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPOverlay;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSOverlay;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.SequentialPres;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -28,9 +28,9 @@ public class Overlay extends SequentialPres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPOverlay element = new DPOverlay( Primitive.overlayParams.get( style ) );
+		LSOverlay element = new LSOverlay( Primitive.overlayParams.get( style ) );
 		element.setChildren( mapPresent( ctx, Primitive.useOverlayParams( style ), children ) );
 		return element;
 	}

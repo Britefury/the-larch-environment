@@ -6,10 +6,10 @@
 //##************************
 package BritefuryJ.Pres.Primitive;
 
-import BritefuryJ.DocPresent.DPBin;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Layout.HAlignment;
-import BritefuryJ.DocPresent.Layout.VAlignment;
+import BritefuryJ.LSpace.LSBin;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Layout.HAlignment;
+import BritefuryJ.LSpace.Layout.VAlignment;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -27,9 +27,9 @@ public class Bin extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPBin element = new DPBin( Primitive.containerParams.get( style ) );
+		LSBin element = new LSBin( Primitive.containerParams.get( style ) );
 		if ( child != null )
 		{
 			StyleValues childStyle = Primitive.useContainerParams.get( style );

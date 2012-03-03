@@ -8,7 +8,7 @@ package BritefuryJ.Controls;
 
 import java.util.regex.Pattern;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Live.LiveInterface;
 import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.PresentationContext;
@@ -27,8 +27,8 @@ public class RealSpinEntry extends SpinEntry
 		private RealSpinEntryListener listener;
 		
 	
-		protected RealSpinEntryControl(PresentationContext ctx, StyleValues style, LiveInterface value, DPElement element, TextEntry.TextEntryControl textEntry,
-				DPElement upSpinButton, DPElement downSpinButton, SpinEntryTextListener textListener,
+		protected RealSpinEntryControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element, TextEntry.TextEntryControl textEntry,
+				LSElement upSpinButton, LSElement downSpinButton, SpinEntryTextListener textListener,
 				double min, double max, double stepSize, double pageSize, RealSpinEntryListener listener)
 		{
 			super( ctx, style, value, element, textEntry, upSpinButton, downSpinButton, textListener );
@@ -163,8 +163,8 @@ public class RealSpinEntry extends SpinEntry
 	
 	
 	@Override
-	protected SpinEntryControl createSpinEntryControl(PresentationContext ctx, StyleValues style, LiveInterface value, DPElement element, TextEntry.TextEntryControl entryControl, DPElement upArrow,
-			DPElement downArrow, SpinEntryControl.SpinEntryTextListener textListener)
+	protected SpinEntryControl createSpinEntryControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element, TextEntry.TextEntryControl entryControl, LSElement upArrow,
+			LSElement downArrow, SpinEntryControl.SpinEntryTextListener textListener)
 	{
 		return new RealSpinEntryControl( ctx, style, value, element, entryControl, upArrow, downArrow, textListener, min, max, stepSize, pageSize, listener );
 	}

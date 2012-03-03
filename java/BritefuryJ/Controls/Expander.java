@@ -6,10 +6,10 @@
 //##************************
 package BritefuryJ.Controls;
 
-import BritefuryJ.DocPresent.DPBin;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Layout.HAlignment;
-import BritefuryJ.DocPresent.Layout.VAlignment;
+import BritefuryJ.LSpace.LSBin;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Layout.HAlignment;
+import BritefuryJ.LSpace.Layout.VAlignment;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Primitive;
@@ -24,13 +24,13 @@ public abstract class Expander extends ControlPres
 
 	public static class ExpanderControl extends Control
 	{
-		private DPBin element;
+		private LSBin element;
 		private Pres expanded, contracted;
 		private boolean currentState;
 		private ExpanderListener listener;
 		
 		
-		protected ExpanderControl(PresentationContext ctx, StyleValues style, DPBin element, Pres expanded, Pres contracted, boolean initialState, ExpanderListener listener)
+		protected ExpanderControl(PresentationContext ctx, StyleValues style, LSBin element, Pres expanded, Pres contracted, boolean initialState, ExpanderListener listener)
 		{
 			super( ctx, style );
 			this.element = element;
@@ -44,7 +44,7 @@ public abstract class Expander extends ControlPres
 		
 		
 		@Override
-		public DPElement getElement()
+		public LSElement getElement()
 		{
 			return element;
 		}

@@ -25,9 +25,9 @@ from Britefury.Kernel.View.DispatchView import MethodDispatchView
 
 from BritefuryJ.AttributeTable import *
 
-from BritefuryJ.DocPresent import *
+from BritefuryJ.LSpace import *
 from BritefuryJ.Graphics import *
-from BritefuryJ.DocPresent.Browser import Location
+from BritefuryJ.LSpace.Browser import Location
 from BritefuryJ.StyleSheet import StyleSheet
 from BritefuryJ.Controls import *
 from BritefuryJ.Pres import *

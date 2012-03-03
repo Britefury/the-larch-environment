@@ -6,45 +6,45 @@
 //##************************
 package BritefuryJ.Editor.RichText;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.EditEvent;
-import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.Selection.Selection;
-import BritefuryJ.DocPresent.Selection.TextSelection;
-import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.Editor.Sequential.EditListener;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.EditEvent;
+import BritefuryJ.LSpace.Marker.Marker;
+import BritefuryJ.LSpace.Selection.Selection;
+import BritefuryJ.LSpace.Selection.TextSelection;
+import BritefuryJ.LSpace.StreamValue.StreamValue;
 
 class RichTextEditEvents
 {
 	protected static abstract class RichTextRequest extends EditEvent
 	{
-		protected EditListener.HandleEditResult invokeOnInlineEmbed(RichTextEditor editor, DPElement element,
-				DPElement sourceElement, FragmentView fragment, Object embed, StreamValue value)
+		protected EditListener.HandleEditResult invokeOnInlineEmbed(RichTextEditor editor, LSElement element,
+				LSElement sourceElement, FragmentView fragment, Object embed, StreamValue value)
 		{
 			return EditListener.HandleEditResult.NOT_HANDLED;
 		}
 
-		protected EditListener.HandleEditResult invokeOnTextSpan(RichTextEditor editor, DPElement element,
-				DPElement sourceElement, FragmentView fragment, Object textSpan, StreamValue value)
+		protected EditListener.HandleEditResult invokeOnTextSpan(RichTextEditor editor, LSElement element,
+				LSElement sourceElement, FragmentView fragment, Object textSpan, StreamValue value)
 		{
 			return EditListener.HandleEditResult.NOT_HANDLED;
 		}
 
-		protected EditListener.HandleEditResult invokeOnParagraph(RichTextEditor editor, DPElement element,
-				DPElement sourceElement, FragmentView fragment, Object paragraph, StreamValue value)
+		protected EditListener.HandleEditResult invokeOnParagraph(RichTextEditor editor, LSElement element,
+				LSElement sourceElement, FragmentView fragment, Object paragraph, StreamValue value)
 		{
 			return EditListener.HandleEditResult.NOT_HANDLED;
 		}
 
-		protected EditListener.HandleEditResult invokeOnParagraphListItem(RichTextEditor editor, DPElement element,
-				DPElement sourceElement, FragmentView fragment, Object paragraph, StreamValue value)
+		protected EditListener.HandleEditResult invokeOnParagraphListItem(RichTextEditor editor, LSElement element,
+				LSElement sourceElement, FragmentView fragment, Object paragraph, StreamValue value)
 		{
 			return EditListener.HandleEditResult.NOT_HANDLED;
 		}
 
-		protected EditListener.HandleEditResult invokeOnBlock(RichTextEditor editor, DPElement element,
-				DPElement sourceElement, FragmentView fragment, Object block, StreamValue value)
+		protected EditListener.HandleEditResult invokeOnBlock(RichTextEditor editor, LSElement element,
+				LSElement sourceElement, FragmentView fragment, Object block, StreamValue value)
 		{
 			return EditListener.HandleEditResult.NOT_HANDLED;
 		}
@@ -62,8 +62,8 @@ class RichTextEditEvents
 		}
 
 		@Override
-		protected EditListener.HandleEditResult invokeOnParagraph(RichTextEditor editor, DPElement element,
-				DPElement sourceElement, FragmentView fragment, Object paragraph, StreamValue value)
+		protected EditListener.HandleEditResult invokeOnParagraph(RichTextEditor editor, LSElement element,
+				LSElement sourceElement, FragmentView fragment, Object paragraph, StreamValue value)
 		{
 			Selection selection = element.getRootElement().getSelection();
 			if ( selection instanceof TextSelection )
@@ -76,8 +76,8 @@ class RichTextEditEvents
 		}
 
 		@Override
-		protected EditListener.HandleEditResult invokeOnBlock(RichTextEditor editor, DPElement element,
-				DPElement sourceElement, FragmentView fragment, Object block, StreamValue value)
+		protected EditListener.HandleEditResult invokeOnBlock(RichTextEditor editor, LSElement element,
+				LSElement sourceElement, FragmentView fragment, Object block, StreamValue value)
 		{
 			Selection selection = element.getRootElement().getSelection();
 			if ( selection instanceof TextSelection )
@@ -101,8 +101,8 @@ class RichTextEditEvents
 		}
 
 		@Override
-		protected EditListener.HandleEditResult invokeOnParagraph(RichTextEditor editor, DPElement element,
-				DPElement sourceElement, FragmentView fragment, Object paragraph, StreamValue value)
+		protected EditListener.HandleEditResult invokeOnParagraph(RichTextEditor editor, LSElement element,
+				LSElement sourceElement, FragmentView fragment, Object paragraph, StreamValue value)
 		{
 			modifyParagraphFn.invoke( paragraph );
 			return EditListener.HandleEditResult.HANDLED;
@@ -122,16 +122,16 @@ class RichTextEditEvents
 		}
 
 		@Override
-		protected EditListener.HandleEditResult invokeOnParagraphListItem(RichTextEditor editor, DPElement element,
-				DPElement sourceElement, FragmentView fragment, Object paragraph, StreamValue value)
+		protected EditListener.HandleEditResult invokeOnParagraphListItem(RichTextEditor editor, LSElement element,
+				LSElement sourceElement, FragmentView fragment, Object paragraph, StreamValue value)
 		{
 			paragraphBefore = paragraph;
 			return EditListener.HandleEditResult.PASS_TO_PARENT;
 		}
 	
 		@Override
-		protected EditListener.HandleEditResult invokeOnBlock(RichTextEditor editor, DPElement element,
-				DPElement sourceElement, FragmentView fragment, Object block, StreamValue value)
+		protected EditListener.HandleEditResult invokeOnBlock(RichTextEditor editor, LSElement element,
+				LSElement sourceElement, FragmentView fragment, Object block, StreamValue value)
 		{
 			if ( paragraphBefore != null )
 			{
@@ -153,16 +153,16 @@ class RichTextEditEvents
 		}
 
 		@Override
-		protected EditListener.HandleEditResult invokeOnParagraphListItem(RichTextEditor editor, DPElement element,
-				DPElement sourceElement, FragmentView fragment, Object paragraph, StreamValue value)
+		protected EditListener.HandleEditResult invokeOnParagraphListItem(RichTextEditor editor, LSElement element,
+				LSElement sourceElement, FragmentView fragment, Object paragraph, StreamValue value)
 		{
 			this.paragraph = paragraph;
 			return EditListener.HandleEditResult.PASS_TO_PARENT;
 		}
 	
 		@Override
-		protected EditListener.HandleEditResult invokeOnBlock(RichTextEditor editor, DPElement element,
-				DPElement sourceElement, FragmentView fragment, Object block, StreamValue value)
+		protected EditListener.HandleEditResult invokeOnBlock(RichTextEditor editor, LSElement element,
+				LSElement sourceElement, FragmentView fragment, Object block, StreamValue value)
 		{
 			if ( paragraph != null )
 			{
@@ -186,8 +186,8 @@ class RichTextEditEvents
 		}
 
 		@Override
-		protected EditListener.HandleEditResult invokeOnParagraph(RichTextEditor editor, DPElement element,
-				DPElement sourceElement, FragmentView fragment, Object paragraph, StreamValue value)
+		protected EditListener.HandleEditResult invokeOnParagraph(RichTextEditor editor, LSElement element,
+				LSElement sourceElement, FragmentView fragment, Object paragraph, StreamValue value)
 		{
 			Object embedValue = makeInlineEmbedFn.invoke();
 			EdInlineEmbed embed = new EdInlineEmbed( embedValue );
@@ -207,24 +207,24 @@ class RichTextEditEvents
 		}
 
 		@Override
-		protected EditListener.HandleEditResult invokeOnInlineEmbed(RichTextEditor editor, DPElement element,
-				DPElement sourceElement, FragmentView fragment, Object embed, StreamValue value)
+		protected EditListener.HandleEditResult invokeOnInlineEmbed(RichTextEditor editor, LSElement element,
+				LSElement sourceElement, FragmentView fragment, Object embed, StreamValue value)
 		{
 			this.embed = embed;
 			return EditListener.HandleEditResult.PASS_TO_PARENT;
 		}
 	
 		@Override
-		protected EditListener.HandleEditResult invokeOnTextSpan(RichTextEditor editor, DPElement element,
-				DPElement sourceElement, FragmentView fragment, Object textSpan, StreamValue value)
+		protected EditListener.HandleEditResult invokeOnTextSpan(RichTextEditor editor, LSElement element,
+				LSElement sourceElement, FragmentView fragment, Object textSpan, StreamValue value)
 		{
 			editor.removeInlineEmbed( textSpan, embed );
 			return EditListener.HandleEditResult.HANDLED;
 		}
 		
 		@Override
-		protected EditListener.HandleEditResult invokeOnParagraph(RichTextEditor editor, DPElement element,
-				DPElement sourceElement, FragmentView fragment, Object paragraph, StreamValue value)
+		protected EditListener.HandleEditResult invokeOnParagraph(RichTextEditor editor, LSElement element,
+				LSElement sourceElement, FragmentView fragment, Object paragraph, StreamValue value)
 		{
 			editor.removeInlineEmbed( paragraph	, embed );
 			return EditListener.HandleEditResult.HANDLED;

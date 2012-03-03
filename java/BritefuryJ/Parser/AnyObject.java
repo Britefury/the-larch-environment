@@ -9,7 +9,7 @@ package BritefuryJ.Parser;
 import java.util.List;
 
 import BritefuryJ.DocModel.DMObjectInterface;
-import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
+import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
 
 /*
  * AnyObject

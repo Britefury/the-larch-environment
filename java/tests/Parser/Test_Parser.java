@@ -13,7 +13,7 @@ import java.util.*;
 
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMSchema;
-import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
+import BritefuryJ.LSpace.StreamValue.StreamValueBuilder;
 import BritefuryJ.Parser.Action;
 import BritefuryJ.Parser.AnyList;
 import BritefuryJ.Parser.AnyNode;

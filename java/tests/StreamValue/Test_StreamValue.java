@@ -9,8 +9,8 @@ package tests.StreamValue;
 import java.util.Arrays;
 
 import junit.framework.TestCase;
-import BritefuryJ.DocPresent.StreamValue.StreamValue;
-import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
+import BritefuryJ.LSpace.StreamValue.StreamValue;
+import BritefuryJ.LSpace.StreamValue.StreamValueBuilder;
 
 public class Test_StreamValue extends TestCase
 {

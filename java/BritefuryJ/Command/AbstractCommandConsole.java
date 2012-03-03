@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Command;
 
-import BritefuryJ.DocPresent.Browser.BrowserPage;
+import BritefuryJ.LSpace.Browser.BrowserPage;
 import BritefuryJ.Projection.ProjectiveBrowserContext;
 import BritefuryJ.Projection.Subject;
 

@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Pres.RichText;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Border;
@@ -28,11 +28,11 @@ public class Figure extends Pres
 
 
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		StyleValues contentStyleValues = RichText.useFigureAttrs( style );
 		StyleSheet figureStyle = RichText.figureStyle( style );
-		DPElement contentElement = content.present( ctx, contentStyleValues );
+		LSElement contentElement = content.present( ctx, contentStyleValues );
 		return new Column( new Pres[] { figureStyle.applyTo( new Border( contentElement ) ), new Caption( captionText ).alignHPack() } ).present( ctx, style );
 	}
 }

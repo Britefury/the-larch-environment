@@ -6,11 +6,11 @@
 //##************************
 package BritefuryJ.Pres.Primitive;
 
-import BritefuryJ.DocPresent.DPBorder;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Layout.HAlignment;
-import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.Graphics.AbstractBorder;
+import BritefuryJ.LSpace.LSBorder;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Layout.HAlignment;
+import BritefuryJ.LSpace.Layout.VAlignment;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -35,18 +35,18 @@ public class Border extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		if ( border != null )
 		{
-			DPBorder element = new DPBorder( border, Primitive.containerParams.get( style ) );
+			LSBorder element = new LSBorder( border, Primitive.containerParams.get( style ) );
 			StyleValues childStyle = Primitive.useContainerParams.get( Primitive.useBorderParams.get( style ) );
 			element.setChild( child.present( ctx, childStyle ).layoutWrap( childStyle.get( Primitive.hAlign, HAlignment.class ), childStyle.get( Primitive.vAlign, VAlignment.class ) ) );
 			return element;
 		}
 		else
 		{
-			DPBorder element = new DPBorder( Primitive.getBorderParams( style ), Primitive.containerParams.get( style ) );
+			LSBorder element = new LSBorder( Primitive.getBorderParams( style ), Primitive.containerParams.get( style ) );
 			StyleValues childStyle = Primitive.useContainerParams.get( Primitive.useBorderParams.get( style ) );
 			element.setChild( child.present( ctx, childStyle ).layoutWrap( childStyle.get( Primitive.hAlign, HAlignment.class ), childStyle.get( Primitive.vAlign, VAlignment.class ) ) );
 			return element;

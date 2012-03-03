@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Command;
 
-import BritefuryJ.DocPresent.PresentationComponent;
+import BritefuryJ.LSpace.PresentationComponent;
 
 public interface CommandConsoleFactory
 {

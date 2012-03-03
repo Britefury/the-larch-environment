@@ -6,9 +6,9 @@
 //##************************
 package BritefuryJ.Pres.Primitive;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPRegion;
-import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSRegion;
+import BritefuryJ.LSpace.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -33,10 +33,10 @@ public class Region extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPElement childElement = child.present( ctx, Primitive.useRegionParams.get( style ) );
-		DPRegion element = new DPRegion( Primitive.regionParams.get( style ) );
+		LSElement childElement = child.present( ctx, Primitive.useRegionParams.get( style ) );
+		LSRegion element = new LSRegion( Primitive.regionParams.get( style ) );
 		element.setChild( childElement );
 		if ( clipboardHandler != null )
 		{

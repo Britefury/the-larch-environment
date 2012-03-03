@@ -9,14 +9,14 @@ package BritefuryJ.Command;
 import java.util.ArrayList;
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 
 public class CommandSet implements CommandSetSource
 {
 	protected class CommandSetInteractor implements GatherCommandSetInteractor
 	{
 		@Override
-		public void gatherCommandSets(DPElement element, List<CommandSet> commandSets)
+		public void gatherCommandSets(LSElement element, List<CommandSet> commandSets)
 		{
 			commandSets.add( CommandSet.this );
 		}

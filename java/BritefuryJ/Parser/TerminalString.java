@@ -8,8 +8,8 @@ package BritefuryJ.Parser;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.StreamValue.StreamValue;
-import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
+import BritefuryJ.LSpace.StreamValue.StreamValue;
+import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
 
 /*
 	 * TerminalString

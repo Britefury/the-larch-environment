@@ -6,10 +6,10 @@
 //##************************
 package BritefuryJ.Pres.Primitive;
 
-import BritefuryJ.DocPresent.DPAspectRatioBin;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Layout.HAlignment;
-import BritefuryJ.DocPresent.Layout.VAlignment;
+import BritefuryJ.LSpace.LSAspectRatioBin;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Layout.HAlignment;
+import BritefuryJ.LSpace.Layout.VAlignment;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -30,9 +30,9 @@ public class AspectRatioBin extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPAspectRatioBin bin = new DPAspectRatioBin( Primitive.containerParams.get( style ), minWidth, aspectRatio );
+		LSAspectRatioBin bin = new LSAspectRatioBin( Primitive.containerParams.get( style ), minWidth, aspectRatio );
 		StyleValues childStyle = Primitive.useContainerParams.get( style );
 		bin.setChild( child.present( ctx, childStyle ).layoutWrap( childStyle.get( Primitive.hAlign, HAlignment.class ), childStyle.get( Primitive.vAlign, VAlignment.class ) ) );
 		return bin;

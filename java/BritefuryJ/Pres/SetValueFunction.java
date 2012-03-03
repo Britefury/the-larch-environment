@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Pres;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.ElementValueFunction;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.ElementValueFunction;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class SetValueFunction extends Pres
@@ -30,9 +30,9 @@ public class SetValueFunction extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPElement element = child.present( ctx, style );
+		LSElement element = child.present( ctx, style );
 		element.setValueFunction( valueFn );
 		return element;
 	}

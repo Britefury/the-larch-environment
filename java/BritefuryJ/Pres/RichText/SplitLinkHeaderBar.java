@@ -8,7 +8,7 @@ package BritefuryJ.Pres.RichText;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Column;
@@ -35,7 +35,7 @@ public class SplitLinkHeaderBar extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		double padding = style.get( RichText.linkHeaderPadding, Double.class );
 		Pres left[] = mapCoerce( mapPresent( ctx, RichText.useLinkHeaderAttrs( style ), leftChildren ) );

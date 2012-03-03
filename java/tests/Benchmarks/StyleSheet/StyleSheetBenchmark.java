@@ -6,9 +6,9 @@
 //##************************
 package tests.Benchmarks.StyleSheet;
 
-import BritefuryJ.DocPresent.DPBox;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPColumn;
+import BritefuryJ.LSpace.LSBox;
+import BritefuryJ.LSpace.LSColumn;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Box;
 import BritefuryJ.Pres.Primitive.Column;
@@ -27,16 +27,16 @@ public class StyleSheetBenchmark
 
 	
 	
-	public static DPElement directConstructionRun()
+	public static LSElement directConstructionRun()
 	{
-		DPElement elements[] = new DPElement[RUN_LENGTH];
+		LSElement elements[] = new LSElement[RUN_LENGTH];
 		for (int i = 0; i < elements.length; i++)
 		{
 			//elements[i] = new DPText( "Hello world" );
-			elements[i] = new DPBox( "", 10.0, 10.0 );
+			elements[i] = new LSBox( "", 10.0, 10.0 );
 		}
 		
-		DPColumn box = new DPColumn();
+		LSColumn box = new LSColumn();
 		box.setChildren( elements );
 		return box;
 	}
@@ -78,7 +78,7 @@ public class StyleSheetBenchmark
 	}
 
 	
-	public static DPElement combinatorStyleSheetRun()
+	public static LSElement combinatorStyleSheetRun()
 	{
 		Pres elements[] = new Pres[RUN_LENGTH];
 		for (int i = 0; i < elements.length; i++)

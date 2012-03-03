@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Pres.RichText;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Box;
@@ -19,7 +19,7 @@ public class HSeparator extends Pres
 	}
 
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		double majorPadding = style.get( RichText.separatorMajorPadding, Double.class );
 		double minorPadding = style.get( RichText.separatorMinorPadding, Double.class );

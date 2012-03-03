@@ -15,10 +15,10 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPRegion;
-import BritefuryJ.DocPresent.TableElement;
-import BritefuryJ.DocPresent.Selection.Selection;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSRegion;
+import BritefuryJ.LSpace.TableElement;
+import BritefuryJ.LSpace.Selection.Selection;
 
 public class TableSelection extends Selection
 {
@@ -29,7 +29,7 @@ public class TableSelection extends Selection
 	
 	public TableSelection(AbstractTableEditorInstance<?> editorInstance, TableElement table, int x0, int y0, int x1, int y1)
 	{
-		super( (DPElement)table );
+		super( (LSElement)table );
 
 		this.editorInstance = editorInstance;
 		this.table = table;
@@ -53,9 +53,9 @@ public class TableSelection extends Selection
 	}
 
 	@Override
-	public DPRegion getRegion()
+	public LSRegion getRegion()
 	{
-		DPElement tableElement = (DPElement)table;
+		LSElement tableElement = (LSElement)table;
 		return tableElement.getRegion();
 	}
 	
@@ -69,7 +69,7 @@ public class TableSelection extends Selection
 	@Override
 	public void draw(Graphics2D graphics)
 	{
-		DPElement tableElement = (DPElement)table;
+		LSElement tableElement = (LSElement)table;
 		
 		if ( tableElement.isRealised() )
 		{
@@ -101,7 +101,7 @@ public class TableSelection extends Selection
 	
 	protected Object[][] getSelectedData()
 	{
-		return editorInstance.getSelectedData( this, (DPElement)table, x0, y0, x1, y1 );
+		return editorInstance.getSelectedData( this, (LSElement)table, x0, y0, x1, y1 );
 	}
 	
 	

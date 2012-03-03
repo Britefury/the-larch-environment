@@ -6,16 +6,16 @@
 //##************************
 package BritefuryJ.Editor.Sequential;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.EditEvent;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.EditEvent;
 
 public class SelectionEditTreeEvent extends EditEvent
 {
 	protected SequentialEditor sequentialEditor;
-	protected DPElement sourceElement;
+	protected LSElement sourceElement;
 	
 	
-	protected SelectionEditTreeEvent(SequentialEditor sequentialEditor, DPElement sourceElement)
+	protected SelectionEditTreeEvent(SequentialEditor sequentialEditor, LSElement sourceElement)
 	{
 		this.sequentialEditor = sequentialEditor;
 		this.sourceElement = sourceElement;
@@ -27,7 +27,7 @@ public class SelectionEditTreeEvent extends EditEvent
 		return sequentialEditor;
 	}
 	
-	public DPElement getSourceElement()
+	public LSElement getSourceElement()
 	{
 		return sourceElement;
 	}

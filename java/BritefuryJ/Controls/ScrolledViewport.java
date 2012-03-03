@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Controls;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.PersistentState.PersistentState;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.PersistentState.PersistentState;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.SpaceBin;
 
@@ -25,7 +25,7 @@ public class ScrolledViewport extends AbstractScrolledViewport
 	
 
 	@Override
-	protected Pres createViewportBin(DPElement viewport)
+	protected Pres createViewportBin(LSElement viewport)
 	{
 		return new SpaceBin( minWidth, minHeight, viewport );
 	}

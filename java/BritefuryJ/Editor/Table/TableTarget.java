@@ -14,10 +14,10 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.TableElement;
-import BritefuryJ.DocPresent.Selection.SelectionPoint;
-import BritefuryJ.DocPresent.Target.Target;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.TableElement;
+import BritefuryJ.LSpace.Selection.SelectionPoint;
+import BritefuryJ.LSpace.Target.Target;
 
 public class TableTarget extends Target
 {
@@ -37,7 +37,7 @@ public class TableTarget extends Target
 	@Override
 	public void draw(Graphics2D graphics)
 	{
-		DPElement tableElement = (DPElement)table;
+		LSElement tableElement = (LSElement)table;
 		
 		if ( tableElement.isRealised() )
 		{
@@ -61,9 +61,9 @@ public class TableTarget extends Target
 	}
 
 	@Override
-	public DPElement getElement()
+	public LSElement getElement()
 	{
-		return (DPElement)table;
+		return (LSElement)table;
 	}
 	
 	@Override
@@ -82,7 +82,7 @@ public class TableTarget extends Target
 	private void notifyMoved()
 	{
 		notifyListenersOfChange();
-		((DPElement)table).queueFullRedraw();
+		((LSElement)table).queueFullRedraw();
 	}
 	
 	@Override

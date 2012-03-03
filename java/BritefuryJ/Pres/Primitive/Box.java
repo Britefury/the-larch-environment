@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Pres.Primitive;
 
-import BritefuryJ.DocPresent.DPBox;
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSBox;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -25,8 +25,8 @@ public class Box extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		return new DPBox( Primitive.shapeParams.get( style ), "", minWidth, minHeight );
+		return new LSBox( Primitive.shapeParams.get( style ), "", minWidth, minHeight );
 	}
 }

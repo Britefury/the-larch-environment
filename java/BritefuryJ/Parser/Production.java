@@ -9,7 +9,7 @@ package BritefuryJ.Parser;
 import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
+import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
 
 
 

@@ -22,10 +22,10 @@ from BritefuryJ.DocModel import DMObjectClass
 
 from BritefuryJ.AttributeTable import *
 from BritefuryJ.Controls import *
-from BritefuryJ.DocPresent import ElementValueFunction, TextEditEvent, DPText
-from BritefuryJ.DocPresent.Interactor import KeyElementInteractor
-from BritefuryJ.DocPresent.StreamValue import StreamValueBuilder
-from BritefuryJ.DocPresent.Input import ObjectDndHandler
+from BritefuryJ.LSpace import ElementValueFunction, TextEditEvent
+from BritefuryJ.LSpace.Interactor import KeyElementInteractor
+from BritefuryJ.LSpace.StreamValue import StreamValueBuilder
+from BritefuryJ.LSpace.Input import ObjectDndHandler
 
 from BritefuryJ.Pres import ApplyPerspective
 from BritefuryJ.Pres.Primitive import Paragraph, Segment

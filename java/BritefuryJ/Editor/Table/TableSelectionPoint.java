@@ -6,10 +6,10 @@
 //##************************
 package BritefuryJ.Editor.Table;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.TableElement;
-import BritefuryJ.DocPresent.Selection.Selection;
-import BritefuryJ.DocPresent.Selection.SelectionPoint;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.TableElement;
+import BritefuryJ.LSpace.Selection.Selection;
+import BritefuryJ.LSpace.Selection.SelectionPoint;
 
 class TableSelectionPoint extends SelectionPoint
 {
@@ -30,7 +30,7 @@ class TableSelectionPoint extends SelectionPoint
 	@Override
 	public boolean isValid()
 	{
-		return ((DPElement)table).isRealised();
+		return ((LSElement)table).isRealised();
 	}
 	
 	

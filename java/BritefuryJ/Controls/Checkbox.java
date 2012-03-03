@@ -8,10 +8,10 @@ package BritefuryJ.Controls;
 
 import java.awt.Paint;
 
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.Graphics.AbstractBorder;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
@@ -28,11 +28,11 @@ public class Checkbox extends ControlPres
 {
 	public static class CheckboxControl extends Control implements IncrementalMonitorListener
 	{
-		private DPElement element, box, check;
+		private LSElement element, box, check;
 		private LiveValue state;
 
 		
-		protected CheckboxControl(PresentationContext ctx, StyleValues style, DPElement element, DPElement box, DPElement check, LiveValue state, Paint checkForeground)
+		protected CheckboxControl(PresentationContext ctx, StyleValues style, LSElement element, LSElement box, LSElement check, LiveValue state, Paint checkForeground)
 		{
 			super( ctx, style );
 			
@@ -49,7 +49,7 @@ public class Checkbox extends ControlPres
 		
 		
 		@Override
-		public DPElement getElement()
+		public LSElement getElement()
 		{
 			return element;
 		}
@@ -127,15 +127,15 @@ public class Checkbox extends ControlPres
 		Paint checkForeground = style.get( Controls.checkboxCheckForeground, Paint.class );
 		
 		Pres check = new Spacer( checkSize, checkSize );
-		DPElement checkElement = check.present( ctx, style );
+		LSElement checkElement = check.present( ctx, style );
 		Pres checkBorder = checkStyle.applyTo( new Border( checkElement ) );
 		
 		Pres childElement = presentAsCombinator( ctx, Controls.useCheckboxAttrs( style ), child );
 		Pres row = checkboxStyle.applyTo( new Row( new Pres[] { checkBorder.alignHPack().alignVCentre(), childElement.alignVCentre() } ) );
-		DPElement rowElement = row.present( ctx, style);
+		LSElement rowElement = row.present( ctx, style);
 		
 		Pres bin = new Bin( rowElement );
-		DPElement element = bin.present( ctx, style );
+		LSElement element = bin.present( ctx, style );
 		element.setFixedValue( state.getStaticValue() );
 		return new CheckboxControl( ctx, style, element, rowElement, checkElement, state, checkForeground );
 	}

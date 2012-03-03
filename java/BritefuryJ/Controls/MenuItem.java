@@ -6,13 +6,13 @@
 //##************************
 package BritefuryJ.Controls;
 
-import BritefuryJ.DocPresent.DPBin;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Event.AbstractPointerButtonEvent;
-import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
-import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.DocPresent.Interactor.ClickElementInteractor;
 import BritefuryJ.Graphics.Painter;
+import BritefuryJ.LSpace.LSBin;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Event.AbstractPointerButtonEvent;
+import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
+import BritefuryJ.LSpace.Input.PointerInputElement;
+import BritefuryJ.LSpace.Interactor.ClickElementInteractor;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Arrow;
@@ -81,7 +81,7 @@ public class MenuItem extends ControlPres
 			@Override
 			public boolean buttonClicked(PointerInputElement element, PointerButtonClickedEvent event)
 			{
-				DPElement menuItemElement = (DPElement)element;
+				LSElement menuItemElement = (LSElement)element;
 				if ( menuItemElement.isRealised() )
 				{
 					if ( bClosePopupOnActivate )
@@ -98,12 +98,12 @@ public class MenuItem extends ControlPres
 	
 		
 		
-		private DPBin element;
+		private LSBin element;
 		private MenuItemListener listener;
 		private boolean bClosePopupOnActivate;
 		
 		
-		protected MenuItemControl(PresentationContext ctx, StyleValues style, DPBin element, MenuItemListener listener, boolean bClosePopupOnActivate)
+		protected MenuItemControl(PresentationContext ctx, StyleValues style, LSBin element, MenuItemListener listener, boolean bClosePopupOnActivate)
 		{
 			super( ctx, style );
 			this.element = element;
@@ -112,7 +112,7 @@ public class MenuItem extends ControlPres
 			this.bClosePopupOnActivate = bClosePopupOnActivate;
 		}
 		
-		protected MenuItemControl(PresentationContext ctx, StyleValues style, DPBin element, PopupMenu subMenu, SubmenuPopupDirection direction, boolean bClosePopupOnActivate)
+		protected MenuItemControl(PresentationContext ctx, StyleValues style, LSBin element, PopupMenu subMenu, SubmenuPopupDirection direction, boolean bClosePopupOnActivate)
 		{
 			super( ctx, style );
 			this.element = element;
@@ -122,7 +122,7 @@ public class MenuItem extends ControlPres
 		}
 		
 		
-		public DPElement getElement()
+		public LSElement getElement()
 		{
 			return element;
 		}
@@ -202,7 +202,7 @@ public class MenuItem extends ControlPres
 		StyleValues menuItemStyle = style.withAttr( Primitive.hoverBackground, hoverBackground );
 		Pres menuItem = new Bin( childElem.pad( padX, padY ) ).alignHExpand();
 
-		DPBin element = (DPBin)menuItem.present( ctx, menuItemStyle );
+		LSBin element = (LSBin)menuItem.present( ctx, menuItemStyle );
 		
 		
 		if ( subMenu != null )

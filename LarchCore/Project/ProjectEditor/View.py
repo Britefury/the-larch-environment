@@ -27,11 +27,11 @@ from BritefuryJ.AttributeTable import *
 
 from BritefuryJ.DefaultPerspective import DefaultPerspective
 
-from BritefuryJ.DocPresent.Browser import Location
+from BritefuryJ.LSpace.Browser import Location
 from BritefuryJ.Graphics import *
 from BritefuryJ.StyleSheet import StyleSheet
-from BritefuryJ.DocPresent.Input import ObjectDndHandler
-from BritefuryJ.DocPresent.Interactor import ClickElementInteractor
+from BritefuryJ.LSpace.Input import ObjectDndHandler
+from BritefuryJ.LSpace.Interactor import ClickElementInteractor
 from BritefuryJ.Controls import *
 from BritefuryJ.Pres import *
 from BritefuryJ.Pres.Primitive import *

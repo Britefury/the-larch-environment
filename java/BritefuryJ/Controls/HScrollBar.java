@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Controls;
 
-import BritefuryJ.DocPresent.Util.Range;
+import BritefuryJ.LSpace.Util.Range;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Arrow;
 import BritefuryJ.Pres.Primitive.Box;

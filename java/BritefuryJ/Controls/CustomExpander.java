@@ -6,13 +6,13 @@
 //##************************
 package BritefuryJ.Controls;
 
-import BritefuryJ.DocPresent.DPBin;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.TreeEventListener;
-import BritefuryJ.DocPresent.Event.AbstractPointerButtonEvent;
-import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
-import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.DocPresent.Interactor.ClickElementInteractor;
+import BritefuryJ.LSpace.LSBin;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.TreeEventListener;
+import BritefuryJ.LSpace.Event.AbstractPointerButtonEvent;
+import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
+import BritefuryJ.LSpace.Input.PointerInputElement;
+import BritefuryJ.LSpace.Interactor.ClickElementInteractor;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Bin;
@@ -36,7 +36,7 @@ public class CustomExpander extends Expander
 		@Override
 		public boolean buttonClicked(PointerInputElement element, PointerButtonClickedEvent event)
 		{
-			((DPElement)element).postTreeEvent( new ExpandEvent() );
+			((LSElement)element).postTreeEvent( new ExpandEvent() );
 			return true;
 		}
 	}
@@ -51,7 +51,7 @@ public class CustomExpander extends Expander
 		private ExpanderControl control;
 		
 		@Override
-		public boolean onTreeEvent(DPElement element, DPElement sourceElement, Object event)
+		public boolean onTreeEvent(LSElement element, LSElement sourceElement, Object event)
 		{
 			if ( event instanceof ExpandEvent )
 			{
@@ -108,7 +108,7 @@ public class CustomExpander extends Expander
 		ExpandEventHandler eventHandler = new ExpandEventHandler();
 		
 		Pres expander = new Bin( initialState  ?  expanded  :  contracted ).withTreeEventListener( eventHandler );
-		DPBin expanderElement = (DPBin)expander.present( ctx, style );
+		LSBin expanderElement = (LSBin)expander.present( ctx, style );
 		
 		ExpanderControl control = new ExpanderControl( ctx, style, expanderElement, expanded, contracted, initialState, listener );
 		eventHandler.control = control;
