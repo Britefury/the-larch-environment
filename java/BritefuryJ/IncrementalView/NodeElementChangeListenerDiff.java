@@ -12,12 +12,12 @@ import java.util.IdentityHashMap;
 import BritefuryJ.LSpace.LSContentLeaf;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.ElementFilter;
-import BritefuryJ.LSpace.Caret.Caret;
+import BritefuryJ.LSpace.Focus.Selection;
 import BritefuryJ.LSpace.Marker.Marker;
 import BritefuryJ.LSpace.Marker.Marker.Bias;
-import BritefuryJ.LSpace.Selection.Selection;
-import BritefuryJ.LSpace.Selection.TextSelection;
-import BritefuryJ.LSpace.Selection.TextSelectionPoint;
+import BritefuryJ.LSpace.TextFocus.Caret;
+import BritefuryJ.LSpace.TextFocus.TextSelection;
+import BritefuryJ.LSpace.TextFocus.TextSelectionPoint;
 import BritefuryJ.Util.StringDiff;
 
 public class NodeElementChangeListenerDiff implements IncrementalView.NodeElementChangeListener

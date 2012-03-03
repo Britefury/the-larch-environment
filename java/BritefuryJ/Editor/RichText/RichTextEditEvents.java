@@ -10,10 +10,10 @@ import BritefuryJ.Editor.Sequential.EditListener;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.EditEvent;
+import BritefuryJ.LSpace.Focus.Selection;
 import BritefuryJ.LSpace.Marker.Marker;
-import BritefuryJ.LSpace.Selection.Selection;
-import BritefuryJ.LSpace.Selection.TextSelection;
 import BritefuryJ.LSpace.StreamValue.StreamValue;
+import BritefuryJ.LSpace.TextFocus.TextSelection;
 
 class RichTextEditEvents
 {

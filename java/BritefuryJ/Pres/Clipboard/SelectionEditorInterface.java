@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Pres.Clipboard;
 
-import BritefuryJ.LSpace.Selection.Selection;
-import BritefuryJ.LSpace.Target.Target;
+import BritefuryJ.LSpace.Focus.Selection;
+import BritefuryJ.LSpace.Focus.Target;
 
 abstract public class SelectionEditorInterface
 {

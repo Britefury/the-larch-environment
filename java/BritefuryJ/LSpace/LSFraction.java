@@ -15,11 +15,11 @@ import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.LSpace.Caret.Caret;
 import BritefuryJ.LSpace.LayoutTree.LayoutNodeFraction;
 import BritefuryJ.LSpace.StyleParams.ContainerStyleParams;
 import BritefuryJ.LSpace.StyleParams.FractionStyleParams;
 import BritefuryJ.LSpace.StyleParams.TextStyleParams;
+import BritefuryJ.LSpace.TextFocus.Caret;
 import BritefuryJ.Math.Point2;
 
 public class LSFraction extends LSContainerNonOverlayed

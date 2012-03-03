@@ -8,8 +8,8 @@ package BritefuryJ.LSpace.Interactor;
 
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerMotionEvent;
+import BritefuryJ.LSpace.Focus.SelectionPoint;
 import BritefuryJ.LSpace.Input.PointerInputElement;
-import BritefuryJ.LSpace.Selection.SelectionPoint;
 import BritefuryJ.Math.Point2;
 
 public interface TargetElementInteractor extends AbstractElementInteractor

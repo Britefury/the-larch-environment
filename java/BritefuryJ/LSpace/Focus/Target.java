@@ -4,14 +4,13 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.LSpace.Target;
+package BritefuryJ.LSpace.Focus;
 
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 import BritefuryJ.LSpace.LSElement;
-import BritefuryJ.LSpace.Selection.SelectionPoint;
 
 public abstract class Target
 {

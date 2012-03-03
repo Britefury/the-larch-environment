@@ -12,11 +12,11 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
-import BritefuryJ.LSpace.Caret.Caret;
+import BritefuryJ.LSpace.Focus.Selection;
+import BritefuryJ.LSpace.Focus.Target;
 import BritefuryJ.LSpace.Marker.Marker;
-import BritefuryJ.LSpace.Selection.Selection;
-import BritefuryJ.LSpace.Selection.TextSelection;
-import BritefuryJ.LSpace.Target.Target;
+import BritefuryJ.LSpace.TextFocus.Caret;
+import BritefuryJ.LSpace.TextFocus.TextSelection;
 
 public abstract class TextClipboardHandler extends ClipboardHandlerInterface
 {

@@ -12,16 +12,16 @@ import java.util.Stack;
 import BritefuryJ.LSpace.LSContentLeafEditable;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.PresentationComponent;
-import BritefuryJ.LSpace.Caret.Caret;
 import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerMotionEvent;
+import BritefuryJ.LSpace.Focus.SelectionManager;
+import BritefuryJ.LSpace.Focus.SelectionPoint;
 import BritefuryJ.LSpace.Interactor.AbstractElementInteractor;
 import BritefuryJ.LSpace.Interactor.TargetElementInteractor;
 import BritefuryJ.LSpace.Marker.Marker;
-import BritefuryJ.LSpace.Selection.SelectionManager;
-import BritefuryJ.LSpace.Selection.SelectionPoint;
-import BritefuryJ.LSpace.Selection.TextSelectionPoint;
+import BritefuryJ.LSpace.TextFocus.Caret;
+import BritefuryJ.LSpace.TextFocus.TextSelectionPoint;
 import BritefuryJ.Math.Point2;
 
 public class PointerTargetInteractor

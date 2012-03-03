@@ -13,9 +13,9 @@ import BritefuryJ.LSpace.EditEvent;
 import BritefuryJ.LSpace.TextEditEvent;
 import BritefuryJ.LSpace.TreeEventListener;
 import BritefuryJ.LSpace.Marker.Marker;
-import BritefuryJ.LSpace.Selection.TextSelection;
 import BritefuryJ.LSpace.StreamValue.SequentialStreamValueVisitor;
 import BritefuryJ.LSpace.StreamValue.StreamValue;
+import BritefuryJ.LSpace.TextFocus.TextSelection;
 import BritefuryJ.Pres.Primitive.Region;
 
 public abstract class SequentialEditor

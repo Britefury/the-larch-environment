@@ -7,7 +7,7 @@
 ##-*************************
 from BritefuryJ.Command import CommandSetRegistry
 
-from BritefuryJ.LSpace.Selection import TextSelection
+from BritefuryJ.LSpace.TextFocus import TextSelection
 
 from LarchCore.Languages.Python25.PythonEditor.PythonEditOperations import insertSpecialFormExpressionAtCaret, insertSpecialFormStatementAtCaret, pyReplaceStatementRangeWithStatement, \
 	getSelectedExpression, getSelectedStatement, getSelectedStatementRange, pyReplaceNode

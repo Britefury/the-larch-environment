@@ -4,10 +4,12 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.LSpace.Selection;
+package BritefuryJ.LSpace.TextFocus;
 
 import BritefuryJ.LSpace.LSContentLeafEditable;
 import BritefuryJ.LSpace.LSRegion;
+import BritefuryJ.LSpace.Focus.Selection;
+import BritefuryJ.LSpace.Focus.SelectionPoint;
 import BritefuryJ.LSpace.Marker.Marker;
 
 public class TextSelectionPoint extends SelectionPoint

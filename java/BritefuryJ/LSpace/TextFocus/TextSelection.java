@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.LSpace.Selection;
+package BritefuryJ.LSpace.TextFocus;
 
 import java.awt.Graphics2D;
 import java.util.ArrayList;
@@ -14,6 +14,7 @@ import BritefuryJ.LSpace.LSContentLeafEditable;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSRegion;
 import BritefuryJ.LSpace.ElementTreeVisitor;
+import BritefuryJ.LSpace.Focus.Selection;
 import BritefuryJ.LSpace.Marker.Marker;
 import BritefuryJ.LSpace.Marker.MarkerListener;
 
