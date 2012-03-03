@@ -4,11 +4,12 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.LSpace.Selection;
+package BritefuryJ.LSpace.Focus;
 
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.PresentationComponent;
 import BritefuryJ.LSpace.Marker.Marker;
+import BritefuryJ.LSpace.TextFocus.TextSelectionPoint;
 
 public class SelectionManager
 {

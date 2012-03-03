@@ -18,7 +18,7 @@ import java.awt.geom.Rectangle2D;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSRegion;
 import BritefuryJ.LSpace.TableElement;
-import BritefuryJ.LSpace.Selection.Selection;
+import BritefuryJ.LSpace.Focus.Selection;
 
 public class TableSelection extends Selection
 {

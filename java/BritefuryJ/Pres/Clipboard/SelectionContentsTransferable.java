@@ -12,7 +12,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import BritefuryJ.LSpace.Selection.Selection;
+import BritefuryJ.LSpace.Focus.Selection;
 
 class SelectionContentsTransferable<SelectionContentsType, SelectionType extends Selection> implements Transferable
 {

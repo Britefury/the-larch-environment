@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Stack;
 
 import BritefuryJ.LSpace.Marker.Marker;
-import BritefuryJ.LSpace.Selection.TextSelection;
+import BritefuryJ.LSpace.TextFocus.TextSelection;
 
 public abstract class ElementTreeVisitor
 {

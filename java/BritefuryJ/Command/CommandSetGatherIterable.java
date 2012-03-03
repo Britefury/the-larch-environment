@@ -10,8 +10,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Focus.Target;
 import BritefuryJ.LSpace.Interactor.AbstractElementInteractor;
-import BritefuryJ.LSpace.Target.Target;
 
 public class CommandSetGatherIterable implements Iterable<BoundCommandSet>
 {

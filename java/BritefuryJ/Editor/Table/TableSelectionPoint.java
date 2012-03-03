@@ -8,8 +8,8 @@ package BritefuryJ.Editor.Table;
 
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.TableElement;
-import BritefuryJ.LSpace.Selection.Selection;
-import BritefuryJ.LSpace.Selection.SelectionPoint;
+import BritefuryJ.LSpace.Focus.Selection;
+import BritefuryJ.LSpace.Focus.SelectionPoint;
 
 class TableSelectionPoint extends SelectionPoint
 {

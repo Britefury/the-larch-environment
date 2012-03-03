@@ -16,8 +16,8 @@ import java.awt.geom.Rectangle2D;
 
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.TableElement;
-import BritefuryJ.LSpace.Selection.SelectionPoint;
-import BritefuryJ.LSpace.Target.Target;
+import BritefuryJ.LSpace.Focus.SelectionPoint;
+import BritefuryJ.LSpace.Focus.Target;
 
 public class TableTarget extends Target
 {

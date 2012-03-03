@@ -19,7 +19,7 @@ from BritefuryJ.DocModel import DMList, DMObject, DMObjectInterface, DMNode
 
 
 from BritefuryJ.LSpace.StyleParams import *
-from BritefuryJ.LSpace.Selection import TextSelection
+from BritefuryJ.LSpace.TextFocus import TextSelection
 from BritefuryJ.LSpace import *
 
 from BritefuryJ.LSpace.StreamValue import StreamValueBuilder, StreamValue

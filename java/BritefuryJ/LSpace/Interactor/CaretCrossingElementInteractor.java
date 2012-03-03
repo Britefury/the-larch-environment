@@ -7,7 +7,7 @@
 package BritefuryJ.LSpace.Interactor;
 
 import BritefuryJ.LSpace.LSElement;
-import BritefuryJ.LSpace.Caret.Caret;
+import BritefuryJ.LSpace.TextFocus.Caret;
 
 public interface CaretCrossingElementInteractor extends AbstractElementInteractor
 {

@@ -10,7 +10,7 @@ import BritefuryJ.LSpace.LSContentLeafEditable;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.ElementTreeVisitor;
 import BritefuryJ.LSpace.Marker.Marker;
-import BritefuryJ.LSpace.Selection.TextSelection;
+import BritefuryJ.LSpace.TextFocus.TextSelection;
 
 public abstract class AbstractStreamValueVisitor
 {

@@ -11,13 +11,13 @@ import java.awt.event.KeyEvent;
 
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.PresentationComponent;
+import BritefuryJ.LSpace.Focus.Selection;
+import BritefuryJ.LSpace.Focus.SelectionManager;
+import BritefuryJ.LSpace.Focus.SelectionPoint;
+import BritefuryJ.LSpace.Focus.Target;
 import BritefuryJ.LSpace.Input.Modifier;
 import BritefuryJ.LSpace.Interactor.AbstractElementInteractor;
 import BritefuryJ.LSpace.Interactor.KeyElementInteractor;
-import BritefuryJ.LSpace.Selection.Selection;
-import BritefuryJ.LSpace.Selection.SelectionManager;
-import BritefuryJ.LSpace.Selection.SelectionPoint;
-import BritefuryJ.LSpace.Target.Target;
 
 public class KeyboardTargetInteractor extends KeyboardInteractor
 {

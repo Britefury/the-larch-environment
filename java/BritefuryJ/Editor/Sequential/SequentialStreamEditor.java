@@ -9,10 +9,10 @@ package BritefuryJ.Editor.Sequential;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Marker.Marker;
-import BritefuryJ.LSpace.Selection.TextSelection;
 import BritefuryJ.LSpace.StreamValue.SequentialStreamValueVisitor;
 import BritefuryJ.LSpace.StreamValue.StreamValue;
 import BritefuryJ.LSpace.StreamValue.StreamValueBuilder;
+import BritefuryJ.LSpace.TextFocus.TextSelection;
 
 public abstract class SequentialStreamEditor extends SequentialEditor
 {

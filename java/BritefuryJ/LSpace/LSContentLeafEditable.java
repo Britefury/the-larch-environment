@@ -13,9 +13,9 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 import BritefuryJ.Graphics.SolidBorder;
-import BritefuryJ.LSpace.Caret.Caret;
 import BritefuryJ.LSpace.Marker.Marker;
 import BritefuryJ.LSpace.StyleParams.ContentLeafEditableStyleParams;
+import BritefuryJ.LSpace.TextFocus.Caret;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;

@@ -2,14 +2,11 @@
 //##* under the terms of the GNU General Public License version 2 as published by the
 //##* Free Software Foundation. The full text of the GNU General Public License
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
-//##* program. This source code is (C)copyright Geoffrey French 2008-2010.
+//##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.LSpace.Selection;
+package BritefuryJ.LSpace.Focus;
 
-
-public abstract class SelectionPoint
+public interface SelectionListener
 {
-	public abstract boolean isValid();
-	
-	public abstract Selection createSelectionTo(SelectionPoint point);
+	void selectionChanged(Selection s);
 }

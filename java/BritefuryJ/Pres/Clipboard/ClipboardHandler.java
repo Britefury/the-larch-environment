@@ -11,8 +11,8 @@ import java.util.List;
 
 import BritefuryJ.LSpace.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.LSpace.Clipboard.DataTransfer;
-import BritefuryJ.LSpace.Selection.Selection;
-import BritefuryJ.LSpace.Target.Target;
+import BritefuryJ.LSpace.Focus.Selection;
+import BritefuryJ.LSpace.Focus.Target;
 import BritefuryJ.Util.PolymorphicMap;
 
 public class ClipboardHandler extends ClipboardHandlerInterface

@@ -12,11 +12,11 @@ import java.awt.Paint;
 import java.awt.font.TextHitInfo;
 import java.awt.geom.AffineTransform;
 
-import BritefuryJ.LSpace.Caret.Caret;
 import BritefuryJ.LSpace.LayoutTree.LayoutNode;
 import BritefuryJ.LSpace.LayoutTree.LayoutNodeText;
 import BritefuryJ.LSpace.Marker.Marker;
 import BritefuryJ.LSpace.StyleParams.TextStyleParams;
+import BritefuryJ.LSpace.TextFocus.Caret;
 import BritefuryJ.LSpace.Util.TextVisual;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;

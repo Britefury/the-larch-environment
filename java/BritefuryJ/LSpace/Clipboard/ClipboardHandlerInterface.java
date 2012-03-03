@@ -10,8 +10,8 @@ import java.awt.datatransfer.Transferable;
 
 import javax.swing.TransferHandler;
 
-import BritefuryJ.LSpace.Selection.Selection;
-import BritefuryJ.LSpace.Target.Target;
+import BritefuryJ.LSpace.Focus.Selection;
+import BritefuryJ.LSpace.Focus.Target;
 
 
 public abstract class ClipboardHandlerInterface

@@ -10,7 +10,7 @@ from copy import deepcopy
 from BritefuryJ.DocModel import DMNode
 
 from BritefuryJ.LSpace.Clipboard import *
-from BritefuryJ.LSpace.Selection import TextSelection
+from BritefuryJ.LSpace.TextFocus import TextSelection
 from BritefuryJ.LSpace.StyleParams import *
 from BritefuryJ.LSpace.StreamValue import StreamValueBuilder
 from BritefuryJ.LSpace import *

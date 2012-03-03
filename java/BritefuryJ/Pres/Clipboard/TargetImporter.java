@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import BritefuryJ.LSpace.Clipboard.DataTransfer;
-import BritefuryJ.LSpace.Selection.Selection;
-import BritefuryJ.LSpace.Target.Target;
+import BritefuryJ.LSpace.Focus.Selection;
+import BritefuryJ.LSpace.Focus.Target;
 
 public class TargetImporter <TargetType extends Target>
 {
