@@ -11,9 +11,9 @@ import java.awt.event.ActionListener;
 
 import javax.swing.Timer;
 
-import BritefuryJ.DocPresent.Corner;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.FragmentContext;
+import BritefuryJ.LSpace.Corner;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.FragmentContext;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -34,23 +34,23 @@ public class TimedPopup
 
 
 
-	public void popup(DPElement element, Corner targetAnchor, Corner popupAnchor, PresentationContext ctx, StyleValues style)
+	public void popup(LSElement element, Corner targetAnchor, Corner popupAnchor, PresentationContext ctx, StyleValues style)
 	{
-		DPElement childElement = child.present( ctx, style );
+		LSElement childElement = child.present( ctx, style );
 		childElement.popup( element, targetAnchor, popupAnchor, true, bRequestFocus );
 		initialiseTimeout( childElement );
 	}
 	
-	public void popupAtMousePosition(DPElement element, Corner popupAnchor, PresentationContext ctx, StyleValues style)
+	public void popupAtMousePosition(LSElement element, Corner popupAnchor, PresentationContext ctx, StyleValues style)
 	{
-		DPElement childElement = child.present( ctx, style );
+		LSElement childElement = child.present( ctx, style );
 		element.getRootElement().createPopupAtMousePosition( childElement, popupAnchor, true, bRequestFocus );
 		initialiseTimeout( childElement );
 	}
 	
 	
 	
-	public void popup(DPElement element, Corner targetAnchor, Corner popupAnchor)
+	public void popup(LSElement element, Corner targetAnchor, Corner popupAnchor)
 	{
 		FragmentContext ctx = element.getFragmentContext();
 		if ( ctx != null )
@@ -63,7 +63,7 @@ public class TimedPopup
 		}
 	}
 	
-	public void popupAtMousePosition(DPElement element, Corner popupAnchor)
+	public void popupAtMousePosition(LSElement element, Corner popupAnchor)
 	{
 		FragmentContext ctx = element.getFragmentContext();
 		if ( ctx != null )
@@ -78,7 +78,7 @@ public class TimedPopup
 	
 	
 	
-	private void initialiseTimeout(final DPElement childElement)
+	private void initialiseTimeout(final LSElement childElement)
 	{
 		ActionListener timeoutListener = new ActionListener()
 		{

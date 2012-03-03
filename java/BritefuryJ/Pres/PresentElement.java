@@ -6,22 +6,22 @@
 //##************************
 package BritefuryJ.Pres;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class PresentElement extends Pres
 {
-	private DPElement element;
+	private LSElement element;
 	
 	
-	public PresentElement(DPElement element)
+	public PresentElement(LSElement element)
 	{
 		this.element = element;
 	}
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		return element;
 	}

@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Pres.Primitive;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPFraction;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSFraction;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -26,9 +26,9 @@ public class Fraction extends Pres
 		
 		
 		@Override
-		public DPElement present(PresentationContext ctx, StyleValues style)
+		public LSElement present(PresentationContext ctx, StyleValues style)
 		{
-			return new DPFraction.DPFractionBar( Primitive.fractionBarParams.get( style ), textRepresentation );
+			return new LSFraction.DPFractionBar( Primitive.fractionBarParams.get( style ), textRepresentation );
 		}
 	}
 	
@@ -53,10 +53,10 @@ public class Fraction extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPElement barElement = bar.present( ctx, style );
-		DPFraction element = new DPFraction( Primitive.fractionParams.get( style ), Primitive.textParams.get( style ), "/" );
+		LSElement barElement = bar.present( ctx, style );
+		LSFraction element = new LSFraction( Primitive.fractionParams.get( style ), Primitive.textParams.get( style ), "/" );
 		StyleValues usedStyle = Primitive.useFractionParams( Primitive.useTextParams( style ) );
 		element.setNumeratorChild( numerator.present( ctx, fractionNumeratorStyle( usedStyle ) ) );
 		element.setDenominatorChild( denominator.present( ctx, fractionDenominatorStyle( usedStyle ) ) );

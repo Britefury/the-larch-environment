@@ -9,7 +9,7 @@ package BritefuryJ.Pres;
 import org.python.core.Py;
 import org.python.core.PyObject;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class PyPresCombinatorFn
@@ -28,14 +28,14 @@ public class PyPresCombinatorFn
 		
 		
 		@Override
-		public DPElement present(PresentationContext ctx, StyleValues style)
+		public LSElement present(PresentationContext ctx, StyleValues style)
 		{
 			PyObject callArgs[] = new PyObject[args.length + 2];
 			callArgs[0] = Py.java2py( ctx );
 			callArgs[1] = Py.java2py( style );
 			System.arraycopy( args, 0, callArgs, 2, args.length );
 			PyObject result = callable.__call__( callArgs );
-			return Py.tojava( result, DPElement.class );
+			return Py.tojava( result, LSElement.class );
 		}
 	}
 

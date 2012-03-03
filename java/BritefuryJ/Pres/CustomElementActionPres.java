@@ -6,14 +6,14 @@
 //##************************
 package BritefuryJ.Pres;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class CustomElementActionPres extends Pres
 {
 	public static interface CustomElementAction
 	{
-		public void action(DPElement element, PresentationContext ctx, StyleValues style);
+		public void action(LSElement element, PresentationContext ctx, StyleValues style);
 	}
 	
 	
@@ -29,9 +29,9 @@ public class CustomElementActionPres extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPElement element = child.present( ctx, style );
+		LSElement element = child.present( ctx, style );
 		action.action( element, ctx, style );
 		return element;
 	}

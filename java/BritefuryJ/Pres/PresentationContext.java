@@ -7,8 +7,8 @@
 package BritefuryJ.Pres;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.LSpace.PersistentState.PersistentState;
 import BritefuryJ.Projection.AbstractPerspective;
 
 public class PresentationContext

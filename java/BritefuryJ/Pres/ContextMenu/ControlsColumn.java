@@ -8,7 +8,7 @@ package BritefuryJ.Pres.ContextMenu;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Pres.ApplyStyleSheetFromAttribute;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.SequentialPres;
@@ -29,9 +29,9 @@ public class ControlsColumn extends SequentialPres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPElement xs[] = mapPresent( ctx, ContextMenuStyle.controlsColumnUsage.useAttrs( style ), children );
+		LSElement xs[] = mapPresent( ctx, ContextMenuStyle.controlsColumnUsage.useAttrs( style ), children );
 		return new ApplyStyleSheetFromAttribute( ContextMenuStyle.controlsColumnStyle, new Column( xs ) ).present( ctx, style );
 	}
 }

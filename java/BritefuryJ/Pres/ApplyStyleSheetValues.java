@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Pres;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class ApplyStyleSheetValues extends Pres
@@ -23,7 +23,7 @@ public class ApplyStyleSheetValues extends Pres
 	
 
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		return child.present( ctx, styleSheetValues );
 	}

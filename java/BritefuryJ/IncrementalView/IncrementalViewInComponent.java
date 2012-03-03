@@ -6,10 +6,10 @@
 //##************************
 package BritefuryJ.IncrementalView;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.PageController;
-import BritefuryJ.DocPresent.PresentationComponent;
-import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.PageController;
+import BritefuryJ.LSpace.PresentationComponent;
+import BritefuryJ.LSpace.PersistentState.PersistentStateStore;
 import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Projection.ProjectiveBrowserContext;
 import BritefuryJ.Projection.Subject;
@@ -25,7 +25,7 @@ public class IncrementalViewInComponent
 		component = new PresentationComponent();
 		view = new IncrementalView( subject, browserContext, persistentState );
 
-		DPElement column = new Column( new Object[] { view.getViewPres() } ).alignHExpand().alignVExpand().present();
+		LSElement column = new Column( new Object[] { view.getViewPres() } ).alignHExpand().alignVExpand().present();
 		component.getRootElement().setChild( column );
 		
 		if ( pageController != null )

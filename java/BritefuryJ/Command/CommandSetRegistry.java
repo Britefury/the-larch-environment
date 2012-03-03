@@ -9,14 +9,14 @@ package BritefuryJ.Command;
 import java.util.HashMap;
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 
 public class CommandSetRegistry implements CommandSetSource
 {
 	protected class CommandSetRegistryInteractor implements GatherCommandSetInteractor
 	{
 		@Override
-		public void gatherCommandSets(DPElement element, List<CommandSet> commandSets)
+		public void gatherCommandSets(LSElement element, List<CommandSet> commandSets)
 		{
 			commandSets.addAll( nameToCmdSet.values() );
 		}

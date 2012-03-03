@@ -9,24 +9,24 @@ package BritefuryJ.Controls;
 import java.awt.event.KeyEvent;
 import java.util.regex.Pattern;
 
-import BritefuryJ.DocPresent.Corner;
-import BritefuryJ.DocPresent.DPBorder;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPRegion;
-import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.PresentationComponent;
-import BritefuryJ.DocPresent.TextEditEventInsert;
-import BritefuryJ.DocPresent.TextEditEventRemove;
-import BritefuryJ.DocPresent.TextEditEventReplace;
-import BritefuryJ.DocPresent.TreeEventListener;
-import BritefuryJ.DocPresent.Caret.Caret;
-import BritefuryJ.DocPresent.Clipboard.TextClipboardHandler;
-import BritefuryJ.DocPresent.Interactor.KeyElementInteractor;
-import BritefuryJ.DocPresent.Interactor.RealiseElementInteractor;
-import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.Selection.TextSelection;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
+import BritefuryJ.LSpace.Corner;
+import BritefuryJ.LSpace.LSBorder;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSRegion;
+import BritefuryJ.LSpace.LSText;
+import BritefuryJ.LSpace.PresentationComponent;
+import BritefuryJ.LSpace.TextEditEventInsert;
+import BritefuryJ.LSpace.TextEditEventRemove;
+import BritefuryJ.LSpace.TextEditEventReplace;
+import BritefuryJ.LSpace.TreeEventListener;
+import BritefuryJ.LSpace.Caret.Caret;
+import BritefuryJ.LSpace.Clipboard.TextClipboardHandler;
+import BritefuryJ.LSpace.Interactor.KeyElementInteractor;
+import BritefuryJ.LSpace.Interactor.RealiseElementInteractor;
+import BritefuryJ.LSpace.Marker.Marker;
+import BritefuryJ.LSpace.Selection.TextSelection;
 import BritefuryJ.Live.LiveInterface;
 import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.Pres;
@@ -111,12 +111,12 @@ public class TextEntry extends ControlPres
 			}
 			
 			
-			public boolean keyPressed(DPElement element, KeyEvent event)
+			public boolean keyPressed(LSElement element, KeyEvent event)
 			{
 				return event.getKeyCode() == KeyEvent.VK_ENTER  ||  event.getKeyCode() == KeyEvent.VK_ESCAPE;
 			}
 	
-			public boolean keyReleased(DPElement element, KeyEvent event)
+			public boolean keyReleased(LSElement element, KeyEvent event)
 			{
 				if ( event.getKeyCode() == KeyEvent.VK_ENTER )
 				{
@@ -131,13 +131,13 @@ public class TextEntry extends ControlPres
 				return false;
 			}
 	
-			public boolean keyTyped(DPElement element, KeyEvent event)
+			public boolean keyTyped(LSElement element, KeyEvent event)
 			{
 				return event.getKeyChar() == KeyEvent.VK_ENTER  ||  event.getKeyChar() == KeyEvent.VK_ESCAPE;
 			}
 			
 			
-			public void elementRealised(DPElement element)
+			public void elementRealised(LSElement element)
 			{
 				if ( bGrabCaretOnRealise )
 				{
@@ -152,7 +152,7 @@ public class TextEntry extends ControlPres
 				}
 			}
 
-			public void elementUnrealised(DPElement element)
+			public void elementUnrealised(LSElement element)
 			{
 			}
 		}
@@ -160,7 +160,7 @@ public class TextEntry extends ControlPres
 		
 		private class TextEntryTreeEventListener implements TreeEventListener
 		{
-			public boolean onTreeEvent(DPElement element, DPElement sourceElement, Object event)
+			public boolean onTreeEvent(LSElement element, LSElement sourceElement, Object event)
 			{
 				if ( event instanceof TextEditEventInsert )
 				{
@@ -225,8 +225,8 @@ public class TextEntry extends ControlPres
 		}
 		
 		
-		private DPBorder outerElement;
-		private DPText textElement;
+		private LSBorder outerElement;
+		private LSText textElement;
 		private BritefuryJ.Graphics.AbstractBorder validBorder, invalidBorder;
 		private TextEntryListener listener;
 		private TextEntryValidator validator;
@@ -235,7 +235,7 @@ public class TextEntry extends ControlPres
 	
 	
 		
-		protected TextEntryControl(PresentationContext ctx, StyleValues style, LiveInterface text, DPBorder outerElement, DPRegion region, DPText textElement, TextEntryListener listener, TextEntryValidator validator,
+		protected TextEntryControl(PresentationContext ctx, StyleValues style, LiveInterface text, LSBorder outerElement, LSRegion region, LSText textElement, TextEntryListener listener, TextEntryValidator validator,
 				BritefuryJ.Graphics.AbstractBorder validBorder, BritefuryJ.Graphics.AbstractBorder invalidBorder)
 		{
 			super( ctx, style );
@@ -262,7 +262,7 @@ public class TextEntry extends ControlPres
 		}
 		
 		
-		public DPElement getElement()
+		public LSElement getElement()
 		{
 			return outerElement;
 		}
@@ -487,12 +487,12 @@ public class TextEntry extends ControlPres
 		BritefuryJ.Graphics.AbstractBorder invalidBorder = style.get( Controls.textEntryInvalidBorder, BritefuryJ.Graphics.AbstractBorder.class );
 		
 		LiveInterface value = valueSource.getLive();
-		DPText textElement = (DPText)new Text( "" ).present( ctx, style );
+		LSText textElement = (LSText)new Text( "" ).present( ctx, style );
 		Pres line = new Row( new Pres[] { new Segment( false, false, textElement ) } );
 		Pres region = new Region( line );
-		DPRegion regionElement = (DPRegion)region.present( ctx, style );
+		LSRegion regionElement = (LSRegion)region.present( ctx, style );
 		Pres outer = new Border( regionElement ).alignVRefY();
-		DPBorder outerElement = (DPBorder)outer.present( ctx, style );
+		LSBorder outerElement = (LSBorder)outer.present( ctx, style );
 		
 		TextEntryControl control = new TextEntryControl( ctx, style, value, outerElement, regionElement, textElement, listener, validator, validBorder, invalidBorder );
 		if ( bSelectAllOnRealise )

@@ -6,10 +6,10 @@
 //##************************
 package BritefuryJ.Editor.SyntaxRecognizing;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.EditEvent;
-import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.EditEvent;
+import BritefuryJ.LSpace.StreamValue.StreamValue;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Logging.LogEntry;
 import BritefuryJ.Parser.ParseResult;
@@ -32,12 +32,12 @@ public abstract class ParsingEditListener extends SRStreamEditListener
 	}
 	
 
-	protected boolean isValueEmpty(DPElement element, FragmentView fragment, Object model, StreamValue value)
+	protected boolean isValueEmpty(LSElement element, FragmentView fragment, Object model, StreamValue value)
 	{
 		return getSyntaxRecognizingEditor().isValueEmpty( value );
 	}
 	
-	protected boolean isValueValid(DPElement element, FragmentView fragment, Object model, StreamValue value)
+	protected boolean isValueValid(LSElement element, FragmentView fragment, Object model, StreamValue value)
 	{
 		return true;
 	}
@@ -49,22 +49,22 @@ public abstract class ParsingEditListener extends SRStreamEditListener
 	}
 
 	
-	protected HandleEditResult handleEmptyValue(DPElement element, FragmentView fragment, EditEvent event, Object model)
+	protected HandleEditResult handleEmptyValue(LSElement element, FragmentView fragment, EditEvent event, Object model)
 	{
 		return HandleEditResult.NOT_HANDLED;
 	}
 	
-	protected abstract HandleEditResult handleParseSuccess(DPElement element, DPElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value, Object parsed);
+	protected abstract HandleEditResult handleParseSuccess(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value, Object parsed);
 	
 	
-	protected HandleEditResult handleParseFailure(DPElement element, DPElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
+	protected HandleEditResult handleParseFailure(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
 	{
 		return HandleEditResult.NOT_HANDLED;
 	}
 	
 	
 	
-	protected HandleEditResult handleValue(DPElement element, DPElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
+	protected HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
 	{
 		String logName = getLogName();
 		if ( value.isEmpty()  ||  isValueEmpty( element, fragment, model, value ) )

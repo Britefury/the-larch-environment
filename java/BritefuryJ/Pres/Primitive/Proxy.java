@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Pres.Primitive;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPProxy;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSProxy;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -25,10 +25,10 @@ public class Proxy extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPElement childElement = child.present( ctx, style );
-		DPProxy proxy = new DPProxy();
+		LSElement childElement = child.present( ctx, style );
+		LSProxy proxy = new LSProxy();
 		proxy.setChild( childElement );
 		return proxy;
 	}

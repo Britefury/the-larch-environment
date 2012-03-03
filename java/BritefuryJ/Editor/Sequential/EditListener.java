@@ -6,11 +6,11 @@
 //##************************
 package BritefuryJ.Editor.Sequential;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.EditEvent;
-import BritefuryJ.DocPresent.TextEditEvent;
-import BritefuryJ.DocPresent.TreeEventListener;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.EditEvent;
+import BritefuryJ.LSpace.TextEditEvent;
+import BritefuryJ.LSpace.TreeEventListener;
 
 public abstract class EditListener implements TreeEventListener
 {
@@ -37,11 +37,11 @@ public abstract class EditListener implements TreeEventListener
 	}
 	
 	
-	protected abstract HandleEditResult handleEditEvent(DPElement element, DPElement sourceElement, EditEvent event);
+	protected abstract HandleEditResult handleEditEvent(LSElement element, LSElement sourceElement, EditEvent event);
 	
 	
 	
-	public boolean onTreeEvent(DPElement element, DPElement sourceElement, Object event)
+	public boolean onTreeEvent(LSElement element, LSElement sourceElement, Object event)
 	{
 		if ( event instanceof EditEvent )
 		{

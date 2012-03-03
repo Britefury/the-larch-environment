@@ -9,26 +9,26 @@ package BritefuryJ.Controls;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.DPBorder;
-import BritefuryJ.DocPresent.DPColumn;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPRegion;
-import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.DPWhitespace;
-import BritefuryJ.DocPresent.ElementValueFunction;
-import BritefuryJ.DocPresent.TextEditEvent;
-import BritefuryJ.DocPresent.TextEditEventInsert;
-import BritefuryJ.DocPresent.TextEditEventRemove;
-import BritefuryJ.DocPresent.TextEditEventReplace;
-import BritefuryJ.DocPresent.TreeEventListener;
-import BritefuryJ.DocPresent.Caret.Caret;
-import BritefuryJ.DocPresent.Clipboard.TextClipboardHandler;
-import BritefuryJ.DocPresent.Interactor.KeyElementInteractor;
-import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.Selection.TextSelection;
-import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
+import BritefuryJ.LSpace.LSBorder;
+import BritefuryJ.LSpace.LSColumn;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSRegion;
+import BritefuryJ.LSpace.LSText;
+import BritefuryJ.LSpace.LSWhitespace;
+import BritefuryJ.LSpace.ElementValueFunction;
+import BritefuryJ.LSpace.TextEditEvent;
+import BritefuryJ.LSpace.TextEditEventInsert;
+import BritefuryJ.LSpace.TextEditEventRemove;
+import BritefuryJ.LSpace.TextEditEventReplace;
+import BritefuryJ.LSpace.TreeEventListener;
+import BritefuryJ.LSpace.Caret.Caret;
+import BritefuryJ.LSpace.Clipboard.TextClipboardHandler;
+import BritefuryJ.LSpace.Interactor.KeyElementInteractor;
+import BritefuryJ.LSpace.Marker.Marker;
+import BritefuryJ.LSpace.Selection.TextSelection;
+import BritefuryJ.LSpace.StreamValue.StreamValueBuilder;
 import BritefuryJ.Live.LiveInterface;
 import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.Pres;
@@ -76,13 +76,13 @@ public class TextArea extends ControlPres
 			
 			
 			@Override
-			public boolean keyPressed(DPElement element, KeyEvent event)
+			public boolean keyPressed(LSElement element, KeyEvent event)
 			{
 				return event.isControlDown()  &&  event.getKeyCode() == KeyEvent.VK_ENTER;
 			}
 	
 			@Override
-			public boolean keyReleased(DPElement element, KeyEvent event)
+			public boolean keyReleased(LSElement element, KeyEvent event)
 			{
 				if ( event.isControlDown()  &&  event.getKeyCode() == KeyEvent.VK_ENTER )
 				{
@@ -93,7 +93,7 @@ public class TextArea extends ControlPres
 			}
 	
 			@Override
-			public boolean keyTyped(DPElement element, KeyEvent event)
+			public boolean keyTyped(LSElement element, KeyEvent event)
 			{
 				return event.isControlDown()  &&  event.getKeyChar() == KeyEvent.VK_ENTER;
 			}
@@ -103,11 +103,11 @@ public class TextArea extends ControlPres
 		private class TextAreaTextLineTreeEventListener implements TreeEventListener
 		{
 			@Override
-			public boolean onTreeEvent(DPElement element, DPElement sourceElement, Object event)
+			public boolean onTreeEvent(LSElement element, LSElement sourceElement, Object event)
 			{
 				if ( event instanceof TextEditEvent )
 				{
-					DPText textElement = (DPText)sourceElement;
+					LSText textElement = (LSText)sourceElement;
 					String lineText = textElement.getText();
 					int lineOffset = textElement.getTextRepresentationOffsetInSubtree( textBox );
 					
@@ -144,11 +144,11 @@ public class TextArea extends ControlPres
 		private class TextAreaNewlineTreeEventListener implements TreeEventListener
 		{
 			@Override
-			public boolean onTreeEvent(DPElement element, DPElement sourceElement, Object event)
+			public boolean onTreeEvent(LSElement element, LSElement sourceElement, Object event)
 			{
 				if ( event instanceof TextEditEvent )
 				{
-					DPWhitespace whitespaceElement = (DPWhitespace)sourceElement;
+					LSWhitespace whitespaceElement = (LSWhitespace)sourceElement;
 					
 					int lineOffset = whitespaceElement.getTextRepresentationOffsetInSubtree( textBox );
 					
@@ -235,24 +235,24 @@ public class TextArea extends ControlPres
 		
 		private class ValueFn implements ElementValueFunction
 		{
-			public Object computeElementValue(DPElement element)
+			public Object computeElementValue(LSElement element)
 			{
 				return getDisplayedText();
 			}
 	
-			public void addStreamValuePrefixToStream(StreamValueBuilder builder, DPElement element)
+			public void addStreamValuePrefixToStream(StreamValueBuilder builder, LSElement element)
 			{
 			}
 	
-			public void addStreamValueSuffixToStream(StreamValueBuilder builder, DPElement element)
+			public void addStreamValueSuffixToStream(StreamValueBuilder builder, LSElement element)
 			{
 			}
 		}
 	
 		
 		
-		private DPElement element;
-		private DPColumn textBox;
+		private LSElement element;
+		private LSColumn textBox;
 		private LiveInterface value;
 		private TextAreaListener listener;
 		private TextAreaTextLineTreeEventListener textLineTreeEventListener = new TextAreaTextLineTreeEventListener();
@@ -260,7 +260,7 @@ public class TextArea extends ControlPres
 		
 		
 		
-		protected TextAreaControl(PresentationContext ctx, StyleValues style, DPElement element, DPRegion region, DPColumn textBox, TextAreaListener listener, LiveInterface value)
+		protected TextAreaControl(PresentationContext ctx, StyleValues style, LSElement element, LSRegion region, LSColumn textBox, TextAreaListener listener, LiveInterface value)
 		{
 			super( ctx, style );
 			
@@ -281,7 +281,7 @@ public class TextArea extends ControlPres
 		
 	
 		@Override
-		public DPElement getElement()
+		public LSElement getElement()
 		{
 			return element;
 		}
@@ -378,7 +378,7 @@ public class TextArea extends ControlPres
 			{
 				return textBox.getRootElement().getCaret().getClampedIndexInSubtree( textBox );
 			}
-			catch (DPElement.IsNotInSubtreeException e)
+			catch (LSElement.IsNotInSubtreeException e)
 			{
 				return -1;
 			}
@@ -407,19 +407,19 @@ public class TextArea extends ControlPres
 			}
 			
 			
-			ArrayList<DPElement> lineElements = new ArrayList<DPElement>();
+			ArrayList<LSElement> lineElements = new ArrayList<LSElement>();
 			for (String line: textLines)
 			{
 				Pres textPres = new Text( line );
-				DPElement textElement = textPres.present( ctx, style );
+				LSElement textElement = textPres.present( ctx, style );
 				Pres seg = new Segment( true, true, textElement );
 				Pres newline = new Whitespace( "\n" );
-				DPElement newlineElement = newline.present( ctx, style );
+				LSElement newlineElement = newline.present( ctx, style );
 				textElement.addTreeEventListener( textLineTreeEventListener );
 				newlineElement.addTreeEventListener( newlineTreeEventListener );
 				
 				Pres linePres = new Row( new Object[] { seg, newlineElement } );
-				DPElement lineElement = linePres.present( ctx, style );
+				LSElement lineElement = linePres.present( ctx, style );
 				lineElements.add( lineElement );
 			}
 			
@@ -510,11 +510,11 @@ public class TextArea extends ControlPres
 		LiveInterface value = valueSource.getLive();
 
 		Pres textBoxPres = new Column( new Pres[] {} );
-		DPColumn textBox = (DPColumn)textBoxPres.present( ctx, textAreaStyle );
+		LSColumn textBox = (LSColumn)textBoxPres.present( ctx, textAreaStyle );
 		Pres regionPres = new Region( textBox );
-		DPRegion region = (DPRegion)regionPres.present( ctx, textAreaStyle );
+		LSRegion region = (LSRegion)regionPres.present( ctx, textAreaStyle );
 		Pres elementPres = new Border( region );
-		DPBorder element = (DPBorder)elementPres.present( ctx, textAreaStyle );
+		LSBorder element = (LSBorder)elementPres.present( ctx, textAreaStyle );
 		
 		return new TextAreaControl( ctx, style, element, region, textBox, listener, value );
 	}

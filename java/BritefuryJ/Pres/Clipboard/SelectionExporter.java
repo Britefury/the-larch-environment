@@ -8,8 +8,8 @@ package BritefuryJ.Pres.Clipboard;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.Selection.Selection;
-import BritefuryJ.DocPresent.Target.Target;
+import BritefuryJ.LSpace.Selection.Selection;
+import BritefuryJ.LSpace.Target.Target;
 
 public class SelectionExporter <SelectionContentsType, SelectionType extends Selection> extends AbstractSelectionExporter<SelectionContentsType, SelectionType>
 {

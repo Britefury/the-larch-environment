@@ -8,7 +8,7 @@ package BritefuryJ.Controls;
 
 import java.util.regex.Pattern;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Live.LiveFunction;
 import BritefuryJ.Live.LiveInterface;
 import BritefuryJ.Live.LiveValue;
@@ -30,7 +30,7 @@ public class RealNumericLabel extends NumericLabel
 		private RealNumericLabelListener listener;
 		
 	
-		protected RealNumericLabelControl(PresentationContext ctx, StyleValues style, LiveInterface value, LiveInterface text, LiveFunction display, DPElement element,
+		protected RealNumericLabelControl(PresentationContext ctx, StyleValues style, LiveInterface value, LiveInterface text, LiveFunction display, LSElement element,
 				double min, double max, RealNumericLabelListener listener)
 		{
 			super( ctx, style, value, text, display, element );
@@ -151,7 +151,7 @@ public class RealNumericLabel extends NumericLabel
 	
 	
 	@Override
-	protected NumericLabelControl createNumericLabelControl(PresentationContext ctx, StyleValues style, LiveInterface value, LiveInterface text, LiveFunction display, DPElement element)
+	protected NumericLabelControl createNumericLabelControl(PresentationContext ctx, StyleValues style, LiveInterface value, LiveInterface text, LiveFunction display, LSElement element)
 	{
 		return new RealNumericLabelControl( ctx, style, value, text, display, element, min, max, listener );
 	}

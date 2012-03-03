@@ -8,8 +8,8 @@ package BritefuryJ.Pres.Primitive;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPRGrid;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSRGrid;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.SequentialPres;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -28,9 +28,9 @@ public class RGrid extends SequentialPres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPRGrid grid = new DPRGrid( Primitive.tableParams.get( style ) );
+		LSRGrid grid = new LSRGrid( Primitive.tableParams.get( style ) );
 		grid.setChildren( mapPresent( ctx, Primitive.useTableParams( style ), children ) );
 		
 		return Table.applyTableBorder( style, grid );

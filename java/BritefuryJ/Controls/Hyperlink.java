@@ -7,10 +7,10 @@
 package BritefuryJ.Controls;
 
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.Browser.Location;
-import BritefuryJ.DocPresent.Interactor.ContextMenuElementInteractor;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSText;
+import BritefuryJ.LSpace.Browser.Location;
+import BritefuryJ.LSpace.Interactor.ContextMenuElementInteractor;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Text;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -19,10 +19,10 @@ public class Hyperlink extends AbstractHyperlink
 {
 	public static class HyperlinkControl extends AbstractHyperlink.AbstractHyperlinkControl
 	{
-		private DPText textElement;
+		private LSText textElement;
 		
 		
-		protected HyperlinkControl(PresentationContext ctx, StyleValues style, DPText element, LinkListener listener, boolean bClosePopupOnActivate)
+		protected HyperlinkControl(PresentationContext ctx, StyleValues style, LSText element, LinkListener listener, boolean bClosePopupOnActivate)
 		{
 			super( ctx, style, element, listener, bClosePopupOnActivate );
 			this.textElement = element;
@@ -54,9 +54,9 @@ public class Hyperlink extends AbstractHyperlink
 	
 	
 	@Override
-	protected Control createHyperlinkControl(PresentationContext ctx, StyleValues style, DPElement contentsElement, boolean bClosePopupOnActivate, LinkListener listener,
+	protected Control createHyperlinkControl(PresentationContext ctx, StyleValues style, LSElement contentsElement, boolean bClosePopupOnActivate, LinkListener listener,
 			ContextMenuElementInteractor contextMenuInteractor)
 	{
-		return new HyperlinkControl( ctx, style, (DPText)contentsElement, listener, bClosePopupOnActivate );
+		return new HyperlinkControl( ctx, style, (LSText)contentsElement, listener, bClosePopupOnActivate );
 	}
 }

@@ -9,7 +9,7 @@ import sys
 
 from java.lang import Throwable
 
-from BritefuryJ.DocPresent.StreamValue import StreamValueBuilder
+from BritefuryJ.LSpace.StreamValue import StreamValueBuilder
 
 from BritefuryJ.Util import InvokePyFunction
 

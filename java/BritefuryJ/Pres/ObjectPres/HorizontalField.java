@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Pres.ObjectPres;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Label;
@@ -29,11 +29,11 @@ public class HorizontalField extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		StyleSheet fieldStyle = style.get( ObjectPresStyle.objectFieldStyle, StyleSheet.class );
 		
-		DPElement valueElement = value.present( ctx, ObjectPresStyle.useObjectFieldAttrs( style ) );
+		LSElement valueElement = value.present( ctx, ObjectPresStyle.useObjectFieldAttrs( style ) );
 		
 		return fieldStyle.applyTo( new Paragraph( new Object[] { new Label( title ), new Label( " " ), new LineBreak(), valueElement } ) ).present( ctx, style );
 	}

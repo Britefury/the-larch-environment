@@ -14,12 +14,12 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-import BritefuryJ.DocPresent.PageController;
-import BritefuryJ.DocPresent.PresentationComponent;
-import BritefuryJ.DocPresent.Browser.BrowserPage;
-import BritefuryJ.DocPresent.Input.Keyboard.Keyboard;
-import BritefuryJ.DocPresent.Input.Keyboard.KeyboardInteractor;
 import BritefuryJ.IncrementalView.IncrementalViewInComponent;
+import BritefuryJ.LSpace.PageController;
+import BritefuryJ.LSpace.PresentationComponent;
+import BritefuryJ.LSpace.Browser.BrowserPage;
+import BritefuryJ.LSpace.Input.Keyboard.Keyboard;
+import BritefuryJ.LSpace.Input.Keyboard.KeyboardInteractor;
 
 public class CommandBar
 {

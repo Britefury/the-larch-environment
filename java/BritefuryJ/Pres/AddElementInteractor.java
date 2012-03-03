@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Pres;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Interactor.AbstractElementInteractor;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class AddElementInteractor extends Pres
@@ -24,9 +24,9 @@ public class AddElementInteractor extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPElement element = child.present( ctx, style );
+		LSElement element = child.present( ctx, style );
 		element.addElementInteractor( interactor );
 		return element;
 	}

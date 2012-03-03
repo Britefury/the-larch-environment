@@ -7,7 +7,7 @@
 package BritefuryJ.Pres;
 
 import BritefuryJ.DefaultPerspective.DefaultPerspective;
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Projection.AbstractPerspective;
 import BritefuryJ.StyleSheet.StyleValues;
 
@@ -31,7 +31,7 @@ public class ApplyPerspective extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		AbstractPerspective p = perspective;
 		if ( p == null )

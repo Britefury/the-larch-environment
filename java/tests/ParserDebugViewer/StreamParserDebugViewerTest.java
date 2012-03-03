@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
+import BritefuryJ.LSpace.StreamValue.StreamValueBuilder;
 import BritefuryJ.Parser.AnyNode;
 import BritefuryJ.Parser.TracedParseResult;
 import BritefuryJ.Parser.Literal;

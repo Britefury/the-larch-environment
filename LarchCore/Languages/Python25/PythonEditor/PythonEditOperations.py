@@ -18,11 +18,11 @@ from BritefuryJ.DocModel import DMList, DMObject, DMObjectInterface, DMNode
 
 
 
-from BritefuryJ.DocPresent.StyleParams import *
-from BritefuryJ.DocPresent.Selection import TextSelection
-from BritefuryJ.DocPresent import *
+from BritefuryJ.LSpace.StyleParams import *
+from BritefuryJ.LSpace.Selection import TextSelection
+from BritefuryJ.LSpace import *
 
-from BritefuryJ.DocPresent.StreamValue import StreamValueBuilder, StreamValue
+from BritefuryJ.LSpace.StreamValue import StreamValueBuilder, StreamValue
 
 
 
@@ -333,7 +333,7 @@ class _InsertSpecialFormTreeEvent (TextEditEvent):
 def _insertSpecialFormAtMarker(marker, specialForm):
 	element = marker.getElement()
 	index = marker.getIndex()
-	assert isinstance( element, DPText )
+	assert isinstance( element, LSText )
 	
 	value = element.getStreamValue()
 	builder = StreamValueBuilder()

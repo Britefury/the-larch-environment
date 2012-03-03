@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.DocPresent.Clipboard.LocalDataFlavor;
+import BritefuryJ.LSpace.Clipboard.LocalDataFlavor;
 
 public abstract class AbstractDataExporter <SelectionContentsType> extends DataExporterInterface<SelectionContentsType>
 {

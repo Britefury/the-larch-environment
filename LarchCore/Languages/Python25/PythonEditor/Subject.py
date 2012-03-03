@@ -7,7 +7,7 @@
 ##-*************************
 import sys
 
-from BritefuryJ.DocPresent.Browser import Location
+from BritefuryJ.LSpace.Browser import Location
 
 from BritefuryJ.Projection import Subject
 

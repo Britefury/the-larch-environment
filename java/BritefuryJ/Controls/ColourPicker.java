@@ -11,11 +11,11 @@ import java.awt.Cursor;
 
 import javax.swing.JColorChooser;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
-import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.DocPresent.Interactor.PushElementInteractor;
 import BritefuryJ.Graphics.FillPainter;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Event.PointerButtonEvent;
+import BritefuryJ.LSpace.Input.PointerInputElement;
+import BritefuryJ.LSpace.Interactor.PushElementInteractor;
 import BritefuryJ.Live.LiveFunction;
 import BritefuryJ.Live.LiveInterface;
 import BritefuryJ.Live.LiveValue;
@@ -37,7 +37,7 @@ public class ColourPicker extends ControlPres
 	
 	public static class ColourPickerControl extends Control
 	{
-		private DPElement element;
+		private LSElement element;
 		
 		
 		public ColourPickerControl(PresentationContext ctx, StyleValues style)
@@ -48,7 +48,7 @@ public class ColourPicker extends ControlPres
 
 
 		@Override
-		public DPElement getElement()
+		public LSElement getElement()
 		{
 			return element;
 		}
@@ -122,7 +122,7 @@ public class ColourPicker extends ControlPres
 					@Override
 					public void buttonRelease(PointerInputElement element, PointerButtonEvent event)
 					{
-						DPElement swatchElement = (DPElement)element;
+						LSElement swatchElement = (LSElement)element;
 						
 						Color newColour = JColorChooser.showDialog( swatchElement.getRootElement().getComponent(), "Choose colour", colour );
 						

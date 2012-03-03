@@ -9,8 +9,8 @@ package BritefuryJ.Pres.Primitive;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPShape;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSShape;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
@@ -26,7 +26,7 @@ public class Arrow extends Pres
 		Point2 b = new Point2( arrowRadius * Math.sin( Math.toRadians( 120.0 ) ), arrowRadius * Math.cos( Math.toRadians( 120.0 ) ) );
 		Point2 c = new Point2( arrowRadius * Math.sin( Math.toRadians( 240.0 ) ), arrowRadius * Math.cos( Math.toRadians( 240.0 ) ) );
 		
-		Path2D.Double down = DPShape.filletedPath( new Point2[] { a, b, c }, true, filletSize );
+		Path2D.Double down = LSShape.filletedPath( new Point2[] { a, b, c }, true, filletSize );
 		//Path2D.Double arrowShape = DPShape.path( new Point2[] { a, b, c }, true );
 		
 		Path2D.Double up = (Path2D.Double)down.clone();
@@ -90,8 +90,8 @@ public class Arrow extends Pres
 
 
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		return new DPShape( Primitive.shapeParams.get( style ), "", shape );
+		return new LSShape( Primitive.shapeParams.get( style ), "", shape );
 	}
 }

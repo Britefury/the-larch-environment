@@ -14,18 +14,18 @@ import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.ChangeHistory.ChangeHistory;
 import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.PageController;
-import BritefuryJ.DocPresent.PresentationComponent;
-import BritefuryJ.DocPresent.TreeEventListener;
-import BritefuryJ.DocPresent.Browser.BrowserPage;
-import BritefuryJ.DocPresent.Browser.Location;
-import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
-import BritefuryJ.DocPresent.StreamValue.SequentialStreamValueVisitor;
-import BritefuryJ.DocPresent.StreamValue.StreamValue;
-import BritefuryJ.DocPresent.Target.Target;
 import BritefuryJ.Graphics.AbstractBorder;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.PageController;
+import BritefuryJ.LSpace.PresentationComponent;
+import BritefuryJ.LSpace.TreeEventListener;
+import BritefuryJ.LSpace.Browser.BrowserPage;
+import BritefuryJ.LSpace.Browser.Location;
+import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
+import BritefuryJ.LSpace.StreamValue.SequentialStreamValueVisitor;
+import BritefuryJ.LSpace.StreamValue.StreamValue;
+import BritefuryJ.LSpace.Target.Target;
 import BritefuryJ.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Label;
@@ -81,7 +81,7 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 	private TreeEventListener treeEventListener = new TreeEventListener()
 	{
 		@Override
-		public boolean onTreeEvent(DPElement element, DPElement sourceElement, Object event)
+		public boolean onTreeEvent(LSElement element, LSElement sourceElement, Object event)
 		{
 			SequentialStreamValueVisitor visitor = new SequentialStreamValueVisitor();
 			StreamValue value = visitor.getStreamValue( element );

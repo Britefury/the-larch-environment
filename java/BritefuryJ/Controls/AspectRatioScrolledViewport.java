@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Controls;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.PersistentState.PersistentState;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.PersistentState.PersistentState;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.AspectRatioBin;
 
@@ -25,7 +25,7 @@ public class AspectRatioScrolledViewport extends AbstractScrolledViewport
 	
 
 	@Override
-	protected Pres createViewportBin(DPElement viewport)
+	protected Pres createViewportBin(LSElement viewport)
 	{
 		return new AspectRatioBin( viewport, minWidth, aspectRatio );
 	}

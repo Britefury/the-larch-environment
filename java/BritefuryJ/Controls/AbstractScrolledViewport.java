@@ -7,10 +7,10 @@
 package BritefuryJ.Controls;
 
 import BritefuryJ.Controls.ScrollBar.ScrollBarControl;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPViewport;
-import BritefuryJ.DocPresent.PersistentState.PersistentState;
-import BritefuryJ.DocPresent.Util.Range;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSViewport;
+import BritefuryJ.LSpace.PersistentState.PersistentState;
+import BritefuryJ.LSpace.Util.Range;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Column;
@@ -23,14 +23,14 @@ public abstract class AbstractScrolledViewport extends ControlPres
 {
 	public class ScrolledViewportControl extends Control
 	{
-		private DPViewport viewport;
-		private DPElement element;
+		private LSViewport viewport;
+		private LSElement element;
 		private ScrollBar.ScrollBarControl xScrollBar, yScrollBar;
 		private Range xRange, yRange;
 		
 		
 		
-		public ScrolledViewportControl(PresentationContext ctx, StyleValues style, DPViewport viewport, DPElement element,
+		public ScrolledViewportControl(PresentationContext ctx, StyleValues style, LSViewport viewport, LSElement element,
 				ScrollBar.ScrollBarControl xScrollBar, ScrollBar.ScrollBarControl yScrollBar, Range xRange, Range yRange)
 		{
 			super( ctx, style );
@@ -44,13 +44,13 @@ public abstract class AbstractScrolledViewport extends ControlPres
 		}
 		
 		
-		public DPViewport getViewportElement()
+		public LSViewport getViewportElement()
 		{
 			return viewport;
 		}
 		
 		@Override
-		public DPElement getElement()
+		public LSElement getElement()
 		{
 			return element;
 		}
@@ -98,7 +98,7 @@ public abstract class AbstractScrolledViewport extends ControlPres
 		Range yRange = new Range( 0.0, 1.0, 0.0, 1.0, 0.1 );
 		
 		Viewport viewport = new Viewport( child, xRange, yRange, state );
-		DPViewport viewportElement = (DPViewport)viewport.alignHExpand().alignVExpand().present( ctx, style );
+		LSViewport viewportElement = (LSViewport)viewport.alignHExpand().alignVExpand().present( ctx, style );
 		
 		Pres bin = createViewportBin( viewportElement );
 		HScrollBar xScroll = new HScrollBar( xRange );
@@ -109,12 +109,12 @@ public abstract class AbstractScrolledViewport extends ControlPres
 		Pres row0 = new Row( new Object[] { bin, yScrollCtl.getElement() } );
 		Pres row1 = new Row( new Object[] { xScrollCtl.getElement(), new Spacer( scrollBarSize, scrollBarSize ).alignHPack() } ).alignVRefY();
 		Pres col = new Column( new Pres[] { row0, row1 } ).alignHExpand().alignVExpand();
-		DPElement element = col.present( ctx, style );
+		LSElement element = col.present( ctx, style );
 		
 		return new ScrolledViewportControl( ctx, style, viewportElement, element, xScrollCtl, yScrollCtl, xRange, yRange );
 	}
 
 
 
-	protected abstract Pres createViewportBin(DPElement child);
+	protected abstract Pres createViewportBin(LSElement child);
 }

@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Pres.Primitive;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPWhitespace;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSWhitespace;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -32,8 +32,8 @@ public class Whitespace extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		return new DPWhitespace( Primitive.contentLeafParams.get( style ), text, width );
+		return new LSWhitespace( Primitive.contentLeafParams.get( style ), text, width );
 	}
 }

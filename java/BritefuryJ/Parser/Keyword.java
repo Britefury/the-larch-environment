@@ -8,7 +8,7 @@ package BritefuryJ.Parser;
 
 import java.util.regex.Pattern;
 
-import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
+import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
 
 /*
  * Keyword

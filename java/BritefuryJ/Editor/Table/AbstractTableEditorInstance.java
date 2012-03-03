@@ -6,16 +6,16 @@
 //##************************
 package BritefuryJ.Editor.Table;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.ElementSearchBredthFirst;
-import BritefuryJ.DocPresent.TableElement;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
-import BritefuryJ.DocPresent.Event.PointerMotionEvent;
-import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.DocPresent.Interactor.TargetElementInteractor;
-import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.Selection.SelectionPoint;
-import BritefuryJ.DocPresent.Target.Target;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.ElementSearchBredthFirst;
+import BritefuryJ.LSpace.TableElement;
+import BritefuryJ.LSpace.Event.PointerButtonEvent;
+import BritefuryJ.LSpace.Event.PointerMotionEvent;
+import BritefuryJ.LSpace.Input.PointerInputElement;
+import BritefuryJ.LSpace.Interactor.TargetElementInteractor;
+import BritefuryJ.LSpace.Marker.Marker;
+import BritefuryJ.LSpace.Selection.SelectionPoint;
+import BritefuryJ.LSpace.Target.Target;
 import BritefuryJ.Live.LiveFunction;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Pres.Pres;
@@ -32,7 +32,7 @@ public abstract class AbstractTableEditorInstance <ModelType>
 			if ( event.getButton() == 1 )
 			{
 				Point2 p = event.getLocalPointerPos();
-				DPElement elem = (DPElement)element;
+				LSElement elem = (LSElement)element;
 				TableElement table = (TableElement)element;
 				int pos[] = table.getCellPositionUnder( p );
 				pos = table.getPositionOfChildCoveringCell( pos[0], pos[1] );
@@ -99,12 +99,12 @@ public abstract class AbstractTableEditorInstance <ModelType>
 		}
 
 		@Override
-		public DPElement present(PresentationContext ctx, StyleValues style)
+		public LSElement present(PresentationContext ctx, StyleValues style)
 		{
 			TargetInteractor interactor = new TargetInteractor();
 			
-			DPElement element = contents.present( ctx, style );
-			DPElement tableElement = ElementSearchBredthFirst.searchByType( element, TableElement.class );
+			LSElement element = contents.present( ctx, style );
+			LSElement tableElement = ElementSearchBredthFirst.searchByType( element, TableElement.class );
 			tableElement.addElementInteractor( interactor );
 			return element;
 		}
@@ -141,7 +141,7 @@ public abstract class AbstractTableEditorInstance <ModelType>
 	
 	
 
-	protected Object[][] getSelectedData(TableSelection tableSelection, DPElement tableElement, int x0, int y0, int x1, int y1)
+	protected Object[][] getSelectedData(TableSelection tableSelection, LSElement tableElement, int x0, int y0, int x1, int y1)
 	{
 		if ( tableElement.isRealised() )
 		{

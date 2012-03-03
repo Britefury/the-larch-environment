@@ -7,11 +7,11 @@
 package BritefuryJ.Controls;
 
 import BritefuryJ.Controls.Button.ButtonControl;
-import BritefuryJ.DocPresent.DPBin;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
-import BritefuryJ.DocPresent.Layout.HAlignment;
-import BritefuryJ.DocPresent.Layout.VAlignment;
+import BritefuryJ.LSpace.LSBin;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Event.PointerButtonEvent;
+import BritefuryJ.LSpace.Layout.HAlignment;
+import BritefuryJ.LSpace.Layout.VAlignment;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Bin;
@@ -44,12 +44,12 @@ public class PresentationButton extends ControlPres
 	
 	public static class PresentationButtonControl extends Control
 	{
-		private DPElement element;
-		private DPBin presContainer;
+		private LSElement element;
+		private LSBin presContainer;
 		private PresFactory presFactory;
 		
 		
-		protected PresentationButtonControl(PresentationContext ctx, StyleValues style, DPElement element, DPBin presContainer, PresFactory presFactory)
+		protected PresentationButtonControl(PresentationContext ctx, StyleValues style, LSElement element, LSBin presContainer, PresFactory presFactory)
 		{
 			super( ctx, style );
 			this.element = element;
@@ -61,7 +61,7 @@ public class PresentationButton extends ControlPres
 		
 		
 		@Override
-		public DPElement getElement()
+		public LSElement getElement()
 		{
 			return element;
 		}
@@ -70,7 +70,7 @@ public class PresentationButton extends ControlPres
 		
 		private void displayPres()
 		{
-			DPElement p = Pres.coerce( presFactory.createPres() ).present( ctx, style );
+			LSElement p = Pres.coerce( presFactory.createPres() ).present( ctx, style );
 			presContainer.setChild( p.layoutWrap( style.get( Primitive.hAlign, HAlignment.class ), style.get( Primitive.vAlign, VAlignment.class ) ) );
 		}
 	}
@@ -116,10 +116,10 @@ public class PresentationButton extends ControlPres
 		Button button = new Button( buttonContent, buttonListener );
 		
 		Bin presBin = new Bin( null );
-		DPBin binElement = (DPBin)presBin.present( ctx, usedStyle );
+		LSBin binElement = (LSBin)presBin.present( ctx, usedStyle );
 		
 		Pres presButton = StyleSheet.style( Primitive.columnSpacing.as( spacing ) ).applyTo( new Column( new Object[] { button, binElement } ) );
-		DPElement element = presButton.present( ctx, usedStyle );
+		LSElement element = presButton.present( ctx, usedStyle );
 		
 		PresentationButtonControl control = new PresentationButtonControl( ctx, usedStyle, element, binElement, presFactory );
 		

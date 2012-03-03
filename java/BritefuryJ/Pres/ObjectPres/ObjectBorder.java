@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Pres.ObjectPres;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Border;
@@ -25,10 +25,10 @@ public class ObjectBorder extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		StyleSheet borderStyle = ObjectPresStyle.objectBorderStyle.get( style );
-		DPElement childElem = child.present( ctx, ObjectPresStyle.useObjectBorderAttrs( style ) );
+		LSElement childElem = child.present( ctx, ObjectPresStyle.useObjectBorderAttrs( style ) );
 		return borderStyle.applyTo( new Border( childElem ).alignVRefY() ).present( ctx, style );
 	}
 }

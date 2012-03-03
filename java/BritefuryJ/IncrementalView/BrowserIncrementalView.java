@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.IncrementalView;
 
-import BritefuryJ.DocPresent.Browser.BrowserPage;
-import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
+import BritefuryJ.LSpace.Browser.BrowserPage;
+import BritefuryJ.LSpace.PersistentState.PersistentStateStore;
 import BritefuryJ.Projection.ProjectiveBrowserContext;
 import BritefuryJ.Projection.Subject;
 

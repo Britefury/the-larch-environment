@@ -8,11 +8,11 @@ package BritefuryJ.Pres;
 
 import java.util.HashMap;
 
-import BritefuryJ.DocPresent.DPBorder;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Layout.HAlignment;
-import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.Graphics.FilledBorder;
+import BritefuryJ.LSpace.LSBorder;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Layout.HAlignment;
+import BritefuryJ.LSpace.Layout.VAlignment;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleValues;
 import BritefuryJ.Util.HashUtils;
@@ -106,12 +106,12 @@ public class Pad extends Pres
 	//
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPElement childElem = child.present( ctx, style );
+		LSElement childElem = child.present( ctx, style );
 		if ( padBorder != null )
 		{
-			DPBorder element = new DPBorder( padBorder, Primitive.getContainerStyleParams( style ) );
+			LSBorder element = new LSBorder( padBorder, Primitive.getContainerStyleParams( style ) );
 			element.setChild( childElem.layoutWrap( style.get( Primitive.hAlign, HAlignment.class ), style.get( Primitive.vAlign, VAlignment.class ) ) );
 			//element.copyAlignmentFlagsFrom( childElem );
 			return element;

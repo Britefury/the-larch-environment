@@ -18,7 +18,7 @@ from BritefuryJ.Command import Command, CommandSet
 from BritefuryJ.Controls import *
 
 from BritefuryJ.Graphics import *
-from BritefuryJ.DocPresent.Interactor import KeyElementInteractor
+from BritefuryJ.LSpace.Interactor import KeyElementInteractor
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
 

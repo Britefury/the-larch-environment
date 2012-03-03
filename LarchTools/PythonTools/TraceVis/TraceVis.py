@@ -18,7 +18,7 @@ from BritefuryJ.Live import LiveValue
 
 from BritefuryJ.Controls import *
 
-from BritefuryJ.DocPresent.Interactor import *
+from BritefuryJ.LSpace.Interactor import *
 from BritefuryJ.Graphics import *
 
 from BritefuryJ.Pres import *

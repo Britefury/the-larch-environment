@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Pres.Primitive;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPText;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSText;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -46,8 +46,8 @@ public class StaticText extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		return new DPText( Primitive.staticTextParams.get( style ), text, textRepresentation );
+		return new LSText( Primitive.staticTextParams.get( style ), text, textRepresentation );
 	}
 }

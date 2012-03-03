@@ -8,8 +8,8 @@ package BritefuryJ.Pres.Primitive;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPRow;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSRow;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
 
@@ -27,9 +27,9 @@ public class Row extends AbstractBox
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPRow element = new DPRow( Primitive.rowParams.get( style ) );
+		LSRow element = new LSRow( Primitive.rowParams.get( style ) );
 		element.setChildren( mapPresent( ctx, Primitive.useRowParams( style ), children ) );
 		return element;
 	}

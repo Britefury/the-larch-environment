@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Pres.ContextMenu;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Pres.ApplyStyleSheetFromAttribute;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
@@ -25,7 +25,7 @@ public class SectionTitle extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		return new ApplyStyleSheetFromAttribute( ContextMenuStyle.sectionTitleStyle, new Label( text ) ).present( ctx, style );
 	}

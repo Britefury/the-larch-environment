@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Pres.Clipboard;
 
-import BritefuryJ.DocPresent.Selection.Selection;
-import BritefuryJ.DocPresent.Target.Target;
+import BritefuryJ.LSpace.Selection.Selection;
+import BritefuryJ.LSpace.Target.Target;
 
 public class SelectionEditor <SelectionType extends Selection> extends SelectionEditorInterface
 {

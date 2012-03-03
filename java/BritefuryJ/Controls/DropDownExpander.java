@@ -6,13 +6,13 @@
 //##************************
 package BritefuryJ.Controls;
 
-import BritefuryJ.DocPresent.DPBin;
-import BritefuryJ.DocPresent.Event.AbstractPointerButtonEvent;
-import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
-import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.DocPresent.Interactor.ClickElementInteractor;
 import BritefuryJ.Graphics.AbstractBorder;
 import BritefuryJ.Graphics.Painter;
+import BritefuryJ.LSpace.LSBin;
+import BritefuryJ.LSpace.Event.AbstractPointerButtonEvent;
+import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
+import BritefuryJ.LSpace.Input.PointerInputElement;
+import BritefuryJ.LSpace.Interactor.ClickElementInteractor;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Arrow;
@@ -102,7 +102,7 @@ public class DropDownExpander extends Expander
 				new Pres[] { contractedArrow.alignHPack().alignVCentre(),header.alignHExpand() } ) ) ).withElementInteractor( headerInteractor );
 
 		Pres expander = new Bin( initialState  ?  expanded  :  contracted );
-		DPBin expanderElement = (DPBin)expander.present( ctx, usedStyle );
+		LSBin expanderElement = (LSBin)expander.present( ctx, usedStyle );
 		
 		ExpanderControl control = new ExpanderControl( ctx, usedStyle, expanderElement, expanded, contracted, initialState, listener );
 		headerInteractor.control = control;

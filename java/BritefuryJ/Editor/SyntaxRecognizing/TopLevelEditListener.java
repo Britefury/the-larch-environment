@@ -6,10 +6,10 @@
 //##************************
 package BritefuryJ.Editor.SyntaxRecognizing;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.EditEvent;
-import BritefuryJ.DocPresent.TextEditEvent;
 import BritefuryJ.Editor.Sequential.SelectionEditTreeEvent;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.EditEvent;
+import BritefuryJ.LSpace.TextEditEvent;
 
 public abstract class TopLevelEditListener extends SREditListener
 {
@@ -19,13 +19,13 @@ public abstract class TopLevelEditListener extends SREditListener
 	}
 	
 	
-	protected void handleTopLevelEditEvent(DPElement element, DPElement sourceElement, EditEvent event)
+	protected void handleTopLevelEditEvent(LSElement element, LSElement sourceElement, EditEvent event)
 	{
 	}
 	
 	
 	@Override
-	protected HandleEditResult handleEditEvent(DPElement element, DPElement sourceElement, EditEvent event)
+	protected HandleEditResult handleEditEvent(LSElement element, LSElement sourceElement, EditEvent event)
 	{
 		handleTopLevelEditEvent( element, sourceElement, event );
 		if ( event instanceof TextEditEvent  ||  event instanceof SelectionEditTreeEvent  ||  canCatchEditEvent( event ) )

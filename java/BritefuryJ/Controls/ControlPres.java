@@ -8,7 +8,7 @@ package BritefuryJ.Controls;
 
 import java.util.WeakHashMap;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Live.LiveInterface;
 import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.Pres;
@@ -17,7 +17,7 @@ import BritefuryJ.StyleSheet.StyleValues;
 
 public abstract class ControlPres extends Pres
 {
-	private WeakHashMap<DPElement, Control> controls = new WeakHashMap<DPElement, Control>();
+	private WeakHashMap<LSElement, Control> controls = new WeakHashMap<LSElement, Control>();
 
 	
 	public static abstract class Control
@@ -32,7 +32,7 @@ public abstract class ControlPres extends Pres
 			this.style = style;
 		}
 		
-		public abstract DPElement getElement();
+		public abstract LSElement getElement();
 	}
 	
 	
@@ -84,7 +84,7 @@ public abstract class ControlPres extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		Control control = createControl( ctx, style );
 		registerControl( control );
@@ -92,7 +92,7 @@ public abstract class ControlPres extends Pres
 	}
 	
 	
-	public Control getControlForElement(DPElement element)
+	public Control getControlForElement(LSElement element)
 	{
 		return controls.get( element );
 	}
@@ -100,7 +100,7 @@ public abstract class ControlPres extends Pres
 	
 	protected void registerControl(Control control)
 	{
-		DPElement element = control.getElement();
+		LSElement element = control.getElement();
 		controls.put( element, control );
 	}
 	

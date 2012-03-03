@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Pres;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.TreeEventListener;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.TreeEventListener;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class AddTreeEventListener extends Pres
@@ -24,9 +24,9 @@ public class AddTreeEventListener extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPElement element = child.present( ctx, style );
+		LSElement element = child.present( ctx, style );
 		element.addTreeEventListener( listener );
 		return element;
 	}

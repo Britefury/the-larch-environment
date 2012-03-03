@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Pres.Primitive;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPScript;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSScript;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -50,7 +50,7 @@ public class Script extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		StyleValues usedStyle = Primitive.useScriptParams( Primitive.useTextParams( style ) );
 		StyleValues childStyle = null;
@@ -59,7 +59,7 @@ public class Script extends Pres
 			childStyle = scriptScriptChildStyle( usedStyle );
 		}
 		
-		DPScript element = new DPScript( Primitive.scriptParams.get( style ), Primitive.textParams.get( style ) );
+		LSScript element = new LSScript( Primitive.scriptParams.get( style ), Primitive.textParams.get( style ) );
 		element.setMainChild( main.present( ctx, usedStyle ) );
 		if ( leftSuper != null )
 		{
