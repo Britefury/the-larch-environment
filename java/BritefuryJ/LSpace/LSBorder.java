@@ -9,10 +9,10 @@ package BritefuryJ.LSpace;
 
 import java.awt.Graphics2D;
 
-import BritefuryJ.Graphics.AbstractBorder;
-import BritefuryJ.Graphics.FilledBorder;
 import BritefuryJ.LSpace.LayoutTree.LayoutNodeBorder;
 import BritefuryJ.LSpace.StyleParams.ContainerStyleParams;
+import BritefuryJ.Graphics.AbstractBorder;
+import BritefuryJ.Graphics.FilledBorder;
 
 
 public class LSBorder extends LSBin
@@ -86,9 +86,14 @@ public class LSBorder extends LSBin
 	}
 	
 	
+	public boolean isRedrawRequiredOnHover()
+	{
+		return super.isRedrawRequiredOnHover()  ||  border.isHighlightable();
+	}
+	
 	
 	protected void drawBackground(Graphics2D graphics)
 	{
-		border.draw( graphics, 0.0, 0.0, getActualWidth(), getActualHeight() );
+		border.draw( graphics, 0.0, 0.0, getActualWidth(), getActualHeight(), isHoverActive() );
 	}
 }
