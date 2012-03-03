@@ -10,12 +10,12 @@ import java.util.HashMap;
 import java.util.regex.Pattern;
 
 import BritefuryJ.Controls.TextEntry.TextEntryControl;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
-import BritefuryJ.DocPresent.Event.PointerMotionEvent;
-import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.DocPresent.Input.PointerInterface;
-import BritefuryJ.DocPresent.Interactor.DragElementInteractor;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Event.PointerButtonEvent;
+import BritefuryJ.LSpace.Event.PointerMotionEvent;
+import BritefuryJ.LSpace.Input.PointerInputElement;
+import BritefuryJ.LSpace.Input.PointerInterface;
+import BritefuryJ.LSpace.Interactor.DragElementInteractor;
 import BritefuryJ.Live.LiveFunction;
 import BritefuryJ.Live.LiveInterface;
 import BritefuryJ.Live.LiveValue;
@@ -93,10 +93,10 @@ public abstract class NumericLabel extends ControlPres
 		protected LiveInterface value;
 		protected LiveInterface text;
 		protected LiveValue displayEntry;
-		protected DPElement element;
+		protected LSElement element;
 		
 		
-		protected NumericLabelControl(PresentationContext ctx, StyleValues style, LiveInterface value, LiveInterface text, LiveFunction display, DPElement element)
+		protected NumericLabelControl(PresentationContext ctx, StyleValues style, LiveInterface value, LiveInterface text, LiveFunction display, LSElement element)
 		{
 			super( ctx, style );
 			
@@ -157,7 +157,7 @@ public abstract class NumericLabel extends ControlPres
 		
 	
 		@Override
-		public DPElement getElement()
+		public LSElement getElement()
 		{
 			return element;
 		}
@@ -202,11 +202,11 @@ public abstract class NumericLabel extends ControlPres
 		LiveFunction display = LiveFunction.value( new Blank() );
 		
 		Proxy proxy = new Proxy( display );
-		DPElement element = proxy.present( ctx, style );
+		LSElement element = proxy.present( ctx, style );
 		
 		return createNumericLabelControl( ctx, style, value, text, display, element );
 	}
 	
 	
-	protected abstract NumericLabelControl createNumericLabelControl(PresentationContext ctx, StyleValues style, LiveInterface value, LiveInterface text, LiveFunction display, DPElement element);
+	protected abstract NumericLabelControl createNumericLabelControl(PresentationContext ctx, StyleValues style, LiveInterface value, LiveInterface text, LiveFunction display, LSElement element);
 }

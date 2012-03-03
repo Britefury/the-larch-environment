@@ -7,7 +7,7 @@
 package BritefuryJ.Pres;
 
 import BritefuryJ.Command.CommandSetSource;
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class AddCommandSets extends Pres
@@ -24,9 +24,9 @@ public class AddCommandSets extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPElement element = child.present( ctx, style );
+		LSElement element = child.present( ctx, style );
 		element.addElementInteractor( commandSetSource.getInteractor() );
 		return element;
 	}

@@ -6,9 +6,9 @@
 //##************************
 package BritefuryJ.Pres;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Browser.Location;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class LocationAsInnerFragment extends Pres
@@ -24,7 +24,7 @@ public class LocationAsInnerFragment extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		FragmentView fragment = ctx.getFragment();
 		return fragment.presentLocationAsElement( location, style, ctx.getInheritedState() );

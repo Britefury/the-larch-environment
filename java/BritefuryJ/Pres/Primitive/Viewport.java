@@ -6,12 +6,12 @@
 //##************************
 package BritefuryJ.Pres.Primitive;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPViewport;
-import BritefuryJ.DocPresent.Layout.HAlignment;
-import BritefuryJ.DocPresent.Layout.VAlignment;
-import BritefuryJ.DocPresent.PersistentState.PersistentState;
-import BritefuryJ.DocPresent.Util.Range;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSViewport;
+import BritefuryJ.LSpace.Layout.HAlignment;
+import BritefuryJ.LSpace.Layout.VAlignment;
+import BritefuryJ.LSpace.PersistentState.PersistentState;
+import BritefuryJ.LSpace.Util.Range;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -40,9 +40,9 @@ public class Viewport extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPViewport element = new DPViewport( Primitive.containerParams.get( style ), xRange, yRange, persistentState );
+		LSViewport element = new LSViewport( Primitive.containerParams.get( style ), xRange, yRange, persistentState );
 		StyleValues childStyle = Primitive.useContainerParams.get( style );
 		element.setChild( child.present( ctx, childStyle ).layoutWrap( childStyle.get( Primitive.hAlign, HAlignment.class ), childStyle.get( Primitive.vAlign, VAlignment.class ) ) );
 		return element;

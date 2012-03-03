@@ -7,11 +7,11 @@
 ##-*************************
 from copy import deepcopy
 
-from BritefuryJ.DocPresent.Clipboard import *
-from BritefuryJ.DocPresent.Selection import TextSelection
-from BritefuryJ.DocPresent.StyleParams import *
-from BritefuryJ.DocPresent.StreamValue import StreamValueBuilder
-from BritefuryJ.DocPresent import *
+from BritefuryJ.LSpace.Clipboard import *
+from BritefuryJ.LSpace.Selection import TextSelection
+from BritefuryJ.LSpace.StyleParams import *
+from BritefuryJ.LSpace.StreamValue import StreamValueBuilder
+from BritefuryJ.LSpace import *
 
 from BritefuryJ.Editor.Sequential import SequentialClipboardHandler, SelectionEditTreeEvent
 

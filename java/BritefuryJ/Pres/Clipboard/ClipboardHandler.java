@@ -9,10 +9,10 @@ package BritefuryJ.Pres.Clipboard;
 import java.awt.datatransfer.Transferable;
 import java.util.List;
 
-import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
-import BritefuryJ.DocPresent.Clipboard.DataTransfer;
-import BritefuryJ.DocPresent.Selection.Selection;
-import BritefuryJ.DocPresent.Target.Target;
+import BritefuryJ.LSpace.Clipboard.ClipboardHandlerInterface;
+import BritefuryJ.LSpace.Clipboard.DataTransfer;
+import BritefuryJ.LSpace.Selection.Selection;
+import BritefuryJ.LSpace.Target.Target;
 import BritefuryJ.Util.PolymorphicMap;
 
 public class ClipboardHandler extends ClipboardHandlerInterface

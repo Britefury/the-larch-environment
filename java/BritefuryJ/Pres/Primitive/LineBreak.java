@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Pres.Primitive;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPLineBreak;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSLineBreak;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -20,8 +20,8 @@ public class LineBreak extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		return new DPLineBreak();
+		return new LSLineBreak();
 	}
 }

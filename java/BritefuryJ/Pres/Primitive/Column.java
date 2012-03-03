@@ -8,8 +8,8 @@ package BritefuryJ.Pres.Primitive;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPColumn;
+import BritefuryJ.LSpace.LSColumn;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
 
@@ -44,9 +44,9 @@ public class Column extends AbstractBox
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPColumn element = new DPColumn( Primitive.columnParams.get( style ) );
+		LSColumn element = new LSColumn( Primitive.columnParams.get( style ) );
 		element.setChildren( mapPresent( ctx, Primitive.useColumnParams( style ), children ) );
 		if ( refPointIndex != -1 )
 		{

@@ -8,7 +8,7 @@ package BritefuryJ.Pres.ObjectPres;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.SequentialPres;
@@ -34,12 +34,12 @@ public class ErrorBoxWithFields extends SequentialPres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		double padding = style.get( ObjectPresStyle.objectContentPadding, Double.class );
 		StyleValues childStyle = ObjectPresStyle.useErrorBorderAttrs( ObjectPresStyle.useErrorBoxAttrs( ObjectPresStyle.useObjectFieldListAttrs( style ) ) );
 		
-		DPElement childElems[] = mapPresent( ctx, childStyle, children );
+		LSElement childElems[] = mapPresent( ctx, childStyle, children );
 		Pres contents = ObjectPresStyle.objectBoxFieldListStyle.get( style ).applyTo( new Column( childElems ).alignHExpand() );
 		
 		Pres titlePres = new ObjectTitle( title );

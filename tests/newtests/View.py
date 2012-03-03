@@ -16,8 +16,8 @@ from Britefury.Kernel.View.EditOperations import replace, replaceWithRange, appe
 from Britefury.Kernel.View.UnparsedText import UnparsedText
 
 
-from BritefuryJ.DocPresent.StyleParams import *
-from BritefuryJ.DocPresent import *
+from BritefuryJ.LSpace.StyleParams import *
+from BritefuryJ.LSpace import *
 
 
 from LarchCore.Languages.Python25 import Parser

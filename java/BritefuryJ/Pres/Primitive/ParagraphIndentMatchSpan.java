@@ -8,10 +8,10 @@ package BritefuryJ.Pres.Primitive;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPParagraphDedentMarker;
-import BritefuryJ.DocPresent.DPParagraphIndentMarker;
-import BritefuryJ.DocPresent.DPSpan;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSParagraphDedentMarker;
+import BritefuryJ.LSpace.LSParagraphIndentMarker;
+import BritefuryJ.LSpace.LSSpan;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.SequentialPres;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -30,26 +30,26 @@ public class ParagraphIndentMatchSpan extends SequentialPres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPSpan element = new DPSpan( Primitive.containerParams.get( style ) );
+		LSSpan element = new LSSpan( Primitive.containerParams.get( style ) );
 		StyleValues childStyle =  Primitive.useContainerParams.get( style );
 		
-		DPElement childElements[];
+		LSElement childElements[];
 		
 		if ( children.length > 0 )
 		{
-			childElements = new DPElement[children.length+2];
-			childElements[0] = new DPParagraphIndentMarker();
+			childElements = new LSElement[children.length+2];
+			childElements[0] = new LSParagraphIndentMarker();
 			for (int i = 0; i < children.length; i++)
 			{
 				childElements[i+1] = children[i].present( ctx, childStyle );
 			}
-			childElements[children.length+1] = new DPParagraphDedentMarker();
+			childElements[children.length+1] = new LSParagraphDedentMarker();
 		}
 		else
 		{
-			childElements = new DPElement[0];
+			childElements = new LSElement[0];
 		}
 
 		element.setChildren( childElements );

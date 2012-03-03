@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Pres.Primitive;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPSegment;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSSegment;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -33,9 +33,9 @@ public class Segment extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPSegment element = new DPSegment( Primitive.containerParams.get( style ), Primitive.textParams.get( style ), bGuardBegin, bGuardEnd );
+		LSSegment element = new LSSegment( Primitive.containerParams.get( style ), Primitive.textParams.get( style ), bGuardBegin, bGuardEnd );
 		element.setChild( child.present( ctx, Primitive.useContainerParams.get( style ) ) );
 		return element;
 	}

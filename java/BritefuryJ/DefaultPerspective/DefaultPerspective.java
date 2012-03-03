@@ -10,9 +10,9 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Inspect.InspectorPerspective;
+import BritefuryJ.LSpace.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.ObjectPresentation.ObjectPresentationPerspective;
 import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;

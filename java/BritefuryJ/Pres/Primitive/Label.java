@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Pres.Primitive;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPLabel;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSLabel;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -29,8 +29,8 @@ public class Label extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		return new DPLabel( Primitive.labelTextParams.get( style ), text );
+		return new LSLabel( Primitive.labelTextParams.get( style ), text );
 	}
 }

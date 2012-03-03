@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
+import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
 
 public class Combine extends BranchExpression
 {

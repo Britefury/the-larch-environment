@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Pres;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class LazyPres extends Pres
@@ -27,7 +27,7 @@ public class LazyPres extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		Pres p = fac.createPres();
 		return p.present( ctx, style );

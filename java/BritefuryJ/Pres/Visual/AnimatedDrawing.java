@@ -12,9 +12,9 @@ import java.awt.event.ActionListener;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPSpacer;
-import BritefuryJ.DocPresent.Interactor.RealiseElementInteractor;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSSpacer;
+import BritefuryJ.LSpace.Interactor.RealiseElementInteractor;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
 
@@ -22,18 +22,18 @@ public class AnimatedDrawing extends Drawing
 {
 	public static interface Stepper
 	{
-		public void step(DPElement element, double time, double deltaTime);
+		public void step(LSElement element, double time, double deltaTime);
 	}
 	
 	
 	private static class AbstractStepper implements RealiseElementInteractor
 	{
-		private DPElement element;
+		private LSElement element;
 		private Stepper stepper;
 		private double startTime, lastTime;
 		protected boolean bRunning;
 		
-		private AbstractStepper(DPElement element, Stepper stepper)
+		private AbstractStepper(LSElement element, Stepper stepper)
 		{
 			this.element = element;
 			this.stepper = stepper;
@@ -54,14 +54,14 @@ public class AnimatedDrawing extends Drawing
 
 
 		@Override
-		public void elementRealised(DPElement element)
+		public void elementRealised(LSElement element)
 		{
 			bRunning = true;
 		}
 
 
 		@Override
-		public void elementUnrealised(DPElement element)
+		public void elementUnrealised(LSElement element)
 		{
 			bRunning = false;
 		}
@@ -69,7 +69,7 @@ public class AnimatedDrawing extends Drawing
 	
 	private static class ContinuousStepper extends AbstractStepper implements Runnable
 	{
-		private ContinuousStepper(DPElement element, Stepper stepper)
+		private ContinuousStepper(LSElement element, Stepper stepper)
 		{
 			super( element, stepper );
 		}
@@ -87,14 +87,14 @@ public class AnimatedDrawing extends Drawing
 
 
 		@Override
-		public void elementRealised(DPElement element)
+		public void elementRealised(LSElement element)
 		{
 			SwingUtilities.invokeLater( this );
 		}
 
 
 		@Override
-		public void elementUnrealised(DPElement element)
+		public void elementUnrealised(LSElement element)
 		{
 		}
 	}
@@ -104,7 +104,7 @@ public class AnimatedDrawing extends Drawing
 		private Timer timer;
 		
 		
-		private TimedStepper(DPElement element, Stepper stepper, double interval)
+		private TimedStepper(LSElement element, Stepper stepper, double interval)
 		{
 			super( element, stepper );
 			int delay = (int)( interval * 1000.0 + 0.5 );
@@ -121,14 +121,14 @@ public class AnimatedDrawing extends Drawing
 
 
 		@Override
-		public void elementRealised(DPElement element)
+		public void elementRealised(LSElement element)
 		{
 			timer.start();
 		}
 
 
 		@Override
-		public void elementUnrealised(DPElement element)
+		public void elementUnrealised(LSElement element)
 		{
 			timer.stop();
 		}
@@ -152,9 +152,9 @@ public class AnimatedDrawing extends Drawing
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPSpacer element = new DPSpacer( minWidth, minHeight );
+		LSSpacer element = new LSSpacer( minWidth, minHeight );
 		element.addPainter( new DrawingPainter( painter ) );
 		
 		AbstractStepper s;

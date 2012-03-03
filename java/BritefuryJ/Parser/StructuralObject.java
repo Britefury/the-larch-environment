@@ -11,7 +11,7 @@ import java.util.List;
 import org.python.core.Py;
 import org.python.core.PyObject;
 
-import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
+import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
 
 /*
  * StructuralObject

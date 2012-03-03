@@ -10,8 +10,8 @@ import java.util.HashMap;
 
 import BritefuryJ.AttributeTable.AttributeBase;
 import BritefuryJ.AttributeTable.AttributeTable;
-import BritefuryJ.DocPresent.Layout.HAlignment;
-import BritefuryJ.DocPresent.Layout.VAlignment;
+import BritefuryJ.LSpace.Layout.HAlignment;
+import BritefuryJ.LSpace.Layout.VAlignment;
 import BritefuryJ.Pres.ApplyStyleSheetValues;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Primitive;

@@ -9,14 +9,14 @@ package BritefuryJ.Pres;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class ElementRef extends Pres
 {
 	private Pres child;
-	private WeakHashMap<DPElement, PresentationContext> contextByElement = new WeakHashMap<DPElement, PresentationContext>();
-	private WeakHashMap<DPElement, StyleValues> styleByElement = new WeakHashMap<DPElement, StyleValues>();
+	private WeakHashMap<LSElement, PresentationContext> contextByElement = new WeakHashMap<LSElement, PresentationContext>();
+	private WeakHashMap<LSElement, StyleValues> styleByElement = new WeakHashMap<LSElement, StyleValues>();
 	
 	
 	public ElementRef(Pres child)
@@ -25,17 +25,17 @@ public class ElementRef extends Pres
 	}
 	
 	
-	public Set<DPElement> getElements()
+	public Set<LSElement> getElements()
 	{
 		return contextByElement.keySet();
 	}
 	
-	public PresentationContext getContextForElement(DPElement element)
+	public PresentationContext getContextForElement(LSElement element)
 	{
 		return contextByElement.get( element );
 	}
 	
-	public StyleValues getStyleForElement(DPElement element)
+	public StyleValues getStyleForElement(LSElement element)
 	{
 		return styleByElement.get( element );
 	}
@@ -43,7 +43,7 @@ public class ElementRef extends Pres
 	
 	public void queueFullRedraw()
 	{
-		for (DPElement element: contextByElement.keySet())
+		for (LSElement element: contextByElement.keySet())
 		{
 			element.queueFullRedraw();
 		}
@@ -57,9 +57,9 @@ public class ElementRef extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPElement element = child.present( ctx, style );
+		LSElement element = child.present( ctx, style );
 		contextByElement.put( element, ctx );
 		styleByElement.put( element, style );
 		return element;

@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Pres;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Input.ObjectDndHandler;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Input.ObjectDndHandler;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class AddDragSource extends Pres
@@ -34,9 +34,9 @@ public class AddDragSource extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPElement element = child.present( ctx, style );
+		LSElement element = child.present( ctx, style );
 		element.addDragSource( source );
 		return element;
 	}

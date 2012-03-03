@@ -10,14 +10,14 @@ import java.awt.datatransfer.DataFlavor;
 import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Caret.Caret;
-import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.Selection.Selection;
-import BritefuryJ.DocPresent.Selection.TextSelection;
-import BritefuryJ.DocPresent.Target.Target;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.IncrementalView.FragmentViewFilter;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Caret.Caret;
+import BritefuryJ.LSpace.Marker.Marker;
+import BritefuryJ.LSpace.Selection.Selection;
+import BritefuryJ.LSpace.Selection.TextSelection;
+import BritefuryJ.LSpace.Target.Target;
 import BritefuryJ.Pres.Clipboard.AbstractDataExporter;
 import BritefuryJ.Pres.Clipboard.AbstractDataImporter;
 import BritefuryJ.Pres.Clipboard.AbstractSelectionExporter;
@@ -242,7 +242,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	
 	private Object getSequentialContentInSelection(TextSelection selection)
 	{
-		DPElement root = selection.getCommonRoot();
+		LSElement root = selection.getCommonRoot();
 		FragmentView fragment = FragmentView.getEnclosingFragment( root, editLevelFragmentFilter );
 		return sequentialEditor.getSequentialContentInSelection( fragment, fragment.getFragmentContentElement(), selection );
 	}
@@ -264,7 +264,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 				
 				// Determine the 
 				FragmentView editRootFragment = null;
-				DPElement editRootFragmentElement = null;
+				LSElement editRootFragmentElement = null;
 				if ( startFragment == endFragment )
 				{
 					editRootFragment = startFragment;
@@ -325,7 +325,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 		{
 			Marker caretMarker = caret.getMarker();
 			FragmentView insertionPointFragment = FragmentView.getEnclosingFragment( caretMarker.getElement(), editLevelFragmentFilter );
-			DPElement insertionPointElement = insertionPointFragment.getFragmentContentElement();
+			LSElement insertionPointElement = insertionPointFragment.getFragmentContentElement();
 			
 			// Splice the content before the insertion point, the inserted content, and the content after the insertion point
 			Object spliced = sequentialEditor.spliceForInsertion( insertionPointFragment, insertionPointElement, caretMarker, caretMarker, data );

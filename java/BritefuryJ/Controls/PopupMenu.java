@@ -9,9 +9,9 @@ package BritefuryJ.Controls;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import BritefuryJ.DocPresent.Corner;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.FragmentContext;
+import BritefuryJ.LSpace.Corner;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.FragmentContext;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Border;
@@ -51,12 +51,12 @@ public abstract class PopupMenu extends Pres
 	// Popup methods
 	//
 
-	public void popup(DPElement element, StyleValues style, Corner targetAnchor, Corner popupAnchor)
+	public void popup(LSElement element, StyleValues style, Corner targetAnchor, Corner popupAnchor)
 	{
 		popup( element, style, targetAnchor, popupAnchor, true, true );
 	}
 	
-	public void popup(DPElement element, Corner targetAnchor, Corner popupAnchor)
+	public void popup(LSElement element, Corner targetAnchor, Corner popupAnchor)
 	{
 		FragmentContext ctx = element.getFragmentContext();
 		if ( ctx != null )
@@ -69,32 +69,32 @@ public abstract class PopupMenu extends Pres
 		}
 	}
 	
-	public void popupToRightOf(DPElement element, StyleValues style)
+	public void popupToRightOf(LSElement element, StyleValues style)
 	{
 		popup( element, style, Corner.TOP_RIGHT, Corner.TOP_LEFT );
 	}
 	
-	public void popupToRightOf(DPElement element)
+	public void popupToRightOf(LSElement element)
 	{
 		popup( element, Corner.TOP_RIGHT, Corner.TOP_LEFT );
 	}
 	
-	public void popupBelow(DPElement element, StyleValues style)
+	public void popupBelow(LSElement element, StyleValues style)
 	{
 		popup( element, style, Corner.BOTTOM_LEFT, Corner.TOP_LEFT );
 	}
 	
-	public void popupBelow(DPElement element)
+	public void popupBelow(LSElement element)
 	{
 		popup( element, Corner.BOTTOM_LEFT, Corner.TOP_LEFT );
 	}
 	
-	public void popupAtMousePosition(DPElement element, StyleValues style, Corner popupAnchor)
+	public void popupAtMousePosition(LSElement element, StyleValues style, Corner popupAnchor)
 	{
 		popupAtMousePosition( element, style, popupAnchor, true, true );
 	}
 	
-	public void popupAtMousePosition(DPElement element, Corner popupAnchor)
+	public void popupAtMousePosition(LSElement element, Corner popupAnchor)
 	{
 		FragmentContext ctx = element.getFragmentContext();
 		if ( ctx != null )
@@ -107,12 +107,12 @@ public abstract class PopupMenu extends Pres
 		}
 	}
 	
-	public void popupAtMousePosition(DPElement element, StyleValues style)
+	public void popupAtMousePosition(LSElement element, StyleValues style)
 	{
 		popupAtMousePosition( element, style, Corner.TOP_LEFT );
 	}
 	
-	public void popupAtMousePosition(DPElement element)
+	public void popupAtMousePosition(LSElement element)
 	{
 		popupAtMousePosition( element, Corner.TOP_LEFT );
 	}
@@ -132,7 +132,7 @@ public abstract class PopupMenu extends Pres
 	
 
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		Pres itemCombinators[] = mapCoerce( mapPresent( ctx, style, items ) );
 		Pres menuElement = new Border( createMenuBox( itemCombinators ) );

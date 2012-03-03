@@ -8,9 +8,9 @@ package BritefuryJ.Cell;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.TreeEventListener;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.TreeEventListener;
 import BritefuryJ.Pres.Pres;
 
 public abstract class AbstractBlankCell implements Presentable
@@ -46,7 +46,7 @@ public abstract class AbstractBlankCell implements Presentable
 	private static final TreeEventListener cellSetListener = new TreeEventListener()
 	{
 		@Override
-		public boolean onTreeEvent(DPElement element, DPElement sourceElement, Object event)
+		public boolean onTreeEvent(LSElement element, LSElement sourceElement, Object event)
 		{
 			if ( event instanceof CellSetValueEvent )
 			{

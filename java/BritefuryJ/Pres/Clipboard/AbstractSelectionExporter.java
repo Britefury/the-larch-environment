@@ -12,8 +12,8 @@ import java.util.List;
 
 import javax.swing.TransferHandler;
 
-import BritefuryJ.DocPresent.Selection.Selection;
-import BritefuryJ.DocPresent.Target.Target;
+import BritefuryJ.LSpace.Selection.Selection;
+import BritefuryJ.LSpace.Target.Target;
 
 abstract public class AbstractSelectionExporter <SelectionContentsType, SelectionType extends Selection>
 {

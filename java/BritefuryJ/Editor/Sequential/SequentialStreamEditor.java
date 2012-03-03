@@ -6,13 +6,13 @@
 //##************************
 package BritefuryJ.Editor.Sequential;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.Selection.TextSelection;
-import BritefuryJ.DocPresent.StreamValue.SequentialStreamValueVisitor;
-import BritefuryJ.DocPresent.StreamValue.StreamValue;
-import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Marker.Marker;
+import BritefuryJ.LSpace.Selection.TextSelection;
+import BritefuryJ.LSpace.StreamValue.SequentialStreamValueVisitor;
+import BritefuryJ.LSpace.StreamValue.StreamValue;
+import BritefuryJ.LSpace.StreamValue.StreamValueBuilder;
 
 public abstract class SequentialStreamEditor extends SequentialEditor
 {
@@ -68,7 +68,7 @@ public abstract class SequentialStreamEditor extends SequentialEditor
 	
 	// Override the following methods in SequentialEditor to support StreamValue objects
 
-	public Object getSequentialContentInSelection(FragmentView subtreeRootFragment, DPElement subtreeRootFragmentElement, TextSelection selection)
+	public Object getSequentialContentInSelection(FragmentView subtreeRootFragment, LSElement subtreeRootFragmentElement, TextSelection selection)
 	{
 		SequentialStreamValueVisitor visitor = new SequentialStreamValueVisitor();
 		StreamValue stream = visitor.getStreamValueInTextSelection( selection );
@@ -76,7 +76,7 @@ public abstract class SequentialStreamEditor extends SequentialEditor
 		return copyStream( stream );
 	}
 
-	public Object spliceForInsertion(FragmentView subtreeRootFragment, DPElement subtreeRootFragmentElement, Marker prefixEnd, Marker suffixStart, Object insertedContent)
+	public Object spliceForInsertion(FragmentView subtreeRootFragment, LSElement subtreeRootFragmentElement, Marker prefixEnd, Marker suffixStart, Object insertedContent)
 	{
 		// Get the item streams for the root element content, before and after the selected region
 		SequentialStreamValueVisitor visitor = new SequentialStreamValueVisitor();
@@ -91,7 +91,7 @@ public abstract class SequentialStreamEditor extends SequentialEditor
 		return joinStreamsForInsertion( subtreeRootFragment, before, insertedStream, after );
 	}
 
-	public Object spliceForDeletion(FragmentView subtreeRootFragment, DPElement subtreeRootFragmentElement, Marker selectionStart, Marker selectionEnd)
+	public Object spliceForDeletion(FragmentView subtreeRootFragment, LSElement subtreeRootFragmentElement, Marker selectionStart, Marker selectionEnd)
 	{
 		// Get the item streams for the root element content, before and after the selected region
 		SequentialStreamValueVisitor visitor = new SequentialStreamValueVisitor();

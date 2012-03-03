@@ -14,15 +14,15 @@ import java.awt.geom.Arc2D;
 import java.awt.geom.Path2D;
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPBin;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPRow;
-import BritefuryJ.DocPresent.ElementPainter;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
-import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.DocPresent.Interactor.PushElementInteractor;
-import BritefuryJ.DocPresent.Layout.HAlignment;
-import BritefuryJ.DocPresent.Layout.VAlignment;
+import BritefuryJ.LSpace.LSBin;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSRow;
+import BritefuryJ.LSpace.ElementPainter;
+import BritefuryJ.LSpace.Event.PointerButtonEvent;
+import BritefuryJ.LSpace.Input.PointerInputElement;
+import BritefuryJ.LSpace.Interactor.PushElementInteractor;
+import BritefuryJ.LSpace.Layout.HAlignment;
+import BritefuryJ.LSpace.Layout.VAlignment;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 import BritefuryJ.Pres.Pres;
@@ -45,15 +45,15 @@ public class TabbedBox extends ControlPres
 
 	public static class TabbedBoxControl extends Control
 	{
-		private DPElement element;
-		private DPBin contentsElement;
+		private LSElement element;
+		private LSBin contentsElement;
 		
 		private Pres tabContents[];
 		private int currentTab;
 		private TabbedBoxListener listener;
 		
 		
-		protected TabbedBoxControl(PresentationContext ctx, StyleValues style, DPElement element, DPBin contentsElement, Pres tabContents[], int initialTab, TabbedBoxListener listener)
+		protected TabbedBoxControl(PresentationContext ctx, StyleValues style, LSElement element, LSBin contentsElement, Pres tabContents[], int initialTab, TabbedBoxListener listener)
 		{
 			super( ctx, style );
 			this.element = element;
@@ -69,7 +69,7 @@ public class TabbedBox extends ControlPres
 		
 		
 		@Override
-		public DPElement getElement()
+		public LSElement getElement()
 		{
 			return element;
 		}
@@ -131,12 +131,12 @@ public class TabbedBox extends ControlPres
 		@Override
 		public void buttonRelease(PointerInputElement element, PointerButtonEvent event)
 		{
-			DPRow header = (DPRow)element;
+			LSRow header = (LSRow)element;
 			Point2 clickPos = event.getLocalPointerPos();
-			List<DPElement> children = header.getChildren();
+			List<LSElement> children = header.getChildren();
 			int i = 0;
 			// Ignore first and last elements - they are for padding
-			for (DPElement child: children.subList( 1, children.size() - 1 ))
+			for (LSElement child: children.subList( 1, children.size() - 1 ))
 			{
 				if ( child.containsParentSpacePoint( clickPos ) )
 				{
@@ -148,7 +148,7 @@ public class TabbedBox extends ControlPres
 		}
 
 		
-		private void addChildPath(Path2D.Double path, DPElement child, Vector2 size, boolean start)
+		private void addChildPath(Path2D.Double path, LSElement child, Vector2 size, boolean start)
 		{
 			Point2 childPos = child.getPositionInParentSpace();
 			Vector2 childSize = child.getActualSizeInParentSpace();
@@ -171,13 +171,13 @@ public class TabbedBox extends ControlPres
 		}
 
 		@Override
-		public void drawBackground(DPElement element, Graphics2D graphics)
+		public void drawBackground(LSElement element, Graphics2D graphics)
 		{
 			Vector2 size = element.getActualSize();
-			DPRow header = (DPRow)element;
+			LSRow header = (LSRow)element;
 			
-			List<DPElement> children = header.getChildren();
-			DPElement selectedChild = children.size() > 2  ?  children.get( control.currentTab + 1 )  :  null;
+			List<LSElement> children = header.getChildren();
+			LSElement selectedChild = children.size() > 2  ?  children.get( control.currentTab + 1 )  :  null;
 			
 			// Path is going counter clock-wise
 			Path2D.Double headerShape = new Path2D.Double();
@@ -209,7 +209,7 @@ public class TabbedBox extends ControlPres
 			
 			// Draw tabs for the other children
 			// Ignore first and last elements - they are for padding
-			for (DPElement child: children.subList( 1, children.size() - 1 ))
+			for (LSElement child: children.subList( 1, children.size() - 1 ))
 			{
 				if ( child != selectedChild )
 				{
@@ -235,7 +235,7 @@ public class TabbedBox extends ControlPres
 
 
 		@Override
-		public void draw(DPElement element, Graphics2D graphics)
+		public void draw(LSElement element, Graphics2D graphics)
 		{
 		}
 	}
@@ -257,7 +257,7 @@ public class TabbedBox extends ControlPres
 		
 		
 		@Override
-		public void drawBackground(DPElement element, Graphics2D graphics)
+		public void drawBackground(LSElement element, Graphics2D graphics)
 		{
 			Vector2 size = element.getActualSize();
 			
@@ -280,7 +280,7 @@ public class TabbedBox extends ControlPres
 
 
 		@Override
-		public void draw(DPElement element, Graphics2D graphics)
+		public void draw(LSElement element, Graphics2D graphics)
 		{
 		}
 	}
@@ -357,14 +357,14 @@ public class TabbedBox extends ControlPres
 		// Contents
 		TabbedBoxContentBoxPainter contentBoxPainter = new TabbedBoxContentBoxPainter( rounding, headerOutlinePaint );
 		Pres contentsBox = new Bin( new Blank() ).alignHExpand().alignVExpand();
-		DPBin contentsElement = (DPBin)contentsBox.present( ctx, usedStyle );
+		LSBin contentsElement = (LSBin)contentsBox.present( ctx, usedStyle );
 		Pres contentsPadded = Pres.coerce( contentsElement ).pad( contentsPadding, contentsPadding ).withPainter( contentBoxPainter ).alignHExpand().alignVExpand();
-		DPElement contentsPaddedElement = contentsPadded.present( ctx, usedStyle );
+		LSElement contentsPaddedElement = contentsPadded.present( ctx, usedStyle );
 		
 		
 		// Tabs
 		Pres tabs = new Column( new Object[] { header, contentsPaddedElement } );
-		DPElement element = tabs.present( ctx, usedStyle );
+		LSElement element = tabs.present( ctx, usedStyle );
 		
 		
 		// Control

@@ -13,7 +13,7 @@ from copy import deepcopy
 
 from BritefuryJ.Command import Command, CommandSet
 
-from BritefuryJ.DocPresent.Input import ObjectDndHandler
+from BritefuryJ.LSpace.Input import ObjectDndHandler
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
 from BritefuryJ.IncrementalView import FragmentData

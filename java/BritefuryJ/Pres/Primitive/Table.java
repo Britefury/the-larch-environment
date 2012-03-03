@@ -6,12 +6,12 @@
 //##************************
 package BritefuryJ.Pres.Primitive;
 
-import BritefuryJ.DocPresent.DPBorder;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPTable;
-import BritefuryJ.DocPresent.Layout.HAlignment;
-import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.Graphics.AbstractBorder;
+import BritefuryJ.LSpace.LSBorder;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSTable;
+import BritefuryJ.LSpace.Layout.HAlignment;
+import BritefuryJ.LSpace.Layout.VAlignment;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -166,24 +166,24 @@ public class Table extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		StyleValues childStyle = Primitive.useTableParams( style );
 		HAlignment childHAlign = childStyle.get( Primitive.hAlign, HAlignment.class );
 		VAlignment childVAlign = childStyle.get( Primitive.vAlign, VAlignment.class );
-		DPTable table = new DPTable( Primitive.tableParams.get( style ) );
+		LSTable table = new LSTable( Primitive.tableParams.get( style ) );
 		if ( childCells != null )
 		{
-			DPTable.TableCell elemCells[][] = new DPTable.TableCell[childCells.length][];
+			LSTable.TableCell elemCells[][] = new LSTable.TableCell[childCells.length][];
 			for (int y = 0; y < childCells.length; y++)
 			{
 				TableCell row[] = childCells[y];
-				DPTable.TableCell elemRow[] = new DPTable.TableCell[row.length];
+				LSTable.TableCell elemRow[] = new LSTable.TableCell[row.length];
 				elemCells[y] = elemRow;
 				for (int x = 0; x < row.length; x++)
 				{
 					TableCell cell = row[x];
-					elemRow[x] = cell != null  ?  new DPTable.TableCell( cell.child.present( ctx, childStyle ).layoutWrap( childHAlign, childVAlign ), cell.colSpan, cell.rowSpan )  :  null;  
+					elemRow[x] = cell != null  ?  new LSTable.TableCell( cell.child.present( ctx, childStyle ).layoutWrap( childHAlign, childVAlign ), cell.colSpan, cell.rowSpan )  :  null;  
 				}
 			}
 			table.setCells( elemCells );
@@ -192,12 +192,12 @@ public class Table extends Pres
 		return applyTableBorder( style, table );
 	}
 
-	protected static DPElement applyTableBorder(StyleValues style, DPElement table)
+	protected static LSElement applyTableBorder(StyleValues style, LSElement table)
 	{
 		AbstractBorder tableBorder = style.get( Primitive.tableBorder, AbstractBorder.class );
 		if ( tableBorder != null )
 		{
-			DPBorder border = new DPBorder( tableBorder );
+			LSBorder border = new LSBorder( tableBorder );
 			border.setChild( table );
 			return border;
 		}

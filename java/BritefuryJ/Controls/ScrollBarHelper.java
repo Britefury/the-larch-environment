@@ -9,15 +9,15 @@ package BritefuryJ.Controls;
 import java.awt.Graphics2D;
 import java.awt.geom.RoundRectangle2D;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.ElementPainter;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
-import BritefuryJ.DocPresent.Event.PointerMotionEvent;
-import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.DocPresent.Interactor.DragElementInteractor;
-import BritefuryJ.DocPresent.Interactor.PushElementInteractor;
-import BritefuryJ.DocPresent.Util.Range;
 import BritefuryJ.Graphics.Painter;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.ElementPainter;
+import BritefuryJ.LSpace.Event.PointerButtonEvent;
+import BritefuryJ.LSpace.Event.PointerMotionEvent;
+import BritefuryJ.LSpace.Input.PointerInputElement;
+import BritefuryJ.LSpace.Interactor.DragElementInteractor;
+import BritefuryJ.LSpace.Interactor.PushElementInteractor;
+import BritefuryJ.LSpace.Util.Range;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -33,7 +33,7 @@ class ScrollBarHelper
 
 	protected static class ScrollBarDragBarInteractor implements PushElementInteractor, DragElementInteractor, ElementPainter, Range.RangeListener
 	{
-		private DPElement element;
+		private LSElement element;
 		private Axis axis;
 		private Range range;
 		private double padding, rounding, minSize;
@@ -43,7 +43,7 @@ class ScrollBarHelper
 		private AABox2 visibleDragBox = null;
 		
 		
-		public ScrollBarDragBarInteractor(DPElement element, Axis axis, Range range, double padding, double rounding, double minSize, Painter dragBoxPainter, Painter dragBoxHoverPainter)
+		public ScrollBarDragBarInteractor(LSElement element, Axis axis, Range range, double padding, double rounding, double minSize, Painter dragBoxPainter, Painter dragBoxHoverPainter)
 		{
 			this.element = element;
 			this.axis = axis;
@@ -117,7 +117,7 @@ class ScrollBarHelper
 		@Override
 		public void dragMotion(PointerInputElement element, PointerMotionEvent event, Point2 dragStartPos, int dragButton)
 		{
-			DPElement dragbarElement = (DPElement)element;
+			LSElement dragbarElement = (LSElement)element;
 			AABox2 box = dragbarElement.getLocalAABox();
 			Point2 localPos = event.getPointer().getLocalPos();
 			Vector2 deltaPos = localPos.sub( dragStartPos );
@@ -145,12 +145,12 @@ class ScrollBarHelper
 		
 		
 		@Override
-		public void drawBackground(DPElement element, Graphics2D graphics)
+		public void drawBackground(LSElement element, Graphics2D graphics)
 		{
 		}
 	
 		@Override
-		public void draw(DPElement element, Graphics2D graphics)
+		public void draw(LSElement element, Graphics2D graphics)
 		{
 			refreshDragBox();
 			

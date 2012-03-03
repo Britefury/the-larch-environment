@@ -8,9 +8,9 @@ package BritefuryJ.Pres.Primitive;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPParagraph;
-import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSParagraph;
+import BritefuryJ.LSpace.Layout.HAlignment;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.SequentialPres;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -29,9 +29,9 @@ public class Paragraph extends SequentialPres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPParagraph element = new DPParagraph( Primitive.paragraphParams.get( style ) );
+		LSParagraph element = new LSParagraph( Primitive.paragraphParams.get( style ) );
 		element.setChildren( mapPresent( ctx, Primitive.useParagraphParams( style ).withAttr( Primitive.hAlign, HAlignment.PACK ), children ) );
 		return element;
 	}

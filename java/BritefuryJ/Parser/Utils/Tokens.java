@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Parser.Utils;
 
-import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
+import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
 import BritefuryJ.Parser.ParseResult;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.RegEx;

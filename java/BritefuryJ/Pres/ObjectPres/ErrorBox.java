@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Pres.ObjectPres;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Column;
@@ -26,11 +26,11 @@ public class ErrorBox extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		double padding = style.get( ObjectPresStyle.objectContentPadding, Double.class );
 		StyleValues childStyle = ObjectPresStyle.useErrorBorderAttrs( ObjectPresStyle.useErrorBoxAttrs( style ) );
-		DPElement contentsElement = contents.alignHExpand().padX( padding ).present( ctx, childStyle.alignHExpand() );
+		LSElement contentsElement = contents.alignHExpand().padX( padding ).present( ctx, childStyle.alignHExpand() );
 		
 		Pres titlePres = new ObjectTitle( title );
 		

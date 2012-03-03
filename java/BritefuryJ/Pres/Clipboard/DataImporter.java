@@ -8,9 +8,9 @@ package BritefuryJ.Pres.Clipboard;
 
 import java.awt.datatransfer.DataFlavor;
 
-import BritefuryJ.DocPresent.Clipboard.LocalDataFlavor;
-import BritefuryJ.DocPresent.Selection.Selection;
-import BritefuryJ.DocPresent.Target.Target;
+import BritefuryJ.LSpace.Clipboard.LocalDataFlavor;
+import BritefuryJ.LSpace.Selection.Selection;
+import BritefuryJ.LSpace.Target.Target;
 
 public class DataImporter <TargetType extends Target> extends AbstractDataImporter<TargetType>
 {

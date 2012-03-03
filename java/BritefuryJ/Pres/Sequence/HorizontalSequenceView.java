@@ -9,7 +9,7 @@ package BritefuryJ.Pres.Sequence;
 import java.util.ArrayList;
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Row;
@@ -29,7 +29,7 @@ public class HorizontalSequenceView extends AbstractSequenceView
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		ArrayList<Object> childElems = new ArrayList<Object>();
 		childElems.ensureCapacity( children.length + 2 );

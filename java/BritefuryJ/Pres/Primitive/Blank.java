@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Pres.Primitive;
 
-import BritefuryJ.DocPresent.DPBlank;
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSBlank;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -20,8 +20,8 @@ public class Blank extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		return new DPBlank();
+		return new LSBlank();
 	}
 }

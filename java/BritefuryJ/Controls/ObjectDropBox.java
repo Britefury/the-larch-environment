@@ -8,10 +8,10 @@ package BritefuryJ.Controls;
 
 import BritefuryJ.DefaultPerspective.DefaultPerspective;
 import BritefuryJ.DefaultPerspective.PrimitivePresenter;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Input.ObjectDndHandler;
-import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.IncrementalView.FragmentData;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Input.ObjectDndHandler;
+import BritefuryJ.LSpace.Input.PointerInputElement;
 import BritefuryJ.Live.LiveFunction;
 import BritefuryJ.Live.LiveInterface;
 import BritefuryJ.Math.Point2;
@@ -45,11 +45,11 @@ public class ObjectDropBox extends ControlPres
 	
 	private static class ObjectDropBoxControl extends Control
 	{
-		private DPElement element;
+		private LSElement element;
 		private ObjectDropBoxListener listener;
 		
 		
-		public ObjectDropBoxControl(PresentationContext ctx, StyleValues style, DPElement element, ObjectDropBoxListener listener)
+		public ObjectDropBoxControl(PresentationContext ctx, StyleValues style, LSElement element, ObjectDropBoxListener listener)
 		{
 			super( ctx, style );
 			
@@ -58,7 +58,7 @@ public class ObjectDropBox extends ControlPres
 		}
 
 		@Override
-		public DPElement getElement()
+		public LSElement getElement()
 		{
 			return element;
 		}
@@ -139,7 +139,7 @@ public class ObjectDropBox extends ControlPres
 		Pres contents = new Row( new Object[] { new Label( "Drop: " ), dropContents } );
 		Pres p = new ObjectBorder( contents ).withDropDest( FragmentData.class, dropListener );
 		
-		DPElement element = p.present( ctx, style );
+		LSElement element = p.present( ctx, style );
 		
 		ObjectDropBoxControl control = new ObjectDropBoxControl( ctx, style, element, listener );
 		

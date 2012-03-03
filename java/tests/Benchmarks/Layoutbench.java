@@ -6,10 +6,10 @@
 //##************************
 package tests.Benchmarks;
 
-import BritefuryJ.DocPresent.Layout.HorizontalLayout;
-import BritefuryJ.DocPresent.Layout.LAllocBox;
-import BritefuryJ.DocPresent.Layout.LAllocHelper;
-import BritefuryJ.DocPresent.Layout.LReqBox;
+import BritefuryJ.LSpace.Layout.HorizontalLayout;
+import BritefuryJ.LSpace.Layout.LAllocBox;
+import BritefuryJ.LSpace.Layout.LAllocHelper;
+import BritefuryJ.LSpace.Layout.LReqBox;
 
 public class Layoutbench
 {

@@ -15,7 +15,7 @@ from BritefuryJ.DocModel import DMObject, DMNode
 from BritefuryJ.Parser import Literal, Keyword, RegEx, Word, SeparatedList, ObjectNode
 from BritefuryJ.Parser.Utils import Tokens
 from BritefuryJ.Parser.Utils.OperatorParser import PrefixLevel, SuffixLevel, InfixLeftLevel, InfixRightLevel, InfixChainLevel, UnaryOperator, BinaryOperator, ChainOperator, OperatorTable
-from BritefuryJ.DocPresent.StreamValue import StreamValueBuilder
+from BritefuryJ.LSpace.StreamValue import StreamValueBuilder
 
 from Britefury.Tests.BritefuryJ.Parser.ParserTestCase import ParserTestCase
 

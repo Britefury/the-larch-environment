@@ -9,7 +9,7 @@ package BritefuryJ.Pres.RichText;
 import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Paragraph;
@@ -39,7 +39,7 @@ abstract class RichParagraph extends AbstractRichText
 	
 	
 	
-	protected DPElement presentParagraph(PresentationContext ctx, StyleValues style)
+	protected LSElement presentParagraph(PresentationContext ctx, StyleValues style)
 	{
 		List<Object> paragraphContents = null;
 		
