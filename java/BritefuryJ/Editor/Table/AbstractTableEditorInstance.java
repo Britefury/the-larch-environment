@@ -56,7 +56,7 @@ public abstract class AbstractTableEditorInstance <ModelType>
 				target = new TableTarget( AbstractTableEditorInstance.this, table, targetX, targetY );
 				elem.getRootElement().setTarget( target );
 				
-				Marker marker = elem.getEditableMarkerClosestToLocalPoint( p );
+				Marker marker = Marker.atPointIn( elem, p, true );
 				if ( marker != null )
 				{
 					elem.getRootElement().getCaret().moveTo( marker );

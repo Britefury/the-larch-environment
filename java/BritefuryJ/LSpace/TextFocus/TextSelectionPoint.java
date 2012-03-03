@@ -46,25 +46,16 @@ public class TextSelectionPoint extends SelectionPoint
 					
 					if ( regionB != regionA )
 					{
-						int order = Marker.markerOrder( markerA, markerB );
-						LSRegion.SharableSelectionFilter filter = regionA.sharableSelectionFilter();
+						int order = markerA.compareTo( markerB );
 						
 						Marker markerBInSameRegion = null;
 						if ( order == 1 )
 						{
-							LSContentLeafEditable leaf = (LSContentLeafEditable)elementB.getPreviousSelectableLeaf( filter, filter );
-							if ( leaf != null )
-							{
-								markerBInSameRegion = leaf.markerAtEnd();
-							}
+							markerBInSameRegion = Marker.atEndOf( regionA, false );
 						}
 						else
 						{
-							LSContentLeafEditable leaf = (LSContentLeafEditable)elementB.getNextSelectableLeaf( filter, filter );
-							if ( leaf != null )
-							{
-								markerBInSameRegion = leaf.markerAtStart();
-							}
+							markerBInSameRegion = Marker.atStartOf( regionA, false );
 						}
 						
 						if ( markerBInSameRegion != null )

@@ -219,7 +219,7 @@ public class TextSelection extends Selection implements MarkerListener
 					{
 						throw new RuntimeException( "Paths have length 1, but elements are different" );
 					}
-					bInOrder = Marker.markerOrder( marker0, marker1 )  ==  1;
+					bInOrder = marker0.compareTo( marker1 )  ==  1;
 					commonRoot = w0;
 				}
 				else

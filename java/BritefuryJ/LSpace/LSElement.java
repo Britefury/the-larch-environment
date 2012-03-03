@@ -125,6 +125,23 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 	
 	
 	
+	//
+	//
+	// TREE TRAVERSAL FUNCTIONS
+	//
+	//
+	
+	public static final TreeTraversal.BranchChildrenFn internalBranchChildrenFn = new TreeTraversal.BranchChildrenFn()
+	{
+		@Override
+		public List<LSElement> getChildrenOf(LSContainer element)
+		{
+			return element.getInternalChildren();
+		}
+	};
+	
+	
+	
 	
 	
 	//
@@ -1113,7 +1130,7 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 
 	public LSContentLeaf getFirstEditableLeafInSubtree()
 	{
-		return getFirstLeafInSubtree( null, new LSContentLeafEditable.EditableLeafElementFilter() );
+		return getFirstLeafInSubtree( null, LSContentLeafEditable.editableLeafElementFilter );
 	}
 
 	public LSContentLeaf getLastLeafInSubtree(ElementFilter branchFilter, ElementFilter leafFilter)
@@ -1128,7 +1145,7 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 
 	public LSContentLeaf getLastEditableLeafInSubtree()
 	{
-		return getLastLeafInSubtree( null, new LSContentLeafEditable.EditableLeafElementFilter() );
+		return getLastLeafInSubtree( null, LSContentLeafEditable.editableLeafElementFilter );
 	}
 
 	
@@ -2219,122 +2236,15 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 	
 	public LSElement getEditableLeafClosestToLocalPoint(Point2 localPos)
 	{
-		return getLeafClosestToLocalPoint( localPos, new LSContentLeafEditable.EditableLeafElementFilter() );
+		return getLeafClosestToLocalPoint( localPos, LSContentLeafEditable.editableRealisedLeafElementFilter );
 	}
 
 	public LSElement getSelectableLeafClosestToLocalPoint(Point2 localPos)
 	{
-		return getLeafClosestToLocalPoint( localPos, new LSContentLeafEditable.SelectableLeafElementFilter() );
+		return getLeafClosestToLocalPoint( localPos, LSContentLeafEditable.selectableRealisedLeafElementFilter );
 	}
 
 	
-	
-	
-	
-	
-	
-	
-	//
-	//
-	// MARKER METHODS
-	//
-	//
-	
-	public Marker markerAtStart()
-	{
-		LSContentLeaf leaf = null;
-		
-		if ( parent != null )
-		{
-			leaf = parent.getContentLeafToRightFromChild( this );
-		}
-		
-		if ( leaf != null )
-		{
-			return leaf.markerAtStart();
-		}
-		else
-		{
-                        if ( parent != null )
-                        {
-        			leaf = parent.getContentLeafToLeftFromChild( this );
-			}
-			if ( leaf != null )
-			{
-				return leaf.markerAtEnd();
-			}
-			else
-			{
-				throw new Marker.InvalidMarkerPosition( "Cannot find leaf to place marker" );
-			}
-		}
-	}
-	
-	public Marker markerAtEnd()
-	{
-		return markerAtStart();
-	}
-	
-	
-	public void moveMarkerToStart(Marker m)
-	{
-		LSContentLeaf leaf = null;
-		
-		if ( parent != null )
-		{
-			leaf = parent.getContentLeafToRightFromChild( this );
-		}
-		
-		if ( leaf != null )
-		{
-			leaf.moveMarkerToStart( m );
-		}
-		else
-		{
-			if ( parent != null )
-			{
-				leaf = parent.getContentLeafToLeftFromChild( this );
-			}
-			if ( leaf != null )
-			{
-				leaf.moveMarkerToEnd( m );
-			}
-			else
-			{
-				throw new Marker.InvalidMarkerPosition( "Cannot find leaf to place marker" );
-			}
-		}
-	}
-	
-	public void moveMarkerToEnd(Marker m)
-	{
-		moveMarkerToStart( m );
-	}
-	
-	public Marker getMarkerClosestToLocalPoint(Point2 localPos, ElementFilter filter)
-	{
-		LSContentLeafEditable leaf = (LSContentLeafEditable)getLeafClosestToLocalPoint( localPos, filter );
-		if ( leaf != null )
-		{
-			Xform2 x = leaf.getAncestorToLocalXform( this );
-			
-			return leaf.markerAtPoint( x.transform( localPos ) );
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
-	public Marker getEditableMarkerClosestToLocalPoint(Point2 localPos)
-	{
-		return getMarkerClosestToLocalPoint( localPos, new LSContentLeafEditable.EditableLeafElementFilter() );
-	}
-	
-	public Marker getSelectableMarkerClosestToLocalPoint(Point2 localPos)
-	{
-		return getMarkerClosestToLocalPoint( localPos, new LSContentLeafEditable.SelectableLeafElementFilter() );
-	}
 	
 	
 	

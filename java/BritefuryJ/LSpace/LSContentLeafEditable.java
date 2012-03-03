@@ -24,6 +24,70 @@ import BritefuryJ.Util.WeakIdentityHashMap;
 
 public abstract class LSContentLeafEditable extends LSContentLeaf
 {
+	public static final ElementFilter editableLeafElementFilter = new ElementFilter()
+	{
+		public boolean testElement(LSElement element)
+		{
+			if ( element instanceof LSContentLeafEditable )
+			{
+				return ((LSContentLeafEditable)element).isEditable();
+			}
+			else
+			{
+				return false;
+			}
+		}
+	};
+	
+	public static final ElementFilter selectableLeafElementFilter = new ElementFilter()
+	{
+		public boolean testElement(LSElement element)
+		{
+			if ( element instanceof LSContentLeafEditable )
+			{
+				return ((LSContentLeafEditable)element).isSelectable();
+			}
+			else
+			{
+				return false;
+			}
+		}
+	};
+
+	
+	public static final ElementFilter editableRealisedLeafElementFilter = new ElementFilter()
+	{
+		public boolean testElement(LSElement element)
+		{
+			if ( element.isRealised()  &&  element instanceof LSContentLeafEditable )
+			{
+				return ((LSContentLeafEditable)element).isEditable();
+			}
+			else
+			{
+				return false;
+			}
+		}
+	};
+	
+	public static final ElementFilter selectableRealisedLeafElementFilter = new ElementFilter()
+	{
+		public boolean testElement(LSElement element)
+		{
+			if ( element.isRealised()  &&  element instanceof LSContentLeafEditable )
+			{
+				return ((LSContentLeafEditable)element).isSelectable();
+			}
+			else
+			{
+				return false;
+			}
+		}
+	};
+
+	
+	
+	
 	public static final int FLAG_EDITABLE = FLAGS_CONTENTLEAF_END * 0x1;
 	public static final int FLAG_SELECTABLE = FLAGS_CONTENTLEAF_END * 0x2;
 	public static final int FLAG_HAS_MARKERS = FLAGS_CONTENTLEAF_END * 0x4;
@@ -164,131 +228,7 @@ public abstract class LSContentLeafEditable extends LSContentLeaf
 	// MARKER METHODS
 	//
 	//	
-	
-	public Marker marker(int position, Marker.Bias bias)
-	{
-		if ( !isRealised() )
-		{
-			throw new RuntimeException( "Cannot create a marker within unrealised element " + this );
-		}
-		return new Marker( this, position, bias );
-	}
-	
-	public Marker markerAtStart()
-	{
-		return marker( 0, Marker.Bias.START );
-	}
-	
-	public Marker markerAtStartPlusOne()
-	{
-		return marker( Math.min( 1, getMarkerRange() ), Marker.Bias.START );
-	}
-	
-	public Marker markerAtEnd()
-	{
-		// We must ensure that an element with no content CANNOT have a marker given a bias of END, otherwise
-		// empty text elements will consume a backspace character.
-		int range = getMarkerRange();
-		if ( range == 0 )
-		{
-			return marker( 0, Marker.Bias.START );
-		}
-		else
-		{
-			return marker( Math.max( range - 1, 0 ), Marker.Bias.END );
-		}
-	}
-	
-	public Marker markerAtEndMinusOne()
-	{
-		return marker( Math.max( getMarkerRange() - 1, 0 ), Marker.Bias.START );
-	}
-	
-	
-	public Marker markerAtPoint(Point2 localPos)
-	{
-		int markerPos = getMarkerPositonForPoint( localPos );
-		return marker( markerPos, Marker.Bias.START );
-	}
 
-
-
-	public void moveMarker(Marker m, int position, Marker.Bias bias)
-	{
-		m.set( this, position, bias );
-	}
-	
-	@Override
-	public void moveMarkerToStart(Marker m)
-	{
-		moveMarker( m, 0, Marker.Bias.START );
-	}
-	
-	public void moveMarkerToStartPlusOne(Marker m)
-	{
-		moveMarker( m, Math.min( 1, getMarkerRange() ), Marker.Bias.START );
-	}
-	
-	@Override
-	public void moveMarkerToEnd(Marker m)
-	{
-		// We must ensure that an element with no content CANNOT have a marker given a bias of END, otherwise
-		// empty text elements will consume a backspace character.
-		int range = getMarkerRange();
-		if ( range == 0 )
-		{
-			moveMarker( m, 0, Marker.Bias.START );
-		}
-		else
-		{
-			moveMarker( m, Math.max( range - 1, 0 ), Marker.Bias.END );
-		}
-	}
-	
-	public void moveMarkerToEndMinusOne(Marker m)
-	{
-		moveMarker( m, Math.max( getMarkerRange() - 1, 0 ), Marker.Bias.START );
-	}
-	
-	public void moveMarkerToPoint(Marker m, Point2 localPos)
-	{
-		int markerPos = getMarkerPositonForPoint( localPos );
-		moveMarker( m, markerPos, Marker.Bias.START );
-	}
-
-	
-	
-	public boolean isMarkerAtStart(Marker m)
-	{
-		if ( m.getElement() == this )
-		{
-			return m.getIndex() == 0;
-		}
-		else
-		{
-			return false;
-		}
-	}
-	
-	public boolean isMarkerAtEnd(Marker m)
-	{
-		if ( m.getElement() == this )
-		{
-			// The index (position and bias) is at the last position,
-			// OR
-			// range is 0, and position is 0, bias is 1, which would make index 1
-			return m.getIndex() == getMarkerRange()  ||  m.getPosition() == getMarkerRange();
-		}
-		else
-		{
-			return false;
-		}
-	}
-	
-	
-	
-	
-	
 	protected WeakIdentityHashMap<Marker, Object> getMarkersForLeaf()
 	{
 		if ( rootElement != null  &&  testFlag( FLAG_HAS_MARKERS ) )
@@ -421,7 +361,16 @@ public abstract class LSContentLeafEditable extends LSContentLeaf
 	// REALISE / UNREALISE
 	//
 	//
-
+	
+	private static ElementFilter editableRealisedFilter = new ElementFilter()
+	{
+		@Override
+		public boolean testElement(LSElement element)
+		{
+			return element.isRealised()  &&  element instanceof LSContentLeafEditable;
+		}
+	};
+	
 	protected void onUnrealise(LSElement unrealiseRoot)
 	{
 		super.onUnrealise( unrealiseRoot );
@@ -434,12 +383,7 @@ public abstract class LSContentLeafEditable extends LSContentLeaf
 			
 			if ( xs.size() > 0 )
 			{
-				LSContentLeaf left = unrealiseRoot.getContentLeafToLeft();
-				
-				while ( left != null  &&  !left.isRealised() )
-				{
-					left = left.getContentLeafToLeft();
-				}
+				LSContentLeafEditable left = (LSContentLeafEditable)TreeTraversal.previousElement( unrealiseRoot, null, internalBranchChildrenFn, editableRealisedFilter );
 				
 				if ( left != null )
 				{
@@ -447,7 +391,7 @@ public abstract class LSContentLeafEditable extends LSContentLeaf
 					{
 						try
 						{
-							left.moveMarkerToEnd( x );
+							x.moveToEndOfLeaf( left );
 						}
 						catch (Marker.InvalidMarkerPosition e)
 						{
@@ -456,12 +400,7 @@ public abstract class LSContentLeafEditable extends LSContentLeaf
 				}
 				else
 				{
-					LSContentLeaf right = unrealiseRoot.getContentLeafToRight();
-					
-					while ( right != null  &&  !right.isRealised() )
-					{
-						right = right.getContentLeafToRight();
-					}
+					LSContentLeafEditable right = (LSContentLeafEditable)TreeTraversal.nextElement( unrealiseRoot, null, internalBranchChildrenFn, editableRealisedFilter );
 					
 					if ( right != null )
 					{
@@ -469,7 +408,7 @@ public abstract class LSContentLeafEditable extends LSContentLeaf
 						{
 							try
 							{
-								right.moveMarkerToStart( x );
+								x.moveToStartOfLeaf( right );
 							}
 							catch (Marker.InvalidMarkerPosition e)
 							{
@@ -589,7 +528,7 @@ public abstract class LSContentLeafEditable extends LSContentLeaf
 	
 	protected boolean handleBackspace(Caret caret)
 	{
-		if ( isMarkerAtStart( caret.getMarker() ) )
+		if ( caret.getMarker().isAtStartOf( this ) )
 		{
 			LSContentLeaf left = getContentLeafToLeft();
 			if ( left == null )
@@ -621,7 +560,8 @@ public abstract class LSContentLeafEditable extends LSContentLeaf
 						return false;
 					}
 				}
-				if ( caret.moveTo( left.markerAtEnd() ) )
+				LSContentLeafEditable editableLeft = (LSContentLeafEditable)left;
+				if ( caret.moveTo( Marker.atEndOfLeaf( editableLeft ) ) )
 				{
 					if ( !bNonEditableContentCleared )
 					{
@@ -644,7 +584,7 @@ public abstract class LSContentLeafEditable extends LSContentLeaf
 	
 	protected boolean handleDelete(Caret caret)
 	{
-		if ( isMarkerAtEnd( caret.getMarker() ) )
+		if ( caret.getMarker().isAtEndOf( this ) )
 		{
 			LSContentLeaf right = getContentLeafToRight();
 			if ( right == null )
@@ -676,7 +616,8 @@ public abstract class LSContentLeafEditable extends LSContentLeaf
 						return false;
 					}
 				}
-				if ( caret.moveTo( right.markerAtStart() ) )
+				LSContentLeafEditable editableRight = (LSContentLeafEditable)right; 
+				if ( caret.moveTo( Marker.atStartOfLeaf( editableRight ) ) )
 				{
 					if ( !bNonEditableContentCleared )
 					{

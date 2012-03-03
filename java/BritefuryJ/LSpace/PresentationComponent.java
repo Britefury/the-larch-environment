@@ -1797,7 +1797,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			return valueCacheManager;
 		}
 		
-		protected DefaultTextRepresentationManager getDefaultTextRepresentationManager()
+		public DefaultTextRepresentationManager getDefaultTextRepresentationManager()
 		{
 			return defaultTextRepresentationManager;
 		}

@@ -9,16 +9,19 @@ package BritefuryJ.LSpace.Marker;
 
 import java.util.ArrayList;
 
+import BritefuryJ.LSpace.AbstractTextRepresentationManager;
+import BritefuryJ.LSpace.ElementFilter;
 import BritefuryJ.LSpace.LSContainer;
 import BritefuryJ.LSpace.LSContentLeaf;
 import BritefuryJ.LSpace.LSContentLeafEditable;
 import BritefuryJ.LSpace.LSElement;
-import BritefuryJ.LSpace.LSSegment;
-import BritefuryJ.LSpace.ElementFilter;
 import BritefuryJ.LSpace.LSElement.IsNotInSubtreeException;
+import BritefuryJ.LSpace.TreeTraversal;
+import BritefuryJ.Math.Point2;
+import BritefuryJ.Math.Xform2;
 import BritefuryJ.Util.HashUtils;
 
-public class Marker
+public class Marker implements Comparable<Marker>
 {
 	public static class InvalidMarkerPosition extends RuntimeException
 	{
@@ -29,18 +32,15 @@ public class Marker
 			super( message );
 		}
 	}
+	
+	public static class CannotFindLeafInSubtreeException extends Exception
+	{
+		static final long serialVersionUID = 0L;
+	}
 
 	
 	public enum Bias { START, END }
 	
-	
-	private enum Direction
-	{
-		DIR_NONE,
-		FORWARD,
-		BACKWARD
-	}
-
 	
 	protected LSContentLeafEditable element;
 	protected int position;
@@ -58,6 +58,11 @@ public class Marker
 	
 	public Marker(LSContentLeafEditable element, int position, Bias bias)
 	{
+		if ( !element.isRealised() )
+		{
+			throw new RuntimeException( "Cannot create a marker within unrealised element " + element );
+		}
+		
 		checkPositionAndBias( element, position, bias );
 		
 		this.element = element;
@@ -184,8 +189,14 @@ public class Marker
 		changed();
 	}
 	
-	public void set(LSContentLeafEditable element, int position, Bias bias)
+	
+	public void moveTo(LSContentLeafEditable element, int position, Bias bias)
 	{
+		if ( !element.isRealised() )
+		{
+			throw new RuntimeException( "Cannot move marker into unrealised leaf element " + element );
+		}
+		
 		if ( element != null )
 		{
 			checkPositionAndBias( element, position, bias );
@@ -211,8 +222,193 @@ public class Marker
 	
 	public void moveTo(Marker marker)
 	{
-		set( marker.element, marker.position, marker.bias );
+		moveTo( marker.element, marker.position, marker.bias );
 	}
+	
+	
+	
+	public void moveToStartOfLeaf(LSContentLeafEditable leaf)
+	{
+		moveTo( leaf, 0, Bias.START );
+	}
+	
+	public void moveToStartOfLeafPlusOne(LSContentLeafEditable leaf)
+	{
+		moveTo( leaf, Math.min( 1, leaf.getMarkerRange() ), Bias.START );
+	}
+	
+	public void moveToEndOfLeaf(LSContentLeafEditable leaf)
+	{
+		// We must ensure that an element with no content CANNOT have a marker given a bias of END, otherwise
+		// empty text elements will consume a backspace character.
+		int range = leaf.getMarkerRange();
+		if ( range == 0 )
+		{
+			moveTo( leaf, 0, Bias.START );
+		}
+		else
+		{
+			moveTo( leaf, Math.max( range - 1, 0 ), Bias.END );
+		}
+	}
+	
+	public void moveToEndOfLeafMinusOne(LSContentLeafEditable leaf)
+	{
+		moveTo( leaf, Math.max( leaf.getMarkerRange() - 1, 0 ), Marker.Bias.START );
+	}
+	
+	public void moveToPointInLeaf(LSContentLeafEditable leaf, Point2 localPos)
+	{
+		int markerPos = leaf.getMarkerPositonForPoint( localPos );
+		moveTo( leaf, markerPos, Marker.Bias.START );
+	}
+	
+	
+	
+	public void moveToStartOf(LSElement element, boolean editable) throws CannotFindLeafInSubtreeException
+	{
+		LSContentLeafEditable leaf = null;
+		
+		if ( element instanceof LSContentLeafEditable )
+		{
+			leaf = (LSContentLeafEditable)element;
+		}
+		else
+		{
+			leaf = (LSContentLeafEditable)TreeTraversal.findFirstElementInSubtree( element, LSElement.internalBranchChildrenFn,
+					editable ? LSContentLeafEditable.editableRealisedLeafElementFilter : LSContentLeafEditable.selectableRealisedLeafElementFilter );
+		}
+		
+		if ( leaf != null )
+		{
+			moveToStartOfLeaf( leaf );
+		}
+		else
+		{
+			throw new CannotFindLeafInSubtreeException();
+		}
+	}
+	
+	public void moveToStartOf(LSElement element, ElementFilter elementFilter) throws CannotFindLeafInSubtreeException
+	{
+		LSContentLeafEditable leaf = null;
+		
+		if ( element instanceof LSContentLeafEditable )
+		{
+			leaf = (LSContentLeafEditable)element;
+		}
+		else
+		{
+			leaf = (LSContentLeafEditable)TreeTraversal.findFirstElementInSubtree( element, LSElement.internalBranchChildrenFn, elementFilter );
+		}
+		
+		if ( leaf != null )
+		{
+			moveToStartOfLeaf( leaf );
+		}
+		else
+		{
+			throw new CannotFindLeafInSubtreeException();
+		}
+	}
+	
+	public void moveToEndOf(LSElement element, boolean editable) throws CannotFindLeafInSubtreeException
+	{
+		LSContentLeafEditable leaf = null;
+		
+		if ( element instanceof LSContentLeafEditable )
+		{
+			leaf = (LSContentLeafEditable)element;
+		}
+		else
+		{
+			leaf = (LSContentLeafEditable)TreeTraversal.findLastElementInSubtree( element, LSElement.internalBranchChildrenFn,
+					editable ? LSContentLeafEditable.editableRealisedLeafElementFilter : LSContentLeafEditable.selectableRealisedLeafElementFilter );
+		}
+		
+		if ( leaf != null )
+		{
+			moveToEndOfLeaf( leaf );
+		}
+		else
+		{
+			throw new CannotFindLeafInSubtreeException();
+		}
+	}
+	
+	public void moveToEndOf(LSElement element, ElementFilter elementFilter) throws CannotFindLeafInSubtreeException
+	{
+		LSContentLeafEditable leaf = null;
+		
+		if ( element instanceof LSContentLeafEditable )
+		{
+			leaf = (LSContentLeafEditable)element;
+		}
+		else
+		{
+			leaf = (LSContentLeafEditable)TreeTraversal.findLastElementInSubtree( element, LSElement.internalBranchChildrenFn, elementFilter );
+		}
+		
+		if ( leaf != null )
+		{
+			moveToEndOfLeaf( leaf );
+		}
+		else
+		{
+			throw new CannotFindLeafInSubtreeException();
+		}
+	}
+	
+	
+	public void moveToPointIn(LSElement element, Point2 localPos, boolean editable) throws CannotFindLeafInSubtreeException
+	{
+		LSContentLeafEditable leaf = (LSContentLeafEditable)element.getLeafClosestToLocalPoint( localPos,
+				editable ? LSContentLeafEditable.editableRealisedLeafElementFilter : LSContentLeafEditable.selectableRealisedLeafElementFilter );
+		
+		if ( leaf != null )
+		{
+			Xform2 x = leaf.getAncestorToLocalXform( element );
+			
+			moveToPointInLeaf( leaf, x.transform( localPos ) );
+		}
+		else
+		{
+			throw new CannotFindLeafInSubtreeException();
+		}
+	}
+	
+	
+	
+	
+	
+	public boolean isAtStartOf(LSContentLeafEditable leaf)
+	{
+		if ( leaf == element )
+		{
+			return getIndex() == 0;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	public boolean isAtEndOf(LSContentLeafEditable leaf)
+	{
+		if ( leaf == element )
+		{
+			// The index (position and bias) is at the last position,
+			// OR
+			// range is 0, and position is 0, bias is 1, which would make index 1
+			return getIndex() == leaf.getMarkerRange()  ||  getPosition() == leaf.getMarkerRange();
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	
 	
 
 	public void clear()
@@ -238,43 +434,11 @@ public class Marker
 	
 	
 	
-	// Returns:
-	//   1 : a is first
-	//   -1 : b is first
-	//   0 : equal
-	public static int markerOrder(Marker a, Marker b)
-	{
-		if ( a.element == b.element )
-		{
-			if ( a.position == b.position )
-			{
-				if ( a.bias == b.bias )
-				{
-					return 0;
-				}
-				else
-				{
-					return a.bias == Bias.START  ?  1  :  -1;
-				}
-			}
-			else
-			{
-				return a.position < b.position  ?  1 : -1;
-			}
-		}
-		else
-		{
-			return LSElement.areElementsInOrder( a.element, b.element )  ?  1  :  -1;
-		}
-	}
-	
-	
-	
 	public Marker copy()
 	{
 		if ( element != null )
 		{
-			return element.marker( position, bias );
+			return new Marker( element, position, bias );
 		}
 		else
 		{
@@ -347,29 +511,42 @@ public class Marker
 	
 	
 	
-	public void moveToPositionAndBiasWithinSubtree(LSElement subtree, int newPosition, Bias newBias, ElementFilter leafFilter)
+	public void moveToPositionAndBiasWithinSubtree(LSElement subtree, AbstractTextRepresentationManager textRepManager, int newPosition, Bias newBias, ElementFilter leafFilter)
 	{
-		moveTo( markerAtPositionAndBiasWithinSubtree( subtree, newPosition, newBias, leafFilter ) );
-	}
-	
-	
-	public static Marker markerAtPositionAndBiasWithinSubtree(LSElement subtree, int newPosition, Bias newBias, ElementFilter leafFilter)
-	{
-		int subtreeTextRepLength = subtree.getTextRepresentationLength();
+		String subtreeTextRep = textRepManager.getTextRepresentationOf( subtree );
+		int subtreeTextRepLength = subtreeTextRep.length(); 
+		
+		int newIndex = newBias == Bias.END   ?  newPosition + 1 : newPosition;
 		
 		if ( newPosition < 0 )
 		{
+			try
+			{
+				moveToStartOf( subtree, leafFilter );
+				return;
+			}
+			catch (CannotFindLeafInSubtreeException e)
+			{
+			}
 			newPosition = 0;
 			newBias = Marker.Bias.START;
 		}
 		else if ( newPosition >= subtreeTextRepLength )
 		{
+			try
+			{
+				moveToEndOf( subtree, leafFilter );
+				return;
+			}
+			catch (CannotFindLeafInSubtreeException e)
+			{
+			}
 			newPosition = subtreeTextRepLength - 1;
 			newBias = Marker.Bias.END;
 		}
 
 		
-		LSContentLeaf leaf = subtree.getLeafAtTextRepresentationPosition( newPosition );
+		LSContentLeaf leaf = textRepManager.getLeafAtPositionInSubtree( subtree, newPosition );
 		if ( leaf != null )
 		{
 			int elemOffset = -1;
@@ -379,7 +556,7 @@ public class Marker
 			}
 			else
 			{
-				elemOffset = leaf.getTextRepresentationOffsetInSubtree( (LSContainer)subtree );
+				elemOffset = textRepManager.getPositionOfElementInSubtree( (LSContainer)subtree, leaf );
 			}
 			int leafPosition = newPosition - elemOffset;
 			
@@ -392,143 +569,134 @@ public class Marker
 				{
 					newBias = Bias.START;
 				}
-				return ( (LSContentLeafEditable)leaf ).marker( leafPosition, newBias );
+				
+				moveTo( (LSContentLeafEditable)leaf, leafPosition, newBias );
+				return;
 			}
 			else
 			{
-				// The leaf is not editable. We must choose a nearby leaf to place the caret in
+				// The leaf is not a LSContentLeafEditable, or it fails the filter test. We must choose a nearby leaf that satisfies the requirements
 				
-				LSSegment segment = leaf.getSegment();
-				LSSegment.SegmentFilter segFilter = segment != null  ?  new LSSegment.SegmentFilter( segment )  :  null;
+				// Get a leaf before and after @leaf
+				LSElement prev = TreeTraversal.previousElement( leaf, null, LSElement.internalBranchChildrenFn, leafFilter );
+				LSElement next = TreeTraversal.nextElement( leaf, null, LSElement.internalBranchChildrenFn, leafFilter );
 				
-				
-				// First, we must decide whether we should search backwards or forwards
-				Direction direction = Direction.DIR_NONE;
-				String leafTextRepresentation = leaf.getTextRepresentation();
-				int leafTextReprLength = leafTextRepresentation.length();
-				
-				// First, see if the leaf textual representation contains a new-line. If so, try to stay on the same side of the new line.
-				if ( leafTextRepresentation.contains( "\n" ) )
+				// Get the distance from the edge of each to the desired position
+				if ( prev != null )
 				{
-					int newIndex = newPosition  +  ( newBias == Marker.Bias.END  ?  1  :  0 );
-					int leafIndex = newIndex - elemOffset;
-					if ( leafTextRepresentation.substring( leafIndex, leafTextReprLength ).contains( "\n" ) )
+					if ( !( prev instanceof LSContentLeafEditable) )
 					{
-						// Newline in text after the caret position; search backwards
-						direction = Direction.BACKWARD;
-					}
-					else if ( leafTextRepresentation.substring( 0, leafIndex ).contains( "\n" ) )
-					{
-						// Newline in text before the caret position; search forwards
-						direction = Direction.FORWARD;
+						throw new RuntimeException( "Leaf filter passed an element that is not a LSContentLeafEditable - it passed a " + prev );
 					}
 				}
-				
-				
-				if ( direction == Direction.DIR_NONE )
+
+				if ( next != null )
 				{
-					// Decide which way to go by staying on the same side of the centre of the leaf
-					if ( (float)leafPosition  <  ((float)leafTextReprLength) * 0.5f )
+					if ( !( next instanceof LSContentLeafEditable) )
 					{
-						direction = Direction.BACKWARD;
-					}
-					else
-					{
-						direction = Direction.FORWARD;
+						throw new RuntimeException( "Leaf filter passed an element that is not a LSContentLeafEditable - it passed a " + next );
 					}
 				}
-				
-				
-				if ( direction == Direction.BACKWARD )
+
+				// Pick the best place
+				// First step, if only one neighbour was found, use that
+				if ( prev == null  &&  next == null )
 				{
-					// Search backwards
-					LSContentLeaf left = leaf.getPreviousLeaf( segFilter, null, leafFilter );
-					if ( left != null )
-					{
-						return left.markerAtEnd();
-					}
-					else
-					{
-						// Searching backwards failed; search forwards
-						LSContentLeaf right = leaf.getNextLeaf( segFilter, null, leafFilter );
-						if ( right != null )
-						{
-							return right.markerAtStart();
-						}
-						else
-						{
-							// Search backwards, this time potentially leaving the segment
-							left = leaf.getPreviousLeaf( null, null, leafFilter );
-							if ( left != null )
-							{
-								return left.markerAtEnd();
-							}
-							else
-							{
-								// Searching backwards failed; search forwards
-								right = leaf.getNextLeaf( null, null, leafFilter );
-								if ( right != null )
-								{
-									return right.markerAtStart();
-								}
-								else
-								{
-									// Searching backwards and forwards failed; place the cursor in the non-editable leaf and hope for the best
-									return leaf.markerAtStart();
-								}
-							}
-						}
-					}
+					clear();
+					return;
 				}
-				else if ( direction == Direction.FORWARD )
+				else if ( prev != null  &&  next == null )
 				{
-					// Search forwards
-					LSContentLeaf right = leaf.getNextLeaf( segFilter, null, leafFilter );
-					if ( right != null )
-					{
-						return right.markerAtStart();
-					}
-					else
-					{
-						// Searching forwards failed; search backwards
-						LSContentLeaf left = leaf.getPreviousLeaf( segFilter, null, leafFilter );
-						if ( left != null )
-						{
-							return left.markerAtEnd();
-						}
-						else
-						{
-							// Search forwards, this time potentially leaving the segment
-							right = leaf.getNextLeaf( null, null, leafFilter );
-							if ( right != null )
-							{
-								return right.markerAtStart();
-							}
-							else
-							{
-								// Searching forwards failed; search backwards
-								left = leaf.getPreviousLeaf( null, null, leafFilter );
-								if ( left != null )
-								{
-									return left.markerAtEnd();
-								}
-								else
-								{
-									// Searching forwards and backwards failed; place the cursor in the non-editable leaf and hope for the best
-									return leaf.markerAtStart();
-								}
-							}
-						}
-					}
+					moveToEndOfLeaf( (LSContentLeafEditable)prev );
+					return;
+				}
+				else if ( prev == null  &&  next != null )
+				{
+					moveToStartOfLeaf( (LSContentLeafEditable)next );
+					return;
 				}
 				else
 				{
-					throw new RuntimeException( "invalid direction" );
+					// Two neighbours were found. Choose the best one.
+				
+					int prevDistance = -1, nextDistance = -1;
+					int prevLength = textRepManager.getTextRepresentationOf( prev ).length();
+					int prevEnd = textRepManager.getPositionOfElementInSubtree( (LSContainer)subtree, prev )  +  prevLength;
+					prevEnd = Math.max( 0, prevEnd );
+					prevDistance = newIndex - prevEnd;
+
+					int nextStart = textRepManager.getPositionOfElementInSubtree( (LSContainer)subtree, next );
+					nextStart = Math.min( nextStart, subtreeTextRepLength );
+					nextDistance = nextStart - newIndex;
+					
+					// Choose the best neighbour by distance.
+					// Avoid crossing a newline character if possible
+					if ( prevDistance < nextDistance )
+					{
+						boolean crossingANewLinePrev = subtreeTextRep.substring( prevEnd, newIndex ).contains( "\n" );
+						
+						if ( !crossingANewLinePrev )
+						{
+							moveToEndOfLeaf( (LSContentLeafEditable)prev );
+							return;
+						}
+						else
+						{
+							// We are crossing a newline going to the previous neighbour - what about the next?
+							boolean crossingANewLineNext = subtreeTextRep.substring( newIndex, nextStart ).contains( "\n" );
+							
+							if ( crossingANewLineNext )
+							{
+								moveToEndOfLeaf( (LSContentLeafEditable)prev );
+								return;
+							}
+							else
+							{
+								moveToStartOfLeaf( (LSContentLeafEditable)next );
+								return;
+							}
+						}
+					}
+					else
+					{
+						boolean crossingANewLineNext = subtreeTextRep.substring( newIndex, nextStart ).contains( "\n" );
+						
+						if ( !crossingANewLineNext )
+						{
+							moveToStartOfLeaf( (LSContentLeafEditable)next );
+							return;
+						}
+						else
+						{
+							// We are crossing a newline going to the previous neighbour - what about the next?
+							boolean crossingANewLinePrev = subtreeTextRep.substring( prevEnd, newIndex ).contains( "\n" );
+							
+							if ( crossingANewLinePrev )
+							{
+								moveToStartOfLeaf( (LSContentLeafEditable)next );
+								return;
+							}
+							else
+							{
+								moveToEndOfLeaf( (LSContentLeafEditable)prev );
+								return;
+							}
+						}
+					}
 				}
 			}
 		}
 		
-		return null;
+		clear();
+		return;
+	}
+	
+	
+	public static Marker markerAtPositionAndBiasWithinSubtree(LSElement subtree, AbstractTextRepresentationManager textRepManager, int newPosition, Bias newBias, ElementFilter leafFilter)
+	{
+		Marker m = new Marker();
+		m.moveToPositionAndBiasWithinSubtree( subtree, textRepManager, newPosition, newBias, leafFilter );
+		return m;
 	}
 	
 	
@@ -536,5 +704,121 @@ public class Marker
 	public String toString()
 	{
 		return "Marker[" + System.identityHashCode( this ) + "]( element=" + element + ", position=" + position + ", bias=" + bias + " )";
+	}
+	
+	
+	
+	// Returns:
+	//   1 : a is first
+	//   -1 : b is first
+	//   0 : equal
+	@Override
+	public int compareTo(Marker b)
+	{
+		if ( element == b.element )
+		{
+			if ( position == b.position )
+			{
+				if ( bias == b.bias )
+				{
+					return 0;
+				}
+				else
+				{
+					return bias == Bias.START  ?  1  :  -1;
+				}
+			}
+			else
+			{
+				return position < b.position  ?  1 : -1;
+			}
+		}
+		else
+		{
+			return LSElement.areElementsInOrder( element, b.element )  ?  1  :  -1;
+		}
+	}
+	
+	
+	
+	
+	public static Marker atStartOfLeaf(LSContentLeafEditable leaf)
+	{
+		Marker m = new Marker();
+		m.moveToStartOfLeaf( leaf );
+		return m;
+	}
+	
+	public static Marker atStartOfLeafPlusOne(LSContentLeafEditable leaf)
+	{
+		Marker m = new Marker();
+		m.moveToStartOfLeafPlusOne( leaf );
+		return m;
+	}
+	
+	public static Marker atEndOfLeaf(LSContentLeafEditable leaf)
+	{
+		Marker m = new Marker();
+		m.moveToEndOfLeaf( leaf );
+		return m;
+	}
+	
+	public static Marker atEndOfLeafMinusOne(LSContentLeafEditable leaf)
+	{
+		Marker m = new Marker();
+		m.moveToEndOfLeafMinusOne( leaf );
+		return m;
+	}
+	
+	public static Marker atPointInLeaf(LSContentLeafEditable leaf, Point2 localPos)
+	{
+		Marker m = new Marker();
+		m.moveToPointInLeaf( leaf, localPos );
+		return m;
+	}
+	
+	
+	
+	public static Marker atStartOf(LSElement element, boolean editable)
+	{
+		Marker m = new Marker();
+		try
+		{
+			m.moveToStartOf( element, editable );
+			return m;
+		}
+		catch (CannotFindLeafInSubtreeException e)
+		{
+			return null;
+		}
+	}
+	
+	public static Marker atEndOf(LSElement element, boolean editable)
+	{
+		Marker m = new Marker();
+		try
+		{
+			m.moveToEndOf( element, editable );
+			return m;
+		}
+		catch (CannotFindLeafInSubtreeException e)
+		{
+			return null;
+		}
+	}
+	
+	
+	public static Marker atPointIn(LSElement element, Point2 localPos, boolean editable)
+	{
+		Marker m = new Marker();
+		try
+		{
+			m.moveToPointIn( element, localPos, editable );
+			return m;
+		}
+		catch (CannotFindLeafInSubtreeException e)
+		{
+			return null;
+		}
 	}
 }
