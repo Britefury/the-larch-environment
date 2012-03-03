@@ -12,11 +12,11 @@ import java.awt.Paint;
 import java.awt.Stroke;
 import java.awt.geom.Line2D;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.ElementPainter;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
-import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.DocPresent.Interactor.PushElementInteractor;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.ElementPainter;
+import BritefuryJ.LSpace.Event.PointerButtonEvent;
+import BritefuryJ.LSpace.Input.PointerInputElement;
+import BritefuryJ.LSpace.Interactor.PushElementInteractor;
 
 class CheckboxHelper
 {
@@ -34,12 +34,12 @@ class CheckboxHelper
 		}
 		
 		@Override
-		public void drawBackground(DPElement element, Graphics2D graphics)
+		public void drawBackground(LSElement element, Graphics2D graphics)
 		{
 		}
 		
 		@Override
-		public void draw(DPElement element, Graphics2D graphics)
+		public void draw(LSElement element, Graphics2D graphics)
 		{
 			if ( checkbox.getState() )
 			{

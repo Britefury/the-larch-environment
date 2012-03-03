@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Pres.ObjectPres;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Label;
@@ -25,7 +25,7 @@ public class ObjectTitle extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		StyleSheet titleStyle = ObjectPresStyle.objectTitleStyle.get( style );
 		return titleStyle.applyTo( new Label( title ) ).present( ctx, style );

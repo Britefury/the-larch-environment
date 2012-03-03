@@ -8,8 +8,8 @@ package BritefuryJ.Pres.Primitive;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPSpan;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSSpan;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.SequentialPres;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -28,9 +28,9 @@ public class Span extends SequentialPres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPSpan element = new DPSpan( Primitive.containerParams.get( style ) );
+		LSSpan element = new LSSpan( Primitive.containerParams.get( style ) );
 		element.setChildren( mapPresent( ctx, Primitive.useContainerParams.get( style ), children ) );
 		return element;
 	}

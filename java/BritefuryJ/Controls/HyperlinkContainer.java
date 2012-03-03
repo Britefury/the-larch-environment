@@ -6,9 +6,9 @@
 //##************************
 package BritefuryJ.Controls;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Browser.Location;
-import BritefuryJ.DocPresent.Interactor.ContextMenuElementInteractor;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Browser.Location;
+import BritefuryJ.LSpace.Interactor.ContextMenuElementInteractor;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
 
@@ -16,7 +16,7 @@ public class HyperlinkContainer extends AbstractHyperlink
 {
 	public static class HyperlinkContainerControl extends AbstractHyperlink.AbstractHyperlinkControl
 	{
-		protected HyperlinkContainerControl(PresentationContext ctx, StyleValues style, DPElement element, LinkListener listener, boolean bClosePopupOnActivate)
+		protected HyperlinkContainerControl(PresentationContext ctx, StyleValues style, LSElement element, LinkListener listener, boolean bClosePopupOnActivate)
 		{
 			super( ctx, style, element, listener, bClosePopupOnActivate );
 		}
@@ -36,7 +36,7 @@ public class HyperlinkContainer extends AbstractHyperlink
 	
 	
 	@Override
-	protected Control createHyperlinkControl(PresentationContext ctx, StyleValues style, DPElement contentsElement, boolean bClosePopupOnActivate, LinkListener listener,
+	protected Control createHyperlinkControl(PresentationContext ctx, StyleValues style, LSElement contentsElement, boolean bClosePopupOnActivate, LinkListener listener,
 			ContextMenuElementInteractor contextMenuInteractor)
 	{
 		return new HyperlinkContainerControl( ctx, style, contentsElement, listener, bClosePopupOnActivate );

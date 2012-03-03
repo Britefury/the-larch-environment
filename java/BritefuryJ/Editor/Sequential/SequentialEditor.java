@@ -6,28 +6,28 @@
 //##************************
 package BritefuryJ.Editor.Sequential;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.EditEvent;
-import BritefuryJ.DocPresent.TextEditEvent;
-import BritefuryJ.DocPresent.TreeEventListener;
-import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.Selection.TextSelection;
-import BritefuryJ.DocPresent.StreamValue.SequentialStreamValueVisitor;
-import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.Editor.Sequential.EditListener.HandleEditResult;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.EditEvent;
+import BritefuryJ.LSpace.TextEditEvent;
+import BritefuryJ.LSpace.TreeEventListener;
+import BritefuryJ.LSpace.Marker.Marker;
+import BritefuryJ.LSpace.Selection.TextSelection;
+import BritefuryJ.LSpace.StreamValue.SequentialStreamValueVisitor;
+import BritefuryJ.LSpace.StreamValue.StreamValue;
 import BritefuryJ.Pres.Primitive.Region;
 
 public abstract class SequentialEditor
 {
 	public static interface HandleEditEventFn
 	{
-		EditListener.HandleEditResult handleEditEvent(DPElement element, DPElement sourceElement, EditEvent event);
+		EditListener.HandleEditResult handleEditEvent(LSElement element, LSElement sourceElement, EditEvent event);
 	}
 	
 	public static interface HandleStreamValueFn
 	{
-		HandleEditResult handleValue(DPElement element, DPElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value);
+		HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value);
 	}
 	
 	
@@ -44,7 +44,7 @@ public abstract class SequentialEditor
 	protected class ClearStructuralValueListener implements TreeEventListener
 	{
 		@Override
-		public boolean onTreeEvent(DPElement element, DPElement sourceElement, Object event)
+		public boolean onTreeEvent(LSElement element, LSElement sourceElement, Object event)
 		{
 			if ( event instanceof EditEvent )
 			{
@@ -69,14 +69,14 @@ public abstract class SequentialEditor
 	protected static class ClearNeighbouringStructuralValueListener implements TreeEventListener
 	{
 		@Override
-		public boolean onTreeEvent(DPElement element, DPElement sourceElement, Object event)
+		public boolean onTreeEvent(LSElement element, LSElement sourceElement, Object event)
 		{
 			if ( event instanceof TextEditEvent )
 			{
 				TextEditEvent editEvent = (TextEditEvent)event;
 				
-				DPElement prevNeighbourCommonAncestor = editEvent.getPrevNeighbourCommonAncestor();
-				DPElement nextNeighbourCommonAncestor = editEvent.getNextNeighbourCommonAncestor();
+				LSElement prevNeighbourCommonAncestor = editEvent.getPrevNeighbourCommonAncestor();
+				LSElement nextNeighbourCommonAncestor = editEvent.getNextNeighbourCommonAncestor();
 				
 				ClearNeighbourEditEvent clearEvent = new ClearNeighbourEditEvent( editEvent.getStreamValueVisitor() );
 				
@@ -117,7 +117,7 @@ public abstract class SequentialEditor
 		}
 
 		@Override
-		protected HandleEditResult handleEditEvent(DPElement element, DPElement sourceElement, EditEvent event)
+		protected HandleEditResult handleEditEvent(LSElement element, LSElement sourceElement, EditEvent event)
 		{
 			return handleEditEventFn.handleEditEvent( element, sourceElement, event );
 		}
@@ -144,7 +144,7 @@ public abstract class SequentialEditor
 		}
 
 		@Override
-		protected HandleEditResult handleValue(DPElement element, DPElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
+		protected HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
 		{
 			return handleStreamValueFn.handleValue( element, sourceElement, fragment, event, model, value );
 		}
@@ -196,7 +196,7 @@ public abstract class SequentialEditor
 	
 	
 	
-	public static SequentialEditor getEditorForElement(DPElement element)
+	public static SequentialEditor getEditorForElement(LSElement element)
 	{
 		SequentialClipboardHandler clipboardHandler = (SequentialClipboardHandler)element.getRegion().getClipboardHandler();
 		return clipboardHandler.getSequentialEditor();
@@ -270,20 +270,20 @@ public abstract class SequentialEditor
 	
 	
 	
-	public abstract Object getSequentialContentInSelection(FragmentView subtreeRootFragment, DPElement subtreeRootFragmentElement, TextSelection selection);
-	public abstract Object spliceForInsertion(FragmentView subtreeRootFragment, DPElement subtreeRootFragmentElement, Marker prefixEnd, Marker suffixStart, Object insertedContent);
-	public abstract Object spliceForDeletion(FragmentView subtreeRootFragment, DPElement subtreeRootFragmentElement, Marker selectionStart, Marker selectionEnd);
+	public abstract Object getSequentialContentInSelection(FragmentView subtreeRootFragment, LSElement subtreeRootFragmentElement, TextSelection selection);
+	public abstract Object spliceForInsertion(FragmentView subtreeRootFragment, LSElement subtreeRootFragmentElement, Marker prefixEnd, Marker suffixStart, Object insertedContent);
+	public abstract Object spliceForDeletion(FragmentView subtreeRootFragment, LSElement subtreeRootFragmentElement, Marker selectionStart, Marker selectionEnd);
 
 
 
-	protected SelectionEditTreeEvent createSelectionEditTreeEvent(DPElement sourceElement)
+	protected SelectionEditTreeEvent createSelectionEditTreeEvent(LSElement sourceElement)
 	{
 		return new SelectionEditTreeEvent( this, sourceElement );
 	}
 
 
 
-	protected static DPElement getEventSourceElement(EditEvent event)
+	protected static LSElement getEventSourceElement(EditEvent event)
 	{
 		if ( event instanceof SelectionEditTreeEvent )
 		{

@@ -9,7 +9,7 @@ package BritefuryJ.Pres.RichText;
 import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Span;
 import BritefuryJ.Pres.Primitive.Text;
@@ -35,7 +35,7 @@ public class RichSpan extends AbstractRichText
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		List<Object> paragraphContents = null;
 		

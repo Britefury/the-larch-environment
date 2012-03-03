@@ -12,17 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import BritefuryJ.DocPresent.DPContentLeafEditable;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.EditEvent;
-import BritefuryJ.DocPresent.ElementTreeVisitor;
-import BritefuryJ.DocPresent.TextEditEvent;
-import BritefuryJ.DocPresent.TreeEventListener;
-import BritefuryJ.DocPresent.Caret.Caret;
-import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.Selection.TextSelection;
-import BritefuryJ.DocPresent.StreamValue.StreamValue;
-import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.Editor.Sequential.EditListener;
 import BritefuryJ.Editor.Sequential.EditListener.HandleEditResult;
 import BritefuryJ.Editor.Sequential.SelectionEditTreeEvent;
@@ -30,6 +19,17 @@ import BritefuryJ.Editor.Sequential.SequentialEditor;
 import BritefuryJ.Editor.Sequential.StreamEditListener;
 import BritefuryJ.Editor.Sequential.Item.EditableStructuralItem;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.LSpace.LSContentLeafEditable;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.EditEvent;
+import BritefuryJ.LSpace.ElementTreeVisitor;
+import BritefuryJ.LSpace.TextEditEvent;
+import BritefuryJ.LSpace.TreeEventListener;
+import BritefuryJ.LSpace.Caret.Caret;
+import BritefuryJ.LSpace.Marker.Marker;
+import BritefuryJ.LSpace.Selection.TextSelection;
+import BritefuryJ.LSpace.StreamValue.StreamValue;
+import BritefuryJ.LSpace.StreamValue.StreamValueBuilder;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Logging.LogEntry;
 import BritefuryJ.Pres.Pres;
@@ -54,7 +54,7 @@ public abstract class RichTextEditor extends SequentialEditor
 
 
 		@Override
-		protected void preOrderVisitElement(DPElement e, boolean complete)
+		protected void preOrderVisitElement(LSElement e, boolean complete)
 		{
 			if ( e.hasFixedValue() )
 			{
@@ -85,7 +85,7 @@ public abstract class RichTextEditor extends SequentialEditor
 
 
 		@Override
-		protected void inOrderCompletelyVisitElement(DPElement e)
+		protected void inOrderCompletelyVisitElement(LSElement e)
 		{
 			StreamValue stream = e.getStreamValue();
 			for (StreamValue.Item item: stream.getItems())
@@ -103,7 +103,7 @@ public abstract class RichTextEditor extends SequentialEditor
 
 
 		@Override
-		protected void postOrderVisitElement(DPElement e, boolean complete)
+		protected void postOrderVisitElement(LSElement e, boolean complete)
 		{
 			if ( e.hasFixedValue() )
 			{
@@ -134,14 +134,14 @@ public abstract class RichTextEditor extends SequentialEditor
 
 
 		@Override
-		protected void inOrderVisitPartialContentLeafEditable(DPContentLeafEditable e, int startIndex, int endIndex)
+		protected void inOrderVisitPartialContentLeafEditable(LSContentLeafEditable e, int startIndex, int endIndex)
 		{
 			contents.add( e.getTextRepresentation().substring( startIndex, endIndex ) );
 		}
 
 
 		@Override
-		protected boolean shouldVisitChildrenOfElement(DPElement e, boolean completeVisit)
+		protected boolean shouldVisitChildrenOfElement(LSElement e, boolean completeVisit)
 		{
 			return completeVisit  ?  e.hasFixedValue()  :  true;
 		}
@@ -233,7 +233,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		HandleStreamValueFn onInlineEmbedEdit = new HandleStreamValueFn()
 		{
 			@Override
-			public EditListener.HandleEditResult handleValue(DPElement element, DPElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
+			public EditListener.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
 			{
 				if ( event instanceof RichTextEditEvents.RichTextRequest )
 				{
@@ -248,7 +248,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		HandleStreamValueFn onTextEdit = new HandleStreamValueFn()
 		{
 			@Override
-			public EditListener.HandleEditResult handleValue(DPElement element, DPElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
+			public EditListener.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
 			{
 				if ( event instanceof TextEditEvent )
 				{
@@ -272,7 +272,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		HandleStreamValueFn onParagraphEdit = new HandleStreamValueFn()
 		{
 			@Override
-			public EditListener.HandleEditResult handleValue(DPElement element, DPElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
+			public EditListener.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
 			{
 				if ( event instanceof TextEditEvent )
 				{
@@ -301,7 +301,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		HandleStreamValueFn onParagraphListItemEdit = new HandleStreamValueFn()
 		{
 			@Override
-			public EditListener.HandleEditResult handleValue(DPElement element, DPElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
+			public EditListener.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
 			{
 				if ( event instanceof RichTextEditEvents.RichTextRequest )
 				{
@@ -331,7 +331,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		HandleStreamValueFn onBlockEdit = new HandleStreamValueFn()
 		{
 			@Override
-			public EditListener.HandleEditResult handleValue(DPElement element, DPElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
+			public EditListener.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
 			{
 				if ( event instanceof TextEditEvent )
 				{
@@ -474,7 +474,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		}
 	}
 	
-	public void deleteParagraphContainingElement(DPElement element)
+	public void deleteParagraphContainingElement(LSElement element)
 	{
 		element.postTreeEvent( new RichTextEditEvents.DeleteParagraphRequest() );
 	}
@@ -489,7 +489,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		}
 	}
 	
-	public void deleteInlineEmbedContainingElement(DPElement element)
+	public void deleteInlineEmbedContainingElement(LSElement element)
 	{
 		element.postTreeEvent( new RichTextEditEvents.DeleteInlineEmbedRequest() );
 	}
@@ -853,7 +853,7 @@ public abstract class RichTextEditor extends SequentialEditor
 
 
 
-	protected void insertInlineEmbed(Log log, DPElement element, Object paragraph, Marker marker, EdInlineEmbed embed)
+	protected void insertInlineEmbed(Log log, LSElement element, Object paragraph, Marker marker, EdInlineEmbed embed)
 	{
 		Visitor v1 = new TagsVisitor( this );
 		v1.visitFromStartOfRootToMarker( marker, element );
@@ -871,7 +871,7 @@ public abstract class RichTextEditor extends SequentialEditor
 
 
 	@Override
-	public Object getSequentialContentInSelection(FragmentView editFragment, DPElement editFragmentElement, TextSelection selection)
+	public Object getSequentialContentInSelection(FragmentView editFragment, LSElement editFragmentElement, TextSelection selection)
 	{
 		Visitor v = new NodeVisitor( this );
 		return getFlattenedContentInSelection( v, editFragment, selection );
@@ -884,7 +884,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		
 		// Walk the tree from the common root of the selection, up to the 'edit fragment',
 		// wrapping the content in start/end tags as we go
-		DPElement commonRoot = selection.getCommonRoot();
+		LSElement commonRoot = selection.getCommonRoot();
 		FragmentView rootFragment = (FragmentView)commonRoot.getFragmentContext();
 		
 		while ( rootFragment != editFragment )
@@ -930,7 +930,7 @@ public abstract class RichTextEditor extends SequentialEditor
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Object spliceForInsertion(FragmentView subtreeRootFragment, DPElement subtreeRootFragmentElement, Marker prefixEnd, Marker suffixStart, Object insertedContent)
+	public Object spliceForInsertion(FragmentView subtreeRootFragment, LSElement subtreeRootFragmentElement, Marker prefixEnd, Marker suffixStart, Object insertedContent)
 	{
 		Visitor v1 = new NodeVisitor( this );
 		v1.visitFromStartOfRootToMarker( prefixEnd, subtreeRootFragmentElement );
@@ -945,7 +945,7 @@ public abstract class RichTextEditor extends SequentialEditor
 	}
 
 	@Override
-	public Object spliceForDeletion(FragmentView subtreeRootFragment, DPElement subtreeRootFragmentElement, Marker selectionStart, Marker selectionEnd)
+	public Object spliceForDeletion(FragmentView subtreeRootFragment, LSElement subtreeRootFragmentElement, Marker selectionStart, Marker selectionEnd)
 	{
 		Visitor v1 = new NodeVisitor( this );
 		v1.visitFromStartOfRootToMarker( selectionStart, subtreeRootFragmentElement );
@@ -960,10 +960,10 @@ public abstract class RichTextEditor extends SequentialEditor
 	
 
 	
-	protected StreamValue streamWithModifiedSelectionStyle(DPElement element, TextSelection selection, ComputeSpanStylesFn computeStylesFn)
+	protected StreamValue streamWithModifiedSelectionStyle(LSElement element, TextSelection selection, ComputeSpanStylesFn computeStylesFn)
 	{
 		FragmentView editFragment = (FragmentView)element.getFragmentContext();
-		DPElement editFragmentElement = editFragment.getFragmentElement();
+		LSElement editFragmentElement = editFragment.getFragmentElement();
 		
 		// Get the content within the selection
 		Visitor selectionVisitor = new TagsVisitor( this );

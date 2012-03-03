@@ -15,19 +15,19 @@ import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.DefaultPerspective;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.DefaultPerspective.PrimitivePresenter;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPFragment;
-import BritefuryJ.DocPresent.FragmentContext;
-import BritefuryJ.DocPresent.Browser.Location;
-import BritefuryJ.DocPresent.Input.ObjectDndHandler;
-import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.DocPresent.Layout.HAlignment;
-import BritefuryJ.DocPresent.Layout.VAlignment;
-import BritefuryJ.DocPresent.PersistentState.PersistentState;
-import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
 import BritefuryJ.Incremental.IncrementalFunctionMonitor;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSFragment;
+import BritefuryJ.LSpace.FragmentContext;
+import BritefuryJ.LSpace.Browser.Location;
+import BritefuryJ.LSpace.Input.ObjectDndHandler;
+import BritefuryJ.LSpace.Input.PointerInputElement;
+import BritefuryJ.LSpace.Layout.HAlignment;
+import BritefuryJ.LSpace.Layout.VAlignment;
+import BritefuryJ.LSpace.PersistentState.PersistentState;
+import BritefuryJ.LSpace.PersistentState.PersistentStateTable;
 import BritefuryJ.ObjectPresentation.PresentationStateListener;
 import BritefuryJ.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.Pres.Pres;
@@ -107,7 +107,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 		@Override
 		public Object createSourceData(PointerInputElement sourceElement, int aspect)
 		{
-			DPElement element = (DPElement)sourceElement;
+			LSElement element = (LSElement)sourceElement;
 			FragmentView ctx = (FragmentView)element.getFragmentContext();
 			return new FragmentData( ctx.getModel(), ctx.getFragmentContentElement() );
 		}
@@ -146,8 +146,8 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	
 	private int flags = 0;
 	
-	private DPFragment fragmentElement;
-	private DPElement element;
+	private LSFragment fragmentElement;
+	private LSElement element;
 	private PersistentStateTable persistentState;
 	private PresentationStateListenerList stateListeners;
 
@@ -175,7 +175,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 		
 		
 		// Fragment element, with null context, initially; later set in @setContext method
-		fragmentElement = new DPFragment( this );
+		fragmentElement = new LSFragment( this );
 		fragmentElement.addDragSource( fragmentDragSource );
 		element = null;
 		this.persistentState = persistentState;
@@ -196,19 +196,19 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	//
 	//
 	
-	public DPElement getFragmentElement()
+	public LSElement getFragmentElement()
 	{
 		return fragmentElement;
 	}
 	
-	public DPElement getRefreshedFragmentElement()
+	public LSElement getRefreshedFragmentElement()
 	{
 		refresh();
 		return fragmentElement;
 	}
 	
 	
-	public DPElement getFragmentContentElement()
+	public LSElement getFragmentContentElement()
 	{
 		return element;
 	}
@@ -354,7 +354,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 		
 		incView.onElementChangeFrom( this, fragmentElement );
 
-		DPElement newElement = fragmentElement;
+		LSElement newElement = fragmentElement;
 		if ( testFlag( FLAG_NODE_REFRESH_REQUIRED ) )
 		{
 			// Compute the result for this node, and refresh all children
@@ -463,7 +463,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	}
 	
 	
-	private DPElement computeFragmentElement()
+	private LSElement computeFragmentElement()
 	{
 		incView.profile_startModelViewMapping();
 
@@ -484,7 +484,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 		
 		if ( fragmentFactory != null )
 		{
-			DPElement r = fragmentFactory.createFragmentElement( incView, this, model );
+			LSElement r = fragmentFactory.createFragmentElement( incView, this, model );
 			
 			onComputeNodeResultEnd();
 			incView.profile_stopModelViewMapping();
@@ -578,7 +578,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 		{
 			if ( r != null )
 			{
-				element = (DPElement)r;
+				element = (LSElement)r;
 				fragmentElement.setChild( element );
 				StyleValues style = getStyleValues();
 				fragmentElement.setAlignment( style.get( Primitive.hAlign, HAlignment.class ), style.get( Primitive.vAlign, VAlignment.class ) );
@@ -643,10 +643,10 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	// Inner fragment presentation
 	//
 	
-	public DPElement presentInnerFragment(Object x, AbstractPerspective perspective, StyleValues style, SimpleAttributeTable inheritedState)
+	public LSElement presentInnerFragment(Object x, AbstractPerspective perspective, StyleValues style, SimpleAttributeTable inheritedState)
 	{
 		IncrementalView.FragmentFactory factory = getFragmentFactory();
-		DPElement e = presentInnerFragment( x, perspective, factory.subjectContext, style, inheritedState );
+		LSElement e = presentInnerFragment( x, perspective, factory.subjectContext, style, inheritedState );
 		if ( perspective != factory.perspective )
 		{
 			e = perspectiveFragmentRegion( e, perspective );
@@ -656,7 +656,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	
 	
 	
-	public DPElement presentLocationAsElement(Location location, StyleValues style, SimpleAttributeTable inheritedState)
+	public LSElement presentLocationAsElement(Location location, StyleValues style, SimpleAttributeTable inheritedState)
 	{
 		Subject subject = getBrowserContext().resolveLocationAsSubject( location );
 		AbstractPerspective perspective = subject.getPerspective();
@@ -664,7 +664,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 		{
 			perspective = DefaultPerspective.instance;
 		}
-		DPElement e = presentInnerFragment( subject.getFocus(), perspective, subject.getSubjectContext(), style, inheritedState );
+		LSElement e = presentInnerFragment( subject.getFocus(), perspective, subject.getSubjectContext(), style, inheritedState );
 		return perspectiveFragmentRegion( e, perspective );
 	}
 	
@@ -674,14 +674,14 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	}
 	
 	
-	protected static DPElement perspectiveFragmentRegion(DPElement fragmentContents, AbstractPerspective perspective)
+	protected static LSElement perspectiveFragmentRegion(LSElement fragmentContents, AbstractPerspective perspective)
 	{
 		return new Region( fragmentContents, perspective.getClipboardHandler() ).present();
 	}
 	
 
 
-	private DPElement presentInnerFragment(Object model, AbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
+	private LSElement presentInnerFragment(Object model, AbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
 	{
 		if ( model == null )
 		{
@@ -760,7 +760,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	}
 
 	
-	public static FragmentView getEnclosingFragment(DPElement element, FragmentViewFilter filter)
+	public static FragmentView getEnclosingFragment(LSElement element, FragmentViewFilter filter)
 	{
 		if ( filter == null )
 		{

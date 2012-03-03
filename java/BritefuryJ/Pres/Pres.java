@@ -11,19 +11,19 @@ import java.util.List;
 
 import BritefuryJ.AttributeTable.AttributeBase;
 import BritefuryJ.Command.CommandSetSource;
-import BritefuryJ.DocPresent.Corner;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.ElementPainter;
-import BritefuryJ.DocPresent.ElementValueFunction;
-import BritefuryJ.DocPresent.FragmentContext;
-import BritefuryJ.DocPresent.TreeEventListener;
-import BritefuryJ.DocPresent.Input.ObjectDndHandler;
-import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
-import BritefuryJ.DocPresent.Interactor.ContextMenuElementInteractor;
-import BritefuryJ.DocPresent.Layout.HAlignment;
-import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.IncrementalView.IncrementalView;
+import BritefuryJ.LSpace.Corner;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.ElementPainter;
+import BritefuryJ.LSpace.ElementValueFunction;
+import BritefuryJ.LSpace.FragmentContext;
+import BritefuryJ.LSpace.TreeEventListener;
+import BritefuryJ.LSpace.Input.ObjectDndHandler;
+import BritefuryJ.LSpace.Interactor.AbstractElementInteractor;
+import BritefuryJ.LSpace.Interactor.ContextMenuElementInteractor;
+import BritefuryJ.LSpace.Layout.HAlignment;
+import BritefuryJ.LSpace.Layout.VAlignment;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Projection.AbstractPerspective;
 import BritefuryJ.Projection.ProjectiveBrowserContext;
@@ -66,12 +66,12 @@ public abstract class Pres
 	}
 
 
-	public DPElement present()
+	public LSElement present()
 	{
 		return present( PresentationContext.defaultCtx, StyleValues.instance );
 	}
 
-	public abstract DPElement present(PresentationContext ctx, StyleValues style);
+	public abstract LSElement present(PresentationContext ctx, StyleValues style);
 	
 	
 	
@@ -359,32 +359,32 @@ public abstract class Pres
 	// Popup methods
 	//
 	
-	public void popup(DPElement element, PresentationContext ctx, StyleValues style, Corner targetAnchor, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public void popup(LSElement element, PresentationContext ctx, StyleValues style, Corner targetAnchor, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		DPElement popupElement = present( ctx, style );
+		LSElement popupElement = present( ctx, style );
 		popupElement.popup( element, targetAnchor, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popupToRightOf(DPElement element, PresentationContext ctx, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public void popupToRightOf(LSElement element, PresentationContext ctx, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		DPElement popupElement = present( ctx, style );
+		LSElement popupElement = present( ctx, style );
 		popupElement.popup( element, Corner.TOP_RIGHT, Corner.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popupBelow(DPElement element, PresentationContext ctx, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public void popupBelow(LSElement element, PresentationContext ctx, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		DPElement popupElement = present( ctx, style );
+		LSElement popupElement = present( ctx, style );
 		popupElement.popup( element, Corner.BOTTOM_LEFT, Corner.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popupAtMousePosition(DPElement element, PresentationContext ctx, StyleValues style, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public void popupAtMousePosition(LSElement element, PresentationContext ctx, StyleValues style, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		DPElement popupElement = present( ctx, style );
+		LSElement popupElement = present( ctx, style );
 		element.getRootElement().createPopupAtMousePosition( popupElement, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
 	
-	private DPElement createPopupElement(DPElement contextElement, StyleValues style)
+	private LSElement createPopupElement(LSElement contextElement, StyleValues style)
 	{
 		PresentationContext presCtx = PresentationContext.defaultCtx;
 		FragmentContext fragCtx = contextElement.getFragmentContext();
@@ -420,75 +420,75 @@ public abstract class Pres
 		return viewPres.present( presCtx, style );
 	}
 	
-	private DPElement createPopupElement(DPElement contextElement)
+	private LSElement createPopupElement(LSElement contextElement)
 	{
 		return createPopupElement( contextElement, null );
 	}
 	
 	
 	
-	public void popup(DPElement element, Corner targetAnchor, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public void popup(LSElement element, Corner targetAnchor, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		DPElement popupElement = createPopupElement( element );
+		LSElement popupElement = createPopupElement( element );
 		popupElement.popup( element, targetAnchor, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popup(DPElement element, StyleValues style, Corner targetAnchor, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public void popup(LSElement element, StyleValues style, Corner targetAnchor, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		DPElement popupElement = createPopupElement( element, style );
+		LSElement popupElement = createPopupElement( element, style );
 		popupElement.popup( element, targetAnchor, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popupToRightOf(DPElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public void popupToRightOf(LSElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		popup( element, Corner.TOP_RIGHT, Corner.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popupToRightOf(DPElement element, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public void popupToRightOf(LSElement element, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		popup( element, style, Corner.TOP_RIGHT, Corner.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popupBelow(DPElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public void popupBelow(LSElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		popup( element, Corner.BOTTOM_LEFT, Corner.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popupBelow(DPElement element, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public void popupBelow(LSElement element, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		popup( element, style, Corner.BOTTOM_LEFT, Corner.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popupOver(DPElement element, Point2 targetLocalPos, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public void popupOver(LSElement element, Point2 targetLocalPos, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		DPElement popupElement = createPopupElement( element );
+		LSElement popupElement = createPopupElement( element );
 		popupElement.popupOver( element, targetLocalPos, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popupOver(DPElement element, Point2 targetLocalPos, StyleValues style, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public void popupOver(LSElement element, Point2 targetLocalPos, StyleValues style, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		DPElement popupElement = createPopupElement( element, style );
+		LSElement popupElement = createPopupElement( element, style );
 		popupElement.popupOver( element, targetLocalPos, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popupAtMousePosition(DPElement element, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public void popupAtMousePosition(LSElement element, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		DPElement popupElement = createPopupElement( element );
+		LSElement popupElement = createPopupElement( element );
 		element.getRootElement().createPopupAtMousePosition( popupElement, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popupAtMousePosition(DPElement element, StyleValues style, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public void popupAtMousePosition(LSElement element, StyleValues style, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		DPElement popupElement = createPopupElement( element, style );
+		LSElement popupElement = createPopupElement( element, style );
 		element.getRootElement().createPopupAtMousePosition( popupElement, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popupAtMousePosition(DPElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public void popupAtMousePosition(LSElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		popupAtMousePosition( element, Corner.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popupAtMousePosition(DPElement element, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public void popupAtMousePosition(LSElement element, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		popupAtMousePosition( element, style, Corner.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
@@ -497,9 +497,9 @@ public abstract class Pres
 	
 	
 	
-	protected static DPElement[] mapPresent(PresentationContext ctx, StyleValues style, Pres children[])
+	protected static LSElement[] mapPresent(PresentationContext ctx, StyleValues style, Pres children[])
 	{
-		DPElement result[] = new DPElement[children.length];
+		LSElement result[] = new LSElement[children.length];
 		for (int i = 0; i < children.length; i++)
 		{
 			result[i] = children[i].present( ctx, style );
@@ -507,9 +507,9 @@ public abstract class Pres
 		return result;
 	}
 	
-	protected static DPElement[] mapPresent(PresentationContext ctx, StyleValues style, List<Pres> children)
+	protected static LSElement[] mapPresent(PresentationContext ctx, StyleValues style, List<Pres> children)
 	{
-		DPElement result[] = new DPElement[children.size()];
+		LSElement result[] = new LSElement[children.size()];
 		int i = 0;
 		for (Pres child: children)
 		{
@@ -536,9 +536,9 @@ public abstract class Pres
 		{
 			return (Pres)x;
 		}
-		else if ( x instanceof DPElement )
+		else if ( x instanceof LSElement )
 		{
-			return new PresentElement( (DPElement)x );
+			return new PresentElement( (LSElement)x );
 		}
 		else
 		{
@@ -556,9 +556,9 @@ public abstract class Pres
 		{
 			return (Pres)x;
 		}
-		else if ( x instanceof DPElement )
+		else if ( x instanceof LSElement )
 		{
-			return new PresentElement( (DPElement)x );
+			return new PresentElement( (LSElement)x );
 		}
 		else
 		{
@@ -566,7 +566,7 @@ public abstract class Pres
 		}
 	}
 
-	public static Pres elementToPres(DPElement e)
+	public static Pres elementToPres(LSElement e)
 	{
 		return new PresentElement( e );
 	}

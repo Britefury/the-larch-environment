@@ -8,7 +8,7 @@ package BritefuryJ.Pres.ObjectPres;
 
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.LineBreak;
@@ -28,7 +28,7 @@ public abstract class UnescapedString extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		StyleSheet escapeStyle = style.get( ObjectPresStyle.stringEscapeStyle, StyleSheet.class );
 		StyleSheet contentStyle = style.get( ObjectPresStyle.stringContentStyle, StyleSheet.class );

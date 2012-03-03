@@ -10,13 +10,13 @@ import java.util.HashMap;
 import java.util.regex.Pattern;
 
 import BritefuryJ.Controls.TextEntry.TextEntryControl;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
-import BritefuryJ.DocPresent.Event.PointerMotionEvent;
-import BritefuryJ.DocPresent.Input.Modifier;
-import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.DocPresent.Input.PointerInterface;
-import BritefuryJ.DocPresent.Interactor.DragElementInteractor;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Event.PointerButtonEvent;
+import BritefuryJ.LSpace.Event.PointerMotionEvent;
+import BritefuryJ.LSpace.Input.Modifier;
+import BritefuryJ.LSpace.Input.PointerInputElement;
+import BritefuryJ.LSpace.Input.PointerInterface;
+import BritefuryJ.LSpace.Interactor.DragElementInteractor;
 import BritefuryJ.Live.LiveFunction;
 import BritefuryJ.Live.LiveInterface;
 import BritefuryJ.Math.Point2;
@@ -114,13 +114,13 @@ public abstract class SpinEntry extends ControlPres
 		
 		
 		protected LiveInterface value;
-		protected DPElement element;
+		protected LSElement element;
 		protected TextEntry.TextEntryControl textEntry;
-		protected DPElement upSpinButton, downSpinButton;
+		protected LSElement upSpinButton, downSpinButton;
 		
 		
-		protected SpinEntryControl(PresentationContext ctx, StyleValues style, LiveInterface value, DPElement element, TextEntry.TextEntryControl textEntry,
-				DPElement upSpinButton, DPElement downSpinButton, SpinEntryTextListener textListener)
+		protected SpinEntryControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element, TextEntry.TextEntryControl textEntry,
+				LSElement upSpinButton, LSElement downSpinButton, SpinEntryTextListener textListener)
 		{
 			super( ctx, style );
 			
@@ -144,7 +144,7 @@ public abstract class SpinEntry extends ControlPres
 		
 		
 		@Override
-		public DPElement getElement()
+		public LSElement getElement()
 		{
 			return element;
 		}
@@ -195,9 +195,9 @@ public abstract class SpinEntry extends ControlPres
 		double hspacing = style.get( Controls.spinEntryHSpacing, Double.class );
 		
 		Pres upArrow = new Arrow( Arrow.Direction.UP, arrowSize ).alignVBottom();
-		DPElement upArrowElement = arrowStyle.applyTo( upArrow ).present( ctx, style );
+		LSElement upArrowElement = arrowStyle.applyTo( upArrow ).present( ctx, style );
 		Pres downArrow = new Arrow( Arrow.Direction.DOWN, arrowSize ).alignVTop();
-		DPElement downArrowElement = arrowStyle.applyTo( downArrow ).present( ctx, style );
+		LSElement downArrowElement = arrowStyle.applyTo( downArrow ).present( ctx, style );
 		Pres arrowsBox = arrowStyle.applyTo( new Column( new Object[] { upArrowElement, downArrowElement } ).alignVCentre() );
 		
 		SpinEntryControl.SpinEntryTextListener textListener = new SpinEntryControl.SpinEntryTextListener();
@@ -206,7 +206,7 @@ public abstract class SpinEntry extends ControlPres
 		TextEntry.TextEntryControl entryControl = (TextEntryControl)entry.createControl( ctx, style.alignHExpand().alignVRefY() );
 		
 		Pres row = StyleSheet.style( Primitive.rowSpacing.as( hspacing ) ).applyTo( new Row( new Object[] { entryControl.getElement(), arrowsBox } ) );
-		DPElement element = row.present( ctx, style );
+		LSElement element = row.present( ctx, style );
 		
 		return createSpinEntryControl( ctx, style, value, element, entryControl, upArrowElement, downArrowElement, textListener );
 	}
@@ -216,6 +216,6 @@ public abstract class SpinEntry extends ControlPres
 	protected abstract String getValidationFailMessage();
 	
 	
-	protected abstract SpinEntryControl createSpinEntryControl(PresentationContext ctx, StyleValues style, LiveInterface value, DPElement element, TextEntry.TextEntryControl entryControl, DPElement upArrow,
-			DPElement downArrow, SpinEntryControl.SpinEntryTextListener textListener);
+	protected abstract SpinEntryControl createSpinEntryControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element, TextEntry.TextEntryControl entryControl, LSElement upArrow,
+			LSElement downArrow, SpinEntryControl.SpinEntryTextListener textListener);
 }

@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class InnerFragment extends Pres
@@ -35,7 +35,7 @@ public class InnerFragment extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		FragmentView fragment = ctx.getFragment();
 		

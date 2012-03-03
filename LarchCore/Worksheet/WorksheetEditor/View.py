@@ -26,11 +26,11 @@ from BritefuryJ.Pres import InnerFragment, LocationAsInnerFragment
 
 
 from BritefuryJ.Controls import *
-from BritefuryJ.DocPresent import *
+from BritefuryJ.LSpace import *
 from BritefuryJ.Graphics import *
-from BritefuryJ.DocPresent.Input import ObjectDndHandler
-from BritefuryJ.DocPresent.Browser import Location
-from BritefuryJ.DocPresent.Selection import TextSelection
+from BritefuryJ.LSpace.Input import ObjectDndHandler
+from BritefuryJ.LSpace.Browser import Location
+from BritefuryJ.LSpace.Selection import TextSelection
 from BritefuryJ.StyleSheet import StyleSheet
 from BritefuryJ.Pres import *
 from BritefuryJ.Pres.Primitive import *
@@ -42,7 +42,7 @@ from BritefuryJ.EditPerspective import EditPerspective
 
 from BritefuryJ.IncrementalView import FragmentData
 
-from BritefuryJ.DocPresent.Interactor import KeyElementInteractor
+from BritefuryJ.LSpace.Interactor import KeyElementInteractor
 
 from BritefuryJ.Editor.Sequential import SequentialEditorPerspective
 from BritefuryJ.Editor.Sequential.Item import *

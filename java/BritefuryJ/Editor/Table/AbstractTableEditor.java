@@ -14,10 +14,10 @@ import java.util.List;
 import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.TextExtractor;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
-import BritefuryJ.DocPresent.Selection.Selection;
-import BritefuryJ.DocPresent.Target.Target;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Clipboard.ClipboardHandlerInterface;
+import BritefuryJ.LSpace.Selection.Selection;
+import BritefuryJ.LSpace.Target.Target;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Clipboard.AbstractSelectionExporter;
@@ -305,7 +305,7 @@ public abstract class AbstractTableEditor<ModelType>
 		Pres p = new Pres()
 		{
 			@Override
-			public DPElement present(PresentationContext ctx, StyleValues style)
+			public LSElement present(PresentationContext ctx, StyleValues style)
 			{
 				StyleSheet styleSheet = TableEditorStyle.tableStyle( style, hasTopHeader, hasLeftHeader );
 				StyleValues used = TableEditorStyle.useTableAttrs( style );

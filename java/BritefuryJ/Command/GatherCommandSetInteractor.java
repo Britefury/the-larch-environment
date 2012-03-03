@@ -8,10 +8,10 @@ package BritefuryJ.Command;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Interactor.AbstractElementInteractor;
 
 public interface GatherCommandSetInteractor extends AbstractElementInteractor
 {
-	void gatherCommandSets(DPElement element, List<CommandSet> commandSets);
+	void gatherCommandSets(LSElement element, List<CommandSet> commandSets);
 }

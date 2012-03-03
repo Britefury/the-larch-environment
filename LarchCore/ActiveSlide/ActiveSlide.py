@@ -9,13 +9,13 @@ from Britefury.Util.Abstract import abstractmethod
 
 from BritefuryJ.Controls import *
 
-from BritefuryJ.DocPresent import ElementPainter, PageController
+from BritefuryJ.LSpace import ElementPainter, PageController
 
-from BritefuryJ.DocPresent.Browser import Location
+from BritefuryJ.LSpace.Browser import Location
 
 from BritefuryJ.Pres.Primitive import *
-from BritefuryJ.DocPresent.Interactor import *
-from BritefuryJ.DocPresent.Input import Modifier
+from BritefuryJ.LSpace.Interactor import *
+from BritefuryJ.LSpace.Input import Modifier
 
 
 from BritefuryJ.Projection import Subject

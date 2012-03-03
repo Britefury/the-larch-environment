@@ -9,9 +9,9 @@ package BritefuryJ.Pres.Visual;
 import java.awt.Graphics2D;
 import java.awt.Shape;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPSpacer;
-import BritefuryJ.DocPresent.ElementPainter;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSSpacer;
+import BritefuryJ.LSpace.ElementPainter;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -20,7 +20,7 @@ public class Drawing extends Pres
 {
 	public static interface Painter
 	{
-		public void draw(DPElement element, Graphics2D graphics);
+		public void draw(LSElement element, Graphics2D graphics);
 	}
 	
 	
@@ -35,12 +35,12 @@ public class Drawing extends Pres
 		
 		
 		@Override
-		public void drawBackground(DPElement element, Graphics2D graphics)
+		public void drawBackground(LSElement element, Graphics2D graphics)
 		{
 		}
 
 		@Override
-		public void draw(DPElement element, Graphics2D graphics)
+		public void draw(LSElement element, Graphics2D graphics)
 		{
 			Shape prevClip = graphics.getClip();
 			element.clip( graphics );
@@ -63,9 +63,9 @@ public class Drawing extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPSpacer element = new DPSpacer( minWidth, minHeight );
+		LSSpacer element = new LSSpacer( minWidth, minHeight );
 		element.addPainter( new DrawingPainter( painter ) );
 		return element;
 	}

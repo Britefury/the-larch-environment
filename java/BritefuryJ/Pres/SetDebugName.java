@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Pres;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class SetDebugName extends Pres
@@ -29,9 +29,9 @@ public class SetDebugName extends Pres
 	
 
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPElement element = child.present( ctx, style );
+		LSElement element = child.present( ctx, style );
 		element.setDebugName( debugName );
 		return element;
 	}

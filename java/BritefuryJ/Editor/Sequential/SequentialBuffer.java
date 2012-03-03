@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Editor.Sequential;
 
-import BritefuryJ.DocPresent.Clipboard.LocalDataFlavor;
+import BritefuryJ.LSpace.Clipboard.LocalDataFlavor;
 
 public class SequentialBuffer
 {

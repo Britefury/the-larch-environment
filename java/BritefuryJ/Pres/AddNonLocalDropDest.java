@@ -8,8 +8,8 @@ package BritefuryJ.Pres;
 
 import java.awt.datatransfer.DataFlavor;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Input.ObjectDndHandler;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Input.ObjectDndHandler;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class AddNonLocalDropDest extends Pres
@@ -31,9 +31,9 @@ public class AddNonLocalDropDest extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPElement element = child.present( ctx, style );
+		LSElement element = child.present( ctx, style );
 		element.addNonLocalDropDest( dest );
 		return element;
 	}

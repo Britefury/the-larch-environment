@@ -7,8 +7,8 @@
 package BritefuryJ.Projection;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.LSpace.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.Pres.ApplyPerspective;
 import BritefuryJ.Pres.Pres;
 

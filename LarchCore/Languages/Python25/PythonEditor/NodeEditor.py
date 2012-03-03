@@ -14,10 +14,10 @@ from java.awt import Color
 from BritefuryJ.DocModel import DMList, DMObject, DMObjectInterface
 
 
-from BritefuryJ.DocPresent.StyleParams import *
+from BritefuryJ.LSpace.StyleParams import *
 from BritefuryJ.StyleSheet import *
-from BritefuryJ.DocPresent import *
-from BritefuryJ.DocPresent.Interactor import KeyElementInteractor
+from BritefuryJ.LSpace import *
+from BritefuryJ.LSpace.Interactor import KeyElementInteractor
 
 
 from BritefuryJ.Logging import LogEntry

@@ -9,16 +9,16 @@ package BritefuryJ.Cell;
 import java.awt.event.KeyEvent;
 import java.util.IdentityHashMap;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.TextEditEvent;
-import BritefuryJ.DocPresent.TreeEventListener;
-import BritefuryJ.DocPresent.Caret.Caret;
-import BritefuryJ.DocPresent.Clipboard.TextClipboardHandler;
-import BritefuryJ.DocPresent.Interactor.CaretCrossingElementInteractor;
-import BritefuryJ.DocPresent.Interactor.KeyElementInteractor;
-import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.Selection.TextSelection;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSText;
+import BritefuryJ.LSpace.TextEditEvent;
+import BritefuryJ.LSpace.TreeEventListener;
+import BritefuryJ.LSpace.Caret.Caret;
+import BritefuryJ.LSpace.Clipboard.TextClipboardHandler;
+import BritefuryJ.LSpace.Interactor.CaretCrossingElementInteractor;
+import BritefuryJ.LSpace.Interactor.KeyElementInteractor;
+import BritefuryJ.LSpace.Marker.Marker;
+import BritefuryJ.LSpace.Selection.TextSelection;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Bin;
 import BritefuryJ.Pres.Primitive.Region;
@@ -51,21 +51,21 @@ public class EditableTextCell
 		@Override
 		protected void deleteText(TextSelection selection, Caret caret)
 		{
-			DPText textElement = (DPText)selection.getStartMarker().getElement();
+			LSText textElement = (LSText)selection.getStartMarker().getElement();
 			textElement.removeText( selection.getStartMarker(), selection.getEndMarker() );
 		}
 
 		@Override
 		protected void insertText(Marker marker, String text)
 		{
-			DPText textElement = (DPText)marker.getElement();
+			LSText textElement = (LSText)marker.getElement();
 			textElement.insertText( marker, text );
 		}
 		
 		@Override
 		protected void replaceText(TextSelection selection, Caret caret, String replacement)
 		{
-			DPText textElement = (DPText)selection.getStartMarker().getElement();
+			LSText textElement = (LSText)selection.getStartMarker().getElement();
 			textElement.replaceText( selection.getStartMarker(), selection.getEndMarker(), replacement );
 		}
 		
@@ -80,12 +80,12 @@ public class EditableTextCell
 	private static final CaretCrossingElementInteractor caretInteractor = new CaretCrossingElementInteractor()
 	{
 		@Override
-		public void caretEnter(DPElement element, Caret c)
+		public void caretEnter(LSElement element, Caret c)
 		{
 		}
 
 		@Override
-		public void caretLeave(DPElement element, Caret c)
+		public void caretLeave(LSElement element, Caret c)
 		{
 			// Note: we have had prior problems with:
 			// - When pasting data from a spreadsheet into a table editor, a cell is chosen to position the pasted data. Choosing this position will normally alter
@@ -110,19 +110,19 @@ public class EditableTextCell
 	private static final KeyElementInteractor keyInteractor = new KeyElementInteractor()
 	{
 		@Override
-		public boolean keyPressed(DPElement element, KeyEvent event)
+		public boolean keyPressed(LSElement element, KeyEvent event)
 		{
 			return false;
 		}
 
 		@Override
-		public boolean keyReleased(DPElement element, KeyEvent event)
+		public boolean keyReleased(LSElement element, KeyEvent event)
 		{
 			return false;
 		}
 
 		@Override
-		public boolean keyTyped(DPElement element, KeyEvent event)
+		public boolean keyTyped(LSElement element, KeyEvent event)
 		{
 			if ( event.getKeyChar() == '\n' )
 			{
@@ -155,7 +155,7 @@ public class EditableTextCell
 	{
 		TreeEventListener listener = new TreeEventListener()
 		{
-			public boolean onTreeEvent(DPElement element, DPElement sourceElement, Object event)
+			public boolean onTreeEvent(LSElement element, LSElement sourceElement, Object event)
 			{
 				if ( event instanceof CommitEvent )
 				{

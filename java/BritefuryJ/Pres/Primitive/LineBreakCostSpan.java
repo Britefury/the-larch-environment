@@ -8,8 +8,8 @@ package BritefuryJ.Pres.Primitive;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPLineBreakCostSpan;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSLineBreakCostSpan;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.SequentialPres;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -28,9 +28,9 @@ public class LineBreakCostSpan extends SequentialPres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPLineBreakCostSpan element = new DPLineBreakCostSpan( Primitive.containerParams.get( style ) );
+		LSLineBreakCostSpan element = new LSLineBreakCostSpan( Primitive.containerParams.get( style ) );
 		element.setChildren( mapPresent( ctx, Primitive.useContainerParams.get( style ), children ) );
 		return element;
 	}

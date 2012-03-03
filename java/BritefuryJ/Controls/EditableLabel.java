@@ -10,12 +10,12 @@ import java.util.regex.Pattern;
 
 import BritefuryJ.Controls.TextEntry.TextEntryControl;
 import BritefuryJ.DefaultPerspective.DefaultPerspective;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
-import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.DocPresent.Interactor.PushElementInteractor;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Event.PointerButtonEvent;
+import BritefuryJ.LSpace.Input.PointerInputElement;
+import BritefuryJ.LSpace.Interactor.PushElementInteractor;
 import BritefuryJ.Live.LiveInterface;
 import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.Pres;
@@ -64,7 +64,7 @@ public class EditableLabel extends ControlPres
 
 		
 		
-		private DPElement element;
+		private LSElement element;
 		private LiveValue display;
 		private LiveInterface value;
 		private Pres notSet;
@@ -72,7 +72,7 @@ public class EditableLabel extends ControlPres
 		private TextEntry.TextEntryValidator validator;
 		
 		
-		public EditableLabelControl(PresentationContext ctx, StyleValues style, DPElement element, LiveValue display, LiveInterface value, Pres notSet,
+		public EditableLabelControl(PresentationContext ctx, StyleValues style, LSElement element, LiveValue display, LiveInterface value, Pres notSet,
 				EditableLabelListener listener, TextEntry.TextEntryValidator validator)
 		{
 			super( ctx, style );
@@ -99,7 +99,7 @@ public class EditableLabel extends ControlPres
 
 
 		@Override
-		public DPElement getElement()
+		public LSElement getElement()
 		{
 			return element;
 		}
@@ -247,7 +247,7 @@ public class EditableLabel extends ControlPres
 		LiveInterface value = valueSource.getLive();
 		
 		Pres unitPres = DefaultPerspective.instance.applyTo( display );
-		DPElement element = unitPres.present( ctx, usedStyle );
+		LSElement element = unitPres.present( ctx, usedStyle );
 		return new EditableLabelControl( ctx, usedStyle, element, display, value, notSet, listener, validator );
 	}
 }

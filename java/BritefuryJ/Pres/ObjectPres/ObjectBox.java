@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Pres.ObjectPres;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Column;
@@ -26,11 +26,11 @@ public class ObjectBox extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		double padding = style.get( ObjectPresStyle.objectContentPadding, Double.class );
 		StyleValues childStyle = ObjectPresStyle.useObjectBorderAttrs( ObjectPresStyle.useObjectBoxAttrs( style ) );
-		DPElement contentsElement = contents.padX( padding ).present( ctx, childStyle );
+		LSElement contentsElement = contents.padX( padding ).present( ctx, childStyle );
 		
 		Pres titlePres = new ObjectTitle( title );
 		

@@ -11,10 +11,10 @@ import java.util.Arrays;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.DefaultObjectPresenterRegistry;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.EditPerspective.EditPerspective;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.ObjectPresentation.ObjectPresentationPerspective;
 import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;
@@ -64,7 +64,7 @@ public class CellEditPerspective extends ObjectPresentationPerspective
 	
 	
 	
-	public static boolean notifySetCellValue(DPElement cellElement, Object value)
+	public static boolean notifySetCellValue(LSElement cellElement, Object value)
 	{
 		CellSetValueEvent cellEvent = new CellSetValueEvent( value );
 		return cellElement.postTreeEvent( cellEvent );

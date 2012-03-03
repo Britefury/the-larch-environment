@@ -11,14 +11,14 @@ import java.util.List;
 import java.util.WeakHashMap;
 import java.util.regex.Pattern;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.EditEvent;
-import BritefuryJ.DocPresent.TreeEventListener;
-import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
-import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.Editor.Sequential.SequentialStreamEditor;
 import BritefuryJ.Editor.SyntaxRecognizing.Precedence.PrecedenceHandler;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.EditEvent;
+import BritefuryJ.LSpace.TreeEventListener;
+import BritefuryJ.LSpace.Interactor.AbstractElementInteractor;
+import BritefuryJ.LSpace.StreamValue.StreamValue;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Util.HashUtils;
 
@@ -60,7 +60,7 @@ public abstract class SyntaxRecognizingEditor extends SequentialStreamEditor
 
 		
 		@Override
-		protected HandleEditResult handleEmptyValue(DPElement element, FragmentView fragment, EditEvent event, Object model)
+		protected HandleEditResult handleEmptyValue(LSElement element, FragmentView fragment, EditEvent event, Object model)
 		{
 			if ( emptyCommit == null )
 			{
@@ -74,7 +74,7 @@ public abstract class SyntaxRecognizingEditor extends SequentialStreamEditor
 		}
 
 		@Override
-		protected HandleEditResult handleParseSuccess(DPElement element, DPElement sourceElement,
+		protected HandleEditResult handleParseSuccess(LSElement element, LSElement sourceElement,
 				FragmentView fragment, EditEvent event, Object model, StreamValue value,
 				Object parsed)
 		{
@@ -179,7 +179,7 @@ public abstract class SyntaxRecognizingEditor extends SequentialStreamEditor
 		}
 
 
-		protected boolean isValueValid(DPElement element, DPElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
+		protected boolean isValueValid(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
 		{
 			if ( test != null )
 			{
@@ -192,21 +192,21 @@ public abstract class SyntaxRecognizingEditor extends SequentialStreamEditor
 		}
 
 		@Override
-		protected boolean shouldApplyToInnerFragment(DPElement element, DPElement sourceElement, FragmentView fragment,
+		protected boolean shouldApplyToInnerFragment(LSElement element, LSElement sourceElement, FragmentView fragment,
 				EditEvent event, Object model, StreamValue value)
 		{
 			return innerCommit != null;
 		}
 		
 		@Override
-		protected HandleEditResult handleUnparsed(DPElement element, DPElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
+		protected HandleEditResult handleUnparsed(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
 		{
 			commit.commit( model, value );
 			return HandleEditResult.HANDLED;
 		}
 
 		@Override
-		protected HandleEditResult handleInnerUnparsed(DPElement element, DPElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
+		protected HandleEditResult handleInnerUnparsed(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
 		{
 			innerCommit.commit( model, value );
 			return HandleEditResult.HANDLED;

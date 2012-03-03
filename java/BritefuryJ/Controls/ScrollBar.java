@@ -6,9 +6,9 @@
 //##************************
 package BritefuryJ.Controls;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Util.Range;
 import BritefuryJ.Graphics.Painter;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Util.Range;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Bin;
@@ -21,11 +21,11 @@ public abstract class ScrollBar extends ControlPres
 	{
 		private Range range;
 		
-		private DPElement element;
+		private LSElement element;
 		
 		
 		
-		public ScrollBarControl(PresentationContext ctx, StyleValues style, Range range, DPElement element, DPElement dragBox, ScrollBarHelper.Axis axis,
+		public ScrollBarControl(PresentationContext ctx, StyleValues style, Range range, LSElement element, LSElement dragBox, ScrollBarHelper.Axis axis,
 				double dragBoxPadding, double dragBoxRounding, double dragBoxMinSize, Painter dragBoxPainter, Painter dragBoxHoverPainter)
 		{
 			super( ctx, style );
@@ -48,7 +48,7 @@ public abstract class ScrollBar extends ControlPres
 		
 		
 		@Override
-		public DPElement getElement()
+		public LSElement getElement()
 		{
 			return element;
 		}
@@ -78,10 +78,10 @@ public abstract class ScrollBar extends ControlPres
 		
 		
 		Pres dragBar = dragBoxStyle.applyTo( createDragBox( scrollBarSize ) );
-		DPElement dragBarElement = dragBar.present( ctx, style );
+		LSElement dragBarElement = dragBar.present( ctx, style );
 		Pres p = new Bin( Pres.coerce( dragBarElement ) );
 		
-		DPElement element = p.present( ctx, style );
+		LSElement element = p.present( ctx, style );
 		
 		return new ScrollBarControl( ctx, style, range, element, dragBarElement, getAxis(), dragBoxPadding, dragBoxRounding, dragBoxMinSize, dragBoxPainter, dragBoxHoverPainter );
 	}

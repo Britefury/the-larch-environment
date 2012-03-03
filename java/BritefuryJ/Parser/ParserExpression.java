@@ -11,8 +11,8 @@ import java.util.List;
 
 import org.python.core.PyObject;
 
-import BritefuryJ.DocPresent.StreamValue.StreamValue;
-import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
+import BritefuryJ.LSpace.StreamValue.StreamValue;
+import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
 import BritefuryJ.ParserHelpers.TraceNode;
 
 public abstract class ParserExpression

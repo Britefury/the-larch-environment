@@ -9,25 +9,25 @@ package BritefuryJ.Command;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
-import BritefuryJ.DocPresent.Target.Target;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Interactor.AbstractElementInteractor;
+import BritefuryJ.LSpace.Target.Target;
 
 public class CommandSetGatherIterable implements Iterable<BoundCommandSet>
 {
 	private class CommandSetGatherIterator implements Iterator<BoundCommandSet>
 	{
-		private DPElement currentElement = null;
+		private LSElement currentElement = null;
 		private LinkedList<CommandSet> commandSets = new LinkedList<CommandSet>();
 		
 		
-		public CommandSetGatherIterator(DPElement element)
+		public CommandSetGatherIterator(LSElement element)
 		{
 			nextElement( element );
 		}
 		
 		
-		private void nextElement(DPElement element)
+		private void nextElement(LSElement element)
 		{
 			currentElement = null;
 			while ( element != null )
@@ -83,10 +83,10 @@ public class CommandSetGatherIterable implements Iterable<BoundCommandSet>
 	}
 
 
-	private DPElement element;
+	private LSElement element;
 
 
-	public CommandSetGatherIterable(DPElement element)
+	public CommandSetGatherIterable(LSElement element)
 	{
 		this.element = element;
 	}

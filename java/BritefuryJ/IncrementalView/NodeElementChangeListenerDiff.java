@@ -9,15 +9,15 @@ package BritefuryJ.IncrementalView;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 
-import BritefuryJ.DocPresent.DPContentLeaf;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.ElementFilter;
-import BritefuryJ.DocPresent.Caret.Caret;
-import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.Marker.Marker.Bias;
-import BritefuryJ.DocPresent.Selection.Selection;
-import BritefuryJ.DocPresent.Selection.TextSelection;
-import BritefuryJ.DocPresent.Selection.TextSelectionPoint;
+import BritefuryJ.LSpace.LSContentLeaf;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.ElementFilter;
+import BritefuryJ.LSpace.Caret.Caret;
+import BritefuryJ.LSpace.Marker.Marker;
+import BritefuryJ.LSpace.Marker.Marker.Bias;
+import BritefuryJ.LSpace.Selection.Selection;
+import BritefuryJ.LSpace.Selection.TextSelection;
+import BritefuryJ.LSpace.Selection.TextSelectionPoint;
 import BritefuryJ.Util.StringDiff;
 
 public class NodeElementChangeListenerDiff implements IncrementalView.NodeElementChangeListener
@@ -62,7 +62,7 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 	
 	private static class MarkerState
 	{
-		private DPElement subtree;
+		private LSElement subtree;
 		private int position;
 		private Marker.Bias bias;
 		
@@ -73,7 +73,7 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 		}
 		
 		
-		public void setSubtreeElement(DPElement subtree)
+		public void setSubtreeElement(LSElement subtree)
 		{
 			this.subtree = subtree;
 		}
@@ -126,7 +126,7 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 		
 		public void handleModification()
 		{
-			DPElement nodeElement = node.getFragmentContentElement();
+			LSElement nodeElement = node.getFragmentContentElement();
 			
 			// Invoking child.refresh() above can cause this method to be invoked on another node; recursively;
 			// Ensure that only the inner-most recursion level handles the caret
@@ -336,7 +336,7 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 		Caret caret = view.getCaret();
 		if ( caret != null  &&  caret.isValid() )
 		{
-			caretMon = monitorMarker( caret.getMarker(), new DPContentLeaf.EditableLeafElementFilter() );
+			caretMon = monitorMarker( caret.getMarker(), new LSContentLeaf.EditableLeafElementFilter() );
 		}
 		
 		Selection selection = view.getSelection();
@@ -387,14 +387,14 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 	}
 
 	
-	public void elementChangeFrom(FragmentView node, DPElement element)
+	public void elementChangeFrom(FragmentView node, LSElement element)
 	{
 		for (MonitoredMarker m: markers)
 		{
 			Marker marker = m.marker;
 			if ( markerToState.get( marker ) == null )
 			{
-				DPElement nodeElement = node.getFragmentContentElement();
+				LSElement nodeElement = node.getFragmentContentElement();
 				try
 				{
 					int pos = marker.getPositionInSubtree( nodeElement );
@@ -404,7 +404,7 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 					markerToState.put( marker, state );
 					m.state = state;
 				}
-				catch (DPElement.IsNotInSubtreeException e)
+				catch (LSElement.IsNotInSubtreeException e)
 				{
 					// Caret is not in this sub-tree - do nothing
 				}
@@ -412,7 +412,7 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 		}
 	}
 
-	public void elementChangeTo(FragmentView node, DPElement element)
+	public void elementChangeTo(FragmentView node, LSElement element)
 	{
 		NodeState nodeState = nodeToState.get( node );
 		if ( nodeState != null )

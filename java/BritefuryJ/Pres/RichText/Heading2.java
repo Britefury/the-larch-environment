@@ -8,7 +8,7 @@ package BritefuryJ.Pres.RichText;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
 
@@ -30,7 +30,7 @@ public class Heading2 extends RichParagraph
 	}
 
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		return presentParagraph( ctx, style.withAttrs( RichText.h2TextStyle( style ) ) );
 	}

@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Pres.Primitive;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPSpacer;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSSpacer;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -25,8 +25,8 @@ public class Spacer extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		return new DPSpacer( minWidth, minHeight );
+		return new LSSpacer( minWidth, minHeight );
 	}
 }

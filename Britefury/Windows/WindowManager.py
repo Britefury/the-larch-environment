@@ -10,7 +10,7 @@ from BritefuryJ.AttributeTable import SimpleAttributeTable
 
 from BritefuryJ.Command import CommandConsole
 
-from BritefuryJ.DocPresent.Browser import Location
+from BritefuryJ.LSpace.Browser import Location
 
 from BritefuryJ.Projection import ProjectiveBrowserContext, Subject
 

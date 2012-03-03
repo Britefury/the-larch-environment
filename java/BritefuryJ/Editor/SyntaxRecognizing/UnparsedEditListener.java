@@ -6,11 +6,11 @@
 //##************************
 package BritefuryJ.Editor.SyntaxRecognizing;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.EditEvent;
-import BritefuryJ.DocPresent.StreamValue.StreamValue;
-import BritefuryJ.DocPresent.StreamValue.SequentialStreamValueVisitor;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.EditEvent;
+import BritefuryJ.LSpace.StreamValue.SequentialStreamValueVisitor;
+import BritefuryJ.LSpace.StreamValue.StreamValue;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Logging.LogEntry;
 
@@ -21,40 +21,40 @@ public abstract class UnparsedEditListener extends SRStreamEditListener
 		return null;
 	}
 	
-	protected boolean isValueValid(DPElement element, DPElement sourceElement, FragmentView fragment,
+	protected boolean isValueValid(LSElement element, LSElement sourceElement, FragmentView fragment,
 			EditEvent event, Object model, StreamValue value)
 	{
 		return true;
 	}
 	
-	protected boolean isValueEmpty(DPElement element, DPElement sourceElement, FragmentView fragment,
+	protected boolean isValueEmpty(LSElement element, LSElement sourceElement, FragmentView fragment,
 			EditEvent event, Object model, StreamValue value)
 	{
 		return getSyntaxRecognizingEditor().isValueEmpty( value );
 	}
 	
-	protected boolean shouldApplyToInnerFragment(DPElement element, DPElement sourceElement, FragmentView fragment,
+	protected boolean shouldApplyToInnerFragment(LSElement element, LSElement sourceElement, FragmentView fragment,
 			EditEvent event, Object model, StreamValue value)
 	{
 		return true;
 	}
 	
-	protected HandleEditResult handleInvalidValue(DPElement element, DPElement sourceElement, FragmentView fragment,
+	protected HandleEditResult handleInvalidValue(LSElement element, LSElement sourceElement, FragmentView fragment,
 			EditEvent event, Object model, StreamValue value)
 	{
 		return HandleEditResult.NOT_HANDLED;
 	}
 	
-	protected abstract HandleEditResult handleUnparsed(DPElement element, DPElement sourceElement, FragmentView fragment,
+	protected abstract HandleEditResult handleUnparsed(LSElement element, LSElement sourceElement, FragmentView fragment,
 			EditEvent event, Object model, StreamValue value);
 	
-	protected abstract HandleEditResult handleInnerUnparsed(DPElement element, DPElement sourceElement, FragmentView fragment,
+	protected abstract HandleEditResult handleInnerUnparsed(LSElement element, LSElement sourceElement, FragmentView fragment,
 			EditEvent event, Object model, StreamValue value);
 	
 	
 
 	@Override
-	protected HandleEditResult handleValue(DPElement element, DPElement sourceElement, FragmentView fragment,
+	protected HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment,
 			EditEvent event, Object model, StreamValue value)
 	{
 		String logName = getLogName();
@@ -78,7 +78,7 @@ public abstract class UnparsedEditListener extends SRStreamEditListener
 			}
 			else
 			{
-				DPElement sourceFragmentElement = sourceFragment.getFragmentContentElement();
+				LSElement sourceFragmentElement = sourceFragment.getFragmentContentElement();
 				Object sourceModel = sourceFragment.getModel();
 				SequentialStreamValueVisitor visitor = event.getStreamValueVisitor();
 				StreamValue sourceValue = visitor.getStreamValue( sourceFragmentElement );

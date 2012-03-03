@@ -10,9 +10,9 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
-import BritefuryJ.DocPresent.Clipboard.DataTransfer;
-import BritefuryJ.DocPresent.Selection.Selection;
-import BritefuryJ.DocPresent.Target.Target;
+import BritefuryJ.LSpace.Clipboard.DataTransfer;
+import BritefuryJ.LSpace.Selection.Selection;
+import BritefuryJ.LSpace.Target.Target;
 
 public abstract class DataImporterInterface <TargetType extends Target>
 {

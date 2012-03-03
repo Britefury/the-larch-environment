@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Pres;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.ElementPainter;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.ElementPainter;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class AddElementPainter extends Pres
@@ -24,9 +24,9 @@ public class AddElementPainter extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPElement element = child.present( ctx, style );
+		LSElement element = child.present( ctx, style );
 		element.addPainter( painter );
 		return element;
 	}

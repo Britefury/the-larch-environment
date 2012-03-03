@@ -8,9 +8,9 @@ package BritefuryJ.Editor.Sequential.Item;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.TreeEventListener;
 import BritefuryJ.Editor.Sequential.SequentialEditor;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.TreeEventListener;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -45,9 +45,9 @@ public class StructuralItem extends Pres
 
 
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPElement element = child.present( ctx, style );
+		LSElement element = child.present( ctx, style );
 		element.addTreeEventListener( SequentialEditor.getClearNeighbouringStructuralValueListener() );
 		element.setFixedValue( value );
 		if ( editListeners != null )

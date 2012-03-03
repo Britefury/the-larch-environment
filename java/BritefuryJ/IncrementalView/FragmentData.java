@@ -6,15 +6,15 @@
 //##************************
 package BritefuryJ.IncrementalView;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.LSpace.LSElement;
 
 public class FragmentData
 {
 	private Object model;
-	private DPElement element;
+	private LSElement element;
 	
 	
-	public FragmentData(Object model, DPElement element)
+	public FragmentData(Object model, LSElement element)
 	{
 		this.model = model;
 		this.element = element;
@@ -26,7 +26,7 @@ public class FragmentData
 		return model;
 	}
 	
-	public DPElement getElement()
+	public LSElement getElement()
 	{
 		return element;
 	}

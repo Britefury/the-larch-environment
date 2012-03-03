@@ -6,20 +6,20 @@
 //##************************
 package BritefuryJ.Editor.Sequential;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.EditEvent;
-import BritefuryJ.DocPresent.StreamValue.StreamValue;
-import BritefuryJ.DocPresent.StreamValue.SequentialStreamValueVisitor;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.EditEvent;
+import BritefuryJ.LSpace.StreamValue.SequentialStreamValueVisitor;
+import BritefuryJ.LSpace.StreamValue.StreamValue;
 
 public abstract class StreamEditListener extends EditListener
 {
-	protected abstract HandleEditResult handleValue(DPElement element, DPElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value);
+	protected abstract HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value);
 	
 	
 	
 	@Override
-	protected HandleEditResult handleEditEvent(DPElement element, DPElement sourceElement, EditEvent editEvent)
+	protected HandleEditResult handleEditEvent(LSElement element, LSElement sourceElement, EditEvent editEvent)
 	{
 		SequentialStreamValueVisitor visitor = editEvent.getStreamValueVisitor();
 		

@@ -8,8 +8,8 @@ package BritefuryJ.Pres.Primitive;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPGridRow;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSGridRow;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.SequentialPres;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -28,9 +28,9 @@ public class GridRow extends SequentialPres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPGridRow element = new DPGridRow( Primitive.gridRowParams.get( style ) );
+		LSGridRow element = new LSGridRow( Primitive.gridRowParams.get( style ) );
 		element.setChildren( mapPresent( ctx, Primitive.useGridRowParams( style ), children ) );
 		return element;
 	}

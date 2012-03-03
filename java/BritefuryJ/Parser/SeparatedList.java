@@ -14,7 +14,7 @@ import org.python.core.Py;
 import org.python.core.PyInteger;
 import org.python.core.PyObject;
 
-import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
+import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
 
 public class SeparatedList extends ParserExpression
 {

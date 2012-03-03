@@ -9,7 +9,7 @@ from BritefuryJ.Controls import *
 
 from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.Pres.RichText import *
-from BritefuryJ.DocPresent.Browser import Location
+from BritefuryJ.LSpace.Browser import Location
 from BritefuryJ.StyleSheet import StyleSheet
 
 from BritefuryJ.Projection import Subject

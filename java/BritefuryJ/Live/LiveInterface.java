@@ -9,10 +9,10 @@ package BritefuryJ.Live;
 
 
 import BritefuryJ.DefaultPerspective.PrimitivePresenter;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.ElementValueFunction;
-import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.ElementValueFunction;
+import BritefuryJ.LSpace.StreamValue.StreamValueBuilder;
 import BritefuryJ.Pres.ApplyPerspective;
 import BritefuryJ.Pres.CompositePres;
 import BritefuryJ.Pres.InnerFragment;
@@ -34,18 +34,18 @@ public abstract class LiveInterface extends CompositePres
 			this.unit = unit;
 		}
 		
-		public Object computeElementValue(DPElement element)
+		public Object computeElementValue(LSElement element)
 		{
 			return unit.getStaticValue();
 		}
 
 		@Override
-		public void addStreamValuePrefixToStream(StreamValueBuilder builder, DPElement element)
+		public void addStreamValuePrefixToStream(StreamValueBuilder builder, LSElement element)
 		{
 		}
 
 		@Override
-		public void addStreamValueSuffixToStream(StreamValueBuilder builder, DPElement element)
+		public void addStreamValueSuffixToStream(StreamValueBuilder builder, LSElement element)
 		{
 		}
 	}
@@ -62,7 +62,7 @@ public abstract class LiveInterface extends CompositePres
 		
 
 		@Override
-		public DPElement present(PresentationContext ctx, StyleValues style)
+		public LSElement present(PresentationContext ctx, StyleValues style)
 		{
 			Object value = null;
 			try

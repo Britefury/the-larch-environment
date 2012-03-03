@@ -9,7 +9,7 @@ package BritefuryJ.Parser;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
+import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
 
 public class Word extends TerminalString
 {
