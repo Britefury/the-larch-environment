@@ -13,7 +13,7 @@ class ElementValueCacheManager
 	private WeakHashMap<ElementValueCache<?>, Object> caches = new WeakHashMap<ElementValueCache<?>, Object>();
 	
 	
-	public ElementValueCacheManager(PresentationComponent.RootElement rootElement)
+	public ElementValueCacheManager(LSRootElement rootElement)
 	{
 	}
 

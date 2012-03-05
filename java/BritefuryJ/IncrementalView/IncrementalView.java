@@ -24,7 +24,7 @@ import BritefuryJ.Editor.Table.ObjectList.ObjectListInterface;
 import BritefuryJ.Editor.Table.ObjectList.ObjectListTableEditor;
 import BritefuryJ.Incremental.IncrementalValueMonitor;
 import BritefuryJ.LSpace.LSElement;
-import BritefuryJ.LSpace.PresentationComponent;
+import BritefuryJ.LSpace.LSRootElement;
 import BritefuryJ.LSpace.Focus.Selection;
 import BritefuryJ.LSpace.PersistentState.PersistentStateStore;
 import BritefuryJ.LSpace.PersistentState.PersistentStateTable;
@@ -361,20 +361,20 @@ public class IncrementalView
 	}
 	
 	
-	public PresentationComponent.RootElement getPresentationRootElement()
+	public LSRootElement getPresentationRootElement()
 	{
 		return rootElement != null  ?  rootElement.getRootElement()  :  null;
 	}
 	
 	public Caret getCaret()
 	{
-		PresentationComponent.RootElement elementTree = getPresentationRootElement();
+		LSRootElement elementTree = getPresentationRootElement();
 		return elementTree != null  ?  elementTree.getCaret()  :  null;
 	}
 	
 	public Selection getSelection()
 	{
-		PresentationComponent.RootElement elementTree = getPresentationRootElement();
+		LSRootElement elementTree = getPresentationRootElement();
 		return elementTree != null  ?  elementTree.getSelection()  :  null;
 	}
 	

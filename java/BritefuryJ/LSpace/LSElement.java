@@ -369,7 +369,7 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 	
 	protected ElementStyleParams styleParams;
 	protected LSContainer parent;
-	protected PresentationComponent.RootElement rootElement;
+	protected LSRootElement rootElement;
 	
 	protected LayoutNode layoutNode;
 	
@@ -1003,7 +1003,7 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 		return testFlag( FLAG_REALISED );
 	}
 	
-	public PresentationComponent.RootElement getRootElement()
+	public LSRootElement getRootElement()
 	{
 		return rootElement;
 	}
@@ -1014,7 +1014,7 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 		return parent;
 	}
 	
-	protected void setParent(LSContainer parent, PresentationComponent.RootElement root)
+	protected void setParent(LSContainer parent, LSRootElement root)
 	{
 		this.parent = parent;
 		if ( root != rootElement )
@@ -1246,7 +1246,7 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 	}
 	
 	
-	protected void setRootElement(PresentationComponent.RootElement root)
+	protected void setRootElement(LSRootElement root)
 	{
 		if ( root != rootElement )
 		{

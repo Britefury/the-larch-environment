@@ -8,7 +8,7 @@ package BritefuryJ.LSpace.Input.Keyboard;
 
 import java.awt.event.KeyEvent;
 
-import BritefuryJ.LSpace.PresentationComponent;
+import BritefuryJ.LSpace.LSRootElement;
 import BritefuryJ.Util.PriorityList;
 
 public class Keyboard
@@ -21,7 +21,7 @@ public class Keyboard
 
 
 
-	public Keyboard(PresentationComponent.RootElement rootElement)
+	public Keyboard(LSRootElement rootElement)
 	{
 		interactors.add( TARGET_INTERACTOR_PRIORITY, new KeyboardTargetInteractor( rootElement ) );
 	}

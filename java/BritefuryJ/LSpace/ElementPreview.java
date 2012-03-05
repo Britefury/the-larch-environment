@@ -40,7 +40,7 @@ public class ElementPreview
 	private Vector2 previewSize;
 	private Point2 pos;
 	private boolean success;
-	private PresentationComponent.RootElement root;
+	private LSRootElement root;
 	
 	
 	public ElementPreview(LSElement element)
@@ -112,7 +112,7 @@ public class ElementPreview
 	}
 	
 	
-	public void attachTo(PresentationComponent.RootElement root, Point2 pos, boolean success)
+	public void attachTo(LSRootElement root, Point2 pos, boolean success)
 	{
 		if ( this.root != null )
 		{

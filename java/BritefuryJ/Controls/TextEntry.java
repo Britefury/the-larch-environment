@@ -16,7 +16,7 @@ import BritefuryJ.LSpace.LSBorder;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSRegion;
 import BritefuryJ.LSpace.LSText;
-import BritefuryJ.LSpace.PresentationComponent;
+import BritefuryJ.LSpace.LSRootElement;
 import BritefuryJ.LSpace.TextEditEventInsert;
 import BritefuryJ.LSpace.TextEditEventRemove;
 import BritefuryJ.LSpace.TextEditEventReplace;
@@ -287,7 +287,7 @@ public class TextEntry extends ControlPres
 		
 		public void selectAll()
 		{
-			PresentationComponent.RootElement root = textElement.getRootElement();
+			LSRootElement root = textElement.getRootElement();
 			if ( root != null )
 			{
 				root.setSelection( new TextSelection( textElement, Marker.atStartOfLeaf( textElement ), Marker.atEndOfLeaf( textElement ) ) );

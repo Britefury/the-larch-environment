@@ -18,7 +18,7 @@ import BritefuryJ.LSpace.LSRegion;
 import BritefuryJ.LSpace.LSText;
 import BritefuryJ.LSpace.LSWhitespace;
 import BritefuryJ.LSpace.ElementValueFunction;
-import BritefuryJ.LSpace.PresentationComponent;
+import BritefuryJ.LSpace.LSRootElement;
 import BritefuryJ.LSpace.TextEditEvent;
 import BritefuryJ.LSpace.TextEditEventInsert;
 import BritefuryJ.LSpace.TextEditEventRemove;
@@ -428,7 +428,7 @@ public class TextArea extends ControlPres
 			
 			if ( caretPos != -1 )
 			{
-				PresentationComponent.RootElement root = textBox.getRootElement();
+				LSRootElement root = textBox.getRootElement();
 				root.getCaret().moveToPositionAndBiasWithinSubtree( textBox, root.getDefaultTextRepresentationManager(), caretPos, Marker.Bias.START );
 			}
 		}

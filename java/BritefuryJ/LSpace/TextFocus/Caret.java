@@ -17,7 +17,7 @@ import BritefuryJ.LSpace.LSContentLeaf;
 import BritefuryJ.LSpace.LSContentLeafEditable;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSSegment;
-import BritefuryJ.LSpace.PresentationComponent;
+import BritefuryJ.LSpace.LSRootElement;
 import BritefuryJ.LSpace.Focus.SelectionPoint;
 import BritefuryJ.LSpace.Focus.Target;
 import BritefuryJ.LSpace.Marker.Marker;
@@ -542,7 +542,7 @@ public class Caret extends Target implements MarkerListener
 		LSElement element = getElement();
 		if ( element != null )
 		{
-			PresentationComponent.RootElement root = element.getRootElement();
+			LSRootElement root = element.getRootElement();
 			if ( root != null )
 			{
 				root.setCaretAsTarget();

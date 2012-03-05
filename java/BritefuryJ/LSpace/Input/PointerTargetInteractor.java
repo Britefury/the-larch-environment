@@ -11,7 +11,7 @@ import java.util.Stack;
 
 import BritefuryJ.LSpace.LSContentLeafEditable;
 import BritefuryJ.LSpace.LSElement;
-import BritefuryJ.LSpace.PresentationComponent;
+import BritefuryJ.LSpace.LSRootElement;
 import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerMotionEvent;
@@ -46,7 +46,7 @@ public class PointerTargetInteractor
 			
 			if ( ( event.getModifiers() & ( Modifier.ALT | Modifier.ALT_GRAPH ) )  ==  0 )
 			{
-				PresentationComponent.RootElement rootElement = event.getPointer().concretePointer().getRootElement();
+				LSRootElement rootElement = event.getPointer().concretePointer().getRootElement();
 				SelectionPoint startPoint = null;
 				
 				
@@ -142,7 +142,7 @@ public class PointerTargetInteractor
 		@Override
 		public void dragMotion(PointerMotionEvent event, Point2 dragStartPos, int dragButton)
 		{
-			PresentationComponent.RootElement rootElement = event.getPointer().concretePointer().getRootElement();
+			LSRootElement rootElement = event.getPointer().concretePointer().getRootElement();
 			SelectionManager selectionManager = rootElement.getSelectionManager();
 			SelectionPoint selCurrent = null;
 			
@@ -187,7 +187,7 @@ public class PointerTargetInteractor
 			if ( lastMousePressPositionedCaret  &&  event.getButton() == 1  &&  ( event.getModifiers() & ( Modifier.ALT | Modifier.ALT_GRAPH | Modifier.CTRL | Modifier.SHIFT ) )  ==  0 )
 			{
 				Point2 windowPos = event.getLocalPointerPos();
-				PresentationComponent.RootElement rootElement = event.getPointer().concretePointer().getRootElement();
+				LSRootElement rootElement = event.getPointer().concretePointer().getRootElement();
 				LSContentLeafEditable selectableLeaf = (LSContentLeafEditable)rootElement.getSelectableLeafClosestToLocalPoint( windowPos );
 				if ( selectableLeaf != null )
 				{

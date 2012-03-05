@@ -360,7 +360,7 @@ public abstract class LSContainer extends LSElement
 		
 	
 	
-	protected void setRootElement(PresentationComponent.RootElement area)
+	protected void setRootElement(LSRootElement area)
 	{
 		super.setRootElement( area );
 		

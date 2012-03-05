@@ -6,13 +6,13 @@
 //##************************
 package BritefuryJ.LSpace.LayoutTree;
 
-import BritefuryJ.LSpace.PresentationComponent;
+import BritefuryJ.LSpace.LSRootElement;
 import BritefuryJ.LSpace.Layout.LAllocHelper;
 import BritefuryJ.LSpace.Layout.LReqBoxInterface;
 
 public class LayoutNodeRootElement extends LayoutNodeBin
 {
-	public LayoutNodeRootElement(PresentationComponent.RootElement element)
+	public LayoutNodeRootElement(LSRootElement element)
 	{
 		super( element );
 	}
@@ -23,7 +23,7 @@ public class LayoutNodeRootElement extends LayoutNodeBin
 	{
 		super.handleQueueResize();
 		
-		PresentationComponent.RootElement rootElement = (PresentationComponent.RootElement)element;
+		LSRootElement rootElement = (LSRootElement)element;
 		rootElement.queueReallocation();
 	}
 
