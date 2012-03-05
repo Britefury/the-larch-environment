@@ -10,7 +10,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 import BritefuryJ.LSpace.LSElement;
-import BritefuryJ.LSpace.PresentationComponent;
+import BritefuryJ.LSpace.LSRootElement;
 import BritefuryJ.LSpace.Focus.Selection;
 import BritefuryJ.LSpace.Focus.SelectionManager;
 import BritefuryJ.LSpace.Focus.SelectionPoint;
@@ -21,11 +21,11 @@ import BritefuryJ.LSpace.Interactor.KeyElementInteractor;
 
 public class KeyboardTargetInteractor extends KeyboardInteractor
 {
-	PresentationComponent.RootElement root;
+	LSRootElement root;
 	
 	
 	
-	public KeyboardTargetInteractor(PresentationComponent.RootElement rootElement)
+	public KeyboardTargetInteractor(LSRootElement rootElement)
 	{
 		root = rootElement;
 	}

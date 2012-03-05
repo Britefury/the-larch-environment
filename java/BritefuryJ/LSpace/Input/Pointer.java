@@ -14,6 +14,7 @@ import java.util.IdentityHashMap;
 import java.util.Stack;
 
 import BritefuryJ.LSpace.PresentationComponent;
+import BritefuryJ.LSpace.LSRootElement;
 import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerEvent;
@@ -46,7 +47,7 @@ public class Pointer extends PointerInterface
 	
 	protected Point2 localPos = new Point2();
 	protected int modifiers = 0;
-	protected PresentationComponent.RootElement rootElement;
+	protected LSRootElement rootElement;
 	protected InputTable inputTable;
 	protected DndDropLocal dndDrop;
 	protected PresentationComponent component;
@@ -58,7 +59,7 @@ public class Pointer extends PointerInterface
 	protected IdentityHashMap<PointerInputElement, ArrayList<ElementUnrealiseListener>> unrealiseListeners = new IdentityHashMap<PointerInputElement, ArrayList<ElementUnrealiseListener>>();
 	
 
-	public Pointer(InputTable inputTable, PresentationComponent.RootElement rootElement, DndController dndController, PresentationComponent component)
+	public Pointer(InputTable inputTable, LSRootElement rootElement, DndController dndController, PresentationComponent component)
 	{
 		this.inputTable = inputTable;
 		this.component = component;
@@ -130,7 +131,7 @@ public class Pointer extends PointerInterface
 		return component;
 	}
 
-	public PresentationComponent.RootElement getRootElement()
+	public LSRootElement getRootElement()
 	{
 		return rootElement;
 	}

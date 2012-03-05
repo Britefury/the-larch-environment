@@ -32,7 +32,7 @@ public class LSImage extends LSContentLeaf
 	{
 		public abstract double getWidth();
 		public abstract double getHeight();
-		public abstract void draw(Graphics2D graphics, double scaleX, double scaleY, PresentationComponent.RootElement root); 
+		public abstract void draw(Graphics2D graphics, double scaleX, double scaleY, LSRootElement root); 
 	}
 	
 	
@@ -55,7 +55,7 @@ public class LSImage extends LSContentLeaf
 			return image.getHeight();
 		}
 		
-		public void draw(Graphics2D graphics, double scaleX, double scaleY, PresentationComponent.RootElement root)
+		public void draw(Graphics2D graphics, double scaleX, double scaleY, LSRootElement root)
 		{
 			if ( scaleX == 1.0  &&  scaleY == 1.0 )
 			{
@@ -90,7 +90,7 @@ public class LSImage extends LSContentLeaf
 			return svg.getHeight();
 		}
 		
-		public void draw(Graphics2D graphics, double scaleX, double scaleY, PresentationComponent.RootElement root)
+		public void draw(Graphics2D graphics, double scaleX, double scaleY, LSRootElement root)
 		{
 			AffineTransform prevXform = graphics.getTransform();
 			
@@ -304,7 +304,7 @@ public class LSImage extends LSContentLeaf
 
 	protected void draw(Graphics2D graphics)
 	{
-		PresentationComponent.RootElement root = getRootElement();
+		LSRootElement root = getRootElement();
 		
 		if ( root != null )
 		{

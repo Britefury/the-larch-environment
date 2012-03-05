@@ -13,6 +13,7 @@ import java.util.WeakHashMap;
 import javax.swing.JComponent;
 
 import BritefuryJ.LSpace.PresentationComponent;
+import BritefuryJ.LSpace.LSRootElement;
 
 
 
@@ -26,7 +27,7 @@ public class InputTable
 	protected JComponent component;
 	
 	
-	public InputTable(PresentationComponent.RootElement rootElement, DndController dndController, PresentationComponent component)
+	public InputTable(LSRootElement rootElement, DndController dndController, PresentationComponent component)
 	{
 		pointersWithinBoundsByElement = new WeakHashMap<PointerInputElement, ArrayList<PointerInterface>>();
 		this.rootElement = rootElement;

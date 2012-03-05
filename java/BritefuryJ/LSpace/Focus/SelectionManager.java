@@ -7,17 +7,17 @@
 package BritefuryJ.LSpace.Focus;
 
 import BritefuryJ.LSpace.LSElement;
-import BritefuryJ.LSpace.PresentationComponent;
+import BritefuryJ.LSpace.LSRootElement;
 import BritefuryJ.LSpace.Marker.Marker;
 import BritefuryJ.LSpace.TextFocus.TextSelectionPoint;
 
 public class SelectionManager
 {
 	private SelectionPoint initialPoint = null;
-	private PresentationComponent.RootElement rootElement;
+	private LSRootElement rootElement;
 	
 	
-	public SelectionManager(PresentationComponent.RootElement rootElement)
+	public SelectionManager(LSRootElement rootElement)
 	{
 		this.rootElement = rootElement;
 	}

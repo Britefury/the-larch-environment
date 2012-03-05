@@ -11,12 +11,12 @@ import java.util.ArrayList;
 
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSRegion;
-import BritefuryJ.LSpace.PresentationComponent;
+import BritefuryJ.LSpace.LSRootElement;
 
 public abstract class Selection
 {
 	private ArrayList<SelectionListener> listeners;
-	protected PresentationComponent.RootElement rootElement;
+	protected LSRootElement rootElement;
 	
 	
 	public Selection(LSElement element)
@@ -42,7 +42,7 @@ public abstract class Selection
 	
 	
 	
-	public PresentationComponent.RootElement getRootElement()
+	public LSRootElement getRootElement()
 	{
 		return rootElement;
 	}
