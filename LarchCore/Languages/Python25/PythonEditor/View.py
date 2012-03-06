@@ -26,7 +26,6 @@ from BritefuryJ.LSpace import ElementValueFunction, TextEditEvent
 from BritefuryJ.LSpace.Interactor import KeyElementInteractor
 from BritefuryJ.LSpace.StreamValue import StreamValueBuilder
 from BritefuryJ.LSpace.Input import ObjectDndHandler
-from BritefuryJ.LSpace.Marker import Marker
 
 from BritefuryJ.Pres import ApplyPerspective
 from BritefuryJ.Pres.Primitive import Paragraph, Segment
@@ -45,7 +44,6 @@ from BritefuryJ.Editor.SyntaxRecognizing.SRFragmentEditor import EditMode
 from BritefuryJ.ModelAccess.DocModel import *
 
 
-
 from LarchCore.Languages.Python25 import Schema
 from LarchCore.Languages.Python25 import PythonCommands
 
@@ -58,6 +56,7 @@ from LarchCore.Languages.Python25.PythonEditor.Keywords import *
 from LarchCore.Languages.Python25.PythonEditor.Precedence import *
 from LarchCore.Languages.Python25.PythonEditor.PythonEditorCombinators import *
 
+from BritefuryJ.LSpace.Marker import Marker
 
 
 
