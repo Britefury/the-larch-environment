@@ -528,7 +528,7 @@ public class ObjectDndHandler extends DndHandler
 	}
 
 
-	public boolean canDrop(PointerInputElement destElement, DndDrop drop)
+	public boolean canDrop(PointerInputElement destElement, DndDropSwing drop)
 	{
 		Transferable transferable = drop.getTransferable();
 		if ( transferable.isDataFlavorSupported( ObjectDndDataFlavor.flavor ) )
@@ -570,7 +570,7 @@ public class ObjectDndHandler extends DndHandler
 		}
 	}
 	
-	public boolean acceptDrop(PointerInputElement destElement, DndDrop drop)
+	public boolean acceptDrop(PointerInputElement destElement, DndDropSwing drop)
 	{
 		Transferable transferable = drop.getTransferable();
 		
@@ -647,7 +647,7 @@ public class ObjectDndHandler extends DndHandler
 
 	
 	
-	private ArrayList<TransferMatch> negotiateTransferMatches(ObjectDndTransferData transferData, PointerInputElement destElement, DndDrop drop)
+	private ArrayList<TransferMatch> negotiateTransferMatches(ObjectDndTransferData transferData, PointerInputElement destElement, DndDropSwing drop)
 	{
 		ArrayList<TransferMatch> matches = new ArrayList<TransferMatch>();
 		

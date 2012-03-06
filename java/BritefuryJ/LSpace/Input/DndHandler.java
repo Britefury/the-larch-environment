@@ -51,12 +51,12 @@ public abstract class DndHandler
 	
 	public abstract boolean isDest(PointerInputElement sourceElement);
 
-	public boolean canDrop(PointerInputElement destElement, DndDrop drop)
+	public boolean canDrop(PointerInputElement destElement, DndDropSwing drop)
 	{
 		return false;
 	}
 	
-	public boolean acceptDrop(PointerInputElement destElement, DndDrop drop)
+	public boolean acceptDrop(PointerInputElement destElement, DndDropSwing drop)
 	{
 		return false;
 	}

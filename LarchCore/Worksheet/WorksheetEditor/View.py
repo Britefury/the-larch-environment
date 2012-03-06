@@ -31,6 +31,7 @@ from BritefuryJ.Graphics import *
 from BritefuryJ.LSpace.Input import ObjectDndHandler
 from BritefuryJ.LSpace.Browser import Location
 from BritefuryJ.LSpace.TextFocus import TextSelection
+from BritefuryJ.LSpace.Marker import Marker
 from BritefuryJ.StyleSheet import StyleSheet
 from BritefuryJ.Pres import *
 from BritefuryJ.Pres.Primitive import *
@@ -67,7 +68,7 @@ _quoteLocationEditorBorderStyle = StyleSheet.style( Primitive.border( SolidBorde
 
 
 def _onDrop_embeddedObject(element, pos, data, action):
-	marker = element.getEditableMarkerClosestToLocalPoint( pos )
+	marker = Marker.atPointIn( element, pos, True )
 	if marker is not None  and  marker.isValid():
 		# Display a context menu
 		def _onDropInline(control):

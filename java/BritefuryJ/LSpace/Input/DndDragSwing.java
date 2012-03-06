@@ -9,7 +9,7 @@ package BritefuryJ.LSpace.Input;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 
-public class DndDropLocal extends DndDrop
+public class DndDragSwing
 {
 	protected PointerInputElement sourceElement;
 	protected int sourceButton;
@@ -22,7 +22,7 @@ public class DndDropLocal extends DndDrop
 	
 	
 
-	protected DndDropLocal(PointerInputElement sourceElement, int sourceButton)
+	protected DndDragSwing(PointerInputElement sourceElement, int sourceButton)
 	{
 		super();
 		

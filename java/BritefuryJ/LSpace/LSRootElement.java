@@ -42,7 +42,7 @@ import BritefuryJ.LSpace.Focus.SelectionManager;
 import BritefuryJ.LSpace.Focus.Target;
 import BritefuryJ.LSpace.Focus.TargetListener;
 import BritefuryJ.LSpace.Input.DndController;
-import BritefuryJ.LSpace.Input.DndDropLocal;
+import BritefuryJ.LSpace.Input.DndDragSwing;
 import BritefuryJ.LSpace.Input.DndDropSwing;
 import BritefuryJ.LSpace.Input.InputTable;
 import BritefuryJ.LSpace.Input.Pointer;
@@ -169,6 +169,7 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	// Page controller
 	//
 	//
+	
 	public void setPageController(PageController pageController)
 	{
 		this.pageController = pageController;
@@ -180,6 +181,11 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	}
 	
 	
+	//
+	//
+	// COMPONENT
+	//
+	//
 	
 	public PresentationComponent getComponent()
 	{
@@ -189,19 +195,6 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	public ImageObserver getImageObserver()
 	{
 		return component;
-	}
-	
-	
-	
-	//
-	//
-	// CARET METHODS
-	//
-	//
-
-	public Caret getCaret()
-	{
-		return caret;
 	}
 	
 	
@@ -276,9 +269,6 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		queueFullRedraw();
 	}
 
-	
-	
-	
 	public String getTextRepresentationInSelection(TextSelection s)
 	{
 		return defaultTextRepresentationManager.getTextRepresentationInTextSelection( s );
@@ -286,9 +276,11 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 
 			
 	
-	
+
+	//
 	//
 	// Immediate event queue methods
+	//
 	//
 	
 	public void queueImmediateEvent(Runnable event)
@@ -354,7 +346,9 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	
 	
 	//
-	// Queue redraw
+	//
+	// PAINTING METHODS
+	//
 	//
 	
 	public void queueFullRedraw()
@@ -376,204 +370,22 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	}
 	
 	
-	
-
-	
-	//
-	// Queue reallocation
-	//
-	
-	public void queueReallocation()
+	public Graphics2D getGraphics()
 	{
-		bAllocationRequired = true;
-		component.notifyQueueReallocation();
-		queueFullRedraw();
-	}
-	
-	
-	
-
-	//
-	// Allocation
-	//
-	
-	private void performAllocation()
-	{
-		if ( bAllocationRequired )
+		Graphics2D g2;
+		try
 		{
-			long t1 = System.nanoTime();
-			
-			LayoutNodeRootElement rootLayout = (LayoutNodeRootElement)getLayoutNode();
-
-			// Get X requisition
-			LReqBoxInterface reqX = rootLayout.refreshRequisitionX();
-			
-			// Allocate X
-			double prevWidth = rootLayout.getAllocWidth();
-			rootLayout.allocateX( reqX, 0.0, windowSize.x );
-			rootLayout.refreshAllocationX( prevWidth );
-			
-			// Get Y requisition
-			LReqBoxInterface reqY = rootLayout.refreshRequisitionY();
-			
-			// Allocate Y
-			LAllocV prevAllocV = rootLayout.getAllocV();
-			//rootLayout.allocateY( reqY, 0.0, reqY.getReqHeight() );
-			rootLayout.allocateY( reqY, 0.0, windowSize.y );
-			rootLayout.refreshAllocationY( prevAllocV );
-			
-			bAllocationRequired = false;
-			
-			// Send motion events; pointer hasn't moved, but the elements have
-			inputTable.onRootElementReallocate();
-			long t2 = System.nanoTime();
-			double typesetTime = (double)(t2-t1) * 1.0e-9;
-			System.out.println( "RootElement.performAllocation(): TYPESET TIME = " + typesetTime  +  ", used memory = "  + ( Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() ) );
-			if ( profile != null )
-			{
-				profile.addMeasurement( new TypesetProfileMeasurement( typesetTime ) );
-			}
-			
-			if ( ensureVisibilityElement != null )
-			{
-				ensureVisibilityElement.ensureVisible();
-				ensureVisibilityElement = null;
-			}
+			g2 = (Graphics2D)component.getGraphics();
 		}
-	}
-	
-
-	
-	
-	Dimension getMinimumSize()
-	{
-		if ( isRealised() )
+		catch (ClassCastException e)
 		{
-			//performAllocationForSpaceRequirements();
-			performAllocation();
-			LayoutNodeRootElement rootLayout = (LayoutNodeRootElement)getLayoutNode();
-			return new Dimension( (int)( rootLayout.getReqMinWidth() + 1.0 ),  (int)( rootLayout.getReqHeight() + 1.0 ) );
-		}
-		else
-		{
-			return new Dimension( 1, 1 );
-		}
-	}
-	
-	Dimension getPreferredSize()
-	{
-		if ( isRealised() )
-		{
-			//performAllocationForSpaceRequirements();
-			performAllocation();
-			LayoutNodeRootElement rootLayout = (LayoutNodeRootElement)getLayoutNode();
-			return new Dimension( (int)( rootLayout.getReqPrefWidth() + 1.0 ),  (int)( rootLayout.getReqHeight() + 1.0 ) );
-		}
-		else
-		{
-			return new Dimension( 1, 1 );
-		}
-	}
-	
-	Dimension getMaximumSize()
-	{
-		return getPreferredSize();
-	}
-	
-	
-	
-	void componentFocusGained()
-	{
-		hasComponentFocus = true;
-		Target target = getTarget();
-		if ( target == getCaret()  &&  !target.isValid() )
-		{
-			queueMoveCaretToStartOfDocument();
+			throw new CannotGetGraphics2DException();
 		}
 		
-		queueFullRedraw();
-	}
-	
-	void componentFocusLost()
-	{
-		hasComponentFocus = false;
-		queueFullRedraw();
+		return g2;
 	}
 	
 	
-	
-	
-	
-	
-	//
-	// Hierarchy methods
-	//
-	
-	protected void setRootElement(LSRootElement root)
-	{
-	}
-	
-	protected void unparent()
-	{
-	}
-	
-	
-	protected void onSubtreeStructureChanged()
-	{
-		if ( !caret.isValid() )
-		{
-			queueMoveCaretToStartOfDocument();
-		}
-
-		// Handle selections
-		if ( selection != null )
-		{
-			selection.onPresentationTreeStructureChanged();
-		}
-	}
-	
-	
-	
-	private void queueMoveCaretToStartOfDocument()
-	{
-		if ( !caretMoveToStartQueued )
-		{
-			final Runnable putCaretAtStart = new Runnable()
-			{
-				public void run()
-				{
-					if ( !caret.isValid() )
-					{
-						caret.moveToStartOfElement( LSRootElement.this );
-					}
-					
-					caretMoveToStartQueued = false;
-				}
-			};
-		
-			SwingUtilities.invokeLater( putCaretAtStart );
-			
-			caretMoveToStartQueued = true;
-		}
-	}
-
-	
-	
-	
-	//
-	// Event handling
-	//
-	
-	protected void configureEvent(Vector2 size)
-	{
-		if ( !size.equals( windowSize ) )
-		{
-			windowSize = size;
-			bAllocationRequired = true;
-			queueReallocation();
-		}
-		emitImmediateEvents();
-	}
 	
 	
 	protected void exposeEvent(Graphics2D graphics, Rectangle2D.Double exposeArea)
@@ -663,9 +475,268 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	
 	//
 	//
-	// MOUSE EVENTS
+	// LAYOUT METHODS
 	//
 	//
+	
+	public void queueReallocation()
+	{
+		bAllocationRequired = true;
+		component.notifyQueueReallocation();
+		queueFullRedraw();
+	}
+	
+	private void performAllocation()
+	{
+		if ( bAllocationRequired )
+		{
+			long t1 = System.nanoTime();
+			
+			LayoutNodeRootElement rootLayout = (LayoutNodeRootElement)getLayoutNode();
+
+			// Get X requisition
+			LReqBoxInterface reqX = rootLayout.refreshRequisitionX();
+			
+			// Allocate X
+			double prevWidth = rootLayout.getAllocWidth();
+			rootLayout.allocateX( reqX, 0.0, windowSize.x );
+			rootLayout.refreshAllocationX( prevWidth );
+			
+			// Get Y requisition
+			LReqBoxInterface reqY = rootLayout.refreshRequisitionY();
+			
+			// Allocate Y
+			LAllocV prevAllocV = rootLayout.getAllocV();
+			//rootLayout.allocateY( reqY, 0.0, reqY.getReqHeight() );
+			rootLayout.allocateY( reqY, 0.0, windowSize.y );
+			rootLayout.refreshAllocationY( prevAllocV );
+			
+			bAllocationRequired = false;
+			
+			// Send motion events; pointer hasn't moved, but the elements have
+			inputTable.onRootElementReallocate();
+			long t2 = System.nanoTime();
+			double typesetTime = (double)(t2-t1) * 1.0e-9;
+			System.out.println( "RootElement.performAllocation(): TYPESET TIME = " + typesetTime  +  ", used memory = "  + ( Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() ) );
+			if ( profile != null )
+			{
+				profile.addMeasurement( new TypesetProfileMeasurement( typesetTime ) );
+			}
+			
+			if ( ensureVisibilityElement != null )
+			{
+				ensureVisibilityElement.ensureVisible();
+				ensureVisibilityElement = null;
+			}
+		}
+	}
+	
+
+	// Configure event
+	
+	protected void configureEvent(Vector2 size)
+	{
+		if ( !size.equals( windowSize ) )
+		{
+			windowSize = size;
+			bAllocationRequired = true;
+			queueReallocation();
+		}
+		emitImmediateEvents();
+	}
+	
+	
+	// Swing size requirement methods
+	
+	Dimension getMinimumSize()
+	{
+		if ( isRealised() )
+		{
+			//performAllocationForSpaceRequirements();
+			performAllocation();
+			LayoutNodeRootElement rootLayout = (LayoutNodeRootElement)getLayoutNode();
+			return new Dimension( (int)( rootLayout.getReqMinWidth() + 1.0 ),  (int)( rootLayout.getReqHeight() + 1.0 ) );
+		}
+		else
+		{
+			return new Dimension( 1, 1 );
+		}
+	}
+	
+	Dimension getPreferredSize()
+	{
+		if ( isRealised() )
+		{
+			//performAllocationForSpaceRequirements();
+			performAllocation();
+			LayoutNodeRootElement rootLayout = (LayoutNodeRootElement)getLayoutNode();
+			return new Dimension( (int)( rootLayout.getReqPrefWidth() + 1.0 ),  (int)( rootLayout.getReqHeight() + 1.0 ) );
+		}
+		else
+		{
+			return new Dimension( 1, 1 );
+		}
+	}
+	
+	Dimension getMaximumSize()
+	{
+		return getPreferredSize();
+	}
+	
+	
+	// Ensure element visibility
+	
+	protected void queueEnsureVisible(LSElement element)
+	{
+		ensureVisibilityElement = element;
+	}
+	
+	
+	
+	
+	//
+	// Hierarchy methods
+	//
+	
+	protected void setRootElement(LSRootElement root)
+	{
+	}
+	
+	protected void unparent()
+	{
+	}
+	
+	
+	protected void onSubtreeStructureChanged()
+	{
+		if ( !caret.isValid() )
+		{
+			queueMoveCaretToStartOfDocument();
+		}
+
+		// Handle selections
+		if ( selection != null )
+		{
+			selection.onPresentationTreeStructureChanged();
+		}
+	}
+	
+	
+	
+	private void queueMoveCaretToStartOfDocument()
+	{
+		if ( !caretMoveToStartQueued )
+		{
+			final Runnable putCaretAtStart = new Runnable()
+			{
+				public void run()
+				{
+					if ( !caret.isValid() )
+					{
+						caret.moveToStartOfElement( LSRootElement.this );
+					}
+					
+					caretMoveToStartQueued = false;
+				}
+			};
+		
+			SwingUtilities.invokeLater( putCaretAtStart );
+			
+			caretMoveToStartQueued = true;
+		}
+	}
+
+	
+	
+	
+	
+	
+	//
+	//
+	// COMPONENT FOCUS GAIN / LOSS METHODS
+	//
+	//
+	
+	void componentFocusGained()
+	{
+		hasComponentFocus = true;
+		Target target = getTarget();
+		if ( target == getCaret()  &&  !target.isValid() )
+		{
+			queueMoveCaretToStartOfDocument();
+		}
+		
+		queueFullRedraw();
+	}
+	
+	void componentFocusLost()
+	{
+		hasComponentFocus = false;
+		queueFullRedraw();
+	}
+	
+	
+	
+	
+
+	//
+	//
+	// REALISE / UNREALISE METHODS
+	//
+	//
+	
+	protected void realiseEvent()
+	{
+		handleRealise();
+		emitImmediateEvents();
+	}
+	
+	
+	protected void unrealiseEvent()
+	{
+		handleUnrealise( this );
+		emitImmediateEvents();
+	}
+	
+	
+	protected void elementUnrealised(LSElement element)
+	{
+		inputTable.onElementUnrealised( element );
+	}
+	
+	
+	
+	
+	
+	//
+	//
+	// INPUT METHODS
+	//
+	//
+	
+	public InputTable getInputTable()
+	{
+		return inputTable;
+	}
+	
+
+	
+
+	//
+	//
+	// MOUSE METHODS
+	//
+	//
+
+	protected void setPointerCursor(Cursor cursor)
+	{
+		component.setCursor( cursor );
+	}
+	
+	protected void setPointerCursorDefault()
+	{
+		component.setCursor( new Cursor( Cursor.DEFAULT_CURSOR ) );
+	}
 	
 	
 	protected void mouseDownEvent(int button, Point2 windowPos, int buttonModifiers, int keyModifiers)
@@ -788,6 +859,18 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	
 	
 	
+	//
+	//
+	// KEYBOARD METHODS
+	//
+	//
+	
+	public Keyboard getKeyboard()
+	{
+		return keyboard;
+	}
+
+	
 	protected boolean keyPressEvent(KeyEvent event, int keyModifiers)
 	{
 		// Ensure layout is up to date so that event handling will work correctly
@@ -854,22 +937,6 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	
 	
 
-	protected void realiseEvent()
-	{
-		handleRealise();
-		emitImmediateEvents();
-	}
-	
-	
-	protected void unrealiseEvent()
-	{
-		handleUnrealise( this );
-		emitImmediateEvents();
-	}
-	
-	
-	
-
 	//
 	//
 	// DRAG AND DROP PROTOCOL
@@ -897,7 +964,7 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	}
 	
 	
-	public void dndInitiateDrag(DndDropLocal drop, MouseEvent mouseEvent, int requestedAction)
+	public void dndInitiateDrag(DndDragSwing drop, MouseEvent mouseEvent, int requestedAction)
 	{
 		// Ensure layout is up to date so that event handling will work correctly
 		performAllocation();
@@ -1025,51 +1092,6 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	
 	
 	
-	protected void setPointerCursor(Cursor cursor)
-	{
-		component.setCursor( cursor );
-	}
-	
-	protected void setPointerCursorDefault()
-	{
-		component.setCursor( new Cursor( Cursor.DEFAULT_CURSOR ) );
-	}
-	
-	
-	public InputTable getInputTable()
-	{
-		return inputTable;
-	}
-	
-	public Keyboard getKeyboard()
-	{
-		return keyboard;
-	}
-	
-	public void elementUnrealised(LSElement element)
-	{
-		inputTable.onElementUnrealised( element );
-	}
-	
-	
-	public Graphics2D getGraphics()
-	{
-		Graphics2D g2;
-		try
-		{
-			g2 = (Graphics2D)component.getGraphics();
-		}
-		catch (ClassCastException e)
-		{
-			throw new CannotGetGraphics2DException();
-		}
-		
-		return g2;
-	}
-	
-	
-	
-	
 	//
 	//
 	// ELEMENT PREVIEW METHODS
@@ -1104,6 +1126,12 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	// CARET METHODS
 	//
 	//
+	
+	public Caret getCaret()
+	{
+		return caret;
+	}
+	
 	
 	private void caretChanged(Caret c)
 	{
@@ -1202,11 +1230,6 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	}
 	
 	
-	protected void queueEnsureVisible(LSElement element)
-	{
-		ensureVisibilityElement = element;
-	}
-	
 	protected void caretGrab(LSElement element)
 	{
 		caret.grab( element );
@@ -1219,6 +1242,12 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	
 	
 	
+	
+	//
+	//
+	// POPUP METHODS
+	//
+	//
 	
 	protected PresentationPopup createPopupPresentation(LSElement popupContents, Point2 localPos, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
@@ -1238,9 +1267,7 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	// SELECTION METHODS (private)
 	//
 	//
-	
-	
-	
+
 	public void selectionChanged(Selection s)
 	{
 		if ( s == selection )
@@ -1324,6 +1351,13 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		return selection != null  ?  selection.getRegion()  :  null;
 	}
 	
+	
+	
+	//
+	//
+	// VALUE CACHE METHODS
+	//
+	//
 	
 	protected ElementValueCacheManager getElementValueCacheManager()
 	{
