@@ -14,7 +14,9 @@ import BritefuryJ.LSpace.LSContentLeafEditable;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSRegion;
 import BritefuryJ.LSpace.ElementTreeVisitor;
+import BritefuryJ.LSpace.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.LSpace.Focus.Selection;
+import BritefuryJ.LSpace.Focus.Target;
 import BritefuryJ.LSpace.Marker.Marker;
 import BritefuryJ.LSpace.Marker.MarkerListener;
 
@@ -253,5 +255,22 @@ public class TextSelection extends Selection implements MarkerListener
 			DrawVisitor v = new DrawVisitor( graphics );
 			v.visitTextSelection( this );
 		}
+	}
+	
+	
+	
+	@Override
+	protected boolean deleteSelectionInRegion(Target target, ClipboardHandlerInterface clipboardHandler)
+	{
+		if ( target instanceof Caret )
+		{
+			Caret caret = (Caret)target;
+			if ( caret.getMarker().equals( getEndMarker() ) )
+			{
+				caret.moveTo( getStartMarker() );
+			}
+			caret.makeCurrentTarget();
+		}
+		return super.deleteSelectionInRegion( target, clipboardHandler );
 	}
 }

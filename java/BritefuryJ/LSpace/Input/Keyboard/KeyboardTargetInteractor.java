@@ -68,7 +68,7 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 				{
 					if ( event.getKeyCode() == KeyEvent.VK_BACK_SPACE  ||  event.getKeyCode() == KeyEvent.VK_DELETE )
 					{
-						root.deleteSelection();
+						selection.deleteContents( getTarget() );
 						return true;
 					}
 				}
@@ -148,7 +148,7 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 						String str = String.valueOf( event.getKeyChar() );
 						if ( str.length() > 0 )
 						{
-							root.replaceSelectionWithText( str );
+							selection.replaceContentsWithText( str, getTarget() );
 							return true;
 						}
 					}

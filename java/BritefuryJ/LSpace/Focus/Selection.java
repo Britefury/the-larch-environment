@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSRegion;
 import BritefuryJ.LSpace.LSRootElement;
+import BritefuryJ.LSpace.Clipboard.ClipboardHandlerInterface;
 
 public abstract class Selection
 {
@@ -79,5 +80,47 @@ public abstract class Selection
 				listener.selectionChanged( this );
 			}
 		}
+	}
+	
+	
+	
+	public boolean deleteContents(Target target)
+	{
+		LSRegion region = getRegion();
+		if ( region != null )
+		{
+			ClipboardHandlerInterface clipboardHandler = region.getClipboardHandler();
+			if ( clipboardHandler != null )
+			{
+				return deleteSelectionInRegion( target, clipboardHandler );
+			}
+		}
+		
+		return false;
+	}
+
+
+
+	protected boolean deleteSelectionInRegion(Target target, ClipboardHandlerInterface clipboardHandler)
+	{
+		return clipboardHandler.deleteSelection( this, target );
+	}
+
+
+
+
+	public boolean replaceContentsWithText(String replacement, Target target)
+	{
+		LSRegion region = getRegion();
+		if ( region != null )
+		{
+			ClipboardHandlerInterface clipboardHandler = region.getClipboardHandler();
+			if ( clipboardHandler != null )
+			{
+				return clipboardHandler.replaceSelectionWithText( this, target, replacement );
+			}
+		}
+		
+		return false;
 	}
 }

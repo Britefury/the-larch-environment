@@ -26,7 +26,7 @@ public class LSRegion extends LSProxy
 		
 		public boolean testElement(LSElement element)
 		{
-			LSRegion regionB = getRegionOf( element );
+			LSRegion regionB = regionOf( element );
 			
 			if ( regionB == regionA )
 			{
@@ -104,7 +104,7 @@ public class LSRegion extends LSProxy
 		return true;
 	}
 	
-	protected static LSRegion getRegionOf(LSElement e)
+	public static LSRegion regionOf(LSElement e)
 	{
 		while ( e != null )
 		{

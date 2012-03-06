@@ -11,10 +11,12 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSRegion;
 
 public abstract class Target
 {
 	private ArrayList<TargetListener> listeners = new ArrayList<TargetListener>();
+	protected boolean active = false;
 
 
 	public abstract void draw(Graphics2D graphics);
@@ -27,10 +29,31 @@ public abstract class Target
 	
 	public abstract LSElement getElement();
 	
+	public LSRegion getRegion()
+	{
+		return isValid()  ?  LSRegion.regionOf( getElement() )  :  null;
+	}
+	
+	
+	
 	public LSElement getKeyboardInputElement()
 	{
 		return null;
 	}
+	
+	
+	// Notify target that is is current
+	public void notifyActivate()
+	{
+		active = true;
+	}
+	
+	// Notify target that is is no longer current
+	public void notifyDeactivate()
+	{
+		active = false;
+	}
+	
 	
 	
 	public abstract boolean isEditable();
