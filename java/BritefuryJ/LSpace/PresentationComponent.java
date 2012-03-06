@@ -503,8 +503,10 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	
 	
 	public LSRootElement rootElement;
-	private boolean realised, bConfigured;
+	private boolean realised, configured;
 	private PresentationPopup containingPopup = null;
+	
+	
 	
 	
 	public PresentationComponent()
@@ -521,7 +523,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		rootElement = new LSRootElement( this );
 		
 		realised = false;
-		bConfigured = false;
+		configured = false;
 		
 		addComponentListener( this );
 		addMouseListener( this );
@@ -540,6 +542,13 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	}
 	
 	
+	
+	//
+	//
+	// ROOT ELEMENT METHODS
+	//
+	//
+	
 	public LSRootElement getRootElement()
 	{
 		return rootElement;
@@ -547,21 +556,26 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	
 	
 	
+	//
+	//
+	// PAGE CONTROLLER METHODS
+	//
+	//
+	
+	
 	public void setPageController(PageController pageController)
 	{
 		rootElement.setPageController( pageController );
 	}
 	
-	public void setChild(LSElement element)
-	{
-		rootElement.setChild( element );
-	}
+
 	
-	public LSElement getChild()
-	{
-		return rootElement.getChild();
-	}
 	
+	//
+	//
+	// PAINTING METHODS
+	//
+	//
 	
 	@Override
 	public void paint(Graphics g)
@@ -582,48 +596,59 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		g2.addRenderingHints( taa );
 		rootElement.exposeEvent( g2, new Rectangle2D.Double( 0.0, 0.0, (double)getWidth(), (double)getHeight()) );
 	}
+	
+	
+	//
+	//
+	// MOUSE EVENT METHODS
+	//
+	//
 
+	@Override
 	public void mousePressed(MouseEvent e)
 	{
 		rootElement.mouseDownEvent( getButton( e ), new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), getKeyModifiers( e ) );
 	}
 
+	@Override
 	public void mouseReleased(MouseEvent e)
 	{
 		rootElement.mouseUpEvent( getButton( e ), new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), getKeyModifiers( e ) );
 	}
 
-	
+	@Override
 	public void mouseClicked(MouseEvent e)
 	{
 		rootElement.mouseClicked( getButton( e ), e.getClickCount(), new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ) );
 	}
 
 	
+	@Override
 	public void mouseMoved(MouseEvent e)
 	{
 		rootElement.mouseMotionEvent( new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), getKeyModifiers( e ), e );
 	}
 
+	@Override
 	public void mouseDragged(MouseEvent e)
 	{
 		rootElement.mouseDragEvent( new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), getKeyModifiers( e ), e );
 	}
 
+	@Override
 	public void mouseEntered(MouseEvent e)
 	{
 		rootElement.mouseEnterEvent( new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), getKeyModifiers( e ) );
 	}
 
+	@Override
 	public void mouseExited(MouseEvent e)
 	{
 		rootElement.mouseLeaveEvent( new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), getKeyModifiers( e ) );
 	}
 
 
-	
-
-
+	@Override
 	public void mouseWheelMoved(MouseWheelEvent e)
 	{
 		rootElement.mouseWheelEvent( new Point2( (double)e.getX(), (double)e.getY() ), e.getWheelRotation(), e.getUnitsToScroll(), getButtonModifiers( e ) );
@@ -631,6 +656,41 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	
 	
 	
+	//
+	//
+	// KEYBOARD EVENT METHODS
+	//
+	//
+	
+	@Override
+	public void keyPressed(KeyEvent e)
+	{
+		rootElement.keyPressEvent( e, getKeyModifiers( e ) );
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e)
+	{
+		rootElement.keyReleaseEvent( e, getKeyModifiers( e ) );
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e)
+	{
+		rootElement.keyTypedEvent( e, getKeyModifiers( e ) );
+	}
+	
+	
+
+	
+
+	//
+	//
+	// LAYOUT METHODS
+	//
+	//
+	
+	@Override
 	public Dimension getMinimumSize()
 	{
 		if ( isMinimumSizeSet() )
@@ -643,6 +703,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		}
 	}
 	
+	@Override
 	public Dimension getPreferredSize()
 	{
 		if ( isPreferredSizeSet() )
@@ -655,6 +716,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		}
 	}
 	
+	@Override
 	public Dimension getMaximumSize()
 	{
 		if ( isMaximumSizeSet() )
@@ -668,6 +730,26 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	}
 	
 	
+	@Override
+	public void componentResized(ComponentEvent e)
+	{
+		rootElement.configureEvent( new Vector2( (double)getWidth(), (double)getHeight() ) );
+		configured = true;
+	}
+
+	@Override
+	public void componentMoved(ComponentEvent e)
+	{
+	}
+
+	@Override
+	public void hierarchyChanged(HierarchyEvent e)
+	{
+		sendRealiseEvents();
+	}
+	
+	
+	
 	void notifyQueueReallocation()
 	{
 		if ( !isMinimumSizeSet()  ||  !isPreferredSizeSet()  ||  !isMaximumSizeSet()  ||  isPopup() )
@@ -678,6 +760,12 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	
 	
 	
+	
+	//
+	//
+	// DRAG AND DROP METHODS
+	//
+	//
 
 	private boolean swingDndCanImport(TransferHandler.TransferSupport transfer)
 	{
@@ -691,75 +779,11 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	
 
 	
-	public void keyPressed(KeyEvent e)
-	{
-		rootElement.keyPressEvent( e, getKeyModifiers( e ) );
-	}
-
-
-	public void keyReleased(KeyEvent e)
-	{
-		rootElement.keyReleaseEvent( e, getKeyModifiers( e ) );
-	}
-
-
-	public void keyTyped(KeyEvent e)
-	{
-		rootElement.keyTypedEvent( e, getKeyModifiers( e ) );
-	}
-	
-	
-
-	
-	public void componentResized(ComponentEvent e)
-	{
-		rootElement.configureEvent( new Vector2( (double)getWidth(), (double)getHeight() ) );
-		bConfigured = true;
-	}
-
-	public void componentMoved(ComponentEvent e)
-	{
-	}
-
-
-	public void componentShown(ComponentEvent e)
-	{
-		sendRealiseEvents();
-	}
-
-	public void componentHidden(ComponentEvent e)
-	{
-		sendUnrealiseEvents();
-	}
-	
-	
-	public void focusGained(FocusEvent e)
-	{
-		rootElement.componentFocusGained();
-	}
-	
-	public void focusLost(FocusEvent e)
-	{
-		rootElement.componentFocusLost();
-	}
-
-
-
-	public void hierarchyChanged(HierarchyEvent e)
-	{
-		sendRealiseEvents();
-	}
-	
-	
-	private void initialise()
-	{
-		if ( !bConfigured )
-		{
-			rootElement.configureEvent( new Vector2( (double)getWidth(), (double)getHeight() ) );
-			bConfigured = true;
-		}
-	}
-	
+	//
+	//
+	// REALISE / UNREALISE
+	//
+	//
 	
 	private void sendRealiseEvents()
 	{
@@ -772,7 +796,6 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		}
 	}
 
-	
 	private void sendUnrealiseEvents()
 	{
 		if ( realised )
@@ -782,74 +805,60 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			realised = false;
 		}
 	}
-
 	
-	private static int getButton(MouseEvent e)
+	private void initialise()
 	{
-		int b = e.getButton();
-		
-		switch ( b )
+		if ( !configured )
 		{
-		case MouseEvent.BUTTON1:
-			return 1;
-		case MouseEvent.BUTTON2:
-			return 2;
-		case MouseEvent.BUTTON3:
-			return 3;
-		default:
-			throw new InvalidMouseButtonException();
+			rootElement.configureEvent( new Vector2( (double)getWidth(), (double)getHeight() ) );
+			configured = true;
 		}
 	}
 	
-	private static int getButtonModifiers(InputEvent e)
+	
+	
+	
+	//
+	//
+	// SHOW / HIDE
+	//
+	//
+	
+	@Override
+	public void componentShown(ComponentEvent e)
 	{
-		int modifiers = 0;
-		int m = e.getModifiersEx();
-		
-		if ( ( m & InputEvent.BUTTON1_DOWN_MASK )  !=  0 )
-		{
-			modifiers |= Modifier.BUTTON1;
-		}
-		
-		if ( ( m & InputEvent.BUTTON2_DOWN_MASK )  !=  0 )
-		{
-			modifiers |= Modifier.BUTTON2;
-		}
-		
-		if ( ( m & InputEvent.BUTTON3_DOWN_MASK )  !=  0 )
-		{
-			modifiers |= Modifier.BUTTON3;
-		}
-		
-		return modifiers;
+		sendRealiseEvents();
 	}
 
-	private static int getKeyModifiers(InputEvent e)
+	@Override
+	public void componentHidden(ComponentEvent e)
 	{
-		int modifiers = 0;
-		
-		if ( e.isControlDown() )
-		{
-			modifiers |= Modifier.CTRL;
-		}
-		
-		if ( e.isShiftDown() )
-		{
-			modifiers |= Modifier.SHIFT;
-		}
-		
-		if ( e.isAltDown() )
-		{
-			modifiers |= Modifier.ALT;
-		}
-		
-		if ( e.isAltGraphDown() )
-		{
-			modifiers |= Modifier.ALT_GRAPH;
-		}
-		
-		return modifiers;
+		sendUnrealiseEvents();
 	}
+	
+	
+	//
+	//
+	// FOCUS GAIN / LOSS
+	//
+	//
+	
+	@Override
+	public void focusGained(FocusEvent e)
+	{
+		rootElement.componentFocusGained();
+	}
+	
+	@Override
+	public void focusLost(FocusEvent e)
+	{
+		rootElement.componentFocusLost();
+	}
+
+
+
+	
+
 	
 	
 	
@@ -929,5 +938,81 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		}
 
 		return new PresentationPopup( chain, ownerWindow, this, popupContents, x, y, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+	}
+
+
+
+
+	//
+	//
+	// MOUSE UTILITY FUNCTIONS
+	//
+	//
+	
+	private static int getButton(MouseEvent e)
+	{
+		int b = e.getButton();
+		
+		switch ( b )
+		{
+		case MouseEvent.BUTTON1:
+			return 1;
+		case MouseEvent.BUTTON2:
+			return 2;
+		case MouseEvent.BUTTON3:
+			return 3;
+		default:
+			throw new InvalidMouseButtonException();
+		}
+	}
+	
+	private static int getButtonModifiers(InputEvent e)
+	{
+		int modifiers = 0;
+		int m = e.getModifiersEx();
+		
+		if ( ( m & InputEvent.BUTTON1_DOWN_MASK )  !=  0 )
+		{
+			modifiers |= Modifier.BUTTON1;
+		}
+		
+		if ( ( m & InputEvent.BUTTON2_DOWN_MASK )  !=  0 )
+		{
+			modifiers |= Modifier.BUTTON2;
+		}
+		
+		if ( ( m & InputEvent.BUTTON3_DOWN_MASK )  !=  0 )
+		{
+			modifiers |= Modifier.BUTTON3;
+		}
+		
+		return modifiers;
+	}
+
+	private static int getKeyModifiers(InputEvent e)
+	{
+		int modifiers = 0;
+		
+		if ( e.isControlDown() )
+		{
+			modifiers |= Modifier.CTRL;
+		}
+		
+		if ( e.isShiftDown() )
+		{
+			modifiers |= Modifier.SHIFT;
+		}
+		
+		if ( e.isAltDown() )
+		{
+			modifiers |= Modifier.ALT;
+		}
+		
+		if ( e.isAltGraphDown() )
+		{
+			modifiers |= Modifier.ALT_GRAPH;
+		}
+		
+		return modifiers;
 	}
 }

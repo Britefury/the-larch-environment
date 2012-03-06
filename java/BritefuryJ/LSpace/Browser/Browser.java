@@ -78,7 +78,7 @@ public class Browser
 		
 		presComponent = new PresentationComponent();
 		presComponent.setPageController( pageController );
-		presComponent.setChild( viewport.getElement() );
+		presComponent.getRootElement().setChild( viewport.getElement() );
 		
 		ActionMap actionMap = presComponent.getActionMap();
 		actionMap.put( TransferHandler.getCutAction().getValue( Action.NAME ), TransferHandler.getCutAction() );

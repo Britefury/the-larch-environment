@@ -226,6 +226,21 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	
 	//
 	//
+	// CARET METHODS
+	//
+	//
+	
+	public Caret getCaret()
+	{
+		return caret;
+	}
+	
+	
+
+	
+	
+	//
+	//
 	// SELECTION METHODS
 	//
 	//
@@ -259,7 +274,16 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		return defaultTextRepresentationManager.getTextRepresentationInTextSelection( s );
 	}
 
-			
+	
+	public void selectionChanged(Selection s)
+	{
+		if ( s == selection )
+		{
+			queueFullRedraw();
+		}
+	}
+	
+	
 	
 
 	//
@@ -1108,21 +1132,6 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	
 	//
 	//
-	// CARET METHODS
-	//
-	//
-	
-	public Caret getCaret()
-	{
-		return caret;
-	}
-	
-	
-
-	
-	
-	//
-	//
 	// POPUP METHODS
 	//
 	//
@@ -1138,22 +1147,6 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		return component.createPopupPresentation( popupContents, mouse.x, mouse.y, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 	}
 
-	
-	
-	//
-	//
-	// SELECTION METHODS (private)
-	//
-	//
-
-	public void selectionChanged(Selection s)
-	{
-		if ( s == selection )
-		{
-			queueFullRedraw();
-		}
-	}
-	
 	
 	
 	//
