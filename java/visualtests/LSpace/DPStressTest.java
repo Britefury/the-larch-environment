@@ -165,7 +165,7 @@ public class DPStressTest
 		System.out.println( "Element tree creation time: " + (double)( t2 - t1 ) / 1000000000.0 );
 		LSViewport viewport = new LSViewport( new ContainerStyleParams( HAlignment.EXPAND, VAlignment.EXPAND, null, null, null ), new PersistentState() );
 		viewport.setChild( w );
-		presentation.setChild( viewport );
+		presentation.getRootElement().setChild( viewport );
 	     
 	     
 	     
