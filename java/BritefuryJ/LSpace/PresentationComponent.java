@@ -49,6 +49,8 @@ import BritefuryJ.Incremental.IncrementalValueMonitor;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.LSpace.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.LSpace.Clipboard.DataTransfer;
+import BritefuryJ.LSpace.Focus.Selection;
+import BritefuryJ.LSpace.Focus.Target;
 import BritefuryJ.LSpace.Input.DndDragSwing;
 import BritefuryJ.LSpace.Input.Modifier;
 import BritefuryJ.LSpace.Layout.HAlignment;
@@ -259,13 +261,14 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			}
 			else
 			{
-				LSRegion region = rootElement.getSelectionRegion();
+				Selection selection = rootElement.getSelection();
+				LSRegion region = selection != null  ?  selection.getRegion()  :  null;
 				if ( region != null )
 				{
 					ClipboardHandlerInterface clipboardHandler = region.getClipboardHandler();
 					if ( clipboardHandler != null )
 					{	
-						return clipboardHandler.getExportActions( rootElement.selection );
+						return clipboardHandler.getExportActions( rootElement.getSelection() );
 					}
 				}
 				return NONE;
@@ -281,13 +284,14 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			}
 			else
 			{
-				LSRegion region = rootElement.getSelectionRegion();
+				Selection selection = rootElement.getSelection();
+				LSRegion region = selection != null  ?  selection.getRegion()  :  null;
 				if ( region != null )
 				{
 					ClipboardHandlerInterface clipboardHandler = region.getClipboardHandler();
 					if ( clipboardHandler != null )
 					{
-						return clipboardHandler.createExportTransferable( rootElement.selection );
+						return clipboardHandler.createExportTransferable( rootElement.getSelection() );
 					}
 				}
 				return null;
@@ -305,13 +309,14 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			}
 			else
 			{
-				LSRegion region = rootElement.getSelectionRegion();
+				Selection selection = rootElement.getSelection();
+				LSRegion region = selection != null  ?  selection.getRegion()  :  null;
 				if ( region != null )
 				{
 					ClipboardHandlerInterface clipboardHandler = region.getClipboardHandler();
 					if ( clipboardHandler != null )
 					{
-						clipboardHandler.exportDone( rootElement.selection, rootElement.getTarget(), data, action );
+						clipboardHandler.exportDone( rootElement.getSelection(), rootElement.getTarget(), data, action );
 					}
 				}
 			}
@@ -331,13 +336,14 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				}
 				else
 				{
-					LSRegion region = rootElement.getTargetRegion();
+					Target target = rootElement.getTarget();
+					LSRegion region = target != null  ?  target.getRegion()  :  null;
 					if ( region != null )
 					{
 						ClipboardHandlerInterface clipboardHandler = region.getClipboardHandler();
 						if ( clipboardHandler != null )
 						{
-							return clipboardHandler.canImport( rootElement.getTarget(), rootElement.selection, new DataTransfer( transfer ) );
+							return clipboardHandler.canImport( rootElement.getTarget(), rootElement.getSelection(), new DataTransfer( transfer ) );
 						}
 					}
 					return false;
@@ -361,13 +367,14 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				}
 				else
 				{
-					LSRegion region = rootElement.getTargetRegion();
+					Target target = rootElement.getTarget();
+					LSRegion region = target != null  ?  target.getRegion()  :  null;
 					if ( region != null )
 					{
 						ClipboardHandlerInterface clipboardHandler = region.getClipboardHandler();
 						if ( clipboardHandler != null )
 						{
-							return clipboardHandler.importData( rootElement.getTarget(), rootElement.selection, new DataTransfer( transfer ) );
+							return clipboardHandler.importData( rootElement.getTarget(), rootElement.getSelection(), new DataTransfer( transfer ) );
 						}
 					}
 					return false;

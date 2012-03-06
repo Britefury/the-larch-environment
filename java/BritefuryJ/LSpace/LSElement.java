@@ -1458,7 +1458,7 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 		{
 			if ( rootElement != null )
 			{
-				rootElement.caretUngrab( this );
+				rootElement.getCaret().ungrab( this );
 			}
 			clearFlag( FLAG_CARET_GRABBED );
 		}
@@ -1740,7 +1740,7 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 	}
 	
 	
-	protected void handleCaretEnter(Caret c)
+	public void handleCaretEnter(Caret c)
 	{
 		onCaretEnter( c );
 		Iterable<AbstractElementInteractor> interactors = getElementInteractors( CaretCrossingElementInteractor.class );
@@ -1754,7 +1754,7 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 		}
 	}
 	
-	protected void handleCaretLeave(Caret c)
+	public void handleCaretLeave(Caret c)
 	{
 		onCaretLeave( c );
 		Iterable<AbstractElementInteractor> interactors = getElementInteractors( CaretCrossingElementInteractor.class );
@@ -1775,7 +1775,7 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 		if ( isRealised() )
 		{
 			setFlag( FLAG_CARET_GRABBED );
-			getRootElement().caretGrab( this );
+			getRootElement().getCaret().grab( this );
 		}
 	}
 	
@@ -1783,7 +1783,7 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 	{
 		if ( isRealised()  &&  testFlag( FLAG_CARET_GRABBED ) )
 		{
-			getRootElement().caretUngrab( this );
+			getRootElement().getCaret().ungrab( this );
 			clearFlag( FLAG_CARET_GRABBED );
 		}
 	}
@@ -2632,7 +2632,7 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 	
 	public LSRegion getRegion()
 	{
-		return LSRegion.getRegionOf( this );
+		return LSRegion.regionOf( this );
 	}
 	
 	

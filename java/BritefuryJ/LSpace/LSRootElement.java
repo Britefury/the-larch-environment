@@ -35,12 +35,10 @@ import BritefuryJ.LSpace.PresentationComponent.CannotGetGraphics2DException;
 import BritefuryJ.LSpace.PresentationComponent.PresentationPopup;
 import BritefuryJ.LSpace.PresentationComponent.TypesetProfile;
 import BritefuryJ.LSpace.PresentationComponent.TypesetProfileMeasurement;
-import BritefuryJ.LSpace.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.LSpace.Focus.Selection;
 import BritefuryJ.LSpace.Focus.SelectionListener;
 import BritefuryJ.LSpace.Focus.SelectionManager;
 import BritefuryJ.LSpace.Focus.Target;
-import BritefuryJ.LSpace.Focus.TargetListener;
 import BritefuryJ.LSpace.Input.DndController;
 import BritefuryJ.LSpace.Input.DndDragSwing;
 import BritefuryJ.LSpace.Input.DndDropSwing;
@@ -80,12 +78,11 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		new HashMap<LSContentLeafEditable, WeakIdentityHashMap<Marker, Object>>();
 	
 	private Caret caret;
-	private LSContentLeafEditable currentCaretLeaf = null;
 	
 	private Target target;
 	
 	private SelectionManager selectionManager;
-	Selection selection;
+	private Selection selection;
 	
 	
 	private boolean caretMoveToStartQueued;
@@ -129,16 +126,7 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		
 		bAllocationRequired = true;
 		
-		TargetListener caretTargetListener = new TargetListener()
-		{
-			public void targetChanged(Target t)
-			{
-				caretChanged( (Caret)t );
-			}
-		};
-		
 		caret = new Caret();
-		caret.addTargetListener( caretTargetListener );
 		
 		target = null;
 		
@@ -212,29 +200,26 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	
 	public void setTarget(Target t)
 	{
-		boolean wasCaret = target == null;
+		Target prev = getTarget();
+		if ( prev != null )
+		{
+			prev.notifyDeactivate();
+		}
+		
 		target = t;
-		boolean isCaret = target == null;
-		if ( isCaret && !wasCaret )
+
+		Target cur = getTarget();
+		if ( cur != null )
 		{
-			notifyCaretNowCurrentTarget();
+			cur.notifyActivate();
 		}
-		else if ( !isCaret && wasCaret )
-		{
-			notifyCaretNoLongerCurrentTarget();
-		}
+
 		queueFullRedraw();
 	}
 	
 	public void setCaretAsTarget()
 	{
-		boolean wasCaret = target == null;
-		target = null;
-		if ( !wasCaret )
-		{
-			notifyCaretNowCurrentTarget();
-		}
-		queueFullRedraw();
+		setTarget( null );
 	}
 	
 	
@@ -1133,114 +1118,7 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	}
 	
 	
-	private void caretChanged(Caret c)
-	{
-		assert c == caret;
-		
-		if ( c.isValid()  &&  getTarget() == c )
-		{
-			LSContentLeafEditable caretLeaf = c.getElement();
-			
-			if ( caretLeaf != currentCaretLeaf )
-			{
-				ArrayList<LSElement> prevPath = null, curPath = null;
-				if ( currentCaretLeaf != null )
-				{
-					prevPath = currentCaretLeaf.getElementPathToRoot();
-				}
-				else
-				{
-					prevPath = new ArrayList<LSElement>();
-				}
-				
-				if ( caretLeaf != null )
-				{
-					curPath = caretLeaf.getElementPathToRoot();
-				}
-				else
-				{
-					curPath = new ArrayList<LSElement>();
-				}
-				
 
-				int prevPathDivergeIndex = prevPath.size() - 1, curPathDivergeIndex = curPath.size() - 1;
-				for (int i = prevPath.size() - 1, j = curPath.size() - 1; i >= 0  &&  j >= 0;  i--, j--)
-				{
-					LSElement prev = prevPath.get( i ), cur = curPath.get( j );
-					if ( prev != cur )
-					{
-						// Found indices where paths diverge
-						prevPathDivergeIndex = i;
-						curPathDivergeIndex = j;
-						
-						break;
-					}
-				}
-				
-				
-				// Send leave events
-				for (int x = 0; x <= prevPathDivergeIndex; x++)
-				{
-					prevPath.get( x ).handleCaretLeave( c );
-				}
-				
-				currentCaretLeaf = caretLeaf;
-
-				for (int x = curPathDivergeIndex; x >= 0; x--)
-				{
-					curPath.get( x ).handleCaretEnter( c );
-				}
-			}
-			
-			
-			queueFullRedraw();
-		}
-	}
-	
-	private void notifyCaretNowCurrentTarget()
-	{
-		if ( caret.isValid() )
-		{
-			LSContentLeafEditable caretLeaf = caret.getElement();
-			
-			ArrayList<LSElement> path = caretLeaf.getElementPathFromRoot();
-			for (LSElement e: path)
-			{
-				e.handleCaretEnter( caret );
-			}
-			
-			currentCaretLeaf = caretLeaf;
-		}
-	}
-	
-	private void notifyCaretNoLongerCurrentTarget()
-	{
-		if ( caret.isValid() )
-		{
-			LSContentLeafEditable caretLeaf = caret.getElement();
-			
-			ArrayList<LSElement> path = caretLeaf.getElementPathToRoot();
-			for (LSElement e: path)
-			{
-				e.handleCaretLeave( caret );
-			}
-			
-			currentCaretLeaf = null;
-		}
-	}
-	
-	
-	protected void caretGrab(LSElement element)
-	{
-		caret.grab( element );
-	}
-	
-	protected void caretUngrab(LSElement element)
-	{
-		caret.ungrab( element );
-	}
-	
-	
 	
 	
 	//
@@ -1274,81 +1152,6 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		{
 			queueFullRedraw();
 		}
-	}
-	
-	
-	
-	//
-	//
-	// SELECTION EDIT METHODS
-	//
-	//
-	
-	public boolean deleteSelection()
-	{
-		LSRegion selectionRegion = getSelectionRegion();
-		if ( selectionRegion != null )
-		{
-			ClipboardHandlerInterface clipboardHandler = selectionRegion.getClipboardHandler();
-			if ( clipboardHandler != null )
-			{
-				if ( selection instanceof TextSelection )
-				{
-					TextSelection ts = (TextSelection)selection;
-					if ( caret.getMarker().equals( ts.getEndMarker() ) )
-					{
-						caret.moveTo( ts.getStartMarker() );
-					}
-					caret.makeCurrentTarget();
-				}
-				return clipboardHandler.deleteSelection( selection, getTarget() );
-			}
-		}
-		
-		return false;
-	}
-
-	public boolean replaceSelectionWithText(String replacement)
-	{
-		LSRegion selectionRegion = getSelectionRegion();
-		if ( selectionRegion != null )
-		{
-			ClipboardHandlerInterface clipboardHandler = selectionRegion.getClipboardHandler();
-			if ( clipboardHandler != null )
-			{
-				return clipboardHandler.replaceSelectionWithText( selection, getTarget(), replacement );
-			}
-		}
-		
-		return false;
-	}
-	
-	
-	
-	
-	//
-	//
-	// REGION METHODS
-	//
-	//
-	
-	protected LSRegion getTargetRegion()
-	{
-		Target target = getTarget();
-		if ( target.isValid() )
-		{
-			return target.getElement().getRegion();
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
-	protected LSRegion getSelectionRegion()
-	{
-		Selection selection = getSelection();
-		return selection != null  ?  selection.getRegion()  :  null;
 	}
 	
 	

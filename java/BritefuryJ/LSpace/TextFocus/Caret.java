@@ -11,6 +11,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 
 import BritefuryJ.LSpace.AbstractTextRepresentationManager;
 import BritefuryJ.LSpace.LSContentLeaf;
@@ -36,6 +37,7 @@ public class Caret extends Target implements MarkerListener
 	
 	protected Marker marker;
 	protected LSElement grabElement = null;
+	protected LSContentLeafEditable currentLeaf = null;
 	
 	
 	
@@ -87,6 +89,44 @@ public class Caret extends Target implements MarkerListener
 	{
 		return marker.getElement();
 	}
+	
+	
+	// Notify target that is is current
+	public void notifyActivate()
+	{
+		super.notifyActivate();
+		if ( isValid() )
+		{
+			LSContentLeafEditable caretLeaf = getElement();
+			
+			ArrayList<LSElement> path = caretLeaf.getElementPathFromRoot();
+			for (LSElement e: path)
+			{
+				e.handleCaretEnter( this );
+			}
+			
+			currentLeaf = caretLeaf;
+		}
+	}
+	
+	// Notify target that is is no longer current
+	public void notifyDeactivate()
+	{	
+		if ( isValid() )
+		{
+			LSContentLeafEditable caretLeaf = getElement();
+			
+			ArrayList<LSElement> path = caretLeaf.getElementPathToRoot();
+			for (LSElement e: path)
+			{
+				e.handleCaretLeave( this );
+			}
+			
+			currentLeaf = null;
+		}
+		super.notifyDeactivate();
+	}
+	
 	
 	
 	@Override
@@ -209,6 +249,77 @@ public class Caret extends Target implements MarkerListener
 	protected void changed()
 	{
 		notifyListenersOfChange();
+		
+		handleChange();
+	}
+	
+	
+	private void handleChange()
+	{
+		if ( active  &&  isValid() )
+		{
+			if ( getElement().getRootElement().getTarget() != this )
+			{
+				throw new RuntimeException( "Caret is active, but is not the current target" );
+			}
+
+			
+			LSContentLeafEditable caretLeaf = getElement();
+			
+			if ( caretLeaf != currentLeaf )
+			{
+				ArrayList<LSElement> prevPath = null, curPath = null;
+				if ( currentLeaf != null )
+				{
+					prevPath = currentLeaf.getElementPathToRoot();
+				}
+				else
+				{
+					prevPath = new ArrayList<LSElement>();
+				}
+				
+				if ( caretLeaf != null )
+				{
+					curPath = caretLeaf.getElementPathToRoot();
+				}
+				else
+				{
+					curPath = new ArrayList<LSElement>();
+				}
+				
+
+				int prevPathDivergeIndex = prevPath.size() - 1, curPathDivergeIndex = curPath.size() - 1;
+				for (int i = prevPath.size() - 1, j = curPath.size() - 1; i >= 0  &&  j >= 0;  i--, j--)
+				{
+					LSElement prev = prevPath.get( i ), cur = curPath.get( j );
+					if ( prev != cur )
+					{
+						// Found indices where paths diverge
+						prevPathDivergeIndex = i;
+						curPathDivergeIndex = j;
+						
+						break;
+					}
+				}
+				
+				
+				// Send leave events
+				for (int x = 0; x <= prevPathDivergeIndex; x++)
+				{
+					prevPath.get( x ).handleCaretLeave( this );
+				}
+				
+				currentLeaf = caretLeaf;
+
+				for (int x = curPathDivergeIndex; x >= 0; x--)
+				{
+					curPath.get( x ).handleCaretEnter( this );
+				}
+			}
+			
+			
+			getElement().getRootElement().queueFullRedraw();
+		}
 	}
 	
 	

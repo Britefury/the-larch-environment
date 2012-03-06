@@ -158,23 +158,6 @@ public abstract class LSContentLeafEditable extends LSContentLeaf
 	}
 	
 	
-	public void grabCaret()
-	{
-		if ( isRealised() )
-		{
-			getRootElement().caretGrab( this );
-		}
-	}
-	
-	public void ungrabCaret()
-	{
-		if ( isRealised() )
-		{
-			getRootElement().caretUngrab( this );
-		}
-	}
-	
-	
 	
 	
 	
