@@ -10,5 +10,5 @@ import java.awt.event.MouseEvent;
 
 public interface DndController
 {
-	void dndInitiateDrag(DndDropLocal drop, MouseEvent mouseEvent, int requestedAction);
+	void dndInitiateDrag(DndDragSwing drop, MouseEvent mouseEvent, int requestedAction);
 }

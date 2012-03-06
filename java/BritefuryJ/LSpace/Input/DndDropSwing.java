@@ -13,14 +13,17 @@ import javax.swing.TransferHandler;
 
 import BritefuryJ.Math.Point2;
 
-public class DndDropSwing extends DndDrop
+public class DndDropSwing
 {
+	protected PointerInputElement targetElement;
+	protected Point2 targetPosition;
 	protected TransferHandler.TransferSupport support;
 	
 	
 	public DndDropSwing(PointerInputElement targetElement, Point2 targetPosition, TransferHandler.TransferSupport support)
 	{
-		super( targetElement, targetPosition );
+		this.targetElement = targetElement;
+		this.targetPosition = targetPosition;
 
 		this.support = support;
 	}
@@ -63,5 +66,21 @@ public class DndDropSwing extends DndDrop
 	public void setDropAction(int action)
 	{
 		support.setDropAction( action );
+	}
+
+
+
+
+	public PointerInputElement getTargetElement()
+	{
+		return targetElement;
+	}
+
+
+
+
+	public Point2 getTargetPosition()
+	{
+		return targetPosition;
 	}
 }

@@ -49,7 +49,7 @@ import BritefuryJ.Incremental.IncrementalValueMonitor;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.LSpace.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.LSpace.Clipboard.DataTransfer;
-import BritefuryJ.LSpace.Input.DndDropLocal;
+import BritefuryJ.LSpace.Input.DndDragSwing;
 import BritefuryJ.LSpace.Input.Modifier;
 import BritefuryJ.LSpace.Layout.HAlignment;
 import BritefuryJ.LSpace.Layout.VAlignment;
@@ -245,7 +245,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	class PresAreaTransferHandler extends TransferHandler
 	{
 		private static final long serialVersionUID = 1L;
-		private DndDropLocal drop = null;
+		private DndDragSwing drop = null;
 		
 		
 		
@@ -380,7 +380,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			}
 		}
 
-		public void initiateExportDnd(DndDropLocal drop)
+		public void initiateExportDnd(DndDragSwing drop)
 		{
 			this.drop = drop;
 		}

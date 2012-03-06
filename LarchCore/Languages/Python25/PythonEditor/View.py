@@ -26,6 +26,7 @@ from BritefuryJ.LSpace import ElementValueFunction, TextEditEvent
 from BritefuryJ.LSpace.Interactor import KeyElementInteractor
 from BritefuryJ.LSpace.StreamValue import StreamValueBuilder
 from BritefuryJ.LSpace.Input import ObjectDndHandler
+from BritefuryJ.LSpace.Marker import Marker
 
 from BritefuryJ.Pres import ApplyPerspective
 from BritefuryJ.Pres.Primitive import Paragraph, Segment
@@ -164,7 +165,7 @@ def _onDrop_embeddedObject(element, pos, data, action):
 	def _displayModelException(e):
 		ApplyPerspective( None, Pres.coerce( e ) ).popupAtMousePosition( element, True, True )
 
-	marker = element.getEditableMarkerClosestToLocalPoint( pos )
+	marker = Marker.atPointIn( element, pos, True )
 	if marker is not None  and  marker.isValid():
 		def _performInsertion(model):
 			embeddedValue = DMNode.embedIsolated( model, False )

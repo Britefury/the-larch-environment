@@ -49,7 +49,7 @@ public class Pointer extends PointerInterface
 	protected int modifiers = 0;
 	protected LSRootElement rootElement;
 	protected InputTable inputTable;
-	protected DndDropLocal dndDrop;
+	protected DndDragSwing dndDrop;
 	protected PresentationComponent component;
 	protected PriorityList<PointerInteractor> interactors = new PriorityList<PointerInteractor>();
 	protected boolean isWithinBoundsOfRoot = false;
