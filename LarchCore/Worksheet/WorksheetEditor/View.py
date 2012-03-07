@@ -224,8 +224,8 @@ def _worksheetContextMenuFactory(element, menu):
 		return onButton
 
 	
-	italicStyle = Button( _italicButtonLabelStyle( Label( 'I' ) ), makeToggleStyleFn( 'italic' ) )
-	boldStyle = Button( _boldButtonLabelStyle( Label( 'B' ) ), makeToggleStyleFn( 'bold' ) )
+	italicStyle = Button( _italicButtonLabelStyle( SpaceBin( 16.0, 16.0, Label( 'I' ).alignHCentre().alignVCentre() ) ), makeToggleStyleFn( 'italic' ) )
+	boldStyle = Button( _boldButtonLabelStyle( SpaceBin( 16.0, 16.0, Label( 'B' ).alignHCentre().alignVCentre() ) ), makeToggleStyleFn( 'bold' ) )
 	styles = ControlsRow( [ italicStyle, boldStyle ] ).alignHPack()
 	menu.add( SectionColumn( [ SectionTitle( 'Style' ), styles ] ).alignHExpand() )
 

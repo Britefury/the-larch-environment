@@ -154,7 +154,7 @@ public class Controls
 			new FilledOutlinePainter( new Color( 0.7f, 0.8f, 0.9f ), new Color( 0.0f, 0.25f, 0.5f ), new BasicStroke( 1.0f ) ) );
 	
 	public static final InheritedAttributeNonNull popupMenuAttrs = new InheritedAttributeNonNull( controlsNamespace, "popupMenuAttrs", StyleSheet.class,
-		    StyleSheet.style( Primitive.border.as( new SolidBorder( 1.0, 2.0, Color.black, null ) ), Primitive.rowSpacing.as( 10.0 ) ) );
+		    StyleSheet.style( Primitive.border.as( new SolidBorder( 1.0, 2.0, Color.black, Color.white ) ), Primitive.rowSpacing.as( 10.0 ) ) );
 
 	
 	public static final InheritedAttributeNonNull tooltipBorder = new InheritedAttributeNonNull( controlsNamespace, "tooltipBorder", AbstractBorder.class,

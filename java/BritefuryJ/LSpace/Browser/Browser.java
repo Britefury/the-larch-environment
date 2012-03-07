@@ -116,6 +116,7 @@ public class Browser
 		panel = new JPanel( new BorderLayout() );
 		panel.add( header, BorderLayout.PAGE_START );
 		panel.add( presComponent, BorderLayout.CENTER );
+		panel.setBackground( Color.WHITE );
 
 		
 		
