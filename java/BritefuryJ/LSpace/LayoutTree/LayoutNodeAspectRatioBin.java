@@ -26,14 +26,15 @@ public class LayoutNodeAspectRatioBin extends LayoutNodeBin
 		double minWidth = spacer.getMinWidth();
 		if ( child != null )
 		{
+			LReqBoxInterface c = child.getLayoutNode().refreshRequisitionX();
 			if ( minWidth >= 0.0 )
 			{
 				child.getLayoutNode().refreshRequisitionX();
-				layoutReqBox.setRequisitionX( minWidth, minWidth );
+				layoutReqBox.setRequisitionX( Math.max( minWidth, c.getReqMinWidth() ), Math.max( minWidth, c.getReqMinHAdvance() ), c.getReqPrefWidth(), c.getReqPrefHAdvance() );
 			}
 			else
 			{
-				layoutReqBox.setRequisitionX( child.getLayoutNode().refreshRequisitionX() );
+				layoutReqBox.setRequisitionX( c );
 			}
 		}
 		else
@@ -53,14 +54,22 @@ public class LayoutNodeAspectRatioBin extends LayoutNodeBin
 		double minHeight = width / aspectRatio;
 		if ( child != null )
 		{
+			LReqBoxInterface c = child.getLayoutNode().refreshRequisitionY();
 			if ( minHeight >= 0.0 )
 			{
 				child.getLayoutNode().refreshRequisitionY();
-				layoutReqBox.setRequisitionY( minHeight, 0.0 );
+				if ( minHeight > c.getReqHeight() )
+				{
+					layoutReqBox.setRequisitionY( minHeight, 0.0 );
+				}
+				else
+				{
+					layoutReqBox.setRequisitionY( c.getReqHeight(), c.getReqVSpacing(), c.getReqRefY() );
+				}
 			}
 			else
 			{
-				layoutReqBox.setRequisitionY( child.getLayoutNode().refreshRequisitionY() );
+				layoutReqBox.setRequisitionY( c );
 			}
 		}
 		else

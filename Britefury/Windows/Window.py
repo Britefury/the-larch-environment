@@ -230,7 +230,7 @@ class Window (object):
 		self._frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE )
 		
 		self._frame.setJMenuBar( menuBar )
-		
+
 		self._frame.add( windowPanel )
 		self._frame.addWindowListener( _WindowLister() )
 		self._frame.setDefaultCloseOperation( JFrame.DO_NOTHING_ON_CLOSE )

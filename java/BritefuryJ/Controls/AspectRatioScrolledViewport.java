@@ -27,6 +27,6 @@ public class AspectRatioScrolledViewport extends AbstractScrolledViewport
 	@Override
 	protected Pres createViewportBin(LSElement viewport)
 	{
-		return new AspectRatioBin( viewport, minWidth, aspectRatio );
+		return new AspectRatioBin( minWidth, aspectRatio, viewport );
 	}
 }

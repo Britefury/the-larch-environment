@@ -20,7 +20,7 @@ public class AspectRatioBin extends Pres
 	private double minWidth, aspectRatio;
 	
 	
-	public AspectRatioBin(Object child, double minWidth, double aspectRatio)
+	public AspectRatioBin(double minWidth, double aspectRatio, Object child)
 	{
 		this.child = coerce( child );
 		this.minWidth = minWidth;

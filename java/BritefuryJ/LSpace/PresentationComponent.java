@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.LSpace;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -55,6 +56,7 @@ import BritefuryJ.LSpace.Input.DndDragSwing;
 import BritefuryJ.LSpace.Input.Modifier;
 import BritefuryJ.LSpace.Layout.HAlignment;
 import BritefuryJ.LSpace.Layout.VAlignment;
+import BritefuryJ.LSpace.Util.WindowTransparency;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -101,6 +103,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				popupWindow.setAlwaysOnTop( true );
 				popupWindow.setFocusable( true );
 			}
+			popupWindow.getContentPane().setBackground( Color.WHITE );
 			
 			// Create a presentation component for the popup contents, and add them
 			popupComponent = new PresentationComponent( this );
@@ -123,6 +126,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			{
 				popupWindow.requestFocus();
 			}
+			
+			
+			WindowTransparency.setWindowOpaque( popupWindow, false );
 
 		
 			WindowFocusListener focusListener = new WindowFocusListener()

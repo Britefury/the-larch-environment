@@ -409,10 +409,6 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		// Clip to the exposed area
 		graphics.clip( exposeArea );
 		
-		// Fill background
-		graphics.setColor( Color.WHITE );
-		graphics.fill( exposeArea );
-		
 		// Get the top-left and bottom-right corners of the exposed area in root space
 		Point2 topLeftRootSpace = new Point2( exposeArea.x, exposeArea.y );
 		Point2 bottomRightRootSpace = new Point2( exposeArea.x + exposeArea.width, exposeArea.y + exposeArea.height );
