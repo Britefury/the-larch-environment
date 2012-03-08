@@ -2564,14 +2564,14 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 	//
 	//
 	
-	public PresentationComponent.PresentationPopup popup(LSElement targetElement, Corner targetAnchor, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationComponent.PresentationPopup popup(LSElement targetElement, Anchor targetAnchor, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		AABox2 visibleBox = targetElement.getVisibleBoxInLocalSpace();
 		Point2 targerCorner = targetAnchor.getBoxCorner( visibleBox );
 		return popupOver( targetElement, targerCorner, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public PresentationComponent.PresentationPopup popupOver(LSElement targetElement, Point2 targetLocalPos, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationComponent.PresentationPopup popupOver(LSElement targetElement, Point2 targetLocalPos, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		if ( targetElement.isLocalSpacePointVisible( targetLocalPos ) )
 		{
@@ -2811,7 +2811,7 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 			LSElement model = (LSElement)fragment.getModel();
 
 			Pres p = inspect( model );
-			p.popupAtMousePosition( el, Corner.TOP_LEFT, true, true );
+			p.popupAtMousePosition( el, Anchor.TOP_LEFT, true, true );
 		}
 		
 		
