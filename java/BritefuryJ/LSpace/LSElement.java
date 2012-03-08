@@ -2410,7 +2410,7 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 	
 	
 	
-	protected String getLeafTextRepresentation()
+	public String getLeafTextRepresentation()
 	{
 		return null;
 	}

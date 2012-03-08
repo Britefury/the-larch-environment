@@ -520,18 +520,18 @@ public abstract class LSContentLeafEditable extends LSContentLeaf
 			}
 			else
 			{
-				boolean bNonEditableContentCleared = false;
-				boolean deleting = true;
+				boolean contentDeleted = false;
+				// Delete the textual content of any non-editable or empty editable leaves to the left of the caret
 				while ( !left.isEditable()  ||  left.getTextRepresentationLength() == 0 )
 				{
-					if ( deleting )
-					{
-						bNonEditableContentCleared |= left.deleteText();
-					}
+					// Delete the content
+					contentDeleted |= left.deleteText();
 					if ( !left.isWhitespace() )
 					{
-						deleting = false;
+						// Not a whitespace element - we have deleted something - break
+						break;
 					}
+
 					if ( !isRealised() )
 					{
 						// Bail out if a response to the deletion of the text is this element becoming unrealised
@@ -543,10 +543,27 @@ public abstract class LSContentLeafEditable extends LSContentLeaf
 						return false;
 					}
 				}
+				
+				// Jump over non-editable elements until we reach over an editable one
+				while ( !left.isEditable()  ||  left.getTextRepresentationLength() == 0 )
+				{
+					if ( !isRealised() )
+					{
+						// Bail out if a response to the deletion of the text is this element becoming unrealised
+						return true;
+					}
+					left = left.getContentLeafToLeft();
+					if ( left == null )
+					{
+						return false;
+					}
+				}
+				
+				
 				LSContentLeafEditable editableLeft = (LSContentLeafEditable)left;
 				if ( caret.moveTo( Marker.atEndOfLeaf( editableLeft ) ) )
 				{
-					if ( !bNonEditableContentCleared )
+					if ( !contentDeleted )
 					{
 						left.removeTextFromEnd( 1 );
 					}
@@ -576,18 +593,18 @@ public abstract class LSContentLeafEditable extends LSContentLeaf
 			}
 			else
 			{
-				boolean bNonEditableContentCleared = false;
-				boolean deleting = true;
+				boolean contentDeleted = false;
+				// Delete the textual content of any non-editable or empty editable leaves to the left of the caret
 				while ( !right.isEditable()  ||  right.getTextRepresentationLength() == 0 )
 				{
-					if ( deleting )
-					{
-						bNonEditableContentCleared |= right.deleteText();
-					}
+					// Delete the content
+					contentDeleted |= right.deleteText();
 					if ( !right.isWhitespace() )
 					{
-						deleting = false;
+						// Not a whitespace element - we have deleted something - break
+						break;
 					}
+
 					if ( !isRealised() )
 					{
 						// Bail out if a response to the deletion of the text is this element becoming unrealised
@@ -599,10 +616,26 @@ public abstract class LSContentLeafEditable extends LSContentLeaf
 						return false;
 					}
 				}
+				
+				// Jump over non-editable elements until we reach over an editable one
+				while ( !right.isEditable()  ||  right.getTextRepresentationLength() == 0 )
+				{
+					if ( !isRealised() )
+					{
+						// Bail out if a response to the deletion of the text is this element becoming unrealised
+						return true;
+					}
+					right = right.getContentLeafToRight();
+					if ( right == null )
+					{
+						return false;
+					}
+				}
+
 				LSContentLeafEditable editableRight = (LSContentLeafEditable)right; 
 				if ( caret.moveTo( Marker.atStartOfLeaf( editableRight ) ) )
 				{
-					if ( !bNonEditableContentCleared )
+					if ( !contentDeleted )
 					{
 						right.removeTextFromStart( 1 );
 					}
