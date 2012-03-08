@@ -11,6 +11,8 @@ from BritefuryJ.Command import *
 
 from BritefuryJ.DocModel import DMNode
 
+from BritefuryJ.Pres.Primitive import *
+
 from LarchCore.Languages.Python25.PythonCommands import pythonCommands, makeInsertEmbeddedExpressionAtCaretAction, chainActions
 
 from LarchTools.PythonTools.SWYN import Schema
@@ -55,7 +57,8 @@ class SWYN (object):
 
 
 	def __present__(self, fragment, inherited_state):
-		return SWYNPerspective( self.regex )
+		#return SWYNPerspective( self.regex )
+		return Paragraph( [ HiddenText( u'\ue000' ), SWYNPerspective( self.regex ), HiddenText( u'\ue000' ) ] )
 
 
 

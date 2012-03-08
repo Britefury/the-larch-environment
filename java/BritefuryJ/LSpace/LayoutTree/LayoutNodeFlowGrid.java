@@ -50,7 +50,7 @@ public class LayoutNodeFlowGrid extends ArrangedSequenceLayoutNode
 		columnBounds = null;
 
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
-		FlowGridLayout.computeRequisitionX_horizontal( layoutReqBox, getLeavesRefreshedRequisitionXBoxes(), getColumnSpacing() );
+		FlowGridLayout.computeRequisitionX_horizontal( layoutReqBox, getLeavesRefreshedRequisitionXBoxes(), getColumnSpacing(), getTargetNumColumns() );
 	}
 
 	@Override

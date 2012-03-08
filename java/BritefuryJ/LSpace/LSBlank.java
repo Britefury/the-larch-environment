@@ -35,7 +35,7 @@ public class LSBlank extends LSElement
 	//
 	
 	@Override
-	protected String getLeafTextRepresentation()
+	public String getLeafTextRepresentation()
 	{
 		return "";
 	}

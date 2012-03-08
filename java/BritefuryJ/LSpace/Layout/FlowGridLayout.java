@@ -52,20 +52,33 @@ public class FlowGridLayout
 	}
 	
 	
-	public static void computeRequisitionX_horizontal(LReqBoxInterface reqBox, LReqBoxInterface childReqBoxes[], double columnSpacing)
+	public static void computeRequisitionX_horizontal(LReqBoxInterface reqBox, LReqBoxInterface childReqBoxes[], double columnSpacing, int targetNumColumns)
 	{
-		// Accumulate the width required for all the children
-		
 		double minWidth = 0.0, prefWidth = 0.0;
-		double prefX = 0.0;
-		for (LReqBoxInterface child: childReqBoxes)
+		if ( targetNumColumns == -1 )
 		{
-			// Minimum width and hadvance are the greatest minimum requirements for any child
-			minWidth = Math.max( minWidth,  child.getReqMinWidth() );
-
-			// Preferred width and hadvance are accumulated, with @columnSpacing between each one
-			prefWidth = prefX + child.getReqPrefWidth();
-			prefX = prefWidth + columnSpacing;
+			// Accumulate the width required for all the children
+			
+			double prefX = 0.0;
+			for (LReqBoxInterface child: childReqBoxes)
+			{
+				// Minimum width and hadvance are the greatest minimum requirements for any child
+				minWidth = Math.max( minWidth,  child.getReqMinWidth() );
+	
+				// Preferred width and hadvance are accumulated, with @columnSpacing between each one
+				prefWidth = prefX + child.getReqPrefWidth();
+				prefX = prefWidth + columnSpacing;
+			}
+		}
+		else
+		{
+			for (LReqBoxInterface child: childReqBoxes)
+			{
+				// Minimum width and hadvance are the greatest minimum requirements for any child
+				minWidth = Math.max( minWidth,  child.getReqMinWidth() );
+			}
+			// The preferred width is the maximum child width * number of columns, with any required column spacing
+			prefWidth = minWidth * targetNumColumns  +  columnSpacing * ( targetNumColumns - 1 );
 		}
 		
 		reqBox.setRequisitionX( minWidth, prefWidth, minWidth, prefWidth );

@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
+import math
+
 from copy import deepcopy
 
 from java.lang import Throwable
@@ -172,7 +174,7 @@ _choiceBorder = SolidBorder( 1.0, 4.0, 3.0, 3.0, Color( 0.7, 0.4, 1.0 ), Color( 
 _commentBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 0.4, 0.4, 0.4 ), Color( 0.9, 0.9, 0.9 ) )
 _flagsBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 1.0, 0.6, 0.2 ), Color( 1.0, 1.0, 0.8 ) )
 
-_swynBorder = SolidBorder( 3.0, 10.0, 10.0, 10.0, Color( 0.8, 1.0, 0.8 ), None )
+_swynBorder = SolidBorder( 2.0, 4.0, 10.0, 10.0, Color( 0.7, 0.8, 0.7 ), None )
 
 
 _charClasses = {
@@ -225,8 +227,12 @@ def charSetRange(min, max):
 
 def charSet(invert, items):
 	items = [ Row( [ Segment( item ) ] )   for item in items ]
-	itemsColumn = Column( items, 0 )   if len( items ) == 1  else Column( items )
-	return _charSetBorder.surround( Row( [ _controlCharStyle( Text( '[^'   if invert   else '[' ) ), itemsColumn, _controlCharStyle( Text( ']' ) ) ] ) )
+	if len( items ) == 1:
+		itemsCollection = items[0]
+	else:
+		width = int( math.ceil( math.sqrt( float( len( items ) ) ) ) )
+		itemsCollection = FlowGrid( width, items )
+	return _charSetBorder.surround( Row( [ _controlCharStyle( Text( '[^'   if invert   else '[' ) ), itemsCollection, _controlCharStyle( Text( ']' ) ) ] ) )
 
 def group(subexp, capturing):
 	contents = [ subexp ]   if capturing   else [ _controlCharStyle( Text( '?:' ) ), subexp ]

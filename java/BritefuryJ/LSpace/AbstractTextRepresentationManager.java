@@ -224,12 +224,13 @@ public abstract class AbstractTextRepresentationManager
 			
 			
 			
-			append( getElementSuffixLength( e, complete ) );
 			if ( queryPosition < position  &&  e instanceof LSContentLeaf )
 			{
 				leaf = (LSContentLeaf)e;
 				throw new FoundException();
 			}
+
+			append( getElementSuffixLength( e, complete ) );
 		}
 
 		@Override
@@ -429,7 +430,7 @@ public abstract class AbstractTextRepresentationManager
 		return null;
 	}
 
-	protected abstract String getElementContent(LSElement e);		// Return true if element content added, else children will be visited
+	protected abstract String getElementContent(LSElement e);		// Return non-null if element content added, else children will be visited
 	
 	protected final String getPartialEditableLeafContent(LSContentLeafEditable e, int startIndex, int endIndex)
 	{

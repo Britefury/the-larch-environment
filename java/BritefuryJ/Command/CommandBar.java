@@ -113,6 +113,7 @@ public class CommandBar
 		JPanel commandBarBorder = new JPanel( new BorderLayout() );
 		commandBarBorder.add( view.getComponent(), BorderLayout.CENTER );
 		commandBarBorder.setBorder( BorderFactory.createLineBorder( new Color( 0.65f, 0.65f, 0.65f ), 1 ) );
+		commandBarBorder.setBackground( Color.WHITE );
 		
 		commandBarArea = new JPanel( new BorderLayout( 5, 0 ) );
 		commandBarArea.add( commandBarBorder, BorderLayout.CENTER );
