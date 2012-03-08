@@ -16,10 +16,14 @@ from LarchCore.Languages.Python25.PythonCommands import pythonCommands, makeInse
 from LarchTools.PythonTools.SWYN import Schema
 from LarchTools.PythonTools.SWYN.Parser import SWYNGrammar
 from LarchTools.PythonTools.SWYN.View import perspective as SWYNPerspective
+from LarchTools.PythonTools.SWYN.CodeGenerator import SWYNCodeGenerator
 
 
 
 class SWYN (object):
+	_codeGen = SWYNCodeGenerator()
+
+
 	def __init__(self, regex=None):
 		if regex is None:
 			regex = Schema.SWYNRegEx( expr= Schema.UNPARSED( value=[ '' ] ) )
@@ -45,6 +49,9 @@ class SWYN (object):
 		else:
 			raise TypeError, 'Invalid regular expression type'
 
+
+	def __py_eval__(self, _globals, _locals, codeGen):
+		return self._codeGen( self.regex )
 
 
 	def __present__(self, fragment, inherited_state):
