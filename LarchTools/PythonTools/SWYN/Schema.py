@@ -10,7 +10,7 @@ from BritefuryJ.DocModel import DMSchema, DMObjectClass, DMNode
 
 
 
-schema = DMSchema( 'SWYN', 'swyn', 'LarchTools.PythonTools.SWYN', 0 )
+schema = DMSchema( 'SWYN', 'swyn', 'LarchTools.PythonTools.SWYN', 1 )
 
 
 Node = schema.newClass( 'Node', [] )

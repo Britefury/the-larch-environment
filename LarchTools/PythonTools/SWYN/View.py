@@ -167,7 +167,7 @@ _charSetItemBorder = FilledBorder( 1.0, 1.0, 1.0, 1.0, Color( 0.9, 0.9, 0.9 ) )
 
 _groupBorder = SolidBorder( 1.0, 4.0, 3.0, 3.0, Color( 1.0, 0.7, 0.4 ), Color( 1.0, 1.0, 0.8 ) )
 _repeatBorder = SolidBorder( 1.0, 1.0, 3.0, 3.0, Color( 0.0, 0.7, 0.0 ), Color( 0.85, 1.0, 0.85 ) )
-_choiceBorder = SolidBorder( 1.0, 4.0, 3.0, 3.0, Color.BLACK, Color( 0.8, 0.6, 1.0 ) )
+_choiceBorder = SolidBorder( 1.0, 4.0, 3.0, 3.0, Color( 0.7, 0.4, 1.0 ), Color( 0.9, 0.8, 1.0 ) )
 
 _commentBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 0.4, 0.4, 0.4 ), Color( 0.9, 0.9, 0.9 ) )
 _flagsBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 1.0, 0.6, 0.2 ), Color( 1.0, 1.0, 0.8 ) )
@@ -223,10 +223,10 @@ def charSetChar(char):
 def charSetRange(min, max):
 	return _charSetItemBorder.surround( Row( [ min, _controlCharStyle( Text( '-' ) ), max ] ) )
 
-def charSet(items):
+def charSet(invert, items):
 	items = [ Row( [ Segment( item ) ] )   for item in items ]
 	itemsColumn = Column( items, 0 )   if len( items ) == 1  else Column( items )
-	return _charSetBorder.surround( Row( [ _controlCharStyle( Text( '[' ) ), itemsColumn, _controlCharStyle( Text( ']' ) ) ] ) )
+	return _charSetBorder.surround( Row( [ _controlCharStyle( Text( '[^'   if invert   else '[' ) ), itemsColumn, _controlCharStyle( Text( ']' ) ) ] ) )
 
 def group(subexp, capturing):
 	contents = [ subexp ]   if capturing   else [ _controlCharStyle( Text( '?:' ) ), subexp ]
@@ -258,7 +258,7 @@ def _repetition(subexp, repetitions):
 	return Script.scriptRSuper( Row( [ subexp ] ), _repeatBorder.surround( repetitions ) )
 
 def repeat(subexp, repetitions):
-	return _repetition( subexp, Text( '{' + repetitions + '}' ) )
+	return _repetition( subexp, Row( [ _controlCharStyle( Text( '{' ) ), Text( repetitions ), _controlCharStyle( Text( '}' ) ) ] ) )
 
 def zeroOrMore(subexp, greedy):
 	return _repetition( subexp, Text( '*?'   if greedy   else '*' ) )
@@ -270,7 +270,8 @@ def optional(subexp, greedy):
 	return _repetition( subexp, Text( '??'   if greedy   else '?' ) )
 
 def repeatRange(subexp, min, max, greedy):
-	return _repetition( subexp, Text( '{%s,%s}' % ( min, max )  + ( ''   if greedy   else '?' ) ) )
+	greedyness = []   if greedy   else [ _controlCharStyle( Text( '?' ) ) ]
+	return _repetition( subexp, Row( [ _controlCharStyle( Text( '{' ) ), Text( min ),  _controlCharStyle( Text( ',' ) ), Text( max ), _controlCharStyle( Text( '}' ) ) ]  +  greedyness ) )
 
 def sequence(subexps):
 	return Paragraph( subexps )
@@ -396,9 +397,9 @@ class SWYNView (MethodDispatchView):
 
 	@DMObjectNodeDispatchMethod( Schema.CharSet )
 	@Expression
-	def CharSet(self, fragment, inheritedState, model, items):
+	def CharSet(self, fragment, inheritedState, model, invert, items):
 		itemViews = [ _displayNode( item )   for item in items ]
-		return charSet( itemViews )
+		return charSet( invert is not None, itemViews )
 
 
 

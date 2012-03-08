@@ -192,13 +192,12 @@ public class Marker implements Comparable<Marker>
 	
 	public void moveTo(LSContentLeafEditable element, int position, Bias bias)
 	{
-		if ( !element.isRealised() )
-		{
-			throw new RuntimeException( "Cannot move marker into unrealised leaf element " + element );
-		}
-		
 		if ( element != null )
 		{
+			if ( !element.isRealised() )
+			{
+				throw new RuntimeException( "Cannot move marker into unrealised leaf element " + element );
+			}
 			checkPositionAndBias( element, position, bias );
 		}
 		
