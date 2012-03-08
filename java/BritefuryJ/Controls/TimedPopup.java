@@ -11,7 +11,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.Timer;
 
-import BritefuryJ.LSpace.Corner;
+import BritefuryJ.LSpace.Anchor;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.FragmentContext;
 import BritefuryJ.Pres.Pres;
@@ -34,14 +34,14 @@ public class TimedPopup
 
 
 
-	public void popup(LSElement element, Corner targetAnchor, Corner popupAnchor, PresentationContext ctx, StyleValues style)
+	public void popup(LSElement element, Anchor targetAnchor, Anchor popupAnchor, PresentationContext ctx, StyleValues style)
 	{
 		LSElement childElement = child.present( ctx, style );
 		childElement.popup( element, targetAnchor, popupAnchor, true, bRequestFocus );
 		initialiseTimeout( childElement );
 	}
 	
-	public void popupAtMousePosition(LSElement element, Corner popupAnchor, PresentationContext ctx, StyleValues style)
+	public void popupAtMousePosition(LSElement element, Anchor popupAnchor, PresentationContext ctx, StyleValues style)
 	{
 		LSElement childElement = child.present( ctx, style );
 		element.getRootElement().createPopupAtMousePosition( childElement, popupAnchor, true, bRequestFocus );
@@ -50,7 +50,7 @@ public class TimedPopup
 	
 	
 	
-	public void popup(LSElement element, Corner targetAnchor, Corner popupAnchor)
+	public void popup(LSElement element, Anchor targetAnchor, Anchor popupAnchor)
 	{
 		FragmentContext ctx = element.getFragmentContext();
 		if ( ctx != null )
@@ -63,7 +63,7 @@ public class TimedPopup
 		}
 	}
 	
-	public void popupAtMousePosition(LSElement element, Corner popupAnchor)
+	public void popupAtMousePosition(LSElement element, Anchor popupAnchor)
 	{
 		FragmentContext ctx = element.getFragmentContext();
 		if ( ctx != null )

@@ -57,7 +57,6 @@ import BritefuryJ.LSpace.Input.Modifier;
 import BritefuryJ.LSpace.Layout.HAlignment;
 import BritefuryJ.LSpace.Layout.VAlignment;
 import BritefuryJ.LSpace.Util.WindowTransparency;
-import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 import BritefuryJ.Pres.Pres;
@@ -89,8 +88,8 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		private PopupChain chain;
 		private boolean isOpen;
 		
-		private PresentationPopup(PopupChain popupChain, Window ownerWindow, PresentationComponent parentComponent, LSElement popupContents, int x, int y,
-				Corner popupAnchor, boolean closeOnLoseFocus, boolean requestFocus)
+		private PresentationPopup(PopupChain popupChain, Window ownerWindow, PresentationComponent parentComponent, LSElement popupContents, int screenX, int screenY,
+				Anchor popupAnchor, boolean closeOnLoseFocus, boolean requestFocus)
 		{
 			chain = popupChain;
 			chain.addPopup( this );
@@ -114,11 +113,10 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			
 			popupWindow.pack();
 			Dimension sz = popupWindow.getSize();
-			AABox2 windowBox = new AABox2( 0.0, 0.0, sz.getWidth(), sz.getHeight() );
-			Point2 windowAnchor = popupAnchor.getBoxCorner( windowBox );
-			x -= (int)( windowAnchor.x + 0.5 );
-			y -= (int)( windowAnchor.y + 0.5 );
-			popupWindow.setLocation( x, y );
+			Point2 windowAnchor = new Point2( sz.getWidth() * popupAnchor.getPropX(), sz.getHeight() * popupAnchor.getPropY() );
+			screenX -= (int)( windowAnchor.x + 0.5 );
+			screenY -= (int)( windowAnchor.y + 0.5 );
+			popupWindow.setLocation( screenX, screenY );
 
 			
 			popupWindow.setVisible( true );
@@ -910,12 +908,13 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	}
 	
 	
-	PresentationPopup createPopupPresentation(LSElement popupContents, int x, int y, Corner popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	PresentationPopup createPopupPresentation(LSElement popupContents, int targetX, int targetY, Anchor popupAnchor,
+			boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		// Offset the popup position by the location of this presentation component on the screen
 		Point locOnScreen = getLocationOnScreen();
-		x += locOnScreen.x;
-		y += locOnScreen.y;
+		targetX += locOnScreen.x;
+		targetY += locOnScreen.y;
 		
 		// Get the popup chain that this presentation component is a member of
 		PopupChain chain = getPopupChain();
@@ -943,7 +942,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			ownerWindow = SwingUtilities.getWindowAncestor( root );
 		}
 
-		return new PresentationPopup( chain, ownerWindow, this, popupContents, x, y, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+		return new PresentationPopup( chain, ownerWindow, this, popupContents, targetX, targetY, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 	}
 
 

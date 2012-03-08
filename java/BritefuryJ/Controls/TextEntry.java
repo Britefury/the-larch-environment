@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
-import BritefuryJ.LSpace.Corner;
+import BritefuryJ.LSpace.Anchor;
 import BritefuryJ.LSpace.LSBorder;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSRegion;
@@ -329,7 +329,7 @@ public class TextEntry extends ControlPres
 				if ( failMessage != null )
 				{
 					Tooltip tooltip = new Tooltip( failMessage, 5.0 );
-					tooltip.popup( outerElement, Corner.TOP_LEFT, Corner.BOTTOM_LEFT, ctx, style );
+					tooltip.popup( outerElement, Anchor.TOP_LEFT, Anchor.BOTTOM_LEFT, ctx, style );
 				}
 				return;
 			}
