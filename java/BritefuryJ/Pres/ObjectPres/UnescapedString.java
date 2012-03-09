@@ -54,6 +54,14 @@ public abstract class UnescapedString extends Pres
 				case '\n':
 					escapeItem = escapeStyle.applyTo( new StaticText( "\\n" ) );
 					break;
+				case '\b':
+					escapeItem = escapeStyle.applyTo( new StaticText( "\\b" ) );
+					break;
+				case '\f':
+					escapeItem = escapeStyle.applyTo( new StaticText( "\\f" ) );
+					break;
+				default:
+					break;
 			}
 			
 			if ( escapeItem != null )

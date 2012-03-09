@@ -65,7 +65,6 @@ class SWYNGrammar (Grammar):
 
 
 
-
 	# Character set
 	@Rule
 	def charSetChar(self):
@@ -146,7 +145,6 @@ class SWYNGrammar (Grammar):
 
 
 
-
 	# Repetition
 	@Rule
 	def zeroOrMore(self):
@@ -183,6 +181,7 @@ class SWYNGrammar (Grammar):
 	@Rule
 	def choice(self):
 		return ( self.sequence()  +  ( Literal( '|' ) + self.sequence() ).oneOrMore() ).action( lambda input, begin, end, x, bindings: Schema.Choice( subexps=[ x[0] ] + [ p[1]   for p in x[1] ] ) )  |  self.sequence()
+
 
 
 	@Rule

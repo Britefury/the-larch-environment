@@ -77,7 +77,7 @@ public class PrimitivePresenter
 			lineContent.add( punctuationStyle.applyTo( new StaticText(  "\"" ) ) );
 			lineContent.add( new UnescapedStringAsSpan( text ) );
 			lineContent.add( punctuationStyle.applyTo( new StaticText(  "\"" ) ) );
-			return new Row( lineContent );
+			return staticStyle.applyTo( new Row( lineContent ) );
 		}
 		else
 		{
@@ -107,7 +107,7 @@ public class PrimitivePresenter
 			lastLineContent.add( punctuationStyle.applyTo( new StaticText(  "\"" ) ) );
 			lines.add( new Row( lastLineContent ) );
 			
-			return multiLineStringStyle.applyTo( new Column( lines ) );
+			return staticStyle.applyTo( multiLineStringStyle.applyTo( new Column( lines ) ) );
 		}
 	}
 
