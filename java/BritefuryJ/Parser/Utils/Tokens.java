@@ -376,10 +376,10 @@ public class Tokens
 
 	public static final ParserExpression javaCharacterLiteral = new JavaCharacterLiteral();
 
-	public static final ParserExpression singleQuotedString = new RegEx( "\'(?:[^\'\\n\\r\\\\]|(?:\'\')|(?:\\\\x[0-9a-fA-F]+)|(?:\\\\.))*\'" );
-	public static final ParserExpression doubleQuotedString = new RegEx( "\"(?:[^\"\\n\\r\\\\]|(?:\"\")|(?:\\\\x[0-9a-fA-F]+)|(?:\\\\.))*\"" );
-	public static final ParserExpression quotedString = new RegEx( "(?:\"(?:[^\"\\n\\r\\\\]|(?:\"\")|(?:\\\\x[0-9a-fA-F]+)|(?:\\\\.))*\")|(?:\'(?:[^\'\\n\\r\\\\]|(?:\'\')|(?:\\\\x[0-9a-fA-F]+)|(?:\\\\.))*\')" );
-	public static final ParserExpression unicodeString = new RegEx( "(u|U)((?:\"(?:[^\"\\n\\r\\\\]|(?:\"\")|(?:\\\\x[0-9a-fA-F]+)|(?:\\\\.))*\")|(?:\'(?:[^\'\\n\\r\\\\]|(?:\'\')|(?:\\\\x[0-9a-fA-F]+)|(?:\\\\.))*\'))" );
+	public static final ParserExpression singleQuotedString = new RegEx( "\'(?:[^\'\\n\\r\\\\]|(?:\'\')|(?:\\\\.))*\'" );
+	public static final ParserExpression doubleQuotedString = new RegEx( "\"(?:[^\"\\n\\r\\\\]|(?:\"\")|(?:\\\\.))*\"" );
+	public static final ParserExpression quotedString = new RegEx( "(?:\"(?:[^\"\\n\\r\\\\]|(?:\"\")|(?:\\\\.))*\")|(?:\'(?:[^\'\\n\\r\\\\]|(?:\'\')|(?:\\\\.))*\')" );
+	public static final ParserExpression unicodeString = new RegEx( "(u|U)((?:\"(?:[^\"\\n\\r\\\\]|(?:\"\")|(?:\\\\.))*\")|(?:\'(?:[^\'\\n\\r\\\\]|(?:\'\')|(?:\\\\.))*\'))" );
 	
 	public static final ParserExpression javaStringLiteral = new JavaStringLiteral();
 }

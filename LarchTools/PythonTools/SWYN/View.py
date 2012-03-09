@@ -72,14 +72,14 @@ def _isValidUnparsedValue(value):
 def _commitUnparsed(model, value):
 	unparsed = Schema.UNPARSED( value=value.getItemValues() )
 	# In some cases, we will be replacing @model with an UNPARSED node that contains a reference to @model.
-	# Since pyReplaceNode calls model.become(), this causes severe problems, due to circular references.
+	# Since swynReplaceNode calls model.become(), this causes severe problems, due to circular references.
 	# The call to deepcopy eliminates this possibility.
 	swynReplaceNode( model, deepcopy( unparsed ) )
 
 def _commitInnerUnparsed(model, value):
 	unparsed = Schema.UNPARSED( value=value.getItemValues() )
 	# In some cases, we will be replacing @model with an UNPARSED node that contains a reference to @model.
-	# Since pyReplaceNode calls model.become(), this causes severe problems, due to circular references.
+	# Since swynReplaceNode calls model.become(), this causes severe problems, due to circular references.
 	# The call to deepcopy eliminates this possibility.
 	swynReplaceNode( model, deepcopy( unparsed ) )
 

@@ -557,7 +557,7 @@ class Python25View (MethodDispatchView):
 
 		quote = "'"   if quotation == 'single'   else   '"'
 
-		return stringLiteral( fmt, quote, value )
+		return stringLiteral( fmt, quote, value, format.endswith( 'regex' ) )
 
 	# Integer literal
 	@DMObjectNodeDispatchMethod( Schema.IntLiteral )

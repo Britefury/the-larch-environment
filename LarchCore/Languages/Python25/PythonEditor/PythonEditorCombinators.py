@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2010.
 ##-*************************
+import re
+
 from java.awt import Color
 
 from Britefury.Util.Lerp import lerp, lerpColour
@@ -38,6 +40,9 @@ class PythonEditorStyle (object):
 	                                            StyleSheet.style( Primitive.fontFace( _pythonCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.0, 0.0, 0.5 ) ) ) )
 	stringLiteralStyle = InheritedAttributeNonNull( pythonEditor, 'stringLiteralStyle', StyleSheet,
 	                                                StyleSheet.style( Primitive.fontFace( _pythonCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.25, 0.0, 0.5 ) ) ) )
+	stringLiteralEscapeStyle = InheritedAttributeNonNull( pythonEditor, 'stringLiteralEscapeStyle', StyleSheet,
+	                                                StyleSheet.style( Primitive.fontFace( _pythonCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.25, 0.0, 0.5 ) ),
+	                                                                  Primitive.border( SolidBorder( 1.0, 1.0, 4.0, 4.0, Color( 0.25, 0.0, 0.5 ), Color( 0.9, 0.8, 1.0 ) ) ) ) )
 	numLiteralStyle = InheritedAttributeNonNull( pythonEditor, 'numLiteralStyle', StyleSheet,
 	                                             StyleSheet.style( Primitive.fontFace( _pythonCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.0, 0.5, 0.5 ) ) ) )
 	punctuationStyle = InheritedAttributeNonNull( pythonEditor, 'punctuationStyle', StyleSheet,
@@ -236,14 +241,34 @@ def unparsedElements(components):
 #
 #
 
-def stringLiteral(format, quotation, value):
+_non_escaped_string_re = re.compile( r'(\\(?:[abnfrt\\' + '\'\"' + r']|(?:x[0-9a-fA-F]{2})|(?:u[0-9a-fA-F]{4})|(?:U[0-9a-fA-F]{8})))' )
+
+def stringLiteral(format, quotation, value, raw):
 	boxContents = []
 
 	if format is not None:
 		boxContents.append( ApplyStyleSheetFromAttribute( PythonEditorStyle.literalFormatStyle, Text( format ) ) )
 
+	# Split the value into pieces of escaped and non-escaped contente
+	if raw:
+		valuePres = ApplyStyleSheetFromAttribute( PythonEditorStyle.stringLiteralStyle, Text( value ) )
+	else:
+		segments = _non_escaped_string_re.split( value )
+		if len( segments ) == 1:
+			valuePres = ApplyStyleSheetFromAttribute( PythonEditorStyle.stringLiteralStyle, Text( value ) )
+		else:
+			escape = False
+			segsAsPres = []
+			for seg in segments:
+				if seg is not None  and  len( seg ) > 0:
+					if escape:
+						segsAsPres.append( ApplyStyleSheetFromAttribute( PythonEditorStyle.stringLiteralEscapeStyle, Border( Text( seg ) ) ) )
+					else:
+						segsAsPres.append( Text( seg ) )
+				escape = not escape
+			valuePres = ApplyStyleSheetFromAttribute( PythonEditorStyle.stringLiteralStyle, Span( segsAsPres ) )
+
 	quotationPres = ApplyStyleSheetFromAttribute( PythonEditorStyle.quotationStyle, Text( quotation ) )
-	valuePres = ApplyStyleSheetFromAttribute( PythonEditorStyle.stringLiteralStyle, Text( value ) )
 	boxContents.extend( [ quotationPres,  valuePres,  quotationPres ] )
 
 	return Row( boxContents )
