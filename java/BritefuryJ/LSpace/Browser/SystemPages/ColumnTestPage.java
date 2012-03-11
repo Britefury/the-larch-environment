@@ -47,8 +47,8 @@ public class ColumnTestPage extends SystemPage
 	
 	private Pres makeRefAlignedRow(int refPointIndex, String header)
 	{
-		Pres v = new Column( new Pres[] { styleSheet.applyTo( new Label( "First item" ) ), styleSheet.applyTo( new Label( "Second item" ) ),
-				styleSheet.applyTo( new Label( "Third item" ) ), styleSheet.applyTo( new Label( "Fourth item item" ) ) }, refPointIndex );
+		Pres v = new Column( refPointIndex, new Pres[] { styleSheet.applyTo( new Label( "First item" ) ), styleSheet.applyTo( new Label( "Second item" ) ),
+						styleSheet.applyTo( new Label( "Third item" ) ), styleSheet.applyTo( new Label( "Fourth item item" ) ) } );
 		v = styleSheet.withValues( Primitive.columnSpacing.as( 0.0 ) ).applyTo( v );
 		return new Row( new Pres[] { t18Style.applyTo( new Label( header ) ), v, t18Style.applyTo( new Label( "After" ) ) } );
 	}

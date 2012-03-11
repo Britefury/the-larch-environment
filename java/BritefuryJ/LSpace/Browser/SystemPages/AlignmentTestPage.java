@@ -70,8 +70,8 @@ public class AlignmentTestPage extends SystemPage
 
 		Pres valignTitle = new Heading2( "Vertical alignment" ); 
 
-		Pres refColumn = new Column( new Pres[] { new Label( "0" ), new Label( "1 (ref-y)" ), new Label( "2" ),
-				new Label( "3" ), new Label( "4" ), new Label( "5" ) }, 1 );
+		Pres refColumn = new Column( 1, new Pres[] { new Label( "0" ), new Label( "1 (ref-y)" ), new Label( "2" ),
+						new Label( "3" ), new Label( "4" ), new Label( "5" ) } );
 		Pres refBox = styleSheet.withValues( Primitive.background.as( new FilledOutlinePainter( new Color( 0.8f, 0.85f, 1.0f ), new Color( 0.0f, 0.25f, 1.0f ) ) ) ).applyTo( new Bin( refColumn.pad( 5.0, 5.0 ) ) );
 		
 

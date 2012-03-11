@@ -151,7 +151,8 @@ public class FlowGridLayout
 			childIndex = end;
 		}
 		
-		VerticalLayout.computeRequisitionY( reqBox, rowReqBoxes, -1, rowSpacing );
+		int refPointIndex = rowReqBoxes.length == 1  ?  0  :  -1;
+		VerticalLayout.computeRequisitionY( reqBox, rowReqBoxes, refPointIndex, rowSpacing );
 		
 		return rowReqBoxes;
 	}

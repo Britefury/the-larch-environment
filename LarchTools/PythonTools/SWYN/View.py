@@ -162,7 +162,7 @@ _groupNameStyle = StyleSheet.style( Primitive.fontItalic( True ) )
 _commentStyle = StyleSheet.style( Primitive.foreground( Color( 0.2, 0.2, 0.2, 0.5 ) ) )
 _flagsStyle = StyleSheet.style( Primitive.foreground( Color( 1.0, 0.5, 0.0 ) ) )
 
-_escapeBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 0.75, 0.65, 0.55 ), Color( 1.0, 0.85, 0.75 ) )
+_escapeBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 0.75, 0.6, 0.5 ), Color( 1.0, 0.85, 0.75 ) )
 
 _charSetBorder = SolidBorder( 1.0, 4.0, 3.0, 3.0,Color( 0.5, 0.5, 0.6 ), Color( 0.7, 0.7, 0.8 ) )
 _charSetItemBorder = FilledBorder( 1.0, 1.0, 1.0, 1.0, Color( 0.9, 0.9, 0.9 ) )
