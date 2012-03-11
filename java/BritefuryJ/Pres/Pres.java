@@ -18,6 +18,7 @@ import BritefuryJ.LSpace.ElementPainter;
 import BritefuryJ.LSpace.ElementValueFunction;
 import BritefuryJ.LSpace.FragmentContext;
 import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.PresentationComponent;
 import BritefuryJ.LSpace.TreeEventListener;
 import BritefuryJ.LSpace.Input.ObjectDndHandler;
 import BritefuryJ.LSpace.Interactor.AbstractElementInteractor;
@@ -426,58 +427,58 @@ public abstract class Pres
 	
 	
 	
-	public void popup(LSElement element, Anchor targetAnchor, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationComponent.PresentationPopup popup(LSElement element, Anchor targetAnchor, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		LSElement popupElement = createPopupElement( element );
-		popupElement.popup( element, targetAnchor, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+		return popupElement.popup( element, targetAnchor, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popup(LSElement element, StyleValues style, Anchor targetAnchor, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationComponent.PresentationPopup popup(LSElement element, StyleValues style, Anchor targetAnchor, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		LSElement popupElement = createPopupElement( element, style );
-		popupElement.popup( element, targetAnchor, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+		return popupElement.popup( element, targetAnchor, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popupToRightOf(LSElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationComponent.PresentationPopup popupToRightOf(LSElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		popup( element, Anchor.RIGHT, Anchor.LEFT, bCloseOnLoseFocus, bRequestFocus );
+		return popup( element, Anchor.RIGHT, Anchor.LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popupToRightOf(LSElement element, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationComponent.PresentationPopup popupToRightOf(LSElement element, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		popup( element, style, Anchor.RIGHT, Anchor.LEFT, bCloseOnLoseFocus, bRequestFocus );
+		return popup( element, style, Anchor.RIGHT, Anchor.LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popupBelow(LSElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationComponent.PresentationPopup popupBelow(LSElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		popup( element, Anchor.BOTTOM, Anchor.TOP, bCloseOnLoseFocus, bRequestFocus );
+		return popup( element, Anchor.BOTTOM, Anchor.TOP, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popupBelow(LSElement element, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationComponent.PresentationPopup popupBelow(LSElement element, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		popup( element, style, Anchor.BOTTOM, Anchor.TOP, bCloseOnLoseFocus, bRequestFocus );
+		return popup( element, style, Anchor.BOTTOM, Anchor.TOP, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popupAtMousePosition(LSElement element, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationComponent.PresentationPopup popupAtMousePosition(LSElement element, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		LSElement popupElement = createPopupElement( element );
-		element.getRootElement().createPopupAtMousePosition( popupElement, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+		return element.getRootElement().createPopupAtMousePosition( popupElement, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popupAtMousePosition(LSElement element, StyleValues style, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationComponent.PresentationPopup popupAtMousePosition(LSElement element, StyleValues style, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		LSElement popupElement = createPopupElement( element, style );
-		element.getRootElement().createPopupAtMousePosition( popupElement, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+		return element.getRootElement().createPopupAtMousePosition( popupElement, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popupAtMousePosition(LSElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationComponent.PresentationPopup popupAtMousePosition(LSElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		popupAtMousePosition( element, Anchor.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
+		return popupAtMousePosition( element, Anchor.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popupAtMousePosition(LSElement element, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationComponent.PresentationPopup popupAtMousePosition(LSElement element, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		popupAtMousePosition( element, style, Anchor.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
+		return popupAtMousePosition( element, style, Anchor.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
 	
