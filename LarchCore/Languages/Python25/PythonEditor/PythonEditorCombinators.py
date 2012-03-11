@@ -41,8 +41,8 @@ class PythonEditorStyle (object):
 	stringLiteralStyle = InheritedAttributeNonNull( pythonEditor, 'stringLiteralStyle', StyleSheet,
 	                                                StyleSheet.style( Primitive.fontFace( _pythonCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.25, 0.0, 0.5 ) ) ) )
 	stringLiteralEscapeStyle = InheritedAttributeNonNull( pythonEditor, 'stringLiteralEscapeStyle', StyleSheet,
-	                                                StyleSheet.style( Primitive.fontFace( _pythonCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.25, 0.0, 0.5 ) ),
-	                                                                  Primitive.border( SolidBorder( 1.0, 1.0, 4.0, 4.0, Color( 0.25, 0.0, 0.5 ), Color( 0.9, 0.8, 1.0 ) ) ) ) )
+	                                                StyleSheet.style( Primitive.fontFace( _pythonCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.25, 0.2, 0.15 ) ),
+	                                                                  Primitive.border( SolidBorder( 1.0, 1.0, 4.0, 4.0, Color( 0.75, 0.6, 0.5 ), Color( 1.0, 0.85, 0.75 ) ) ) ) )
 	numLiteralStyle = InheritedAttributeNonNull( pythonEditor, 'numLiteralStyle', StyleSheet,
 	                                             StyleSheet.style( Primitive.fontFace( _pythonCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.0, 0.5, 0.5 ) ) ) )
 	punctuationStyle = InheritedAttributeNonNull( pythonEditor, 'punctuationStyle', StyleSheet,

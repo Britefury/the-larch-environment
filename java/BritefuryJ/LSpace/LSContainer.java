@@ -605,7 +605,7 @@ public abstract class LSContainer extends LSElement
 				System.out.println( "DPContainer.createMetaElement(): null child in " + getClass().getName() );
 			}
 		}
-		Pres metaChildrenColumn = new Column( metaChildren, metaChildren.size() - 1 );
+		Pres metaChildrenColumn = new Column( metaChildren.size() - 1, metaChildren );
 		
 		Pres indentMetaChildren = metaChildrenColumn.padX( 25.0, 0.0 );
 		

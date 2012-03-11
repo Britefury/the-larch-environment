@@ -330,8 +330,6 @@ public class SequentialClipboardHandler extends ClipboardHandler
 			// Splice the content before the insertion point, the inserted content, and the content after the insertion point
 			Object spliced = sequentialEditor.spliceForInsertion( insertionPointFragment, insertionPointElement, caretMarker, caretMarker, data );
 			
-			System.out.println( "SequentialClipboardHandler.insertAtCaret: inserting at " + insertionPointElement );
-			
 			// Store the spliced content in the structural value of the root element
 			SelectionEditTreeEvent event = sequentialEditor.createSelectionEditTreeEvent( insertionPointElement );
 			event.getStreamValueVisitor().setElementFixedValue( insertionPointElement, spliced );

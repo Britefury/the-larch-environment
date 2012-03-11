@@ -119,11 +119,11 @@ public class VerticalInlineSequenceView extends AbstractSequenceView
 			
 			if ( endDelim != null )
 			{
-				return new Column( new Pres[] { first, indent, endDelim }, 0 ).present( ctx, style );
+				return new Column( 0, new Pres[] { first, indent, endDelim } ).present( ctx, style );
 			}
 			else
 			{
-				return new Column( new Pres[] { first, indent }, 0 ).present( ctx, style );
+				return new Column( 0, new Pres[] { first, indent } ).present( ctx, style );
 			}
 		}
 	}

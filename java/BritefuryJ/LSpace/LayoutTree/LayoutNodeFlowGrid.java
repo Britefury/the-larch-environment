@@ -8,6 +8,7 @@ package BritefuryJ.LSpace.LayoutTree;
 
 import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
+import java.util.List;
 
 import BritefuryJ.LSpace.LSContainer;
 import BritefuryJ.LSpace.LSElement;
@@ -415,6 +416,16 @@ public class LayoutNodeFlowGrid extends ArrangedSequenceLayoutNode
 
 
 
+	//
+	// Focus navigation methods
+	//
+	
+	public List<LSElement> horizontalNavigationList()
+	{
+		return getLeaves();
+	}
+	
+	
 	
 	private double getColumnSpacing()
 	{

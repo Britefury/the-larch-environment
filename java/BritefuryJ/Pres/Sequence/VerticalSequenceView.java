@@ -87,7 +87,7 @@ public class VerticalSequenceView extends AbstractSequenceView
 				outerChildElems.add(  endDelim );
 			}
 			
-			return new Column( outerChildElems, 0 ).present( ctx, style );
+			return new Column( 0, outerChildElems ).present( ctx, style );
 		}
 		else
 		{

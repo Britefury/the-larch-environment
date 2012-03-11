@@ -24,7 +24,7 @@ public class Column extends AbstractBox
 		this.refPointIndex = -1;
 	}
 	
-	public Column(Object children[], int refPointIndex)
+	public Column(int refPointIndex, Object children[])
 	{
 		super( children );
 		this.refPointIndex = refPointIndex;
@@ -36,7 +36,7 @@ public class Column extends AbstractBox
 		this.refPointIndex = -1;
 	}
 
-	public Column(List<Object> children, int refPointIndex)
+	public Column(int refPointIndex, List<Object> children)
 	{
 		super( children );
 		this.refPointIndex = refPointIndex;
