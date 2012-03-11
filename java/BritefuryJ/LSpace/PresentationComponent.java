@@ -12,6 +12,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ComponentEvent;
@@ -87,6 +88,8 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		private PresentationComponent popupComponent;
 		private PopupChain chain;
 		private boolean isOpen;
+		private Point2 screenPosition;
+		private Vector2 screenSize;
 		
 		private PresentationPopup(PopupChain popupChain, Window ownerWindow, PresentationComponent parentComponent, LSElement popupContents, int screenX, int screenY,
 				Anchor popupAnchor, boolean closeOnLoseFocus, boolean requestFocus)
@@ -116,7 +119,20 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			Point2 windowAnchor = new Point2( sz.getWidth() * popupAnchor.getPropX(), sz.getHeight() * popupAnchor.getPropY() );
 			screenX -= (int)( windowAnchor.x + 0.5 );
 			screenY -= (int)( windowAnchor.y + 0.5 );
+			
+			// Ensure >= 0
+			screenX = Math.max( screenX, 0 );
+			screenY = Math.max( screenY, 0 );
+			
+			// Ensure that it is not offscreen due to width/height
+			Dimension screenSz = Toolkit.getDefaultToolkit().getScreenSize();
+			screenX = Math.min( screenX, (int)( screenSz.getWidth() - sz.getWidth() ) );
+			screenY = Math.min( screenY, (int)( screenSz.getHeight() - sz.getHeight() ) );
+
 			popupWindow.setLocation( screenX, screenY );
+			
+			screenPosition = new Point2( screenX, screenY );
+			screenSize = new Vector2( sz.getWidth(), sz.getHeight() );
 
 			
 			popupWindow.setVisible( true );
@@ -159,6 +175,23 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		{
 			isOpen = false;
 			popupWindow.setVisible( false );
+		}
+		
+		
+		public PresentationComponent getPresentationComponent()
+		{
+			return popupComponent;
+		}
+		
+		
+		public Point2 getPositionOnScreen()
+		{
+			return screenPosition;
+		}
+		
+		public Vector2 getSizeOnScreen()
+		{
+			return screenSize;
 		}
 	}
 	
@@ -703,7 +736,11 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		}
 		else
 		{
-			return rootElement.getMinimumSize();
+			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			Dimension contentSize = rootElement.getMinimumSize();
+			Dimension d = new Dimension();
+			d.setSize( Math.min( contentSize.getWidth(), screenSize.getWidth() ), Math.min( contentSize.getHeight(), screenSize.getHeight() ) );
+			return d;
 		}
 	}
 	
@@ -716,7 +753,11 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		}
 		else
 		{
-			return rootElement.getPreferredSize();
+			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			Dimension contentSize = rootElement.getPreferredSize();
+			Dimension d = new Dimension();
+			d.setSize( Math.min( contentSize.getWidth(), screenSize.getWidth() ), Math.min( contentSize.getHeight(), screenSize.getHeight() ) );
+			return d;
 		}
 	}
 	
@@ -729,7 +770,11 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		}
 		else
 		{
-			return rootElement.getMaximumSize();
+			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			Dimension contentSize = rootElement.getMaximumSize();
+			Dimension d = new Dimension();
+			d.setSize( Math.min( contentSize.getWidth(), screenSize.getWidth() ), Math.min( contentSize.getHeight(), screenSize.getHeight() ) );
+			return d;
 		}
 	}
 	

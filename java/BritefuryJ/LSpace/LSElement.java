@@ -25,6 +25,7 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.Point;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.datatransfer.DataFlavor;
@@ -617,6 +618,12 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 		return null;
 	}
 	
+	public Point2 getLocalAnchor(Anchor a)
+	{
+		Vector2 s = getActualSize();
+		return new Point2( s.x * a.getPropX(), s.y * a.getPropY() );
+	}
+	
 	public AABox2 getAABoxInParentSpace()
 	{
 		return new AABox2( getPositionInParentSpace(), getActualSizeInParentSpace() );
@@ -790,6 +797,13 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 	public Point2 getLocalPointRelativeToRoot(Point2 p)
 	{
 		return getLocalPointRelativeToAncestor( null, p );
+	}
+	
+	public Point2 getLocalPointRelativeToScreen(Point2 p)
+	{
+		Point2 pInRoot = getLocalPointRelativeToRoot( p );
+		Point screenRoot = rootElement.getComponent().getLocationOnScreen();
+		return new Point2( pInRoot.x + screenRoot.x, pInRoot.y + screenRoot.y );
 	}
 	
 	public Point2 getLocalPointRelativeToAncestor(LSElement ancestor, Point2 p)
