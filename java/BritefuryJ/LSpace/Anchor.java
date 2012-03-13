@@ -22,6 +22,7 @@ public class Anchor
 	public static final Anchor BOTTOM_LEFT = new Anchor( 0.0, 1.0 );
 	public static final Anchor BOTTOM_RIGHT = new Anchor( 1.0, 1.0 );
 	
+	public static final Anchor CENTRE = new Anchor( 0.5, 0.5 );
 	
 	private double propX, propY;
 	

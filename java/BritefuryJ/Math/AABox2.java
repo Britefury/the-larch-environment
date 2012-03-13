@@ -209,6 +209,12 @@ public class AABox2 implements Serializable
 	{
 		return upperY - lowerY;
 	}
+	
+	
+	public AABox2 offset(Vector2 o)
+	{
+		return new AABox2( lowerX + o.x, lowerY + o.y, upperX + o.x, upperY + o.y );
+	}
 
 
 	public AABox2 copy()

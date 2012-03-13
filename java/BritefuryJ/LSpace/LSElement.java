@@ -613,6 +613,19 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 		return new AABox2( new Point2(), getActualSize() );
 	}
 	
+	public AABox2 getAABoxRelativeToAncestor(LSElement ancestor)
+	{
+		Point2 localOriginRelativeToAncestor = getLocalPointRelativeToAncestor( ancestor, new Point2() );
+		return getLocalAABox().offset( localOriginRelativeToAncestor.toVector2() );
+	}
+	
+	public AABox2 getAABoxRelativeToScreen()
+	{
+		Point2 localOriginRelativeToScreen = getLocalPointRelativeToScreen( new Point2() );
+		return getLocalAABox().offset( localOriginRelativeToScreen.toVector2() );
+	}
+	
+	
 	public AABox2 getLocalClipBox()
 	{
 		return null;
