@@ -21,8 +21,11 @@ import BritefuryJ.LSpace.ElementPainter;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
+import BritefuryJ.Pres.CompositePres;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Bin;
+import BritefuryJ.StyleSheet.StyleValues;
 
 public class BubblePopup
 {
@@ -75,7 +78,7 @@ public class BubblePopup
 			path.append( new Arc2D.Double( 0.0, ARROW_LENGTH, RADIUS, RADIUS, 90.0, 90.0, Arc2D.OPEN ), false );
 			path.append( new Arc2D.Double( 0.0, size.y - RADIUS, RADIUS, RADIUS, 180.0, 90.0, Arc2D.OPEN ), true );
 			path.append( new Arc2D.Double( size.x - RADIUS, size.y - RADIUS, RADIUS, RADIUS, 270.0, 90.0, Arc2D.OPEN ), true );
-			path.append( new Arc2D.Double( 0.0, ARROW_LENGTH, RADIUS, RADIUS, 0.0, 90.0, Arc2D.OPEN ), true );
+			path.append( new Arc2D.Double( size.x - RADIUS, ARROW_LENGTH, RADIUS, RADIUS, 0.0, 90.0, Arc2D.OPEN ), true );
 			path.lineTo( targetAnchorRelativeToPopup.x + ARROW_WIDTH * 0.5, ARROW_LENGTH );
 			path.lineTo( targetAnchorRelativeToPopup.x, 0.0 );
 			path.lineTo( targetAnchorRelativeToPopup.x - ARROW_WIDTH * 0.5, ARROW_LENGTH );
@@ -113,11 +116,31 @@ public class BubblePopup
 	
 	
 	
+	private static class BubblePres extends CompositePres
+	{
+		private Pres contents;
+		private LSElement targetElement;
+		
+		private BubblePres(Object contents, LSElement targetElement)
+		{
+			this.contents = Pres.coerce( contents );
+			this.targetElement = targetElement;
+		}
+
+		@Override
+		public Pres pres(PresentationContext ctx, StyleValues style)
+		{
+			BubblePainter painter = new BubblePainter( targetElement, Anchor.BOTTOM );
+			
+			return new Bin( contents.pad( BORDER, BORDER, BORDER + ARROW_LENGTH, BORDER ) ).withPainter( painter );
+		}
+	}
+	
+	
+	
 	public static void popupInBubbleOver(Object contents, LSElement target)
 	{
-		BubblePainter painter = new BubblePainter( target, Anchor.BOTTOM );
-		
-		Pres b = new Bin( Pres.coerce( contents ).pad( BORDER, BORDER, BORDER + ARROW_LENGTH, BORDER ) ).withPainter( painter );
+		BubblePres b = new BubblePres( contents, target );
 		
 		b.popup( target, Anchor.BOTTOM, Anchor.TOP, true, true );
 	}
