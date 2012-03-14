@@ -12,7 +12,6 @@ from BritefuryJ.DocModel import DMNode
 from BritefuryJ.LSpace.Clipboard import *
 from BritefuryJ.LSpace.TextFocus import TextSelection
 from BritefuryJ.LSpace.StyleParams import *
-from BritefuryJ.LSpace.StreamValue import StreamValueBuilder
 from BritefuryJ.LSpace import *
 
 from BritefuryJ.Editor.Sequential import SequentialClipboardHandler, SelectionEditTreeEvent

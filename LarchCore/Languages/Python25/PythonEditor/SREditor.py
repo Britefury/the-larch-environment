@@ -10,8 +10,9 @@ from copy import deepcopy
 from BritefuryJ.LSpace.Clipboard import *
 from BritefuryJ.LSpace.TextFocus import TextSelection
 from BritefuryJ.LSpace.StyleParams import *
-from BritefuryJ.LSpace.StreamValue import StreamValueBuilder
 from BritefuryJ.LSpace import *
+
+from BritefuryJ.Util.RichString import RichStringBuilder
 
 from BritefuryJ.Editor.Sequential import SequentialClipboardHandler, SelectionEditTreeEvent
 
@@ -67,14 +68,14 @@ class PythonSyntaxRecognizingEditor (SyntaxRecognizingEditor):
 	
 	def textToSequentialForImport(self, text):
 		text = text.replace( '\t', '' )
-		return StreamValueBuilder( text ).stream()
+		return RichStringBuilder( text ).richString()
 
 	
-	def joinStreamsForInsertion(self, subtreeRootFragment, before, insertion, after):
-		return joinStreamsForInsertion( subtreeRootFragment, before, insertion, after )
+	def joinRichStringsForInsertion(self, subtreeRootFragment, before, insertion, after):
+		return joinRichStringsForInsertion( subtreeRootFragment, before, insertion, after )
 	
-	def joinStreamsForDeletion(self, subtreeRootFragment, before, after):
-		return joinStreamsAroundDeletionPoint( before, after )
+	def joinRichStringsForDeletion(self, subtreeRootFragment, before, after):
+		return joinRichStringsAroundDeletionPoint( before, after )
 	
 	def copyStructuralValue(self, x):
 		return deepcopy( x )
@@ -132,7 +133,7 @@ class PythonSyntaxRecognizingEditor (SyntaxRecognizingEditor):
 			
 	def _indentLine(self, element, fragment, node):
 		event = PythonIndentTreeEvent()
-		visitor = event.getStreamValueVisitor()
+		visitor = event.getRichStringVisitor()
 		visitor.setElementPrefix( element, Schema.Indent() )
 		visitor.setElementSuffix( element, Schema.Dedent() )
 		bSuccess = element.postTreeEventToParent( event )
@@ -147,7 +148,7 @@ class PythonSyntaxRecognizingEditor (SyntaxRecognizingEditor):
 		if not isTopLevel( suiteParent ):
 			# This statement is not within a top-level node
 			event = PythonDedentTreeEvent()
-			visitor = event.getStreamValueVisitor()
+			visitor = event.getRichStringVisitor()
 			visitor.setElementPrefix( element, Schema.Dedent() )
 			visitor.setElementSuffix( element, Schema.Indent() )
 			bSuccess = element.postTreeEventToParent( event )
@@ -178,7 +179,7 @@ class PythonSyntaxRecognizingEditor (SyntaxRecognizingEditor):
 		rootElement = root.getFragmentContentElement()
 				
 		event = IndentPythonSelectionTreeEvent( self, rootElement )
-		visitor = event.getStreamValueVisitor()
+		visitor = event.getRichStringVisitor()
 		visitor.ignoreElementFixedValuesOnPath( startContext.getFragmentContentElement(), rootElement )
 		visitor.ignoreElementFixedValuesOnPath( endContext.getFragmentContentElement(), rootElement )
 		visitor.setElementPrefix( startStmtElement, Schema.Indent() )
@@ -213,7 +214,7 @@ class PythonSyntaxRecognizingEditor (SyntaxRecognizingEditor):
 		endContext.getFragmentContentElement().clearFixedValuesOnPathUpTo( rootElement )
 		
 		event = DedentPythonSelectionTreeEvent( self, rootElement )
-		visitor = event.getStreamValueVisitor()
+		visitor = event.getRichStringVisitor()
 		visitor.ignoreElementFixedValuesOnPath( startContext.getFragmentContentElement(), rootElement )
 		visitor.ignoreElementFixedValuesOnPath( endContext.getFragmentContentElement(), rootElement )
 		visitor.setElementPrefix( startStmtElement, Schema.Dedent() )

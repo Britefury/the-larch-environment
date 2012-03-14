@@ -4,46 +4,46 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.LSpace.StreamValue;
+package BritefuryJ.Util.RichString;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class StreamValueAccessor
+public class RichStringAccessor
 {
-	private StreamValue stream;
-	private StreamValue.Item currentItem;
+	private RichString richString;
+	private RichString.Item currentItem;
 	
 	
-	protected StreamValueAccessor(StreamValue stream)
+	protected RichStringAccessor(RichString richString)
 	{
-		this.stream = stream;
+		this.richString = richString;
 		
-		currentItem = stream.items.length == 1  ?  stream.items[0]  :  null;
+		currentItem = richString.items.length == 1  ?  richString.items[0]  :  null;
 	}
 	
 	
-	public StreamValue getStream()
+	public RichString getRichString()
 	{
-		return stream;
+		return richString;
 	}
 	
 	
 	public int length()
 	{
-		return stream.length();
+		return richString.length();
 	}
 	
 	
 	public int consumeString(int start, String x)
 	{
 		updateCurrentItem( start );
-		if ( currentItem instanceof StreamValue.TextItem )
+		if ( currentItem instanceof RichString.TextItem )
 		{
 			if ( start + x.length() <= currentItem.stop )
 			{
 				int offset = start - currentItem.start;
-				StreamValue.TextItem t = (StreamValue.TextItem)currentItem;
+				RichString.TextItem t = (RichString.TextItem)currentItem;
 				if ( t.textValue.substring( offset, offset + x.length() ).equals( x ) )
 				{
 					return start + x.length();
@@ -57,9 +57,9 @@ public class StreamValueAccessor
 	public int consumeRegEx(int start, Pattern pattern)
 	{
 		updateCurrentItem( start );
-		if ( currentItem instanceof StreamValue.TextItem )
+		if ( currentItem instanceof RichString.TextItem )
 		{
-			StreamValue.TextItem t = (StreamValue.TextItem)currentItem;
+			RichString.TextItem t = (RichString.TextItem)currentItem;
 			int offset = start - t.start;
 			Matcher m = pattern.matcher( t.textValue.substring( offset, t.stop - t.start ) );
 			
@@ -76,9 +76,9 @@ public class StreamValueAccessor
 	public int skipRegEx(int start,  Pattern pattern)
 	{
 		updateCurrentItem( start );
-		if ( currentItem instanceof StreamValue.TextItem )
+		if ( currentItem instanceof RichString.TextItem )
 		{
-			StreamValue.TextItem t = (StreamValue.TextItem)currentItem;
+			RichString.TextItem t = (RichString.TextItem)currentItem;
 			if ( start < t.stop )
 			{
 				int offset = start - t.start;
@@ -99,9 +99,9 @@ public class StreamValueAccessor
 	public String matchRegEx(int start, Pattern pattern)
 	{
 		updateCurrentItem( start );
-		if ( currentItem instanceof StreamValue.TextItem )
+		if ( currentItem instanceof RichString.TextItem )
 		{
-			StreamValue.TextItem t = (StreamValue.TextItem)currentItem;
+			RichString.TextItem t = (RichString.TextItem)currentItem;
 			int offset = start - t.start;
 			Matcher m = pattern.matcher( t.textValue.substring( offset, t.stop - t.start ) );
 			
@@ -118,9 +118,9 @@ public class StreamValueAccessor
 	public boolean matchesRegEx(int start, int stop, Pattern pattern)
 	{
 		updateCurrentItem( start );
-		if ( currentItem instanceof StreamValue.TextItem )
+		if ( currentItem instanceof RichString.TextItem )
 		{
-			StreamValue.TextItem t = (StreamValue.TextItem)currentItem;
+			RichString.TextItem t = (RichString.TextItem)currentItem;
 			int offset = start - t.start;
 			stop = Math.min( stop, t.stop );
 			Matcher m = pattern.matcher( t.textValue.substring( offset, stop - t.start ) );
@@ -145,9 +145,9 @@ public class StreamValueAccessor
 	public Object[] matchStructuralNode(int start)
 	{
 		updateCurrentItem( start );
-		if ( currentItem instanceof StreamValue.StructuralItem )
+		if ( currentItem instanceof RichString.StructuralItem )
 		{
-			StreamValue.StructuralItem s = (StreamValue.StructuralItem)currentItem;
+			RichString.StructuralItem s = (RichString.StructuralItem)currentItem;
 			return new Object[] { s.structuralValue };
 		}
 		
@@ -159,18 +159,18 @@ public class StreamValueAccessor
 	public boolean canMatchTextAt(int pos)
 	{
 		updateCurrentItem( pos );
-		return currentItem instanceof StreamValue.TextItem;
+		return currentItem instanceof RichString.TextItem;
 	}
 	
 	public boolean canMatchStructuralNodeAt(int pos)
 	{
 		updateCurrentItem( pos );
-		return currentItem instanceof StreamValue.StructuralItem;
+		return currentItem instanceof RichString.StructuralItem;
 	}
 	
 	public boolean isAtEnd(int pos)
 	{
-		return pos == stream.length;
+		return pos == richString.length;
 	}
 	
 
@@ -178,9 +178,9 @@ public class StreamValueAccessor
 	public CharSequence getItemTextFrom(int start)
 	{
 		updateCurrentItem( start );
-		if ( currentItem instanceof StreamValue.TextItem )
+		if ( currentItem instanceof RichString.TextItem )
 		{
-			StreamValue.TextItem t = (StreamValue.TextItem)currentItem;
+			RichString.TextItem t = (RichString.TextItem)currentItem;
 			return t.textValue.subSequence( start - currentItem.start, currentItem.stop - currentItem.start );
 		}
 		
@@ -189,9 +189,9 @@ public class StreamValueAccessor
 	
 	
 	
-	public StreamValueAccessor subStream(int start, int stop)
+	public RichStringAccessor substring(int start, int stop)
 	{
-		return stream.subStream( start, stop ).accessor();
+		return richString.substring( start, stop ).accessor();
 	}
 	
 	
@@ -206,7 +206,7 @@ public class StreamValueAccessor
 				return;
 			}
 		}
-		currentItem = stream.itemAt( pos );
+		currentItem = richString.itemAt( pos );
 		
 		// TODO: remove this:
 		if ( currentItem != null  &&  ( pos < currentItem.start  ||  pos > currentItem.stop ) )
@@ -218,6 +218,6 @@ public class StreamValueAccessor
 
 	public String toString()
 	{
-		return stream.toString();
+		return richString.toString();
 	}
 }

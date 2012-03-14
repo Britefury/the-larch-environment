@@ -9,12 +9,12 @@ package BritefuryJ.Editor.SyntaxRecognizing;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.EditEvent;
-import BritefuryJ.LSpace.StreamValue.SequentialStreamValueVisitor;
-import BritefuryJ.LSpace.StreamValue.StreamValue;
+import BritefuryJ.LSpace.SequentialRichStringVisitor;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Logging.LogEntry;
+import BritefuryJ.Util.RichString.RichString;
 
-public abstract class UnparsedEditListener extends SRStreamEditListener
+public abstract class UnparsedEditListener extends SRRichStringEditListener
 {
 	protected String getLogName()
 	{
@@ -22,40 +22,40 @@ public abstract class UnparsedEditListener extends SRStreamEditListener
 	}
 	
 	protected boolean isValueValid(LSElement element, LSElement sourceElement, FragmentView fragment,
-			EditEvent event, Object model, StreamValue value)
+			EditEvent event, Object model, RichString value)
 	{
 		return true;
 	}
 	
 	protected boolean isValueEmpty(LSElement element, LSElement sourceElement, FragmentView fragment,
-			EditEvent event, Object model, StreamValue value)
+			EditEvent event, Object model, RichString value)
 	{
 		return getSyntaxRecognizingEditor().isValueEmpty( value );
 	}
 	
 	protected boolean shouldApplyToInnerFragment(LSElement element, LSElement sourceElement, FragmentView fragment,
-			EditEvent event, Object model, StreamValue value)
+			EditEvent event, Object model, RichString value)
 	{
 		return true;
 	}
 	
 	protected HandleEditResult handleInvalidValue(LSElement element, LSElement sourceElement, FragmentView fragment,
-			EditEvent event, Object model, StreamValue value)
+			EditEvent event, Object model, RichString value)
 	{
 		return HandleEditResult.NOT_HANDLED;
 	}
 	
 	protected abstract HandleEditResult handleUnparsed(LSElement element, LSElement sourceElement, FragmentView fragment,
-			EditEvent event, Object model, StreamValue value);
+			EditEvent event, Object model, RichString value);
 	
 	protected abstract HandleEditResult handleInnerUnparsed(LSElement element, LSElement sourceElement, FragmentView fragment,
-			EditEvent event, Object model, StreamValue value);
+			EditEvent event, Object model, RichString value);
 	
 	
 
 	@Override
 	protected HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment,
-			EditEvent event, Object model, StreamValue value)
+			EditEvent event, Object model, RichString value)
 	{
 		String logName = getLogName();
 		if ( isValueValid( element, sourceElement, fragment, event, model, value ) )
@@ -71,7 +71,7 @@ public abstract class UnparsedEditListener extends SRStreamEditListener
 					Log log = fragment.getView().getLog();
 					if ( log.isRecording() )
 					{
-						log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " (unparsed) - apply to model" ).vItem( "editedStream", value ) );
+						log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " (unparsed) - apply to model" ).vItem( "editedRichStr", value ) );
 					}
 				}
 				return handleUnparsed( element, sourceElement, fragment, event, model, value );
@@ -80,8 +80,8 @@ public abstract class UnparsedEditListener extends SRStreamEditListener
 			{
 				LSElement sourceFragmentElement = sourceFragment.getFragmentContentElement();
 				Object sourceModel = sourceFragment.getModel();
-				SequentialStreamValueVisitor visitor = event.getStreamValueVisitor();
-				StreamValue sourceValue = visitor.getStreamValue( sourceFragmentElement );
+				SequentialRichStringVisitor visitor = event.getRichStringVisitor();
+				RichString sourceValue = visitor.getRichString( sourceFragmentElement );
 				
 				if ( value.isEmpty()  ||  isValueEmpty( sourceFragmentElement, sourceElement, sourceFragment, event, sourceModel, sourceValue ) )
 				{
@@ -91,7 +91,7 @@ public abstract class UnparsedEditListener extends SRStreamEditListener
 						Log log = fragment.getView().getLog();
 						if ( log.isRecording() )
 						{
-							log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " (unparsed) - sub-model deleted" ).vItem( "editedStream", value ) );
+							log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " (unparsed) - sub-model deleted" ).vItem( "editedRichStr", value ) );
 						}
 					}
 					return handleUnparsed( element, sourceElement, fragment, event, model, value );
@@ -103,7 +103,7 @@ public abstract class UnparsedEditListener extends SRStreamEditListener
 					Log log = fragment.getView().getLog();
 					if ( log.isRecording() )
 					{
-						log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " (unparsed) - apply to sub-model" ).vItem( "editedStream", sourceValue ) );
+						log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " (unparsed) - apply to sub-model" ).vItem( "editedRichStr", sourceValue ) );
 					}
 				}
 				return handleInnerUnparsed( sourceFragmentElement, sourceElement, sourceFragment, event, sourceModel, sourceValue );
@@ -116,7 +116,7 @@ public abstract class UnparsedEditListener extends SRStreamEditListener
 				Log log = fragment.getView().getLog();
 				if ( log.isRecording() )
 				{
-					log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " (unparsed) - invalid" ).vItem( "editedStream", value ) );
+					log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " (unparsed) - invalid" ).vItem( "editedRichStr", value ) );
 				}
 			}
 			

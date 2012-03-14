@@ -4,15 +4,13 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.LSpace.StreamValue;
+package BritefuryJ.LSpace;
 
 import java.util.IdentityHashMap;
 
-import BritefuryJ.LSpace.LSContentLeafEditable;
-import BritefuryJ.LSpace.LSElement;
-import BritefuryJ.LSpace.ElementValueFunction;
+import BritefuryJ.Util.RichString.RichStringBuilder;
 
-public class SequentialStreamValueVisitor extends AbstractStreamValueVisitor
+public class SequentialRichStringVisitor extends AbstractRichStringVisitor
 {
 	protected static class ElementModification
 	{
@@ -114,7 +112,7 @@ public class SequentialStreamValueVisitor extends AbstractStreamValueVisitor
 		}
 
 		
-		protected static void addPrefix(ElementModification mod, StreamValueBuilder builder, LSElement element)
+		protected static void addPrefix(ElementModification mod, RichStringBuilder builder, LSElement element)
 		{
 			if ( mod != null  &&  mod.testFlag( FLAG_PREFIX ) )
 			{
@@ -127,13 +125,13 @@ public class SequentialStreamValueVisitor extends AbstractStreamValueVisitor
 					ElementValueFunction fn = element.getValueFunction();  
 					if ( fn != null )
 					{
-						fn.addStreamValuePrefixToStream( builder, element );
+						fn.addPrefixToRichString( builder, element );
 					}
 				}
 			}
 		}
 
-		protected static void addSuffix(ElementModification mod, StreamValueBuilder builder, LSElement element)
+		protected static void addSuffix(ElementModification mod, RichStringBuilder builder, LSElement element)
 		{
 			if ( mod != null  &&  mod.testFlag( FLAG_SUFFIX ) )
 			{
@@ -146,14 +144,14 @@ public class SequentialStreamValueVisitor extends AbstractStreamValueVisitor
 					ElementValueFunction fn = element.getValueFunction();  
 					if ( fn != null )
 					{
-						fn.addStreamValueSuffixToStream( builder, element );
+						fn.addSuffixToRichString( builder, element );
 					}
 				}
 			}
 		}
 		
 		
-		protected static boolean addFixedValue(ElementModification mod, StreamValueBuilder builder, LSElement element)
+		protected static boolean addFixedValue(ElementModification mod, RichStringBuilder builder, LSElement element)
 		{
 			if ( mod != null )
 			{
@@ -199,7 +197,7 @@ public class SequentialStreamValueVisitor extends AbstractStreamValueVisitor
 			}
 		}
 
-		protected static boolean addElementFunctionResult(ElementModification mod, StreamValueBuilder builder, LSElement element)
+		protected static boolean addElementFunctionResult(ElementModification mod, RichStringBuilder builder, LSElement element)
 		{
 			if ( mod != null  &&  mod.testFlag( FLAG_IGNORE_VALUE_FUNCTION ) )
 			{
@@ -289,7 +287,7 @@ public class SequentialStreamValueVisitor extends AbstractStreamValueVisitor
 	
 	
 	
-	public SequentialStreamValueVisitor()
+	public SequentialRichStringVisitor()
 	{
 	}
 	
@@ -405,7 +403,7 @@ public class SequentialStreamValueVisitor extends AbstractStreamValueVisitor
 
 
 	@Override
-	protected void preOrderVisitElement(StreamValueBuilder builder, LSElement e)
+	protected void preOrderVisitElement(RichStringBuilder builder, LSElement e)
 	{
 		ElementModification mod = getElementModification( e );
 		ElementModification.addPrefix( mod, builder, e );
@@ -413,7 +411,7 @@ public class SequentialStreamValueVisitor extends AbstractStreamValueVisitor
 
 
 	@Override
-	protected void postOrderVisitElement(StreamValueBuilder builder, LSElement e)
+	protected void postOrderVisitElement(RichStringBuilder builder, LSElement e)
 	{
 		ElementModification mod = getElementModification( e );
 		ElementModification.addSuffix( mod, builder, e );
@@ -421,19 +419,19 @@ public class SequentialStreamValueVisitor extends AbstractStreamValueVisitor
 	
 
 	@Override
-	protected void inOrderVisitElement(StreamValueBuilder builder, LSElement e)
+	protected void inOrderVisitElement(RichStringBuilder builder, LSElement e)
 	{
 		ElementModification mod = getElementModification( e );
 		if ( !ElementModification.addFixedValue( mod, builder, e ) )
 		{
 			if ( !ElementModification.addElementFunctionResult( mod, builder, e ) )
 			{
-				e.addToStreamValue( builder );
+				e.addToRichString( builder );
 			}
 		}
 	}
 
-	protected void inOrderVisitPartialContentLeafEditable(StreamValueBuilder builder, LSContentLeafEditable e, int startIndex, int endIndex)
+	protected void inOrderVisitPartialContentLeafEditable(RichStringBuilder builder, LSContentLeafEditable e, int startIndex, int endIndex)
 	{
 		builder.appendTextValue( e.getTextRepresentation().substring( startIndex, endIndex ) );
 	}

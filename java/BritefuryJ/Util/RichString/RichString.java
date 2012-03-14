@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.LSpace.StreamValue;
+package BritefuryJ.Util.RichString;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ import BritefuryJ.Pres.ObjectPres.UnescapedStringAsSpan;
 import BritefuryJ.Pres.Primitive.Paragraph;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class StreamValue implements Presentable
+public class RichString implements Presentable
 {
 	public static abstract class Item
 	{
@@ -236,13 +236,13 @@ public class StreamValue implements Presentable
 	protected int length;
 	
 	
-	public StreamValue(String text)
+	public RichString(String text)
 	{
 		items = new Item[] { new TextItem( text, 0, text.length() ) };
 		length = text.length();
 	}
 	
-	protected StreamValue(Item items[])
+	protected RichString(Item items[])
 	{
 		this.items = items;
 		length = items.length > 0  ?  items[items.length-1].stop  :  0;
@@ -375,7 +375,7 @@ public class StreamValue implements Presentable
 		}
 		else
 		{
-			throw new RuntimeException( "Item stream is not textual" );
+			throw new RuntimeException( "Item sequence is not textual" );
 		}
 	}
 	
@@ -509,7 +509,7 @@ public class StreamValue implements Presentable
 	{
 		if ( pos >= length )
 		{
-			throw new IndexOutOfBoundsException( "StreamValue index out of range: pos=" + pos + "/" + length );
+			throw new IndexOutOfBoundsException( "RichString index out of range: pos=" + pos + "/" + length );
 		}
 		Item x = itemAt( pos );
 		if ( x instanceof StructuralItem )
@@ -527,7 +527,7 @@ public class StreamValue implements Presentable
 		}
 	}
 	
-	public StreamValue __getitem__(PySlice i)
+	public RichString __getitem__(PySlice i)
 	{
 		int indices[] = i.indicesEx( length );
 		int start = indices[0];
@@ -535,15 +535,15 @@ public class StreamValue implements Presentable
 		int step = indices[2];
 		if ( step != 1 )
 		{
-			throw new RuntimeException( "StreamValue.__getItem__(PySlice) does not support slice step != 1" );
+			throw new RuntimeException( "RichString.__getItem__(PySlice) does not support slice step != 1" );
 		}
 
-		return subStream( start, stop );
+		return substring( start, stop );
 	}
 	
 	
 	
-	public StreamValue subStream(int start, int stop)
+	public RichString substring(int start, int stop)
 	{
 		if ( items.length == 0 )
 		{
@@ -551,7 +551,7 @@ public class StreamValue implements Presentable
 		}
 		else if ( start == stop )
 		{
-			return new StreamValue( new Item[] {} );
+			return new RichString( new Item[] {} );
 		}
 		else
 		{
@@ -592,14 +592,14 @@ public class StreamValue implements Presentable
 				}
 			}
 			
-			return new StreamValue( subItems );
+			return new RichString( subItems );
 		}
 	}
 	
 	
-	public StreamValue[] split(String sub)
+	public RichString[] split(String sub)
 	{
-		ArrayList<StreamValue> streams = new ArrayList<StreamValue>();
+		ArrayList<RichString> richStrings = new ArrayList<RichString>();
 		
 		int subLength = sub.length();
 		int pos = 0;
@@ -607,40 +607,40 @@ public class StreamValue implements Presentable
 		
 		while ( index != -1 )
 		{
-			streams.add( subStream( pos, index ) );
+			richStrings.add( substring( pos, index ) );
 			pos = index + subLength;
 			index = indexOf( sub, pos );
 		}
 		
-		streams.add( subStream( pos, length ) );
+		richStrings.add( substring( pos, length ) );
 		
-		return streams.toArray( new StreamValue[streams.size()] );
+		return richStrings.toArray( new RichString[richStrings.size()] );
 	}
 	
 	
-	public StreamValue[] split(Object sub)
+	public RichString[] split(Object sub)
 	{
-		ArrayList<StreamValue> streams = new ArrayList<StreamValue>();
+		ArrayList<RichString> richStrings = new ArrayList<RichString>();
 		
 		int pos = 0;
 		int index = indexOf( sub );
 		
 		while ( index != -1 )
 		{
-			streams.add( subStream( pos, index ) );
+			richStrings.add( substring( pos, index ) );
 			pos = index + 1;
 			index = indexOf( sub, pos );
 		}
 		
-		streams.add( subStream( pos, length ) );
+		richStrings.add( substring( pos, length ) );
 		
-		return streams.toArray( new StreamValue[streams.size()] );
+		return richStrings.toArray( new RichString[richStrings.size()] );
 	}
 	
 	
-	public StreamValueAccessor accessor()
+	public RichStringAccessor accessor()
 	{
-		return new StreamValueAccessor( this );
+		return new RichStringAccessor( this );
 	}
 	
 	
@@ -693,9 +693,9 @@ public class StreamValue implements Presentable
 			return true;
 		}
 		
-		if ( x instanceof StreamValue )
+		if ( x instanceof RichString )
 		{
-			StreamValue sx = (StreamValue)x;
+			RichString sx = (RichString)x;
 			
 			if ( length == sx.length  &&  items.length == sx.items.length )
 			{
@@ -734,9 +734,9 @@ public class StreamValue implements Presentable
 	{
 		Pres contents = new Paragraph( InnerFragment.map( items ) );
 		
-		return streamValueStyle.applyTo( new ObjectBox( "BritefuryJ.DocPresent.StreamValue.StreamValue", contents ) );
+		return richStringStyle.applyTo( new ObjectBox( "BritefuryJ.Util.RichString.RichString", contents ) );
 	}
 
 
-	private static StyleSheet streamValueStyle = StyleSheet.style( ObjectPresStyle.objectBorderPaint.as( new Color( 0.65f, 0.0f, 0.55f ) ), ObjectPresStyle.objectTitlePaint.as( new Color( 0.65f, 0.0f, 0.55f ) ) );
+	private static StyleSheet richStringStyle = StyleSheet.style( ObjectPresStyle.objectBorderPaint.as( new Color( 0.65f, 0.0f, 0.55f ) ), ObjectPresStyle.objectTitlePaint.as( new Color( 0.65f, 0.0f, 0.55f ) ) );
 }

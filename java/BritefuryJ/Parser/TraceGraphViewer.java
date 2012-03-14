@@ -16,12 +16,12 @@ import BritefuryJ.GraphViz.GraphViz;
 import BritefuryJ.Graphics.AbstractBorder;
 import BritefuryJ.Graphics.SolidBorder;
 import BritefuryJ.LSpace.PersistentState.PersistentState;
-import BritefuryJ.LSpace.StreamValue.StreamValue;
-import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
 import BritefuryJ.ParserHelpers.ParseResultInterface;
 import BritefuryJ.ParserHelpers.TraceNode;
 import BritefuryJ.ParserHelpers.TracedParseResultInterface;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Util.RichString.RichString;
+import BritefuryJ.Util.RichString.RichStringAccessor;
 
 public class TraceGraphViewer
 {
@@ -89,10 +89,10 @@ public class TraceGraphViewer
 			inputString = (String)inputObject;
 			inputString = inputString.substring( data.getResult().getBegin(), data.getResult().getEnd() );
 		}
-		else if ( inputObject instanceof StreamValueAccessor )
+		else if ( inputObject instanceof RichStringAccessor )
 		{
-			StreamValue stream = ((StreamValueAccessor)inputObject).getStream();
-			inputString = stream.subStream( data.getResult().getBegin(), data.getResult().getEnd() ).toString();
+			RichString richStr = ((RichStringAccessor)inputObject).getRichString();
+			inputString = richStr.substring( data.getResult().getBegin(), data.getResult().getEnd() ).toString();
 		}
 		else if ( inputObject instanceof List )
 		{

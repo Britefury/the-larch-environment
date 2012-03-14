@@ -20,14 +20,14 @@ import org.python.core.PyUnicode;
 import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectInterface;
-import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
+import BritefuryJ.Util.RichString.RichStringAccessor;
 
 /*
  * ObjectNode
  * 
  * ObjectNode:node( input )				->  input instanceof DMObject  ?  ObjectNode.matchObjectContents( input )  :  fail
  * ObjectNode:string( input, start )			->  fail
- * ObjectNode:stream( input, start )			->  item = input.consumeStructuralItem(); item instanceof DMObject  ?  ObjectNode.matchObjectContents( input )  :  fail
+ * ObjectNode:richStr( input, start )			->  item = input.consumeStructuralItem(); item instanceof DMObject  ?  ObjectNode.matchObjectContents( input )  :  fail
  * ObjectNode:list( input, start )				->  input[start] instanceof DMObject  ?  ObjectNode.matchObjectContents( input[start] )  :  fail
  * 
  * ObjectNode.matchObjectContents( input )	->  [ result[fieldName] = s:node( fieldValue )   for fieldName, fieldValue in fieldSubexps ]
@@ -261,7 +261,7 @@ public class ObjectNode extends ParserExpression
 		return ParseResult.failure( start );
 	}
 	
-	protected ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start)
+	protected ParseResult evaluateRichStringItems(ParserState state, RichStringAccessor input, int start)
 	{
 		if ( start < input.length() )
 		{

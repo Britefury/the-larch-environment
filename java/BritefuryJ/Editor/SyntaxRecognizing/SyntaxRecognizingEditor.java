@@ -11,18 +11,18 @@ import java.util.List;
 import java.util.WeakHashMap;
 import java.util.regex.Pattern;
 
-import BritefuryJ.Editor.Sequential.SequentialStreamEditor;
+import BritefuryJ.Editor.Sequential.SequentialRichStringEditor;
 import BritefuryJ.Editor.SyntaxRecognizing.Precedence.PrecedenceHandler;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.EditEvent;
 import BritefuryJ.LSpace.TreeEventListener;
 import BritefuryJ.LSpace.Interactor.AbstractElementInteractor;
-import BritefuryJ.LSpace.StreamValue.StreamValue;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Util.HashUtils;
+import BritefuryJ.Util.RichString.RichString;
 
-public abstract class SyntaxRecognizingEditor extends SequentialStreamEditor
+public abstract class SyntaxRecognizingEditor extends SequentialRichStringEditor
 {
 	public static interface CommitFn
 	{
@@ -75,7 +75,7 @@ public abstract class SyntaxRecognizingEditor extends SequentialStreamEditor
 
 		@Override
 		protected HandleEditResult handleParseSuccess(LSElement element, LSElement sourceElement,
-				FragmentView fragment, EditEvent event, Object model, StreamValue value,
+				FragmentView fragment, EditEvent event, Object model, RichString value,
 				Object parsed)
 		{
 			if ( parsed.equals( model ) )
@@ -141,12 +141,12 @@ public abstract class SyntaxRecognizingEditor extends SequentialStreamEditor
 	
 	public interface UnparseableContentTest
 	{
-		public boolean testValue(StreamValue value);
+		public boolean testValue(RichString value);
 	}
 	
 	public interface UnparseableCommitFn
 	{
-		public void commit(Object model, StreamValue stream);
+		public void commit(Object model, RichString richStr);
 	}
 	
 	
@@ -179,7 +179,7 @@ public abstract class SyntaxRecognizingEditor extends SequentialStreamEditor
 		}
 
 
-		protected boolean isValueValid(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
+		protected boolean isValueValid(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
 		{
 			if ( test != null )
 			{
@@ -193,20 +193,20 @@ public abstract class SyntaxRecognizingEditor extends SequentialStreamEditor
 
 		@Override
 		protected boolean shouldApplyToInnerFragment(LSElement element, LSElement sourceElement, FragmentView fragment,
-				EditEvent event, Object model, StreamValue value)
+				EditEvent event, Object model, RichString value)
 		{
 			return innerCommit != null;
 		}
 		
 		@Override
-		protected HandleEditResult handleUnparsed(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
+		protected HandleEditResult handleUnparsed(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
 		{
 			commit.commit( model, value );
 			return HandleEditResult.HANDLED;
 		}
 
 		@Override
-		protected HandleEditResult handleInnerUnparsed(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
+		protected HandleEditResult handleInnerUnparsed(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
 		{
 			innerCommit.commit( model, value );
 			return HandleEditResult.HANDLED;
@@ -340,7 +340,7 @@ public abstract class SyntaxRecognizingEditor extends SequentialStreamEditor
 	
 	
 	
-	protected boolean isValueEmpty(StreamValue value)
+	protected boolean isValueEmpty(RichString value)
 	{
 		return value.isTextual()  &&  whitespace.matcher( value.textualValue() ).matches();
 	}

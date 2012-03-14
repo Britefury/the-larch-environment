@@ -6,11 +6,11 @@
 //##************************
 package BritefuryJ.LSpace;
 
-import BritefuryJ.LSpace.StreamValue.StreamValueBuilder;
+import BritefuryJ.Util.RichString.RichStringBuilder;
 
 public interface ElementValueFunction
 {
 	public Object computeElementValue(LSElement element);
-	public void addStreamValuePrefixToStream(StreamValueBuilder builder, LSElement element);
-	public void addStreamValueSuffixToStream(StreamValueBuilder builder, LSElement element);
+	public void addPrefixToRichString(RichStringBuilder builder, LSElement element);
+	public void addSuffixToRichString(RichStringBuilder builder, LSElement element);
 }

@@ -8,7 +8,7 @@ package BritefuryJ.Parser;
 
 import java.util.List;
 
-import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
+import BritefuryJ.Util.RichString.RichStringAccessor;
 
 
 
@@ -17,7 +17,7 @@ import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
  * 
  * PeekNot:node( input )			->  result = PeekNot.subexp:node( input ); result.isValid()  ?  fail  :  suppressed
  * PeekNot:string( input, start )		->  result = PeekNot.subexp:string( input, start ); result.isValid()  ?  fail  :  suppressed
- * PeekNot:stream( input, start )	->  result = PeekNot.subexp:stream( input, start ); result.isValid()  ?  fail  :  suppressed
+ * PeekNot:richStr( input, start )		->  result = PeekNot.subexp:richStr( input, start ); result.isValid()  ?  fail  :  suppressed
  * PeekNot:list( input, start )		->  result = PeekNot.subexp:list( input, start ); result.isValid()  ?  fail  :  suppressed
  */
 public class PeekNot extends UnaryBranchExpression
@@ -61,9 +61,9 @@ public class PeekNot extends UnaryBranchExpression
 		}
 	}
 
-	protected ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start)
+	protected ParseResult evaluateRichStringItems(ParserState state, RichStringAccessor input, int start)
 	{
-		ParseResult res = subexp.handleStreamItems( state, input, start );
+		ParseResult res = subexp.handleRichStringItems( state, input, start );
 		
 		if ( res.isValid() )
 		{

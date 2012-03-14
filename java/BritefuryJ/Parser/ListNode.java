@@ -10,14 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
+import BritefuryJ.Util.RichString.RichStringAccessor;
 
 /*
  * ListNode
  * 
  * ListNode:node( input )				->  input instanceof List  ?  ListNode.matchListContents( input )  :  fail
  * ListNode:string( input, start )			->  fail
- * ListNode:stream( input, start )		->  item = input.consumeStructuralItem(); item instanceof List  ?  ListNode.matchListContents( input )  :  fail
+ * ListNode:richStr( input, start )		->  item = input.consumeStructuralItem(); item instanceof List  ?  ListNode.matchListContents( input )  :  fail
  * ListNode:list( input, start )			->  input[start] instanceof List  ?  ListNode.matchListContents( input[start], 0 )  :  fail
  * 
  * ListNode.matchListContents( input )	->  start = 0; [ start, result = s:list( input, start )   for s in ListNode.subexps ]
@@ -108,7 +108,7 @@ public class ListNode extends BranchExpression
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start)
+	protected ParseResult evaluateRichStringItems(ParserState state, RichStringAccessor input, int start)
 	{
 		if ( start < input.length() )
 		{

@@ -16,7 +16,7 @@ import BritefuryJ.Editor.Sequential.EditListener;
 import BritefuryJ.Editor.Sequential.EditListener.HandleEditResult;
 import BritefuryJ.Editor.Sequential.SelectionEditTreeEvent;
 import BritefuryJ.Editor.Sequential.SequentialEditor;
-import BritefuryJ.Editor.Sequential.StreamEditListener;
+import BritefuryJ.Editor.Sequential.RichStringEditListener;
 import BritefuryJ.Editor.Sequential.Item.EditableStructuralItem;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.LSpace.LSContentLeafEditable;
@@ -26,8 +26,6 @@ import BritefuryJ.LSpace.ElementTreeVisitor;
 import BritefuryJ.LSpace.TextEditEvent;
 import BritefuryJ.LSpace.TreeEventListener;
 import BritefuryJ.LSpace.Marker.Marker;
-import BritefuryJ.LSpace.StreamValue.StreamValue;
-import BritefuryJ.LSpace.StreamValue.StreamValueBuilder;
 import BritefuryJ.LSpace.TextFocus.Caret;
 import BritefuryJ.LSpace.TextFocus.TextSelection;
 import BritefuryJ.Logging.Log;
@@ -36,6 +34,8 @@ import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Proxy;
 import BritefuryJ.Pres.RichText.RichText;
 import BritefuryJ.StyleSheet.StyleSheet;
+import BritefuryJ.Util.RichString.RichString;
+import BritefuryJ.Util.RichString.RichStringBuilder;
 
 public abstract class RichTextEditor extends SequentialEditor
 {
@@ -87,16 +87,16 @@ public abstract class RichTextEditor extends SequentialEditor
 		@Override
 		protected void inOrderCompletelyVisitElement(LSElement e)
 		{
-			StreamValue stream = e.getStreamValue();
-			for (StreamValue.Item item: stream.getItems())
+			RichString richStr = e.getRichString();
+			for (RichString.Item item: richStr.getItems())
 			{
 				if ( item.isStructural() )
 				{
-					completelyVisitStructralValue( ((StreamValue.StructuralItem)item).getValue() );
+					completelyVisitStructralValue( ((RichString.StructuralItem)item).getValue() );
 				}
 				else
 				{
-					contents.add( ((StreamValue.TextItem)item).getValue() );
+					contents.add( ((RichString.TextItem)item).getValue() );
 				}
 			}
 		}
@@ -225,15 +225,15 @@ public abstract class RichTextEditor extends SequentialEditor
 	
 	
 	
-	private StreamEditListener inlineEmbedEditListener, textEditListener, paraEditListener, paraListItemEditListener, blockEditListener;
+	private RichStringEditListener inlineEmbedEditListener, textEditListener, paraEditListener, paraListItemEditListener, blockEditListener;
 	
 	
 	public RichTextEditor()
 	{
-		HandleStreamValueFn onInlineEmbedEdit = new HandleStreamValueFn()
+		HandleRichStringFn onInlineEmbedEdit = new HandleRichStringFn()
 		{
 			@Override
-			public EditListener.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
+			public EditListener.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
 			{
 				if ( event instanceof RichTextEditEvents.RichTextRequest )
 				{
@@ -245,17 +245,17 @@ public abstract class RichTextEditor extends SequentialEditor
 		};
 
 	
-		HandleStreamValueFn onTextEdit = new HandleStreamValueFn()
+		HandleRichStringFn onTextEdit = new HandleRichStringFn()
 		{
 			@Override
-			public EditListener.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
+			public EditListener.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
 			{
 				if ( event instanceof TextEditEvent )
 				{
 					boolean handled = false;
 					if ( sourceElement.getFragmentContext() == fragment )
 					{
-						handled = setTextContentsFromStream( fragment.getView().getLog(), model, value );
+						handled = setTextContentsFromRichString( fragment.getView().getLog(), model, value );
 					}
 					return handled  ?  EditListener.HandleEditResult.HANDLED  :  EditListener.HandleEditResult.PASS_TO_PARENT;
 				}
@@ -269,23 +269,23 @@ public abstract class RichTextEditor extends SequentialEditor
 		};
 
 		
-		HandleStreamValueFn onParagraphEdit = new HandleStreamValueFn()
+		HandleRichStringFn onParagraphEdit = new HandleRichStringFn()
 		{
 			@Override
-			public EditListener.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
+			public EditListener.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
 			{
 				if ( event instanceof TextEditEvent )
 				{
 					boolean handled = false;
 					if ( sourceElement.getFragmentContext() == fragment )
 					{
-						handled = setParagraphTextContentsFromStream( fragment.getView().getLog(), model, value );
+						handled = setParagraphTextContentsFromRichString( fragment.getView().getLog(), model, value );
 					}
 					return handled  ?  EditListener.HandleEditResult.HANDLED  :  EditListener.HandleEditResult.PASS_TO_PARENT;
 				}
 				else if ( event instanceof SelectionEditTreeEvent )
 				{
-					boolean handled = setParagraphContentsFromBlockStream( fragment.getView().getLog(), model, value );
+					boolean handled = setParagraphContentsFromBlockRichString( fragment.getView().getLog(), model, value );
 					return handled  ?  EditListener.HandleEditResult.HANDLED  :  EditListener.HandleEditResult.PASS_TO_PARENT;
 				}
 				else if ( event instanceof RichTextEditEvents.RichTextRequest )
@@ -298,10 +298,10 @@ public abstract class RichTextEditor extends SequentialEditor
 		};
 
 		
-		HandleStreamValueFn onParagraphListItemEdit = new HandleStreamValueFn()
+		HandleRichStringFn onParagraphListItemEdit = new HandleRichStringFn()
 		{
 			@Override
-			public EditListener.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
+			public EditListener.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
 			{
 				if ( event instanceof RichTextEditEvents.RichTextRequest )
 				{
@@ -313,10 +313,10 @@ public abstract class RichTextEditor extends SequentialEditor
 		};
 
 		
-//		HandleStreamValueFn onParagraphEmbedEdit = new HandleStreamValueFn()
+//		HandleRichStringValueFn onParagraphEmbedEdit = new HandleRichStringValueFn()
 //		{
 //			@Override
-//			public EditListener.HandleEditResult handleValue(DPElement element, DPElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
+//			public EditListener.HandleEditResult handleValue(DPElement element, DPElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
 //			{
 //				if ( event instanceof RichTextEditEvents.RichTextRequest )
 //				{
@@ -328,19 +328,19 @@ public abstract class RichTextEditor extends SequentialEditor
 //		};
 
 		
-		HandleStreamValueFn onBlockEdit = new HandleStreamValueFn()
+		HandleRichStringFn onBlockEdit = new HandleRichStringFn()
 		{
 			@Override
-			public EditListener.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
+			public EditListener.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
 			{
 				if ( event instanceof TextEditEvent )
 				{
-					setBlockContentsFromRawStream( fragment.getView().getLog(), model, value );
+					setBlockContentsFromRawRichString( fragment.getView().getLog(), model, value );
 					return EditListener.HandleEditResult.HANDLED;
 				}
 				else if ( event instanceof SelectionEditTreeEvent )
 				{
-					setModelContentsFromEditorModelStream( model, value );
+					setModelContentsFromEditorModelRichString( model, value );
 					return EditListener.HandleEditResult.HANDLED;
 				}
 				else if ( event instanceof RichTextEditEvents.RichTextRequest )
@@ -353,11 +353,11 @@ public abstract class RichTextEditor extends SequentialEditor
 		};
 
 	
-		inlineEmbedEditListener = streamEditListener( onInlineEmbedEdit );
-		textEditListener = streamEditListener( onTextEdit );
-		paraEditListener = streamEditListener( onParagraphEdit );
-		paraListItemEditListener = streamEditListener( onParagraphListItemEdit );
-		blockEditListener = streamEditListener( onBlockEdit );
+		inlineEmbedEditListener = richStringEditListener( onInlineEmbedEdit );
+		textEditListener = richStringEditListener( onTextEdit );
+		paraEditListener = richStringEditListener( onParagraphEdit );
+		paraListItemEditListener = richStringEditListener( onParagraphListItemEdit );
+		blockEditListener = richStringEditListener( onBlockEdit );
 	}
 	
 	
@@ -512,54 +512,54 @@ public abstract class RichTextEditor extends SequentialEditor
 
 
 
-	protected boolean setTextContentsFromStream(Log log, Object model, StreamValue value)
+	protected boolean setTextContentsFromRichString(Log log, Object model, RichString value)
 	{
 		if ( log.isRecording() )
 		{
-			log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setTextContentsFromStream" ).vItem( "stream", value ) );
+			log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setTextContentsFromRichString" ).vItem( "richStr", value ) );
 		}
-		setModelContentsFromEditorModelStream( model, value );
+		setModelContentsFromEditorModelRichString( model, value );
 		return !value.contains( "\n" );
 	}
 
-	protected boolean setParagraphTextContentsFromStream(Log log, Object model, StreamValue value)
+	protected boolean setParagraphTextContentsFromRichString(Log log, Object model, RichString value)
 	{
 		if ( value.endsWith( "\n" ) )
 		{
-			StreamValue toLast = value.subStream( 0, value.length() - 1 );
-			setModelContentsFromEditorModelStream( model, toLast );
+			RichString toLast = value.substring( 0, value.length() - 1 );
+			setModelContentsFromEditorModelRichString( model, toLast );
 			if ( log.isRecording() )
 			{
-				log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setParagraphTextContentsFromStream - with trailing newline" ).vItem( "stream", value ) );
+				log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setParagraphTextContentsFromRichString - with trailing newline" ).vItem( "richStr", value ) );
 			}
 			return !toLast.contains( "\n" );
 		}
 		else
 		{
-			setModelContentsFromEditorModelStream( model, value );
+			setModelContentsFromEditorModelRichString( model, value );
 			EdNode e = modelToEditorModel( model );
 			((EdParagraph)e).suppressNewline();
 			if ( log.isRecording() )
 			{
-				log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setParagraphTextContentsFromStream - no trailing newline" ).vItem( "stream", value ) );
+				log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setParagraphTextContentsFromRichString - no trailing newline" ).vItem( "richStr", value ) );
 			}
 		}
 		return false;
 	}
 
 
-	protected boolean setParagraphContentsFromBlockStream(Log log, Object paragraph, StreamValue stream)
+	protected boolean setParagraphContentsFromBlockRichString(Log log, Object paragraph, RichString richStr)
 	{
 		if ( log.isRecording() )
 		{
-			log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setParagraphContentsFromBlockStream" ).vItem( "stream", stream ) );
+			log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setParagraphContentsFromBlockRichString" ).vItem( "richStr", richStr ) );
 		}
-		List<Object> items = stream.getItemValues();
+		List<Object> items = richStr.getItemValues();
 		if ( items.size() == 1 )
 		{
 			EdParagraph block = (EdParagraph)items.get( 0 );
 			List<? extends Object> contents = block.getContents();
-			setModelContentsFromEditorModelStream( paragraph, new StreamValueBuilder( contents ).stream() );
+			setModelContentsFromEditorModelRichString( paragraph, new RichStringBuilder( contents ).richString() );
 			return true;
 		}
 		else
@@ -569,7 +569,7 @@ public abstract class RichTextEditor extends SequentialEditor
 	}
 
 
-	protected void setBlockContentsFromRawStream(Log log, Object model, StreamValue value)
+	protected void setBlockContentsFromRawRichString(Log log, Object model, RichString value)
 	{
 		ArrayList<Object> tags = new ArrayList<Object>();
 		modelToTags( tags, model );
@@ -578,9 +578,9 @@ public abstract class RichTextEditor extends SequentialEditor
 		List<Object> paras = Merge.mergeParagraphs( flattened );
 		if ( log.isRecording() )
 		{
-			log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setBlockContentsFromRawStream" ).vItem( "tags", tags ).vItem( "paras", paras ) );
+			log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setBlockContentsFromRawRichString" ).vItem( "tags", tags ).vItem( "paras", paras ) );
 		}
-		setModelContentsFromEditorModelStream( model, new StreamValueBuilder( paras ).stream() );
+		setModelContentsFromEditorModelRichString( model, new RichStringBuilder( paras ).richString() );
 	}
 
 
@@ -694,9 +694,9 @@ public abstract class RichTextEditor extends SequentialEditor
 	}
 
 	
-	protected void setModelContentsFromEditorModelStream(Object model, StreamValue stream)
+	protected void setModelContentsFromEditorModelRichString(Object model, RichString richString)
 	{
-		ArrayList<Object> values = stream.getItemValues();
+		ArrayList<Object> values = richString.getItemValues();
 		ArrayList<Object> editorModelValues = new ArrayList<Object>();
 		editorModelValues.ensureCapacity( values.size() );
 		
@@ -864,7 +864,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		splicedFlattened.add( embed );
 		splicedFlattened.addAll( v2.flattened() );
 		ArrayList<Object> splicedMerged = Merge.mergeParagraphs( splicedFlattened );
-		setParagraphContentsFromBlockStream( log, paragraph, new StreamValueBuilder( splicedMerged ).stream() );
+		setParagraphContentsFromBlockRichString( log, paragraph, new RichStringBuilder( splicedMerged ).richString() );
 	}
 
 
@@ -941,7 +941,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		splicedFlattened.addAll( deepCopyFlattened( (List<? extends Object>)insertedContent ) );
 		splicedFlattened.addAll( v2.flattened() );
 		ArrayList<Object> splicedMerged = Merge.mergeParagraphs( splicedFlattened );
-		return new StreamValueBuilder( splicedMerged ).stream();
+		return new RichStringBuilder( splicedMerged ).richString();
 	}
 
 	@Override
@@ -955,12 +955,12 @@ public abstract class RichTextEditor extends SequentialEditor
 		splicedFlattened.addAll( v1.flattened() );
 		splicedFlattened.addAll( v2.flattened() );
 		ArrayList<Object> splicedMerged = Merge.mergeParagraphs( splicedFlattened );
-		return new StreamValueBuilder( splicedMerged ).stream();
+		return new RichStringBuilder( splicedMerged ).richString();
 	}
 	
 
 	
-	protected StreamValue streamWithModifiedSelectionStyle(LSElement element, TextSelection selection, ComputeSpanStylesFn computeStylesFn)
+	protected RichString richStringWithModifiedSelectionStyle(LSElement element, TextSelection selection, ComputeSpanStylesFn computeStylesFn)
 	{
 		FragmentView editFragment = (FragmentView)element.getFragmentContext();
 		LSElement editFragmentElement = editFragment.getFragmentElement();
@@ -1013,8 +1013,8 @@ public abstract class RichTextEditor extends SequentialEditor
 		splicedFlattened.addAll( v2.flattened() );
 		ArrayList<Object> splicedMerged = Merge.mergeParagraphs( splicedFlattened );
 		
-		// Convert to stream
-		return new StreamValueBuilder( splicedMerged ).stream();
+		// Convert to rich string
+		return new RichStringBuilder( splicedMerged ).richString();
 	}
 
 

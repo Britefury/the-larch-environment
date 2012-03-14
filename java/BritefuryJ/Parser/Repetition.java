@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
+import BritefuryJ.Util.RichString.RichStringAccessor;
 
 public class Repetition extends UnaryBranchExpression
 {
@@ -125,7 +125,7 @@ public class Repetition extends UnaryBranchExpression
 	}
 
 	@SuppressWarnings("unchecked")
-	protected ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start)
+	protected ParseResult evaluateRichStringItems(ParserState state, RichStringAccessor input, int start)
 	{
 		ArrayList<Object> values = new ArrayList<Object>();
 		Map<String, Object> bindings = null;
@@ -136,7 +136,7 @@ public class Repetition extends UnaryBranchExpression
 		
 		while ( ( maxRepetitions == -1  ||  i < maxRepetitions ) )
 		{
-			ParseResult res = subexp.handleStreamItems( state, input, pos );
+			ParseResult res = subexp.handleRichStringItems( state, input, pos );
 			errorPos = res.end;
 			
 			if ( !res.isValid() )

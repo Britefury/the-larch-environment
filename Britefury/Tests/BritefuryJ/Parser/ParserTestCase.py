@@ -344,10 +344,10 @@ class ParserTestCase (unittest.TestCase):
 
 
 
-	def _parseStreamTest(self, parser, input, expected, ignoreChars=None):
+	def _parseRichStringTest(self, parser, input, expected, ignoreChars=None):
 		if ignoreChars is None:
 			ignoreChars = self.__junk_regex__
-		result = parser.traceParseStreamItems( input, ignoreChars )
+		result = parser.traceParseRichStringItems( input, ignoreChars )
 
 		if not result.isValid():
 			print 'PARSE FAILURE while parsing %s, stopped at %d: %s'  %  ( input, result.end, input[:result.end] )
@@ -382,7 +382,7 @@ class ParserTestCase (unittest.TestCase):
 
 
 
-	def _parseStreamTestSX(self, parser, input, expectedSX, ignoreChars=None):
+	def _parseRichStringTestSX(self, parser, input, expectedSX, ignoreChars=None):
 		if ignoreChars is None:
 			ignoreChars = self.__junk_regex__
 		expected = DMIOReader.readFromString( expectedSX )
@@ -421,7 +421,7 @@ class ParserTestCase (unittest.TestCase):
 		self.assert_( bSame )
 
 
-	def _parseStreamFailTest(self, parser, input, ignoreChars=None):
+	def _parseRichStringFailTest(self, parser, input, ignoreChars=None):
 		if ignoreChars is None:
 			ignoreChars = self.__junk_regex__
 		result = parser.traceParseListItems( input, ignoreChars )

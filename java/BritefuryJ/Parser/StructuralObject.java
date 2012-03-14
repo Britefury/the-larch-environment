@@ -11,14 +11,14 @@ import java.util.List;
 import org.python.core.Py;
 import org.python.core.PyObject;
 
-import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
+import BritefuryJ.Util.RichString.RichStringAccessor;
 
 /*
  * StructuralObject
  * 
  * StructuralObject:node( input )					->  objClass.isInstance( input )  ?  success  :  fail
  * StructuralObject:string( input, start )			->  fail
- * StructuralObject:stream( input, start )			->  item = input.consumeStructuralItem(); objClass.isInstance( item )  ?  success  :  fail
+ * StructuralObject:richStr( input, start )			->  item = input.consumeStructuralItem(); objClass.isInstance( item )  ?  success  :  fail
  * StructuralObject:list( input, start )				->  iobjClass.isInstance( input[start] )  ?  success  :  fail
  */
 public class StructuralObject extends ParserExpression
@@ -80,7 +80,7 @@ public class StructuralObject extends ParserExpression
 		return ParseResult.failure( start );
 	}
 	
-	protected ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start)
+	protected ParseResult evaluateRichStringItems(ParserState state, RichStringAccessor input, int start)
 	{
 		if ( start < input.length() )
 		{

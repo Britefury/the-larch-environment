@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
 import BritefuryJ.ParserHelpers.TraceNode;
 import BritefuryJ.Util.HashUtils;
+import BritefuryJ.Util.RichString.RichStringAccessor;
 
 
 public class ParserState
@@ -173,7 +173,7 @@ public class ParserState
 		return start;
 	}
 	
-	public int skipJunkChars(StreamValueAccessor input, int start)
+	public int skipJunkChars(RichStringAccessor input, int start)
 	{
 		if ( junkPattern != null  &&  start <= input.length() )
 		{
@@ -204,9 +204,9 @@ public class ParserState
 		return memoisedMatch( rule, ParserExpression.Mode.STRING, input, start );
 	}
 	
-	ParseResult memoisedMatchStream(ParserExpression rule, StreamValueAccessor input, int start)
+	ParseResult memoisedMatchRichString(ParserExpression rule, RichStringAccessor input, int start)
 	{
-		return memoisedMatch( rule, ParserExpression.Mode.STREAM, input, start );
+		return memoisedMatch( rule, ParserExpression.Mode.RICHSTRING, input, start );
 	}
 	
 	ParseResult memoisedMatchList(ParserExpression rule, List<Object> input, int start)
@@ -297,7 +297,7 @@ public class ParserState
 			if ( memoEntry.bEvaluating )
 			{
 				// Somewhere lower down in the call stack is the outer application of @rule; this application
-				// is recursive; specifically left-recursive since we are at the same position in the stream
+				// is recursive; specifically left-recursive since we are at the same position in the input
 
 				// Left recursion has been detected
 				onLeftRecursionDetected( memoEntry );
@@ -372,9 +372,9 @@ public class ParserState
 		{
 			return rule.handleStringChars( this, (String)input, start );
 		}
-		else if ( mode == ParserExpression.Mode.STREAM )
+		else if ( mode == ParserExpression.Mode.RICHSTRING )
 		{
-			return rule.handleStreamItems( this, (StreamValueAccessor)input, start );
+			return rule.handleRichStringItems( this, (RichStringAccessor)input, start );
 		}
 		else if ( mode == ParserExpression.Mode.NODE )
 		{

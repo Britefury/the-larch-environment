@@ -6,26 +6,25 @@
 //##************************
 package BritefuryJ.LSpace;
 
-import BritefuryJ.LSpace.StreamValue.SequentialStreamValueVisitor;
 
 public abstract class EditEvent
 {
-	private SequentialStreamValueVisitor streamValueVisitor;
+	private SequentialRichStringVisitor richStringVisitor;
 	
 	
 	protected EditEvent()
 	{
-		streamValueVisitor = new SequentialStreamValueVisitor();
+		richStringVisitor = new SequentialRichStringVisitor();
 	}
 	
-	protected EditEvent(SequentialStreamValueVisitor streamValueVisitor)
+	protected EditEvent(SequentialRichStringVisitor richStringVisitor)
 	{
-		this.streamValueVisitor = streamValueVisitor;
+		this.richStringVisitor = richStringVisitor;
 	}
 	
 	
-	public SequentialStreamValueVisitor getStreamValueVisitor()
+	public SequentialRichStringVisitor getRichStringVisitor()
 	{
-		return streamValueVisitor;
+		return richStringVisitor;
 	}
 }

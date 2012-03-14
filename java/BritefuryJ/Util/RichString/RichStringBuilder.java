@@ -4,19 +4,19 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.LSpace.StreamValue;
+package BritefuryJ.Util.RichString;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 
-public class StreamValueBuilder
+public class RichStringBuilder
 {
 	public abstract static class Item
 	{
 		abstract public int length();
 		
-		abstract public StreamValue.Item streamItem(int start);
+		abstract public RichString.Item richStringItem(int start);
 	}
 
 	
@@ -39,9 +39,9 @@ public class StreamValueBuilder
 		}
 
 	
-		public StreamValue.Item streamItem(int start)
+		public RichString.Item richStringItem(int start)
 		{
-			return new StreamValue.TextItem( textValue.toString(), start, start + textValue.length() );
+			return new RichString.TextItem( textValue.toString(), start, start + textValue.length() );
 		}
 	}
 
@@ -64,9 +64,9 @@ public class StreamValueBuilder
 		}
 
 	
-		public StreamValue.Item streamItem(int start)
+		public RichString.Item richStringItem(int start)
 		{
-			return new StreamValue.StructuralItem( structuralValue, start, start + 1 );
+			return new RichString.StructuralItem( structuralValue, start, start + 1 );
 		}
 	}
 
@@ -75,25 +75,25 @@ public class StreamValueBuilder
 	private ArrayList<Item> items;
 	
 	
-	public StreamValueBuilder()
+	public RichStringBuilder()
 	{
 		items = new ArrayList<Item>();
 	}
 	
-	public StreamValueBuilder(String text)
+	public RichStringBuilder(String text)
 	{
 		items = new ArrayList<Item>();
 		appendTextValue( text );
 	}
 	
-	public StreamValueBuilder(Item items[])
+	public RichStringBuilder(Item items[])
 	{
 		this.items = new ArrayList<Item>();
 
                 this.items.addAll( Arrays.asList( items ) );
 	}
 	
-	public StreamValueBuilder(Iterable<? extends Object> values)
+	public RichStringBuilder(Iterable<? extends Object> values)
 	{
 		items = new ArrayList<Item>();
 		extend( values );
@@ -119,15 +119,15 @@ public class StreamValueBuilder
 		items.add( new StructuralItem( structuralValue ) );
 	}
 	
-	public void appendStreamValueItem(StreamValue.Item item)
+	public void appendRichStringItem(RichString.Item item)
 	{
-		if ( item instanceof StreamValue.TextItem )
+		if ( item instanceof RichString.TextItem )
 		{
-			appendTextValue( ((StreamValue.TextItem)item).textValue );
+			appendTextValue( ((RichString.TextItem)item).textValue );
 		}
-		else if ( item instanceof StreamValue.StructuralItem )
+		else if ( item instanceof RichString.StructuralItem )
 		{
-			appendStructuralValue( ((StreamValue.StructuralItem)item).structuralValue );
+			appendStructuralValue( ((RichString.StructuralItem)item).structuralValue );
 		}
 	}
 	
@@ -137,13 +137,13 @@ public class StreamValueBuilder
 		{
 			appendTextValue( (String)value );
 		}
-		else if ( value instanceof StreamValue )
+		else if ( value instanceof RichString )
 		{
-			extend( (StreamValue)value );
+			extend( (RichString)value );
 		}
-		else if ( value instanceof StreamValue.Item )
+		else if ( value instanceof RichString.Item )
 		{
-			appendStreamValueItem( (StreamValue.Item)value );
+			appendRichStringItem( (RichString.Item)value );
 		}
 		else
 		{
@@ -151,17 +151,17 @@ public class StreamValueBuilder
 		}
 	}
 	
-	public void extend(StreamValue items)
+	public void extend(RichString items)
 	{
-		for (StreamValue.Item item: items.getItems())
+		for (RichString.Item item: items.getItems())
 		{
-			if ( item instanceof StreamValue.TextItem )
+			if ( item instanceof RichString.TextItem )
 			{
-				appendTextValue( ((StreamValue.TextItem)item).textValue );
+				appendTextValue( ((RichString.TextItem)item).textValue );
 			}
-			else if ( item instanceof StreamValue.StructuralItem )
+			else if ( item instanceof RichString.StructuralItem )
 			{
-				appendStructuralValue( ((StreamValue.StructuralItem)item).structuralValue );
+				appendStructuralValue( ((RichString.StructuralItem)item).structuralValue );
 			}
 		}
 	}
@@ -175,19 +175,19 @@ public class StreamValueBuilder
 	}
 	
 	
-	public StreamValue stream()
+	public RichString richString()
 	{
-		StreamValue.Item streamItems[] = new StreamValue.Item[items.size()];
+		RichString.Item richStringItems[] = new RichString.Item[items.size()];
 		
 		int pos = 0;
 		int i = 0;
 		for (Item item: items)
 		{
-			streamItems[i] = item.streamItem( pos );
+			richStringItems[i] = item.richStringItem( pos );
 			pos += item.length();
 			i++;
 		}
 		
-		return new StreamValue( streamItems );		
+		return new RichString( richStringItems );		
 	}
 }

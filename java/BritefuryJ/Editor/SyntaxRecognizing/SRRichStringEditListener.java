@@ -7,9 +7,9 @@
 package BritefuryJ.Editor.SyntaxRecognizing;
 
 import BritefuryJ.Editor.Sequential.SequentialEditor;
-import BritefuryJ.Editor.Sequential.StreamEditListener;
+import BritefuryJ.Editor.Sequential.RichStringEditListener;
 
-public abstract class SRStreamEditListener extends StreamEditListener
+public abstract class SRRichStringEditListener extends RichStringEditListener
 {
 	protected abstract SyntaxRecognizingEditor getSyntaxRecognizingEditor();
 	

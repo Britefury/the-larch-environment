@@ -22,7 +22,7 @@ from BritefuryJ.LSpace.StyleParams import *
 from BritefuryJ.LSpace.TextFocus import TextSelection
 from BritefuryJ.LSpace import *
 
-from BritefuryJ.LSpace.StreamValue import StreamValueBuilder, StreamValue
+from BritefuryJ.Util.RichString import RichStringBuilder, RichString
 
 
 
@@ -199,10 +199,10 @@ def modifySuiteMinimisingChanges(target, modified):
 #
 #
 
-def getMinDepthOfStream(itemStream):
+def getMinDepthOfRichString(richStr):
 	depth = 0
 	minDepth = 0
-	for item in itemStream.getItems():
+	for item in richStr.getItems():
 		if item.isStructural():
 			v = item.getValue()
 			if v.isInstanceOf( Schema.Indent ):
@@ -214,9 +214,9 @@ def getMinDepthOfStream(itemStream):
 	return minDepth
 
 
-def getDepthOffsetOfStream(itemStream):
+def getDepthOffsetOfRichString(richStr):
 	depth = 0
-	for item in itemStream.getItems():
+	for item in richStr.getItems():
 		if item.isStructural():
 			v = item.getValue()
 			if v.isInstanceOf( Schema.Indent ):
@@ -226,10 +226,10 @@ def getDepthOffsetOfStream(itemStream):
 	return depth
 
 
-def joinStreamsAroundDeletionPoint(before, after):
-	beforeOffset = getDepthOffsetOfStream( before )
-	afterOffset = getDepthOffsetOfStream( after )
-	builder = StreamValueBuilder()
+def joinRichStringsAroundDeletionPoint(before, after):
+	beforeOffset = getDepthOffsetOfRichString( before )
+	afterOffset = getDepthOffsetOfRichString( after )
+	builder = RichStringBuilder()
 	if ( beforeOffset + afterOffset )  ==  0:
 		builder.extend( before )
 		builder.extend( after )
@@ -239,8 +239,8 @@ def joinStreamsAroundDeletionPoint(before, after):
 		afterItems = after.getItems()
 		if len( afterItems ) > 0:
 			firstItem = afterItems[0]
-			if isinstance( firstItem, StreamValue.TextItem ):
-				builder.appendStreamValueItem( firstItem )
+			if isinstance( firstItem, RichString.TextItem ):
+				builder.appendRichStringItem( firstItem )
 				afterItems = list(afterItems)[1:]
 				
 		if offset < 0:
@@ -251,15 +251,15 @@ def joinStreamsAroundDeletionPoint(before, after):
 				builder.appendStructuralValue( Schema.Dedent() )
 
 		for x in afterItems:
-			builder.appendStreamValueItem( x )
-	return builder.stream()
+			builder.appendRichStringItem( x )
+	return builder.richString()
 
 
 
-def _extendStreamWithoutDedents(builder, itemStream, startDepth):
+def _extendRichStringWithoutDedents(builder, richStr, startDepth):
 	depth = startDepth
 	indentsToSkip = 0
-	for item in itemStream.getItems():
+	for item in richStr.getItems():
 		if item.isStructural():
 			v = item.getValue()
 			if v.isInstanceOf( Schema.Indent ):
@@ -275,20 +275,20 @@ def _extendStreamWithoutDedents(builder, itemStream, startDepth):
 				else:
 					depth -= 1
 		if item is not None:
-			builder.appendStreamValueItem( item )
+			builder.appendRichStringItem( item )
 	
 
 
-def joinStreamsForInsertion(commonRootCtx, before, insertion, after):
+def joinRichStringsForInsertion(commonRootCtx, before, insertion, after):
 	# Work out how much 'room' we have to play with, in case the inserted data dedents
 	rootDepth = getStatementDepth( commonRootCtx )
 	
-	beforeOffset = getDepthOffsetOfStream( before )
-	insertionOffset = getDepthOffsetOfStream( insertion )
-	insertionMinDepth = getMinDepthOfStream( insertion )
-	afterOffset = getDepthOffsetOfStream( after )
+	beforeOffset = getDepthOffsetOfRichString( before )
+	insertionOffset = getDepthOffsetOfRichString( insertion )
+	insertionMinDepth = getMinDepthOfRichString( insertion )
+	afterOffset = getDepthOffsetOfRichString( after )
 	
-	builder = StreamValueBuilder()
+	builder = RichStringBuilder()
 	if ( beforeOffset + insertionOffset + afterOffset )  ==  0   and   ( beforeOffset + insertionMinDepth )  >=  0:
 		builder.extend( before )
 		builder.extend( insertion )
@@ -297,15 +297,15 @@ def joinStreamsForInsertion(commonRootCtx, before, insertion, after):
 		offset = beforeOffset + insertionOffset + afterOffset
 		builder.extend( before )
 		if ( beforeOffset + insertionMinDepth )  <  0:
-			_extendStreamWithoutDedents( builder, insertion, beforeOffset )
+			_extendRichStringWithoutDedents( builder, insertion, beforeOffset )
 		else:
 			builder.extend( insertion )
 		
 		afterItems = after.getItems()
 		if len( afterItems ) > 0:
 			firstItem = afterItems[0]
-			if isinstance( firstItem, StreamValue.TextItem ):
-				builder.appendStreamValueItem( firstItem )
+			if isinstance( firstItem, RichString.TextItem ):
+				builder.appendRichStringItem( firstItem )
 				afterItems = list(afterItems)[1:]
 				
 		if offset < 0:
@@ -316,8 +316,8 @@ def joinStreamsForInsertion(commonRootCtx, before, insertion, after):
 				builder.appendStructuralValue( Schema.Dedent() )
 
 		for x in afterItems:
-			builder.appendStreamValueItem( x )
-	return builder.stream()
+			builder.appendRichStringItem( x )
+	return builder.richString()
 
 
 
@@ -335,15 +335,15 @@ def _insertSpecialFormAtMarker(marker, specialForm):
 	index = marker.getIndex()
 	assert isinstance( element, LSText )
 	
-	value = element.getStreamValue()
-	builder = StreamValueBuilder()
+	value = element.getRichString()
+	builder = RichStringBuilder()
 	builder.append( value[:index] )
 	builder.appendStructuralValue( specialForm )
 	builder.append( value[index:] )
-	modifiedValue = builder.stream()
+	modifiedValue = builder.richString()
 	
 	event = _InsertSpecialFormTreeEvent( element )
-	visitor = event.getStreamValueVisitor()
+	visitor = event.getRichStringVisitor()
 	visitor.setElementFixedValue( element, modifiedValue )
 
 	element.postTreeEvent( event )

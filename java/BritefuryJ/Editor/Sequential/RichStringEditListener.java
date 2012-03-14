@@ -9,21 +9,21 @@ package BritefuryJ.Editor.Sequential;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.EditEvent;
-import BritefuryJ.LSpace.StreamValue.SequentialStreamValueVisitor;
-import BritefuryJ.LSpace.StreamValue.StreamValue;
+import BritefuryJ.LSpace.SequentialRichStringVisitor;
+import BritefuryJ.Util.RichString.RichString;
 
-public abstract class StreamEditListener extends EditListener
+public abstract class RichStringEditListener extends EditListener
 {
-	protected abstract HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value);
+	protected abstract HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value);
 	
 	
 	
 	@Override
 	protected HandleEditResult handleEditEvent(LSElement element, LSElement sourceElement, EditEvent editEvent)
 	{
-		SequentialStreamValueVisitor visitor = editEvent.getStreamValueVisitor();
+		SequentialRichStringVisitor visitor = editEvent.getRichStringVisitor();
 		
-		StreamValue value = visitor.getStreamValue( element );
+		RichString value = visitor.getRichString( element );
 		FragmentView fragment = (FragmentView)element.getFragmentContext();
 		Object model = fragment.getModel();
 		

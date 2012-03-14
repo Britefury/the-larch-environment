@@ -68,9 +68,6 @@ import BritefuryJ.LSpace.Layout.VAlignment;
 import BritefuryJ.LSpace.LayoutTree.ArrangedSequenceLayoutNode;
 import BritefuryJ.LSpace.LayoutTree.LayoutNode;
 import BritefuryJ.LSpace.Marker.Marker;
-import BritefuryJ.LSpace.StreamValue.SequentialStreamValueVisitor;
-import BritefuryJ.LSpace.StreamValue.StreamValue;
-import BritefuryJ.LSpace.StreamValue.StreamValueBuilder;
 import BritefuryJ.LSpace.StyleParams.ElementStyleParams;
 import BritefuryJ.LSpace.TextFocus.Caret;
 import BritefuryJ.Math.AABox2;
@@ -90,6 +87,8 @@ import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Pres.Primitive.Spacer;
 import BritefuryJ.Projection.Perspective;
 import BritefuryJ.StyleSheet.StyleSheet;
+import BritefuryJ.Util.RichString.RichString;
+import BritefuryJ.Util.RichString.RichStringBuilder;
 
 
 
@@ -2504,23 +2503,23 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 
 	//
 	//
-	// STREAM VALUE METHODS
+	// RICH STRING METHODS
 	//
 	//
 	
-	public void addToStreamValue(StreamValueBuilder builder)
+	public void addToRichString(RichStringBuilder builder)
 	{
 	}
 	
-	public StreamValue getStreamValue()
+	public RichString getRichString()
 	{
-		SequentialStreamValueVisitor visitor = new SequentialStreamValueVisitor();
-		return getStreamValue( visitor );
+		SequentialRichStringVisitor visitor = new SequentialRichStringVisitor();
+		return getRichString( visitor );
 	}
 	
-	public StreamValue getStreamValue(SequentialStreamValueVisitor visitor)
+	public RichString getRichString(SequentialRichStringVisitor visitor)
 	{
-		return visitor.getStreamValue( this );
+		return visitor.getRichString( this );
 	}
 	
 	

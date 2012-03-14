@@ -8,14 +8,14 @@ package BritefuryJ.Parser;
 
 import java.util.List;
 
-import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
+import BritefuryJ.Util.RichString.RichStringAccessor;
 
 /*
  * ClearBindings
  * 
  * ClearBindings:node( input )			->  clearBindings( Bind.subexp:node( input ) )
  * ClearBindings:string( input, start )		->  clearBindings( Bind.subexp:string( input, start ) )
- * ClearBindings:stream( input, start )		->  clearBindings( Bind.subexp:stream( input, start ) )
+ * ClearBindings:richStr( input, start )		->  clearBindings( Bind.subexp:richStr( input, start ) )
  * ClearBindings:list( input, start )		->  clearBindings( Bind.subexp:list( input, start ) )
  */
 public class ClearBindings extends UnaryBranchExpression
@@ -60,9 +60,9 @@ public class ClearBindings extends UnaryBranchExpression
 		}
 	}
 
-	protected ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start)
+	protected ParseResult evaluateRichStringItems(ParserState state, RichStringAccessor input, int start)
 	{
-		ParseResult res = subexp.handleStreamItems( state, input, start );
+		ParseResult res = subexp.handleRichStringItems( state, input, start );
 		
 		if ( res.isValid() )
 		{

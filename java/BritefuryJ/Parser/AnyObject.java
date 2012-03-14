@@ -9,14 +9,14 @@ package BritefuryJ.Parser;
 import java.util.List;
 
 import BritefuryJ.DocModel.DMObjectInterface;
-import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
+import BritefuryJ.Util.RichString.RichStringAccessor;
 
 /*
  * AnyObject
  * 
  * AnyObject:node( input )			->  input instanceof DMObject  ?  input  :  fail
  * AnyObject:string( input, start )	->  fail
- * AnyObject:stream( input, start )	->  item = input.consumeStructuralItem(); item instanceof DMObject  ?  item  :  fail
+ * AnyObject:richStr( input, start )	->  item = input.consumeStructuralItem(); item instanceof DMObject  ?  item  :  fail
  * AnyObject:list( input, start )		->  input[start] instanceof DMObject  ?  input[start]  :  fail
  */
 public class AnyObject extends ParserExpression
@@ -43,7 +43,7 @@ public class AnyObject extends ParserExpression
 		return ParseResult.failure( start );
 	}
 
-	protected ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start)
+	protected ParseResult evaluateRichStringItems(ParserState state, RichStringAccessor input, int start)
 	{
 		if ( start < input.length() )
 		{

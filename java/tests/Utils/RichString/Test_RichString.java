@@ -4,15 +4,15 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package tests.StreamValue;
+package tests.Utils.RichString;
 
 import java.util.Arrays;
 
 import junit.framework.TestCase;
-import BritefuryJ.LSpace.StreamValue.StreamValue;
-import BritefuryJ.LSpace.StreamValue.StreamValueBuilder;
+import BritefuryJ.Util.RichString.RichString;
+import BritefuryJ.Util.RichString.RichStringBuilder;
 
-public class Test_StreamValue extends TestCase
+public class Test_RichString extends TestCase
 {
 	private class Tag
 	{
@@ -42,10 +42,10 @@ public class Test_StreamValue extends TestCase
 	
 	
 	
-	private StreamValue streamOf(Object... items)
+	private RichString richStringOf(Object... items)
 	{
-		StreamValueBuilder builder = new StreamValueBuilder( Arrays.asList( items ) );
-		return builder.stream();
+		RichStringBuilder builder = new RichStringBuilder( Arrays.asList( items ) );
+		return builder.richString();
 	}
 	
 	private Tag tag(String name)
@@ -57,17 +57,17 @@ public class Test_StreamValue extends TestCase
 	
 	public void test_equals()
 	{
-		StreamValue s = streamOf( "Hello", tag("abc"), " world" );
+		RichString s = richStringOf( "Hello", tag("abc"), " world" );
 		
-		assertEquals( streamOf( "Hello", tag("abc"), " world" ), s );
-		assertEquals( streamOf( "He", "llo", tag("abc"), " world" ), s );
-		assertEquals( streamOf( "Hell", "o", tag("abc"), " world" ), s );
-		assertEquals( streamOf( "Hello", tag("abc"), " ", "world" ), s );
+		assertEquals( richStringOf( "Hello", tag("abc"), " world" ), s );
+		assertEquals( richStringOf( "He", "llo", tag("abc"), " world" ), s );
+		assertEquals( richStringOf( "Hell", "o", tag("abc"), " world" ), s );
+		assertEquals( richStringOf( "Hello", tag("abc"), " ", "world" ), s );
 	}
 
 	public void test_indexOf_String()
 	{
-		StreamValue s = streamOf( "Hello", tag("abc"), " world", tag("def"), " the end" );
+		RichString s = richStringOf( "Hello", tag("abc"), " world", tag("def"), " the end" );
 		
 		assertEquals( 0, s.indexOf( "Hello" ) );
 		assertEquals( 1, s.indexOf( "ello" ) );
@@ -84,7 +84,7 @@ public class Test_StreamValue extends TestCase
 
 	public void test_indexOf_Object()
 	{
-		StreamValue s = streamOf( "Hello", tag("abc"), " world", tag("abc"), " the end" );
+		RichString s = richStringOf( "Hello", tag("abc"), " world", tag("abc"), " the end" );
 		
 		assertEquals( 5, s.indexOf( tag("abc") ) );
 		assertEquals( 12, s.indexOf( tag("abc"), 6 ) );
@@ -94,10 +94,10 @@ public class Test_StreamValue extends TestCase
 	
 	public void test_split_String()
 	{
-		StreamValue s = streamOf( "Hello", tag("abc"), " world", tag("abc"), " the end" );
+		RichString s = richStringOf( "Hello", tag("abc"), " world", tag("abc"), " the end" );
 		
-		assertTrue( Arrays.equals( new StreamValue[] {
-				streamOf( "He" ), streamOf(), streamOf( "o", tag("abc"), " wor" ), streamOf( "d", tag("abc"), " the end" ) },
+		assertTrue( Arrays.equals( new RichString[] {
+				richStringOf( "He" ), richStringOf(), richStringOf( "o", tag("abc"), " wor" ), richStringOf( "d", tag("abc"), " the end" ) },
 				s.split( "l" ) ) );
 	}
 }

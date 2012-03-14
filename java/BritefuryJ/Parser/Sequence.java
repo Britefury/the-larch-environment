@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
+import BritefuryJ.Util.RichString.RichStringAccessor;
 
 public class Sequence extends BranchExpression
 {
@@ -69,7 +69,7 @@ public class Sequence extends BranchExpression
 	}
 
 	@SuppressWarnings("unchecked")
-	protected ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start)
+	protected ParseResult evaluateRichStringItems(ParserState state, RichStringAccessor input, int start)
 	{
 		ArrayList<Object> value = new ArrayList<Object>();
 		Map<String, Object> bindings = null;
@@ -77,7 +77,7 @@ public class Sequence extends BranchExpression
 		int pos = start;
 		for (int i = 0; i < subexps.length; i++)
 		{
-			ParseResult result = subexps[i].handleStreamItems( state, input, pos );
+			ParseResult result = subexps[i].handleRichStringItems( state, input, pos );
 			pos = result.end;
 			
 			if ( !result.isValid() )

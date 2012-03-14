@@ -16,7 +16,7 @@ from BritefuryJ.DocModel import DMObject, DMNode
 from BritefuryJ.Parser import Action, Condition, Suppress, Literal, Keyword, RegEx, Word, Sequence, Combine, Choice, Optional, Repetition, ZeroOrMore, OneOrMore, Peek, PeekNot, SeparatedList, ObjectNode
 from BritefuryJ.Parser.Utils.Tokens import identifier, decimalInteger, hexInteger, integer, singleQuotedString, doubleQuotedString, quotedString, floatingPoint
 from BritefuryJ.Parser.Utils.OperatorParser import PrefixLevel, SuffixLevel, InfixLeftLevel, InfixRightLevel, InfixChainLevel, UnaryOperator, BinaryOperator, ChainOperator, OperatorTable
-from BritefuryJ.LSpace.StreamValue import StreamValueBuilder
+from BritefuryJ.Util.RichString import RichStringBuilder
 
 from Britefury.Tests.BritefuryJ.Parser.ParserTestCase import ParserTestCase
 
@@ -1253,11 +1253,11 @@ import unittest
 
 
 class TestCase_Python25Parser (ParserTestCase):
-	def _pythonStream(self, *args):
-		b = StreamValueBuilder()
+	def _pythonRichString(self, *args):
+		b = RichStringBuilder()
 		for x in args:
 			b.append( x )
-		return b.stream()
+		return b.richString()
 	
 	
 	def setUp(self):
@@ -1591,19 +1591,19 @@ class TestCase_Python25Parser (ParserTestCase):
 
 	def test_structuralAtom(self):
 		g = Python25Grammar()
-		s = self._pythonStream( Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ) )
-		self._parseStreamTest( g.atom(), s, Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ) )
+		s = self._pythonRichString( Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ) )
+		self._parseRichStringTest( g.atom(), s, Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ) )
 
 		
 		
 	def test_embeddedStructuralExpression(self):
 		g = Python25Grammar()
-		s = self._pythonStream( Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ) )
-		self._parseStreamTest( g.tupleOrExpression(), s, Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ) )
-		s = self._pythonStream( 'return ', Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ), '\n' )
-		self._parseStreamTest( g.singleLineStatement(), s, Schema.ReturnStmt( value=Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ) ) )
-		s = self._pythonStream( 'x + ', Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ) )
-		self._parseStreamTest( g.tupleOrExpression(), s, Schema.Add( x=Schema.Load( name='x' ), y=Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ) ) )
+		s = self._pythonRichString( Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ) )
+		self._parseRichStringTest( g.tupleOrExpression(), s, Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ) )
+		s = self._pythonRichString( 'return ', Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ), '\n' )
+		self._parseRichStringTest( g.singleLineStatement(), s, Schema.ReturnStmt( value=Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ) ) )
+		s = self._pythonRichString( 'x + ', Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ) )
+		self._parseRichStringTest( g.tupleOrExpression(), s, Schema.Add( x=Schema.Load( name='x' ), y=Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ) ) )
 
 		
 		
@@ -2403,17 +2403,17 @@ class TestCase_Python25Parser (ParserTestCase):
 					     Schema.WhileStmt( condition=Schema.Load( name='a' ), suite=[ Schema.BlankLine() ] ) ] )
 
 		
-	def test_streamSuite(self):	
+	def test_richStringSuite(self):
 		g = Python25Grammar()
-		s = self._pythonStream( 'while a:\n', Schema.Indent(), 'continue\n', Schema.Dedent() )
-		self._parseStreamTest( g.suite(), s, [ Schema.WhileStmt( condition=Schema.Load( name='a' ), suite=[ Schema.ContinueStmt() ] ) ] )
+		s = self._pythonRichString( 'while a:\n', Schema.Indent(), 'continue\n', Schema.Dedent() )
+		self._parseRichStringTest( g.suite(), s, [ Schema.WhileStmt( condition=Schema.Load( name='a' ), suite=[ Schema.ContinueStmt() ] ) ] )
 		
 		
 	def test_embeddedStructural(self):
 		g = Python25Grammar()
-		#s = self._pythonStream( 'x = ', Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ), '\n' )
-		s = self._pythonStream( 'x = ', Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ), ' + c\n' )
-		self._parseStreamTest( g.suite(), s, [ Schema.AssignStmt( targets=[ Schema.SingleTarget( name='x' ) ], value=Schema.Add( x=Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ), y=Schema.Load( name='c' ) ) ) ] )
+		#s = self._pythonRichString( 'x = ', Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ), '\n' )
+		s = self._pythonRichString( 'x = ', Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ), ' + c\n' )
+		self._parseRichStringTest( g.suite(), s, [ Schema.AssignStmt( targets=[ Schema.SingleTarget( name='x' ) ], value=Schema.Add( x=Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ), y=Schema.Load( name='c' ) ) ) ] )
 		
 		
 

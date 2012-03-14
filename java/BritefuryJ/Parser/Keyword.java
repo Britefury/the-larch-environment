@@ -8,7 +8,7 @@ package BritefuryJ.Parser;
 
 import java.util.regex.Pattern;
 
-import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
+import BritefuryJ.Util.RichString.RichStringAccessor;
 
 /*
  * Keyword
@@ -16,7 +16,7 @@ import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
  * Keyword:node( input )			->  input == Keyword.keywordString  ?  input  :  fail
  * Keyword:string( input, start )		->  input[start:start+Keyword.keywordString.length()] == Keyword.keywordString  &&
  * 									input[start+Keyword.keywordString.length()] not in Keyword.disallowedSubsequentChars  ?  input[start:start+Keyword.keywordString.length()] : fail
- * Keyword:stream( input, start )	->  input[start:start+Keyword.keywordString.length()] == Keyword.keywordString  &&
+ * Keyword:richStr( input, start )		->  input[start:start+Keyword.keywordString.length()] == Keyword.keywordString  &&
  * 								input[start+Keyword.keywordString.length()] not in Keyword.disallowedSubsequentChars  ?  input[start:start+Keyword.keywordString.length()] : fail
  * Keyword:list( input, start )		->  input[start] == Keyword.keywordString  ?  input[start]  :  fail
  */
@@ -69,7 +69,7 @@ public class Keyword extends TerminalString
 		return ParseResult.failure( start );
 	}
 	
-	protected ParseResult consumeStream(StreamValueAccessor input, int start)
+	protected ParseResult consumeRichString(RichStringAccessor input, int start)
 	{
 		CharSequence itemText = input.getItemTextFrom( start );
 		int end = keywordString.length();

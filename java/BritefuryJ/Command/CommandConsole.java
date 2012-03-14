@@ -19,13 +19,12 @@ import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.PageController;
 import BritefuryJ.LSpace.PresentationComponent;
+import BritefuryJ.LSpace.SequentialRichStringVisitor;
 import BritefuryJ.LSpace.TreeEventListener;
 import BritefuryJ.LSpace.Browser.BrowserPage;
 import BritefuryJ.LSpace.Browser.Location;
 import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
 import BritefuryJ.LSpace.Focus.Target;
-import BritefuryJ.LSpace.StreamValue.SequentialStreamValueVisitor;
-import BritefuryJ.LSpace.StreamValue.StreamValue;
 import BritefuryJ.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Label;
@@ -36,6 +35,7 @@ import BritefuryJ.Projection.AbstractPerspective;
 import BritefuryJ.Projection.ProjectiveBrowserContext;
 import BritefuryJ.Projection.Subject;
 import BritefuryJ.StyleSheet.StyleSheet;
+import BritefuryJ.Util.RichString.RichString;
 
 public class CommandConsole extends AbstractCommandConsole implements Presentable
 {
@@ -83,8 +83,8 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 		@Override
 		public boolean onTreeEvent(LSElement element, LSElement sourceElement, Object event)
 		{
-			SequentialStreamValueVisitor visitor = new SequentialStreamValueVisitor();
-			StreamValue value = visitor.getStreamValue( element );
+			SequentialRichStringVisitor visitor = new SequentialRichStringVisitor();
+			RichString value = visitor.getRichString( element );
 			onEdit( value );
 			return true;
 		}
@@ -226,7 +226,7 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 	
 	
 	
-	private void onEdit(StreamValue value)
+	private void onEdit(RichString value)
 	{
 		if ( value.isTextual() )
 		{
@@ -316,7 +316,7 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 		}
 		else
 		{
-			throw new RuntimeException( "Stream value contains structural items" );
+			throw new RuntimeException( "Rich string contains structural items" );
 		}
 	}
 

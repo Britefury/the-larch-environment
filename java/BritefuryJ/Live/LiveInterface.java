@@ -12,7 +12,6 @@ import BritefuryJ.DefaultPerspective.PrimitivePresenter;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.ElementValueFunction;
-import BritefuryJ.LSpace.StreamValue.StreamValueBuilder;
 import BritefuryJ.Pres.ApplyPerspective;
 import BritefuryJ.Pres.CompositePres;
 import BritefuryJ.Pres.InnerFragment;
@@ -20,6 +19,7 @@ import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.ObjectPres.ErrorBox;
 import BritefuryJ.StyleSheet.StyleValues;
+import BritefuryJ.Util.RichString.RichStringBuilder;
 
 
 
@@ -40,12 +40,12 @@ public abstract class LiveInterface extends CompositePres
 		}
 
 		@Override
-		public void addStreamValuePrefixToStream(StreamValueBuilder builder, LSElement element)
+		public void addPrefixToRichString(RichStringBuilder builder, LSElement element)
 		{
 		}
 
 		@Override
-		public void addStreamValueSuffixToStream(StreamValueBuilder builder, LSElement element)
+		public void addSuffixToRichString(RichStringBuilder builder, LSElement element)
 		{
 		}
 	}

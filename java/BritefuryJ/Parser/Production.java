@@ -9,7 +9,7 @@ package BritefuryJ.Parser;
 import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
+import BritefuryJ.Util.RichString.RichStringAccessor;
 
 
 
@@ -18,7 +18,7 @@ import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
  * 
  * Production:node( input )			->  result = memoisedMatch( Production.subexp:node( input ) )
  * Production:string( input, start )	->  result = memoisedMatch( Production.subexp:string( input, start ) )
- * Production:stream( input, start )	->  result = memoisedMatch( Production.subexp:stream( input, start ) )
+ * Production:richStr( input, start )	->  result = memoisedMatch( Production.subexp:richStr( input, start ) )
  * Production:list( input, start )		->  result = memoisedMatch( Production.subexp:list( input, start ) )
  */
 public class Production extends ParserExpression
@@ -98,9 +98,9 @@ public class Production extends ParserExpression
 	}
 
 	@Override
-	protected ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start)
+	protected ParseResult evaluateRichStringItems(ParserState state, RichStringAccessor input, int start)
 	{
-		return state.memoisedMatchStream( subexp, input, start );
+		return state.memoisedMatchRichString( subexp, input, start );
 	}
 
 	@Override

@@ -8,7 +8,7 @@ package BritefuryJ.Parser;
 
 import java.util.List;
 
-import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
+import BritefuryJ.Util.RichString.RichStringAccessor;
 
 public class StringNode extends UnaryBranchExpression
 {
@@ -34,10 +34,10 @@ public class StringNode extends UnaryBranchExpression
 				return res.withRange( start, start + 1 );
 			}
 		}
-		else if ( input instanceof StreamValueAccessor )
+		else if ( input instanceof RichStringAccessor )
 		{
-			StreamValueAccessor s = (StreamValueAccessor)input;
-			ParseResult res = subexp.handleStreamItems( state, s, 0 );
+			RichStringAccessor s = (RichStringAccessor)input;
+			ParseResult res = subexp.handleRichStringItems( state, s, 0 );
 			if ( res.getEnd() == s.length() )
 			{
 				return res.withRange( start, start + 1 );
@@ -58,7 +58,7 @@ public class StringNode extends UnaryBranchExpression
 		return ParseResult.failure( start );
 	}
 	
-	protected ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start)
+	protected ParseResult evaluateRichStringItems(ParserState state, RichStringAccessor input, int start)
 	{
 		if ( start < input.length() )
 		{

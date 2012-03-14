@@ -570,7 +570,7 @@ public abstract class LSContainer extends LSElement
 	
 	//
 	//
-	// STREAM VALUE METHODS
+	// SEQUENTIAL CONTENT METHODS
 	//
 	//
 	
