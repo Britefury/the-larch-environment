@@ -14,6 +14,8 @@ import org.python.core.PyDictionary;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 
+import BritefuryJ.Util.HashUtils;
+
 
 public class AABox2 implements Serializable
 {
@@ -272,6 +274,29 @@ public class AABox2 implements Serializable
 	}
 	
 
+	public boolean equals(Object other)
+	{
+		if ( this == other )
+		{
+			return true;
+		}
+		
+		if ( other instanceof AABox2 )
+		{
+			AABox2 b = (AABox2)other;
+			return lowerX == b.lowerX  &&  lowerY == b.lowerY  &&  upperX == b.upperX  &&  upperY == b.upperY;
+		}
+
+		return false;
+	}
+	
+	public int hashCode()
+	{
+		return HashUtils.quadHash( new Double( lowerX ).hashCode(), new Double( lowerY ).hashCode(), new Double( upperX ).hashCode(), new Double( upperY ).hashCode() );
+	}
+
+
+	
 	public PyObject __getstate__()
 	{
 		return new PyTuple( Py.newFloat( lowerX ), Py.newFloat( lowerY ), Py.newFloat( upperX ), Py.newFloat( upperY ) );

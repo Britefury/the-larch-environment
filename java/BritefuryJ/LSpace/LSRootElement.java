@@ -13,6 +13,7 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
@@ -119,7 +120,7 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		
 		rootElement = this;
 		
-		windowSize = new Vector2( 1.0, 1.0 );
+		windowSize = null;
 		
 		inputTable = new InputTable( this, this, component );
 		rootSpaceMouse = inputTable.getMouse();
@@ -497,6 +498,12 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		{
 			long t1 = System.nanoTime();
 			
+			Dimension screenSize = null;
+			if ( windowSize == null )
+			{
+				screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			}
+			
 			LayoutNodeRootElement rootLayout = (LayoutNodeRootElement)getLayoutNode();
 
 			// Get X requisition
@@ -504,7 +511,8 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 			
 			// Allocate X
 			double prevWidth = rootLayout.getAllocWidth();
-			rootLayout.allocateX( reqX, 0.0, windowSize.x );
+			double windowWidth = windowSize != null  ?  windowSize.x  :  Math.min( reqX.getReqPrefWidth(), screenSize.getWidth() );
+			rootLayout.allocateX( reqX, 0.0, windowWidth );
 			rootLayout.refreshAllocationX( prevWidth );
 			
 			// Get Y requisition
@@ -512,8 +520,9 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 			
 			// Allocate Y
 			LAllocV prevAllocV = rootLayout.getAllocV();
+			double windowHeight = windowSize != null  ?  windowSize.y  :  Math.min( reqX.getReqHeight(), screenSize.getHeight() );
 			//rootLayout.allocateY( reqY, 0.0, reqY.getReqHeight() );
-			rootLayout.allocateY( reqY, 0.0, windowSize.y );
+			rootLayout.allocateY( reqY, 0.0, windowHeight );
 			rootLayout.refreshAllocationY( prevAllocV );
 			
 			bAllocationRequired = false;
@@ -541,7 +550,7 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	
 	protected void configureEvent(Vector2 size)
 	{
-		if ( !size.equals( windowSize ) )
+		if ( windowSize == null  ||  !size.equals( windowSize ) )
 		{
 			windowSize = size;
 			bAllocationRequired = true;
@@ -560,7 +569,7 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 			//performAllocationForSpaceRequirements();
 			performAllocation();
 			LayoutNodeRootElement rootLayout = (LayoutNodeRootElement)getLayoutNode();
-			return new Dimension( (int)( rootLayout.getReqMinWidth() + 1.0 ),  (int)( rootLayout.getReqHeight() + 1.0 ) );
+			return new Dimension( (int)Math.ceil( rootLayout.getReqMinWidth() ),  (int)Math.ceil( rootLayout.getReqHeight() ) );
 		}
 		else
 		{
@@ -575,7 +584,7 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 			//performAllocationForSpaceRequirements();
 			performAllocation();
 			LayoutNodeRootElement rootLayout = (LayoutNodeRootElement)getLayoutNode();
-			return new Dimension( (int)( rootLayout.getReqPrefWidth() + 1.0 ),  (int)( rootLayout.getReqHeight() + 1.0 ) );
+			return new Dimension( (int)Math.ceil( rootLayout.getReqPrefWidth() ),  (int)Math.ceil( rootLayout.getReqHeight() ) );
 		}
 		else
 		{

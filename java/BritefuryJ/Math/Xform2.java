@@ -56,14 +56,20 @@ public class Xform2 implements Serializable
 	}
 	
 	
-	public boolean equals(Xform2 b)
+	public boolean equals(Object other)
 	{
-		if ( this == b )
+		if ( this == other )
 		{
 			return true;
 		}
 		
-		return scale == b.scale  &&  translation.equals( b.translation );
+		if ( other instanceof Xform2 )
+		{
+			Xform2 x = (Xform2)other;
+			return scale == x.scale  &&  translation.equals( x.translation );
+		}
+
+		return false;
 	}
 	
 	public int hashCode()

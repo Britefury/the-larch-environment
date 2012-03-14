@@ -53,14 +53,20 @@ public class Vector2 implements Presentable, Serializable
 	}
 	
 	
-	public boolean equals(Vector2 b)
+	public boolean equals(Object other)
 	{
-		if ( this == b )
+		if ( this == other )
 		{
 			return true;
 		}
 		
-		return x == b.x  &&  y == b.y;
+		if ( other instanceof Vector2 )
+		{
+			Vector2 v = (Vector2)other;
+			return x == v.x  &&  y == v.y;
+		}
+		
+		return false;
 	}
 	
 	public int hashCode()
@@ -183,7 +189,7 @@ public class Vector2 implements Presentable, Serializable
 	
 	public PyObject __copy__()
 	{
-		return Py.java2py( copy() );
+		return Py.java2py( new Vector2() );
 	}
 	
 	public PyObject __deepcopy__(PyDictionary memo)

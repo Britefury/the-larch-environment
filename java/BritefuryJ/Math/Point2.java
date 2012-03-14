@@ -60,14 +60,20 @@ public class Point2 implements Presentable, Serializable
 	}
 	
 	
-	public boolean equals(Point2 b)
+	public boolean equals(Object other)
 	{
-		if ( this == b )
+		if ( this == other )
 		{
 			return true;
 		}
 		
-		return x == b.x  &&  y == b.y;
+		if ( other instanceof Point2 )
+		{
+			Point2 p = (Point2)other;
+			return x == p.x  &&  y == p.y;
+		}
+		
+		return false;
 	}
 	
 	public int hashCode()
