@@ -75,6 +75,7 @@ public class TestsDirectory extends BrowserPage
 	
 	
 	
+	public static final BubblePopupTestPage bubblePopup = new BubblePopupTestPage();
 	public static final ButtonTestPage button = new ButtonTestPage();
 	public static final CheckboxTestPage checkbox = new CheckboxTestPage();
 	public static final ColourPickerTestPage colourPicker = new ColourPickerTestPage();
@@ -94,6 +95,7 @@ public class TestsDirectory extends BrowserPage
 	public static final TextEntryTestPage textEntry = new TextEntryTestPage();
 	
 	private static final Hyperlink controlsLinks[] = {
+		new Hyperlink( "Bubble popup", new Location( "system.tests.bubblePopup" ) ),
 		new Hyperlink( "Button", new Location( "system.tests.button" ) ),
 		new Hyperlink( "Check box", new Location( "system.tests.checkbox" ) ),
 		new Hyperlink( "Colour picker", new Location( "system.tests.colourPicker" ) ),

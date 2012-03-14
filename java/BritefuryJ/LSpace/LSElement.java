@@ -615,14 +615,19 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 	
 	public AABox2 getAABoxRelativeToAncestor(LSElement ancestor)
 	{
-		Point2 localOriginRelativeToAncestor = getLocalPointRelativeToAncestor( ancestor, new Point2() );
-		return getLocalAABox().offset( localOriginRelativeToAncestor.toVector2() );
+		Xform2 toElementXform = getLocalToAncestorXform( ancestor );
+		return toElementXform.transform( getLocalAABox() );
+	}
+	
+	public AABox2 getAABoxRelativeToRoot()
+	{
+		return getAABoxRelativeToAncestor( rootElement );
 	}
 	
 	public AABox2 getAABoxRelativeToScreen()
 	{
-		Point2 localOriginRelativeToScreen = getLocalPointRelativeToScreen( new Point2() );
-		return getLocalAABox().offset( localOriginRelativeToScreen.toVector2() );
+		Point screenRoot = rootElement.getComponent().getLocationOnScreen();
+		return getAABoxRelativeToAncestor( rootElement ).offset( new Vector2( screenRoot.x, screenRoot.y ) );
 	}
 	
 	

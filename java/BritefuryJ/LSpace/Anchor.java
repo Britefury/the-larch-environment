@@ -54,6 +54,12 @@ public class Anchor
 	
 	
 	
+	public Anchor opposite()
+	{
+		return new Anchor( 1.0 - propX, 1.0 - propY );
+	}
+	
+	
 	
 	public Point2 getBoxCorner(AABox2 box)
 	{
