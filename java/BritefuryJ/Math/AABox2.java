@@ -109,6 +109,50 @@ public class AABox2 implements Serializable
 	}
 	
 	
+	public Point2[] closestPoints(AABox2 b)
+	{
+		Point2 p0 = new Point2(), p1 = new Point2();
+		
+		if ( lowerX > b.upperX )
+		{
+			// @this is to the right of @b
+			p0.x = lowerX;
+			p1.x = b.upperX;
+		}
+		else if ( upperX < b.lowerX )
+		{
+			// @this is to the left of @b
+			p0.x = upperX;
+			p1.x = b.lowerX;
+		}
+		else
+		{
+			// There is overlap in X - take the centre of the overlapping region
+			p0.x = p1.x = ( Math.max( lowerX, b.lowerX ) + Math.min( upperX, b.upperX ) ) * 0.5;
+		}
+		
+		if ( lowerY > b.upperY )
+		{
+			// @this is below @b
+			p0.y = lowerY;
+			p1.y = b.upperY;
+		}
+		else if ( upperY < b.lowerY )
+		{
+			// @this is above @b
+			p0.y = upperY;
+			p1.y = b.lowerY;
+		}
+		else
+		{
+			// There is overlap in Y - take the centre of the overlapping region
+			p0.y = p1.y = ( Math.max( lowerY, b.lowerY ) + Math.min( upperY, b.upperY ) ) * 0.5;
+		}
+		
+		return new Point2[] { p0, p1 };
+	}
+	
+	
 	public void addPoint(double x, double y)
 	{
 		if ( isEmpty() )
@@ -171,6 +215,11 @@ public class AABox2 implements Serializable
 	public Point2 getUpper()
 	{
 		return new Point2( upperX, upperY );
+	}
+	
+	public Point2 getCentre()
+	{
+		return new Point2( ( lowerX + upperX ) * 0.5, ( lowerY + upperY ) * 0.5 );
 	}
 	
 	public Vector2 getSize()
