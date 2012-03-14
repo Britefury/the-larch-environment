@@ -9,7 +9,7 @@ import sys
 
 from java.lang import Throwable
 
-from BritefuryJ.LSpace.StreamValue import StreamValueBuilder
+from BritefuryJ.Util.RichString import RichStringBuilder
 
 from BritefuryJ.Util import InvokePyFunction
 
@@ -25,17 +25,17 @@ class _OutputStream (object):
 		if not ( isinstance( text, str )  or  isinstance( text, unicode ) ):
 			raise TypeError, 'argument 1 must be string, not %s' % type( text )
 		if self._builder is None:
-			self._builder = StreamValueBuilder()
+			self._builder = RichStringBuilder()
 		self._builder.appendTextValue( text )
 	
 	def display(self, value):
 		if self._builder is None:
-			self._builder = StreamValueBuilder()
+			self._builder = RichStringBuilder()
 		self._builder.appendStructuralValue( value )
 		
 		
-	def getStream(self):
-		return self._builder.stream()   if self._builder is not None   else None
+	def getRichString(self):
+		return self._builder.richString()   if self._builder is not None   else None
 
 		
 		
@@ -122,7 +122,7 @@ def getResultOfExecutionWithinModule(pythonCode, module, bEvaluate):
 
 		sys.stdout, sys.stderr = savedStdout, savedStderr
 
-	return ExecutionResult( stdout.getStream(), stderr.getStream(), caughtException, result )
+	return ExecutionResult( stdout.getRichString(), stderr.getRichString(), caughtException, result )
 
 
 def getResultOfExecutionInScopeWithinModule(pythonCode, globals, locals, module, bEvaluate):
@@ -168,7 +168,7 @@ def getResultOfExecutionInScopeWithinModule(pythonCode, globals, locals, module,
 
 		sys.stdout, sys.stderr = savedStdout, savedStderr
 
-	return ExecutionResult( stdout.getStream(), stderr.getStream(), caughtException, result )
+	return ExecutionResult( stdout.getRichString(), stderr.getRichString(), caughtException, result )
 
 
 

@@ -13,7 +13,6 @@ import java.util.*;
 
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMSchema;
-import BritefuryJ.LSpace.StreamValue.StreamValueBuilder;
 import BritefuryJ.Parser.Action;
 import BritefuryJ.Parser.AnyList;
 import BritefuryJ.Parser.AnyNode;
@@ -51,6 +50,7 @@ import BritefuryJ.Parser.Suppress;
 import BritefuryJ.Parser.TracedParseResult;
 import BritefuryJ.Parser.Word;
 import BritefuryJ.Parser.ZeroOrMore;
+import BritefuryJ.Util.RichString.RichStringBuilder;
 
 public class Test_Parser extends ParserTestCase
 {
@@ -132,7 +132,7 @@ public class Test_Parser extends ParserTestCase
 		
 
 		ParserExpression parser = new Literal( "abc" ).action( f );
-		matchTestStringAndStream( parser, "abc", "abcabc" );
+		matchTestStringAndRichString( parser, "abc", "abcabc" );
 		
 		matchTestNodeSX( new AnyNode().action( f_l ), "[a b c]", "[a b c a b c]" );
 		matchTestListSX( new AnyNode().action( f_l ), "[[a b c]]", "[a b c a b c]" );
@@ -159,7 +159,7 @@ public class Test_Parser extends ParserTestCase
 		
 
 		ParserExpression parser = ( ( new Literal( "a" ).__add__( "b" ).__add__( "c" ) ).mergeUpAction( f ) ).__add__( "d" );
-		matchTestStringAndStreamSX( parser, "abcd", "[a b c a b c d]" );
+		matchTestStringAndRichStringSX( parser, "abcd", "[a b c a b c d]" );
 		
 		matchTestListSX( parser, "[a b c d]", "[a b c a b c d]" );
 	}
@@ -170,10 +170,10 @@ public class Test_Parser extends ParserTestCase
 	{
 		assertTrue( new AnyList().isEquivalentTo( new AnyList() ) );
 		
-		matchFailTestStringAndStream( new AnyList(), "abc" );
+		matchFailTestStringAndRichString( new AnyList(), "abc" );
 		
-		matchTestStreamSX( new AnyList(), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "[a b]" ) ) } ).stream(), "[a b]" );
-		matchFailTestStream( new AnyList(), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "a" ) ) } ).stream() );
+		matchTestRichStringSX( new AnyList(), new RichStringBuilder( new RichStringBuilder.Item[] { new RichStringBuilder.StructuralItem( readInputSX( "[a b]" ) ) } ).richString(), "[a b]" );
+		matchFailTestRichString( new AnyList(), new RichStringBuilder( new RichStringBuilder.Item[] { new RichStringBuilder.StructuralItem( readInputSX( "a" ) ) } ).richString() );
 		
 		matchTestNodeSX( new AnyList(), "[a b c]", "[a b c]" );
 		matchFailTestNodeSX( new AnyList(), "a" );
@@ -186,10 +186,10 @@ public class Test_Parser extends ParserTestCase
 	{
 		assertTrue( new AnyNode().isEquivalentTo( new AnyNode() ) );
 
-		matchFailTestStringAndStream( new AnyNode(), "abc" );
+		matchFailTestStringAndRichString( new AnyNode(), "abc" );
 		
-		matchTestStreamSX( new AnyNode(), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "[a b]" ) ) } ).stream(), "[a b]" );
-		matchTestStreamSX( new AnyNode(), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "a" ) ) } ).stream(), "a" );
+		matchTestRichStringSX( new AnyNode(), new RichStringBuilder( new RichStringBuilder.Item[] { new RichStringBuilder.StructuralItem( readInputSX( "[a b]" ) ) } ).richString(), "[a b]" );
+		matchTestRichStringSX( new AnyNode(), new RichStringBuilder( new RichStringBuilder.Item[] { new RichStringBuilder.StructuralItem( readInputSX( "a" ) ) } ).richString(), "a" );
 		
 		matchTestNodeSX( new AnyNode(), "a", "a" );
 		
@@ -201,10 +201,10 @@ public class Test_Parser extends ParserTestCase
 	{
 		assertTrue( new AnyObject().isEquivalentTo( new AnyObject() ) );
 	
-		matchFailTestStringAndStream( new AnyObject(), "abc" );
+		matchFailTestStringAndRichString( new AnyObject(), "abc" );
 		
-		matchTestStreamSX( new AnyObject(), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "{m=tests.Parser.Test_Parser.s : (m Foo a=xyz)}" ) ) } ).stream(), "{m=tests.Parser.Test_Parser.s : (m Foo a=xyz)}" );
-		matchFailTestStream( new AnyObject(), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "a" ) ) } ).stream() );
+		matchTestRichStringSX( new AnyObject(), new RichStringBuilder( new RichStringBuilder.Item[] { new RichStringBuilder.StructuralItem( readInputSX( "{m=tests.Parser.Test_Parser.s : (m Foo a=xyz)}" ) ) } ).richString(), "{m=tests.Parser.Test_Parser.s : (m Foo a=xyz)}" );
+		matchFailTestRichString( new AnyObject(), new RichStringBuilder( new RichStringBuilder.Item[] { new RichStringBuilder.StructuralItem( readInputSX( "a" ) ) } ).richString() );
 		
 		matchTestNodeSX( new AnyObject(), "{m=tests.Parser.Test_Parser.s : (m Foo a=xyz)}", "{m=tests.Parser.Test_Parser.s : (m Foo a=xyz)}" );
 		matchFailTestNodeSX( new AnyObject(), "[a]" );
@@ -219,10 +219,10 @@ public class Test_Parser extends ParserTestCase
 	{
 		assertTrue( new AnyString().isEquivalentTo( new AnyString() ) );
 	
-		matchFailTestStringAndStream( new AnyString(), "abc" );
+		matchFailTestStringAndRichString( new AnyString(), "abc" );
 		
-		matchTestStreamSX( new AnyString(), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "a" ) ) } ).stream(), "a" );
-		matchFailTestStream( new AnyString(), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "[a b]" ) ) } ).stream() );
+		matchTestRichStringSX( new AnyString(), new RichStringBuilder( new RichStringBuilder.Item[] { new RichStringBuilder.StructuralItem( readInputSX( "a" ) ) } ).richString(), "a" );
+		matchFailTestRichString( new AnyString(), new RichStringBuilder( new RichStringBuilder.Item[] { new RichStringBuilder.StructuralItem( readInputSX( "[a b]" ) ) } ).richString() );
 
 		matchTestNodeSX( new AnyString(), "a", "a" );
 		matchFailTestNodeSX( new AnyString(), "[a]" );
@@ -236,13 +236,13 @@ public class Test_Parser extends ParserTestCase
 	{
 		ParserExpression parser1 = identifier.bindTo(  "x" );
 		
-		matchTestStringAndStreamSX( parser1, "abc", "abc" );
-		bindingsTestStringAndStreamSX( parser1, "abc", "[[x abc]]" );
+		matchTestStringAndRichStringSX( parser1, "abc", "abc" );
+		bindingsTestStringAndRichStringSX( parser1, "abc", "[[x abc]]" );
 
 		ParserExpression parser2 = identifier.bindTo( "x" ).bindTo( "y" );
 		
-		matchTestStringAndStreamSX( parser2, "abc", "abc" );
-		bindingsTestStringAndStreamSX( parser2, "abc", "[[x abc] [y abc]]" );
+		matchTestStringAndRichStringSX( parser2, "abc", "abc" );
+		bindingsTestStringAndRichStringSX( parser2, "abc", "[[x abc] [y abc]]" );
 		
 		bindingsTestNodeSX( new ObjectNode( Foo ).bindTo( "x" ),"{m=tests.Parser.Test_Parser.s : (m Foo a=a)}", "{m=tests.Parser.Test_Parser.s : [[x (m Foo a=a)]]}" );
 		bindingsTestListSX( new AnyString().bindTo( "x" ),"[a]", "{m=tests.Parser.Test_Parser.s : [[x a]]}" );
@@ -265,16 +265,16 @@ public class Test_Parser extends ParserTestCase
 		ParserExpression parser = new Choice( new Object[] { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) } );
 		ParserExpression parserWithBindings = new Choice( new Object[] { new Literal( "ab" ).bindTo( "x" ), new Literal( "cd" ).bindTo( "y" ), new Literal( "ef" ).bindTo( "z" ) } );
 		
-		matchTestStringAndStream( parser, "ab", "ab" );
-		matchTestStringAndStream( parser, "qw", "qw" );
-		matchTestStringAndStream( parser, "fh", "fh" );
-		matchFailTestStringAndStream( parser, "xy" );
-		matchSubTestStringAndStream( new Literal( "ab" ).__or__( "abcd" ), "ab", "ab", 2 );
-		matchSubTestStringAndStream( new Literal( "ab" ).__or__( "abcd" ), "abcd", "ab", 2 );
+		matchTestStringAndRichString( parser, "ab", "ab" );
+		matchTestStringAndRichString( parser, "qw", "qw" );
+		matchTestStringAndRichString( parser, "fh", "fh" );
+		matchFailTestStringAndRichString( parser, "xy" );
+		matchSubTestStringAndRichString( new Literal( "ab" ).__or__( "abcd" ), "ab", "ab", 2 );
+		matchSubTestStringAndRichString( new Literal( "ab" ).__or__( "abcd" ), "abcd", "ab", 2 );
 		
-		bindingsTestStringAndStreamSX( parserWithBindings, "ab", "[[x ab]]" );
-		bindingsTestStringAndStreamSX( parserWithBindings, "cd", "[[y cd]]" );
-		bindingsTestStringAndStreamSX( parserWithBindings, "ef", "[[z ef]]" );
+		bindingsTestStringAndRichStringSX( parserWithBindings, "ab", "[[x ab]]" );
+		bindingsTestStringAndRichStringSX( parserWithBindings, "cd", "[[y cd]]" );
+		bindingsTestStringAndRichStringSX( parserWithBindings, "ef", "[[z ef]]" );
 
 
 		
@@ -304,13 +304,13 @@ public class Test_Parser extends ParserTestCase
 	{
 		ParserExpression parser1 = identifier.bindTo(  "x" );
 		
-		matchTestStringAndStreamSX( parser1, "abc", "abc" );
-		bindingsTestStringAndStreamSX( parser1, "abc", "[[x abc]]" );
+		matchTestStringAndRichStringSX( parser1, "abc", "abc" );
+		bindingsTestStringAndRichStringSX( parser1, "abc", "[[x abc]]" );
 	
 		ParserExpression parser2 = parser1.clearBindings();
 		
-		matchTestStringAndStreamSX( parser2, "abc", "abc" );
-		bindingsTestStringAndStreamSX( parser2, "abc", "[]" );
+		matchTestStringAndRichStringSX( parser2, "abc", "abc" );
+		bindingsTestStringAndRichStringSX( parser2, "abc", "[]" );
 		
 		
 		matchTestNodeSX( new ObjectNode( Foo ).bindTo( "x" ).clearBindings(), "{m=tests.Parser.Test_Parser.s : (m Foo a=x)}", "{m=tests.Parser.Test_Parser.s : (m Foo a=x)}" );
@@ -335,8 +335,8 @@ public class Test_Parser extends ParserTestCase
 	
 		ParserExpression parser = new Combine( new Object[] { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) } );
 		
-		matchTestStringAndStream( parser, "abqwfh", "abqwfh" );
-		matchFailTestStringAndStream( parser, "abfh" );
+		matchTestStringAndRichString( parser, "abqwfh", "abqwfh" );
+		matchFailTestStringAndRichString( parser, "abfh" );
 	
 	
 	
@@ -346,19 +346,19 @@ public class Test_Parser extends ParserTestCase
 		Object[] subsB = { new Sequence( subsB1 ), new Sequence( subsB2 ), new Sequence( subsB3 ) };
 		ParserExpression parser2 = new Combine( subsB );
 		String[] result2 = { "ab", "cd", "ef", "gh", "ij", "kl" };
-		matchTestStringAndStream( parser2, "abcdefghijkl", Arrays.asList( result2 ) );
+		matchTestStringAndRichString( parser2, "abcdefghijkl", Arrays.asList( result2 ) );
 	
 		Object[] subsC = { new Sequence( subsB1 ), new Sequence( subsB2 ), new Sequence( subsB3 ), new Literal( "xyz" ) };
 		ParserExpression parser3 = new Combine( subsC );
 		String[] result3 = { "ab", "cd", "ef", "gh", "ij", "kl", "xyz" };
-		matchTestStringAndStream( parser3, "abcdefghijklxyz", Arrays.asList( result3 ) );
+		matchTestStringAndRichString( parser3, "abcdefghijklxyz", Arrays.asList( result3 ) );
 
 	
 	
 		ParserExpression parserWithBindings = new Combine( new Object[] { new Literal( "ab" ).bindTo( "x" ), new Literal( "qw" ).bindTo( "y" ), new Literal( "fh" ).bindTo( "x" ) } );
 		
-		matchTestStringAndStream( parserWithBindings, "abqwfh", "abqwfh" );
-		bindingsTestStringAndStreamSX( parserWithBindings, "abqwfh", "[[x fh] [y qw]]" );
+		matchTestStringAndRichString( parserWithBindings, "abqwfh", "abqwfh" );
+		bindingsTestStringAndRichStringSX( parserWithBindings, "abqwfh", "[[x fh] [y qw]]" );
 
 	
 	
@@ -399,8 +399,8 @@ public class Test_Parser extends ParserTestCase
 		
 		ParserExpression parser = new Word( "abcdefghijklmnopqrstuvwxyz" ).condition( f );
 		
-		matchTestStringAndStream( parser, "helloworld", "helloworld" );
-		matchFailTestStringAndStream( parser, "xabcdef" );
+		matchTestStringAndRichString( parser, "helloworld", "helloworld" );
+		matchFailTestStringAndRichString( parser, "xabcdef" );
 	}
 
 
@@ -434,7 +434,7 @@ public class Test_Parser extends ParserTestCase
 		
 
 		ParserExpression parser = new Delegate( new Literal( "abc" ) );
-		matchTestStringAndStream( parser, "abc", "abcabc", f_s );
+		matchTestStringAndRichString( parser, "abc", "abcabc", f_s );
 		
 		matchTestNodeSX( new Delegate( new AnyNode() ), "[a b c]", "[a b c a b c]", f_l );
 		matchTestListSX( new Delegate( new AnyNode() ), "[[a b c]]", "[a b c a b c]", f_l );
@@ -450,14 +450,14 @@ public class Test_Parser extends ParserTestCase
 		assertFalse( new Keyword( "abc", "xyz" ).isEquivalentTo( new Keyword( "def", "xyz" ) ) );
 		assertFalse( new Keyword( "abc", "xyz" ).isEquivalentTo( new Keyword( "abc", "pqr" ) ) );
 		
-		matchTestStringAndStream( new Keyword( "hello" ), "hello", "hello" );
-		matchFailTestStringAndStream( new Keyword( "hello" ), "helloq" );
-		matchSubTestStringAndStream( new Keyword( "hello", "abc" ), "hello", "hello", 5 );
-		matchSubTestStringAndStream( new Keyword( "hello", "abc" ), "helloxx", "hello", 5 );
-		matchFailTestStringAndStream( new Keyword( "hello", "abc" ), "helloaa" );
-		matchTestStringAndStreamSX( new Keyword( "hello" ).__add__( new Keyword( "there" ) ), "hello there", "[hello there]" );
+		matchTestStringAndRichString( new Keyword( "hello" ), "hello", "hello" );
+		matchFailTestStringAndRichString( new Keyword( "hello" ), "helloq" );
+		matchSubTestStringAndRichString( new Keyword( "hello", "abc" ), "hello", "hello", 5 );
+		matchSubTestStringAndRichString( new Keyword( "hello", "abc" ), "helloxx", "hello", 5 );
+		matchFailTestStringAndRichString( new Keyword( "hello", "abc" ), "helloaa" );
+		matchTestStringAndRichStringSX( new Keyword( "hello" ).__add__( new Keyword( "there" ) ), "hello there", "[hello there]" );
 		
-		matchTestStream( new Keyword( "hello" ), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( "hello" ) } ).stream(), "hello" );
+		matchTestRichString( new Keyword( "hello" ), new RichStringBuilder( new RichStringBuilder.Item[] { new RichStringBuilder.StructuralItem( "hello" ) } ).richString(), "hello" );
 
 		matchTestNode( new Keyword( "hello" ), "hello", "hello" );
 
@@ -472,7 +472,7 @@ public class Test_Parser extends ParserTestCase
 		matchFailTestNodeSX( parser1, "[abcde]" );
 		matchFailTestNodeSX( parser1, "[abc de]" );
 		matchFailTestString( parser1, "abc" );
-		matchTestStreamSX( parser1, new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "[abc]" ) ) } ).stream(), "[abc]" );
+		matchTestRichStringSX( parser1, new RichStringBuilder( new RichStringBuilder.Item[] { new RichStringBuilder.StructuralItem( readInputSX( "[abc]" ) ) } ).richString(), "[abc]" );
 		matchTestListSX( parser1, "[[abc]]", "[abc]" );
 
 		ParserExpression parser2 = new ListNode( new Object[] { new Literal( "abc" ), new Literal( "def" ) } );
@@ -494,8 +494,8 @@ public class Test_Parser extends ParserTestCase
 		matchFailTestNodeSX( parser4, "[abc d]" );
 		bindingsTestNodeSX( parser4, "[abc [d]]", "[[x [d]]]" );
 		matchFailTestString( parser4, "abcd" );
-		matchTestStreamSX( parser4, new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "[abc [d]]" ) ) } ).stream(), "[abc [d]]" );
-		bindingsTestStreamSX( parser4, new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "[abc [d]]" ) ) } ).stream(), "[[x [d]]]" );
+		matchTestRichStringSX( parser4, new RichStringBuilder( new RichStringBuilder.Item[] { new RichStringBuilder.StructuralItem( readInputSX( "[abc [d]]" ) ) } ).richString(), "[abc [d]]" );
+		bindingsTestRichStringSX( parser4, new RichStringBuilder( new RichStringBuilder.Item[] { new RichStringBuilder.StructuralItem( readInputSX( "[abc [d]]" ) ) } ).richString(), "[[x [d]]]" );
 		matchTestListSX( parser4, "[[abc [d]]]", "[abc [d]]" );
 		bindingsTestListSX( parser4, "[[abc [d]]]", "[[x [d]]]" );
 
@@ -525,12 +525,12 @@ public class Test_Parser extends ParserTestCase
 		assertTrue( new Literal( "abc" ).isEquivalentTo( new Literal( "abc" ) ) );
 		assertFalse( new Literal( "abc" ).isEquivalentTo( new Literal( "def" ) ) );
 		
-		matchTestStringAndStream( new Literal( "abcxyz" ), "abcxyz", "abcxyz" );
-		matchFailTestStringAndStream( new Literal( "abcxyz" ), "qwerty" );
-		matchSubTestStringAndStream( new Literal( "abcxyz" ), "abcxyz123", "abcxyz", 6 );
+		matchTestStringAndRichString( new Literal( "abcxyz" ), "abcxyz", "abcxyz" );
+		matchFailTestStringAndRichString( new Literal( "abcxyz" ), "qwerty" );
+		matchSubTestStringAndRichString( new Literal( "abcxyz" ), "abcxyz123", "abcxyz", 6 );
 
 		
-		matchTestStream( new Literal( "hello" ), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( "hello" ) } ).stream(), "hello" );
+		matchTestRichString( new Literal( "hello" ), new RichStringBuilder( new RichStringBuilder.Item[] { new RichStringBuilder.StructuralItem( "hello" ) } ).richString(), "hello" );
 
 		matchTestNode( new Literal( "hello" ), "hello", "hello" );
 
@@ -544,13 +544,13 @@ public class Test_Parser extends ParserTestCase
 		assertFalse( new LiteralNode( "abc" ).isEquivalentTo( new LiteralNode( "def" ) ) );
 		
 		matchTestNode( new LiteralNode( "hello" ), "hello", "hello" );
-		matchFailTestStringAndStream( new LiteralNode( "hello" ), "hello" );
-		matchTestStream( new LiteralNode( "hello" ), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( "hello" ) } ).stream(), "hello" );
+		matchFailTestStringAndRichString( new LiteralNode( "hello" ), "hello" );
+		matchTestRichString( new LiteralNode( "hello" ), new RichStringBuilder( new RichStringBuilder.Item[] { new RichStringBuilder.StructuralItem( "hello" ) } ).richString(), "hello" );
 		matchTestListSX( new LiteralNode( "hello" ), "[hello]", "hello" );
 
 		matchTestNodeSX( new LiteralNode( Foo.newInstance( new Object[] { "x" } ) ), "{m=tests.Parser.Test_Parser.s : (m Foo a=x)}", "{m=tests.Parser.Test_Parser.s : (m Foo a=x)}" );
-		matchTestStreamSX( new LiteralNode( Foo.newInstance( new Object[] { "x" } ) ),
-				new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "{m=tests.Parser.Test_Parser.s : (m Foo a=x)}" ) ) } ).stream(), "{m=tests.Parser.Test_Parser.s : (m Foo a=x)}" );
+		matchTestRichStringSX( new LiteralNode( Foo.newInstance( new Object[] { "x" } ) ),
+				new RichStringBuilder( new RichStringBuilder.Item[] { new RichStringBuilder.StructuralItem( readInputSX( "{m=tests.Parser.Test_Parser.s : (m Foo a=x)}" ) ) } ).richString(), "{m=tests.Parser.Test_Parser.s : (m Foo a=x)}" );
 		matchTestListSX( new LiteralNode( Foo.newInstance( new Object[] { "x" } ) ), "{m=tests.Parser.Test_Parser.s : [(m Foo a=x)]}", "{m=tests.Parser.Test_Parser.s : (m Foo a=x)}" );
 	}
 
@@ -562,7 +562,7 @@ public class Test_Parser extends ParserTestCase
 		matchTestNodeSX( parser1, "{m=tests.Parser.Test_Parser.s : (m A x=abc y=pqr)}", "{m=tests.Parser.Test_Parser.s : (m A x=abc y=pqr)}" );
 		matchFailTestNodeSX( parser1, "{m=tests.Parser.Test_Parser.s : (m A x=pqr y=xyz)}" );
 		matchFailTestString( parser1, "abc" );
-		matchTestStreamSX( parser1, new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "{m=tests.Parser.Test_Parser.s : (m A x=abc y=xyz)}" ) ) } ).stream(),
+		matchTestRichStringSX( parser1, new RichStringBuilder( new RichStringBuilder.Item[] { new RichStringBuilder.StructuralItem( readInputSX( "{m=tests.Parser.Test_Parser.s : (m A x=abc y=xyz)}" ) ) } ).richString(),
 				"{m=tests.Parser.Test_Parser.s : (m A x=abc y=xyz)}" );
 		matchTestListSX( parser1, "{m=tests.Parser.Test_Parser.s : [(m A x=abc y=xyz)]}", "{m=tests.Parser.Test_Parser.s : (m A x=abc y=xyz)}" );
 		
@@ -590,7 +590,7 @@ public class Test_Parser extends ParserTestCase
 		matchTestNodeSX( parser6, "{m=tests.Parser.Test_Parser.s : (m A x=def y=def)}", "{m=tests.Parser.Test_Parser.s : (m A x=def y=def)}" );
 		bindingsTestNodeSX( parser6, "{m=tests.Parser.Test_Parser.s : (m A x=abc y=abc)}", "[[x abc]]" );
 		bindingsTestNodeSX( parser6, "{m=tests.Parser.Test_Parser.s : (m A x=abc y=def)}", "[[x def]]" );
-		bindingsTestStreamSX( parser6, new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "{m=tests.Parser.Test_Parser.s : (m A x=abc y=def)}" ) ) } ).stream(),
+		bindingsTestRichStringSX( parser6, new RichStringBuilder( new RichStringBuilder.Item[] { new RichStringBuilder.StructuralItem( readInputSX( "{m=tests.Parser.Test_Parser.s : (m A x=abc y=def)}" ) ) } ).richString(),
 		"[[x def]]" );
 		bindingsTestListSX( parser6, "{m=tests.Parser.Test_Parser.s : [(m A x=abc y=def)]}", "[[x def]]" );
 		
@@ -619,19 +619,19 @@ public class Test_Parser extends ParserTestCase
 		String[][] result2 = { { "ab", "cd", },   { "abb", "cdd" } };
 		String[][] result3 = { { "ab", "cd", },   { "abb", "cdd" },   { "abbb", "cddd" } };
 		
-		matchFailTestStringAndStream( parser, "" );
+		matchFailTestStringAndRichString( parser, "" );
 		
-		matchTestStringAndStream( parser, "abcd", arrayToList2D( result1 ) );
-		matchTestStringAndStream( parser, "abcdabbcdd", arrayToList2D( result2 ) );
-		matchTestStringAndStream( parser, "abcdabbcddabbbcddd", arrayToList2D( result3 ) );
+		matchTestStringAndRichString( parser, "abcd", arrayToList2D( result1 ) );
+		matchTestStringAndRichString( parser, "abcdabbcdd", arrayToList2D( result2 ) );
+		matchTestStringAndRichString( parser, "abcdabbcddabbbcddd", arrayToList2D( result3 ) );
 		
 		ParserExpression parser2 = new OneOrMore( new Word( "a", "b" ) );
 		matchFailTestListSX( parser2, "[]" );
 		matchTestListSX( parser2, "[ab]", "[ab]" );
 		matchTestListSX( parser2, "[ab abb abbb]", "[ab abb abbb]" );
-		matchFailTestStream( parser2, new StreamValueBuilder().stream() );
-		matchTestStreamSX( parser2, new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( "ab" ) } ).stream(), "[ab]" );
-		matchTestStreamSX( parser2, new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.TextItem( "ab" ), new StreamValueBuilder.StructuralItem( "ab" ) } ).stream(),
+		matchFailTestRichString( parser2, new RichStringBuilder().richString() );
+		matchTestRichStringSX( parser2, new RichStringBuilder( new RichStringBuilder.Item[] { new RichStringBuilder.StructuralItem( "ab" ) } ).richString(), "[ab]" );
+		matchTestRichStringSX( parser2, new RichStringBuilder( new RichStringBuilder.Item[] { new RichStringBuilder.TextItem( "ab" ), new RichStringBuilder.StructuralItem( "ab" ) } ).richString(),
 		"[ab ab]" );
 	}
 
@@ -645,9 +645,9 @@ public class Test_Parser extends ParserTestCase
 	
 		ParserExpression parser = new Word( "a", "b" ).optional();
 		
-		matchTestStringAndStream( parser, "", null );
-		matchTestStringAndStream( parser, "abb", "abb" );
-		matchSubTestStringAndStream( parser, "abbabb", "abb", 3 );
+		matchTestStringAndRichString( parser, "", null );
+		matchTestStringAndRichString( parser, "abb", "abb" );
+		matchSubTestStringAndRichString( parser, "abbabb", "abb", 3 );
 		
 		matchTestNode( parser, "abb", "abb" );
 		matchTestNode( parser, "", null );
@@ -670,11 +670,11 @@ public class Test_Parser extends ParserTestCase
 		String[][] result1 = { { "ab" } };
 		String[][] result2 = { { "ab", "ab" } };
 	
-		matchFailTestStringAndStream( parser, "" );
-		matchFailTestStringAndStream( parser, "ab" );
-		matchFailTestStringAndStream( parser, "abab" );
-		matchSubTestStringAndStream( parser, "abcd", arrayToList2D( result1 ), 2 );
-		matchSubTestStringAndStream( parser, "ababcd", arrayToList2D( result2 ), 4 );
+		matchFailTestStringAndRichString( parser, "" );
+		matchFailTestStringAndRichString( parser, "ab" );
+		matchFailTestStringAndRichString( parser, "abab" );
+		matchSubTestStringAndRichString( parser, "abcd", arrayToList2D( result1 ), 2 );
+		matchSubTestStringAndRichString( parser, "ababcd", arrayToList2D( result2 ), 4 );
 		
 		matchTestNodeSX( new Word( "a", "b" ).peek(), "ab", "`null`" );
 
@@ -696,11 +696,11 @@ public class Test_Parser extends ParserTestCase
 		String[][] result1 = { { "ab" } };
 		String[][] result2 = { { "ab", "ab" } };
 	
-		matchFailTestStringAndStream( parser, "" );
-		matchFailTestStringAndStream( parser, "abcd" );
-		matchFailTestStringAndStream( parser, "ababcd" );
-		matchTestStringAndStream( parser, "ab", arrayToList2D( result1 ) );
-		matchTestStringAndStream( parser, "abab", arrayToList2D( result2 ) );
+		matchFailTestStringAndRichString( parser, "" );
+		matchFailTestStringAndRichString( parser, "abcd" );
+		matchFailTestStringAndRichString( parser, "ababcd" );
+		matchTestStringAndRichString( parser, "ab", arrayToList2D( result1 ) );
+		matchTestStringAndRichString( parser, "abab", arrayToList2D( result2 ) );
 		
 		matchFailTestNodeSX( new Word( "a", "b" ).peekNot(), "ab" );
 		matchTestNodeSX( new Word( "a", "b" ).peekNot(), "cd", "`null`" );
@@ -717,14 +717,14 @@ public class Test_Parser extends ParserTestCase
 		assertTrue( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ).isEquivalentTo( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ) ) );
 		assertFalse( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ).isEquivalentTo( new RegEx( "[A-Za-z_][A-Za-z0-9_]*abc" ) ) );
 	
-		matchTestStringAndStream( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ), "abc_123", "abc_123" );
-		matchFailTestStringAndStream( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ), "9abc" );
-		matchSubTestStringAndStream( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ), "abc_xyz...", "abc_xyz", 7 );
-		matchTestStringAndStream( new RegEx( "[A-Za-z_]*" ), "abc_", "abc_" );
-		matchFailTestStringAndStream( new RegEx( "[A-Za-z_]*" ), "." );
+		matchTestStringAndRichString( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ), "abc_123", "abc_123" );
+		matchFailTestStringAndRichString( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ), "9abc" );
+		matchSubTestStringAndRichString( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ), "abc_xyz...", "abc_xyz", 7 );
+		matchTestStringAndRichString( new RegEx( "[A-Za-z_]*" ), "abc_", "abc_" );
+		matchFailTestStringAndRichString( new RegEx( "[A-Za-z_]*" ), "." );
 	
 
-		matchTestStream( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( "abc_123" ) } ).stream(), "abc_123" );
+		matchTestRichString( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ), new RichStringBuilder( new RichStringBuilder.Item[] { new RichStringBuilder.StructuralItem( "abc_123" ) } ).richString(), "abc_123" );
 
 		matchTestNode( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ), "abc_123", "abc_123" );
 
@@ -758,41 +758,41 @@ public class Test_Parser extends ParserTestCase
 		String[][] result4 = { { "ab", "cd", },   { "abb", "cdd" },   { "abbb", "cddd" },   { "abbbb", "cdddd" } };
 		String[][] result5 = { { "ab", "cd", },   { "abb", "cdd" },   { "abbb", "cddd" },   { "abbbb", "cdddd" },   { "abbbbb", "cddddd" } };
 		
-		matchTestStringAndStream( parser_2, "", arrayToList2D( result0 ) );
-		matchTestStringAndStream( parser02, "", arrayToList2D( result0 ) );
-		matchTestStringAndStream( parser02N, "", null );
-		matchFailTestStringAndStream( parser24, "" );
-		matchFailTestStringAndStream( parser2_, "" );
+		matchTestStringAndRichString( parser_2, "", arrayToList2D( result0 ) );
+		matchTestStringAndRichString( parser02, "", arrayToList2D( result0 ) );
+		matchTestStringAndRichString( parser02N, "", null );
+		matchFailTestStringAndRichString( parser24, "" );
+		matchFailTestStringAndRichString( parser2_, "" );
 		
-		matchTestStringAndStream( parser_2, "abcd", arrayToList2D( result1 ) );
-		matchTestStringAndStream( parser02, "abcd", arrayToList2D( result1 ) );
-		matchTestStringAndStream( parser02N, "abcd", arrayToList2D( result1 ) );
-		matchFailTestStringAndStream( parser24, "abcd" );
-		matchFailTestStringAndStream( parser2_, "abcd" );
+		matchTestStringAndRichString( parser_2, "abcd", arrayToList2D( result1 ) );
+		matchTestStringAndRichString( parser02, "abcd", arrayToList2D( result1 ) );
+		matchTestStringAndRichString( parser02N, "abcd", arrayToList2D( result1 ) );
+		matchFailTestStringAndRichString( parser24, "abcd" );
+		matchFailTestStringAndRichString( parser2_, "abcd" );
 		
-		matchTestStringAndStream( parser_2, "abcdabbcdd", arrayToList2D( result2 ) );
-		matchTestStringAndStream( parser02, "abcdabbcdd", arrayToList2D( result2  ) );
-		matchTestStringAndStream( parser02N, "abcdabbcdd", arrayToList2D( result2  ) );
-		matchTestStringAndStream( parser24, "abcdabbcdd", arrayToList2D( result2  ) );
-		matchTestStringAndStream( parser2_, "abcdabbcdd", arrayToList2D( result2  ) );
+		matchTestStringAndRichString( parser_2, "abcdabbcdd", arrayToList2D( result2 ) );
+		matchTestStringAndRichString( parser02, "abcdabbcdd", arrayToList2D( result2  ) );
+		matchTestStringAndRichString( parser02N, "abcdabbcdd", arrayToList2D( result2  ) );
+		matchTestStringAndRichString( parser24, "abcdabbcdd", arrayToList2D( result2  ) );
+		matchTestStringAndRichString( parser2_, "abcdabbcdd", arrayToList2D( result2  ) );
 		
-		matchSubTestStringAndStream( parser_2, "abcdabbcddabbbcddd", arrayToList2D( result2 ), 10 );
-		matchSubTestStringAndStream( parser02, "abcdabbcddabbbcddd", arrayToList2D( result2 ), 10 );
-		matchSubTestStringAndStream( parser02N, "abcdabbcddabbbcddd", arrayToList2D( result2 ), 10 );
-		matchTestStringAndStream( parser24, "abcdabbcddabbbcddd", arrayToList2D( result3 ) );
-		matchTestStringAndStream( parser2_, "abcdabbcddabbbcddd", arrayToList2D( result3 ) );
+		matchSubTestStringAndRichString( parser_2, "abcdabbcddabbbcddd", arrayToList2D( result2 ), 10 );
+		matchSubTestStringAndRichString( parser02, "abcdabbcddabbbcddd", arrayToList2D( result2 ), 10 );
+		matchSubTestStringAndRichString( parser02N, "abcdabbcddabbbcddd", arrayToList2D( result2 ), 10 );
+		matchTestStringAndRichString( parser24, "abcdabbcddabbbcddd", arrayToList2D( result3 ) );
+		matchTestStringAndRichString( parser2_, "abcdabbcddabbbcddd", arrayToList2D( result3 ) );
 		
-		matchSubTestStringAndStream( parser_2, "abcdabbcddabbbcdddabbbbcdddd", arrayToList2D( result2 ), 10 );
-		matchSubTestStringAndStream( parser02, "abcdabbcddabbbcdddabbbbcdddd", arrayToList2D( result2 ), 10 );
-		matchSubTestStringAndStream( parser02N, "abcdabbcddabbbcdddabbbbcdddd", arrayToList2D( result2 ), 10 );
-		matchTestStringAndStream( parser24, "abcdabbcddabbbcdddabbbbcdddd", arrayToList2D( result4 ) );
-		matchTestStringAndStream( parser2_, "abcdabbcddabbbcdddabbbbcdddd", arrayToList2D( result4 ) );
+		matchSubTestStringAndRichString( parser_2, "abcdabbcddabbbcdddabbbbcdddd", arrayToList2D( result2 ), 10 );
+		matchSubTestStringAndRichString( parser02, "abcdabbcddabbbcdddabbbbcdddd", arrayToList2D( result2 ), 10 );
+		matchSubTestStringAndRichString( parser02N, "abcdabbcddabbbcdddabbbbcdddd", arrayToList2D( result2 ), 10 );
+		matchTestStringAndRichString( parser24, "abcdabbcddabbbcdddabbbbcdddd", arrayToList2D( result4 ) );
+		matchTestStringAndRichString( parser2_, "abcdabbcddabbbcdddabbbbcdddd", arrayToList2D( result4 ) );
 		
-		matchSubTestStringAndStream( parser_2, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", arrayToList2D( result2 ), 10 );
-		matchSubTestStringAndStream( parser02, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", arrayToList2D( result2 ), 10 );
-		matchSubTestStringAndStream( parser02N, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", arrayToList2D( result2 ), 10 );
-		matchSubTestStringAndStream( parser24, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", arrayToList2D( result4 ), 28 );
-		matchTestStringAndStream( parser2_, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", arrayToList2D( result5 ) );
+		matchSubTestStringAndRichString( parser_2, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", arrayToList2D( result2 ), 10 );
+		matchSubTestStringAndRichString( parser02, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", arrayToList2D( result2 ), 10 );
+		matchSubTestStringAndRichString( parser02N, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", arrayToList2D( result2 ), 10 );
+		matchSubTestStringAndRichString( parser24, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", arrayToList2D( result4 ), 28 );
+		matchTestStringAndRichString( parser2_, "abcdabbcddabbbcdddabbbbcddddabbbbbcddddd", arrayToList2D( result5 ) );
 
 	
 		ParserExpression parserStructural = new Word( "a", "b" ).repeat( 2, 4 );
@@ -801,7 +801,7 @@ public class Test_Parser extends ParserTestCase
 		matchTestListSX( parserStructural, "[ab abb abbb]", "[ab abb abbb]" );
 		matchTestListSX( parserStructural, "[ab abb abbb abbb]", "[ab abb abbb abbb]" );
 		matchSubTestListSX( parserStructural, "[ab abb abbb abbb ab]", "[ab abb abbb abbb]", 4 );
-		matchTestStreamSX( parserStructural, new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.TextItem( "ab" ), new StreamValueBuilder.StructuralItem( "ab" ) } ).stream(),
+		matchTestRichStringSX( parserStructural, new RichStringBuilder( new RichStringBuilder.Item[] { new RichStringBuilder.TextItem( "ab" ), new RichStringBuilder.StructuralItem( "ab" ) } ).richString(),
 		"[ab ab]" );
 	}
 
@@ -888,185 +888,185 @@ public class Test_Parser extends ParserTestCase
 	
 		
 		
-		matchTestStringAndStreamSX( parser0N, "", "[]" );
-		matchIncompleteTestStringAndStream( parser0N, "," );
-		matchTestStringAndStreamSX( parser0N, "ab", "[ab]" );
-		matchIncompleteTestStringAndStream( parser0N, "ab," );
-		matchTestStringAndStreamSX( parser0N, "ab,cd", "[ab cd]" );
-		matchIncompleteTestStringAndStream( parser0N, "ab,cd," );
-		matchTestStringAndStreamSX( parser0N, "ab,cd,ef", "[ab cd ef]" );
-		matchIncompleteTestStringAndStream( parser0N, "ab,cd,ef," );
+		matchTestStringAndRichStringSX( parser0N, "", "[]" );
+		matchIncompleteTestStringAndRichString( parser0N, "," );
+		matchTestStringAndRichStringSX( parser0N, "ab", "[ab]" );
+		matchIncompleteTestStringAndRichString( parser0N, "ab," );
+		matchTestStringAndRichStringSX( parser0N, "ab,cd", "[ab cd]" );
+		matchIncompleteTestStringAndRichString( parser0N, "ab,cd," );
+		matchTestStringAndRichStringSX( parser0N, "ab,cd,ef", "[ab cd ef]" );
+		matchIncompleteTestStringAndRichString( parser0N, "ab,cd,ef," );
 		
-		matchFailTestStringAndStream( parser1N, "" );
-		matchFailTestStringAndStream( parser1N, "," );
-		matchTestStringAndStreamSX( parser1N, "ab", "[ab]" );
-		matchIncompleteTestStringAndStream( parser1N, "ab," );
-		matchTestStringAndStreamSX( parser1N, "ab,cd", "[ab cd]" );
-		matchIncompleteTestStringAndStream( parser1N, "ab,cd," );
-		matchTestStringAndStreamSX( parser1N, "ab,cd,ef", "[ab cd ef]" );
-		matchIncompleteTestStringAndStream( parser1N, "ab,cd,ef," );
+		matchFailTestStringAndRichString( parser1N, "" );
+		matchFailTestStringAndRichString( parser1N, "," );
+		matchTestStringAndRichStringSX( parser1N, "ab", "[ab]" );
+		matchIncompleteTestStringAndRichString( parser1N, "ab," );
+		matchTestStringAndRichStringSX( parser1N, "ab,cd", "[ab cd]" );
+		matchIncompleteTestStringAndRichString( parser1N, "ab,cd," );
+		matchTestStringAndRichStringSX( parser1N, "ab,cd,ef", "[ab cd ef]" );
+		matchIncompleteTestStringAndRichString( parser1N, "ab,cd,ef," );
 		
-		matchFailTestStringAndStream( parser2N, "" );
-		matchFailTestStringAndStream( parser2N, "," );
-		matchFailTestStringAndStream( parser2N, "ab" );
-		matchFailTestStringAndStream( parser2N, "ab," );
-		matchTestStringAndStreamSX( parser2N, "ab,cd", "[ab cd]" );
-		matchIncompleteTestStringAndStream( parser2N, "ab,cd," );
-		matchTestStringAndStreamSX( parser2N, "ab,cd,ef", "[ab cd ef]" );
-		matchIncompleteTestStringAndStream( parser2N, "ab,cd,ef," );
+		matchFailTestStringAndRichString( parser2N, "" );
+		matchFailTestStringAndRichString( parser2N, "," );
+		matchFailTestStringAndRichString( parser2N, "ab" );
+		matchFailTestStringAndRichString( parser2N, "ab," );
+		matchTestStringAndRichStringSX( parser2N, "ab,cd", "[ab cd]" );
+		matchIncompleteTestStringAndRichString( parser2N, "ab,cd," );
+		matchTestStringAndRichStringSX( parser2N, "ab,cd,ef", "[ab cd ef]" );
+		matchIncompleteTestStringAndRichString( parser2N, "ab,cd,ef," );
 	
-		matchFailTestStringAndStream( parser23N, "" );
-		matchFailTestStringAndStream( parser23N, "," );
-		matchFailTestStringAndStream( parser23N, "ab" );
-		matchFailTestStringAndStream( parser23N, "ab," );
-		matchTestStringAndStreamSX( parser23N, "ab,cd", "[ab cd]" );
-		matchIncompleteTestStringAndStream( parser23N, "ab,cd," );
-		matchTestStringAndStreamSX( parser23N, "ab,cd,ef", "[ab cd ef]" );
-		matchIncompleteTestStringAndStream( parser23N, "ab,cd,ef," );
-		matchIncompleteTestStringAndStream( parser23N, "ab,cd,ef,gh" );
-		matchIncompleteTestStringAndStream( parser23N, "ab,cd,ef,gh," );
+		matchFailTestStringAndRichString( parser23N, "" );
+		matchFailTestStringAndRichString( parser23N, "," );
+		matchFailTestStringAndRichString( parser23N, "ab" );
+		matchFailTestStringAndRichString( parser23N, "ab," );
+		matchTestStringAndRichStringSX( parser23N, "ab,cd", "[ab cd]" );
+		matchIncompleteTestStringAndRichString( parser23N, "ab,cd," );
+		matchTestStringAndRichStringSX( parser23N, "ab,cd,ef", "[ab cd ef]" );
+		matchIncompleteTestStringAndRichString( parser23N, "ab,cd,ef," );
+		matchIncompleteTestStringAndRichString( parser23N, "ab,cd,ef,gh" );
+		matchIncompleteTestStringAndRichString( parser23N, "ab,cd,ef,gh," );
 	
-		matchTestStringAndStreamSX( parserDN, "[]", "[]" );
-		matchFailTestStringAndStream( parserDN, "[,]" );
-		matchTestStringAndStreamSX( parserDN, "[ab]", "[ab]" );
-		matchFailTestStringAndStream( parserDN, "[ab,]" );
-		matchTestStringAndStreamSX( parserDN, "[ab,cd]", "[ab cd]" );
-		matchFailTestStringAndStream( parserDN, "[ab,cd,]" );
-		matchTestStringAndStreamSX( parserDN, "[ab,cd,ef]", "[ab cd ef]" );
-		matchFailTestStringAndStream( parserDN, "[ab,cd,ef,]" );
-		
-	
-		
-		matchTestStringAndStreamSX( parser0O, "", "[]" );
-		matchIncompleteTestStringAndStream( parser0O, "," );
-		matchTestStringAndStreamSX( parser0O, "ab", "[ab]" );
-		matchTestStringAndStreamSX( parser0O, "ab,", "[ab]" );
-		matchTestStringAndStreamSX( parser0O, "ab,cd", "[ab cd]" );
-		matchTestStringAndStreamSX( parser0O, "ab,cd,", "[ab cd]" );
-		matchTestStringAndStreamSX( parser0O, "ab,cd,ef", "[ab cd ef]" );
-		matchTestStringAndStreamSX( parser0O, "ab,cd,ef,", "[ab cd ef]" );
-		
-		matchFailTestStringAndStream( parser1O, "" );
-		matchFailTestStringAndStream( parser1O, "," );
-		matchTestStringAndStreamSX( parser1O, "ab", "[ab]" );
-		matchTestStringAndStreamSX( parser1O, "ab,", "[ab]" );
-		matchTestStringAndStreamSX( parser1O, "ab,cd", "[ab cd]" );
-		matchTestStringAndStreamSX( parser1O, "ab,cd,", "[ab cd]" );
-		matchTestStringAndStreamSX( parser1O, "ab,cd,ef", "[ab cd ef]" );
-		matchTestStringAndStreamSX( parser1O, "ab,cd,ef,", "[ab cd ef]" );
-		
-		matchFailTestStringAndStream( parser2O, "" );
-		matchFailTestStringAndStream( parser2O, "," );
-		matchFailTestStringAndStream( parser2O, "ab" );
-		matchFailTestStringAndStream( parser2O, "ab," );
-		matchTestStringAndStreamSX( parser2O, "ab,cd", "[ab cd]" );
-		matchTestStringAndStreamSX( parser2O, "ab,cd,", "[ab cd]" );
-		matchTestStringAndStreamSX( parser2O, "ab,cd,ef", "[ab cd ef]" );
-		matchTestStringAndStreamSX( parser2O, "ab,cd,ef,", "[ab cd ef]" );
-	
-		matchFailTestStringAndStream( parser23O, "" );
-		matchFailTestStringAndStream( parser23O, "," );
-		matchFailTestStringAndStream( parser23O, "ab" );
-		matchFailTestStringAndStream( parser23O, "ab," );
-		matchTestStringAndStreamSX( parser23O, "ab,cd", "[ab cd]" );
-		matchTestStringAndStreamSX( parser23O, "ab,cd,", "[ab cd]" );
-		matchTestStringAndStreamSX( parser23O, "ab,cd,ef", "[ab cd ef]" );
-		matchTestStringAndStreamSX( parser23O, "ab,cd,ef,", "[ab cd ef]" );
-		matchIncompleteTestStringAndStream( parser23O, "ab,cd,ef,gh" );
-		matchIncompleteTestStringAndStream( parser23O, "ab,cd,ef,gh," );
-	
-		matchTestStringAndStreamSX( parserDO, "[]", "[]" );
-		matchFailTestStringAndStream( parserDO, "[,]" );
-		matchTestStringAndStreamSX( parserDO, "[ab]", "[ab]" );
-		matchTestStringAndStreamSX( parserDO, "[ab,]", "[ab]" );
-		matchTestStringAndStreamSX( parserDO, "[ab,cd]", "[ab cd]" );
-		matchTestStringAndStreamSX( parserDO, "[ab,cd,]", "[ab cd]" );
-		matchTestStringAndStreamSX( parserDO, "[ab,cd,ef]", "[ab cd ef]" );
-		matchTestStringAndStreamSX( parserDO, "[ab,cd,ef,]", "[ab cd ef]" );
+		matchTestStringAndRichStringSX( parserDN, "[]", "[]" );
+		matchFailTestStringAndRichString( parserDN, "[,]" );
+		matchTestStringAndRichStringSX( parserDN, "[ab]", "[ab]" );
+		matchFailTestStringAndRichString( parserDN, "[ab,]" );
+		matchTestStringAndRichStringSX( parserDN, "[ab,cd]", "[ab cd]" );
+		matchFailTestStringAndRichString( parserDN, "[ab,cd,]" );
+		matchTestStringAndRichStringSX( parserDN, "[ab,cd,ef]", "[ab cd ef]" );
+		matchFailTestStringAndRichString( parserDN, "[ab,cd,ef,]" );
 		
 	
 		
-		matchTestStringAndStreamSX( parser0R, "", "[]" );
-		matchIncompleteTestStringAndStream( parser0R, "," );
-		matchIncompleteTestStringAndStream( parser0R, "ab" );
-		matchTestStringAndStreamSX( parser0R, "ab,", "[ab]" );
-		matchIncompleteTestStringAndStream( parser0R, "ab,cd" );
-		matchTestStringAndStreamSX( parser0R, "ab,cd,", "[ab cd]" );
-		matchIncompleteTestStringAndStream( parser0R, "ab,cd,ef" );
-		matchTestStringAndStreamSX( parser0R, "ab,cd,ef,", "[ab cd ef]" );
+		matchTestStringAndRichStringSX( parser0O, "", "[]" );
+		matchIncompleteTestStringAndRichString( parser0O, "," );
+		matchTestStringAndRichStringSX( parser0O, "ab", "[ab]" );
+		matchTestStringAndRichStringSX( parser0O, "ab,", "[ab]" );
+		matchTestStringAndRichStringSX( parser0O, "ab,cd", "[ab cd]" );
+		matchTestStringAndRichStringSX( parser0O, "ab,cd,", "[ab cd]" );
+		matchTestStringAndRichStringSX( parser0O, "ab,cd,ef", "[ab cd ef]" );
+		matchTestStringAndRichStringSX( parser0O, "ab,cd,ef,", "[ab cd ef]" );
 		
-		matchFailTestStringAndStream( parser1R, "" );
-		matchFailTestStringAndStream( parser1R, "," );
-		matchFailTestStringAndStream( parser1R, "ab" );
-		matchTestStringAndStreamSX( parser1R, "ab,", "[ab]" );
-		matchIncompleteTestStringAndStream( parser1R, "ab,cd" );
-		matchTestStringAndStreamSX( parser1R, "ab,cd,", "[ab cd]" );
-		matchIncompleteTestStringAndStream( parser1R, "ab,cd,ef" );
-		matchTestStringAndStreamSX( parser1R, "ab,cd,ef,", "[ab cd ef]" );
+		matchFailTestStringAndRichString( parser1O, "" );
+		matchFailTestStringAndRichString( parser1O, "," );
+		matchTestStringAndRichStringSX( parser1O, "ab", "[ab]" );
+		matchTestStringAndRichStringSX( parser1O, "ab,", "[ab]" );
+		matchTestStringAndRichStringSX( parser1O, "ab,cd", "[ab cd]" );
+		matchTestStringAndRichStringSX( parser1O, "ab,cd,", "[ab cd]" );
+		matchTestStringAndRichStringSX( parser1O, "ab,cd,ef", "[ab cd ef]" );
+		matchTestStringAndRichStringSX( parser1O, "ab,cd,ef,", "[ab cd ef]" );
 		
-		matchFailTestStringAndStream( parser2R, "" );
-		matchFailTestStringAndStream( parser2R, "," );
-		matchFailTestStringAndStream( parser2R, "ab" );
-		matchFailTestStringAndStream( parser2R, "ab," );
-		matchFailTestStringAndStream( parser2R, "ab,cd" );
-		matchTestStringAndStreamSX( parser2R, "ab,cd,", "[ab cd]" );
-		matchIncompleteTestStringAndStream( parser2R, "ab,cd,ef" );
-		matchTestStringAndStreamSX( parser2R, "ab,cd,ef,", "[ab cd ef]" );
+		matchFailTestStringAndRichString( parser2O, "" );
+		matchFailTestStringAndRichString( parser2O, "," );
+		matchFailTestStringAndRichString( parser2O, "ab" );
+		matchFailTestStringAndRichString( parser2O, "ab," );
+		matchTestStringAndRichStringSX( parser2O, "ab,cd", "[ab cd]" );
+		matchTestStringAndRichStringSX( parser2O, "ab,cd,", "[ab cd]" );
+		matchTestStringAndRichStringSX( parser2O, "ab,cd,ef", "[ab cd ef]" );
+		matchTestStringAndRichStringSX( parser2O, "ab,cd,ef,", "[ab cd ef]" );
 	
-		matchFailTestStringAndStream( parser23R, "" );
-		matchFailTestStringAndStream( parser23R, "," );
-		matchFailTestStringAndStream( parser23R, "ab" );
-		matchFailTestStringAndStream( parser23R, "ab," );
-		matchFailTestStringAndStream( parser23R, "ab,cd" );
-		matchTestStringAndStreamSX( parser23R, "ab,cd,", "[ab cd]" );
-		matchIncompleteTestStringAndStream( parser23R, "ab,cd,ef" );
-		matchTestStringAndStreamSX( parser23R, "ab,cd,ef,", "[ab cd ef]" );
-		matchIncompleteTestStringAndStream( parser23O, "ab,cd,ef,gh" );
-		matchIncompleteTestStringAndStream( parser23O, "ab,cd,ef,gh," );
+		matchFailTestStringAndRichString( parser23O, "" );
+		matchFailTestStringAndRichString( parser23O, "," );
+		matchFailTestStringAndRichString( parser23O, "ab" );
+		matchFailTestStringAndRichString( parser23O, "ab," );
+		matchTestStringAndRichStringSX( parser23O, "ab,cd", "[ab cd]" );
+		matchTestStringAndRichStringSX( parser23O, "ab,cd,", "[ab cd]" );
+		matchTestStringAndRichStringSX( parser23O, "ab,cd,ef", "[ab cd ef]" );
+		matchTestStringAndRichStringSX( parser23O, "ab,cd,ef,", "[ab cd ef]" );
+		matchIncompleteTestStringAndRichString( parser23O, "ab,cd,ef,gh" );
+		matchIncompleteTestStringAndRichString( parser23O, "ab,cd,ef,gh," );
+	
+		matchTestStringAndRichStringSX( parserDO, "[]", "[]" );
+		matchFailTestStringAndRichString( parserDO, "[,]" );
+		matchTestStringAndRichStringSX( parserDO, "[ab]", "[ab]" );
+		matchTestStringAndRichStringSX( parserDO, "[ab,]", "[ab]" );
+		matchTestStringAndRichStringSX( parserDO, "[ab,cd]", "[ab cd]" );
+		matchTestStringAndRichStringSX( parserDO, "[ab,cd,]", "[ab cd]" );
+		matchTestStringAndRichStringSX( parserDO, "[ab,cd,ef]", "[ab cd ef]" );
+		matchTestStringAndRichStringSX( parserDO, "[ab,cd,ef,]", "[ab cd ef]" );
 		
-		matchTestStringAndStreamSX( parserDR, "[]", "[]" );
-		matchFailTestStringAndStream( parserDR, "[,]" );
-		matchFailTestStringAndStream( parserDR, "[ab]" );
-		matchTestStringAndStreamSX( parserDR, "[ab,]", "[ab]" );
-		matchFailTestStringAndStream( parserDR, "[ab,cd]");
-		matchTestStringAndStreamSX( parserDR, "[ab,cd,]", "[ab cd]" );
-		matchFailTestStringAndStream( parserDR, "[ab,cd,ef]" );
-		matchTestStringAndStreamSX( parserDR, "[ab,cd,ef,]", "[ab cd ef]" );
+	
+		
+		matchTestStringAndRichStringSX( parser0R, "", "[]" );
+		matchIncompleteTestStringAndRichString( parser0R, "," );
+		matchIncompleteTestStringAndRichString( parser0R, "ab" );
+		matchTestStringAndRichStringSX( parser0R, "ab,", "[ab]" );
+		matchIncompleteTestStringAndRichString( parser0R, "ab,cd" );
+		matchTestStringAndRichStringSX( parser0R, "ab,cd,", "[ab cd]" );
+		matchIncompleteTestStringAndRichString( parser0R, "ab,cd,ef" );
+		matchTestStringAndRichStringSX( parser0R, "ab,cd,ef,", "[ab cd ef]" );
+		
+		matchFailTestStringAndRichString( parser1R, "" );
+		matchFailTestStringAndRichString( parser1R, "," );
+		matchFailTestStringAndRichString( parser1R, "ab" );
+		matchTestStringAndRichStringSX( parser1R, "ab,", "[ab]" );
+		matchIncompleteTestStringAndRichString( parser1R, "ab,cd" );
+		matchTestStringAndRichStringSX( parser1R, "ab,cd,", "[ab cd]" );
+		matchIncompleteTestStringAndRichString( parser1R, "ab,cd,ef" );
+		matchTestStringAndRichStringSX( parser1R, "ab,cd,ef,", "[ab cd ef]" );
+		
+		matchFailTestStringAndRichString( parser2R, "" );
+		matchFailTestStringAndRichString( parser2R, "," );
+		matchFailTestStringAndRichString( parser2R, "ab" );
+		matchFailTestStringAndRichString( parser2R, "ab," );
+		matchFailTestStringAndRichString( parser2R, "ab,cd" );
+		matchTestStringAndRichStringSX( parser2R, "ab,cd,", "[ab cd]" );
+		matchIncompleteTestStringAndRichString( parser2R, "ab,cd,ef" );
+		matchTestStringAndRichStringSX( parser2R, "ab,cd,ef,", "[ab cd ef]" );
+	
+		matchFailTestStringAndRichString( parser23R, "" );
+		matchFailTestStringAndRichString( parser23R, "," );
+		matchFailTestStringAndRichString( parser23R, "ab" );
+		matchFailTestStringAndRichString( parser23R, "ab," );
+		matchFailTestStringAndRichString( parser23R, "ab,cd" );
+		matchTestStringAndRichStringSX( parser23R, "ab,cd,", "[ab cd]" );
+		matchIncompleteTestStringAndRichString( parser23R, "ab,cd,ef" );
+		matchTestStringAndRichStringSX( parser23R, "ab,cd,ef,", "[ab cd ef]" );
+		matchIncompleteTestStringAndRichString( parser23O, "ab,cd,ef,gh" );
+		matchIncompleteTestStringAndRichString( parser23O, "ab,cd,ef,gh," );
+		
+		matchTestStringAndRichStringSX( parserDR, "[]", "[]" );
+		matchFailTestStringAndRichString( parserDR, "[,]" );
+		matchFailTestStringAndRichString( parserDR, "[ab]" );
+		matchTestStringAndRichStringSX( parserDR, "[ab,]", "[ab]" );
+		matchFailTestStringAndRichString( parserDR, "[ab,cd]");
+		matchTestStringAndRichStringSX( parserDR, "[ab,cd,]", "[ab cd]" );
+		matchFailTestStringAndRichString( parserDR, "[ab,cd,ef]" );
+		matchTestStringAndRichStringSX( parserDR, "[ab,cd,ef,]", "[ab cd ef]" );
 	
 	
 	
-		matchTestStringAndStreamSX( parserDOC, "[]", "[]" );
-		matchFailTestStringAndStream( parserDOC, "[,]" );
-		matchFailTestStringAndStream( parserDOC, "[ab]" );
-		matchFailTestStringAndStream( parserDOC, "[ab,]" );
-		matchTestStringAndStreamSX( parserDOC, "[ab,cd]", "[ab cd]" );
-		matchTestStringAndStreamSX( parserDOC, "[ab,cd,]", "[ab cd]" );
-		matchFailTestStringAndStream( parserDOC, "[ab,cd,ef]" );
-		matchFailTestStringAndStream( parserDOC, "[ab,cd,ef,]" );
-		matchTestStringAndStreamSX( parserDOC, "[ab,cd,ef,gh]", "[ab cd ef gh]" );
-		matchTestStringAndStreamSX( parserDOC, "[ab,cd,ef,gh,]", "[ab cd ef gh]" );
+		matchTestStringAndRichStringSX( parserDOC, "[]", "[]" );
+		matchFailTestStringAndRichString( parserDOC, "[,]" );
+		matchFailTestStringAndRichString( parserDOC, "[ab]" );
+		matchFailTestStringAndRichString( parserDOC, "[ab,]" );
+		matchTestStringAndRichStringSX( parserDOC, "[ab,cd]", "[ab cd]" );
+		matchTestStringAndRichStringSX( parserDOC, "[ab,cd,]", "[ab cd]" );
+		matchFailTestStringAndRichString( parserDOC, "[ab,cd,ef]" );
+		matchFailTestStringAndRichString( parserDOC, "[ab,cd,ef,]" );
+		matchTestStringAndRichStringSX( parserDOC, "[ab,cd,ef,gh]", "[ab cd ef gh]" );
+		matchTestStringAndRichStringSX( parserDOC, "[ab,cd,ef,gh,]", "[ab cd ef gh]" );
 		
-		matchTestStringAndStreamSX( parserDOA, "[]", "[]" );
-		matchFailTestStringAndStream( parserDOA, "[,]" );
-		matchTestStringAndStreamSX( parserDOA, "[ab]", "[ab]" );
-		matchTestStringAndStreamSX( parserDOA, "[ab,]", "[ab sep]" );
-		matchTestStringAndStreamSX( parserDOA, "[ab,cd]", "[ab cd]" );
-		matchTestStringAndStreamSX( parserDOA, "[ab,cd,]", "[ab cd sep]" );
-		matchTestStringAndStreamSX( parserDOA, "[ab,cd,ef]", "[ab cd ef]" );
-		matchTestStringAndStreamSX( parserDOA, "[ab,cd,ef,]", "[ab cd ef sep]" );
-		matchTestStringAndStreamSX( parserDOA, "[ab,cd,ef,gh]", "[ab cd ef gh]" );
-		matchTestStringAndStreamSX( parserDOA, "[ab,cd,ef,gh,]", "[ab cd ef gh sep]" );
+		matchTestStringAndRichStringSX( parserDOA, "[]", "[]" );
+		matchFailTestStringAndRichString( parserDOA, "[,]" );
+		matchTestStringAndRichStringSX( parserDOA, "[ab]", "[ab]" );
+		matchTestStringAndRichStringSX( parserDOA, "[ab,]", "[ab sep]" );
+		matchTestStringAndRichStringSX( parserDOA, "[ab,cd]", "[ab cd]" );
+		matchTestStringAndRichStringSX( parserDOA, "[ab,cd,]", "[ab cd sep]" );
+		matchTestStringAndRichStringSX( parserDOA, "[ab,cd,ef]", "[ab cd ef]" );
+		matchTestStringAndRichStringSX( parserDOA, "[ab,cd,ef,]", "[ab cd ef sep]" );
+		matchTestStringAndRichStringSX( parserDOA, "[ab,cd,ef,gh]", "[ab cd ef gh]" );
+		matchTestStringAndRichStringSX( parserDOA, "[ab,cd,ef,gh,]", "[ab cd ef gh sep]" );
 		
-		matchTestStringAndStreamSX( parserDOCA, "[]", "[]" );
-		matchFailTestStringAndStream( parserDOCA, "[,]" );
-		matchFailTestStringAndStream( parserDOCA, "[ab]" );
-		matchFailTestStringAndStream( parserDOCA, "[ab,]" );
-		matchTestStringAndStreamSX( parserDOCA, "[ab,cd]", "[ab cd]" );
-		matchTestStringAndStreamSX( parserDOCA, "[ab,cd,]", "[ab cd sep]" );
-		matchFailTestStringAndStream( parserDOCA, "[ab,cd,ef]" );
-		matchFailTestStringAndStream( parserDOCA, "[ab,cd,ef,]" );
-		matchTestStringAndStreamSX( parserDOCA, "[ab,cd,ef,gh]", "[ab cd ef gh]" );
-		matchTestStringAndStreamSX( parserDOCA, "[ab,cd,ef,gh,]", "[ab cd ef gh sep]" );
+		matchTestStringAndRichStringSX( parserDOCA, "[]", "[]" );
+		matchFailTestStringAndRichString( parserDOCA, "[,]" );
+		matchFailTestStringAndRichString( parserDOCA, "[ab]" );
+		matchFailTestStringAndRichString( parserDOCA, "[ab,]" );
+		matchTestStringAndRichStringSX( parserDOCA, "[ab,cd]", "[ab cd]" );
+		matchTestStringAndRichStringSX( parserDOCA, "[ab,cd,]", "[ab cd sep]" );
+		matchFailTestStringAndRichString( parserDOCA, "[ab,cd,ef]" );
+		matchFailTestStringAndRichString( parserDOCA, "[ab,cd,ef,]" );
+		matchTestStringAndRichStringSX( parserDOCA, "[ab,cd,ef,gh]", "[ab cd ef gh]" );
+		matchTestStringAndRichStringSX( parserDOCA, "[ab,cd,ef,gh,]", "[ab cd ef gh sep]" );
 		
 		
 		ParserExpression parserList = new SeparatedList( identifier, "/", "<", ">", 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL );
@@ -1099,13 +1099,13 @@ public class Test_Parser extends ParserTestCase
 		
 		String[] result = { "ab", "qw", "fh" };
 		
-		matchTestStringAndStream( parser, "abqwfh", Arrays.asList( result ) );
-		matchFailTestStringAndStream( parser, "abfh" );
+		matchTestStringAndRichString( parser, "abqwfh", Arrays.asList( result ) );
+		matchFailTestStringAndRichString( parser, "abfh" );
 
 		
 		ParserExpression parser2 = new Word( "a", "b" ).__add__( new Word( "a", "b" ) ).__add__( new Word( "a", "b" ) );
 		matchTestListSX( parser2, "[ab abb abbb]", "[ab abb abbb]" );
-		matchTestStreamSX( parser2, new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.TextItem( "ab" ), new StreamValueBuilder.StructuralItem( "ab" ), new StreamValueBuilder.TextItem( "ab" ) } ).stream(),
+		matchTestRichStringSX( parser2, new RichStringBuilder( new RichStringBuilder.Item[] { new RichStringBuilder.TextItem( "ab" ), new RichStringBuilder.StructuralItem( "ab" ), new RichStringBuilder.TextItem( "ab" ) } ).richString(),
 		"[ab ab ab]" );
 	}
 
@@ -1121,9 +1121,9 @@ public class Test_Parser extends ParserTestCase
 
 		matchFailTestString( new StringNode( "abcxyz" ), "abcxyz" );
 		
-		matchFailTestStream( new StringNode( "hello" ), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.TextItem( "hello" ) } ).stream(), "hello" );
-		matchTestStream( new StringNode( "hello" ), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( "hello" ) } ).stream(), "hello" );
-		matchFailTestStream( new StringNode( "hello" ), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( "hellothere" ) } ).stream() );
+		matchFailTestRichString( new StringNode( "hello" ), new RichStringBuilder( new RichStringBuilder.Item[] { new RichStringBuilder.TextItem( "hello" ) } ).richString(), "hello" );
+		matchTestRichString( new StringNode( "hello" ), new RichStringBuilder( new RichStringBuilder.Item[] { new RichStringBuilder.StructuralItem( "hello" ) } ).richString(), "hello" );
+		matchFailTestRichString( new StringNode( "hello" ), new RichStringBuilder( new RichStringBuilder.Item[] { new RichStringBuilder.StructuralItem( "hellothere" ) } ).richString() );
 
 		matchTestListSX( new StringNode( "hello" ), "[hello]", "hello" );
 		matchFailTestListSX( new StringNode( "hello" ), "[hellothere]" );
@@ -1153,8 +1153,8 @@ public class Test_Parser extends ParserTestCase
 		Object[] subs = { new Literal( "ab" ), new Literal( "qw" ).suppress(), new Literal( "fh" ) };
 		ParserExpression parser = new Sequence( subs );
 		
-		matchTestStringAndStreamSX( parser, "abqwfh", "[ab fh]" );
-		matchFailTestStringAndStream( parser, "abfh" );
+		matchTestStringAndRichStringSX( parser, "abqwfh", "[ab fh]" );
+		matchFailTestStringAndRichString( parser, "abfh" );
 
 		matchTestListSX( parser, "[ab qw fh]", "[ab fh]" );
 		matchFailTestListSX( parser, "[ab fh]" );
@@ -1167,28 +1167,28 @@ public class Test_Parser extends ParserTestCase
 		assertTrue( new Word( "abc" ).isEquivalentTo( new Word( "abc" ) ) );
 		assertFalse( new Word( "abc" ).isEquivalentTo( new Word( "def" ) ) );
 		
-		matchTestStringAndStream( new Word( "abc" ), "aabbcc", "aabbcc" );
-		matchTestStringAndStream( new Word( "abc" ), "ccbbaa", "ccbbaa" );
-		matchSubTestStringAndStream( new Word( "abc" ), "aabbccxx", "aabbcc", 6 );
-		matchSubTestStringAndStream( new Word( "abc" ), "aabbccxxaa", "aabbcc", 6 );
-		matchFailTestStringAndStream( new Word( "abc" ), "x" );
+		matchTestStringAndRichString( new Word( "abc" ), "aabbcc", "aabbcc" );
+		matchTestStringAndRichString( new Word( "abc" ), "ccbbaa", "ccbbaa" );
+		matchSubTestStringAndRichString( new Word( "abc" ), "aabbccxx", "aabbcc", 6 );
+		matchSubTestStringAndRichString( new Word( "abc" ), "aabbccxxaa", "aabbcc", 6 );
+		matchFailTestStringAndRichString( new Word( "abc" ), "x" );
 		
 		assertTrue( new Word( "abc", "xyz" ).isEquivalentTo( new Word( "abc", "xyz" ) ) );
 		assertFalse( new Word( "abc", "xyz" ).isEquivalentTo( new Word( "def", "xyz" ) ) );
 		assertFalse( new Word( "abc", "xyz" ).isEquivalentTo( new Word( "abc", "pqr" ) ) );
 		
-		matchTestStringAndStream( new Word( "abc", "def" ), "addeeff", "addeeff" );
-		matchTestStringAndStream( new Word( "abc", "def" ), "affeedd", "affeedd" );
-		matchSubTestStringAndStream( new Word( "abc", "def" ), "affeeddxx", "affeedd", 7 );
-		matchSubTestStringAndStream( new Word( "abc", "def" ), "affeeddxxa", "affeedd", 7 );
-		matchSubTestStringAndStream( new Word( "abc", "def" ), "affeeddxxf", "affeedd", 7 );
-		matchFailTestStringAndStream( new Word( "abc", "def" ), "ddeeff" );
-		matchFailTestStringAndStream( new Word( "abc", "def" ), "x" );
-		matchFailTestStringAndStream( new Word( "abc", "def" ), "dadeeff" );
+		matchTestStringAndRichString( new Word( "abc", "def" ), "addeeff", "addeeff" );
+		matchTestStringAndRichString( new Word( "abc", "def" ), "affeedd", "affeedd" );
+		matchSubTestStringAndRichString( new Word( "abc", "def" ), "affeeddxx", "affeedd", 7 );
+		matchSubTestStringAndRichString( new Word( "abc", "def" ), "affeeddxxa", "affeedd", 7 );
+		matchSubTestStringAndRichString( new Word( "abc", "def" ), "affeeddxxf", "affeedd", 7 );
+		matchFailTestStringAndRichString( new Word( "abc", "def" ), "ddeeff" );
+		matchFailTestStringAndRichString( new Word( "abc", "def" ), "x" );
+		matchFailTestStringAndRichString( new Word( "abc", "def" ), "dadeeff" );
 	
 		
 
-		matchTestStream( new Word( "abc", "def" ), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( "addeeff" ) } ).stream(), "addeeff" );
+		matchTestRichString( new Word( "abc", "def" ), new RichStringBuilder( new RichStringBuilder.Item[] { new RichStringBuilder.StructuralItem( "addeeff" ) } ).richString(), "addeeff" );
 
 		matchTestNode( new Word( "abc", "def" ), "addeeff", "addeeff" );
 
@@ -1212,21 +1212,21 @@ public class Test_Parser extends ParserTestCase
 		String[][] result1 = { { "ab", "cd", } };
 		String[][] result2 = { { "ab", "cd", },   { "abb", "cdd" } };
 		
-		matchTestStringAndStream( parserO, "", arrayToList2D( result0 ) );
-		matchTestStringAndStream( parserN, "", null );
+		matchTestStringAndRichString( parserO, "", arrayToList2D( result0 ) );
+		matchTestStringAndRichString( parserN, "", null );
 		
-		matchTestStringAndStream( parserO, "abcd", arrayToList2D( result1 ) );
-		matchTestStringAndStream( parserN, "abcd", arrayToList2D( result1 ) );
+		matchTestStringAndRichString( parserO, "abcd", arrayToList2D( result1 ) );
+		matchTestStringAndRichString( parserN, "abcd", arrayToList2D( result1 ) );
 		
-		matchTestStringAndStream( parserO, "abcdabbcdd", arrayToList2D( result2 ) );
-		matchTestStringAndStream( parserN, "abcdabbcdd", arrayToList2D( result2 ) );
+		matchTestStringAndRichString( parserO, "abcdabbcdd", arrayToList2D( result2 ) );
+		matchTestStringAndRichString( parserN, "abcdabbcdd", arrayToList2D( result2 ) );
 		
 		ParserExpression parser2 = new ZeroOrMore( new Word( "a", "b" ) );
 		matchTestListSX( parser2, "[ab abb abbb]", "[ab abb abbb]" );
 		matchTestListSX( parser2, "[]", "[]" );
-		matchTestStreamSX( parser2, new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.TextItem( "ab" ), new StreamValueBuilder.StructuralItem( "ab" ) } ).stream(),
+		matchTestRichStringSX( parser2, new RichStringBuilder( new RichStringBuilder.Item[] { new RichStringBuilder.TextItem( "ab" ), new RichStringBuilder.StructuralItem( "ab" ) } ).richString(),
 		"[ab ab]" );
-		matchTestStreamSX( parser2, new StreamValueBuilder().stream(), "[]" );
+		matchTestRichStringSX( parser2, new RichStringBuilder().richString(), "[]" );
 	}
 
 
@@ -1281,24 +1281,24 @@ public class Test_Parser extends ParserTestCase
 		Production add = new Production( "add", ( mul.__add__( new ZeroOrMore( addop.__add__( mul ) ).action( flattenAction ) ) ).action( action ) );
 		ParserExpression parser = add;
 		
-		matchTestStringAndStream( parser, "123", "123" );
+		matchTestStringAndRichString( parser, "123", "123" );
 		
-		matchTestStringAndStreamSX( parser, "1*2", "[1 * 2]" );
-		matchTestStringAndStreamSX( parser, "1*2*3", "[1 * 2 * 3]" );
+		matchTestStringAndRichStringSX( parser, "1*2", "[1 * 2]" );
+		matchTestStringAndRichStringSX( parser, "1*2*3", "[1 * 2 * 3]" );
 
-		matchTestStringAndStreamSX( parser, "1+2", "[1 + 2]" );
-		matchTestStringAndStreamSX( parser, "1+2+3", "[1 + 2 + 3]" );
+		matchTestStringAndRichStringSX( parser, "1+2", "[1 + 2]" );
+		matchTestStringAndRichStringSX( parser, "1+2+3", "[1 + 2 + 3]" );
 
-		matchTestStringAndStreamSX( parser, "1+2*3", "[1 + [2 * 3]]" );
-		matchTestStringAndStreamSX( parser, "1*2+3", "[[1 * 2] + 3]" );
+		matchTestStringAndRichStringSX( parser, "1+2*3", "[1 + [2 * 3]]" );
+		matchTestStringAndRichStringSX( parser, "1*2+3", "[[1 * 2] + 3]" );
 
-		matchTestStringAndStreamSX( parser, "1*2+3+4", "[[1 * 2] + 3 + 4]" );
-		matchTestStringAndStreamSX( parser, "1+2*3+4", "[1 + [2 * 3] + 4]" );
-		matchTestStringAndStreamSX( parser, "1+2+3*4", "[1 + 2 + [3 * 4]]" );
+		matchTestStringAndRichStringSX( parser, "1*2+3+4", "[[1 * 2] + 3 + 4]" );
+		matchTestStringAndRichStringSX( parser, "1+2*3+4", "[1 + [2 * 3] + 4]" );
+		matchTestStringAndRichStringSX( parser, "1+2+3*4", "[1 + 2 + [3 * 4]]" );
 
-		matchTestStringAndStreamSX( parser, "1+2*3*4", "[1 + [2 * 3 * 4]]" );
-		matchTestStringAndStreamSX( parser, "1*2+3*4", "[[1 * 2] + [3 * 4]]" );
-		matchTestStringAndStreamSX( parser, "1*2*3+4", "[[1 * 2 * 3] + 4]" );
+		matchTestStringAndRichStringSX( parser, "1+2*3*4", "[1 + [2 * 3 * 4]]" );
+		matchTestStringAndRichStringSX( parser, "1*2+3*4", "[[1 * 2] + [3 * 4]]" );
+		matchTestStringAndRichStringSX( parser, "1*2*3+4", "[[1 * 2 * 3] + 4]" );
 	}
 
 
@@ -1308,7 +1308,7 @@ public class Test_Parser extends ParserTestCase
 		Production y = new Production( "_y" );
 		y.setExpression( x.__add__( y ).__or__( "y" ) );
 		
-		matchTestStringAndStreamSX( y, "xxxy", "[x [x [x y]]]" );
+		matchTestStringAndRichStringSX( y, "xxxy", "[x [x [x y]]]" );
 	}
 
 
@@ -1318,7 +1318,7 @@ public class Test_Parser extends ParserTestCase
 		Production y = new Production( "_y" );
 		y.setExpression( y.__add__( x ).__or__( "y" ) );
 		
-		matchTestStringAndStreamSX( y, "yxxx", "[[[y x] x] x]" );
+		matchTestStringAndRichStringSX( y, "yxxx", "[[[y x] x] x]" );
 	}
 
 	public void testIndirectLeftRecursion() throws ParserExpression.ParserCoerceException, Production.CannotOverwriteProductionExpressionException
@@ -1328,8 +1328,8 @@ public class Test_Parser extends ParserTestCase
 		Production y = new Production( "_y", z.__add__( x ).__or__( "z" ) );
 		z.setExpression( y.__or__( "y" ) );
 		
-		matchTestStringAndStreamSX( z, "zxxx", "[[[z x] x] x]" );
-		matchTestStringAndStreamSX( z, "yxxx", "[[[y x] x] x]" );
+		matchTestStringAndRichStringSX( z, "zxxx", "[[[z x] x] x]" );
+		matchTestStringAndRichStringSX( z, "yxxx", "[[[y x] x] x]" );
 	}
 
 	public void testLeftRecursion() throws Production.CannotOverwriteProductionExpressionException
@@ -1355,44 +1355,44 @@ public class Test_Parser extends ParserTestCase
 		add.setExpression( ( add.__add__( addop ).__add__( mul ) ).__or__( mul ) );
 		ParserExpression parser = add;
 		
-		matchTestStringAndStream( parser, "123", "123" );
+		matchTestStringAndRichString( parser, "123", "123" );
 		
-		matchTestStringAndStreamSX( parser, "1*2", "[1 * 2]" );
-		matchTestStringAndStreamSX( parser, "1*2*3", "[[1 * 2] * 3]" );
+		matchTestStringAndRichStringSX( parser, "1*2", "[1 * 2]" );
+		matchTestStringAndRichStringSX( parser, "1*2*3", "[[1 * 2] * 3]" );
 
-		matchTestStringAndStreamSX( parser, "1+2", "[1 + 2]" );
-		matchTestStringAndStreamSX( parser, "1+2+3", "[[1 + 2] + 3]" );
+		matchTestStringAndRichStringSX( parser, "1+2", "[1 + 2]" );
+		matchTestStringAndRichStringSX( parser, "1+2+3", "[[1 + 2] + 3]" );
 
-		matchTestStringAndStreamSX( parser, "1+2*3", "[1 + [2 * 3]]" );
-		matchTestStringAndStreamSX( parser, "1*2+3", "[[1 * 2] + 3]" );
+		matchTestStringAndRichStringSX( parser, "1+2*3", "[1 + [2 * 3]]" );
+		matchTestStringAndRichStringSX( parser, "1*2+3", "[[1 * 2] + 3]" );
 
-		matchTestStringAndStreamSX( parser, "1*2+3+4", "[[[1 * 2] + 3] + 4]" );
-		matchTestStringAndStreamSX( parser, "1+2*3+4", "[[1 + [2 * 3]] + 4]" );
-		matchTestStringAndStreamSX( parser, "1+2+3*4", "[[1 + 2] + [3 * 4]]" );
+		matchTestStringAndRichStringSX( parser, "1*2+3+4", "[[[1 * 2] + 3] + 4]" );
+		matchTestStringAndRichStringSX( parser, "1+2*3+4", "[[1 + [2 * 3]] + 4]" );
+		matchTestStringAndRichStringSX( parser, "1+2+3*4", "[[1 + 2] + [3 * 4]]" );
 
-		matchTestStringAndStreamSX( parser, "1+2*3*4", "[1 + [[2 * 3] * 4]]" );
-		matchTestStringAndStreamSX( parser, "1*2+3*4", "[[1 * 2] + [3 * 4]]" );
-		matchTestStringAndStreamSX( parser, "1*2*3+4", "[[[1 * 2] * 3] + 4]" );
+		matchTestStringAndRichStringSX( parser, "1+2*3*4", "[1 + [[2 * 3] * 4]]" );
+		matchTestStringAndRichStringSX( parser, "1*2+3*4", "[[1 * 2] + [3 * 4]]" );
+		matchTestStringAndRichStringSX( parser, "1*2*3+4", "[[[1 * 2] * 3] + 4]" );
 		
 
-		StreamValueBuilder builder1 = new StreamValueBuilder();
+		RichStringBuilder builder1 = new RichStringBuilder();
 		builder1.appendTextValue( "1+" );
 		builder1.appendStructuralValue( Num.newInstance( new Object[] { "2" } ) );
 		builder1.appendTextValue( "*3*4" );
 
-		StreamValueBuilder builder2 = new StreamValueBuilder();
+		RichStringBuilder builder2 = new RichStringBuilder();
 		builder2.appendTextValue( "1*" );
 		builder2.appendStructuralValue( Num.newInstance( new Object[] { "2" } ) );
 		builder2.appendTextValue( "+3*4" );
 
-		StreamValueBuilder builder3 = new StreamValueBuilder();
+		RichStringBuilder builder3 = new RichStringBuilder();
 		builder3.appendTextValue( "1*" );
 		builder3.appendStructuralValue( Num.newInstance( new Object[] { "2" } ) );
 		builder3.appendTextValue( "*3+4" );
 
-		matchTestStreamSX( parser, builder1.stream(), "{m=tests.Parser.Test_Parser.s : [1 + [[(m Num x=2) * 3] * 4]]}" );
-		matchTestStreamSX( parser, builder2.stream(), "{m=tests.Parser.Test_Parser.s : [[1 * (m Num x=2)] + [3 * 4]]}" );
-		matchTestStreamSX( parser, builder3.stream(), "{m=tests.Parser.Test_Parser.s : [[[1 * (m Num x=2)] * 3] + 4]}" );
+		matchTestRichStringSX( parser, builder1.richString(), "{m=tests.Parser.Test_Parser.s : [1 + [[(m Num x=2) * 3] * 4]]}" );
+		matchTestRichStringSX( parser, builder2.richString(), "{m=tests.Parser.Test_Parser.s : [[1 * (m Num x=2)] + [3 * 4]]}" );
+		matchTestRichStringSX( parser, builder3.richString(), "{m=tests.Parser.Test_Parser.s : [[[1 * (m Num x=2)] * 3] + 4]}" );
 	}
 
 
@@ -1466,33 +1466,33 @@ public class Test_Parser extends ParserTestCase
 		primary.setExpression( primaryNoNewArray );
 		
 	
-		matchTestStringAndStreamSX( primary, "this", "this" );
-		matchTestStringAndStreamSX( primary, "this.x", "[fieldAccess this x]" );
-		matchTestStringAndStreamSX( primary, "this.x[i]", "[arrayAccess [fieldAccess this x] i]" );
-		matchTestStringAndStreamSX( primary, "this.x.y", "[fieldAccess [fieldAccess this x] y]" );
-		matchTestStringAndStreamSX( primary, "this.x.m()", "[methodInvoke [fieldAccess this x] m]" );
-		matchTestStringAndStreamSX( primary, "this.x.m().n()", "[methodInvoke [methodInvoke [fieldAccess this x] m] n]" );
-		matchTestStringAndStreamSX( primary, "x[i][j].y", "[fieldAccess [arrayAccess [arrayAccess x i] j] y]" );
+		matchTestStringAndRichStringSX( primary, "this", "this" );
+		matchTestStringAndRichStringSX( primary, "this.x", "[fieldAccess this x]" );
+		matchTestStringAndRichStringSX( primary, "this.x[i]", "[arrayAccess [fieldAccess this x] i]" );
+		matchTestStringAndRichStringSX( primary, "this.x.y", "[fieldAccess [fieldAccess this x] y]" );
+		matchTestStringAndRichStringSX( primary, "this.x.m()", "[methodInvoke [fieldAccess this x] m]" );
+		matchTestStringAndRichStringSX( primary, "this.x.m().n()", "[methodInvoke [methodInvoke [fieldAccess this x] m] n]" );
+		matchTestStringAndRichStringSX( primary, "x[i][j].y", "[fieldAccess [arrayAccess [arrayAccess x i] j] y]" );
 
-		matchTestStringAndStreamSX( methodInvocation, "this.m()", "[methodInvoke this m]" );
-		matchTestStringAndStreamSX( methodInvocation, "this.m().n()", "[methodInvoke [methodInvoke this m] n]" );
-		matchTestStringAndStreamSX( methodInvocation, "this.x.m()", "[methodInvoke [fieldAccess this x] m]" );
-		matchTestStringAndStreamSX( methodInvocation, "this.x.y.m()", "[methodInvoke [fieldAccess [fieldAccess this x] y] m]" );
-		matchTestStringAndStreamSX( methodInvocation, "this[i].m()", "[methodInvoke [arrayAccess this i] m]" );
-		matchTestStringAndStreamSX( methodInvocation, "this[i][j].m()", "[methodInvoke [arrayAccess [arrayAccess this i] j] m]" );
-		matchTestStringAndStreamSX( arrayAccess, "this[i]", "[arrayAccess this i]" );
-		matchTestStringAndStreamSX( arrayAccess, "this[i][j]", "[arrayAccess [arrayAccess this i] j]" );
-		matchTestStringAndStreamSX( arrayAccess, "this.x[i]", "[arrayAccess [fieldAccess this x] i]" );
-		matchTestStringAndStreamSX( arrayAccess, "this.x.y[i]", "[arrayAccess [fieldAccess [fieldAccess this x] y] i]" );
-		matchTestStringAndStreamSX( arrayAccess, "this.m()[i]", "[arrayAccess [methodInvoke this m] i]" );
-		matchTestStringAndStreamSX( arrayAccess, "this.m().n()[i]", "[arrayAccess [methodInvoke [methodInvoke this m] n] i]" );
-		matchTestStringAndStreamSX( fieldAccess, "this.x", "[fieldAccess this x]" );
-		matchTestStringAndStreamSX( fieldAccess, "this.x.y", "[fieldAccess [fieldAccess this x] y]" );
-		matchTestStringAndStreamSX( fieldAccess, "this[i].x", "[fieldAccess [arrayAccess this i] x]" );
-		matchTestStringAndStreamSX( fieldAccess, "this[i][j].x", "[fieldAccess [arrayAccess [arrayAccess this i] j] x]" );
-		matchTestStringAndStreamSX( fieldAccessOrArrayAccess, "this[i]", "[arrayAccess this i]" );
-		matchTestStringAndStreamSX( fieldAccessOrArrayAccess, "this[i].x", "[fieldAccess [arrayAccess this i] x]" );
-		matchTestStringAndStreamSX( fieldAccessOrArrayAccess, "this.x[i]", "[arrayAccess [fieldAccess this x] i]" );
+		matchTestStringAndRichStringSX( methodInvocation, "this.m()", "[methodInvoke this m]" );
+		matchTestStringAndRichStringSX( methodInvocation, "this.m().n()", "[methodInvoke [methodInvoke this m] n]" );
+		matchTestStringAndRichStringSX( methodInvocation, "this.x.m()", "[methodInvoke [fieldAccess this x] m]" );
+		matchTestStringAndRichStringSX( methodInvocation, "this.x.y.m()", "[methodInvoke [fieldAccess [fieldAccess this x] y] m]" );
+		matchTestStringAndRichStringSX( methodInvocation, "this[i].m()", "[methodInvoke [arrayAccess this i] m]" );
+		matchTestStringAndRichStringSX( methodInvocation, "this[i][j].m()", "[methodInvoke [arrayAccess [arrayAccess this i] j] m]" );
+		matchTestStringAndRichStringSX( arrayAccess, "this[i]", "[arrayAccess this i]" );
+		matchTestStringAndRichStringSX( arrayAccess, "this[i][j]", "[arrayAccess [arrayAccess this i] j]" );
+		matchTestStringAndRichStringSX( arrayAccess, "this.x[i]", "[arrayAccess [fieldAccess this x] i]" );
+		matchTestStringAndRichStringSX( arrayAccess, "this.x.y[i]", "[arrayAccess [fieldAccess [fieldAccess this x] y] i]" );
+		matchTestStringAndRichStringSX( arrayAccess, "this.m()[i]", "[arrayAccess [methodInvoke this m] i]" );
+		matchTestStringAndRichStringSX( arrayAccess, "this.m().n()[i]", "[arrayAccess [methodInvoke [methodInvoke this m] n] i]" );
+		matchTestStringAndRichStringSX( fieldAccess, "this.x", "[fieldAccess this x]" );
+		matchTestStringAndRichStringSX( fieldAccess, "this.x.y", "[fieldAccess [fieldAccess this x] y]" );
+		matchTestStringAndRichStringSX( fieldAccess, "this[i].x", "[fieldAccess [arrayAccess this i] x]" );
+		matchTestStringAndRichStringSX( fieldAccess, "this[i][j].x", "[fieldAccess [arrayAccess [arrayAccess this i] j] x]" );
+		matchTestStringAndRichStringSX( fieldAccessOrArrayAccess, "this[i]", "[arrayAccess this i]" );
+		matchTestStringAndRichStringSX( fieldAccessOrArrayAccess, "this[i].x", "[fieldAccess [arrayAccess this i] x]" );
+		matchTestStringAndRichStringSX( fieldAccessOrArrayAccess, "this.x[i]", "[arrayAccess [fieldAccess this x] i]" );
 	}
 	
 	

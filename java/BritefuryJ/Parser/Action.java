@@ -12,7 +12,7 @@ import java.util.Map;
 import org.python.core.Py;
 import org.python.core.PyObject;
 
-import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
+import BritefuryJ.Util.RichString.RichStringAccessor;
 
 
 /*
@@ -20,7 +20,7 @@ import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
  * 
  * Action:node( input )		->  Action.action( Action.subexp:node( input ) )
  * Action:string( input, start )	->  Action.action( Action.subexp:string( input, start ) )
- * Action:stream( input, start )	->  Action.action( Action.subexp:stream( input, start ) )
+ * Action:richStr( input, start )	->  Action.action( Action.subexp:richStr( input, start ) )
  * Action:list( input, start )		->  Action.action( Action.subexp:list( input, start ) )
  */
 public class Action extends UnaryBranchExpression
@@ -133,9 +133,9 @@ public class Action extends UnaryBranchExpression
 		}
 	}
 
-	protected ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start)
+	protected ParseResult evaluateRichStringItems(ParserState state, RichStringAccessor input, int start)
 	{
-		ParseResult res = subexp.handleStreamItems( state, input, start );
+		ParseResult res = subexp.handleRichStringItems( state, input, start );
 		
 		if ( res.isValid() )
 		{

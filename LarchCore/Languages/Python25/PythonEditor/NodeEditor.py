@@ -23,7 +23,7 @@ from BritefuryJ.LSpace.Interactor import KeyElementInteractor
 from BritefuryJ.Logging import LogEntry
 
 from BritefuryJ.Editor.Sequential import SequentialEditor, SelectionEditTreeEvent, EditListener
-from BritefuryJ.Editor.Sequential.StreamEditListener import HandleEditResult
+from BritefuryJ.Editor.Sequential.RichStringEditListener import HandleEditResult
 from BritefuryJ.Editor.SyntaxRecognizing import ParsingEditListener, PartialParsingEditListener, UnparsedEditListener, TopLevelEditListener
 
 

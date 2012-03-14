@@ -8,14 +8,14 @@ package BritefuryJ.Parser;
 
 import java.util.List;
 
-import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
+import BritefuryJ.Util.RichString.RichStringAccessor;
 
 /*
  * AnyList
  * 
  * AnyList:node( input )		->  input instanceof List  ?  input  :  fail
  * AnyList:string( input, start )	->  fail
- * AnyList:stream( input, start )	->  item = input.consumeStructuralItem(); item instanceof List  ?  item  :  fail
+ * AnyList:richStr( input, start )	->  item = input.consumeStructuralItem(); item instanceof List  ?  item  :  fail
  * AnyList:list( input, start )	->  input[start] instanceof List  ?  input[start]  :  fail
  */
 public class AnyList extends ParserExpression
@@ -42,7 +42,7 @@ public class AnyList extends ParserExpression
 		return ParseResult.failure( start );
 	}
 
-	protected ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start)
+	protected ParseResult evaluateRichStringItems(ParserState state, RichStringAccessor input, int start)
 	{
 		if ( start < input.length() )
 		{

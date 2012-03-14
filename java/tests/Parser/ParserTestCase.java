@@ -13,11 +13,11 @@ import java.util.Map;
 import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMIOReader;
 import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
-import BritefuryJ.LSpace.StreamValue.StreamValue;
-import BritefuryJ.LSpace.StreamValue.StreamValueBuilder;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParseResult;
 import BritefuryJ.Parser.ParserExpression;
+import BritefuryJ.Util.RichString.RichString;
+import BritefuryJ.Util.RichString.RichStringBuilder;
 
 abstract public class ParserTestCase extends TestCase
 {
@@ -71,79 +71,79 @@ abstract public class ParserTestCase extends TestCase
 	
 	
 	
-	public void matchTestStringAndStreamSX(ParserExpression parser, String input, String expectedSX)
+	public void matchTestStringAndRichStringSX(ParserExpression parser, String input, String expectedSX)
 	{
-		matchTestStringAndStreamSX( parser, input, expectedSX, "[ \t\n]*", null );
+		matchTestStringAndRichStringSX( parser, input, expectedSX, "[ \t\n]*", null );
 	}
 
-	public void matchTestStringAndStreamSX(ParserExpression parser, String input, String expectedSX, ParseAction delegateAction)
+	public void matchTestStringAndRichStringSX(ParserExpression parser, String input, String expectedSX, ParseAction delegateAction)
 	{
-		matchTestStringAndStreamSX( parser, input, expectedSX, "[ \t\n]*", delegateAction );
+		matchTestStringAndRichStringSX( parser, input, expectedSX, "[ \t\n]*", delegateAction );
 	}
 
-	public void matchTestStringAndStreamSX(ParserExpression parser, String input, String expectedSX, String ignoreCharsRegex, ParseAction delegateAction)
+	public void matchTestStringAndRichStringSX(ParserExpression parser, String input, String expectedSX, String ignoreCharsRegex, ParseAction delegateAction)
 	{
 		Object expected = readExpectedSX( expectedSX );
-		matchTestStringAndStream( parser, input, expected, ignoreCharsRegex, delegateAction );
+		matchTestStringAndRichString( parser, input, expected, ignoreCharsRegex, delegateAction );
 	}
 	
 	
-	public void matchTestStringAndStream(ParserExpression parser, String input, Object expected)
+	public void matchTestStringAndRichString(ParserExpression parser, String input, Object expected)
 	{
-		matchTestStringAndStream( parser, input, expected, "[ \t\n]*", null );
+		matchTestStringAndRichString( parser, input, expected, "[ \t\n]*", null );
 	}
 
-	public void matchTestStringAndStream(ParserExpression parser, String input, Object expected, ParseAction delegateAction)
+	public void matchTestStringAndRichString(ParserExpression parser, String input, Object expected, ParseAction delegateAction)
 	{
-		matchTestStringAndStream( parser, input, expected, "[ \t\n]*", delegateAction );
+		matchTestStringAndRichString( parser, input, expected, "[ \t\n]*", delegateAction );
 	}
 
-	public void matchTestStringAndStream(ParserExpression parser, String input, Object expected, String ignoreCharsRegex, ParseAction delegateAction)
+	public void matchTestStringAndRichString(ParserExpression parser, String input, Object expected, String ignoreCharsRegex, ParseAction delegateAction)
 	{
-		StreamValueBuilder builder = new StreamValueBuilder();
+		RichStringBuilder builder = new RichStringBuilder();
 		builder.appendTextValue( input );
 		
 		matchTestString( parser, input, expected, ignoreCharsRegex, delegateAction );
-		matchTestStream( parser, builder.stream(), expected, ignoreCharsRegex, delegateAction );
+		matchTestRichString( parser, builder.richString(), expected, ignoreCharsRegex, delegateAction );
 	}
 
 	
 	
 	
-	public void bindingsTestStringAndStreamSX(ParserExpression parser, String input, String expectedBindingsSX)
+	public void bindingsTestStringAndRichStringSX(ParserExpression parser, String input, String expectedBindingsSX)
 	{
-		bindingsTestStringAndStreamSX( parser, input, expectedBindingsSX, "[ \t\n]*", null );
+		bindingsTestStringAndRichStringSX( parser, input, expectedBindingsSX, "[ \t\n]*", null );
 	}
 
-	public void bindingsTestStringAndStreamSX(ParserExpression parser, String input, String expectedBindingsSX, ParseAction delegateAction)
+	public void bindingsTestStringAndRichStringSX(ParserExpression parser, String input, String expectedBindingsSX, ParseAction delegateAction)
 	{
-		bindingsTestStringAndStreamSX( parser, input, expectedBindingsSX, "[ \t\n]*", delegateAction );
+		bindingsTestStringAndRichStringSX( parser, input, expectedBindingsSX, "[ \t\n]*", delegateAction );
 	}
 
-	public void bindingsTestStringAndStreamSX(ParserExpression parser, String input, String expectedBindingsSX, String ignoreCharsRegex, ParseAction delegateAction)
+	public void bindingsTestStringAndRichStringSX(ParserExpression parser, String input, String expectedBindingsSX, String ignoreCharsRegex, ParseAction delegateAction)
 	{
 		Map<String, Object> expectedBindings = readExpectedBindingsSX( expectedBindingsSX );
-		bindingsTestStringAndStream( parser, input, expectedBindings, ignoreCharsRegex, delegateAction );
+		bindingsTestStringAndRichString( parser, input, expectedBindings, ignoreCharsRegex, delegateAction );
 	}
 	
 	
-	public void bindingsTestStringAndStream(ParserExpression parser, String input, Map<String, Object> expectedBindings)
+	public void bindingsTestStringAndRichString(ParserExpression parser, String input, Map<String, Object> expectedBindings)
 	{
-		bindingsTestStringAndStream( parser, input, expectedBindings, "[ \t\n]*", null );
+		bindingsTestStringAndRichString( parser, input, expectedBindings, "[ \t\n]*", null );
 	}
 
-	public void bindingsTestStringAndStream(ParserExpression parser, String input, Map<String, Object> expectedBindings, ParseAction delegateAction)
+	public void bindingsTestStringAndRichString(ParserExpression parser, String input, Map<String, Object> expectedBindings, ParseAction delegateAction)
 	{
-		bindingsTestStringAndStream( parser, input, expectedBindings, "[ \t\n]*", delegateAction );
+		bindingsTestStringAndRichString( parser, input, expectedBindings, "[ \t\n]*", delegateAction );
 	}
 
-	public void bindingsTestStringAndStream(ParserExpression parser, String input, Map<String, Object> expectedBindings, String ignoreCharsRegex, ParseAction delegateAction)
+	public void bindingsTestStringAndRichString(ParserExpression parser, String input, Map<String, Object> expectedBindings, String ignoreCharsRegex, ParseAction delegateAction)
 	{
-		StreamValueBuilder builder = new StreamValueBuilder();
+		RichStringBuilder builder = new RichStringBuilder();
 		builder.appendTextValue( input );
 		
 		bindingsTestString( parser, input, expectedBindings, ignoreCharsRegex, delegateAction );
-		bindingsTestStream( parser, builder.stream(), expectedBindings, ignoreCharsRegex, delegateAction );
+		bindingsTestRichString( parser, builder.richString(), expectedBindings, ignoreCharsRegex, delegateAction );
 	}
 
 	
@@ -291,40 +291,40 @@ abstract public class ParserTestCase extends TestCase
 
 	
 	
-	public void matchTestStreamSX(ParserExpression parser, StreamValue input, String expectedSX)
+	public void matchTestRichStringSX(ParserExpression parser, RichString input, String expectedSX)
 	{
-		matchTestStreamSX( parser, input, expectedSX, "[ \t\n]*", null );
+		matchTestRichStringSX( parser, input, expectedSX, "[ \t\n]*", null );
 	}
 
-	public void matchTestStreamSX(ParserExpression parser, StreamValue input, String expectedSX, ParseAction delegateAction)
+	public void matchTestRichStringSX(ParserExpression parser, RichString input, String expectedSX, ParseAction delegateAction)
 	{
-		matchTestStreamSX( parser, input, expectedSX, "[ \t\n]*", delegateAction );
+		matchTestRichStringSX( parser, input, expectedSX, "[ \t\n]*", delegateAction );
 	}
 
-	public void matchTestStreamSX(ParserExpression parser, StreamValue input, String expectedSX, String ignoreCharsRegex, ParseAction delegateAction)
+	public void matchTestRichStringSX(ParserExpression parser, RichString input, String expectedSX, String ignoreCharsRegex, ParseAction delegateAction)
 	{
 		Object expected = readExpectedSX( expectedSX );
-		matchTestStream( parser, input, expected, ignoreCharsRegex, delegateAction );
+		matchTestRichString( parser, input, expected, ignoreCharsRegex, delegateAction );
 	}
 	
 
-	public void matchTestStream(ParserExpression parser, StreamValue input, Object expected)
+	public void matchTestRichString(ParserExpression parser, RichString input, Object expected)
 	{
-		matchTestStream( parser, input, expected, "[ \t\n]*", null );
+		matchTestRichString( parser, input, expected, "[ \t\n]*", null );
 	}
 
-	public void matchTestStream(ParserExpression parser, StreamValue input, Object expected, ParseAction delegateAction)
+	public void matchTestRichString(ParserExpression parser, RichString input, Object expected, ParseAction delegateAction)
 	{
-		matchTestStream( parser, input, expected, "[ \t\n]*", delegateAction );
+		matchTestRichString( parser, input, expected, "[ \t\n]*", delegateAction );
 	}
 
-	public void matchTestStream(ParserExpression parser, StreamValue input, Object expected, String ignoreCharsRegex, ParseAction delegateAction)
+	public void matchTestRichString(ParserExpression parser, RichString input, Object expected, String ignoreCharsRegex, ParseAction delegateAction)
 	{
-		ParseResult result = parser.parseStreamItems( input, ignoreCharsRegex, delegateAction );
+		ParseResult result = parser.parseRichStringItems( input, ignoreCharsRegex, delegateAction );
 		
 		if ( !result.isValid() )
 		{
-			System.out.println( "PARSE FAILURE while parsing " + input + ", stopped at " + String.valueOf( result.getEnd() ) + ": " + input.subStream( 0, result.getEnd() ).toString() );
+			System.out.println( "PARSE FAILURE while parsing " + input + ", stopped at " + String.valueOf( result.getEnd() ) + ": " + input.substring( 0, result.getEnd() ).toString() );
 			System.out.println( "EXPECTED:" );
 			System.out.println( expected.toString() );
 		}
@@ -340,7 +340,7 @@ abstract public class ParserTestCase extends TestCase
 		{
 			System.out.println( "INCOMPLETE PARSE while parsing " + input );
 			System.out.println( "Parsed " + String.valueOf( result.getEnd() ) + "/" + String.valueOf( input.length() ) + " characters" );
-			System.out.println( "Parsed text " + input.subStream( 0, result.getEnd() ).toString() );
+			System.out.println( "Parsed text " + input.substring( 0, result.getEnd() ).toString() );
 			System.out.println( "EXPECTED: (a " + expectedClassName + ")" );
 			System.out.println( expectedStr );
 			System.out.println( "RESULT: (a " + valueClassName + ")" );
@@ -372,38 +372,38 @@ abstract public class ParserTestCase extends TestCase
 	
 	
 
-	public void bindingsTestStreamSX(ParserExpression parser, StreamValue input, String expectedBindingsSX)
+	public void bindingsTestRichStringSX(ParserExpression parser, RichString input, String expectedBindingsSX)
 	{
-		bindingsTestStreamSX( parser, input, expectedBindingsSX, "[ \t\n]*", null );
+		bindingsTestRichStringSX( parser, input, expectedBindingsSX, "[ \t\n]*", null );
 	}
 
-	public void bindingsTestStreamSX(ParserExpression parser, StreamValue input, String expectedBindingsSX, ParseAction delegateAction)
+	public void bindingsTestRichStringSX(ParserExpression parser, RichString input, String expectedBindingsSX, ParseAction delegateAction)
 	{
-		bindingsTestStreamSX( parser, input, expectedBindingsSX, "[ \t\n]*", delegateAction );
+		bindingsTestRichStringSX( parser, input, expectedBindingsSX, "[ \t\n]*", delegateAction );
 	}
 
-	public void bindingsTestStreamSX(ParserExpression parser, StreamValue input, String expectedBindingsSX, String ignoreCharsRegex, ParseAction delegateAction)
+	public void bindingsTestRichStringSX(ParserExpression parser, RichString input, String expectedBindingsSX, String ignoreCharsRegex, ParseAction delegateAction)
 	{
-		bindingsTestStream( parser, input, readExpectedBindingsSX( expectedBindingsSX ), ignoreCharsRegex, delegateAction );
+		bindingsTestRichString( parser, input, readExpectedBindingsSX( expectedBindingsSX ), ignoreCharsRegex, delegateAction );
 	}
 	
-	public void bindingsTestStream(ParserExpression parser, StreamValue input, Map<String, Object> expectedBindings)
+	public void bindingsTestRichString(ParserExpression parser, RichString input, Map<String, Object> expectedBindings)
 	{
-		bindingsTestStream( parser, input, expectedBindings, "[ \t\n]*", null );
+		bindingsTestRichString( parser, input, expectedBindings, "[ \t\n]*", null );
 	}
 
-	public void bindingsTestStream(ParserExpression parser, StreamValue input, Map<String, Object> expectedBindings, ParseAction delegateAction)
+	public void bindingsTestRichString(ParserExpression parser, RichString input, Map<String, Object> expectedBindings, ParseAction delegateAction)
 	{
-		bindingsTestStream( parser, input, expectedBindings, "[ \t\n]*", delegateAction );
+		bindingsTestRichString( parser, input, expectedBindings, "[ \t\n]*", delegateAction );
 	}
 
-	public void bindingsTestStream(ParserExpression parser, StreamValue input, Map<String, Object> expectedBindings, String ignoreCharsRegex, ParseAction delegateAction)
+	public void bindingsTestRichString(ParserExpression parser, RichString input, Map<String, Object> expectedBindings, String ignoreCharsRegex, ParseAction delegateAction)
 	{
-		ParseResult result = parser.parseStreamItems( input, ignoreCharsRegex, delegateAction );
+		ParseResult result = parser.parseRichStringItems( input, ignoreCharsRegex, delegateAction );
 		
 		if ( !result.isValid() )
 		{
-			System.out.println( "PARSE FAILURE while parsing " + input + ", stopped at " + String.valueOf( result.getEnd() ) + ": " + input.subStream(  0, result.getEnd() ) );
+			System.out.println( "PARSE FAILURE while parsing " + input + ", stopped at " + String.valueOf( result.getEnd() ) + ": " + input.substring(  0, result.getEnd() ) );
 		}
 		assertTrue( result.isValid() );
 		
@@ -413,7 +413,7 @@ abstract public class ParserTestCase extends TestCase
 		{
 			System.out.println( "INCOMPLETE PARSE while parsing " + input );
 			System.out.println( "Parsed " + String.valueOf( result.getEnd() ) + "/" + String.valueOf( input.length() ) + " characters" );
-			System.out.println( "Parsed text " + input.subStream( 0, result.getEnd() ) );
+			System.out.println( "Parsed text " + input.substring( 0, result.getEnd() ) );
 		}
 		assertEquals( result.getEnd(), input.length() );
 		
@@ -700,29 +700,29 @@ abstract public class ParserTestCase extends TestCase
 	
 
 	
-	public void matchSubTestStringAndStreamSX(ParserExpression parser, String input, String expectedSX, int end)
+	public void matchSubTestStringAndRichStringSX(ParserExpression parser, String input, String expectedSX, int end)
 	{
-		matchSubTestStringAndStreamSX( parser, input, expectedSX, end, "[ \t\n]*" );
+		matchSubTestStringAndRichStringSX( parser, input, expectedSX, end, "[ \t\n]*" );
 	}
 	
-	public void matchSubTestStringAndStreamSX(ParserExpression parser, String input, String expectedSX, int end, String ignoreCharsRegex)
+	public void matchSubTestStringAndRichStringSX(ParserExpression parser, String input, String expectedSX, int end, String ignoreCharsRegex)
 	{
 		Object expected = readExpectedSX( expectedSX );
-		matchSubTestStringAndStream( parser, input, expected, end, ignoreCharsRegex );
+		matchSubTestStringAndRichString( parser, input, expected, end, ignoreCharsRegex );
 	}
 		
-	public void matchSubTestStringAndStream(ParserExpression parser, String input, Object expected, int end)
+	public void matchSubTestStringAndRichString(ParserExpression parser, String input, Object expected, int end)
 	{
-		matchSubTestStringAndStream( parser, input, expected, end, "[ \t\n]*" );
+		matchSubTestStringAndRichString( parser, input, expected, end, "[ \t\n]*" );
 	}
 	
-	public void matchSubTestStringAndStream(ParserExpression parser, String input, Object expected, int end, String ignoreCharsRegex)
+	public void matchSubTestStringAndRichString(ParserExpression parser, String input, Object expected, int end, String ignoreCharsRegex)
 	{
-		StreamValueBuilder builder = new StreamValueBuilder();
+		RichStringBuilder builder = new RichStringBuilder();
 		builder.appendTextValue( input );
 		
 		matchSubTestString( parser, input, expected, end, ignoreCharsRegex );
-		matchSubTestStream( parser, builder.stream(), expected, end, ignoreCharsRegex );
+		matchSubTestRichString( parser, builder.richString(), expected, end, ignoreCharsRegex );
 	}
 
 		
@@ -796,31 +796,31 @@ abstract public class ParserTestCase extends TestCase
 
 
 
-	public void matchSubTestStreamSX(ParserExpression parser, StreamValue input, String expectedSX, int end)
+	public void matchSubTestRichStringSX(ParserExpression parser, RichString input, String expectedSX, int end)
 	{
-		matchSubTestStreamSX( parser, input, expectedSX, end, "[ \t\n]*" );
+		matchSubTestRichStringSX( parser, input, expectedSX, end, "[ \t\n]*" );
 	}
 
-	public void matchSubTestStreamSX(ParserExpression parser, StreamValue input, String expectedSX, int end, String ignoreCharsRegex)
+	public void matchSubTestRichStringSX(ParserExpression parser, RichString input, String expectedSX, int end, String ignoreCharsRegex)
 	{
 		Object expected = readExpectedSX( expectedSX );
-		matchSubTestStream( parser, input, expected, end, ignoreCharsRegex );
+		matchSubTestRichString( parser, input, expected, end, ignoreCharsRegex );
 
 	}
 	
 	
-	public void matchSubTestStream(ParserExpression parser, StreamValue input, Object expected, int end)
+	public void matchSubTestRichString(ParserExpression parser, RichString input, Object expected, int end)
 	{
-		matchSubTestStream( parser, input, expected, end, "[ \t\n]*" );
+		matchSubTestRichString( parser, input, expected, end, "[ \t\n]*" );
 	}
 	
-	public void matchSubTestStream(ParserExpression parser, StreamValue input, Object expected, int end, String ignoreCharsRegex)
+	public void matchSubTestRichString(ParserExpression parser, RichString input, Object expected, int end, String ignoreCharsRegex)
 	{
-		ParseResult result = parser.parseStreamItems( input, ignoreCharsRegex );
+		ParseResult result = parser.parseRichStringItems( input, ignoreCharsRegex );
 
 		if ( !result.isValid() )
 		{
-			System.out.println( "PARSE FAILURE while parsing " + input.subStream(  0, end ) + ", stopped at " + String.valueOf( result.getEnd() ) + ": " + input.subStream(  0, result.getEnd() ) );
+			System.out.println( "PARSE FAILURE while parsing " + input.substring(  0, end ) + ", stopped at " + String.valueOf( result.getEnd() ) + ": " + input.substring(  0, result.getEnd() ) );
 			System.out.println( "EXPECTED:" );
 			System.out.println( expected.toString() );
 		}
@@ -834,9 +834,9 @@ abstract public class ParserTestCase extends TestCase
 		
 		if ( result.getEnd() != end )
 		{
-			System.out.println( "DID NOT PARSE CORRECT AMOUNT while parsing " + input.subStream( 0, end ) );
+			System.out.println( "DID NOT PARSE CORRECT AMOUNT while parsing " + input.substring( 0, end ) );
 			System.out.println( "Parsed " + String.valueOf( result.getEnd() ) + "/" + String.valueOf( end ) + " characters" );
-			System.out.println( input.subStream( 0, result.getEnd() ) );
+			System.out.println( input.substring( 0, result.getEnd() ) );
 			System.out.println( "EXPECTED: (a " + expectedClassName + ")" );
 			System.out.println( expectedStr );
 			System.out.println( "RESULT: (a " + valueClassName + ")" );
@@ -940,18 +940,18 @@ abstract public class ParserTestCase extends TestCase
 
 
 
-	public void matchFailTestStringAndStream(ParserExpression parser, String input)
+	public void matchFailTestStringAndRichString(ParserExpression parser, String input)
 	{
-		matchFailTestStringAndStream( parser, input, "[ \t\n]*" );
+		matchFailTestStringAndRichString( parser, input, "[ \t\n]*" );
 	}
 	
-	public void matchFailTestStringAndStream(ParserExpression parser, String input, String ignoreCharsRegex)
+	public void matchFailTestStringAndRichString(ParserExpression parser, String input, String ignoreCharsRegex)
 	{
-		StreamValueBuilder builder = new StreamValueBuilder();
+		RichStringBuilder builder = new RichStringBuilder();
 		builder.appendTextValue( input );
 		
 		matchFailTestString( parser, input, ignoreCharsRegex );
-		matchFailTestStream( parser, builder.stream(), ignoreCharsRegex );
+		matchFailTestRichString( parser, builder.richString(), ignoreCharsRegex );
 	}
 
 	public void matchFailTestString(ParserExpression parser, String input)
@@ -981,14 +981,14 @@ abstract public class ParserTestCase extends TestCase
 
 
 
-	public void matchFailTestStream(ParserExpression parser, StreamValue input)
+	public void matchFailTestRichString(ParserExpression parser, RichString input)
 	{
-		matchFailTestStream( parser, input, "[ \t\n]*" );
+		matchFailTestRichString( parser, input, "[ \t\n]*" );
 	}
 	
-	public void matchFailTestStream(ParserExpression parser, StreamValue input, String ignoreCharsRegex)
+	public void matchFailTestRichString(ParserExpression parser, RichString input, String ignoreCharsRegex)
 	{
-		ParseResult result = parser.parseStreamItems( input, ignoreCharsRegex );
+		ParseResult result = parser.parseRichStringItems( input, ignoreCharsRegex );
 
 		if ( result.isValid() )
 		{
@@ -1087,18 +1087,18 @@ abstract public class ParserTestCase extends TestCase
 
 	
 	
-	public void matchIncompleteTestStringAndStream(ParserExpression parser, String input)
+	public void matchIncompleteTestStringAndRichString(ParserExpression parser, String input)
 	{
-		matchIncompleteTestStringAndStream( parser, input, "[ \t\n]*" );
+		matchIncompleteTestStringAndRichString( parser, input, "[ \t\n]*" );
 	}
 	
-	public void matchIncompleteTestStringAndStream(ParserExpression parser, String input, String ignoreCharsRegex)
+	public void matchIncompleteTestStringAndRichString(ParserExpression parser, String input, String ignoreCharsRegex)
 	{
-		StreamValueBuilder builder = new StreamValueBuilder();
+		RichStringBuilder builder = new RichStringBuilder();
 		builder.appendTextValue( input );
 		
 		matchIncompleteTestString( parser, input, ignoreCharsRegex );
-		matchIncompleteTestStream( parser, builder.stream(), ignoreCharsRegex );
+		matchIncompleteTestRichString( parser, builder.richString(), ignoreCharsRegex );
 	}
 
 	public void matchIncompleteTestString(ParserExpression parser, String input)
@@ -1133,18 +1133,18 @@ abstract public class ParserTestCase extends TestCase
 
 
 
-	public void matchIncompleteTestStream(ParserExpression parser, StreamValue input)
+	public void matchIncompleteTestRichString(ParserExpression parser, RichString input)
 	{
-		matchIncompleteTestStream( parser, input, "[ \t\n]*" );
+		matchIncompleteTestRichString( parser, input, "[ \t\n]*" );
 	}
 	
-	public void matchIncompleteTestStream(ParserExpression parser, StreamValue input, String ignoreCharsRegex)
+	public void matchIncompleteTestRichString(ParserExpression parser, RichString input, String ignoreCharsRegex)
 	{
-		ParseResult result = parser.parseStreamItems( input, ignoreCharsRegex );
+		ParseResult result = parser.parseRichStringItems( input, ignoreCharsRegex );
 
 		if ( !result.isValid() )
 		{
-			System.out.println( "PARSE FAILURE while parsing " + input + ", stopped at " + String.valueOf( result.getEnd() ) + ": " + input.subStream(  0, result.getEnd() ) );
+			System.out.println( "PARSE FAILURE while parsing " + input + ", stopped at " + String.valueOf( result.getEnd() ) + ": " + input.substring(  0, result.getEnd() ) );
 			System.out.println( "EXPECTED INCOMPLETE PARSE:" );
 		}
 		assertTrue( result.isValid() );

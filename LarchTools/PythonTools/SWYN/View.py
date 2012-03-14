@@ -31,7 +31,6 @@ from BritefuryJ.Controls import *
 from BritefuryJ.LSpace import ElementValueFunction, TextEditEvent
 from BritefuryJ.Graphics import *
 from BritefuryJ.LSpace.Interactor import KeyElementInteractor
-from BritefuryJ.LSpace.StreamValue import StreamValueBuilder
 from BritefuryJ.LSpace.Input import ObjectDndHandler
 
 from BritefuryJ.Pres import ApplyPerspective

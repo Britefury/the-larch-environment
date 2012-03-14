@@ -8,14 +8,14 @@ package BritefuryJ.Parser;
 
 import java.util.List;
 
-import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
+import BritefuryJ.Util.RichString.RichStringAccessor;
 
 /*
  * Optional
  * 
  * Optional:node( input )			->  result = Optional.subexp:node( input ); result.isValid()  ?  result  :  null_result
  * Optional:string( input, start )		->  result = Optional.subexp:string( input, start ); result.isValid()  ?  result  :  null_result
- * Optional:stream( input, start )	->  result = Optional.subexp:stream( input, start ); result.isValid()  ?  result  :  null_result
+ * Optional:richStr( input, start )		->  result = Optional.subexp:richStr( input, start ); result.isValid()  ?  result  :  null_result
  * Optional:list( input, start )		->  result = Optional.subexp:list( input, start ); result.isValid()  ?  result  :  null_result
  */
 public class Optional extends UnaryBranchExpression
@@ -59,9 +59,9 @@ public class Optional extends UnaryBranchExpression
 		}
 	}
 
-	protected ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start)
+	protected ParseResult evaluateRichStringItems(ParserState state, RichStringAccessor input, int start)
 	{
-		ParseResult res = subexp.handleStreamItems( state, input, start );
+		ParseResult res = subexp.handleRichStringItems( state, input, start );
 		
 		if ( res.isValid() )
 		{

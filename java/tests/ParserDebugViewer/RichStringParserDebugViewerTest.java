@@ -10,19 +10,19 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import BritefuryJ.LSpace.StreamValue.StreamValueBuilder;
 import BritefuryJ.Parser.AnyNode;
 import BritefuryJ.Parser.TracedParseResult;
 import BritefuryJ.Parser.Literal;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.Production;
+import BritefuryJ.Util.RichString.RichStringBuilder;
 
-public class StreamParserDebugViewerTest
+public class RichStringParserDebugViewerTest
 {
-	public static TracedParseResult streamParseDebugResultTest() throws ParserExpression.ParserCoerceException, Production.CannotOverwriteProductionExpressionException
+	public static TracedParseResult richStringParseDebugResultTest() throws ParserExpression.ParserCoerceException, Production.CannotOverwriteProductionExpressionException
 	{
-		StreamValueBuilder builder1 = new StreamValueBuilder();
+		RichStringBuilder builder1 = new RichStringBuilder();
 		builder1.appendTextValue( "this[" );
 		builder1.appendTextValue( "i" );
 		//builder1.appendStructuralValue( xs );
@@ -30,7 +30,7 @@ public class StreamParserDebugViewerTest
 
 		
 		ParserExpression parser = buildParser();
-		return parser.traceParseStreamItems( builder1.stream() );
+		return parser.traceParseRichStringItems( builder1.richString() );
 	}
 	
 	

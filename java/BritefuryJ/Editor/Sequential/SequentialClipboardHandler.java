@@ -97,7 +97,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	
 	
 	
-	private AbstractDataImporter<Caret> streamImporter = new AbstractDataImporter<Caret>()
+	private AbstractDataImporter<Caret> richStringImporter = new AbstractDataImporter<Caret>()
 	{
 		@Override
 		protected boolean canImportFlavor(DataFlavor flavor)
@@ -140,7 +140,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	
 	@SuppressWarnings("unchecked")
 	private List<? extends DataImporterInterface<Caret>> dataImporters = (List<? extends DataImporterInterface<Caret>>)
-			Arrays.asList( streamImporter, stringImporter );
+			Arrays.asList( richStringImporter, stringImporter );
 	private TargetImporter<Caret> importer = new TargetImporter<Caret>( Caret.class, dataImporters );
 	
 	
@@ -285,7 +285,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 					// Create the event
 					SelectionEditTreeEvent event = sequentialEditor.createSelectionEditTreeEvent( editRootFragmentElement );
 					// Store the spliced content in the structural value of the root element
-					event.getStreamValueVisitor().setElementFixedValue( editRootFragmentElement, spliced );
+					event.getRichStringVisitor().setElementFixedValue( editRootFragmentElement, spliced );
 					// Take a copy of the end marker
 					Marker end = endMarker.copy();
 					// Clear the selection
@@ -302,8 +302,8 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	
 					// Create the event
 					SelectionEditTreeEvent event = sequentialEditor.createSelectionEditTreeEvent( editRootFragmentElement );
-					// Store the joined stream in the structural value of the root element
-					event.getStreamValueVisitor().setElementFixedValue( editRootFragmentElement, spliced );
+					// Store the joined rich string in the structural value of the root element
+					event.getRichStringVisitor().setElementFixedValue( editRootFragmentElement, spliced );
 					// Take a copy of the end marker
 					Marker end = endMarker.copy();
 					// Clear the selection
@@ -332,7 +332,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 			
 			// Store the spliced content in the structural value of the root element
 			SelectionEditTreeEvent event = sequentialEditor.createSelectionEditTreeEvent( insertionPointElement );
-			event.getStreamValueVisitor().setElementFixedValue( insertionPointElement, spliced );
+			event.getRichStringVisitor().setElementFixedValue( insertionPointElement, spliced );
 			// Move the caret to the start of the next item, to ensure that it is placed *after* the inserted content, once the insertion is done.
 			caret.moveToStartOfNextItem();
 			// Post a tree event

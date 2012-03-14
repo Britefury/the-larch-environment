@@ -27,7 +27,6 @@ import BritefuryJ.LSpace.TreeEventListener;
 import BritefuryJ.LSpace.Clipboard.TextClipboardHandler;
 import BritefuryJ.LSpace.Interactor.KeyElementInteractor;
 import BritefuryJ.LSpace.Marker.Marker;
-import BritefuryJ.LSpace.StreamValue.StreamValueBuilder;
 import BritefuryJ.LSpace.TextFocus.Caret;
 import BritefuryJ.LSpace.TextFocus.TextSelection;
 import BritefuryJ.Live.LiveInterface;
@@ -44,6 +43,7 @@ import BritefuryJ.Pres.Primitive.Text;
 import BritefuryJ.Pres.Primitive.Whitespace;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
+import BritefuryJ.Util.RichString.RichStringBuilder;
 
 public class TextArea extends ControlPres
 {
@@ -241,11 +241,11 @@ public class TextArea extends ControlPres
 				return getDisplayedText();
 			}
 	
-			public void addStreamValuePrefixToStream(StreamValueBuilder builder, LSElement element)
+			public void addPrefixToRichString(RichStringBuilder builder, LSElement element)
 			{
 			}
 	
-			public void addStreamValueSuffixToStream(StreamValueBuilder builder, LSElement element)
+			public void addSuffixToRichString(RichStringBuilder builder, LSElement element)
 			{
 			}
 		}

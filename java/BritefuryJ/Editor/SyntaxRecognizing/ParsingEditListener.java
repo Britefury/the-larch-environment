@@ -9,13 +9,13 @@ package BritefuryJ.Editor.SyntaxRecognizing;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.EditEvent;
-import BritefuryJ.LSpace.StreamValue.StreamValue;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Logging.LogEntry;
 import BritefuryJ.Parser.ParseResult;
 import BritefuryJ.Parser.ParserExpression;
+import BritefuryJ.Util.RichString.RichString;
 
-public abstract class ParsingEditListener extends SRStreamEditListener
+public abstract class ParsingEditListener extends SRRichStringEditListener
 {
 	protected ParserExpression parser;
 	
@@ -32,12 +32,12 @@ public abstract class ParsingEditListener extends SRStreamEditListener
 	}
 	
 
-	protected boolean isValueEmpty(LSElement element, FragmentView fragment, Object model, StreamValue value)
+	protected boolean isValueEmpty(LSElement element, FragmentView fragment, Object model, RichString value)
 	{
 		return getSyntaxRecognizingEditor().isValueEmpty( value );
 	}
 	
-	protected boolean isValueValid(LSElement element, FragmentView fragment, Object model, StreamValue value)
+	protected boolean isValueValid(LSElement element, FragmentView fragment, Object model, RichString value)
 	{
 		return true;
 	}
@@ -54,17 +54,17 @@ public abstract class ParsingEditListener extends SRStreamEditListener
 		return HandleEditResult.NOT_HANDLED;
 	}
 	
-	protected abstract HandleEditResult handleParseSuccess(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value, Object parsed);
+	protected abstract HandleEditResult handleParseSuccess(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value, Object parsed);
 	
 	
-	protected HandleEditResult handleParseFailure(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
+	protected HandleEditResult handleParseFailure(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
 	{
 		return HandleEditResult.NOT_HANDLED;
 	}
 	
 	
 	
-	protected HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
+	protected HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
 	{
 		String logName = getLogName();
 		if ( value.isEmpty()  ||  isValueEmpty( element, fragment, model, value ) )
@@ -74,14 +74,14 @@ public abstract class ParsingEditListener extends SRStreamEditListener
 				Log log = fragment.getView().getLog();
 				if ( log.isRecording() )
 				{
-					log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " - deleted" ).vItem( "editedStream", value ) );
+					log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " - deleted" ).vItem( "editedRichStr", value ) );
 				}
 			}
 			return handleEmptyValue( element, fragment, event, model );
 		}
 		else if ( isValueValid( element, fragment, model, value ) )
 		{
-			Object parsed[] = parseStream( value );
+			Object parsed[] = parseRichString( value );
 			
 			if ( parsed != null )
 			{
@@ -90,7 +90,7 @@ public abstract class ParsingEditListener extends SRStreamEditListener
 					Log log = fragment.getView().getLog();
 					if ( log.isRecording() )
 					{
-						log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " - parse succeeded" ).vItem( "editedStream", value ).hItem( "parser", parser ).vItem( "parsed", parsed[0] ) );
+						log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " - parse succeeded" ).vItem( "editedRichStr", value ).hItem( "parser", parser ).vItem( "parsed", parsed[0] ) );
 					}
 				}
 				return handleParseSuccess( element, sourceElement, fragment, event, model, value, parsed[0] );
@@ -102,7 +102,7 @@ public abstract class ParsingEditListener extends SRStreamEditListener
 					Log log = fragment.getView().getLog();
 					if ( log.isRecording() )
 					{
-						log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " - parse failed" ).vItem( "editedStream", value ).hItem( "parser", parser ) );
+						log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " - parse failed" ).vItem( "editedRichStr", value ).hItem( "parser", parser ) );
 					}
 				}
 				return handleParseFailure( element, sourceElement, fragment, event, model, value );
@@ -116,9 +116,9 @@ public abstract class ParsingEditListener extends SRStreamEditListener
 
 	
 	
-	private Object[] parseStream(StreamValue value)
+	private Object[] parseRichString(RichString value)
 	{
-		ParseResult res = parser.parseStreamItems( value );
+		ParseResult res = parser.parseRichStringItems( value );
 		if ( res.isValid() )
 		{
 			if ( res.getEnd() == value.length() )

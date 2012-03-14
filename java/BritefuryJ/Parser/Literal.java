@@ -6,14 +6,14 @@
 //##************************
 package BritefuryJ.Parser;
 
-import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
+import BritefuryJ.Util.RichString.RichStringAccessor;
 
 /*
  * Literal
  * 
  * Literal:node( input )			->  input == Literal.matchString  ?  input  :  fail
  * Literal:string( input, start )		->  input[start:start+Literal.matchString.length()] == Literal.matchString  ?  input[start:start+Literal.matchString.length()] : fail
- * Literal:stream( input, start )		->  input[start:start+Literal.matchString.length()] == Literal.matchString  ?  input[start:start+Literal.matchString.length()] : fail
+ * Literal:richStr( input, start )		->  input[start:start+Literal.matchString.length()] == Literal.matchString  ?  input[start:start+Literal.matchString.length()] : fail
  * Literal:list( input, start )			->  input[start] == Literal.matchString  ?  input[start]  :  fail
  */
 public class Literal extends TerminalString
@@ -45,7 +45,7 @@ public class Literal extends TerminalString
 		return ParseResult.failure( start );
 	}
 	
-	protected ParseResult consumeStream(StreamValueAccessor input, int start)
+	protected ParseResult consumeRichString(RichStringAccessor input, int start)
 	{
 		int end = input.consumeString( start, matchString );
 		

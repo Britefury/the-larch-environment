@@ -10,13 +10,13 @@ import BritefuryJ.Editor.Sequential.EditListener.HandleEditResult;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.EditEvent;
+import BritefuryJ.LSpace.SequentialRichStringVisitor;
 import BritefuryJ.LSpace.TextEditEvent;
 import BritefuryJ.LSpace.TreeEventListener;
 import BritefuryJ.LSpace.Marker.Marker;
-import BritefuryJ.LSpace.StreamValue.SequentialStreamValueVisitor;
-import BritefuryJ.LSpace.StreamValue.StreamValue;
 import BritefuryJ.LSpace.TextFocus.TextSelection;
 import BritefuryJ.Pres.Primitive.Region;
+import BritefuryJ.Util.RichString.RichString;
 
 public abstract class SequentialEditor
 {
@@ -25,18 +25,18 @@ public abstract class SequentialEditor
 		EditListener.HandleEditResult handleEditEvent(LSElement element, LSElement sourceElement, EditEvent event);
 	}
 	
-	public static interface HandleStreamValueFn
+	public static interface HandleRichStringFn
 	{
-		HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value);
+		HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value);
 	}
 	
 	
 	
 	protected static class ClearNeighbourEditEvent extends EditEvent
 	{
-		protected ClearNeighbourEditEvent(SequentialStreamValueVisitor streamValueVisitor)
+		protected ClearNeighbourEditEvent(SequentialRichStringVisitor richStringVisitor)
 		{
-			super( streamValueVisitor );
+			super( richStringVisitor );
 		}
 	}
 	
@@ -56,7 +56,7 @@ public abstract class SequentialEditor
 					// Otherwise, clear it
 					if ( !( isSelectionEditEvent( editEvent )  &&  getEventSourceElement( editEvent ) == element ) )
 					{
-						editEvent.getStreamValueVisitor().ignoreElementFixedValue( element );
+						editEvent.getRichStringVisitor().ignoreElementFixedValue( element );
 					}
 				}
 			}
@@ -78,7 +78,7 @@ public abstract class SequentialEditor
 				LSElement prevNeighbourCommonAncestor = editEvent.getPrevNeighbourCommonAncestor();
 				LSElement nextNeighbourCommonAncestor = editEvent.getNextNeighbourCommonAncestor();
 				
-				ClearNeighbourEditEvent clearEvent = new ClearNeighbourEditEvent( editEvent.getStreamValueVisitor() );
+				ClearNeighbourEditEvent clearEvent = new ClearNeighbourEditEvent( editEvent.getRichStringVisitor() );
 				
 				if ( prevNeighbourCommonAncestor != null  &&  prevNeighbourCommonAncestor.isInSubtreeRootedAt( element ) )
 				{
@@ -126,14 +126,14 @@ public abstract class SequentialEditor
 	
 	
 	
-	protected class _StreamEditListener extends StreamEditListener
+	protected class _RichStringEditListener extends RichStringEditListener
 	{
-		private HandleStreamValueFn handleStreamValueFn;
+		private HandleRichStringFn handleRichStringFn;
 		
 		
-		protected _StreamEditListener(HandleStreamValueFn handleStreamValueFn)
+		protected _RichStringEditListener(HandleRichStringFn handleRichStringFn)
 		{
-			this.handleStreamValueFn = handleStreamValueFn;
+			this.handleRichStringFn = handleRichStringFn;
 		}
 		
 
@@ -144,9 +144,9 @@ public abstract class SequentialEditor
 		}
 
 		@Override
-		protected HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
+		protected HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
 		{
-			return handleStreamValueFn.handleValue( element, sourceElement, fragment, event, model, value );
+			return handleRichStringFn.handleValue( element, sourceElement, fragment, event, model, value );
 		}
 	}
 	
@@ -209,9 +209,9 @@ public abstract class SequentialEditor
 		return new _EditListener( handleEditEventFn );
 	}
 	
-	public StreamEditListener streamEditListener(HandleStreamValueFn handleStreamValueFn)
+	public RichStringEditListener richStringEditListener(HandleRichStringFn handleRichStringFn)
 	{
-		return new _StreamEditListener( handleStreamValueFn );
+		return new _RichStringEditListener( handleRichStringFn );
 	}
 	
 	
@@ -253,9 +253,9 @@ public abstract class SequentialEditor
 	protected abstract boolean canConvertSequentialToTextForExport(Object sequential);
 	protected abstract String sequentialToTextForExport(Object sequential);
 
-	protected SequentialBuffer createSelectionBuffer(Object stream)
+	protected SequentialBuffer createSelectionBuffer(Object richString)
 	{
-		return new SequentialBuffer( stream, clipboardHandler );
+		return new SequentialBuffer( richString, clipboardHandler );
 	}
 	
 	protected Class<? extends SequentialBuffer> getSelectionBufferType()

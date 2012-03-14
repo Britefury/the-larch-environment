@@ -6,11 +6,11 @@
 //##************************
 package BritefuryJ.Parser.Utils;
 
-import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
 import BritefuryJ.Parser.ParseResult;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.RegEx;
 import BritefuryJ.Parser.TerminalString;
+import BritefuryJ.Util.RichString.RichStringAccessor;
 
 public class Tokens
 {
@@ -131,7 +131,7 @@ public class Tokens
 			return ParseResult.failure( start );
 		}
 
-		protected ParseResult consumeStream(StreamValueAccessor input, int start)
+		protected ParseResult consumeRichString(RichStringAccessor input, int start)
 		{
 			CharSequence itemText = input.getItemTextFrom( start );
 			
@@ -207,7 +207,7 @@ public class Tokens
 		}
 
 
-		protected ParseResult consumeStream(StreamValueAccessor input, int start)
+		protected ParseResult consumeRichString(RichStringAccessor input, int start)
 		{
 			CharSequence itemText = input.getItemTextFrom( start );
 			
@@ -303,7 +303,7 @@ public class Tokens
 		}
 
 
-		protected ParseResult consumeStream(StreamValueAccessor input, int start)
+		protected ParseResult consumeRichString(RichStringAccessor input, int start)
 		{
 			CharSequence itemText = input.getItemTextFrom( start );
 			

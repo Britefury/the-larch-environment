@@ -10,10 +10,10 @@ package BritefuryJ.LSpace;
 import java.util.ArrayList;
 
 import BritefuryJ.LSpace.LayoutTree.ContentLeafLayoutNodeInterface;
-import BritefuryJ.LSpace.StreamValue.StreamValueBuilder;
 import BritefuryJ.LSpace.StyleParams.ContentLeafStyleParams;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Pres.ObjectPres.UnescapedStringAsRow;
+import BritefuryJ.Util.RichString.RichStringBuilder;
 
 public abstract class LSContentLeaf extends LSElement
 {
@@ -248,9 +248,9 @@ public abstract class LSContentLeaf extends LSElement
 	
 	
 	
-	// Stream value computation
+	// Rich string computation
 	
-	public void addToStreamValue(StreamValueBuilder builder)
+	public void addToRichString(RichStringBuilder builder)
 	{
 		builder.appendTextValue( textRepresentation );
 	}

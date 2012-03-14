@@ -25,79 +25,79 @@ public class Test_Tokens extends ParserTestCase
 	public void testIdentifier()
 	{
 		ParserExpression parser = Tokens.identifier;
-		matchTestStringAndStream( parser, "ab", "ab" );
-		matchTestStringAndStream( parser, "ab12", "ab12" );
-		matchFailTestStringAndStream( parser, "12ab" );
-		matchTestStringAndStream( parser, "_ab", "_ab" );
+		matchTestStringAndRichString( parser, "ab", "ab" );
+		matchTestStringAndRichString( parser, "ab12", "ab12" );
+		matchFailTestStringAndRichString( parser, "12ab" );
+		matchTestStringAndRichString( parser, "_ab", "_ab" );
 	}
 
 	public void testJavaIdentifier()
 	{
 		ParserExpression parser = Tokens.javaIdentifier;
-		matchTestStringAndStream( parser, "ab", "ab" );
-		matchTestStringAndStream( parser, "ab12", "ab12" );
-		matchFailTestStringAndStream( parser, "12ab" );
-		matchTestStringAndStream( parser, "_ab", "_ab" );
+		matchTestStringAndRichString( parser, "ab", "ab" );
+		matchTestStringAndRichString( parser, "ab12", "ab12" );
+		matchFailTestStringAndRichString( parser, "12ab" );
+		matchTestStringAndRichString( parser, "_ab", "_ab" );
 	}
 	
 
 	public void testDecimalInteger()
 	{
 		ParserExpression parser = Tokens.decimalInteger;
-		matchTestStringAndStream( parser, "123", "123" );
-		matchTestStringAndStream( parser, "-123", "-123" );
+		matchTestStringAndRichString( parser, "123", "123" );
+		matchTestStringAndRichString( parser, "-123", "-123" );
 	}
 
 	public void testDecimalIntegerNoOctal()
 	{
 		ParserExpression parser = Tokens.decimalIntegerNoOctal;
-		matchTestStringAndStream( parser, "123", "123" );
-		matchTestStringAndStream( parser, "0", "0" );
-		matchSubTestStringAndStream( parser, "0123", "0", 1 );
+		matchTestStringAndRichString( parser, "123", "123" );
+		matchTestStringAndRichString( parser, "0", "0" );
+		matchSubTestStringAndRichString( parser, "0123", "0", 1 );
 	}
 
 
 	public void testHexadecimalInteger()
 	{
 		ParserExpression parser = Tokens.hexInteger;
-		matchTestStringAndStream( parser, "0x123", "0x123" );
-		matchTestStringAndStream( parser, "0X123", "0X123" );
-		matchTestStringAndStream( parser, "0x0123456789abcdef", "0x0123456789abcdef" );
-		matchTestStringAndStream( parser, "0x0123456789ABCDEF", "0x0123456789ABCDEF" );
+		matchTestStringAndRichString( parser, "0x123", "0x123" );
+		matchTestStringAndRichString( parser, "0X123", "0X123" );
+		matchTestStringAndRichString( parser, "0x0123456789abcdef", "0x0123456789abcdef" );
+		matchTestStringAndRichString( parser, "0x0123456789ABCDEF", "0x0123456789ABCDEF" );
 	}
 
 	public void testOctalInteger()
 	{
 		ParserExpression parser = Tokens.octalInteger;
-		matchFailTestStringAndStream( parser, "12" );
-		matchFailTestStringAndStream( parser, "0" );
-		matchTestStringAndStream( parser, "01", "01" );
-		matchTestStringAndStream( parser, "01234567", "01234567" );
-		matchSubTestStringAndStream( parser, "0123456789", "01234567", 8 );
+		matchFailTestStringAndRichString( parser, "12" );
+		matchFailTestStringAndRichString( parser, "0" );
+		matchTestStringAndRichString( parser, "01", "01" );
+		matchTestStringAndRichString( parser, "01234567", "01234567" );
+		matchSubTestStringAndRichString( parser, "0123456789", "01234567", 8 );
 	}
 
 	public void testFloatingPoint()
 	{
 		ParserExpression parser = Tokens.floatingPoint;
-		matchTestStringAndStream( parser, "3.14", "3.14" );
-		matchTestStringAndStream( parser, "-3.14", "-3.14" );
-		matchTestStringAndStream( parser, "3.", "3." );
-		matchTestStringAndStream( parser, "-3.", "-3." );
-		matchTestStringAndStream( parser, ".14", ".14" );
-		matchTestStringAndStream( parser, "-.14", "-.14" );
+		matchTestStringAndRichString( parser, "3.14", "3.14" );
+		matchTestStringAndRichString( parser, "-3.14", "-3.14" );
+		matchTestStringAndRichString( parser, "3.", "3." );
+		matchTestStringAndRichString( parser, "-3.", "-3." );
+		matchTestStringAndRichString( parser, ".14", ".14" );
+		matchTestStringAndRichString( parser, "-.14", "-.14" );
 
-		matchTestStringAndStream( parser, "3.14e5", "3.14e5" );
-		matchTestStringAndStream( parser, "3.14e-5", "3.14e-5" );
-		matchTestStringAndStream( parser, "-3.14e5", "-3.14e5" );
-		matchTestStringAndStream( parser, "-3.14e-5", "-3.14e-5" );
-		matchTestStringAndStream( parser, "3.e5", "3.e5" );
-		matchTestStringAndStream( parser, "3.e-5", "3.e-5" );
-		matchTestStringAndStream( parser, "-3.e5", "-3.e5" );
-		matchTestStringAndStream( parser, "-3.e-5", "-3.e-5" );
-		matchTestStringAndStream( parser, ".14e5", ".14e5" );
-		matchTestStringAndStream( parser, ".14e-5", ".14e-5" );
-		matchTestStringAndStream( parser, "-.14e5", "-.14e5" );
-		matchTestStringAndStream( parser, "-.14e-5", "-.14e-5" );
+		matchTestStringAndRichString( parser, "3.14e5", "3.14e5" );
+		matchTestStringAndRichString( parser, "3.14e-5", "3.14e-5" );
+		matchTestStringAndRichString( parser, "-3.14e5", "-3.14e5" );
+		matchTestStringAndRichString( parser, "-3.14e-5", "-3.14e-5" );
+		matchTestStringAndRichString( parser, "3.e5", "3.e5" );
+		matchTestStringAndRichString( parser, "3.e-5", "3.e-5" );
+		matchTestStringAndRichString( parser, "-3.e5", "-3.e5" );
+		matchTestStringAndRichString( parser, "-3.e-5", "-3.e-5" );
+		matchTestStringAndRichString( parser, ".14e5", ".14e5" );
+		matchTestStringAndRichString( parser, ".14e-5", ".14e-5" );
+		matchTestStringAndRichString( parser, "-.14e5", "-.14e5" );
+		matchTestStringAndRichString( parser, "-.14e-5", "-.14e-5" );
 	}
 
 	
@@ -105,90 +105,90 @@ public class Test_Tokens extends ParserTestCase
 	public void testJavaCharacterLiteral()
 	{
 		ParserExpression parser = Tokens.javaCharacterLiteral;
-		matchTestStringAndStream( parser, "'a'", "'a'" );
-		matchFailTestStringAndStream( parser, "'a" );
-		matchTestStringAndStream( parser, "'\\b'", "'\\b'" );
-		matchTestStringAndStream( parser, "'\\t'", "'\\t'" );
-		matchTestStringAndStream( parser, "'\\n'", "'\\n'" );
-		matchTestStringAndStream( parser, "'\\f'", "'\\f'" );
-		matchTestStringAndStream( parser, "'\\r'", "'\\r'" );
-		matchTestStringAndStream( parser, "'\\\"'", "'\\\"'" );
-		matchTestStringAndStream( parser, "'\\''", "'\\''" );
-		matchTestStringAndStream( parser, "'\\\\'", "'\\\\'" );
-		matchFailTestStringAndStream( parser, "'\\a'" );
-		matchTestStringAndStream( parser, "'\\0'", "'\\0'" );
-		matchTestStringAndStream( parser, "'\\1'", "'\\1'" );
-		matchTestStringAndStream( parser, "'\\2'", "'\\2'" );
-		matchTestStringAndStream( parser, "'\\3'", "'\\3'" );
-		matchTestStringAndStream( parser, "'\\4'", "'\\4'" );
-		matchTestStringAndStream( parser, "'\\5'", "'\\5'" );
-		matchTestStringAndStream( parser, "'\\6'", "'\\6'" );
-		matchTestStringAndStream( parser, "'\\7'", "'\\7'" );
-		matchTestStringAndStream( parser, "'\\77'", "'\\77'" );
-		matchFailTestStringAndStream( parser, "'\\777'" );
-		matchFailTestStringAndStream( parser, "'\\477'" );
-		matchTestStringAndStream( parser, "'\\377'", "'\\377'" );
-		matchTestStringAndStream( parser, "'\\u0123'", "'\\u0123'" );
-		matchTestStringAndStream( parser, "'\\u01aF'", "'\\u01aF'" );
-		matchFailTestStringAndStream( parser, "'\\u01a'" );
-		matchFailTestStringAndStream( parser, "'\\u01a043'" );
+		matchTestStringAndRichString( parser, "'a'", "'a'" );
+		matchFailTestStringAndRichString( parser, "'a" );
+		matchTestStringAndRichString( parser, "'\\b'", "'\\b'" );
+		matchTestStringAndRichString( parser, "'\\t'", "'\\t'" );
+		matchTestStringAndRichString( parser, "'\\n'", "'\\n'" );
+		matchTestStringAndRichString( parser, "'\\f'", "'\\f'" );
+		matchTestStringAndRichString( parser, "'\\r'", "'\\r'" );
+		matchTestStringAndRichString( parser, "'\\\"'", "'\\\"'" );
+		matchTestStringAndRichString( parser, "'\\''", "'\\''" );
+		matchTestStringAndRichString( parser, "'\\\\'", "'\\\\'" );
+		matchFailTestStringAndRichString( parser, "'\\a'" );
+		matchTestStringAndRichString( parser, "'\\0'", "'\\0'" );
+		matchTestStringAndRichString( parser, "'\\1'", "'\\1'" );
+		matchTestStringAndRichString( parser, "'\\2'", "'\\2'" );
+		matchTestStringAndRichString( parser, "'\\3'", "'\\3'" );
+		matchTestStringAndRichString( parser, "'\\4'", "'\\4'" );
+		matchTestStringAndRichString( parser, "'\\5'", "'\\5'" );
+		matchTestStringAndRichString( parser, "'\\6'", "'\\6'" );
+		matchTestStringAndRichString( parser, "'\\7'", "'\\7'" );
+		matchTestStringAndRichString( parser, "'\\77'", "'\\77'" );
+		matchFailTestStringAndRichString( parser, "'\\777'" );
+		matchFailTestStringAndRichString( parser, "'\\477'" );
+		matchTestStringAndRichString( parser, "'\\377'", "'\\377'" );
+		matchTestStringAndRichString( parser, "'\\u0123'", "'\\u0123'" );
+		matchTestStringAndRichString( parser, "'\\u01aF'", "'\\u01aF'" );
+		matchFailTestStringAndRichString( parser, "'\\u01a'" );
+		matchFailTestStringAndRichString( parser, "'\\u01a043'" );
 	}
 
 	
 	public void testSingleQuotedString()
 	{
 		ParserExpression parser = Tokens.singleQuotedString;
-		matchTestStringAndStream( parser, "'abc'", "'abc'" );
-		matchTestStringAndStream( parser, "'ab\\'c'", "'ab\\'c'" );
-		matchSubTestStringAndStream( parser, "'abc'113", "'abc'", 5 );
+		matchTestStringAndRichString( parser, "'abc'", "'abc'" );
+		matchTestStringAndRichString( parser, "'ab\\'c'", "'ab\\'c'" );
+		matchSubTestStringAndRichString( parser, "'abc'113", "'abc'", 5 );
 	}
 
 
 	public void testDoubleQuotedString()
 	{
 		ParserExpression parser = Tokens.doubleQuotedString;
-		matchTestStringAndStream( parser, "\"abc\"", "\"abc\"" );
-		matchTestStringAndStream( parser, "\"ab\\\"c\"", "\"ab\\\"c\"" );
-		matchSubTestStringAndStream( parser, "\"abc\"113\"", "\"abc\"", 5 );
+		matchTestStringAndRichString( parser, "\"abc\"", "\"abc\"" );
+		matchTestStringAndRichString( parser, "\"ab\\\"c\"", "\"ab\\\"c\"" );
+		matchSubTestStringAndRichString( parser, "\"abc\"113\"", "\"abc\"", 5 );
 	}
 
 
 	public void testQuotedString()
 	{
 		ParserExpression parser = Tokens.quotedString;
-		matchTestStringAndStream( parser, "'abc'", "'abc'" );
-		matchTestStringAndStream( parser, "'ab\\'c'", "'ab\\'c'" );
-		matchSubTestStringAndStream( parser, "'abc'113", "'abc'", 5 );
-		matchTestStringAndStream( parser, "\"abc\"", "\"abc\"" );
-		matchTestStringAndStream( parser, "\"ab\\\"c\"", "\"ab\\\"c\"" );
-		matchSubTestStringAndStream( parser, "\"abc\"113\"", "\"abc\"", 5 );
+		matchTestStringAndRichString( parser, "'abc'", "'abc'" );
+		matchTestStringAndRichString( parser, "'ab\\'c'", "'ab\\'c'" );
+		matchSubTestStringAndRichString( parser, "'abc'113", "'abc'", 5 );
+		matchTestStringAndRichString( parser, "\"abc\"", "\"abc\"" );
+		matchTestStringAndRichString( parser, "\"ab\\\"c\"", "\"ab\\\"c\"" );
+		matchSubTestStringAndRichString( parser, "\"abc\"113\"", "\"abc\"", 5 );
 	}
 
 
 	public void testUnicodeString()
 	{
 		ParserExpression parser = Tokens.unicodeString;
-		matchTestStringAndStream( parser, "u'abc'", "u'abc'" );
-		matchTestStringAndStream( parser, "u'ab\\'c'", "u'ab\\'c'" );
-		matchSubTestStringAndStream( parser, "u'abc'113", "u'abc'", 6 );
-		matchTestStringAndStream( parser, "u\"abc\"", "u\"abc\"" );
-		matchTestStringAndStream( parser, "u\"ab\\\"c\"", "u\"ab\\\"c\"" );
-		matchSubTestStringAndStream( parser, "u\"abc\"113\"", "u\"abc\"", 6 );
+		matchTestStringAndRichString( parser, "u'abc'", "u'abc'" );
+		matchTestStringAndRichString( parser, "u'ab\\'c'", "u'ab\\'c'" );
+		matchSubTestStringAndRichString( parser, "u'abc'113", "u'abc'", 6 );
+		matchTestStringAndRichString( parser, "u\"abc\"", "u\"abc\"" );
+		matchTestStringAndRichString( parser, "u\"ab\\\"c\"", "u\"ab\\\"c\"" );
+		matchSubTestStringAndRichString( parser, "u\"abc\"113\"", "u\"abc\"", 6 );
 	}
 	
 	
 	public void testJavaStringLiteral()
 	{
 		ParserExpression parser = Tokens.javaStringLiteral;
-		matchTestStringAndStream( parser, "\"abc\"", "\"abc\"" );
-		matchSubTestStringAndStream( parser, "\"abc\"q", "\"abc\"", 5 );
-		matchTestStringAndStream( parser, "\"abc\\b\\t\\n\\f\\r\\\"\\\'\\\\xyz\"", "\"abc\\b\\t\\n\\f\\r\\\"\\\'\\\\xyz\"" );
-		matchFailTestStringAndStream( parser, "\"abc\\a\\t\\n\\f\\r\\\"\\\'\\\\xyz\"" );
-		matchTestStringAndStream( parser, "\"abc\\0\\1\\2\\3\\4\\5\\6\\7xyz\"", "\"abc\\0\\1\\2\\3\\4\\5\\6\\7xyz\"" );
-		matchTestStringAndStream( parser, "\"abc\\347xyz\"", "\"abc\\347xyz\"" );
-		matchTestStringAndStream( parser, "\"abc\\u0123xyz\"", "\"abc\\u0123xyz\"" );
-		matchTestStringAndStream( parser, "\"abc\\u01aFxyz\"", "\"abc\\u01aFxyz\"" );
-		matchFailTestStringAndStream( parser, "\"abc\\u347xyz\"" );
+		matchTestStringAndRichString( parser, "\"abc\"", "\"abc\"" );
+		matchSubTestStringAndRichString( parser, "\"abc\"q", "\"abc\"", 5 );
+		matchTestStringAndRichString( parser, "\"abc\\b\\t\\n\\f\\r\\\"\\\'\\\\xyz\"", "\"abc\\b\\t\\n\\f\\r\\\"\\\'\\\\xyz\"" );
+		matchFailTestStringAndRichString( parser, "\"abc\\a\\t\\n\\f\\r\\\"\\\'\\\\xyz\"" );
+		matchTestStringAndRichString( parser, "\"abc\\0\\1\\2\\3\\4\\5\\6\\7xyz\"", "\"abc\\0\\1\\2\\3\\4\\5\\6\\7xyz\"" );
+		matchTestStringAndRichString( parser, "\"abc\\347xyz\"", "\"abc\\347xyz\"" );
+		matchTestStringAndRichString( parser, "\"abc\\u0123xyz\"", "\"abc\\u0123xyz\"" );
+		matchTestStringAndRichString( parser, "\"abc\\u01aFxyz\"", "\"abc\\u01aFxyz\"" );
+		matchFailTestStringAndRichString( parser, "\"abc\\u347xyz\"" );
 	}
 
 

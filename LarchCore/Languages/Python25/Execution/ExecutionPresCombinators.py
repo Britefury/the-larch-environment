@@ -47,7 +47,7 @@ class ExecutionStyle (object):
 def _textLines(text, textStyleAttribute):
 	return ApplyStyleSheetFromAttribute( textStyleAttribute, Column( [ StaticText( line )   for line in text.split( '\n' ) ] ) )
 
-def _streamItem(item, textStyleAttribute, bUseDefaultPerspectiveForResult):
+def _richStringItem(item, textStyleAttribute, bUseDefaultPerspectiveForResult):
 	if item.isStructural():
 		resultView = InnerFragment( item.getValue() )
 		if bUseDefaultPerspectiveForResult:
@@ -56,17 +56,17 @@ def _streamItem(item, textStyleAttribute, bUseDefaultPerspectiveForResult):
 	else:
 		return _textLines( item.getValue(), textStyleAttribute )
 
-def _streamLines(labelText, stream, textStyleAttribute, bUseDefaultPerspectiveForResult):
+def _richStringLines(labelText, richString, textStyleAttribute, bUseDefaultPerspectiveForResult):
 	label = ApplyStyleSheetFromAttribute( ExecutionStyle.labelStyle, StaticText( labelText ) )
-	lines = [ _streamItem( item, textStyleAttribute, bUseDefaultPerspectiveForResult )   for item in stream.getItems() ]
+	lines = [ _richStringItem( item, textStyleAttribute, bUseDefaultPerspectiveForResult )   for item in richString.getItems() ]
 	return Column( [ label, Column( lines ).padX( 5.0, 0.0 ) ] )
 
 
-def execStdout(stream, bUseDefaultPerspectiveForResult):
-	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdOutStyle, Border( _streamLines( 'STDOUT:', stream, ExecutionStyle.stdOutStyle, bUseDefaultPerspectiveForResult ).alignHExpand() ).alignHExpand() )
+def execStdout(richString, bUseDefaultPerspectiveForResult):
+	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdOutStyle, Border( _richStringLines( 'STDOUT:', richString, ExecutionStyle.stdOutStyle, bUseDefaultPerspectiveForResult ).alignHExpand() ).alignHExpand() )
 
-def execStderr(stream, bUseDefaultPerspectiveForResult):
-	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdErrStyle, Border( _streamLines( 'STDERR:', stream, ExecutionStyle.stdErrStyle, bUseDefaultPerspectiveForResult ).alignHExpand() ).alignHExpand() )
+def execStderr(richString, bUseDefaultPerspectiveForResult):
+	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdErrStyle, Border( _richStringLines( 'STDERR:', richString, ExecutionStyle.stdErrStyle, bUseDefaultPerspectiveForResult ).alignHExpand() ).alignHExpand() )
 	
 def execException(exceptionView):
 	label = ApplyStyleSheetFromAttribute( ExecutionStyle.labelStyle, StaticText( 'EXCEPTION:' ) )

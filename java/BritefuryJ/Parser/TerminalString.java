@@ -8,26 +8,26 @@ package BritefuryJ.Parser;
 
 import java.util.List;
 
-import BritefuryJ.LSpace.StreamValue.StreamValue;
-import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
+import BritefuryJ.Util.RichString.RichString;
+import BritefuryJ.Util.RichString.RichStringAccessor;
 
 /*
 	 * TerminalString
 	 * 
 	 * TerminalString:node( input )				->  TerminalString.matchNode( input, 0 )
 	 * TerminalString:string( input, start )		->  TerminalString.consumeString( input, start )
-	 * TerminalString:stream( input, start )		->  structural = input[start].matchStructural(); structural != null  ?  TerminalString.matchNode( structural )  :  TerminalString.consumeStream( input, start )
+	 * TerminalString:richStr( input, start )		->  structural = input[start].matchStructural(); structural != null  ?  TerminalString.matchNode( structural )  :  TerminalString.consumeRichString( input, start )
 	 * TerminalString:list( input, start )			->  TerminalString.matchNode( input[start], start )
 	 * 
 	 * TerminalString.matchNode(input, start)		->	input instanceof String  ->  res = TerminalString.consumeString( input, 0 ); res.end == input.length()  ?  success  :  fail 
-	 * 										input instanceof Stream  ->  res = TerminalString.consumeStream( input, 0 ); res.end == input.length()  ?  success  :  fail
+	 * 										input instanceof RichString  ->  res = TerminalString.consumeRichString( input, 0 ); res.end == input.length()  ?  success  :  fail
 	 * TerminalString.consumeString(input, start)	->	defined in subclass
-	 * TerminalString.consumeStream(input, start)	->	defined in subclass
+	 * TerminalString.consumeRichString(input, start) ->	defined in subclass
  */
 public abstract class TerminalString extends ParserExpression
 {
 	protected abstract ParseResult consumeString(String input, int start);
-	protected abstract ParseResult consumeStream(StreamValueAccessor input, int start);
+	protected abstract ParseResult consumeRichString(RichStringAccessor input, int start);
 	
 	
 	private ParseResult matchNode(Object input, int start)
@@ -42,12 +42,12 @@ public abstract class TerminalString extends ParserExpression
 				return res.withRange( start, start + 1 );
 			}
 		}
-		else if ( input instanceof StreamValue )
+		else if ( input instanceof RichString )
 		{
-			StreamValue s = (StreamValue)input;
-			StreamValueAccessor accessor = s.accessor();
+			RichString s = (RichString)input;
+			RichStringAccessor accessor = s.accessor();
 			
-			ParseResult res = consumeStream( accessor, 0 );
+			ParseResult res = consumeRichString( accessor, 0 );
 			if ( res.getEnd() == s.length() )
 			{
 				return res.withRange( start, start + 1 );
@@ -74,7 +74,7 @@ public abstract class TerminalString extends ParserExpression
 		return ParseResult.failure( start );
 	}
 	
-	protected ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start)
+	protected ParseResult evaluateRichStringItems(ParserState state, RichStringAccessor input, int start)
 	{
 		start = state.skipJunkChars( input, start );
 		
@@ -87,7 +87,7 @@ public abstract class TerminalString extends ParserExpression
 			}
 			else
 			{
-				return consumeStream( input, start );
+				return consumeRichString( input, start );
 			}
 		}
 		

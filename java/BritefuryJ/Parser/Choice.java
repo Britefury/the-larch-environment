@@ -8,14 +8,14 @@ package BritefuryJ.Parser;
 
 import java.util.List;
 
-import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
+import BritefuryJ.Util.RichString.RichStringAccessor;
 
 /*
  * Choice
  * 
  * Choice:node( input )		->  first_success_of( [ s:node( input )   for s in Choice.subexps ] )
  * Choice:string( input, start )	->  first_success_of( [ s:string( input, start )   for s in Choice.subexps ] )
- * Choice:stream( input, start )	->  first_success_of( [ s:stream( input, start )   for s in Choice.subexps ] )
+ * Choice:richStr( input, start )	->  first_success_of( [ s:richStr( input, start )   for s in Choice.subexps ] )
  * Choice:list( input, start )	->  first_success_of( [ s:list( input, start )   for s in Choice.subexps ] )
  */
 public class Choice extends BranchExpression
@@ -71,13 +71,13 @@ public class Choice extends BranchExpression
 		return ParseResult.failure( maxErrorPos );
 	}
 
-	protected ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start)
+	protected ParseResult evaluateRichStringItems(ParserState state, RichStringAccessor input, int start)
 	{
 		int maxErrorPos = start;
 		
 		for (ParserExpression subexp: subexps)
 		{
-			ParseResult result = subexp.handleStreamItems( state, input, start );
+			ParseResult result = subexp.handleRichStringItems( state, input, start );
 			if ( result.isValid() )
 			{
 				return result;

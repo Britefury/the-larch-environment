@@ -11,9 +11,9 @@ import java.util.List;
 
 import org.python.core.PyObject;
 
-import BritefuryJ.LSpace.StreamValue.StreamValue;
-import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
 import BritefuryJ.ParserHelpers.TraceNode;
+import BritefuryJ.Util.RichString.RichString;
+import BritefuryJ.Util.RichString.RichStringAccessor;
 
 public abstract class ParserExpression
 {
@@ -30,7 +30,7 @@ public abstract class ParserExpression
 	{
 		NODE,
 		STRING,
-		STREAM,
+		RICHSTRING,
 		LIST
 	}
 	
@@ -194,40 +194,40 @@ public abstract class ParserExpression
 	
 
 	
-	public ParseResult parseStreamItems(StreamValue input)
+	public ParseResult parseRichStringItems(RichString input)
 	{
-		return parseStreamItems( input.accessor(), "[ ]*", null );
+		return parseRichStringItems( input.accessor(), "[ ]*", null );
 	}
 
-	public ParseResult parseStreamItems(StreamValue input, String junkRegex)
+	public ParseResult parseRichStringItems(RichString input, String junkRegex)
 	{
-		return parseStreamItems( input.accessor(), junkRegex, null );
+		return parseRichStringItems( input.accessor(), junkRegex, null );
 	}
 
-	public ParseResult parseStreamItems(StreamValue input, ParseAction delegateAction)
+	public ParseResult parseRichStringItems(RichString input, ParseAction delegateAction)
 	{
-		return parseStreamItems( input.accessor(), "[ ]*", delegateAction );
+		return parseRichStringItems( input.accessor(), "[ ]*", delegateAction );
 	}
 
-	public ParseResult parseStreamItems(StreamValue input, String junkRegex, ParseAction delegateAction)
+	public ParseResult parseRichStringItems(RichString input, String junkRegex, ParseAction delegateAction)
 	{
-		return parseStreamItems( input.accessor(), junkRegex, delegateAction );
+		return parseRichStringItems( input.accessor(), junkRegex, delegateAction );
 	}
 
-	public ParseResult parseStreamItems(StreamValue input, PyObject delegateAction)
+	public ParseResult parseRichStringItems(RichString input, PyObject delegateAction)
 	{
-		return parseStreamItems( input.accessor(), "[ ]*", new Action.PyAction( delegateAction ) );
+		return parseRichStringItems( input.accessor(), "[ ]*", new Action.PyAction( delegateAction ) );
 	}
 
-	public ParseResult parseStreamItems(StreamValue input, String junkRegex, PyObject delegateAction)
+	public ParseResult parseRichStringItems(RichString input, String junkRegex, PyObject delegateAction)
 	{
-		return parseStreamItems( input.accessor(), junkRegex, new Action.PyAction( delegateAction ) );
+		return parseRichStringItems( input.accessor(), junkRegex, new Action.PyAction( delegateAction ) );
 	}
 
-	private ParseResult parseStreamItems(StreamValueAccessor input, String junkRegex, ParseAction delegateAction)
+	private ParseResult parseRichStringItems(RichStringAccessor input, String junkRegex, ParseAction delegateAction)
 	{
 		ParserState state = new ParserState( junkRegex, delegateAction );
-		ParseResult result = handleStreamItems( state, input, 0 );
+		ParseResult result = handleRichStringItems( state, input, 0 );
 		if ( result.isValid() )
 		{
 			result.end = state.skipJunkChars( input, result.end );
@@ -237,41 +237,41 @@ public abstract class ParserExpression
 	}
 	
 	
-	public TracedParseResult traceParseStreamItems(StreamValue input)
+	public TracedParseResult traceParseRichStringItems(RichString input)
 	{
-		return traceParseStreamItems( input.accessor(), "[ ]*", null );
+		return traceParseRichStringItems( input.accessor(), "[ ]*", null );
 	}
 
-	public TracedParseResult traceParseStreamItems(StreamValue input, String junkRegex)
+	public TracedParseResult traceParseRichStringItems(RichString input, String junkRegex)
 	{
-		return traceParseStreamItems( input.accessor(), junkRegex, null );
+		return traceParseRichStringItems( input.accessor(), junkRegex, null );
 	}
 
-	public TracedParseResult traceParseStreamItems(StreamValue input, ParseAction delegateAction)
+	public TracedParseResult traceParseRichStringItems(RichString input, ParseAction delegateAction)
 	{
-		return traceParseStreamItems( input.accessor(), "[ ]*", delegateAction );
+		return traceParseRichStringItems( input.accessor(), "[ ]*", delegateAction );
 	}
 
-	public TracedParseResult traceParseStreamItems(StreamValue input, String junkRegex, ParseAction delegateAction)
+	public TracedParseResult traceParseRichStringItems(RichString input, String junkRegex, ParseAction delegateAction)
 	{
-		return traceParseStreamItems( input.accessor(), junkRegex, delegateAction );
+		return traceParseRichStringItems( input.accessor(), junkRegex, delegateAction );
 	}
 
-	public TracedParseResult traceParseStreamItems(StreamValue input, PyObject delegateAction)
+	public TracedParseResult traceParseRichStringItems(RichString input, PyObject delegateAction)
 	{
-		return traceParseStreamItems( input.accessor(), "[ ]*", new Action.PyAction( delegateAction ) );
+		return traceParseRichStringItems( input.accessor(), "[ ]*", new Action.PyAction( delegateAction ) );
 	}
 
-	public TracedParseResult traceParseStreamItems(StreamValue input, String junkRegex, PyObject delegateAction)
+	public TracedParseResult traceParseRichStringItems(RichString input, String junkRegex, PyObject delegateAction)
 	{
-		return traceParseStreamItems( input.accessor(), junkRegex, new Action.PyAction( delegateAction ) );
+		return traceParseRichStringItems( input.accessor(), junkRegex, new Action.PyAction( delegateAction ) );
 	}
 
-	private TracedParseResult traceParseStreamItems(StreamValueAccessor input, String junkRegex, ParseAction delegateAction)
+	private TracedParseResult traceParseRichStringItems(RichStringAccessor input, String junkRegex, ParseAction delegateAction)
 	{
 		ParserState state = new ParserState( junkRegex, delegateAction );
 		state.enableTrace();
-		TracedParseResult result = (TracedParseResult)handleStreamItems( state, input, 0 );
+		TracedParseResult result = (TracedParseResult)handleRichStringItems( state, input, 0 );
 		if ( result.isValid() )
 		{
 			result.end = state.skipJunkChars( input, result.end );
@@ -426,18 +426,18 @@ public abstract class ParserExpression
 		}
 	}	
 	
-	protected ParseResult handleStreamItems(ParserState state, StreamValueAccessor input, int start)
+	protected ParseResult handleRichStringItems(ParserState state, RichStringAccessor input, int start)
 	{
 		if ( state.bTracingEnabled )
 		{
 			traceBegin( state, input, start );
 			// Get the parse result
-			ParseResult result = evaluateStreamItems( state, input, start );
+			ParseResult result = evaluateRichStringItems( state, input, start );
 			return traceEnd( state, input, result );
 		}
 		else
 		{
-			return evaluateStreamItems( state, input, start );
+			return evaluateRichStringItems( state, input, start );
 		}
 	}	
 	
@@ -459,7 +459,7 @@ public abstract class ParserExpression
 	
 	protected abstract ParseResult evaluateNode(ParserState state, Object input);
 	protected abstract ParseResult evaluateStringChars(ParserState state, String input, int start);
-	protected abstract ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start);
+	protected abstract ParseResult evaluateRichStringItems(ParserState state, RichStringAccessor input, int start);
 	protected abstract ParseResult evaluateListItems(ParserState state, List<Object> input, int start);
 	
 	

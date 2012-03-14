@@ -9,14 +9,14 @@ package BritefuryJ.Parser;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
+import BritefuryJ.Util.RichString.RichStringAccessor;
 
 /*
  * RegEx
  * 
  * RegEx:node( input )			->  regex.match(input as string)  ?  input  :  fail
  * RegEx:string( input, start )		->  regex.match(input[start:])  ?  match.group() : fail
- * RegEx:stream( input, start )		->  regex.match(input[start:])  ?  match.group() : fail
+ * RegEx:richStr( input, start )		->  regex.match(input[start:])  ?  match.group() : fail
  * RegEx:list( input, start )			->  regex.match(input[start] as string)  ?  input[start]  :  fail
  */
 public class RegEx extends TerminalString
@@ -66,7 +66,7 @@ public class RegEx extends TerminalString
 		return ParseResult.failure( start );
 	}
 	
-	protected ParseResult consumeStream(StreamValueAccessor input, int start)
+	protected ParseResult consumeRichString(RichStringAccessor input, int start)
 	{
 		String match = input.matchRegEx( start, pattern );
 		

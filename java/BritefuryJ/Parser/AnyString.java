@@ -8,15 +8,15 @@ package BritefuryJ.Parser;
 
 import java.util.List;
 
-import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
+import BritefuryJ.Util.RichString.RichStringAccessor;
 
 /*
  * AnyString
  * 
- * AnyString:node( input )			->  input instanceof Stream | String  ?  input  :  fail
+ * AnyString:node( input )			->  input instanceof RichString | String  ?  input  :  fail
  * AnyString:string( input, start )	->  fail
- * AnyString:stream( input, start )	->  fail
- * AnyString:list( input, start )		->  input[start] instanceof Stream | String  ?  input[start]  :  fail
+ * AnyString:richStr( input, start )	->  fail
+ * AnyString:list( input, start )		->  input[start] instanceof RichString | String  ?  input[start]  :  fail
  */
 public class AnyString extends ParserExpression
 {
@@ -42,7 +42,7 @@ public class AnyString extends ParserExpression
 		return ParseResult.failure( start );
 	}
 
-	protected ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start)
+	protected ParseResult evaluateRichStringItems(ParserState state, RichStringAccessor input, int start)
 	{
 		if ( start < input.length() )
 		{

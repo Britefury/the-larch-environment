@@ -8,14 +8,14 @@ package BritefuryJ.Parser;
 
 import java.util.List;
 
-import BritefuryJ.LSpace.StreamValue.StreamValueAccessor;
+import BritefuryJ.Util.RichString.RichStringAccessor;
 
 /*
  * Suppress
  * 
  * Suppress:node( input )			->  Suppress.subexp:node( input ).suppress()
  * Suppress:string( input, start )		->  Suppress.subexp:string( input, start ).suppress()
- * Suppress:stream( input, start )	->  Suppress.subexp:stream( input, start ).suppress()
+ * Suppress:richStr( input, start )	->  Suppress.subexp:richStr( input, start ).suppress()
  * Suppress:list( input, start )		->  Suppress.subexp:list( input, start ).suppress()
  */
 public class Suppress extends UnaryBranchExpression
@@ -41,9 +41,9 @@ public class Suppress extends UnaryBranchExpression
 		return subexp.handleStringChars( state, input, start ).suppressed();
 	}
 
-	protected ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start)
+	protected ParseResult evaluateRichStringItems(ParserState state, RichStringAccessor input, int start)
 	{
-		return subexp.handleStreamItems( state, input, start ).suppressed();
+		return subexp.handleRichStringItems( state, input, start ).suppressed();
 	}
 	
 	protected ParseResult evaluateListItems(ParserState state, List<Object> input, int start)

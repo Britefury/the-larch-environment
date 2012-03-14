@@ -4,96 +4,95 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.LSpace.StreamValue;
+package BritefuryJ.LSpace;
 
-import BritefuryJ.LSpace.LSContentLeafEditable;
-import BritefuryJ.LSpace.LSElement;
-import BritefuryJ.LSpace.ElementTreeVisitor;
 import BritefuryJ.LSpace.Marker.Marker;
 import BritefuryJ.LSpace.TextFocus.TextSelection;
+import BritefuryJ.Util.RichString.RichString;
+import BritefuryJ.Util.RichString.RichStringBuilder;
 
-public abstract class AbstractStreamValueVisitor
+public abstract class AbstractRichStringVisitor
 {
 	private class Visitor extends ElementTreeVisitor
 	{
-		private StreamValueBuilder builder = new StreamValueBuilder();
+		private RichStringBuilder builder = new RichStringBuilder();
 		
 		
-		protected StreamValue stream()
+		protected RichString richString()
 		{
-			return builder.stream();
+			return builder.richString();
 		}
 
 
 		@Override
 		protected void preOrderVisitElement(LSElement e, boolean complete)
 		{
-			AbstractStreamValueVisitor.this.preOrderVisitElement( builder, e );
+			AbstractRichStringVisitor.this.preOrderVisitElement( builder, e );
 		}
 
 		@Override
 		protected void inOrderCompletelyVisitElement(LSElement e)
 		{
-			AbstractStreamValueVisitor.this.inOrderVisitElement( builder, e );
+			AbstractRichStringVisitor.this.inOrderVisitElement( builder, e );
 		}
 
 		@Override
 		protected void postOrderVisitElement(LSElement e, boolean complete)
 		{
-			AbstractStreamValueVisitor.this.postOrderVisitElement( builder, e );
+			AbstractRichStringVisitor.this.postOrderVisitElement( builder, e );
 		}
 
 		@Override
 		protected void inOrderVisitPartialContentLeafEditable(LSContentLeafEditable e, int startIndex, int endIndex)
 		{
-			AbstractStreamValueVisitor.this.inOrderVisitPartialContentLeafEditable( builder, e, startIndex, endIndex );
+			AbstractRichStringVisitor.this.inOrderVisitPartialContentLeafEditable( builder, e, startIndex, endIndex );
 		}
 		
 		@Override
 		protected boolean shouldVisitChildrenOfElement(LSElement e, boolean completeVisit)
 		{
-			return AbstractStreamValueVisitor.this.shouldVisitChildrenOfElement( e, completeVisit );
+			return AbstractRichStringVisitor.this.shouldVisitChildrenOfElement( e, completeVisit );
 		}
 	}
 	
 	
 	//
-	// Stream value building
+	// Rich string building
 	//
 	
-	public StreamValue getStreamValue(LSElement root)
+	public RichString getRichString(LSElement root)
 	{
 		Visitor visitor = new Visitor();
 		visitor.visitSubtree( root );
-		return visitor.stream();
+		return visitor.richString();
 	}
 	
-	public StreamValue getStreamValueFromStartToMarker(LSElement root, Marker marker)
+	public RichString getRichStringFromStartToMarker(LSElement root, Marker marker)
 	{
 		Visitor visitor = new Visitor();
 		visitor.visitFromStartOfRootToMarker( marker, root );
-		return visitor.stream();
+		return visitor.richString();
 	}
 	
-	public StreamValue getStreamValueFromMarkerToEnd(LSElement root, Marker marker)
+	public RichString getRichStringFromMarkerToEnd(LSElement root, Marker marker)
 	{
 		Visitor visitor = new Visitor();
 		visitor.visitFromMarkerToEndOfRoot( marker, root );
-		return visitor.stream();
+		return visitor.richString();
 	}
 	
-	public StreamValue getStreamValueInTextSelection(TextSelection s)
+	public RichString getRichStringInTextSelection(TextSelection s)
 	{
 		Visitor visitor = new Visitor();
 		visitor.visitTextSelection( s );
-		return visitor.stream();
+		return visitor.richString();
 	}
 
 	
 	
-	protected abstract void preOrderVisitElement(StreamValueBuilder builder, LSElement e);
-	protected abstract void inOrderVisitElement(StreamValueBuilder builder, LSElement e);
-	protected abstract void postOrderVisitElement(StreamValueBuilder builder, LSElement e);
-	protected abstract void inOrderVisitPartialContentLeafEditable(StreamValueBuilder builder, LSContentLeafEditable e, int startIndex, int endIndex);
+	protected abstract void preOrderVisitElement(RichStringBuilder builder, LSElement e);
+	protected abstract void inOrderVisitElement(RichStringBuilder builder, LSElement e);
+	protected abstract void postOrderVisitElement(RichStringBuilder builder, LSElement e);
+	protected abstract void inOrderVisitPartialContentLeafEditable(RichStringBuilder builder, LSContentLeafEditable e, int startIndex, int endIndex);
 	public abstract boolean shouldVisitChildrenOfElement(LSElement e, boolean completeVisit);
 }
