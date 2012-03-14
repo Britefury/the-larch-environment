@@ -859,7 +859,14 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	{
 		if ( !configured )
 		{
-			rootElement.configureEvent( new Vector2( (double)getWidth(), (double)getHeight() ) );
+			int width = getWidth(), height = getHeight();
+			if ( width == 0  &&  height == 0 )
+			{
+				Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+				width = screenSize.width;
+				height = screenSize.height;
+			}
+			rootElement.configureEvent( new Vector2( (double)width, (double)height ) );
 			configured = true;
 		}
 	}

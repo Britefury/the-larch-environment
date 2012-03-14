@@ -2741,6 +2741,7 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 	protected static StyleSheet headerDescriptionTextStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.0f, 0.0f, 0.75f ) ) );
 	protected static StyleSheet metaHeaderRowStyle = StyleSheet.style( Primitive.rowSpacing.as( 10.0 ) );
 	protected static StyleSheet metaHeaderEmptyBorderStyle = StyleSheet.style( Primitive.border.as( new FilledBorder() ) );
+	private static SolidBorder inspectorBorder = new SolidBorder( 1.0, 1.0, new Color( 0.5f, 0.5f, 0.5f ), Color.WHITE );
 	
 	private static Color explorerHeadHoverFillPaint = new Color( 0.0f, 0.4f, 0.8f, 0.25f );
 	private static Color explorerHeadHoverOutlinePaint = new Color( 0.0f, 0.4f, 0.8f, 0.5f );
@@ -2842,7 +2843,7 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 			FragmentView fragment = (FragmentView)el.getFragmentContext();
 			LSElement model = (LSElement)fragment.getModel();
 
-			Pres p = inspect( model );
+			Pres p = inspectorBorder.surround( inspect( model ) );
 			p.popupAtMousePosition( el, Anchor.TOP_LEFT, true, true );
 		}
 		
