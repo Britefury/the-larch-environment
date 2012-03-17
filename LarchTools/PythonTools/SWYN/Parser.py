@@ -24,12 +24,20 @@ from LarchTools.PythonTools.SWYN import Schema
 
 
 
-print 'SWYN implementation does not handle normal escape characters properly (\\n, \\t, \\r, \\x??.....)'
-
 class SWYNGrammar (Grammar):
 	@Rule
-	def escapedChar(self):
+	def pythonEscapedChar(self):
+		return ( Literal( '\\' ) + RegEx( '[abnfrt]|(x[0-9a-fA-F]{2})|(u[0-9a-fA-F]{4})|(U[0-9a-fA-F]{8})' ) ).action( lambda input, begin, end, x, bindings: Schema.PythonEscapedChar( char=x[1] ) )
+
+
+	@Rule
+	def escapedRegexChar(self):
 		return ( Literal( '\\' ) + RegEx( '.' ) ).action( lambda input, begin, end, x, bindings: Schema.EscapedChar( char=x[1] ) )
+
+
+	@Rule
+	def escapedChar(self):
+		return self.pythonEscapedChar() | self.escapedRegexChar()
 
 
 	# Literal Character - escaped or not escaped
