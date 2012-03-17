@@ -161,7 +161,8 @@ _groupNameStyle = StyleSheet.style( Primitive.fontItalic( True ) )
 _commentStyle = StyleSheet.style( Primitive.foreground( Color( 0.2, 0.2, 0.2, 0.5 ) ) )
 _flagsStyle = StyleSheet.style( Primitive.foreground( Color( 1.0, 0.5, 0.0 ) ) )
 
-_escapeBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 0.75, 0.6, 0.5 ), Color( 1.0, 0.85, 0.75 ) )
+_escapeBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 0.5, 0.6, 0.75 ), Color( 0.75, 0.85, 1.0 ) )
+_pythonEscapeBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 0.75, 0.6, 0.5 ), Color( 1.0, 0.85, 0.75 ) )
 
 _charSetBorder = SolidBorder( 1.0, 4.0, 3.0, 3.0,Color( 0.5, 0.5, 0.6 ), Color( 0.7, 0.7, 0.8 ) )
 _charSetItemBorder = FilledBorder( 1.0, 1.0, 1.0, 1.0, Color( 0.9, 0.9, 0.9 ) )
@@ -201,6 +202,9 @@ def literalChar(char):
 
 def escapedChar(char):
 	return _escapeBorder.surround( Row( [ _controlCharStyle( Text( '\\' ) ), Text( char ) ] ) )
+
+def pythonEscapedChar(char):
+	return _pythonEscapeBorder.surround( Row( [ _controlCharStyle( Text( '\\' ) ), Text( char ) ] ) )
 
 def _specialChar(char, name):
 	return _specialBorder.surround( _specialCharStyle( Row( [ HiddenText( char ), Label( name ), Text( '' ) ] ) ) )
@@ -353,6 +357,12 @@ class SWYNView (MethodDispatchView):
 	@Expression
 	def EscapedChar(self, fragment, inheritedState, model, char):
 		return escapedChar( char )
+
+
+	@DMObjectNodeDispatchMethod( Schema.PythonEscapedChar )
+	@Expression
+	def PythonEscapedChar(self, fragment, inheritedState, model, char):
+		return pythonEscapedChar( char )
 
 
 	@DMObjectNodeDispatchMethod( Schema.LiteralChar )

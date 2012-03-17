@@ -49,6 +49,10 @@ class SWYNCodeGenerator (object):
 	def EscapedChar(self, model, char):
 		return '\\' + char
 
+	@DMObjectNodeDispatchMethod( Schema.PythonEscapedChar )
+	def PythonEscapedChar(self, model, char):
+		return '\\' + char
+
 	@DMObjectNodeDispatchMethod( Schema.LiteralChar )
 	def LiteralChar(self, model, char):
 		return char
