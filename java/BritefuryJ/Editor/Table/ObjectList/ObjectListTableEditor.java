@@ -9,6 +9,8 @@ package BritefuryJ.Editor.Table.ObjectList;
 import java.lang.reflect.Constructor;
 import java.util.List;
 
+import net.htmlparser.jericho.Segment;
+
 import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyObject;
@@ -307,7 +309,7 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 				int w = Math.min( dataRow.length, width - x );
 				for (int i = x, a = 0; a < w; i++, a++)
 				{
-					columns[i].set( modelRow, columns[i].copyValue( dataRow[a] ) );
+					columns[i].set( modelRow, dataRow[a] );
 				}
 				
 				if ( !rowsAreLive )
@@ -381,55 +383,26 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 
 
 	@Override
-	protected Object[][] importBlock(int posX, int posY, String[][] textBlock)
+	protected Object[][] importHTMLBlock(int posX, int posY, Segment[][] htmlBlock)
 	{
-		Object destBlock[][] = new Object[textBlock.length][];
-		for (int b = 0; b < textBlock.length; b++)
+		Object destBlock[][] = new Object[htmlBlock.length][];
+		for (int b = 0; b < htmlBlock.length; b++)
 		{
-			String[] srcRow = textBlock[b];
+			Segment[] srcRow = htmlBlock[b];
 			Object[] destRow = new Object[srcRow.length];
 			destBlock[b] = destRow;
 			
 			for (int a = 0, i = posX; a < srcRow.length; a++, i++)
 			{
-				String cellText = srcRow[a];
+				Segment cellHtml = srcRow[a];
 				Object x;
 				if ( i < columns.length )
 				{
-					x = columns[i].importValue( cellText );
+					x = columns[i].importHTML( cellHtml );
 				}
 				else
 				{
-					x = cellText;
-				}
-				destRow[a] = x;
-			}
-		}
-		
-		return destBlock;
-	}
-
-	@Override
-	protected String[][] exportBlock(int posX, int posY, Object[][] valueBlock)
-	{
-		String destBlock[][] = new String[valueBlock.length][];
-		for (int b = 0; b < valueBlock.length; b++)
-		{
-			Object[] srcRow = valueBlock[b];
-			String[] destRow = new String[srcRow.length];
-			destBlock[b] = destRow;
-			
-			for (int a = 0, i = posX; a < srcRow.length; a++, i++)
-			{
-				Object cell = srcRow[a];
-				String x;
-				if ( i < columns.length )
-				{
-					x = columns[i].exportValue( cell );
-				}
-				else
-				{
-					x = cell.toString();
+					x = cellHtml.getTextExtractor().toString();
 				}
 				destRow[a] = x;
 			}

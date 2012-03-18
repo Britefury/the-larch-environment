@@ -4,17 +4,11 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.Editor.Table;
+package BritefuryJ.ClipboardFilter;
 
-class TableSelectionContents
+import org.python.core.PyObject;
+
+public interface PyObjectClipboardImporter
 {
-	protected Object contents[][];
-	protected TableCellExportedValue exportContents[][];
-	
-	
-	protected TableSelectionContents(Object contents[][], TableCellExportedValue exportContents[][])
-	{
-		this.contents = contents;
-		this.exportContents = exportContents;
-	}
+	public PyObject importObject(PyObject x);
 }

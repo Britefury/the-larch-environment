@@ -154,21 +154,8 @@ class ConstantTable (object):
 
 
 
-def _targetFromText(text):
-	return EmbeddedPython25Target.fromText( text )
-
-def _defaultTarget():
-	return EmbeddedPython25Target()
-
-def _valueFromText(text):
-	return EmbeddedPython25Expr.fromText( text )
-
-def _defaultValue():
-	return EmbeddedPython25Expr()
-
-
-_targetColumn = AttributeColumn( 'Name', 'target', _targetFromText, _defaultTarget )
-_valueColumn = AttributeColumn( 'Value', 'value', _valueFromText, _defaultValue )
+_targetColumn = AttributeColumn( 'Name', 'target', EmbeddedPython25Target )
+_valueColumn = AttributeColumn( 'Value', 'value', EmbeddedPython25Expr )
 
 _tableEditor = ObjectListTableEditor( [ _targetColumn, _valueColumn ], ConstantDefinition, False, True, True, True )
 
