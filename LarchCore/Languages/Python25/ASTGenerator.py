@@ -47,19 +47,51 @@ class Python25ASTGeneratorInvalidStructureError (Python25ASTGeneratorError):
 	pass
 
 
+_Pow = _ast.Pow()
+_Invert = _ast.Invert()
+_USub = _ast.USub()
+_UAdd = _ast.UAdd()
+_Mult = _ast.Mult()
+_Div = _ast.Div()
+_Mod = _ast.Mod()
+_Add = _ast.Add()
+_Sub = _ast.Sub()
+_LShift = _ast.LShift()
+_RShift = _ast.RShift()
+_BitAnd = _ast.BitAnd()
+_BitXor = _ast.BitXor()
+_BitOr = _ast.BitOr()
+_And = _ast.And()
+_Or = _ast.Or()
+_Not = _ast.Not()
 
-_cmpOpTable = { Schema.CmpOpLt : _ast.Lt,
-		Schema.CmpOpLte : _ast.LtE,
-		Schema.CmpOpEq : _ast.Eq,
-		Schema.CmpOpNeq : _ast.NotEq,
-		Schema.CmpOpGt : _ast.Gt,
-		Schema.CmpOpGte : _ast.GtE,
-		Schema.CmpOpIs : _ast.Is,
-		Schema.CmpOpIsNot : _ast.IsNot,
-		Schema.CmpOpIn : _ast.In,
-		Schema.CmpOpNotIn : _ast.NotIn
+
+_cmpOpTable = { Schema.CmpOpLt : _ast.Lt(),
+		Schema.CmpOpLte : _ast.LtE(),
+		Schema.CmpOpEq : _ast.Eq(),
+		Schema.CmpOpNeq : _ast.NotEq(),
+		Schema.CmpOpGt : _ast.Gt(),
+		Schema.CmpOpGte : _ast.GtE(),
+		Schema.CmpOpIs : _ast.Is(),
+		Schema.CmpOpIsNot : _ast.IsNot(),
+		Schema.CmpOpIn : _ast.In(),
+		Schema.CmpOpNotIn : _ast.NotIn()
 		}
 
+
+_augAssignOpTable = {
+	'+=' : _Add,
+	'-=' : _Sub,
+	'*=' : _Mult,
+	'/=' : _Div,
+	'%=' : _Mod,
+	'**=' : _Pow,
+	'<<=' : _LShift,
+	'>>=' : _RShift,
+	'&=' : _BitAnd,
+	'|=' : _BitOr,
+	'^=' : _BitXor
+}
 
 
 class Python25ASTGenerator (object):
@@ -357,76 +389,74 @@ class Python25ASTGenerator (object):
 
 
 	# Operators
-	def _prefixOp(self, x, opType, lineno):
+	def _prefixOp(self, x, op, lineno):
 		right = self( x, lineno, _load )
-		op = opType()
 		return _ast.UnaryOp( op, right )
 
-	def _binOp(self, x, y, opType, lineno):
+	def _binOp(self, x, y, op, lineno):
 		left = self( x, lineno, _load )
 		right = self( y, lineno, _load )
-		op = opType()
 		return _ast.BinOp( left, op, right )
 
 	@DMObjectNodeDispatchMethod( Schema.Pow )
 	def Pow(self, lineno, ctx, node, x, y):
-		return self._binOp( x, y, _ast.Pow, lineno )
+		return self._binOp( x, y, _Pow, lineno )
 
 
 	@DMObjectNodeDispatchMethod( Schema.Invert )
 	def Invert(self, lineno, ctx, node, x):
-		return self._prefixOp( x, _ast.Invert, lineno )
+		return self._prefixOp( x, _Invert, lineno )
 
 	@DMObjectNodeDispatchMethod( Schema.Negate )
 	def Negate(self, lineno, ctx, node, x):
-		return self._prefixOp( x, _ast.USub, lineno )
+		return self._prefixOp( x, _USub, lineno )
 
 	@DMObjectNodeDispatchMethod( Schema.Pos )
 	def Pos(self, lineno, ctx, node, x):
-		return self._prefixOp( x, _ast.UAdd, lineno )
+		return self._prefixOp( x, _UAdd, lineno )
 
 
 	@DMObjectNodeDispatchMethod( Schema.Mul )
 	def Mul(self, lineno, ctx, node, x, y):
-		return self._binOp( x, y, _ast.Mult, lineno )
+		return self._binOp( x, y, _Mult, lineno )
 
 	@DMObjectNodeDispatchMethod( Schema.Div )
 	def Div(self, lineno, ctx, node, x, y):
-		return self._binOp( x, y, _ast.Div, lineno )
+		return self._binOp( x, y, _Div, lineno )
 
 	@DMObjectNodeDispatchMethod( Schema.Mod )
 	def Mod(self, lineno, ctx, node, x, y):
-		return self._binOp( x, y, _ast.Mod, lineno )
+		return self._binOp( x, y, _Mod, lineno )
 
 	@DMObjectNodeDispatchMethod( Schema.Add )
 	def Add(self, lineno, ctx, node, x, y):
-		return self._binOp( x, y, _ast.Add, lineno )
+		return self._binOp( x, y, _Add, lineno )
 
 	@DMObjectNodeDispatchMethod( Schema.Sub )
 	def Sub(self, lineno, ctx, node, x, y):
-		return self._binOp( x, y, _ast.Sub, lineno )
+		return self._binOp( x, y, _Sub, lineno )
 
 
 	@DMObjectNodeDispatchMethod( Schema.LShift )
 	def LShift(self, lineno, ctx, node, x, y):
-		return self._binOp( x, y, _ast.LShift, lineno )
+		return self._binOp( x, y, _LShift, lineno )
 
 	@DMObjectNodeDispatchMethod( Schema.RShift )
 	def RShift(self, lineno, ctx, node, x, y):
-		return self._binOp( x, y, _ast.RShift, lineno )
+		return self._binOp( x, y, _RShift, lineno )
 
 
 	@DMObjectNodeDispatchMethod( Schema.BitAnd )
 	def BitAnd(self, lineno, ctx, node, x, y):
-		return self._binOp( x, y, _ast.BitAnd, lineno )
+		return self._binOp( x, y, _BitAnd, lineno )
 
 	@DMObjectNodeDispatchMethod( Schema.BitXor )
 	def BitXor(self, lineno, ctx, node, x, y):
-		return self._binOp( x, y, _ast.BitXor, lineno )
+		return self._binOp( x, y, _BitXor, lineno )
 
 	@DMObjectNodeDispatchMethod( Schema.BitOr )
 	def BitOr(self, lineno, ctx, node, x, y):
-		return self._binOp( x, y, _ast.BitOr, lineno )
+		return self._binOp( x, y, _BitOr, lineno )
 
 
 	@DMObjectNodeDispatchMethod( Schema.Cmp )
@@ -436,7 +466,7 @@ class Python25ASTGenerator (object):
 		comparators = []
 		for op in ops:
 			opClass = op.getDMObjectClass()
-			opTypes.append( _cmpOpTable[opClass]() )
+			opTypes.append( _cmpOpTable[opClass] )
 			comparators.append( self( op['y'], lineno, _load ) )
 		return _ast.Compare( left, opTypes, comparators )
 
@@ -485,7 +515,7 @@ class Python25ASTGenerator (object):
 
 	@DMObjectNodeDispatchMethod( Schema.NotTest )
 	def NotTest(self, lineno, ctx, node, x):
-		return self._prefixOp( x, _ast.Not, lineno )
+		return self._prefixOp( x, _Not, lineno )
 
 	def _joinBoolOp(self, lineno, ctx, x, nodeCls):
 		if x.isInstanceOf( nodeCls ):
@@ -496,12 +526,165 @@ class Python25ASTGenerator (object):
 	@DMObjectNodeDispatchMethod( Schema.AndTest )
 	def AndTest(self, lineno, ctx, node, x, y):
 		xs = [ self( a, lineno, _load )   for a in self._joinBoolOp( lineno, ctx, node, Schema.AndTest ) ]
-		return _ast.BoolOp( _ast.And(), xs )
+		return _ast.BoolOp( _And, xs )
 
 	@DMObjectNodeDispatchMethod( Schema.OrTest )
 	def OrTest(self, lineno, ctx, node, x, y):
 		xs = [ self( a, lineno, _load )   for a in self._joinBoolOp( lineno, ctx, node, Schema.OrTest ) ]
-		return _ast.BoolOp( _ast.Or(), xs )
+		return _ast.BoolOp( _Or, xs )
+
+
+
+
+	def _param(self, lineno, ctx, p):
+		if p.isInstanceOf( Schema.SimpleParam ):
+			return _ast.Name( p['name'], ctx )
+		elif p.isInstanceOf( Schema.TupleParam ):
+			return _ast.Tuple( [ self._param( lineno, _store, x )   for x in p['params'] ], _store )
+		else:
+			raise TypeError, 'cannot handle parameter type %s in _param()' % ( p.getDMObjectClass().getName() )
+
+	def _processParams(self, lineno, params):
+		args = []
+		defaults = []
+		vararg = None
+		kwarg = None
+
+		for p in params:
+			if p.isInstanceOf( Schema.DefaultValueParam ):
+				args.append( self._param( lineno, _param, p['param'] ) )
+				defaults.append( self( p['defaultValue'], lineno, _load ) )
+			elif p.isInstanceOf( Schema.ParamList ):
+				vararg = p['name']
+			elif p.isInstanceOf( Schema.KWParamList ):
+				kwarg = p['name']
+			else:
+				args.append( self._param( lineno, _param, p ) )
+
+		return _ast.arguments( args, vararg, kwarg, defaults )
+
+	# Lambda expression
+	@DMObjectNodeDispatchMethod( Schema.LambdaExpr )
+	def LambdaExpr(self, lineno, ctx, node, params, expr):
+		return _ast.Lambda( self._processParams( lineno, params ), self( expr, lineno, _load ) )
+
+
+
+	# Conditional expression
+	@DMObjectNodeDispatchMethod( Schema.ConditionalExpr )
+	def ConditionalExpr(self, lineno, ctx, node, condition, expr, elseExpr):
+		return _ast.IfExp( self( condition, lineno, ctx ), self( expr, lineno, ctx ), self( elseExpr, lineno, ctx ) )
+
+
+
+
+	# Quote and Unquote
+	@DMObjectNodeDispatchMethod( Schema.Quote )
+	def Quote(self,  lineno, ctx, node, value):
+		raise ValueError, 'Python25ASTGenerator does not support quote expressions; a Python25ModuleASTGenerator must be used'
+
+	@DMObjectNodeDispatchMethod( Schema.Unquote )
+	def Unquote(self,  lineno, ctx, node, value):
+		raise ValueError, 'Python25ASTGenerator does not support unquote expressions; a Python25ModuleASTGenerator must be used'
+
+
+
+
+	# Embedded object
+	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectExpr )
+	def EmbeddedObjectExpr(self,  lineno, ctx, node, embeddedValue):
+		raise ValueError, 'Python25ASTGenerator does not support embedded object expressions; a Python25ModuleASTGenerator must be used'
+
+
+	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectStmt )
+	def EmbeddedObjectStmt (self,  lineno, ctx, node, embeddedValue):
+		raise ValueError, 'Python25ASTGenerator does not support embedded object statements; a Python25ModuleASTGenerator must be used'
+
+
+
+	# Expression statement
+	@DMObjectNodeDispatchMethod( Schema.ExprStmt )
+	def ExprStmt(self, lineno, ctx, node, expr):
+		return _ast.Expr( self( expr, lineno, ctx ) )
+
+
+	# Expression statement
+	@DMObjectNodeDispatchMethod( Schema.UnparsedStmt )
+	def UnparsedStmt(self, lineno, ctx, node, value):
+		raise Python25ASTGeneratorUnparsedError
+
+
+	# Assert statement
+	@DMObjectNodeDispatchMethod( Schema.AssertStmt )
+	def AssertStmt(self, lineno, ctx, node, condition, fail):
+		return _ast.Assert( self( condition, lineno, _load ), self( fail, lineno, _load ) )
+
+
+	# Assignment statement
+	@DMObjectNodeDispatchMethod( Schema.AssignStmt )
+	def AssignStmt(self, lineno, ctx, node, targets, value):
+		return _ast.Assign( [ self( t, lineno, _store )   for t in targets ], self( value, lineno, _load ) )
+
+
+	# Augmented assignment statement
+	@DMObjectNodeDispatchMethod( Schema.AugAssignStmt )
+	def AugAssignStmt(self, lineno, ctx, node, op, target, value):
+		return _ast.AugAssign( self( target, lineno, _augstore ), _augAssignOpTable[op], self( value, lineno, _load ) )
+
+
+	# Pass statement
+	@DMObjectNodeDispatchMethod( Schema.PassStmt )
+	def PassStmt(self,  lineno, ctx, node):
+		return None
+
+
+	# Del statement
+	@DMObjectNodeDispatchMethod( Schema.DelStmt )
+	def DelStmt(self,  lineno, ctx, node, target):
+		if target.isInstanceOf( Schema.TupleTarget ):
+			return _ast.Delete( [ self( t, lineno, _del )   for t in target['targets'] ] )
+		else:
+			return _ast.Delete( [ self( target, lineno, _del ) ] )
+
+
+	# Return statement
+	@DMObjectNodeDispatchMethod( Schema.ReturnStmt )
+	def ReturnStmt(self,  lineno, ctx, node, value):
+		if value is not None:
+			return _ast.Return( self( value, lineno, _load ) )
+		else:
+			return _ast.Return( None )
+
+
+	# Yield statement
+	@DMObjectNodeDispatchMethod( Schema.YieldStmt )
+	def YieldStmt(self,  lineno, ctx, node, value):
+		if value is not None:
+			return _ast.Expr( _ast.Yield( self( value, lineno, _load ) ) )
+		else:
+			return _ast.Expr( _ast.Yield( None ) )
+
+
+	# Raise statement
+	@DMObjectNodeDispatchMethod( Schema.RaiseStmt )
+	def RaiseStmt(self, lineno, ctx, node, excType, excValue, traceback):
+		return _ast.Raise( self( excType, lineno, ctx ), self( excValue, lineno, ctx ), self( traceback, lineno, ctx ) )
+
+
+	# Break statement
+	@DMObjectNodeDispatchMethod( Schema.BreakStmt )
+	def BreakStmt(self, lineno, ctx, node):
+		return _ast.Break()
+
+
+	# Continue statement
+	@DMObjectNodeDispatchMethod( Schema.ContinueStmt )
+	def ContinueStmt(self, lineno, ctx, node):
+		return _ast.Continue()
+
+
+
+
 
 
 
@@ -526,6 +709,9 @@ def _astToString(x):
 
 _load = _ast.Load()
 _store = _ast.Store()
+_augstore = _ast.AugStore()
+_param = _ast.Param()
+_del = _ast.Del()
 
 
 
@@ -587,14 +773,22 @@ class TestCase_Python25ASTGenerator (unittest.TestCase):
 
 	def _testExprSX(self, sx, expected):
 		expectedAST = compile( expected, '<test>', 'eval', _ast.PyCF_ONLY_AST ).body
-
 		self._testSXAST( sx, expectedAST )
 
 
 	def _testExprGenSX(self, gen, sx, expected):
 		expectedAST = compile( expected, '<test>', 'eval', _ast.PyCF_ONLY_AST ).body
-
 		self._testGenSX( gen, sx, expectedAST, 'eval' )
+
+
+	def _testStmtSX(self, sx, expected):
+		expectedAST = compile( expected, '<test>', 'exec', _ast.PyCF_ONLY_AST ).body[0]
+		self._testSXAST( sx, expectedAST )
+
+
+	def _testStmtGenSX(self, gen, sx, expected):
+		expectedAST = compile( expected, '<test>', 'exec', _ast.PyCF_ONLY_AST ).body[0]
+		self._testGenSX( gen, sx, expectedAST, 'exec' )
 
 
 	def _testExecSX(self, sx, expected):
@@ -776,4 +970,78 @@ class TestCase_Python25ASTGenerator (unittest.TestCase):
 		self._testExprSX( '(py Mul x=(py Load name=a) y=(py Add x=(py Load name=b) y=(py Load name=c)))', 'a * (b + c)' )
 		self._testExprSX( '(py Add x=(py Load name=a) y=(py Mul x=(py Load name=b) y=(py Load name=c)))', 'a + b * c' )
 
+
+	def test_lambda(self):
+		self._testExprSX( '(py LambdaExpr params=[] expr=(py Load name=a))', 'lambda: a' )
+		self._testExprSX( '(py LambdaExpr params=[(py SimpleParam name=a)] expr=(py Load name=a))', 'lambda a: a' )
+		self._testExprSX( '(py LambdaExpr params=[(py SimpleParam name=a) (py DefaultValueParam param=(py SimpleParam name=b) defaultValue=(py Load name=z))] expr=(py Load name=a))', 'lambda a, b=z: a' )
+		self._testExprSX( '(py LambdaExpr params=[(py SimpleParam name=a) (py ParamList name=c)] expr=(py Load name=a))', 'lambda a, *c: a' )
+		self._testExprSX( '(py LambdaExpr params=[(py SimpleParam name=a) (py KWParamList name=c)] expr=(py Load name=a))', 'lambda a, **c: a' )
+		self._testExprSX( '(py LambdaExpr params=[(py TupleParam params=[(py SimpleParam name=a)]) (py ParamList name=c)] expr=(py Load name=a))', 'lambda (a,), *c: a' )
+		self._testExprSX( '(py LambdaExpr params=[(py SimpleParam name=a) (py DefaultValueParam param=(py TupleParam params=[(py SimpleParam name=b)]) defaultValue=(py Load name=z))] expr=(py Load name=a))', 'lambda a, (b,)=z: a' )
+
+
+	def test_conditionalExpr(self):
+		self._testExprSX( '(py ConditionalExpr condition=(py Load name=a) expr=(py Load name=b) elseExpr=(py Load name=c))', 'b if a else c' )
+
+
+	def test_ExprStmt(self):
+		self._testStmtSX( '(py ExprStmt expr=(py Load name=a))', 'a' )
+
+
+	def test_AssertStmt(self):
+		self._testStmtSX( '(py AssertStmt condition=(py Load name=a) fail=(py Load name=b))', 'assert a, b' )
+
+
+	def test_AssignStmt(self):
+		self._testStmtSX( '(py AssignStmt targets=[(py SingleTarget name=a)] value=(py Load name=x))', 'a = x' )
+		self._testStmtSX( '(py AssignStmt targets=[(py SingleTarget name=a) (py SingleTarget name=b)] value=(py Load name=x))', 'a = b = x' )
+		self._testStmtSX( '(py AssignStmt targets=[(py SingleTarget name=a) (py TupleTarget targets=[(py SingleTarget name=b) (py SingleTarget name=c)])] value=(py Load name=x))', 'a = b,c = x' )
+		self._testStmtSX( '(py AssignStmt targets=[(py SingleTarget name=a) (py ListTarget targets=[(py SingleTarget name=b) (py SingleTarget name=c)])] value=(py Load name=x))', 'a = [b,c] = x' )
+		self._testStmtSX( '(py AssignStmt targets=[(py SingleTarget name=a) (py AttributeRef target=(py SingleTarget name=b) name=c)] value=(py Load name=x))', 'a = b.c = x' )
+		self._testStmtSX( '(py AssignStmt targets=[(py SingleTarget name=a) (py Subscript target=(py SingleTarget name=b) index=(py Load name=c))] value=(py Load name=x))', 'a = b[c] = x' )
+
+
+	def test_AugAssignStmt(self):
+		self._testStmtSX( '(py AugAssignStmt target=(py SingleTarget name=a) op="+=" value=(py Load name=x))', 'a += x' )
+		self._testStmtSX( '(py AugAssignStmt target=(py SingleTarget name=a) op="-=" value=(py Load name=x))', 'a -= x' )
+		self._testStmtSX( '(py AugAssignStmt target=(py SingleTarget name=a) op="*=" value=(py Load name=x))', 'a *= x' )
+		self._testStmtSX( '(py AugAssignStmt target=(py SingleTarget name=a) op="/=" value=(py Load name=x))', 'a /= x' )
+		self._testStmtSX( '(py AugAssignStmt target=(py SingleTarget name=a) op="%=" value=(py Load name=x))', 'a %= x' )
+		self._testStmtSX( '(py AugAssignStmt target=(py SingleTarget name=a) op="**=" value=(py Load name=x))', 'a **= x' )
+		self._testStmtSX( '(py AugAssignStmt target=(py SingleTarget name=a) op="<<=" value=(py Load name=x))', 'a <<= x' )
+		self._testStmtSX( '(py AugAssignStmt target=(py SingleTarget name=a) op=">>=" value=(py Load name=x))', 'a >>= x' )
+		self._testStmtSX( '(py AugAssignStmt target=(py SingleTarget name=a) op="&=" value=(py Load name=x))', 'a &= x' )
+		self._testStmtSX( '(py AugAssignStmt target=(py SingleTarget name=a) op="|=" value=(py Load name=x))', 'a |= x' )
+		self._testStmtSX( '(py AugAssignStmt target=(py SingleTarget name=a) op="^=" value=(py Load name=x))', 'a ^= x' )
+
+
+	def test_DelStmt(self):
+		self._testStmtSX( '(py DelStmt target=(py SingleTarget name=a))', 'del a' )
+		self._testStmtSX( '(py DelStmt target=(py TupleTarget targets=[(py SingleTarget name=a) (py SingleTarget name=b)]))', 'del a, b' )
+
+
+	def test_ReturnStmt(self):
+		self._testStmtSX( '(py ReturnStmt value=(py Load name=a))', 'return a' )
+		self._testStmtSX( '(py ReturnStmt value=`null`)', 'return' )
+
+
+	def test_YieldStmt(self):
+		self._testStmtSX( '(py YieldStmt value=(py Load name=a))', 'yield a' )
+		self._testStmtSX( '(py YieldStmt value=`null`)', 'yield' )
+
+
+	def test_RaiseStmt(self):
+		self._testStmtSX( '(py RaiseStmt)', 'raise' )
+		self._testStmtSX( '(py RaiseStmt excType=(py Load name=a))', 'raise a' )
+		self._testStmtSX( '(py RaiseStmt excType=(py Load name=a) excValue=(py Load name=b))', 'raise a, b' )
+		self._testStmtSX( '(py RaiseStmt excType=(py Load name=a) excValue=(py Load name=b) traceback=(py Load name=c))', 'raise a, b, c' )
+
+
+	def test_BreakStmt(self):
+		self._testStmtSX( '(py BreakStmt)', 'break' )
+
+
+	def test_ContinueStmt(self):
+		self._testStmtSX( '(py ContinueStmt)', 'continue' )
 
