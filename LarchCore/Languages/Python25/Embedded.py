@@ -64,6 +64,9 @@ class EmbeddedPython25 (object):
 	def __deepcopy__(self, memo):
 		return EmbeddedPython25( deepcopy( self.model, memo ) )
 
+	def __clipboard_copy__(self, memo):
+		return EmbeddedPython25( deepcopy( self.model, memo ) )
+
 
 	def __get_trackable_contents__(self):
 		return [ self.model ]
@@ -125,9 +128,24 @@ class EmbeddedPython25Target (EmbeddedPython25):
 		super(EmbeddedPython25Target, self).__init__( model )
 
 
+	def __copy__(self):
+		return EmbeddedPython25Target( self.model )
+
+	def __deepcopy__(self, memo):
+		return EmbeddedPython25Target( deepcopy( self.model, memo ) )
+
+	def __clipboard_copy__(self, memo):
+		return EmbeddedPython25Target( deepcopy( self.model, memo ) )
+
+
 	@property
 	def target(self):
 		return self.model['target']
+
+
+	@classmethod
+	def __import_from_plain_text__(cls, importData):
+		return cls.fromText( importData )
 
 
 	@staticmethod
@@ -155,6 +173,16 @@ class EmbeddedPython25Expr (EmbeddedPython25):
 		super(EmbeddedPython25Expr, self).__init__( model )
 
 
+	def __copy__(self):
+		return EmbeddedPython25Expr( self.model )
+
+	def __deepcopy__(self, memo):
+		return EmbeddedPython25Expr( deepcopy( self.model, memo ) )
+
+	def __clipboard_copy__(self, memo):
+		return EmbeddedPython25Expr( deepcopy( self.model, memo ) )
+
+
 	@property
 	def expression(self):
 		return self.model['expr']
@@ -166,6 +194,11 @@ class EmbeddedPython25Expr (EmbeddedPython25):
 
 	def evaluate(self, globals, locals):
 		return eval( self.compileForEvaluation( '<expr>' ), globals, locals )
+
+
+	@classmethod
+	def __import_from_plain_text__(cls, importData):
+		return cls.fromText( importData )
 
 
 	@staticmethod
@@ -242,6 +275,16 @@ class EmbeddedPython25Suite (EmbeddedPython25Executable):
 		super(EmbeddedPython25Suite, self).__init__( model )
 
 
+	def __copy__(self):
+		return EmbeddedPython25Suite( self.model )
+
+	def __deepcopy__(self, memo):
+		return EmbeddedPython25Suite( deepcopy( self.model, memo ) )
+
+	def __clipboard_copy__(self, memo):
+		return EmbeddedPython25Suite( deepcopy( self.model, memo ) )
+
+
 	@property
 	def statements(self):
 		return self.model['suite']
@@ -263,6 +306,16 @@ class EmbeddedPython25Module (EmbeddedPython25Executable):
 			raise TypeError, 'Cannot construct EmbeddedPython25Module from %s' % model
 
 		super(EmbeddedPython25Module, self).__init__( model )
+
+
+	def __copy__(self):
+		return EmbeddedPython25Module( self.model )
+
+	def __deepcopy__(self, memo):
+		return EmbeddedPython25Module( deepcopy( self.model, memo ) )
+
+	def __clipboard_copy__(self, memo):
+		return EmbeddedPython25Module( deepcopy( self.model, memo ) )
 
 
 	@property

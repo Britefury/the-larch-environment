@@ -6,12 +6,18 @@
 //##************************
 package BritefuryJ.Editor.Table.ObjectList;
 
+import net.htmlparser.jericho.Segment;
+
 import org.python.core.Py;
 import org.python.core.PyException;
+import org.python.core.PyJavaType;
 import org.python.core.PyObject;
 import org.python.core.PyString;
+import org.python.core.PyType;
 import org.python.core.__builtin__;
 
+import BritefuryJ.ClipboardFilter.ClipboardHTMLImporter;
+import BritefuryJ.ClipboardFilter.ClipboardPlainTextImporter;
 import BritefuryJ.Editor.Table.TableEditorStyle;
 import BritefuryJ.Pres.Primitive.Label;
 
@@ -19,18 +25,28 @@ public class AttributeColumn extends AbstractColumn
 {
 	private String title;
 	private PyString attrname;
-	private PyObject valueConstructorFn, valueExportFn, valueCopyFn;
+	private Class<?> cls;
+	private PyType type;
 	private PyObject defaultValue, defaultValueCallable;
 	
 	
-	public AttributeColumn(String title, PyString attrname, PyObject valueConstructorFn, PyObject valueExportFn, PyObject valueCopyFn, PyObject defaultValue)
+	public AttributeColumn(String title, PyString attrname, PyType type, PyObject defaultValue)
 	{
 		super();
 		this.title = title;
 		this.attrname = __builtin__.intern( attrname );
-		this.valueConstructorFn = valueConstructorFn;
-		this.valueExportFn = valueExportFn;
-		this.valueCopyFn = valueCopyFn;
+		
+		if ( type instanceof PyJavaType )
+		{
+			PyJavaType jtype = (PyJavaType)type;
+			this.cls = Py.tojava( jtype, Class.class );
+			this.type = null;
+		}
+		else
+		{
+			this.cls = null;
+			this.type = type;
+		}
 		if ( defaultValue.isCallable() )
 		{
 			this.defaultValueCallable = defaultValue;
@@ -41,19 +57,30 @@ public class AttributeColumn extends AbstractColumn
 		}
 	}
 	
-	public AttributeColumn(String title, PyString attrname, PyObject valueConstructorFn, PyObject valueCopyFn, PyObject defaultValue)
+	public AttributeColumn(String title, PyString attrname, PyType type)
 	{
-		this( title, attrname, valueConstructorFn, null, valueCopyFn, defaultValue );
-	}
-	
-	public AttributeColumn(String title, PyString attrname, PyObject valueConstructorFn, PyObject defaultValue)
-	{
-		this( title, attrname, valueConstructorFn, null, null, defaultValue );
+		super();
+		this.title = title;
+		this.attrname = __builtin__.intern( attrname );
+		
+		if ( type instanceof PyJavaType )
+		{
+			PyJavaType jtype = (PyJavaType)type;
+			this.cls = Py.tojava( jtype, Class.class );
+			this.type = null;
+		}
+		else
+		{
+			this.cls = null;
+			this.type = type;
+		}
+		this.defaultValueCallable = type;
+		this.defaultValue = null;
 	}
 	
 	public AttributeColumn(String title, PyString attrname)
 	{
-		this( title, attrname, null, null, null, Py.None );
+		this( title, attrname, (PyType)null, Py.None );
 	}
 	
 	
@@ -91,7 +118,14 @@ public class AttributeColumn extends AbstractColumn
 	{
 		if ( defaultValueCallable != null  &&  defaultValueCallable != Py.None )
 		{
-			return defaultValueCallable.__call__();
+			try
+			{
+				return defaultValueCallable.__call__();
+			}
+			catch (Throwable t)
+			{
+				return null;
+			}
 		}
 		else
 		{
@@ -100,11 +134,26 @@ public class AttributeColumn extends AbstractColumn
 	}
 
 	@Override
-	public Object copyValue(Object x)
+	public Object importHTML(Segment importData)
 	{
-		if ( valueCopyFn != null  &&  valueCopyFn != Py.None )
+		Object x = null;
+		if ( cls != null )
 		{
-			return valueCopyFn.__call__( Py.java2py( x ) );
+			x = ClipboardHTMLImporter.instance.importObject( cls, importData );
+		}
+		else if ( type != null )
+		{
+			PyObject pyX = ClipboardHTMLImporter.instance.importObject( type, importData );
+			x = pyX != null  ?  Py.tojava( pyX, Object.class )  :  null;
+		}
+		else
+		{
+			return null;
+		}
+		
+		if ( x == null )
+		{
+			return importPlainText( importData.getTextExtractor().toString() );
 		}
 		else
 		{
@@ -113,28 +162,20 @@ public class AttributeColumn extends AbstractColumn
 	}
 
 	@Override
-	public Object importValue(Object x)
+	public Object importPlainText(String importData)
 	{
-		if ( valueConstructorFn != null  &&  valueConstructorFn != Py.None )
+		if ( cls != null )
 		{
-			return valueConstructorFn.__call__( Py.java2py( x ) );
+			return ClipboardPlainTextImporter.instance.importObject( cls, importData );
+		}
+		else if ( type != null )
+		{
+			PyObject pyX = ClipboardPlainTextImporter.instance.importObject( type, importData );
+			return pyX != null  ?  Py.tojava( pyX, Object.class )  :  null;
 		}
 		else
 		{
-			return x;
-		}
-	}
-
-	@Override
-	public String exportValue(Object x)
-	{
-		if ( valueExportFn != null  &&  valueExportFn != Py.None )
-		{
-			return valueExportFn.__call__( Py.java2py( x ) ).toString();
-		}
-		else
-		{
-			return x.toString();
+			return null;
 		}
 	}
 

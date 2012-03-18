@@ -12,8 +12,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.htmlparser.jericho.Element;
+import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.Source;
-import net.htmlparser.jericho.TextExtractor;
+import BritefuryJ.ClipboardFilter.ClipboardCopier;
+import BritefuryJ.ClipboardFilter.ClipboardCopierMemo;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.LSpace.Focus.Selection;
@@ -72,13 +74,13 @@ public abstract class AbstractTableEditor<ModelType>
 			b.append( "\t</head>\n" );
 			b.append( "\t<body>\n" );
 			b.append( "\t\t<table>\n" );
-			for (String row[]: selectionContents.exportContents)
+			for (TableCellExportedValue row[]: selectionContents.exportContents)
 			{
 				b.append( "\t\t\t<tr>\n" );
-				for (String cell: row)
+				for (TableCellExportedValue cell: row)
 				{
 					b.append( "\t\t\t\t<td>" );
-					b.append( cell );
+					b.append( cell.getHtml() );
 					b.append( "</td>\n" );
 				}
 				b.append( "\t\t\t</tr>\n" );
@@ -95,16 +97,16 @@ public abstract class AbstractTableEditor<ModelType>
 		public Object export(TableSelectionContents selectionContents)
 		{
 			StringBuilder b = new StringBuilder();
-			for (String row[]: selectionContents.exportContents)
+			for (TableCellExportedValue row[]: selectionContents.exportContents)
 			{
 				boolean first = true;
-				for (String cell: row)
+				for (TableCellExportedValue cell: row)
 				{
 					if ( !first )
 					{
 						b.append( "\t" );
 					}
-					b.append( cell );
+					b.append( cell.getPlainText() );
 					first = false;
 				}
 				b.append( "\n" );
@@ -118,7 +120,8 @@ public abstract class AbstractTableEditor<ModelType>
 		public TableSelectionContents getSelectionContents(TableSelection selection)
 		{
 			Object contents[][] = selection.getSelectedData();
-			String exportContents[][] = exportBlock( selection.getX(), selection.getY(), contents );
+			TableCellExportedValue exportContents[][] = exportBlock( selection.getX(), selection.getY(), contents );
+			contents = copyBlock( selection.getX(), selection.getY(), contents );
 			return new TableSelectionContents( contents, exportContents );
 		}
 	};
@@ -170,7 +173,7 @@ public abstract class AbstractTableEditor<ModelType>
 			
 			if ( table != null )
 			{
-				ArrayList<String[]> tableData = new ArrayList<String[]>();
+				ArrayList<Segment[]> tableData = new ArrayList<Segment[]>();
 				
 				List<Element> trs = table.getAllElements( "tr" );
 				
@@ -180,7 +183,7 @@ public abstract class AbstractTableEditor<ModelType>
 					if ( tr.getBegin() > rowPos )
 					{
 						// We have found a non-nested TR
-						ArrayList<String> rowData = new ArrayList<String>();
+						ArrayList<Segment> rowData = new ArrayList<Segment>();
 						
 						// Read TD elements
 						List<Element> tds = tr.getAllElements( "td" );
@@ -191,18 +194,14 @@ public abstract class AbstractTableEditor<ModelType>
 							if ( td.getBegin() > cellPos )
 							{
 								// We have found a non-nested TD
-								TextExtractor extractor = td.getContent().getTextExtractor();
-								
-								String cellData = extractor.toString();
-								
-								rowData.add( cellData );
+								rowData.add( td.getContent() );
 								
 								cellPos = td.getEnd();
 							}
 						}
 						// Done reading TD elements
 						
-						tableData.add( rowData.toArray( new String[rowData.size()] ) );
+						tableData.add( rowData.toArray( new Segment[rowData.size()] ) );
 
 						rowPos = tr.getEnd();
 					}
@@ -211,9 +210,9 @@ public abstract class AbstractTableEditor<ModelType>
 			
 			
 				ModelType model = (ModelType)target.editorInstance.model;
-				String textBlock[][] = tableData.toArray( new String[tableData.size()][] );
+				Segment htmlBlock[][] = tableData.toArray( new Segment[tableData.size()][] );
 				
-				Object[][] subtable = importBlock( target.x, target.y, textBlock );
+				Object[][] subtable = importHTMLBlock( target.x, target.y, htmlBlock );
 				
 				putBlock( model, target.x, target.y, subtable, (AbstractTableEditorInstance<ModelType>)target.editorInstance );
 
@@ -329,23 +328,56 @@ public abstract class AbstractTableEditor<ModelType>
 	protected abstract void putBlock(ModelType model, int x, int y, Object[][] data, AbstractTableEditorInstance<ModelType> editorInstance);
 	protected abstract void deleteBlock(ModelType model, int x, int y, int w, int h, AbstractTableEditorInstance<ModelType> editorInstance);
 
-	protected Object[][] importBlock(int posX, int posY, String[][] textBlock)
+	protected Object[][] importHTMLBlock(int posX, int posY, Segment[][] htmlBlock)
 	{
+		String[][] textBlock = new String[htmlBlock.length][];
+		
+		for (int rowIndex = 0; rowIndex < htmlBlock.length; rowIndex++)
+		{
+			Segment[] htmlRow = htmlBlock[rowIndex];
+			String[] textRow = new String[htmlRow.length];
+			
+			for (int colIndex = 0; colIndex < htmlRow.length; colIndex++)
+			{
+				textRow[colIndex] = htmlRow[colIndex].getTextExtractor().toString();
+			}
+		}
+		
 		return textBlock;
 	}
 
-	protected String[][] exportBlock(int posX, int posY, Object[][] valueBlock)
+	protected Object[][] copyBlock(int posX, int posY, Object[][] valueBlock)
 	{
-		String destBlock[][] = new String[valueBlock.length][];
+		ClipboardCopierMemo memo = new ClipboardCopierMemo();
+		
+		Object destBlock[][] = new Object[valueBlock.length][];
 		for (int b = 0; b < valueBlock.length; b++)
 		{
 			Object[] srcRow = valueBlock[b];
-			String[] destRow = new String[srcRow.length];
+			Object[] destRow = new Object[srcRow.length];
 			destBlock[b] = destRow;
 			
 			for (int a = 0; a < srcRow.length; a++)
 			{
-				destRow[a] = srcRow[a].toString();
+				destRow[a] = ClipboardCopier.instance.copyObject( srcRow[a], memo );
+			}
+		}
+		
+		return destBlock;
+	}
+
+	protected TableCellExportedValue[][] exportBlock(int posX, int posY, Object[][] valueBlock)
+	{
+		TableCellExportedValue destBlock[][] = new TableCellExportedValue[valueBlock.length][];
+		for (int b = 0; b < valueBlock.length; b++)
+		{
+			Object[] srcRow = valueBlock[b];
+			TableCellExportedValue[] destRow = new TableCellExportedValue[srcRow.length];
+			destBlock[b] = destRow;
+			
+			for (int a = 0; a < srcRow.length; a++)
+			{
+				destRow[a] = new TableCellExportedValue( srcRow[a] );
 			}
 		}
 		
