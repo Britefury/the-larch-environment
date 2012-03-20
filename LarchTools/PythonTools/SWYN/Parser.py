@@ -141,7 +141,7 @@ class SWYNGrammar (Grammar):
 
 	@Rule
 	def comment(self):
-		return ( Literal( '(?#' ) + RegEx( '[^)]*' ) + Literal( ')' ) ).action( lambda input, begin, end, x, bindings: Schema.Comment( text=x[1] ) )
+		return ( Literal( '(?#' ) + RegEx( '[^)]+' ).optional() + Literal( ')' ) ).action( lambda input, begin, end, x, bindings: Schema.Comment( text=( x[1]   if x[1] is not None   else '' ) ) )
 
 
 
