@@ -145,6 +145,7 @@ def Expression(method):
 
 _unparsedTextStyle = StyleSheet.style( Primitive.textSquiggleUnderlinePaint( Color.RED ) )
 _controlCharStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.0, 0.0, 0.5 ) ) )
+_invertControlCharStyle = StyleSheet.style( Primitive.foreground( Color( 1.0, 0.0, 0.0, 0.5 ) ) )
 
 _specialCharStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.5, 0.0 ) ), Primitive.fontSize( 10 ) )
 _specialBorder = SolidBorder( 1.0, 1.0, 4.0, 4.0, Color( 0.0, 0.8, 0.0 ), Color( 0.9, 1.0, 0.9 ) )
@@ -235,7 +236,11 @@ def charSet(invert, items):
 	else:
 		width = int( math.ceil( math.sqrt( float( len( items ) ) ) ) )
 		itemsCollection = FlowGrid( width, items )
-	return _charSetBorder.surround( Row( [ _controlCharStyle( Text( '[^'   if invert   else '[' ) ), itemsCollection, _controlCharStyle( Text( ']' ) ) ] ) )
+	contents = [ _controlCharStyle( Text( '[' ) ) ]
+	if invert:
+		contents.append( _invertControlCharStyle( Text( '^' ) ) )
+	contents.extend( [ itemsCollection,  _controlCharStyle( Text( ']' ) ) ] )
+	return _charSetBorder.surround( Row( contents ) )
 
 def group(subexp, capturing):
 	contents = [ subexp ]   if capturing   else [ _controlCharStyle( Text( '?:' ) ), subexp ]
