@@ -158,7 +158,7 @@ _charClassBorder = SolidBorder( 1.0, 1.0, 4.0, 4.0, Color( 0.4, 0.8, 0.0 ), Colo
 #_charClassBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 0.0, 0.25, 0.5 ), Color( 0.8, 0.9, 1.0 ) )
 
 _groupNameStyle = StyleSheet.style( Primitive.fontItalic( True ) )
-_commentStyle = StyleSheet.style( Primitive.foreground( Color( 0.2, 0.2, 0.2, 0.5 ) ) )
+_commentStyle = StyleSheet.style( Primitive.foreground( Color( 0.3, 0.3, 0.3 ) ) )
 _flagsStyle = StyleSheet.style( Primitive.foreground( Color( 1.0, 0.5, 0.0 ) ) )
 
 _escapeBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 0.5, 0.6, 0.75 ), Color( 0.75, 0.85, 1.0 ) )
