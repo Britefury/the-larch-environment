@@ -5,6 +5,13 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
+
+"""
+Python visual regular expression
+
+Inspired by the visual regular expression presentation system in SWYN (Say What You Need), by Alan Blackwell.
+"""
+
 import re
 
 from BritefuryJ.Command import *
@@ -15,20 +22,20 @@ from BritefuryJ.Pres.Primitive import *
 
 from LarchCore.Languages.Python25.PythonCommands import pythonCommands, makeInsertEmbeddedExpressionAtCaretAction, chainActions
 
-from LarchTools.PythonTools.SWYN import Schema
-from LarchTools.PythonTools.SWYN.Parser import SWYNGrammar
-from LarchTools.PythonTools.SWYN.View import perspective as SWYNPerspective
-from LarchTools.PythonTools.SWYN.CodeGenerator import SWYNCodeGenerator
+from LarchTools.PythonTools.VisualRegex import Schema
+from LarchTools.PythonTools.VisualRegex.Parser import VisualRegexGrammar
+from LarchTools.PythonTools.VisualRegex.View import perspective as VREPerspective
+from LarchTools.PythonTools.VisualRegex.CodeGenerator import VisualRegexCodeGenerator
 
 
 
-class SWYN (object):
-	_codeGen = SWYNCodeGenerator()
+class VisualPythonRegex (object):
+	_codeGen = VisualRegexCodeGenerator()
 
 
 	def __init__(self, regex=None):
 		if regex is None:
-			regex = Schema.SWYNRegEx( expr= Schema.UNPARSED( value=[ '' ] ) )
+			regex = Schema.PythonRegEx( expr= Schema.UNPARSED( value=[ '' ] ) )
 
 		if isinstance( regex, re._pattern_type ):
 			# Extract pattern string
@@ -36,14 +43,14 @@ class SWYN (object):
 
 		if isinstance( regex, str )  or  isinstance( regex, unicode ):
 			# Convert to structural form
-			g = SWYNGrammar()
+			g = VisualRegexGrammar()
 			x = g.regex().parseStringChars( regex, None )
-			regex = Schema.SWYNRegEx( expr=x.value )
+			regex = Schema.PythonRegEx( expr=x.value )
 
 		if isinstance( regex, DMNode ):
-			if not regex.isInstanceOf( Schema.SWYNRegEx ):
+			if not regex.isInstanceOf( Schema.PythonRegEx ):
 				if regex.isInstanceOf( Schema.Node ):
-					regex = Schema.SWYNRegEx( expr=regex )
+					regex = Schema.PythonRegEx( expr=regex )
 				else:
 					raise TypeError, 'Wrong schema'
 
@@ -57,19 +64,19 @@ class SWYN (object):
 
 
 	def __present__(self, fragment, inherited_state):
-		#return SWYNPerspective( self.regex )
-		return Paragraph( [ HiddenText( u'\ue000' ), SWYNPerspective( self.regex ), HiddenText( u'\ue000' ) ] )
+		#return VREPerspective( self.regex )
+		return Paragraph( [ HiddenText( u'\ue000' ), VREPerspective( self.regex ), HiddenText( u'\ue000' ) ] )
 
 
 
-def _newSWYNAtCaret(caret):
-	return SWYN()
+def _newVREAtCaret(caret):
+	return VisualPythonRegex()
 
-_exprAtCaret = makeInsertEmbeddedExpressionAtCaretAction( _newSWYNAtCaret )
+_exprAtCaret = makeInsertEmbeddedExpressionAtCaretAction( _newVREAtCaret )
 
 
-_swynCommand = Command( '&S&W&Y&N', _exprAtCaret )
+_vreCommand = Command( '&Visual &Regular &Expression', _exprAtCaret )
 
-_swynCommands = CommandSet( 'LarchTools.PythonTools.SWYN', [ _swynCommand ] )
+_vreCommands = CommandSet( 'LarchTools.PythonTools.VisualRegex', [ _vreCommand ] )
 
-pythonCommands.registerCommandSet( _swynCommands )
+pythonCommands.registerCommandSet( _vreCommands )

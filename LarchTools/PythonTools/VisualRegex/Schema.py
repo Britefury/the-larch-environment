@@ -10,13 +10,13 @@ from BritefuryJ.DocModel import DMSchema, DMObjectClass, DMNode
 
 
 
-schema = DMSchema( 'SWYN', 'swyn', 'LarchTools.PythonTools.SWYN', 1 )
+schema = DMSchema( 'VisualRegex', 'vre', 'LarchTools.PythonTools.VisualRegex', 1 )
 
 
 Node = schema.newClass( 'Node', [] )
 
 
-SWYNRegEx = schema.newClass( 'SWYNRegEx', Node, [ 'expr' ] )
+PythonRegEx = schema.newClass( 'PythonRegEx', Node, [ 'expr' ] )
 
 
 UNPARSED = schema.newClass( 'UNPARSED', Node, [ 'value' ] )

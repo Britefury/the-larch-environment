@@ -19,23 +19,23 @@ from BritefuryJ.Editor.Sequential import SequentialClipboardHandler, SelectionEd
 
 from BritefuryJ.Editor.SyntaxRecognizing import SyntaxRecognizingEditor
 
-from LarchTools.PythonTools.SWYN import Schema
+from LarchTools.PythonTools.VisualRegex import Schema
 
 
 
 
 def isTopLevelFragment(fragment):
 	model = fragment.model
-	return isinstance( model, DMNode )  and  model.isInstanceOf( Schema.SWYNRegEx )
+	return isinstance( model, DMNode )  and  model.isInstanceOf( Schema.PythonRegEx )
 
 
-class SWYNSyntaxRecognizingEditor (SyntaxRecognizingEditor):
+class VisualRegexSyntaxRecognizingEditor (SyntaxRecognizingEditor):
 	def __init__(self):
-		super( SWYNSyntaxRecognizingEditor, self ).__init__()
+		super( VisualRegexSyntaxRecognizingEditor, self ).__init__()
 
 
 	def getName(self):
-		return 'SWYNEdit'
+		return 'VREEdit'
 
 
 	def isClipboardEditLevelFragmentView(self, fragment):
@@ -48,6 +48,6 @@ class SWYNSyntaxRecognizingEditor (SyntaxRecognizingEditor):
 
 
 
-SWYNSyntaxRecognizingEditor.instance = SWYNSyntaxRecognizingEditor()
+VisualRegexSyntaxRecognizingEditor.instance = VisualRegexSyntaxRecognizingEditor()
 
 
