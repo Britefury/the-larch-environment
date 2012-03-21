@@ -20,11 +20,11 @@ from Britefury.Tests.BritefuryJ.Parser.ParserTestCase import ParserTestCase
 
 from Britefury.Grammar.Grammar import Grammar, Rule, RuleList
 
-from LarchTools.PythonTools.SWYN import Schema
+from LarchTools.PythonTools.VisualRegex import Schema
 
 
 
-class SWYNGrammar (Grammar):
+class VisualRegexGrammar (Grammar):
 	@Rule
 	def pythonEscapedChar(self):
 		return ( Literal( '\\' ) + RegEx( '[abnfrt]|(x[0-9a-fA-F]{2})|(u[0-9a-fA-F]{4})|(U[0-9a-fA-F]{8})' ) ).action( lambda input, begin, end, x, bindings: Schema.PythonEscapedChar( char=x[1] ) )
@@ -203,7 +203,7 @@ class TestCase_ReParser (ParserTestCase):
 	__junk_regex__ = ''
 
 	def test_literalChar(self):
-		g = SWYNGrammar()
+		g = VisualRegexGrammar()
 		self._parseStringTest( g.literalChar(), 'a', Schema.LiteralChar( char='a' ) )
 		self._parseStringTest( g.literalChar(), '\\.', Schema.EscapedChar( char='.' ) )
 		self._parseStringTest( g.literalChar(), '\\^', Schema.EscapedChar( char='^' ) )
@@ -228,14 +228,14 @@ class TestCase_ReParser (ParserTestCase):
 
 		
 	def test_specials(self):
-		g = SWYNGrammar()
+		g = VisualRegexGrammar()
 		self._parseStringTest( g.specials(), '.', Schema.AnyChar() )
 		self._parseStringTest( g.specials(), '^', Schema.StartOfLine() )
 		self._parseStringTest( g.specials(), '$', Schema.EndOfLine() )
 
 		
 	def test_charClass(self):
-		g = SWYNGrammar()
+		g = VisualRegexGrammar()
 		self._parseStringTest( g.charClass(), '\\A', Schema.CharClass( cls='A' ) )
 		self._parseStringTest( g.charClass(), '\\b', Schema.CharClass( cls='b' ) )
 		self._parseStringTest( g.charClass(), '\\B', Schema.CharClass( cls='B' ) )
@@ -249,7 +249,7 @@ class TestCase_ReParser (ParserTestCase):
 
 		
 	def test_charSet(self):
-		g = SWYNGrammar()
+		g = VisualRegexGrammar()
 		self._parseStringFailTest( g.charSet(), '[]' )
 		self._parseStringTest( g.charSet(), '[abc]', Schema.CharSet( items=[ Schema.CharSetChar( char=Schema.LiteralChar( char='a' ) ),
 										     Schema.CharSetChar( char=Schema.LiteralChar( char='b' ) ),
@@ -266,7 +266,7 @@ class TestCase_ReParser (ParserTestCase):
 
 
 	def test_group(self):
-		g = SWYNGrammar()
+		g = VisualRegexGrammar()
 		self._parseStringTest( g.item(), '(a)', Schema.Group( capturing='1', subexp=Schema.LiteralChar( char='a' ) ) )
 		self._parseStringTest( g.item(), '(?i)', Schema.SetFlags( flags='i' ) )
 		self._parseStringTest( g.item(), '(?:a)', Schema.Group( subexp=Schema.LiteralChar( char='a' ) ) )
@@ -280,7 +280,7 @@ class TestCase_ReParser (ParserTestCase):
 
 
 	def test_repetition(self):
-		g = SWYNGrammar()
+		g = VisualRegexGrammar()
 		self._parseStringTest( g.repeatedItem(), 'a*', Schema.ZeroOrMore( subexp=Schema.LiteralChar( char='a' ) ) )
 		self._parseStringTest( g.repeatedItem(), 'a*?', Schema.ZeroOrMore( subexp=Schema.LiteralChar( char='a' ), greedy='1' ) )
 		self._parseStringTest( g.repeatedItem(), 'a+', Schema.OneOrMore( subexp=Schema.LiteralChar( char='a' ) ) )
@@ -293,7 +293,7 @@ class TestCase_ReParser (ParserTestCase):
 
 
 	def test_sequence(self):
-		g = SWYNGrammar()
+		g = VisualRegexGrammar()
 		self._parseStringTest( g.sequence(), 'abc', Schema.Sequence( subexps=[ Schema.LiteralChar( char='a' ), Schema.LiteralChar( char='b' ), Schema.LiteralChar( char='c' ) ] ) )
 		self._parseStringTest( g.sequence(), 'a*bc', Schema.Sequence( subexps=[ Schema.ZeroOrMore( subexp=Schema.LiteralChar( char='a' ) ), Schema.LiteralChar( char='b' ), Schema.LiteralChar( char='c' ) ] ) )
 		self._parseStringTest( g.sequence(), 'ab*c', Schema.Sequence( subexps=[ Schema.LiteralChar( char='a' ), Schema.ZeroOrMore( subexp=Schema.LiteralChar( char='b' ) ), Schema.LiteralChar( char='c' ) ] ) )
@@ -304,13 +304,13 @@ class TestCase_ReParser (ParserTestCase):
 
 
 	def test_choice(self):
-		g = SWYNGrammar()
+		g = VisualRegexGrammar()
 		self._parseStringTest( g.choice(), 'abc|def', Schema.Choice( subexps=[ Schema.Sequence( subexps=[ Schema.LiteralChar( char='a' ), Schema.LiteralChar( char='b' ), Schema.LiteralChar( char='c' ) ] ),
 										       Schema.Sequence( subexps=[ Schema.LiteralChar( char='d' ), Schema.LiteralChar( char='e' ), Schema.LiteralChar( char='f' ) ] ) ] ) )
 
 
 	def test_regex(self):
-		g = SWYNGrammar()
+		g = VisualRegexGrammar()
 		self._parseStringTest( g.regex(), 'a', Schema.LiteralChar( char='a' ) )
 		self._parseStringTest( g.regex(), 'abc|def', Schema.Choice( subexps=[ Schema.Sequence( subexps=[ Schema.LiteralChar( char='a' ), Schema.LiteralChar( char='b' ), Schema.LiteralChar( char='c' ) ] ),
 										      Schema.Sequence( subexps=[ Schema.LiteralChar( char='d' ), Schema.LiteralChar( char='e' ), Schema.LiteralChar( char='f' ) ] ) ] ) )

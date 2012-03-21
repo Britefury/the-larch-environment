@@ -54,14 +54,14 @@ from BritefuryJ.ModelAccess.DocModel import *
 
 
 
-from LarchTools.PythonTools.SWYN import Schema
-from LarchTools.PythonTools.SWYN.Parser import SWYNGrammar
-from LarchTools.PythonTools.SWYN.SREditor import SWYNSyntaxRecognizingEditor
+from LarchTools.PythonTools.VisualRegex import Schema
+from LarchTools.PythonTools.VisualRegex.Parser import VisualRegexGrammar
+from LarchTools.PythonTools.VisualRegex.SREditor import VisualRegexSyntaxRecognizingEditor
 
 
 PRECEDENCE_NONE = -1
 
-def swynReplaceNode(data, replacement):
+def vreReplaceNode(data, replacement):
 	data.become( replacement )
 
 
@@ -71,16 +71,16 @@ def _isValidUnparsedValue(value):
 def _commitUnparsed(model, value):
 	unparsed = Schema.UNPARSED( value=value.getItemValues() )
 	# In some cases, we will be replacing @model with an UNPARSED node that contains a reference to @model.
-	# Since swynReplaceNode calls model.become(), this causes severe problems, due to circular references.
+	# Since vreReplaceNode calls model.become(), this causes severe problems, due to circular references.
 	# The call to deepcopy eliminates this possibility.
-	swynReplaceNode( model, deepcopy( unparsed ) )
+	vreReplaceNode( model, deepcopy( unparsed ) )
 
 def _commitInnerUnparsed(model, value):
 	unparsed = Schema.UNPARSED( value=value.getItemValues() )
 	# In some cases, we will be replacing @model with an UNPARSED node that contains a reference to @model.
-	# Since swynReplaceNode calls model.become(), this causes severe problems, due to circular references.
+	# Since vreReplaceNode calls model.become(), this causes severe problems, due to circular references.
 	# The call to deepcopy eliminates this possibility.
-	swynReplaceNode( model, deepcopy( unparsed ) )
+	vreReplaceNode( model, deepcopy( unparsed ) )
 
 
 #
@@ -89,9 +89,9 @@ def _commitInnerUnparsed(model, value):
 #
 #
 
-class SWYNExpressionEditListener (ParsingEditListener):
+class VREExpressionEditListener (ParsingEditListener):
 	def getSyntaxRecognizingEditor(self):
-		return SWYNSyntaxRecognizingEditor.instance
+		return VisualRegexSyntaxRecognizingEditor.instance
 
 	def getLogName(self):
 		return 'Top level expression'
@@ -175,7 +175,7 @@ _choiceBorder = SolidBorder( 1.0, 4.0, 3.0, 3.0, Color( 0.7, 0.4, 1.0 ), Color( 
 _commentBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 0.4, 0.4, 0.4 ), Color( 0.9, 0.9, 0.9 ) )
 _flagsBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 1.0, 0.6, 0.2 ), Color( 1.0, 1.0, 0.8 ) )
 
-_swynBorder = SolidBorder( 2.0, 4.0, 10.0, 10.0, Color( 0.7, 0.8, 0.7 ), None )
+_vreBorder = SolidBorder( 2.0, 4.0, 10.0, 10.0, Color( 0.7, 0.8, 0.7 ), None )
 
 
 _charClasses = {
@@ -306,15 +306,15 @@ def _editTopLevelNode(char):
 
 
 
-class SWYNView (MethodDispatchView):
+class VREView (MethodDispatchView):
 	def __init__(self, grammar):
-		super( SWYNView, self ).__init__()
+		super( VREView, self ).__init__()
 		self._parser = grammar
 
-		editor = SWYNSyntaxRecognizingEditor.instance
+		editor = VisualRegexSyntaxRecognizingEditor.instance
 
-		self._expr = editor.parsingNodeEditListener( 'Expression', grammar.regex(), swynReplaceNode )
-		self._exprOuter = SWYNExpressionEditListener( grammar.regex() )
+		self._expr = editor.parsingNodeEditListener( 'Expression', grammar.regex(), vreReplaceNode )
+		self._exprOuter = VREExpressionEditListener( grammar.regex() )
 		self._topLevel = editor.topLevelNodeEditListener()
 
 		self._exprUnparsed = editor.unparsedNodeEditListener( 'Unparsed expression', _isValidUnparsedValue, _commitUnparsed, _commitInnerUnparsed )
@@ -327,13 +327,13 @@ class SWYNView (MethodDispatchView):
 
 
 
-	@DMObjectNodeDispatchMethod( Schema.SWYNRegEx )
-	def SWYNRegEx(self, fragment, inheritedState, model, expr):
+	@DMObjectNodeDispatchMethod( Schema.PythonRegEx )
+	def PythonRegEx(self, fragment, inheritedState, model, expr):
 		exprView =_editTopLevelNode( expr )
 		seg = Segment( exprView )
 		e = Paragraph( [ seg ] ).alignHPack().alignVRefY()
-		e = _swynBorder.surround( e )
-		e = EditableStructuralItem( SWYNSyntaxRecognizingEditor.instance, [ self._exprOuter, self._topLevel ],  model,  e )
+		e = _vreBorder.surround( e )
+		e = EditableStructuralItem( VisualRegexSyntaxRecognizingEditor.instance, [ self._exprOuter, self._topLevel ],  model,  e )
 		return e
 
 
@@ -342,7 +342,7 @@ class SWYNView (MethodDispatchView):
 	def UNPARSED(self, fragment, inheritedState, model, value):
 		def _viewItem(x):
 			if x is model:
-				raise ValueError, 'SWYNView.UNPARSED: self-referential unparsed node'
+				raise ValueError, 'VREView.UNPARSED: self-referential unparsed node'
 			if isinstance( x, str )  or  isinstance( x, unicode ):
 				view = unparseableText( x )
 				return view
@@ -523,6 +523,6 @@ class SWYNView (MethodDispatchView):
 
 
 
-_parser = SWYNGrammar()
-_view = SWYNView( _parser )
-perspective = SequentialEditorPerspective( _view.fragmentViewFunction, SWYNSyntaxRecognizingEditor.instance )
+_parser = VisualRegexGrammar()
+_view = VREView( _parser )
+perspective = SequentialEditorPerspective( _view.fragmentViewFunction, VisualRegexSyntaxRecognizingEditor.instance )
