@@ -23,17 +23,6 @@ public class DMSchemaResolver
 		}
 	}
 	
-	public static class DuplicateSchemaLocationException extends RuntimeException
-	{
-		private static final long serialVersionUID = 1L;
-		
-		public DuplicateSchemaLocationException(String schemaLocation)
-		{
-			super( "Duplicate schema location: " + schemaLocation );
-		}
-	}
-	
-	
 	public static DMSchema getSchema(String location) throws CouldNotResolveSchemaException
 	{
 		DMSchema schema = schemaTable.get( location );
@@ -50,7 +39,7 @@ public class DMSchemaResolver
 	{
 		if ( schemaTable.containsKey( schema.getLocation() ) )
 		{
-			throw new DuplicateSchemaLocationException( schema.getLocation() );
+			System.err.println( "Registering new document model schema at location " + schema.getLocation() );
 		}
 		schemaTable.put( schema.getLocation(), schema );
 	}
