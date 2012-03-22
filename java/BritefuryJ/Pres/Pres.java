@@ -320,6 +320,25 @@ public abstract class Pres
 	
 	//
 	//
+	// Property methods
+	//
+	//
+	
+	public SetProperty withProperty(Object property, Object value)
+	{
+		return new SetProperty( property, value, this );
+	}
+	
+	public RemoveProperty withoutProperty(Object property)
+	{
+		return new RemoveProperty( property, this );
+	}
+	
+	
+	
+	
+	//
+	//
 	// Custom action methods
 	//
 	//

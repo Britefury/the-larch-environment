@@ -34,6 +34,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -332,6 +333,40 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 			return ls;
 		}
 	}
+	
+	
+	
+	
+	public static class PropertyValue
+	{
+		private LSElement element;
+		private Object property;
+		private Object value;
+		
+		
+		protected PropertyValue(LSElement element, Object property, Object value)
+		{
+			this.element = element;
+			this.property = property;
+			this.value = value;
+		}
+		
+		
+		public LSElement getElement()
+		{
+			return element;
+		}
+		
+		public Object getProperty()
+		{
+			return property;
+		}
+		
+		public Object getValue()
+		{
+			return value;
+		}
+	}
 
 	
 	
@@ -380,6 +415,8 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 	
 	protected ElementValueFunction valueFn;
 	protected Object fixedValue;
+	
+	private HashMap<Object, PropertyValue> properties = null;
 	
 	
 	
@@ -2695,6 +2732,59 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 		{
 			getRootElement().getElementValueCacheManager().invalidateCachedValuesFor( this );
 		}
+	}
+	
+	
+	
+	
+	//
+	//
+	// PROPERTIES
+	//
+	//
+	
+	public PropertyValue getProperty(Object property)
+	{
+		return properties != null  ?  properties.get( property )  :  null;
+	}
+	
+	public void setProperty(Object property, Object value)
+	{
+		if ( properties == null )
+		{
+			properties = new HashMap<Object, PropertyValue>();
+		}
+		properties.put( property, new PropertyValue( this, property, value ) );
+	}
+	
+	public void removeProperty(Object property)
+	{
+		if ( properties != null )
+		{
+			properties.remove( property );
+			if ( properties.isEmpty() )
+			{
+				properties = null;
+			}
+		}
+	}
+	
+	
+	
+	public PropertyValue findPropertyInAncestors(Object property)
+	{
+		LSElement e = this;
+		while ( e != null )
+		{
+			PropertyValue v = e.getProperty( property );
+			if ( v != null )
+			{
+				return v;
+			}
+			e = e.parent;
+		}
+		
+		return null;
 	}
 	
 	
