@@ -292,7 +292,7 @@ class Window (object):
 	
 	
 	def _onNewTab(self):
-		self._browser.openLocationInNewTab( '' )
+		self._browser.openLocationInNewTab( Location( '' ) )
 	
 	
 	def _onNewWindow(self):
