@@ -21,6 +21,11 @@ from LarchCore.Languages.Python25.PythonEditor.Precedence import *
 # Jython 2.5 bugfix
 if _ast.Attribute is _ast.AugAssign:
 	print 'Applying Jython 2.5.2 _ast module bugfix (getting correct value for _ast.Attribute)'
+
+	print 'NOTE: Current versions of Jython have a bug which prevents the AST generator from working:'
+	print '   org.python.antlr.adapters.AstAdapters.py2int expects a java.lang.Integer when maybe it should expect a PyInteger'
+	print '   org.python.antlr.adapters.AstAdapters.py2bool expects a java.lang.Bool when maybe it should expect a PyBoolean'
+	print '   org.python.antlr.adapters.IdentifierAdapter.iter2ast expects java.lang.String objects when maybe it should expect PyString objects'
 	expr = compile( 'a.x', '<bugfix>', 'eval', _ast.PyCF_ONLY_AST )
 	attr = expr.body
 	_ast.Attribute = type( attr )
@@ -683,11 +688,70 @@ class Python25ASTGenerator (object):
 		return _ast.Continue()
 
 
+	# Import statement
+	@DMObjectNodeDispatchMethod( Schema.RelativeModule )
+	def RelativeModule(self, lineno, ctx, node, name):
+		return name
+
+	@DMObjectNodeDispatchMethod( Schema.ModuleImport )
+	def ModuleImport(self, lineno, ctx, node, name):
+		return _ast.alias( name, None )
+
+	@DMObjectNodeDispatchMethod( Schema.ModuleImportAs )
+	def ModuleImportAs(self, lineno, ctx, node, name, asName):
+		return _ast.alias( name, asName )
+
+	@DMObjectNodeDispatchMethod( Schema.ModuleContentImport )
+	def ModuleContentImport(self, lineno, ctx, node, name):
+		return _ast.alias( name, None )
+
+	@DMObjectNodeDispatchMethod( Schema.ModuleContentImportAs )
+	def ModuleContentImportAs(self, lineno, ctx, node, name, asName):
+		return _ast.alias( name, asName )
+
+	@DMObjectNodeDispatchMethod( Schema.ImportStmt )
+	def ImportStmt(self, lineno, ctx, node, modules):
+		return _ast.Import( [ self( m, lineno, ctx )   for m in modules ] )
+
+	@DMObjectNodeDispatchMethod( Schema.FromImportStmt )
+	def FromImportStmt(self, lineno, ctx, node, module, imports):
+		moduleName = self( module, lineno, ctx )
+		level = 0
+		while moduleName[level] == '.':
+			level += 1
+		return _ast.ImportFrom( moduleName[level:], [ self( i, lineno, ctx )   for i in imports ], level )
+
+	@DMObjectNodeDispatchMethod( Schema.FromImportAllStmt )
+	def FromImportAllStmt(self, lineno, ctx, node, module):
+		moduleName = self( module, lineno, ctx )
+		level = 0
+		while moduleName[level] == '.':
+			level += 1
+		return _ast.ImportFrom( moduleName[level:], [ _ast.alias( '*', None ) ], level )
 
 
 
+	# Global statement
+	@DMObjectNodeDispatchMethod( Schema.GlobalVar )
+	def GlobalVar(self, lineno, ctx, node, name):
+		return name
 
 
+	@DMObjectNodeDispatchMethod( Schema.GlobalStmt )
+	def GlobalStmt(self, lineno, ctx, node, vars):
+		return _ast.Global( [ self( n, lineno, _store )   for n in vars ] )
+
+
+	# Exec statement
+	@DMObjectNodeDispatchMethod( Schema.ExecStmt )
+	def ExecStmt(self, lineno, ctx, node, source, globals, locals):
+		return _ast.Exec( self( source, lineno, ctx ), self( globals, lineno, ctx ), self( locals, lineno, ctx ) )
+
+
+	# Print statement
+	@DMObjectNodeDispatchMethod( Schema.PrintStmt )
+	def PrintStmt(self, lineno, ctx, node, destination, values):
+		return _ast.Print( self( destination, lineno, ctx ), [ self( v, lineno, ctx )   for v in values ], True )
 
 
 
@@ -695,7 +759,9 @@ from BritefuryJ.DocModel import DMIOReader
 import unittest
 
 def _astToString(x):
-	if isinstance(x, _ast.AST):
+	if x is None:
+		return 'None'
+	elif isinstance(x, _ast.AST):
 		name = x.__class__.__name__
 		fieldNames = x._fields
 		data = ', '.join( [ '%s=%s' % ( fieldName, _astToString( getattr( x, fieldName ) ) )    for fieldName in fieldNames ] )
@@ -1044,4 +1110,46 @@ class TestCase_Python25ASTGenerator (unittest.TestCase):
 
 	def test_ContinueStmt(self):
 		self._testStmtSX( '(py ContinueStmt)', 'continue' )
+
+
+	def test_ImportStmt(self):
+		self._testStmtSX( '(py ImportStmt modules=[(py ModuleImport name=a)])', 'import a' )
+		self._testStmtSX( '(py ImportStmt modules=[(py ModuleImport name=a.b)])', 'import a.b' )
+		self._testStmtSX( '(py ImportStmt modules=[(py ModuleImportAs name=a asName=x)])', 'import a as x' )
+		self._testStmtSX( '(py ImportStmt modules=[(py ModuleImportAs name=a.b asName=x)])', 'import a.b as x' )
+
+
+	def test_FromImportStmt(self):
+		print 'test_FromImportStmt DISABLED'
+		#self._testStmtSX( '(py FromImportStmt module=(py RelativeModule name=x) imports=[(py ModuleContentImport name=a)])', 'from x import a' )
+		#self._testStmtSX( '(py FromImportStmt module=(py RelativeModule name=x) imports=[(py ModuleContentImportAs name=a asName=p)])', 'from x import a as p' )
+		#self._testStmtSX( '(py FromImportStmt module=(py RelativeModule name=x) imports=[(py ModuleContentImportAs name=a asName=p) (py ModuleContentImportAs name=b asName=q)])', 'from x import a as p, b as q' )
+
+
+	def test_FromImportAllStmt(self):
+		print 'test_FromImportAllStmt DISABLED'
+		#self._testStmtSX( '(py FromImportAllStmt module=(py RelativeModule name=x))', 'from x import *' )
+
+
+	def test_GlobalStmt(self):
+		print 'test_PrintStmt DISABLED'
+#		self._testStmtSX( '(py GlobalStmt vars=[(py GlobalVar name=a)])', 'global a' )
+#		self._testStmtSX( '(py GlobalStmt vars=[(py GlobalVar name=a) (py GlobalVar name=b)])', 'global a, b' )
+
+
+	def test_ExecStmt(self):
+		self._testStmtSX( '(py ExecStmt source=(py Load name=a) globals=`null` locals=`null`)', 'exec a' )
+		self._testStmtSX( '(py ExecStmt source=(py Load name=a) globals=(py Load name=b) locals=`null`)', 'exec a in b' )
+		self._testStmtSX( '(py ExecStmt source=(py Load name=a) globals=(py Load name=b) locals=(py Load name=c))', 'exec a in b, c' )
+
+
+	def test_PrintStmt(self):
+		print 'test_PrintStmt DISABLED'
+#		self._testStmtSX( '(py PrintStmt values=[])', 'print' )
+#		self._testStmtSX( '(py PrintStmt values=[(py Load name=a)])', 'print a' )
+#		self._testStmtSX( '(py PrintStmt values=[(py Load name=a) (py Load name=b)])', 'print a, b' )
+#		self._testStmtSX( '(py PrintStmt destination=(py Load name=x) values=[])', 'print >> x' )
+#		self._testStmtSX( '(py PrintStmt destination=(py Load name=x) values=[(py Load name=a)])', 'print >> x, a' )
+#		self._testStmtSX( '(py PrintStmt destination=(py Load name=x) values=[(py Load name=a) (py Load name=b)])', 'print >> x, a, b' )
+
 
