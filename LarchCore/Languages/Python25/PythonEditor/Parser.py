@@ -1724,6 +1724,7 @@ class TestCase_Python25Parser (ParserTestCase):
 		self._parseStringTest( g.importStmt(), 'from x import ( a as p, b as q )\n', Schema.FromImportStmt( module=Schema.RelativeModule( name='x' ), imports=[ Schema.ModuleContentImportAs( name='a', asName='p' ), Schema.ModuleContentImportAs( name='b', asName='q' ) ] ) )
 		self._parseStringTest( g.importStmt(), 'from x import ( a as p, b as q, )\n', Schema.FromImportStmt( module=Schema.RelativeModule( name='x' ), imports=[ Schema.ModuleContentImportAs( name='a', asName='p' ), Schema.ModuleContentImportAs( name='b', asName='q' ) ] ) )
 		self._parseStringTest( g.importStmt(), 'from x import *\n', Schema.FromImportAllStmt( module=Schema.RelativeModule( name='x' ) ) )
+		self._parseStringTest( g.importStmt(), 'from ..x import *\n', Schema.FromImportAllStmt( module=Schema.RelativeModule( name='..x' ) ) )
 
 
 	def testGlobalStmt(self):

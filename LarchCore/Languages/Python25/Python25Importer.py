@@ -455,10 +455,11 @@ class _StmtImporter (_Importer):
 		return Schema.ImportStmt( modules=[ _import( x )   for x in node.names ] )
 	
 	def ImportFrom(self, node):
+		moduleName = ( '.' * node.level )  +  node.module
 		if len( node.names ) == 1   and   node.names[0].name == '*':
-			return Schema.FromImportAllStmt( module=Schema.RelativeModule( name=node.module ) )
+			return Schema.FromImportAllStmt( module=Schema.RelativeModule( name=moduleName ) )
 		else:
-			return Schema.FromImportStmt( module=Schema.RelativeModule( name=node.module ), imports=[ _importFrom( x )   for x in node.names ] )
+			return Schema.FromImportStmt( module=Schema.RelativeModule( name=moduleName ), imports=[ _importFrom( x )   for x in node.names ] )
 		
 		
 	# Global
@@ -1167,6 +1168,7 @@ class ImporterTestCase (unittest.TestCase):
 		self._stmtTest( 'import a.b as x', Schema.ImportStmt( modules=[ Schema.ModuleImportAs( name='a.b', asName='x' ) ] ) )
 		self._stmtTest( 'import a.b as x, c.d as y', Schema.ImportStmt( modules=[ Schema.ModuleImportAs( name='a.b', asName='x' ), Schema.ModuleImportAs( name='c.d', asName='y' ) ] ) )
 		self._stmtTest( 'from x import a', Schema.FromImportStmt( module=Schema.RelativeModule( name='x' ), imports=[ Schema.ModuleContentImport( name='a' ) ] ) )
+		self._stmtTest( 'from ..x import a', Schema.FromImportStmt( module=Schema.RelativeModule( name='..x' ), imports=[ Schema.ModuleContentImport( name='a' ) ] ) )
 		self._stmtTest( 'from x import a as p', Schema.FromImportStmt( module=Schema.RelativeModule( name='x' ), imports=[ Schema.ModuleContentImportAs( name='a', asName='p' ) ] ) )
 		self._stmtTest( 'from x import a as p, b as q', Schema.FromImportStmt( module=Schema.RelativeModule( name='x' ), imports=[ Schema.ModuleContentImportAs( name='a', asName='p' ), Schema.ModuleContentImportAs( name='b', asName='q' ) ] ) )
 		self._stmtTest( 'from x import (a)', Schema.FromImportStmt( module=Schema.RelativeModule( name='x' ), imports=[ Schema.ModuleContentImport( name='a' ) ] ) )
