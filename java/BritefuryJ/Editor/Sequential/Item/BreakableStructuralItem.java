@@ -15,14 +15,14 @@ import BritefuryJ.StyleSheet.StyleValues;
 public class BreakableStructuralItem extends Pres
 {
 	private SequentialEditor editor;
-	private Object value;
+	private Object model;
 	private Pres child;
 	
 	
-	public BreakableStructuralItem(SequentialEditor editor, Object value, Object child)
+	public BreakableStructuralItem(SequentialEditor editor, Object model, Object child)
 	{
 		this.editor = editor;
-		this.value = value;
+		this.model = model;
 		this.child = coerceNonNull( child );
 	}
 
@@ -32,7 +32,7 @@ public class BreakableStructuralItem extends Pres
 	{
 		LSElement element = child.present( ctx, style );
 		element.addTreeEventListener( SequentialEditor.getClearNeighbouringStructuralValueListener() );
-		element.setFixedValue( value );
+		element.setFixedValue( model );
 		element.addTreeEventListener( editor.getClearStructuralValueListener() );
 		return element;
 	}
