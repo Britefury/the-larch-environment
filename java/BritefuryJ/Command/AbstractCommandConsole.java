@@ -6,11 +6,12 @@
 //##************************
 package BritefuryJ.Command;
 
+import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.LSpace.Browser.BrowserPage;
 import BritefuryJ.Projection.ProjectiveBrowserContext;
 import BritefuryJ.Projection.Subject;
 
-public abstract class AbstractCommandConsole
+public abstract class AbstractCommandConsole implements Presentable
 {
 	private CommandConsoleListener listener = null;
 	

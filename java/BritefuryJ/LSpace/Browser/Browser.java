@@ -124,8 +124,6 @@ public class Browser
 		{
 			AbstractCommandConsole commandConsole = commandConsoleFactory.createCommandConsole( presComponent );
 			commandBar = new CommandBar( presComponent, commandConsole, pageController );
-						
-			panel.add( commandBar.getComponent(), BorderLayout.PAGE_END );
 		}
 		
 		resolve();

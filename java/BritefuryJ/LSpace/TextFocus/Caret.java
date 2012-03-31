@@ -24,6 +24,7 @@ import BritefuryJ.LSpace.Focus.Target;
 import BritefuryJ.LSpace.Marker.Marker;
 import BritefuryJ.LSpace.Marker.Marker.CannotFindLeafInSubtreeException;
 import BritefuryJ.LSpace.Marker.MarkerListener;
+import BritefuryJ.LSpace.StyleParams.ContentLeafEditableStyleParams;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Util.AnimUtils;
 
@@ -58,16 +59,19 @@ public class Caret extends Target implements MarkerListener
 			if ( element != null )
 			{
 				Paint prevPaint = graphics.getPaint();
+				
+				ContentLeafEditableStyleParams elementStyle = (ContentLeafEditableStyleParams)element.getStyleParams();
+				Color caretColour = elementStyle.getCaretColour();
 
 				if ( blinkingEnabled )
 				{
 					double time = System.nanoTime() * 1.0e-9;
 					float alpha = (float)AnimUtils.scurveSeesaw( time, BLINK_TIME );
-					graphics.setPaint( new Color( 0.0f, 0.0f, 1.0f, alpha ) );
+					graphics.setPaint( new Color( caretColour.getRed(), caretColour.getGreen(), caretColour.getBlue(), (int)( alpha * 255.5 ) ) );
 				}
 				else
 				{
-					graphics.setPaint( new Color( 0.0f, 0.0f, 1.0f ) );
+					graphics.setPaint( caretColour );
 				}
 				
 				element.drawCaret( graphics, this );

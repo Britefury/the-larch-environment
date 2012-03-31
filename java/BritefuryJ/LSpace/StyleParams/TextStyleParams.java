@@ -24,7 +24,8 @@ public class TextStyleParams extends ContentLeafEditableStyleParams
 	public static final Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
 
 	
-	public static final TextStyleParams defaultStyleParams = new TextStyleParams( HAlignment.PACK, VAlignment.REFY, null, null, null, true, true, defaultFont, Color.black, null, null, false, false, false );
+	public static final TextStyleParams defaultStyleParams = new TextStyleParams( HAlignment.PACK, VAlignment.REFY, null, null, null, new Color( 0.0f, 0.0f, 1.0f ), true, true,
+			defaultFont, Color.black, null, null, false, false, false );
 	
 	
 	
@@ -34,10 +35,10 @@ public class TextStyleParams extends ContentLeafEditableStyleParams
 
 
 	public TextStyleParams(HAlignment hAlign, VAlignment vAlign, Painter background, Painter hoverBackground, Cursor pointerCursor,
-			boolean bEditable, boolean bSelectable, Font font, Paint textPaint, Paint hoverTextPaint,
+			Color caretColour, boolean bEditable, boolean bSelectable, Font font, Paint textPaint, Paint hoverTextPaint,
 			Paint squiggleUnderlinePaint, boolean bUnderline, boolean bStrikethrough, boolean bMixedSizeCaps)
 	{
-		super( hAlign, vAlign, background, hoverBackground, pointerCursor, bEditable, bSelectable );
+		super( hAlign, vAlign, background, hoverBackground, pointerCursor, caretColour, bEditable, bSelectable );
 		
 		this.font = font;
 		this.textPaint = textPaint;

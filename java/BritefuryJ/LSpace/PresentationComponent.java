@@ -727,6 +727,14 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	//
 	//
 	
+	private Dimension clampSize(Dimension contentSize)
+	{
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		Dimension d = new Dimension();
+		d.setSize( Math.min( contentSize.getWidth(), screenSize.getWidth() ), Math.min( contentSize.getHeight(), screenSize.getHeight() ) );
+		return d;
+	}
+	
 	@Override
 	public Dimension getMinimumSize()
 	{
@@ -736,11 +744,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		}
 		else
 		{
-			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-			Dimension contentSize = rootElement.getMinimumSize();
-			Dimension d = new Dimension();
-			d.setSize( Math.min( contentSize.getWidth(), screenSize.getWidth() ), Math.min( contentSize.getHeight(), screenSize.getHeight() ) );
-			return d;
+			return clampSize( rootElement.getMinimumSize() );
 		}
 	}
 	
@@ -753,11 +757,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		}
 		else
 		{
-			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-			Dimension contentSize = rootElement.getPreferredSize();
-			Dimension d = new Dimension();
-			d.setSize( Math.min( contentSize.getWidth(), screenSize.getWidth() ), Math.min( contentSize.getHeight(), screenSize.getHeight() ) );
-			return d;
+			return clampSize( rootElement.getPreferredSize() );
 		}
 	}
 	
@@ -770,11 +770,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		}
 		else
 		{
-			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-			Dimension contentSize = rootElement.getMaximumSize();
-			Dimension d = new Dimension();
-			d.setSize( Math.min( contentSize.getWidth(), screenSize.getWidth() ), Math.min( contentSize.getHeight(), screenSize.getHeight() ) );
-			return d;
+			return clampSize( rootElement.getMaximumSize() );
 		}
 	}
 	
@@ -801,7 +797,21 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	
 	void notifyQueueReallocation()
 	{
-		if ( !isMinimumSizeSet()  ||  !isPreferredSizeSet()  ||  !isMaximumSizeSet()  ||  isPopup() )
+		if ( isPopup() )
+		{
+			Runnable r = new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					Dimension s = clampSize( rootElement.allocateAndGetPreferredSize() );
+					containingPopup.popupWindow.setSize( s );
+				}
+			};
+			
+			SwingUtilities.invokeLater( r );
+		}
+		else if ( !isMinimumSizeSet()  ||  !isPreferredSizeSet()  ||  !isMaximumSizeSet() )
 		{
 			invalidate();
 		}

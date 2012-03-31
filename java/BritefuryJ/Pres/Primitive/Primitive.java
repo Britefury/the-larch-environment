@@ -64,6 +64,7 @@ public class Primitive
 	public static final Attribute background = new Attribute( primitiveNamespace, "background", Painter.class, null );
 	public static final Attribute hoverBackground = new Attribute( primitiveNamespace, "hoverBackground", Painter.class, null );
 	public static final Attribute cursor = new Attribute( primitiveNamespace, "cursor", Cursor.class, null );
+	public static final InheritedAttributeNonNull caretColour = new InheritedAttributeNonNull( primitiveNamespace, "caretColour", Color.class, new Color( 0.0f, 0.0f, 1.0f ) );
 	public static final AttributeNonNull columnSpacing = new AttributeNonNull( primitiveNamespace, "columnSpacing", Double.class, 0.0 );
 	public static final AttributeNonNull rowSpacing = new AttributeNonNull( primitiveNamespace, "rowSpacing", Double.class, 0.0 );
 	public static final InheritedAttributeNonNull fractionVSpacing = new InheritedAttributeNonNull( primitiveNamespace, "fractionVSpacing", Double.class, 2.0 );
@@ -222,6 +223,7 @@ public class Primitive
 					attribs.get( background, Painter.class ),
 					attribs.get( hoverBackground, Painter.class ),
 					attribs.get( cursor, Cursor.class ),
+					attribs.get( caretColour, Color.class ),
 					attribs.get( editable, Boolean.class ),
 					attribs.get( selectable, Boolean.class ),
 					attribs.get( foreground, Paint.class ),
@@ -426,6 +428,7 @@ public class Primitive
 					attribs.get( background, Painter.class ),
 					attribs.get( hoverBackground, Painter.class ),
 					attribs.get( cursor, Cursor.class ),
+					attribs.get( caretColour, Color.class ),
 					false,
 					attribs.get( selectable, Boolean.class ),
 					font.get( attribs ),
@@ -487,6 +490,7 @@ public class Primitive
 					attribs.get( background, Painter.class ),
 					attribs.get( hoverBackground, Painter.class ),
 					attribs.get( cursor, Cursor.class ),
+					attribs.get( caretColour, Color.class ),
 					attribs.get( editable, Boolean.class ),
 					attribs.get( selectable, Boolean.class ),
 					font.get( attribs ),
