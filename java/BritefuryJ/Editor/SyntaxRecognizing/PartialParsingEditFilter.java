@@ -12,9 +12,9 @@ import BritefuryJ.LSpace.EditEvent;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Util.RichString.RichString;
 
-public abstract class PartialParsingEditListener extends ParsingEditListener
+public abstract class PartialParsingEditFilter extends ParsingEditFilter
 {
-	public PartialParsingEditListener(ParserExpression parser)
+	public PartialParsingEditFilter(ParserExpression parser)
 	{
 		super( parser );
 	}

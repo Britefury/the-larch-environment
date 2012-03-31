@@ -14,7 +14,7 @@ import BritefuryJ.Logging.Log;
 import BritefuryJ.Logging.LogEntry;
 import BritefuryJ.Util.RichString.RichString;
 
-public abstract class UnparsedEditListener extends SRRichStringEditListener
+public abstract class UnparsedEditFilter extends SRRichStringEditFilter
 {
 	protected String getLogName()
 	{
@@ -54,7 +54,7 @@ public abstract class UnparsedEditListener extends SRRichStringEditListener
 	
 
 	@Override
-	protected HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment,
+	protected HandleEditResult handleRichStringEdit(LSElement element, LSElement sourceElement, FragmentView fragment,
 			EditEvent event, Object model, RichString value)
 	{
 		String logName = getLogName();

@@ -15,12 +15,12 @@ import BritefuryJ.Parser.ParseResult;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Util.RichString.RichString;
 
-public abstract class ParsingEditListener extends SRRichStringEditListener
+public abstract class ParsingEditFilter extends SRRichStringEditFilter
 {
 	protected ParserExpression parser;
 	
 	
-	public ParsingEditListener(ParserExpression parser)
+	public ParsingEditFilter(ParserExpression parser)
 	{
 		this.parser = parser;
 	}
@@ -64,7 +64,7 @@ public abstract class ParsingEditListener extends SRRichStringEditListener
 	
 	
 	
-	protected HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
+	protected HandleEditResult handleRichStringEdit(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
 	{
 		String logName = getLogName();
 		if ( value.isEmpty()  ||  isValueEmpty( element, fragment, model, value ) )

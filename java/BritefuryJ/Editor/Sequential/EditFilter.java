@@ -12,7 +12,7 @@ import BritefuryJ.LSpace.EditEvent;
 import BritefuryJ.LSpace.TextEditEvent;
 import BritefuryJ.LSpace.TreeEventListener;
 
-public abstract class EditListener implements TreeEventListener
+public abstract class EditFilter implements TreeEventListener
 {
 	public enum HandleEditResult
 	{
@@ -37,7 +37,7 @@ public abstract class EditListener implements TreeEventListener
 	}
 	
 	
-	protected abstract HandleEditResult handleEditEvent(LSElement element, LSElement sourceElement, EditEvent event);
+	protected abstract HandleEditResult handleEdit(LSElement element, LSElement sourceElement, EditEvent event);
 	
 	
 	
@@ -49,7 +49,7 @@ public abstract class EditListener implements TreeEventListener
 			
 			if ( editEvent instanceof TextEditEvent  ||  isSelectionEditEvent( editEvent )  ||  isEditEvent( editEvent ) )
 			{
-				HandleEditResult res = handleEditEvent( element, sourceElement, editEvent );
+				HandleEditResult res = handleEdit( element, sourceElement, editEvent );
 				
 				if ( res == HandleEditResult.HANDLED )
 				{

@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Editor.Sequential;
 
-import BritefuryJ.Editor.Sequential.EditListener.HandleEditResult;
+import BritefuryJ.Editor.Sequential.EditFilter.HandleEditResult;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.EditEvent;
@@ -22,7 +22,7 @@ public abstract class SequentialEditor
 {
 	public static interface HandleEditEventFn
 	{
-		EditListener.HandleEditResult handleEditEvent(LSElement element, LSElement sourceElement, EditEvent event);
+		EditFilter.HandleEditResult handleEditEvent(LSElement element, LSElement sourceElement, EditEvent event);
 	}
 	
 	public static interface HandleRichStringFn
@@ -99,12 +99,12 @@ public abstract class SequentialEditor
 	
 	
 	
-	protected class _EditListener extends EditListener
+	protected class _FnEditFilter extends EditFilter
 	{
 		private HandleEditEventFn handleEditEventFn;
 		
 		
-		protected _EditListener(HandleEditEventFn handleEditEventFn)
+		protected _FnEditFilter(HandleEditEventFn handleEditEventFn)
 		{
 			this.handleEditEventFn = handleEditEventFn;
 		}
@@ -117,7 +117,7 @@ public abstract class SequentialEditor
 		}
 
 		@Override
-		protected HandleEditResult handleEditEvent(LSElement element, LSElement sourceElement, EditEvent event)
+		protected HandleEditResult handleEdit(LSElement element, LSElement sourceElement, EditEvent event)
 		{
 			return handleEditEventFn.handleEditEvent( element, sourceElement, event );
 		}
@@ -126,12 +126,12 @@ public abstract class SequentialEditor
 	
 	
 	
-	protected class _RichStringEditListener extends RichStringEditListener
+	protected class _FnRichStringEditFilter extends RichStringEditFilter
 	{
 		private HandleRichStringFn handleRichStringFn;
 		
 		
-		protected _RichStringEditListener(HandleRichStringFn handleRichStringFn)
+		protected _FnRichStringEditFilter(HandleRichStringFn handleRichStringFn)
 		{
 			this.handleRichStringFn = handleRichStringFn;
 		}
@@ -144,7 +144,7 @@ public abstract class SequentialEditor
 		}
 
 		@Override
-		protected HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
+		protected HandleEditResult handleRichStringEdit(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
 		{
 			return handleRichStringFn.handleValue( element, sourceElement, fragment, event, model, value );
 		}
@@ -204,14 +204,14 @@ public abstract class SequentialEditor
 	
 	
 	
-	public EditListener editListener(HandleEditEventFn handleEditEventFn)
+	public EditFilter editFilter(HandleEditEventFn handleEditEventFn)
 	{
-		return new _EditListener( handleEditEventFn );
+		return new _FnEditFilter( handleEditEventFn );
 	}
 	
-	public RichStringEditListener richStringEditListener(HandleRichStringFn handleRichStringFn)
+	public RichStringEditFilter richStringEditFilter(HandleRichStringFn handleRichStringFn)
 	{
-		return new _RichStringEditListener( handleRichStringFn );
+		return new _FnRichStringEditFilter( handleRichStringFn );
 	}
 	
 	

@@ -22,9 +22,9 @@ from BritefuryJ.LSpace.Interactor import KeyElementInteractor
 
 from BritefuryJ.Logging import LogEntry
 
-from BritefuryJ.Editor.Sequential import SequentialEditor, SelectionEditTreeEvent, EditListener
-from BritefuryJ.Editor.Sequential.RichStringEditListener import HandleEditResult
-from BritefuryJ.Editor.SyntaxRecognizing import ParsingEditListener, PartialParsingEditListener, UnparsedEditListener, TopLevelEditListener
+from BritefuryJ.Editor.Sequential import SequentialEditor, SelectionEditTreeEvent
+from BritefuryJ.Editor.Sequential.RichStringEditFilter import HandleEditResult
+from BritefuryJ.Editor.SyntaxRecognizing import ParsingEditFilter
 
 
 
@@ -44,7 +44,7 @@ from LarchCore.Languages.Python25.PythonEditor.SREditor import PythonSyntaxRecog
 #
 #
 
-class PythonExpressionEditListener (ParsingEditListener):
+class PythonExpressionEditFilter (ParsingEditFilter):
 	def getSyntaxRecognizingEditor(self):
 		return PythonSyntaxRecognizingEditor.instance
 
@@ -76,7 +76,7 @@ class PythonExpressionEditListener (ParsingEditListener):
 
 
 
-class PythonTargetEditListener (ParsingEditListener):
+class PythonTargetEditFilter (ParsingEditFilter):
 	def getSyntaxRecognizingEditor(self):
 		return PythonSyntaxRecognizingEditor.instance
 
@@ -103,28 +103,6 @@ class PythonTargetEditListener (ParsingEditListener):
 			return HandleEditResult.HANDLED
 		else:
 			return HandleEditResult.NOT_HANDLED
-
-
-
-class PythonExpressionNewLineEvent (object):
-	def __init__(self, model):
-		self.model = model
-
-
-class PythonExpressionTopLevelEditListener (TopLevelEditListener):
-	def getSyntaxRecognizingEditor(self):
-		return PythonSyntaxRecognizingEditor.instance
-	
-	def handleTopLevelEditEvent(self, element, sourceElement, event):
-		if isinstance( event, TextEditEvent ):
-			fragment = element.getFragmentContext()
-			model = fragment.getModel()
-			if isinstance( event, TextEditEventInsert )   and   '\n' in event.getTextInserted():
-				element.postTreeEvent( PythonExpressionNewLineEvent( model ) )
-
-
-class PythonTargetTopLevelEditListener (PythonExpressionTopLevelEditListener):
-	pass
 
 
 
