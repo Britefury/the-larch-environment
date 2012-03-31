@@ -44,11 +44,11 @@ from BritefuryJ.Projection import Perspective, Subject
 from BritefuryJ.IncrementalView import FragmentView, FragmentData
 
 from BritefuryJ.Editor.Sequential import SequentialEditorPerspective
-from BritefuryJ.Editor.Sequential.EditListener import HandleEditResult
+from BritefuryJ.Editor.Sequential.EditFilter import HandleEditResult
 from BritefuryJ.Editor.Sequential.Item import *
 from BritefuryJ.Editor.SyntaxRecognizing.Precedence import PrecedenceHandler
-from BritefuryJ.Editor.SyntaxRecognizing import SREInnerFragment, ParsingEditListener
-from BritefuryJ.Editor.SyntaxRecognizing.SRFragmentEditor import EditMode
+from BritefuryJ.Editor.SyntaxRecognizing import SREInnerFragment, ParsingEditFilter
+from BritefuryJ.Editor.SyntaxRecognizing.SyntaxRecognizingEditor import EditMode
 
 from BritefuryJ.ModelAccess.DocModel import *
 
@@ -89,7 +89,7 @@ def _commitInnerUnparsed(model, value):
 #
 #
 
-class VREExpressionEditListener (ParsingEditListener):
+class VREExpressionEditFilter (ParsingEditFilter):
 	def getSyntaxRecognizingEditor(self):
 		return VisualRegexSyntaxRecognizingEditor.instance
 
@@ -129,14 +129,14 @@ def _setUnwrappedMethod(method, m):
 def Unparsed(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
-		return self._unparsedFragmentEditor.editFragment( v, model, inheritedState )
+		return self._unparsedEditRule.applyToFragment( v, model, inheritedState )
 	return _setUnwrappedMethod( method, _m )
 
 
 def Expression(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
-		return self._expressionFragmentEditor.editFragment( v, model, inheritedState )
+		return self._expressionEditRule.applyToFragment( v, model, inheritedState )
 	return _setUnwrappedMethod( method, _m )
 
 
@@ -313,15 +313,15 @@ class VREView (MethodDispatchView):
 
 		editor = VisualRegexSyntaxRecognizingEditor.instance
 
-		self._expr = editor.parsingNodeEditListener( 'Expression', grammar.regex(), vreReplaceNode )
-		self._exprOuter = VREExpressionEditListener( grammar.regex() )
-		self._topLevel = editor.topLevelNodeEditListener()
+		self._expr = editor.parsingEditFilter( 'Expression', grammar.regex(), vreReplaceNode )
+		self._exprOuter = VREExpressionEditFilter( grammar.regex() )
+		self._topLevel = editor.topLevelEditFilter()
 
-		self._exprUnparsed = editor.unparsedNodeEditListener( 'Unparsed expression', _isValidUnparsedValue, _commitUnparsed, _commitInnerUnparsed )
+		self._exprUnparsed = editor.unparsedEditFilter( 'Unparsed expression', _isValidUnparsedValue, _commitUnparsed, _commitInnerUnparsed )
 
 
-		self._expressionFragmentEditor = editor.fragmentEditor( False, [ self._expr, self._exprUnparsed ] )
-		self._unparsedFragmentEditor = editor.fragmentEditor( False, [ self._expr ] )
+		self._expressionEditRule = editor.editRule( [ self._expr, self._exprUnparsed ] )
+		self._unparsedEditRule = editor.editRule( [ self._expr ] )
 
 
 

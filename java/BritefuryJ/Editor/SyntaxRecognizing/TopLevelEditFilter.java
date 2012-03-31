@@ -11,7 +11,7 @@ import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.EditEvent;
 import BritefuryJ.LSpace.TextEditEvent;
 
-public abstract class TopLevelEditListener extends SREditListener
+public abstract class TopLevelEditFilter extends SREditFilter
 {
 	protected boolean canCatchEditEvent(EditEvent event)
 	{
@@ -19,15 +19,15 @@ public abstract class TopLevelEditListener extends SREditListener
 	}
 	
 	
-	protected void handleTopLevelEditEvent(LSElement element, LSElement sourceElement, EditEvent event)
+	protected void handleTopLevelEdit(LSElement element, LSElement sourceElement, EditEvent event)
 	{
 	}
 	
 	
 	@Override
-	protected HandleEditResult handleEditEvent(LSElement element, LSElement sourceElement, EditEvent event)
+	protected HandleEditResult handleEdit(LSElement element, LSElement sourceElement, EditEvent event)
 	{
-		handleTopLevelEditEvent( element, sourceElement, event );
+		handleTopLevelEdit( element, sourceElement, event );
 		if ( event instanceof TextEditEvent  ||  event instanceof SelectionEditTreeEvent  ||  canCatchEditEvent( event ) )
 		{
 			return HandleEditResult.HANDLED;

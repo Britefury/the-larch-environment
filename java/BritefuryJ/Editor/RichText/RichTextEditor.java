@@ -12,11 +12,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import BritefuryJ.Editor.Sequential.EditListener;
-import BritefuryJ.Editor.Sequential.EditListener.HandleEditResult;
+import BritefuryJ.Editor.Sequential.EditFilter;
+import BritefuryJ.Editor.Sequential.EditFilter.HandleEditResult;
 import BritefuryJ.Editor.Sequential.SelectionEditTreeEvent;
 import BritefuryJ.Editor.Sequential.SequentialEditor;
-import BritefuryJ.Editor.Sequential.RichStringEditListener;
+import BritefuryJ.Editor.Sequential.RichStringEditFilter;
 import BritefuryJ.Editor.Sequential.Item.EditableStructuralItem;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.LSpace.LSContentLeafEditable;
@@ -225,7 +225,7 @@ public abstract class RichTextEditor extends SequentialEditor
 	
 	
 	
-	private RichStringEditListener inlineEmbedEditListener, textEditListener, paraEditListener, paraListItemEditListener, blockEditListener;
+	private RichStringEditFilter inlineEmbedEditListener, textEditListener, paraEditListener, paraListItemEditListener, blockEditListener;
 	
 	
 	public RichTextEditor()
@@ -233,7 +233,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		HandleRichStringFn onInlineEmbedEdit = new HandleRichStringFn()
 		{
 			@Override
-			public EditListener.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
+			public EditFilter.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
 			{
 				if ( event instanceof RichTextEditEvents.RichTextRequest )
 				{
@@ -248,7 +248,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		HandleRichStringFn onTextEdit = new HandleRichStringFn()
 		{
 			@Override
-			public EditListener.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
+			public EditFilter.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
 			{
 				if ( event instanceof TextEditEvent )
 				{
@@ -257,7 +257,7 @@ public abstract class RichTextEditor extends SequentialEditor
 					{
 						handled = setTextContentsFromRichString( fragment.getView().getLog(), model, value );
 					}
-					return handled  ?  EditListener.HandleEditResult.HANDLED  :  EditListener.HandleEditResult.PASS_TO_PARENT;
+					return handled  ?  EditFilter.HandleEditResult.HANDLED  :  EditFilter.HandleEditResult.PASS_TO_PARENT;
 				}
 				else if ( event instanceof RichTextEditEvents.RichTextRequest )
 				{
@@ -272,7 +272,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		HandleRichStringFn onParagraphEdit = new HandleRichStringFn()
 		{
 			@Override
-			public EditListener.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
+			public EditFilter.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
 			{
 				if ( event instanceof TextEditEvent )
 				{
@@ -281,12 +281,12 @@ public abstract class RichTextEditor extends SequentialEditor
 					{
 						handled = setParagraphTextContentsFromRichString( fragment.getView().getLog(), model, value );
 					}
-					return handled  ?  EditListener.HandleEditResult.HANDLED  :  EditListener.HandleEditResult.PASS_TO_PARENT;
+					return handled  ?  EditFilter.HandleEditResult.HANDLED  :  EditFilter.HandleEditResult.PASS_TO_PARENT;
 				}
 				else if ( event instanceof SelectionEditTreeEvent )
 				{
 					boolean handled = setParagraphContentsFromBlockRichString( fragment.getView().getLog(), model, value );
-					return handled  ?  EditListener.HandleEditResult.HANDLED  :  EditListener.HandleEditResult.PASS_TO_PARENT;
+					return handled  ?  EditFilter.HandleEditResult.HANDLED  :  EditFilter.HandleEditResult.PASS_TO_PARENT;
 				}
 				else if ( event instanceof RichTextEditEvents.RichTextRequest )
 				{
@@ -301,7 +301,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		HandleRichStringFn onParagraphListItemEdit = new HandleRichStringFn()
 		{
 			@Override
-			public EditListener.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
+			public EditFilter.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
 			{
 				if ( event instanceof RichTextEditEvents.RichTextRequest )
 				{
@@ -331,17 +331,17 @@ public abstract class RichTextEditor extends SequentialEditor
 		HandleRichStringFn onBlockEdit = new HandleRichStringFn()
 		{
 			@Override
-			public EditListener.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
+			public EditFilter.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
 			{
 				if ( event instanceof TextEditEvent )
 				{
 					setBlockContentsFromRawRichString( fragment.getView().getLog(), model, value );
-					return EditListener.HandleEditResult.HANDLED;
+					return EditFilter.HandleEditResult.HANDLED;
 				}
 				else if ( event instanceof SelectionEditTreeEvent )
 				{
 					setModelContentsFromEditorModelRichString( model, value );
-					return EditListener.HandleEditResult.HANDLED;
+					return EditFilter.HandleEditResult.HANDLED;
 				}
 				else if ( event instanceof RichTextEditEvents.RichTextRequest )
 				{
@@ -353,11 +353,11 @@ public abstract class RichTextEditor extends SequentialEditor
 		};
 
 	
-		inlineEmbedEditListener = richStringEditListener( onInlineEmbedEdit );
-		textEditListener = richStringEditListener( onTextEdit );
-		paraEditListener = richStringEditListener( onParagraphEdit );
-		paraListItemEditListener = richStringEditListener( onParagraphListItemEdit );
-		blockEditListener = richStringEditListener( onBlockEdit );
+		inlineEmbedEditListener = richStringEditFilter( onInlineEmbedEdit );
+		textEditListener = richStringEditFilter( onTextEdit );
+		paraEditListener = richStringEditFilter( onParagraphEdit );
+		paraListItemEditListener = richStringEditFilter( onParagraphListItemEdit );
+		blockEditListener = richStringEditFilter( onBlockEdit );
 	}
 	
 	

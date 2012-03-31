@@ -6,10 +6,10 @@
 //##************************
 package BritefuryJ.Editor.SyntaxRecognizing;
 
+import BritefuryJ.Editor.Sequential.EditFilter;
 import BritefuryJ.Editor.Sequential.SequentialEditor;
-import BritefuryJ.Editor.Sequential.RichStringEditListener;
 
-public abstract class SRRichStringEditListener extends RichStringEditListener
+public abstract class SREditFilter extends EditFilter
 {
 	protected abstract SyntaxRecognizingEditor getSyntaxRecognizingEditor();
 	

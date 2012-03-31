@@ -14,29 +14,35 @@ import java.util.regex.Pattern;
 import BritefuryJ.Editor.Sequential.SequentialRichStringEditor;
 import BritefuryJ.Editor.SyntaxRecognizing.Precedence.PrecedenceHandler;
 import BritefuryJ.IncrementalView.FragmentView;
-import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.EditEvent;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.TreeEventListener;
-import BritefuryJ.LSpace.Interactor.AbstractElementInteractor;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Util.HashUtils;
 import BritefuryJ.Util.RichString.RichString;
 
 public abstract class SyntaxRecognizingEditor extends SequentialRichStringEditor
 {
+	public static enum EditMode
+	{
+		DISPLAY,
+		EDIT
+	}
+	
+
 	public static interface CommitFn
 	{
 		void commit(Object model, Object newValue);
 	}
 	
 	
-	private class ParsingNodeEditListener extends ParsingEditListener
+	private class ParsingNodeEditFilter extends ParsingEditFilter
 	{
 		private CommitFn commit, emptyCommit;
 		private String logName;
 		
 		
-		public ParsingNodeEditListener(ParserExpression parser, CommitFn commit, CommitFn emptyCommit, String logName)
+		public ParsingNodeEditFilter(ParserExpression parser, CommitFn commit, CommitFn emptyCommit, String logName)
 		{
 			super( parser );
 			
@@ -91,9 +97,9 @@ public abstract class SyntaxRecognizingEditor extends SequentialRichStringEditor
 
 		public boolean equals(Object x)
 		{
-			if ( x instanceof ParsingNodeEditListener )
+			if ( x instanceof ParsingNodeEditFilter )
 			{
-				ParsingNodeEditListener px = (ParsingNodeEditListener)x;
+				ParsingNodeEditFilter px = (ParsingNodeEditFilter)x;
 				
 				return parser.equals( px.parser )  &&  commit.equals( px.commit )  && logName.equals( px.logName );  
 			}
@@ -111,12 +117,12 @@ public abstract class SyntaxRecognizingEditor extends SequentialRichStringEditor
 	
 	
 	
-	private class PartialParsingNodeEditListener extends PartialParsingEditListener
+	private class PartialParsingNodeEditFilter extends PartialParsingEditFilter
 	{
 		private String logName;
 		
 		
-		public PartialParsingNodeEditListener(ParserExpression parser, String logName)
+		public PartialParsingNodeEditFilter(ParserExpression parser, String logName)
 		{
 			super( parser );
 			
@@ -150,14 +156,14 @@ public abstract class SyntaxRecognizingEditor extends SequentialRichStringEditor
 	}
 	
 	
-	private class UnparsedNodeEditListener extends UnparsedEditListener
+	private class UnparsedNodeEditFilter extends UnparsedEditFilter
 	{
 		private String logName;
 		private UnparseableContentTest test;
 		private UnparseableCommitFn commit, innerCommit;
 		
 		
-		public UnparsedNodeEditListener(UnparseableContentTest test, UnparseableCommitFn commit, UnparseableCommitFn innerCommit, String logName)
+		public UnparsedNodeEditFilter(UnparseableContentTest test, UnparseableCommitFn commit, UnparseableCommitFn innerCommit, String logName)
 		{
 			this.test = test;
 			this.commit = commit;
@@ -216,9 +222,9 @@ public abstract class SyntaxRecognizingEditor extends SequentialRichStringEditor
 	
 	
 	
-	private class TopLevelNodeEditListener extends TopLevelEditListener
+	private class TopLevelNodeEditFilter extends TopLevelEditFilter
 	{
-		public TopLevelNodeEditListener()
+		public TopLevelNodeEditFilter()
 		{
 		}
 		
@@ -235,13 +241,13 @@ public abstract class SyntaxRecognizingEditor extends SequentialRichStringEditor
 	
 	private static Pattern whitespace = Pattern.compile( "[ ]+" );
 	
-	private WeakHashMap<ParsingNodeEditListener, WeakReference<ParsingNodeEditListener>> parsingCache =
-		new WeakHashMap<ParsingNodeEditListener, WeakReference<ParsingNodeEditListener>>();
-	private WeakHashMap<PartialParsingNodeEditListener, WeakReference<PartialParsingNodeEditListener>> partialParsingCache =
-		new WeakHashMap<PartialParsingNodeEditListener, WeakReference<PartialParsingNodeEditListener>>();
-	private WeakHashMap<UnparsedNodeEditListener, WeakReference<UnparsedNodeEditListener>> unparsedCache =
-		new WeakHashMap<UnparsedNodeEditListener, WeakReference<UnparsedNodeEditListener>>();
-	private TopLevelNodeEditListener cachedTopLevel = new TopLevelNodeEditListener();
+	private WeakHashMap<ParsingNodeEditFilter, WeakReference<ParsingNodeEditFilter>> parsingCache =
+		new WeakHashMap<ParsingNodeEditFilter, WeakReference<ParsingNodeEditFilter>>();
+	private WeakHashMap<PartialParsingNodeEditFilter, WeakReference<PartialParsingNodeEditFilter>> partialParsingCache =
+		new WeakHashMap<PartialParsingNodeEditFilter, WeakReference<PartialParsingNodeEditFilter>>();
+	private WeakHashMap<UnparsedNodeEditFilter, WeakReference<UnparsedNodeEditFilter>> unparsedCache =
+		new WeakHashMap<UnparsedNodeEditFilter, WeakReference<UnparsedNodeEditFilter>>();
+	private TopLevelNodeEditFilter cachedTopLevel = new TopLevelNodeEditFilter();
 	
 	
 	public SyntaxRecognizingEditor()
@@ -251,13 +257,13 @@ public abstract class SyntaxRecognizingEditor extends SequentialRichStringEditor
 	
 	
 	
-	public ParsingEditListener parsingNodeEditListener(String logName, ParserExpression parser, CommitFn commit, CommitFn emptyCommit)
+	public ParsingEditFilter parsingEditFilter(String logName, ParserExpression parser, CommitFn commit, CommitFn emptyCommit)
 	{
-		ParsingNodeEditListener listener = new ParsingNodeEditListener( parser, commit, emptyCommit, logName );
-		WeakReference<ParsingNodeEditListener> x = parsingCache.get( listener );
+		ParsingNodeEditFilter listener = new ParsingNodeEditFilter( parser, commit, emptyCommit, logName );
+		WeakReference<ParsingNodeEditFilter> x = parsingCache.get( listener );
 		if ( x == null  ||  x.get() == null )
 		{
-			parsingCache.put( listener, new WeakReference<ParsingNodeEditListener>( listener ) );
+			parsingCache.put( listener, new WeakReference<ParsingNodeEditFilter>( listener ) );
 			return listener;
 		}
 		else
@@ -266,42 +272,20 @@ public abstract class SyntaxRecognizingEditor extends SequentialRichStringEditor
 		}
 	}
 	
-	public ParsingEditListener parsingNodeEditListener(String logName, ParserExpression parser, CommitFn commit)
+	public ParsingEditFilter parsingEditFilter(String logName, ParserExpression parser, CommitFn commit)
 	{
-		return parsingNodeEditListener( logName, parser, commit, null );
+		return parsingEditFilter( logName, parser, commit, null );
 	}
 	
 	
 	
-	public PartialParsingEditListener partialParsingNodeEditListener(String logName, ParserExpression parser)
+	public PartialParsingEditFilter partialParsingEditFilter(String logName, ParserExpression parser)
 	{
-		PartialParsingNodeEditListener listener = new PartialParsingNodeEditListener( parser, logName );
-		WeakReference<PartialParsingNodeEditListener> x = partialParsingCache.get( listener );
+		PartialParsingNodeEditFilter listener = new PartialParsingNodeEditFilter( parser, logName );
+		WeakReference<PartialParsingNodeEditFilter> x = partialParsingCache.get( listener );
 		if ( x == null  ||  x.get() == null )
 		{
-			partialParsingCache.put( listener, new WeakReference<PartialParsingNodeEditListener>( listener ) );
-			return listener;
-		}
-		else
-		{
-			return x.get();
-		}
-	}
-	
-	
-	
-	public UnparsedEditListener unparsedNodeEditListener(String logName, UnparseableContentTest test, UnparseableCommitFn commit)
-	{
-		return unparsedNodeEditListener( logName, test, commit, null );
-	}
-	
-	public UnparsedEditListener unparsedNodeEditListener(String logName, UnparseableContentTest test, UnparseableCommitFn commit, UnparseableCommitFn innerCommit)
-	{
-		UnparsedNodeEditListener listener = new UnparsedNodeEditListener( test, commit, innerCommit, logName );
-		WeakReference<UnparsedNodeEditListener> x = unparsedCache.get( listener );
-		if ( x == null  ||  x.get() == null )
-		{
-			unparsedCache.put( listener, new WeakReference<UnparsedNodeEditListener>( listener ) );
+			partialParsingCache.put( listener, new WeakReference<PartialParsingNodeEditFilter>( listener ) );
 			return listener;
 		}
 		else
@@ -312,30 +296,54 @@ public abstract class SyntaxRecognizingEditor extends SequentialRichStringEditor
 	
 	
 	
-	public SRFragmentEditor fragmentEditor(boolean bStructural, PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners, List<AbstractElementInteractor> elementInteractors)
+	public UnparsedEditFilter unparsedEditFilter(String logName, UnparseableContentTest test, UnparseableCommitFn commit)
 	{
-		return new SRFragmentEditor( this, bStructural, precedenceHandler, editListeners, elementInteractors );
+		return unparsedEditFilter( logName, test, commit, null );
 	}
 	
-	public SRFragmentEditor fragmentEditor(boolean bStructural, List<TreeEventListener> editListeners, List<AbstractElementInteractor> elementInteractors)
+	public UnparsedEditFilter unparsedEditFilter(String logName, UnparseableContentTest test, UnparseableCommitFn commit, UnparseableCommitFn innerCommit)
 	{
-		return new SRFragmentEditor( this, bStructural, editListeners, elementInteractors );
+		UnparsedNodeEditFilter listener = new UnparsedNodeEditFilter( test, commit, innerCommit, logName );
+		WeakReference<UnparsedNodeEditFilter> x = unparsedCache.get( listener );
+		if ( x == null  ||  x.get() == null )
+		{
+			unparsedCache.put( listener, new WeakReference<UnparsedNodeEditFilter>( listener ) );
+			return listener;
+		}
+		else
+		{
+			return x.get();
+		}
 	}
 	
-	public SRFragmentEditor fragmentEditor(boolean bStructural, PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners)
-	{
-		return new SRFragmentEditor( this, bStructural, precedenceHandler, editListeners );
-	}
 	
-	public SRFragmentEditor fragmentEditor(boolean bStructural, List<TreeEventListener> editListeners)
-	{
-		return new SRFragmentEditor( this, bStructural, editListeners );
-	}
-	
-	
-	public TopLevelNodeEditListener topLevelNodeEditListener()
+	public TopLevelNodeEditFilter topLevelEditFilter()
 	{
 		return cachedTopLevel;
+	}
+	
+	
+	
+	public SREditRule editRule(PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners)
+	{
+		return new SREditRule( this, precedenceHandler, editListeners );
+	}
+	
+	public SREditRule editRule( List<TreeEventListener> editListeners)
+	{
+		return new SREditRule( this, editListeners );
+	}
+	
+	
+	
+	public SRStructuralEditRule structuralEditRule(PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners)
+	{
+		return new SRStructuralEditRule( this, precedenceHandler, editListeners );
+	}
+	
+	public SRStructuralEditRule structuralEditRule(List<TreeEventListener> editListeners)
+	{
+		return new SRStructuralEditRule( this, editListeners );
 	}
 	
 	

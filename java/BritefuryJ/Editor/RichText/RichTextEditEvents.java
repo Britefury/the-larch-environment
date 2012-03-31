@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Editor.RichText;
 
-import BritefuryJ.Editor.Sequential.EditListener;
+import BritefuryJ.Editor.Sequential.EditFilter;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.EditEvent;
@@ -19,34 +19,34 @@ class RichTextEditEvents
 {
 	protected static abstract class RichTextRequest extends EditEvent
 	{
-		protected EditListener.HandleEditResult invokeOnInlineEmbed(RichTextEditor editor, LSElement element,
+		protected EditFilter.HandleEditResult invokeOnInlineEmbed(RichTextEditor editor, LSElement element,
 				LSElement sourceElement, FragmentView fragment, Object embed, RichString value)
 		{
-			return EditListener.HandleEditResult.NOT_HANDLED;
+			return EditFilter.HandleEditResult.NOT_HANDLED;
 		}
 
-		protected EditListener.HandleEditResult invokeOnTextSpan(RichTextEditor editor, LSElement element,
+		protected EditFilter.HandleEditResult invokeOnTextSpan(RichTextEditor editor, LSElement element,
 				LSElement sourceElement, FragmentView fragment, Object textSpan, RichString value)
 		{
-			return EditListener.HandleEditResult.NOT_HANDLED;
+			return EditFilter.HandleEditResult.NOT_HANDLED;
 		}
 
-		protected EditListener.HandleEditResult invokeOnParagraph(RichTextEditor editor, LSElement element,
+		protected EditFilter.HandleEditResult invokeOnParagraph(RichTextEditor editor, LSElement element,
 				LSElement sourceElement, FragmentView fragment, Object paragraph, RichString value)
 		{
-			return EditListener.HandleEditResult.NOT_HANDLED;
+			return EditFilter.HandleEditResult.NOT_HANDLED;
 		}
 
-		protected EditListener.HandleEditResult invokeOnParagraphListItem(RichTextEditor editor, LSElement element,
+		protected EditFilter.HandleEditResult invokeOnParagraphListItem(RichTextEditor editor, LSElement element,
 				LSElement sourceElement, FragmentView fragment, Object paragraph, RichString value)
 		{
-			return EditListener.HandleEditResult.NOT_HANDLED;
+			return EditFilter.HandleEditResult.NOT_HANDLED;
 		}
 
-		protected EditListener.HandleEditResult invokeOnBlock(RichTextEditor editor, LSElement element,
+		protected EditFilter.HandleEditResult invokeOnBlock(RichTextEditor editor, LSElement element,
 				LSElement sourceElement, FragmentView fragment, Object block, RichString value)
 		{
-			return EditListener.HandleEditResult.NOT_HANDLED;
+			return EditFilter.HandleEditResult.NOT_HANDLED;
 		}
 	}
 	
@@ -62,7 +62,7 @@ class RichTextEditEvents
 		}
 
 		@Override
-		protected EditListener.HandleEditResult invokeOnParagraph(RichTextEditor editor, LSElement element,
+		protected EditFilter.HandleEditResult invokeOnParagraph(RichTextEditor editor, LSElement element,
 				LSElement sourceElement, FragmentView fragment, Object paragraph, RichString value)
 		{
 			Selection selection = element.getRootElement().getSelection();
@@ -70,13 +70,13 @@ class RichTextEditEvents
 			{
 				RichString richStr = editor.richStringWithModifiedSelectionStyle( element, (TextSelection)selection, computeStylesFn );
 				editor.setParagraphContentsFromBlockRichString( fragment.getView().getLog(), paragraph, richStr );
-				return EditListener.HandleEditResult.HANDLED;
+				return EditFilter.HandleEditResult.HANDLED;
 			}
-			return EditListener.HandleEditResult.NOT_HANDLED;
+			return EditFilter.HandleEditResult.NOT_HANDLED;
 		}
 
 		@Override
-		protected EditListener.HandleEditResult invokeOnBlock(RichTextEditor editor, LSElement element,
+		protected EditFilter.HandleEditResult invokeOnBlock(RichTextEditor editor, LSElement element,
 				LSElement sourceElement, FragmentView fragment, Object block, RichString value)
 		{
 			Selection selection = element.getRootElement().getSelection();
@@ -85,7 +85,7 @@ class RichTextEditEvents
 				RichString richStr = editor.richStringWithModifiedSelectionStyle( element, (TextSelection)selection, computeStylesFn );
 				editor.setModelContentsFromEditorModelRichString( block, richStr );
 			}
-			return EditListener.HandleEditResult.HANDLED;
+			return EditFilter.HandleEditResult.HANDLED;
 		}
 	}
 	
@@ -101,11 +101,11 @@ class RichTextEditEvents
 		}
 
 		@Override
-		protected EditListener.HandleEditResult invokeOnParagraph(RichTextEditor editor, LSElement element,
+		protected EditFilter.HandleEditResult invokeOnParagraph(RichTextEditor editor, LSElement element,
 				LSElement sourceElement, FragmentView fragment, Object paragraph, RichString value)
 		{
 			modifyParagraphFn.invoke( paragraph );
-			return EditListener.HandleEditResult.HANDLED;
+			return EditFilter.HandleEditResult.HANDLED;
 		}
 	}
 
@@ -122,15 +122,15 @@ class RichTextEditEvents
 		}
 
 		@Override
-		protected EditListener.HandleEditResult invokeOnParagraphListItem(RichTextEditor editor, LSElement element,
+		protected EditFilter.HandleEditResult invokeOnParagraphListItem(RichTextEditor editor, LSElement element,
 				LSElement sourceElement, FragmentView fragment, Object paragraph, RichString value)
 		{
 			paragraphBefore = paragraph;
-			return EditListener.HandleEditResult.PASS_TO_PARENT;
+			return EditFilter.HandleEditResult.PASS_TO_PARENT;
 		}
 	
 		@Override
-		protected EditListener.HandleEditResult invokeOnBlock(RichTextEditor editor, LSElement element,
+		protected EditFilter.HandleEditResult invokeOnBlock(RichTextEditor editor, LSElement element,
 				LSElement sourceElement, FragmentView fragment, Object block, RichString value)
 		{
 			if ( paragraphBefore != null )
@@ -138,7 +138,7 @@ class RichTextEditEvents
 				Object para = makeParagraphFn.invoke();
 				editor.insertParagraphIntoBlockAfter( block, para, paragraphBefore );
 			}
-			return EditListener.HandleEditResult.HANDLED;
+			return EditFilter.HandleEditResult.HANDLED;
 		}
 	}
 
@@ -153,22 +153,22 @@ class RichTextEditEvents
 		}
 
 		@Override
-		protected EditListener.HandleEditResult invokeOnParagraphListItem(RichTextEditor editor, LSElement element,
+		protected EditFilter.HandleEditResult invokeOnParagraphListItem(RichTextEditor editor, LSElement element,
 				LSElement sourceElement, FragmentView fragment, Object paragraph, RichString value)
 		{
 			this.paragraph = paragraph;
-			return EditListener.HandleEditResult.PASS_TO_PARENT;
+			return EditFilter.HandleEditResult.PASS_TO_PARENT;
 		}
 	
 		@Override
-		protected EditListener.HandleEditResult invokeOnBlock(RichTextEditor editor, LSElement element,
+		protected EditFilter.HandleEditResult invokeOnBlock(RichTextEditor editor, LSElement element,
 				LSElement sourceElement, FragmentView fragment, Object block, RichString value)
 		{
 			if ( paragraph != null )
 			{
 				editor.deleteParagraphFromBlock( block, paragraph );
 			}
-			return EditListener.HandleEditResult.HANDLED;
+			return EditFilter.HandleEditResult.HANDLED;
 		}
 	}
 
@@ -186,13 +186,13 @@ class RichTextEditEvents
 		}
 
 		@Override
-		protected EditListener.HandleEditResult invokeOnParagraph(RichTextEditor editor, LSElement element,
+		protected EditFilter.HandleEditResult invokeOnParagraph(RichTextEditor editor, LSElement element,
 				LSElement sourceElement, FragmentView fragment, Object paragraph, RichString value)
 		{
 			Object embedValue = makeInlineEmbedFn.invoke();
 			EdInlineEmbed embed = new EdInlineEmbed( embedValue );
 			editor.insertInlineEmbed( fragment.getView().getLog(), element, paragraph, marker, embed );
-			return EditListener.HandleEditResult.HANDLED;
+			return EditFilter.HandleEditResult.HANDLED;
 		}
 	}
 
@@ -207,27 +207,27 @@ class RichTextEditEvents
 		}
 
 		@Override
-		protected EditListener.HandleEditResult invokeOnInlineEmbed(RichTextEditor editor, LSElement element,
+		protected EditFilter.HandleEditResult invokeOnInlineEmbed(RichTextEditor editor, LSElement element,
 				LSElement sourceElement, FragmentView fragment, Object embed, RichString value)
 		{
 			this.embed = embed;
-			return EditListener.HandleEditResult.PASS_TO_PARENT;
+			return EditFilter.HandleEditResult.PASS_TO_PARENT;
 		}
 	
 		@Override
-		protected EditListener.HandleEditResult invokeOnTextSpan(RichTextEditor editor, LSElement element,
+		protected EditFilter.HandleEditResult invokeOnTextSpan(RichTextEditor editor, LSElement element,
 				LSElement sourceElement, FragmentView fragment, Object textSpan, RichString value)
 		{
 			editor.removeInlineEmbed( textSpan, embed );
-			return EditListener.HandleEditResult.HANDLED;
+			return EditFilter.HandleEditResult.HANDLED;
 		}
 		
 		@Override
-		protected EditListener.HandleEditResult invokeOnParagraph(RichTextEditor editor, LSElement element,
+		protected EditFilter.HandleEditResult invokeOnParagraph(RichTextEditor editor, LSElement element,
 				LSElement sourceElement, FragmentView fragment, Object paragraph, RichString value)
 		{
 			editor.removeInlineEmbed( paragraph	, embed );
-			return EditListener.HandleEditResult.HANDLED;
+			return EditFilter.HandleEditResult.HANDLED;
 		}
 	}
 }

@@ -38,7 +38,7 @@ from BritefuryJ.Editor.Sequential import SequentialEditorPerspective
 from BritefuryJ.Editor.Sequential.Item import *
 from BritefuryJ.Editor.SyntaxRecognizing.Precedence import PrecedenceHandler
 from BritefuryJ.Editor.SyntaxRecognizing import SREInnerFragment
-from BritefuryJ.Editor.SyntaxRecognizing.SRFragmentEditor import EditMode
+from BritefuryJ.Editor.SyntaxRecognizing.SyntaxRecognizingEditor import EditMode
 
 from BritefuryJ.ModelAccess.DocModel import *
 
@@ -131,7 +131,7 @@ def compoundStatementEditor(pythonView, inheritedState, model, compoundBlocks):
 			dedent = StructuralItem( Schema.Dedent(), dedentElement() )
 
 			suiteElement = indentedBlock( indent, lineViews, dedent )
-			suiteElement = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, pythonView._makeCompoundSuiteEditListener( suite ), Schema.IndentedBlock( suite=suite ), suiteElement )
+			suiteElement = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, pythonView._makeCompoundSuiteEditFilter( suite ), Schema.IndentedBlock( suite=suite ), suiteElement )
 
 			statementContents.extend( [ headerStatementLine.alignHExpand(), suiteElement.alignHExpand() ] )
 		else:
@@ -328,7 +328,7 @@ def _setUnwrappedMethod(method, m):
 def Unparsed(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
-		return self._unparsedFragmentEditor.editFragment( v, model, inheritedState )
+		return self._unparsedEditRule.applyToFragment( v, model, inheritedState )
 	return _setUnwrappedMethod( method, _m )
 		
 
@@ -336,7 +336,9 @@ def Unparsed(method):
 def UnparsedStatement(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
-		return self._unparsedStatementFragmentEditor.editFragment( statementLine( v ), model, inheritedState )
+		v = self._unparsedStatementEditRule.applyToFragment( statementLine( v ), model, inheritedState )
+		v = v.withElementInteractor( _statementIndentationInteractor )
+		return v
 	return _setUnwrappedMethod( method, _m )
 		
 
@@ -344,7 +346,7 @@ def UnparsedStatement(method):
 def Expression(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
-		return self._expressionFragmentEditor.editFragment( v, model, inheritedState )
+		return self._expressionEditRule.applyToFragment( v, model, inheritedState )
 	return _setUnwrappedMethod( method, _m )
 
 
@@ -352,7 +354,9 @@ def Expression(method):
 def Statement(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
-		return self._statementFragmentEditor.editFragment( statementLine( v ), model, inheritedState )
+		v = self._statementEditRule.applyToFragment( statementLine( v ), model, inheritedState )
+		v = v.withElementInteractor( _statementIndentationInteractor )
+		return v
 	return _setUnwrappedMethod( method, _m )
 
 
@@ -361,12 +365,15 @@ def CompoundStatementHeader(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
 		if isinstance( v, tuple ):
-			e = self._compoundStatementHeaderFragmentEditor.editFragment( statementLine( v[0] ), model, inheritedState )
+			e = self._compoundStatementHeaderEditRule.applyToFragment( statementLine( v[0] ), model, inheritedState )
+			e = e.withElementInteractor( _statementIndentationInteractor )
 			for f in v[1:]:
 				e = f( e )
 			return e
 		else:
-			return self._compoundStatementHeaderFragmentEditor.editFragment( statementLine( v ), model, inheritedState )
+			v = self._compoundStatementHeaderEditRule.applyToFragment( statementLine( v ), model, inheritedState )
+			v = v.withElementInteractor( _statementIndentationInteractor )
+			return v
 	return _setUnwrappedMethod( method, _m )
 
 
@@ -396,7 +403,9 @@ def SpecialFormStatement(method):
 		v = method(self, fragment, inheritedState, model, *args )
 		v = StructuralItem( model, v )
 		v = specialFormStatementLine( v )
-		return self._specialFormStatementFragmentEditor.editFragment( v, model, inheritedState )
+		v = self._specialFormStatementEditRule.applyToFragment( v, model, inheritedState )
+		v = v.withElementInteractor( _statementIndentationInteractor )
+		return v
 	return _setUnwrappedMethod( method, _m )
 
 
@@ -409,29 +418,27 @@ class Python25View (MethodDispatchView):
 		
 		editor = PythonSyntaxRecognizingEditor.instance
 		
-		self._expr = editor.parsingNodeEditListener( 'Expression', grammar.expression(), pyReplaceNode )
-		self._stmt = editor.parsingNodeEditListener( 'Statement', grammar.simpleSingleLineStatementValid(), pyReplaceNode )
-		self._compHdr = editor.partialParsingNodeEditListener( 'Compound header', grammar.compoundStmtHeader() )
-		self._stmtUnparsed = editor.unparsedNodeEditListener( 'Unparsed statement', _isValidUnparsedStatementValue, _commitUnparsedStatment, _commitInnerUnparsed )
-		self._topLevel = editor.topLevelNodeEditListener()
-		self._exprOuter = PythonExpressionEditListener( grammar.tupleOrExpression() )
-		self._exprTopLevel = PythonExpressionTopLevelEditListener()
-		self._targetOuter = PythonTargetEditListener( grammar.targetListOrTargetItem() )
-		self._targetTopLevel = PythonTargetTopLevelEditListener()
-		
-		self._expressionFragmentEditor = editor.fragmentEditor( False, _pythonPrecedenceHandler, [ self._expr ] )
-		self._unparsedFragmentEditor = editor.fragmentEditor( False, [ self._expr ] )
-		self._statementFragmentEditor = editor.fragmentEditor( True, [ self._stmt, self._compHdr, self._stmtUnparsed ], [ _statementIndentationInteractor ] )
-		self._unparsedStatementFragmentEditor = editor.fragmentEditor( False, [ self._stmt, self._compHdr, self._stmtUnparsed ], [ _statementIndentationInteractor ] )
-		self._compoundStatementHeaderFragmentEditor = editor.fragmentEditor( True, [ self._compHdr, self._stmtUnparsed ], [ _statementIndentationInteractor ] )
-		self._specialFormStatementFragmentEditor = editor.fragmentEditor( True, [ self._stmt, self._compHdr, self._stmtUnparsed ], [ _statementIndentationInteractor ] )
+		self._expr = editor.parsingEditFilter( 'Expression', grammar.expression(), pyReplaceNode )
+		self._stmt = editor.parsingEditFilter( 'Statement', grammar.simpleSingleLineStatementValid(), pyReplaceNode )
+		self._compHdr = editor.partialParsingEditFilter( 'Compound header', grammar.compoundStmtHeader() )
+		self._stmtUnparsed = editor.unparsedEditFilter( 'Unparsed statement', _isValidUnparsedStatementValue, _commitUnparsedStatment, _commitInnerUnparsed )
+		self._topLevel = editor.topLevelEditFilter()
+		self._exprOuter = PythonExpressionEditFilter( grammar.tupleOrExpression() )
+		self._targetOuter = PythonTargetEditFilter( grammar.targetListOrTargetItem() )
+
+		self._expressionEditRule = editor.editRule( _pythonPrecedenceHandler, [ self._expr ] )
+		self._unparsedEditRule = editor.editRule( [ self._expr ] )
+		self._statementEditRule = editor.structuralEditRule( [ self._stmt, self._compHdr, self._stmtUnparsed ] )
+		self._unparsedStatementEditRule = editor.editRule( [ self._stmt, self._compHdr, self._stmtUnparsed ] )
+		self._compoundStatementHeaderEditRule = editor.structuralEditRule( [ self._compHdr, self._stmtUnparsed ] )
+		self._specialFormStatementEditRule = editor.structuralEditRule( [ self._stmt, self._compHdr, self._stmtUnparsed ] )
 
 		
-	def _makeSuiteEditListener(self, suite):
-		return PythonSyntaxRecognizingEditor.instance.parsingNodeEditListener( 'Suite', self._parser.suite(), _makeSuiteCommitFn( suite ) )
+	def _makeSuiteEditFilter(self, suite):
+		return PythonSyntaxRecognizingEditor.instance.parsingEditFilter( 'Suite', self._parser.suite(), _makeSuiteCommitFn( suite ) )
 
-	def _makeCompoundSuiteEditListener(self, suite):
-		return PythonSyntaxRecognizingEditor.instance.parsingNodeEditListener( 'Suite', self._parser.compoundSuite(), _makeSuiteCommitFn( suite ) )
+	def _makeCompoundSuiteEditFilter(self, suite):
+		return PythonSyntaxRecognizingEditor.instance.parsingEditFilter( 'Suite', self._parser.compoundSuite(), _makeSuiteCommitFn( suite ) )
 
 		
 		
@@ -446,7 +453,7 @@ class Python25View (MethodDispatchView):
 			lineViews = SREInnerFragment.map( suite, PRECEDENCE_NONE, EditMode.EDIT )
 		s = suiteView( lineViews ).alignHPack().alignVRefY()
 		s = s.withDropDest( _embeddedObject_dropDest )
-		s = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._makeSuiteEditListener( suite ), self._topLevel ], suite, s )
+		s = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._makeSuiteEditFilter( suite ), self._topLevel ], suite, s )
 		s = s.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		s = s.withCommands( PythonCommands.pythonTargetCommands )
 		s = s.withCommands( PythonCommands.pythonCommands )
@@ -463,7 +470,7 @@ class Python25View (MethodDispatchView):
 			lineViews = SREInnerFragment.map( suite, PRECEDENCE_NONE, EditMode.EDIT )
 		s = suiteView( lineViews ).alignHPack().alignVRefY()
 		s = s.withDropDest( _embeddedObject_dropDest )
-		s = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._makeSuiteEditListener( suite ), self._topLevel ], suite, s )
+		s = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._makeSuiteEditFilter( suite ), self._topLevel ], suite, s )
 		s = s.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		s = s.withCommands( PythonCommands.pythonTargetCommands )
 		s = s.withCommands( PythonCommands.pythonCommands )
@@ -482,7 +489,7 @@ class Python25View (MethodDispatchView):
 			seg = Segment( exprView )
 		e = Paragraph( [ seg ] ).alignHPack().alignVRefY()
 		e = e.withDropDest( _embeddedObject_dropDest )
-		e = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._exprOuter, self._exprTopLevel ],  model,  e )
+		e = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._exprOuter, self._topLevel ],  model,  e )
 		e = e.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		e = e.withCommands( PythonCommands.pythonTargetCommands )
 		e = e.withCommands( PythonCommands.pythonCommands )
@@ -500,7 +507,7 @@ class Python25View (MethodDispatchView):
 			targetView = SREInnerFragment( target, PRECEDENCE_NONE, EditMode.DISPLAY )
 			seg = Segment( targetView )
 		t = Paragraph( [ seg ] ).alignHPack().alignVRefY()
-		t = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._targetOuter, self._targetTopLevel ],  model,  t )
+		t = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._targetOuter, self._topLevel ],  model,  t )
 		t = t.withContextMenuInteractor( _pythonTargetContextMenuFactory )
 		t = t.withCommands( PythonCommands.pythonTargetCommands )
 		return t

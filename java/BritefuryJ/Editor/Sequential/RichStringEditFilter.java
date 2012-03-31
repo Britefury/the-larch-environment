@@ -12,14 +12,14 @@ import BritefuryJ.LSpace.EditEvent;
 import BritefuryJ.LSpace.SequentialRichStringVisitor;
 import BritefuryJ.Util.RichString.RichString;
 
-public abstract class RichStringEditListener extends EditListener
+public abstract class RichStringEditFilter extends EditFilter
 {
-	protected abstract HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value);
+	protected abstract HandleEditResult handleRichStringEdit(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value);
 	
 	
 	
 	@Override
-	protected HandleEditResult handleEditEvent(LSElement element, LSElement sourceElement, EditEvent editEvent)
+	protected HandleEditResult handleEdit(LSElement element, LSElement sourceElement, EditEvent editEvent)
 	{
 		SequentialRichStringVisitor visitor = editEvent.getRichStringVisitor();
 		
@@ -27,6 +27,6 @@ public abstract class RichStringEditListener extends EditListener
 		FragmentView fragment = (FragmentView)element.getFragmentContext();
 		Object model = fragment.getModel();
 		
-		return handleValue( element, sourceElement, fragment, editEvent, model, value );
+		return handleRichStringEdit( element, sourceElement, fragment, editEvent, model, value );
 	}
 }
