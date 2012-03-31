@@ -35,6 +35,19 @@ public class BoundCommandSet
 		return null;
 	}
 
+	public void buildAutocompleteList(List<BoundCommand> autocomplete, String text)
+	{
+		for (Command cmd: commandSet.commands)
+		{
+			String cmdName = cmd.getName().getName().toLowerCase();
+			
+			if ( cmdName.startsWith( text )  ||  cmdName.contains( " " + text ) )
+			{
+				autocomplete.add( cmd.bindTo( binding ) );
+			}
+		}
+	}
+
 	
 	public void buildListOfCommandsStartingWith(List<BoundCommand> cmdList, String charSequence)
 	{

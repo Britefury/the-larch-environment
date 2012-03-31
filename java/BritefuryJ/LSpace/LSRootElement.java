@@ -562,6 +562,21 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	
 	// Swing size requirement methods
 	
+	public Dimension allocateAndGetPreferredSize()
+	{
+		if ( isRealised() )
+		{
+			//performAllocationForSpaceRequirements();
+			performAllocation();
+			LayoutNodeRootElement rootLayout = (LayoutNodeRootElement)getLayoutNode();
+			return new Dimension( (int)Math.ceil( rootLayout.getReqMinWidth() ),  (int)Math.ceil( rootLayout.getReqHeight() ) );
+		}
+		else
+		{
+			return new Dimension( 1, 1 );
+		}
+	}
+	
 	Dimension getMinimumSize()
 	{
 		if ( isRealised() )

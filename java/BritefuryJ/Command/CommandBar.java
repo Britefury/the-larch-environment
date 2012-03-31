@@ -6,20 +6,16 @@
 //##************************
 package BritefuryJ.Command;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.event.KeyEvent;
 
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-
-import BritefuryJ.IncrementalView.IncrementalViewInComponent;
+import BritefuryJ.LSpace.Anchor;
 import BritefuryJ.LSpace.PageController;
 import BritefuryJ.LSpace.PresentationComponent;
 import BritefuryJ.LSpace.Browser.BrowserPage;
 import BritefuryJ.LSpace.Input.Keyboard.Keyboard;
 import BritefuryJ.LSpace.Input.Keyboard.KeyboardInteractor;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.SpaceBin;
 
 public class CommandBar
 {
@@ -36,8 +32,10 @@ public class CommandBar
 		{
 			if ( event.getKeyCode() == KeyEvent.VK_ESCAPE )
 			{
-				commandBarArea.setVisible( true );
-				view.getComponent().grabFocus();
+				Pres space = new SpaceBin( presentation.getRootElement().getAllocWidth(), -1.0, console  ).alignHExpand();
+				popup = space.popup( presentation.getRootElement(), Anchor.TOP, Anchor.TOP, false, true );
+				commandBarSwitchInteractor.addToKeyboard( popup.getPresentationComponent().getRootElement().getKeyboard() );
+				popup.getPresentationComponent().grabFocus();
 				return true;
 			}
 			return false;
@@ -65,7 +63,10 @@ public class CommandBar
 			if ( event.getKeyCode() == KeyEvent.VK_ESCAPE )
 			{
 				presentation.grabFocus();
-				commandBarArea.setVisible( false );
+				popup.closePopup();
+				popup = null;
+				//commandBarArea.setVisible( false );
+				//view.getComponent().getRootElement().closeContainingPopupChain();
 				return true;
 			}
 			return false;
@@ -84,18 +85,21 @@ public class CommandBar
 		public void finished(AbstractCommandConsole commandConsole)
 		{
 			presentation.grabFocus();
-			commandBarArea.setVisible( false );
+			if ( popup != null )
+			{
+				popup.closePopup();
+				popup = null;
+			}
 		}
 	};
 
 
 	
 	private PresentationComponent presentation;
-	private JPanel commandBarArea;
-	
-	private IncrementalViewInComponent view;
 	
 	private AbstractCommandConsole console;
+	
+	private PresentationComponent.PresentationPopup popup = null;
 	
 	
 	public CommandBar(PresentationComponent presentation, AbstractCommandConsole console, PageController pageController)
@@ -107,28 +111,7 @@ public class CommandBar
 		console.setListener( consoleListener );
 
 		
-		view = new IncrementalViewInComponent( console.getSubject(), console.getBrowserContext(), null, pageController );
-
-
-		JPanel commandBarBorder = new JPanel( new BorderLayout() );
-		commandBarBorder.add( view.getComponent(), BorderLayout.CENTER );
-		commandBarBorder.setBorder( BorderFactory.createLineBorder( new Color( 0.65f, 0.65f, 0.65f ), 1 ) );
-		commandBarBorder.setBackground( Color.WHITE );
-		
-		commandBarArea = new JPanel( new BorderLayout( 5, 0 ) );
-		commandBarArea.add( commandBarBorder, BorderLayout.CENTER );
-		commandBarArea.setBorder( BorderFactory.createEmptyBorder( 2, 2, 2, 2 ) );
-		commandBarArea.setVisible( false );
-		
-		
 		presComponentSwitchInteractor.addToKeyboard( presentation.getRootElement().getKeyboard() );
-		commandBarSwitchInteractor.addToKeyboard( view.getComponent().getRootElement().getKeyboard() );
-	}
-	
-	
-	public JComponent getComponent()
-	{
-		return commandBarArea;
 	}
 	
 	

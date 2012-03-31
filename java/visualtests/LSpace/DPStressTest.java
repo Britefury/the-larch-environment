@@ -85,8 +85,8 @@ public class DPStressTest
 	
 	
 	Font f0 = new Font( "Sans serif", Font.PLAIN, 12 );
-	TextStyleParams nameStyle = new TextStyleParams( HAlignment.PACK, VAlignment.REFY, null, null, null, true, true, f0, Color.black, null, null, false, false, false );
-	TextStyleParams puncStyle = new TextStyleParams( HAlignment.PACK, VAlignment.REFY, null, null, null, true, true, f0, Color.blue, null, null, false, false, false );
+	TextStyleParams nameStyle = new TextStyleParams( HAlignment.PACK, VAlignment.REFY, null, null, null, Color.blue, true, true, f0, Color.black, null, null, false, false, false );
+	TextStyleParams puncStyle = new TextStyleParams( HAlignment.PACK, VAlignment.REFY, null, null, null, Color.blue, true, true, f0, Color.blue, null, null, false, false, false );
 	ParagraphStyleParams paraStyle = new ParagraphStyleParams( HAlignment.PACK, VAlignment.REFY, null, null, null, 0.0, 0.0, 0.0 );
 
 	public LSElement name(String n)

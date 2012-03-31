@@ -29,6 +29,7 @@ from BritefuryJ.AttributeTable import *
 
 from BritefuryJ.StyleSheet import *
 from BritefuryJ.LSpace.Browser import Location
+from BritefuryJ.LSpace import PageController
 from BritefuryJ.Graphics import *
 
 from BritefuryJ.Controls import *
@@ -114,6 +115,12 @@ class AppView (MethodDispatchView):
 				document.setDocumentName( name )
 				
 				appDoc = node.registerOpenDocument( document, fragment.getSubjectContext()['location'] + '.documents' )
+
+				location = fragment.getSubjectContext()['location'] + '.documents.' + appDoc.getRelativeLocation()
+
+				pageController = link.element.rootElement.pageController
+				pageController.openLocation( location, PageController.OpenOperation.OPEN_IN_CURRENT_TAB )
+
 				
 			element = link.getElement()
 			openDocuments = node.getOpenDocuments()
@@ -150,7 +157,12 @@ class AppView (MethodDispatchView):
 			index = _newConsoleIndex( consoles )
 			appConsole = Application.AppConsole( index )
 			node.addConsole( appConsole )
-			
+
+			location = fragment.getSubjectContext()['location'] + '.consoles.c%d'  %  ( index, )
+
+			pageController = link.element.rootElement.pageController
+			pageController.openLocation( location, PageController.OpenOperation.OPEN_IN_CURRENT_TAB )
+
 			return True
 		
 			
