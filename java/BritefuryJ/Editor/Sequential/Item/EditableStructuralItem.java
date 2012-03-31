@@ -19,23 +19,23 @@ public class EditableStructuralItem extends Pres
 {
 	private SequentialEditor editor;
 	private TreeEventListener editListeners[];
+	private Object model;
 	private Pres child;
-	private Object value;
 	
 	
-	public EditableStructuralItem(SequentialEditor editor, TreeEventListener editListener, Object value, Object child)
+	public EditableStructuralItem(SequentialEditor editor, TreeEventListener editListener, Object model, Object child)
 	{
 		this.editor = editor;
 		this.editListeners = new TreeEventListener[] { editListener };
 		this.child = coerceNonNull( child );
-		this.value = value;
+		this.model = model;
 	}
 
-	public EditableStructuralItem(SequentialEditor editor, List<TreeEventListener> editListeners, Object value, Object child)
+	public EditableStructuralItem(SequentialEditor editor, List<TreeEventListener> editListeners, Object model, Object child)
 	{
 		this.editor = editor;
 		this.editListeners = editListeners.toArray( new TreeEventListener[editListeners.size()] );
-		this.value = value;
+		this.model = model;
 		this.child = coerceNonNull( child );
 	}
 
@@ -45,7 +45,7 @@ public class EditableStructuralItem extends Pres
 	{
 		LSElement element = child.present( ctx, style );
 		element.addTreeEventListener( SequentialEditor.getClearNeighbouringStructuralValueListener() );
-		element.setFixedValue( value );
+		element.setFixedValue( model );
 		element.addTreeEventListener( editor.getClearStructuralValueListener() );
 		for (TreeEventListener listener: editListeners)
 		{
