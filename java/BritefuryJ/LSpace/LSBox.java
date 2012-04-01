@@ -13,19 +13,19 @@ import BritefuryJ.Graphics.Painter;
 import BritefuryJ.LSpace.LayoutTree.LayoutNodeBox;
 import BritefuryJ.LSpace.StyleParams.ShapeStyleParams;
 
-public class LSBox extends LSContentLeaf
+public class LSBox extends LSBlank
 {
 	private double minWidth, minHeight;
 	
 	
-	public LSBox(String textRepresentation, double minWidth, double minHeight)
+	public LSBox(double minWidth, double minHeight)
 	{
-		this( ShapeStyleParams.defaultStyleParams, textRepresentation, minWidth, minHeight );
+		this( ShapeStyleParams.defaultStyleParams, minWidth, minHeight );
 	}
 	
-	public LSBox(ShapeStyleParams styleParams, String textRepresentation, double minWidth, double minHeight)
+	public LSBox(ShapeStyleParams styleParams, double minWidth, double minHeight)
 	{
-		super( styleParams, textRepresentation );
+		super( styleParams );
 		
 		this.minWidth = minWidth;
 		this.minHeight = minHeight;

@@ -187,7 +187,7 @@ public class LSText extends LSContentLeafEditable
 		int index = c.getIndex();
 		if ( index < 0  ||  ( text.length() > 0  ?  ( index > text.length() )  :  ( index > 1 ) ) )
 		{
-			throw new RuntimeException( "DPText.drawCaret(): caret marker is out of range; " + index + " is not within the range[0-" + text.length() + "]." );
+			throw new RuntimeException( "LSText.drawCaret(): caret marker is out of range; " + index + " is not within the range[0-" + text.length() + "]." );
 		}
 		LayoutNode layout = getLayoutNode();
 		double deltaY = layout.getAllocationBox().getAllocRefY()  -  layout.getRequisitionBox().getReqRefY();
@@ -285,7 +285,7 @@ public class LSText extends LSContentLeafEditable
 	
 	
 	
-	protected boolean deleteText()
+	public boolean deleteText()
 	{
 		if ( isEditable() )
 		{

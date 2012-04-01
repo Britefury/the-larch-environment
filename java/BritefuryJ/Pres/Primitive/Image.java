@@ -13,7 +13,7 @@ import java.net.URI;
 
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSImage;
-import BritefuryJ.LSpace.StyleParams.ContentLeafStyleParams;
+import BritefuryJ.LSpace.StyleParams.ElementStyleParams;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -25,7 +25,7 @@ public class Image extends Pres
 {
 	private static abstract class ImageFactory
 	{
-		public abstract LSImage create(ContentLeafStyleParams styleParams);
+		public abstract LSImage create(ElementStyleParams styleParams);
 	}
 	
 	private ImageFactory imageFactory;
@@ -37,9 +37,9 @@ public class Image extends Pres
 	{
 		imageFactory = new ImageFactory()
 		{
-			public LSImage create(ContentLeafStyleParams styleParams)
+			public LSImage create(ElementStyleParams styleParams)
 			{
-				return new LSImage( styleParams, "", image, null, imageWidth, imageHeight );
+				return new LSImage( styleParams, image, null, imageWidth, imageHeight );
 			}
 		};
 	}
@@ -48,9 +48,9 @@ public class Image extends Pres
 	{
 		imageFactory = new ImageFactory()
 		{
-			public LSImage create(ContentLeafStyleParams styleParams)
+			public LSImage create(ElementStyleParams styleParams)
 			{
-				return new LSImage( styleParams, "", image, hoverImage, imageWidth, imageHeight );
+				return new LSImage( styleParams, image, hoverImage, imageWidth, imageHeight );
 			}
 		};
 	}
@@ -59,9 +59,9 @@ public class Image extends Pres
 	{
 		imageFactory = new ImageFactory()
 		{
-			public LSImage create(ContentLeafStyleParams styleParams)
+			public LSImage create(ElementStyleParams styleParams)
 			{
-				return new LSImage( styleParams, "", image, hoverImage, imageWidth );
+				return new LSImage( styleParams, image, hoverImage, imageWidth );
 			}
 		};
 	}
@@ -70,9 +70,9 @@ public class Image extends Pres
 	{
 		imageFactory = new ImageFactory()
 		{
-			public LSImage create(ContentLeafStyleParams styleParams)
+			public LSImage create(ElementStyleParams styleParams)
 			{
-				return new LSImage( styleParams, "", image, null );
+				return new LSImage( styleParams,  image, null );
 			}
 		};
 	}
@@ -81,9 +81,9 @@ public class Image extends Pres
 	{
 		imageFactory = new ImageFactory()
 		{
-			public LSImage create(ContentLeafStyleParams styleParams)
+			public LSImage create(ElementStyleParams styleParams)
 			{
-				return new LSImage( styleParams, "", image, hoverImage );
+				return new LSImage( styleParams, image, hoverImage );
 			}
 		};
 	}
@@ -94,9 +94,9 @@ public class Image extends Pres
 	{
 		imageFactory = new ImageFactory()
 		{
-			public LSImage create(ContentLeafStyleParams styleParams)
+			public LSImage create(ElementStyleParams styleParams)
 			{
-				return new LSImage( styleParams, "", image, null, imageWidth, imageHeight );
+				return new LSImage( styleParams, image, null, imageWidth, imageHeight );
 			}
 		};
 	}
@@ -105,9 +105,9 @@ public class Image extends Pres
 	{
 		imageFactory = new ImageFactory()
 		{
-			public LSImage create(ContentLeafStyleParams styleParams)
+			public LSImage create(ElementStyleParams styleParams)
 			{
-				return new LSImage( styleParams, "", image, hoverImage, imageWidth, imageHeight );
+				return new LSImage( styleParams, image, hoverImage, imageWidth, imageHeight );
 			}
 		};
 	}
@@ -116,9 +116,9 @@ public class Image extends Pres
 	{
 		imageFactory = new ImageFactory()
 		{
-			public LSImage create(ContentLeafStyleParams styleParams)
+			public LSImage create(ElementStyleParams styleParams)
 			{
-				return new LSImage( styleParams, "", image, hoverImage, imageWidth );
+				return new LSImage( styleParams, image, hoverImage, imageWidth );
 			}
 		};
 	}
@@ -127,9 +127,9 @@ public class Image extends Pres
 	{
 		imageFactory = new ImageFactory()
 		{
-			public LSImage create(ContentLeafStyleParams styleParams)
+			public LSImage create(ElementStyleParams styleParams)
 			{
-				return new LSImage( styleParams, "", image, null );
+				return new LSImage( styleParams, image, null );
 			}
 		};
 	}
@@ -138,9 +138,9 @@ public class Image extends Pres
 	{
 		imageFactory = new ImageFactory()
 		{
-			public LSImage create(ContentLeafStyleParams styleParams)
+			public LSImage create(ElementStyleParams styleParams)
 			{
-				return new LSImage( styleParams, "", image, hoverImage );
+				return new LSImage( styleParams, image, hoverImage );
 			}
 		};
 	}
@@ -151,9 +151,9 @@ public class Image extends Pres
 	{
 		imageFactory = new ImageFactory()
 		{
-			public LSImage create(ContentLeafStyleParams styleParams)
+			public LSImage create(ElementStyleParams styleParams)
 			{
-				return new LSImage( styleParams, "", imageFile, null, imageWidth, imageHeight );
+				return new LSImage( styleParams, imageFile, null, imageWidth, imageHeight );
 			}
 		};
 	}
@@ -162,9 +162,9 @@ public class Image extends Pres
 	{
 		imageFactory = new ImageFactory()
 		{
-			public LSImage create(ContentLeafStyleParams styleParams)
+			public LSImage create(ElementStyleParams styleParams)
 			{
-				return new LSImage( styleParams, "", imageFile, null, imageWidth );
+				return new LSImage( styleParams, imageFile, null, imageWidth );
 			}
 		};
 	}
@@ -173,9 +173,9 @@ public class Image extends Pres
 	{
 		imageFactory = new ImageFactory()
 		{
-			public LSImage create(ContentLeafStyleParams styleParams)
+			public LSImage create(ElementStyleParams styleParams)
 			{
-				return new LSImage( styleParams, "", imageFile, hoverImageFile, imageWidth, imageHeight );
+				return new LSImage( styleParams, imageFile, hoverImageFile, imageWidth, imageHeight );
 			}
 		};
 	}
@@ -184,9 +184,9 @@ public class Image extends Pres
 	{
 		imageFactory = new ImageFactory()
 		{
-			public LSImage create(ContentLeafStyleParams styleParams)
+			public LSImage create(ElementStyleParams styleParams)
 			{
-				return new LSImage( styleParams, "", imageFile, hoverImageFile, imageWidth );
+				return new LSImage( styleParams, imageFile, hoverImageFile, imageWidth );
 			}
 		};
 	}
@@ -195,9 +195,9 @@ public class Image extends Pres
 	{
 		imageFactory = new ImageFactory()
 		{
-			public LSImage create(ContentLeafStyleParams styleParams)
+			public LSImage create(ElementStyleParams styleParams)
 			{
-				return new LSImage( styleParams, "", imageFile, null );
+				return new LSImage( styleParams, imageFile, null );
 			}
 		};
 	}
@@ -206,9 +206,9 @@ public class Image extends Pres
 	{
 		imageFactory = new ImageFactory()
 		{
-			public LSImage create(ContentLeafStyleParams styleParams)
+			public LSImage create(ElementStyleParams styleParams)
 			{
-				return new LSImage( styleParams, "", imageFile, hoverImageFile );
+				return new LSImage( styleParams, imageFile, hoverImageFile );
 			}
 		};
 	}
@@ -217,9 +217,9 @@ public class Image extends Pres
 	{
 		imageFactory = new ImageFactory()
 		{
-			public LSImage create(ContentLeafStyleParams styleParams)
+			public LSImage create(ElementStyleParams styleParams)
 			{
-				return new LSImage( styleParams, "", imageFilename, null, imageWidth, imageHeight );
+				return new LSImage( styleParams, imageFilename, null, imageWidth, imageHeight );
 			}
 		};
 	}
@@ -228,9 +228,9 @@ public class Image extends Pres
 	{
 		imageFactory = new ImageFactory()
 		{
-			public LSImage create(ContentLeafStyleParams styleParams)
+			public LSImage create(ElementStyleParams styleParams)
 			{
-				return new LSImage( styleParams, "", imageFilename, null, imageWidth );
+				return new LSImage( styleParams, imageFilename, null, imageWidth );
 			}
 		};
 	}
@@ -239,9 +239,9 @@ public class Image extends Pres
 	{
 		imageFactory = new ImageFactory()
 		{
-			public LSImage create(ContentLeafStyleParams styleParams)
+			public LSImage create(ElementStyleParams styleParams)
 			{
-				return new LSImage( styleParams, "", imageFilename, hoverImageFilename, imageWidth, imageHeight );
+				return new LSImage( styleParams, imageFilename, hoverImageFilename, imageWidth, imageHeight );
 			}
 		};
 	}
@@ -250,9 +250,9 @@ public class Image extends Pres
 	{
 		imageFactory = new ImageFactory()
 		{
-			public LSImage create(ContentLeafStyleParams styleParams)
+			public LSImage create(ElementStyleParams styleParams)
 			{
-				return new LSImage( styleParams, "", imageFilename, hoverImageFilename, imageWidth );
+				return new LSImage( styleParams, imageFilename, hoverImageFilename, imageWidth );
 			}
 		};
 	}
@@ -261,9 +261,9 @@ public class Image extends Pres
 	{
 		imageFactory = new ImageFactory()
 		{
-			public LSImage create(ContentLeafStyleParams styleParams)
+			public LSImage create(ElementStyleParams styleParams)
 			{
-				return new LSImage( styleParams, "", imageFilename, null );
+				return new LSImage( styleParams, imageFilename, null );
 			}
 		};
 	}
@@ -272,9 +272,9 @@ public class Image extends Pres
 	{
 		imageFactory = new ImageFactory()
 		{
-			public LSImage create(ContentLeafStyleParams styleParams)
+			public LSImage create(ElementStyleParams styleParams)
 			{
-				return new LSImage( styleParams, "", imageFilename, hoverImageFilename );
+				return new LSImage( styleParams, imageFilename, hoverImageFilename );
 			}
 		};
 	}

@@ -8,7 +8,7 @@ package BritefuryJ.LSpace.LayoutTree;
 
 import BritefuryJ.LSpace.LSShape;
 
-public class LayoutNodeShape extends ContentLeafLayoutNode
+public class LayoutNodeShape extends LayoutNodeBlank
 {
 	public LayoutNodeShape(LSShape element)
 	{

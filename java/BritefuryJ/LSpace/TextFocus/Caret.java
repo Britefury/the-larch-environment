@@ -173,12 +173,23 @@ public class Caret extends Target implements MarkerListener
 	@Override
 	public boolean onContentKeyPress(KeyEvent event)
 	{
-		LSContentLeafEditable leaf = getElement();
-		if ( leaf != null  &&  leaf.isEditable() )
+		if ( event.getKeyCode() == KeyEvent.VK_BACK_SPACE )
 		{
-			return leaf.onContentKeyPress( this, event );
+			return handleBackspace();
 		}
-		return false;
+		else if ( event.getKeyCode() == KeyEvent.VK_DELETE )
+		{
+			return handleDelete();
+		}
+		else
+		{
+			LSContentLeafEditable leaf = getElement();
+			if ( leaf != null  &&  leaf.isEditable() )
+			{
+				return leaf.onContentKeyPress( this, event );
+			}
+			return false;
+		}
 	}
 
 	@Override
@@ -664,4 +675,131 @@ public class Caret extends Target implements MarkerListener
 			}
 		}
 	}
+	
+	
+
+	//
+	// Deleting content
+	//
+
+	protected boolean handleBackspace()
+	{
+		LSContentLeafEditable start = getElement();
+		
+		if ( getMarker().isAtStartOf( start ) )
+		{
+			LSContentLeaf left = start.getContentLeafToLeft();
+			if ( left == null )
+			{
+				return false;
+			}
+			else
+			{
+				boolean contentDeleted = false;
+				
+				// If @left is not editable, or empty
+				if ( !left.isEditable()  ||  left.getTextRepresentationLength() == 0 )
+				{
+					// Delete the content
+					contentDeleted |= left.deleteText();
+
+					if ( !start.isRealised() )
+					{
+						// Bail out if a response to the deletion of the text is the start element becoming unrealised
+						return true;
+					}
+				}
+				
+				// Jump over non-editable elements until we reach over an editable one
+				while ( !left.isEditable()  ||  left.getTextRepresentationLength() == 0 )
+				{
+					left = left.getContentLeafToLeft();
+					if ( left == null )
+					{
+						return false;
+					}
+				}
+				
+				
+				LSContentLeafEditable editableLeft = (LSContentLeafEditable)left;
+				if ( moveTo( Marker.atEndOfLeaf( editableLeft ) ) )
+				{
+					if ( !contentDeleted )
+					{
+						left.removeTextFromEnd( 1 );
+					}
+					makeCurrentTarget();
+				}
+				return true;
+			}
+		}
+		else
+		{
+			if ( start.isEditable() )
+			{
+				start.removeText( getMarker().getClampedIndex() - 1, 1 );
+			}
+			return true;
+		}
+	}
+	
+	protected boolean handleDelete()
+	{
+		LSContentLeafEditable start = getElement();
+		
+		if ( getMarker().isAtEndOf( start ) )
+		{
+			LSContentLeaf right = start.getContentLeafToRight();
+			if ( right == null )
+			{
+				return false;
+			}
+			else
+			{
+				boolean contentDeleted = false;
+				// If @right is not editable, or empty
+				if ( !right.isEditable()  ||  right.getTextRepresentationLength() == 0 )
+				{
+					// Delete the content
+					contentDeleted |= right.deleteText();
+
+					if ( !start.isRealised() )
+					{
+						// Bail out if a response to the deletion of the text is the start element becoming unrealised
+						return true;
+					}
+				}
+				
+				// Jump over non-editable elements until we reach over an editable one
+				while ( !right.isEditable()  ||  right.getTextRepresentationLength() == 0 )
+				{
+					right = right.getContentLeafToRight();
+					if ( right == null )
+					{
+						return false;
+					}
+				}
+
+				LSContentLeafEditable editableRight = (LSContentLeafEditable)right; 
+				if ( moveTo( Marker.atStartOfLeaf( editableRight ) ) )
+				{
+					if ( !contentDeleted )
+					{
+						right.removeTextFromStart( 1 );
+					}
+					makeCurrentTarget();
+				}
+				return true;
+			}
+		}
+		else
+		{
+			if ( start.isEditable() )
+			{
+				start.removeText( getMarker(), 1 );
+			}
+			return true;
+		}
+	}
+	
 }

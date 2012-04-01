@@ -27,6 +27,6 @@ public class Box extends Pres
 	@Override
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		return new LSBox( Primitive.shapeParams.get( style ), "", minWidth, minHeight );
+		return new LSBox( Primitive.shapeParams.get( style ), minWidth, minHeight );
 	}
 }
