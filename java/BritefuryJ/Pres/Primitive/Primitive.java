@@ -26,6 +26,7 @@ import BritefuryJ.Graphics.SolidBorder;
 import BritefuryJ.LSpace.TableBackgroundPainter;
 import BritefuryJ.LSpace.Layout.HAlignment;
 import BritefuryJ.LSpace.Layout.VAlignment;
+import BritefuryJ.LSpace.StyleParams.CaretSlotStyleParams;
 import BritefuryJ.LSpace.StyleParams.ColumnStyleParams;
 import BritefuryJ.LSpace.StyleParams.ContainerStyleParams;
 import BritefuryJ.LSpace.StyleParams.ContentLeafStyleParams;
@@ -508,6 +509,31 @@ public class Primitive
 		return useFont.get( style.useAttr( hAlign ).useAttr( vAlign ).useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
 				.useAttr( editable ).useAttr( selectable ).useAttr( foreground ).useAttr( hoverForeground ).useAttr( textSquiggleUnderlinePaint )
 				.useAttr( fontUnderline ).useAttr( fontStrikethrough ).useAttr( fontSmallCaps ) );
+	}
+	
+	
+	
+	protected static DerivedValueTable<CaretSlotStyleParams> caretSlotParams = new DerivedValueTable<CaretSlotStyleParams>( primitiveNamespace )
+	{
+		protected CaretSlotStyleParams evaluate(AttributeTable attribs)
+		{
+			return new CaretSlotStyleParams(
+					attribs.get( hAlign, HAlignment.class ),
+					attribs.get( vAlign, VAlignment.class ),
+					attribs.get( background, Painter.class ),
+					attribs.get( hoverBackground, Painter.class ),
+					attribs.get( cursor, Cursor.class ),
+					attribs.get( caretColour, Color.class ),
+					attribs.get( editable, Boolean.class ),
+					attribs.get( selectable, Boolean.class ),
+					font.get( attribs ) );
+		}
+	};
+	
+	protected static StyleValues useCaretSlotParams(StyleValues style)
+	{
+		return useFont.get( style.useAttr( hAlign ).useAttr( vAlign ).useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
+				.useAttr( editable ).useAttr( selectable ) );
 	}
 	
 	

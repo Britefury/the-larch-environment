@@ -333,7 +333,7 @@ class _InsertSpecialFormTreeEvent (TextEditEvent):
 def _insertSpecialFormAtMarker(marker, specialForm):
 	element = marker.getElement()
 	index = marker.getIndex()
-	assert isinstance( element, LSText )
+	assert isinstance( element, LSContentLeafEditable )
 	
 	value = element.getRichString()
 	builder = RichStringBuilder()

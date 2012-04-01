@@ -10,42 +10,19 @@ import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.LSpace.LayoutTree.ArrangedSequenceLayoutNode;
+import BritefuryJ.LSpace.StyleParams.CaretSlotStyleParams;
 import BritefuryJ.LSpace.StyleParams.ContainerStyleParams;
-import BritefuryJ.LSpace.StyleParams.TextStyleParams;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 
 public class LSSegment extends LSContainerNonOverlayed
 {
-	//
-	// Utility classes
-	//
-	
-	public static class SegmentFilter implements ElementFilter
-	{
-		private LSSegment segment;
-		
-		
-		public SegmentFilter(LSSegment seg)
-		{
-			segment = seg;
-		}
-		
-		public boolean testElement(LSElement element)
-		{
-			return getSegmentOf( element ) == segment;
-		}
-	}
-
-	
-	
 	protected final static int FLAGS_SEGMENT_BEGIN = FLAGS_CONTAINERNONOVERLAYED_END;
 	protected final static int FLAG_GUARD_BEGIN = FLAGS_SEGMENT_BEGIN * 0x1;
 	protected final static int FLAG_GUARD_END = FLAGS_SEGMENT_BEGIN * 0x2;
-	protected final static int FLAG_GUARDS_REFRESHING = FLAGS_SEGMENT_BEGIN * 0x4;
 
 	
-	protected TextStyleParams textStyleParams;
+	protected CaretSlotStyleParams caretSlotStyleParams;
 	protected LSElement beginGuard, endGuard;
 	protected LSElement child;
 	
@@ -56,16 +33,16 @@ public class LSSegment extends LSContainerNonOverlayed
 	
 	public LSSegment(boolean bGuardBegin, boolean bGuardEnd)
 	{
-		this( ContainerStyleParams.defaultStyleParams, TextStyleParams.defaultStyleParams, bGuardBegin, bGuardEnd );
+		this( ContainerStyleParams.defaultStyleParams, CaretSlotStyleParams.defaultStyleParams, bGuardBegin, bGuardEnd );
 	}
 
-	public LSSegment(ContainerStyleParams styleParams, TextStyleParams textStyleParams, boolean bGuardBegin, boolean bGuardEnd)
+	public LSSegment(ContainerStyleParams styleParams, CaretSlotStyleParams caretSlotStyleParams, boolean bGuardBegin, boolean bGuardEnd)
 	{
 		super( styleParams );
-		this.textStyleParams = textStyleParams;
+		this.caretSlotStyleParams = caretSlotStyleParams;
 		setFlagValue( FLAG_GUARD_BEGIN, bGuardBegin );
 		setFlagValue( FLAG_GUARD_END, bGuardEnd );
-		clearFlag( FLAG_GUARDS_REFRESHING );
+		refreshGuards();
 	}
 	
 	
@@ -155,37 +132,11 @@ public class LSSegment extends LSContainerNonOverlayed
 	
 	private void refreshGuards()
 	{
-		// Set the flag to indicate that the guard elements are being refreshed
-		setFlag( FLAG_GUARDS_REFRESHING );
-		boolean bBegin = false, bEnd = false;
-		
-		if ( child != null )
-		{
-			LSElement firstLeaf = child.getFirstLeafInSubtree();
-			LSElement lastLeaf = child.getLastLeafInSubtree();
-			
-			if ( firstLeaf != null  &&  lastLeaf != null )
-			{
-				bBegin = getSegmentOf( firstLeaf ) != this;
-				bEnd = getSegmentOf( lastLeaf ) != this;
-			}
-		}
-		
 		if ( testFlag( FLAG_GUARD_BEGIN ) )
 		{
-			if ( bBegin  &&  !( beginGuard instanceof LSText ) )
-			{
-				unregisterBeginGuard();
-				beginGuard = new LSText(textStyleParams, "" );
-				registerBeginGuard();
-			}
-			
-			if ( !bBegin  &&  !( beginGuard instanceof LSWhitespace ) )
-			{
-				unregisterBeginGuard();
-				beginGuard = new LSWhitespace( "" );
-				registerBeginGuard();
-			}
+			unregisterBeginGuard();
+			beginGuard = new LSCaretSlot( caretSlotStyleParams, LSCaretSlot.SlotType.SEGMENT_BOUNDARY );
+			registerBeginGuard();
 		}
 		else
 		{
@@ -196,27 +147,15 @@ public class LSSegment extends LSContainerNonOverlayed
 		
 		if ( testFlag( FLAG_GUARD_END ) )
 		{
-			if ( bEnd  &&  !( endGuard instanceof LSText ) )
-			{
-				unregisterEndGuard();
-				endGuard = new LSText(textStyleParams, "" );
-				registerEndGuard();
-			}
-			
-			if ( !bEnd  &&  !( endGuard instanceof LSWhitespace ) )
-			{
-				unregisterEndGuard();
-				endGuard = new LSWhitespace( "" );
-				registerEndGuard();
-			}
+			unregisterEndGuard();
+			endGuard = new LSCaretSlot( caretSlotStyleParams, LSCaretSlot.SlotType.SEGMENT_BOUNDARY );
+			registerEndGuard();
 		}
 		else
 		{
 			unregisterEndGuard();
 			endGuard = null;
 		}
-		// Clear the flag to indicate that the guard elements are no longer being refreshed
-		clearFlag( FLAG_GUARDS_REFRESHING );
 	}
 	
 	
@@ -258,18 +197,6 @@ public class LSSegment extends LSContainerNonOverlayed
 	}
 
 
-	
-	protected void onSubtreeStructureChanged()
-	{
-		super.onSubtreeStructureChanged();
-		
-		if ( !testFlag( FLAG_GUARDS_REFRESHING ) )
-		{
-			refreshGuards();
-		}
-	}
-	
-	
 	
 	protected AABox2 getVisibleBoxInLocalSpace()
 	{

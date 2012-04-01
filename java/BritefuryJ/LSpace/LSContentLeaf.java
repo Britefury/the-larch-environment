@@ -388,6 +388,19 @@ public abstract class LSContentLeaf extends LSElement
 	
 	
 	//
+	//
+	// CARET SLOT
+	//
+	//
+	
+	public boolean isCaretSlot()
+	{
+		return false;
+	}
+	
+	
+	
+	//
 	// Meta element methods
 	//
 	

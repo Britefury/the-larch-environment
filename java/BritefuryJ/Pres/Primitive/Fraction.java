@@ -56,7 +56,7 @@ public class Fraction extends Pres
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		LSElement barElement = bar.present( ctx, style );
-		LSFraction element = new LSFraction( Primitive.fractionParams.get( style ), Primitive.textParams.get( style ), "/" );
+		LSFraction element = new LSFraction( Primitive.fractionParams.get( style ), Primitive.caretSlotParams.get( style ), "/" );
 		StyleValues usedStyle = Primitive.useFractionParams( Primitive.useTextParams( style ) );
 		element.setNumeratorChild( numerator.present( ctx, fractionNumeratorStyle( usedStyle ) ) );
 		element.setDenominatorChild( denominator.present( ctx, fractionDenominatorStyle( usedStyle ) ) );

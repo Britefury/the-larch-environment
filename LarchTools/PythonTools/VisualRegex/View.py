@@ -208,7 +208,7 @@ def pythonEscapedChar(char):
 	return _pythonEscapeBorder.surround( Row( [ _controlCharStyle( Text( '\\' ) ), Text( char ) ] ) )
 
 def _specialChar(char, name):
-	return _specialBorder.surround( _specialCharStyle( Row( [ HiddenText( char ), Label( name ), Text( '' ) ] ) ) )
+	return _specialBorder.surround( _specialCharStyle( Segment( Row( [ HiddenText( char ), Label( name ) ] ) ) ) )
 
 def anyChar():
 	return _specialChar( '.', 'ANY' )
@@ -221,7 +221,7 @@ def endOfLine():
 
 def charClass(cls):
 	name = _charClasses[cls]
-	return _charClassBorder.surround( _charClassStyle( Row( [ HiddenText( '\\' + cls ), Label( name ), Text( '' ) ] ) ) )
+	return _charClassBorder.surround( _charClassStyle( Segment( Row( [ HiddenText( '\\' + cls ), Label( name ) ] ) ) ) )
 
 def charSetChar(char):
 	return _charSetItemBorder.surround( char )
