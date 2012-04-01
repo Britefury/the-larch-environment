@@ -8,7 +8,7 @@ package BritefuryJ.LSpace.LayoutTree;
 
 import BritefuryJ.LSpace.LSImage;
 
-public class LayoutNodeImage extends ContentLeafLayoutNode
+public class LayoutNodeImage extends LayoutNodeBlank
 {
 	public LayoutNodeImage(LSImage element)
 	{

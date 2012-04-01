@@ -17,7 +17,7 @@ import BritefuryJ.LSpace.Layout.VAlignment;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.ObjectPres.HorizontalField;
 
-public class ShapeStyleParams extends ContentLeafStyleParams
+public class ShapeStyleParams extends ElementStyleParams
 {
 	public static final ShapeStyleParams defaultStyleParams = new ShapeStyleParams( HAlignment.PACK, VAlignment.REFY, null, null, null, new FillPainter( Color.black ), null );
 	private Painter painter, hoverPainter;

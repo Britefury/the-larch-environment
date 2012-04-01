@@ -21,20 +21,20 @@ import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 
-public class LSShape extends LSContentLeaf
+public class LSShape extends LSBlank
 {
 	private Shape shape;
 	private AABox2 bounds;
 	
 	
-	public LSShape(String textRepresentation, Shape shape)
+	public LSShape(Shape shape)
 	{
-		this( ShapeStyleParams.defaultStyleParams, textRepresentation, shape );
+		this( ShapeStyleParams.defaultStyleParams, shape );
 	}
 	
-	public LSShape(ShapeStyleParams styleParams, String textRepresentation, Shape shape)
+	public LSShape(ShapeStyleParams styleParams, Shape shape)
 	{
-		super( styleParams, textRepresentation );
+		super( styleParams );
 		
 		this.shape = shape;
 		

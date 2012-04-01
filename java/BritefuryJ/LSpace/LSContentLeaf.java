@@ -311,7 +311,7 @@ public abstract class LSContentLeaf extends LSElement
 	}
 
 	
-	protected boolean deleteText()
+	public boolean deleteText()
 	{
 		int length = textRepresentation.length();
 		if ( length > 0 )
@@ -322,10 +322,7 @@ public abstract class LSContentLeaf extends LSElement
 			textRepresentationChanged( new TextEditEventRemove( this, getPreviousEditableLeaf(), getNextEditableLeaf(), 0, oldText ) );
 			return true;
 		}
-		else
-		{
-			return false;
-		}
+		return false;
 	}
 	
 	
@@ -387,20 +384,6 @@ public abstract class LSContentLeaf extends LSElement
 	{
 		return false;
 	}
-	
-	
-	
-	//
-	//
-	// WHITESPACE METHODS
-	//
-	//
-	
-	protected boolean isWhitespace()
-	{
-		return false;
-	}
-	
 	
 	
 	

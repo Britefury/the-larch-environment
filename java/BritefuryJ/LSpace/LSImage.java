@@ -20,13 +20,13 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import BritefuryJ.LSpace.LayoutTree.LayoutNodeImage;
-import BritefuryJ.LSpace.StyleParams.ContentLeafStyleParams;
+import BritefuryJ.LSpace.StyleParams.ElementStyleParams;
 
 import com.kitfox.svg.SVGCache;
 import com.kitfox.svg.SVGDiagram;
 import com.kitfox.svg.SVGException;
 
-public class LSImage extends LSContentLeaf
+public class LSImage extends LSBlank
 {
 	private static abstract class AbstractImg
 	{
@@ -117,84 +117,84 @@ public class LSImage extends LSContentLeaf
 	private AbstractImg image, hoverImage;
 	
 	
-	public LSImage(ContentLeafStyleParams styleParams, String textRepresentation, BufferedImage image, BufferedImage hoverImage, double imageWidth, double imageHeight)
+	public LSImage(ElementStyleParams styleParams, BufferedImage image, BufferedImage hoverImage, double imageWidth, double imageHeight)
 	{
-		super( styleParams, textRepresentation );
+		super( styleParams );
 		
 		initImage( img( image ), img( hoverImage ), imageWidth, imageHeight );
 	}
 	
-	public LSImage(ContentLeafStyleParams styleParams, String textRepresentation, BufferedImage image, BufferedImage hoverImage, double imageWidth)
+	public LSImage(ElementStyleParams styleParams, BufferedImage image, BufferedImage hoverImage, double imageWidth)
 	{
-		super( styleParams, textRepresentation );
+		super( styleParams );
 		
 		initImage( img( image ), img( hoverImage ), imageWidth );
 	}
 	
-	public LSImage(ContentLeafStyleParams styleParams, String textRepresentation, BufferedImage image, BufferedImage hoverImage)
+	public LSImage(ElementStyleParams styleParams, BufferedImage image, BufferedImage hoverImage)
 	{
-		super( styleParams, textRepresentation );
+		super( styleParams );
 		
 		initImage( img( image ), img( hoverImage ) );
 	}
 	
 
-	public LSImage(ContentLeafStyleParams styleParams, String textRepresentation, SVGDiagram image, SVGDiagram hoverImage, double imageWidth, double imageHeight)
+	public LSImage(ElementStyleParams styleParams, SVGDiagram image, SVGDiagram hoverImage, double imageWidth, double imageHeight)
 	{
-		super( styleParams, textRepresentation );
+		super( styleParams );
 		
 		initImage( img( image ), img( hoverImage ), imageWidth, imageHeight );
 	}
 	
-	public LSImage(ContentLeafStyleParams styleParams, String textRepresentation, SVGDiagram image, SVGDiagram hoverImage, double imageWidth)
+	public LSImage(ElementStyleParams styleParams, SVGDiagram image, SVGDiagram hoverImage, double imageWidth)
 	{
-		super( styleParams, textRepresentation );
+		super( styleParams );
 		
 		initImage( img( image ), img( hoverImage ), imageWidth );
 	}
 	
-	public LSImage(ContentLeafStyleParams styleParams, String textRepresentation, SVGDiagram image, SVGDiagram hoverImage)
+	public LSImage(ElementStyleParams styleParams, SVGDiagram image, SVGDiagram hoverImage)
 	{
-		super( styleParams, textRepresentation );
+		super( styleParams );
 		
 		initImage( img( image ), img( hoverImage ) );
 	}
 	
 
-	public LSImage(ContentLeafStyleParams styleParams, String textRepresentation, File imageFile, File hoverImageFile, double imageWidth, double imageHeight)
+	public LSImage(ElementStyleParams styleParams, File imageFile, File hoverImageFile, double imageWidth, double imageHeight)
 	{
-		super( styleParams, textRepresentation );
+		super( styleParams );
 		
 		initImage( readImageFile( imageFile ), hoverImageFile != null  ?  readImageFile( hoverImageFile )  :  null,  imageWidth, imageHeight );
 	}
 	
-	public LSImage(ContentLeafStyleParams styleParams, String textRepresentation, File imageFile, File hoverImageFile, double imageWidth)
+	public LSImage(ElementStyleParams styleParams, File imageFile, File hoverImageFile, double imageWidth)
 	{
-		super( styleParams, textRepresentation );
+		super( styleParams );
 		
 		initImage( readImageFile( imageFile ), hoverImageFile != null  ?  readImageFile( hoverImageFile )  :  null,  imageWidth );
 	}
 	
-	public LSImage(ContentLeafStyleParams styleParams, String textRepresentation, File imageFile, File hoverImageFile)
+	public LSImage(ElementStyleParams styleParams, File imageFile, File hoverImageFile)
 	{
-		super( styleParams, textRepresentation );
+		super( styleParams );
 		
 		initImage( readImageFile( imageFile ), hoverImageFile != null  ?  readImageFile( hoverImageFile )  :  null );
 	}
 	
-	public LSImage(ContentLeafStyleParams styleParams, String textRepresentation, String imageFilename, String hoverImageFilename, double imageWidth, double imageHeight)
+	public LSImage(ElementStyleParams styleParams, String imageFilename, String hoverImageFilename, double imageWidth, double imageHeight)
 	{
-		this( styleParams, textRepresentation, new File( imageFilename ), hoverImageFilename != null  ?  new File( hoverImageFilename )  :  null,  imageWidth, imageHeight );
+		this( styleParams, new File( imageFilename ), hoverImageFilename != null  ?  new File( hoverImageFilename )  :  null,  imageWidth, imageHeight );
 	}
 	
-	public LSImage(ContentLeafStyleParams styleParams, String textRepresentation, String imageFilename, String hoverImageFilename, double imageWidth)
+	public LSImage(ElementStyleParams styleParams, String imageFilename, String hoverImageFilename, double imageWidth)
 	{
-		this( styleParams, textRepresentation, new File( imageFilename ), hoverImageFilename != null  ?  new File( hoverImageFilename )  :  null,  imageWidth );
+		this( styleParams, new File( imageFilename ), hoverImageFilename != null  ?  new File( hoverImageFilename )  :  null,  imageWidth );
 	}
 	
-	public LSImage(ContentLeafStyleParams styleParams, String textRepresentation, String imageFilename, String hoverImageFilename)
+	public LSImage(ElementStyleParams styleParams, String imageFilename, String hoverImageFilename)
 	{
-		this( styleParams, textRepresentation, new File( imageFilename ), hoverImageFilename != null  ?  new File( hoverImageFilename )  :  null );
+		this( styleParams, new File( imageFilename ), hoverImageFilename != null  ?  new File( hoverImageFilename )  :  null );
 	}
 	
 	

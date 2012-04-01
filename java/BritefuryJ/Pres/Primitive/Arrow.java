@@ -92,6 +92,6 @@ public class Arrow extends Pres
 	@Override
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		return new LSShape( Primitive.shapeParams.get( style ), "", shape );
+		return new LSShape( Primitive.shapeParams.get( style ), shape );
 	}
 }

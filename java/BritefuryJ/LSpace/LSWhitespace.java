@@ -77,17 +77,4 @@ public class LSWhitespace extends LSContentLeaf
 		graphics.fill( shape );
 		popGraphicsTransform( graphics, current );
 	}
-	
-	
-	
-	//
-	//
-	// WHITESPACE METHODS
-	//
-	//
-	
-	protected boolean isWhitespace()
-	{
-		return true;
-	}
 }
