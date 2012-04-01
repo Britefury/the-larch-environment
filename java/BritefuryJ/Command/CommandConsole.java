@@ -17,13 +17,12 @@ import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.Graphics.AbstractBorder;
 import BritefuryJ.Graphics.SolidBorder;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.LSpace.Anchor;
 import BritefuryJ.LSpace.LSElement;
-import BritefuryJ.LSpace.PageController;
 import BritefuryJ.LSpace.PresentationComponent;
 import BritefuryJ.LSpace.SequentialRichStringVisitor;
 import BritefuryJ.LSpace.TreeEventListener;
 import BritefuryJ.LSpace.Browser.BrowserPage;
-import BritefuryJ.LSpace.Browser.Location;
 import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
 import BritefuryJ.LSpace.Focus.Target;
 import BritefuryJ.ObjectPresentation.PresentationStateListenerList;
@@ -36,6 +35,7 @@ import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Pres.Primitive.Spacer;
 import BritefuryJ.Pres.Primitive.Text;
+import BritefuryJ.Pres.UI.BubblePopup;
 import BritefuryJ.Projection.AbstractPerspective;
 import BritefuryJ.Projection.ProjectiveBrowserContext;
 import BritefuryJ.Projection.Subject;
@@ -154,9 +154,7 @@ public class CommandConsole extends AbstractCommandConsole
 			@Override
 			public void onLinkClicked(Hyperlink.AbstractHyperlinkControl link, PointerButtonClickedEvent event)
 			{
-				FragmentView fragment = (FragmentView)link.getElement().getFragmentContext();
-				Location location = fragment.getBrowserContext().getLocationForObject( error );
-				link.getElement().getRootElement().getPageController().openLocation( location, PageController.OpenOperation.OPEN_IN_NEW_WINDOW );
+				BubblePopup.popupInBubbleAdjacentTo( error, link.getElement(), Anchor.TOP, true, true );
 			}
 		};
 		

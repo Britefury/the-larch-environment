@@ -11,9 +11,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.LSpace.LayoutTree.LayoutNodeScript;
+import BritefuryJ.LSpace.StyleParams.CaretSlotStyleParams;
 import BritefuryJ.LSpace.StyleParams.ContainerStyleParams;
 import BritefuryJ.LSpace.StyleParams.ScriptStyleParams;
-import BritefuryJ.LSpace.StyleParams.TextStyleParams;
 
 
 public class LSScript extends LSContainerNonOverlayed
@@ -31,21 +31,21 @@ public class LSScript extends LSContainerNonOverlayed
 	protected LSElement[] children;
 	protected LSSegment segs[];
 	protected LSParagraph paras[];
-	TextStyleParams segmentTextStyleParams;
+	CaretSlotStyleParams segmentCaretSlotStyleParams;
 
 
 	public LSScript()
 	{
-		this( ScriptStyleParams.defaultStyleSheet, TextStyleParams.defaultStyleParams);
+		this( ScriptStyleParams.defaultStyleSheet, CaretSlotStyleParams.defaultStyleParams);
 	}
 	
-	public LSScript(ScriptStyleParams styleSheet, TextStyleParams segmentTextStyleParams)
+	public LSScript(ScriptStyleParams styleSheet, CaretSlotStyleParams segmentCaretSlotStyleParams)
 	{
 		super( styleSheet );
 		
 		layoutNode = new LayoutNodeScript( this );
 		
-		this.segmentTextStyleParams = segmentTextStyleParams;
+		this.segmentCaretSlotStyleParams = segmentCaretSlotStyleParams;
 		
 		children = new LSElement[NUMCHILDREN];
 		segs = new LSSegment[NUMCHILDREN];
@@ -86,7 +86,7 @@ public class LSScript extends LSContainerNonOverlayed
 
 			if ( bSegmentRequired  &&  !bSegmentPresent )
 			{
-				LSSegment seg = new LSSegment( (ContainerStyleParams)getStyleParams(), segmentTextStyleParams, isBeginGuardRequired( slot ), isEndGuardRequired( slot ) );
+				LSSegment seg = new LSSegment( (ContainerStyleParams)getStyleParams(), segmentCaretSlotStyleParams, isBeginGuardRequired( slot ), isEndGuardRequired( slot ) );
 				segs[slot] = seg;
 				LSParagraph para = new LSParagraph( );
 				para.setChildren( Arrays.asList( new LSElement[] { seg } ) );

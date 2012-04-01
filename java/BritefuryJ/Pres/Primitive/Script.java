@@ -59,7 +59,7 @@ public class Script extends Pres
 			childStyle = scriptScriptChildStyle( usedStyle );
 		}
 		
-		LSScript element = new LSScript( Primitive.scriptParams.get( style ), Primitive.textParams.get( style ) );
+		LSScript element = new LSScript( Primitive.scriptParams.get( style ), Primitive.caretSlotParams.get( style ) );
 		element.setMainChild( main.present( ctx, usedStyle ) );
 		if ( leftSuper != null )
 		{

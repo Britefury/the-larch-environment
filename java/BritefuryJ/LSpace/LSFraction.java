@@ -16,9 +16,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.LSpace.LayoutTree.LayoutNodeFraction;
+import BritefuryJ.LSpace.StyleParams.CaretSlotStyleParams;
 import BritefuryJ.LSpace.StyleParams.ContainerStyleParams;
 import BritefuryJ.LSpace.StyleParams.FractionStyleParams;
-import BritefuryJ.LSpace.StyleParams.TextStyleParams;
 import BritefuryJ.LSpace.TextFocus.Caret;
 import BritefuryJ.Math.Point2;
 
@@ -176,33 +176,33 @@ public class LSFraction extends LSContainerNonOverlayed
 	protected LSElement children[];
 	protected LSSegment segs[];
 	protected LSParagraph paras[];
-	TextStyleParams segmentTextStyleParams;
+	CaretSlotStyleParams segmentCaretSlotStyleParams;
 
 	
 	
 	
 	public LSFraction()
 	{
-		this( FractionStyleParams.defaultStyleParams, TextStyleParams.defaultStyleParams, "/" );
+		this( FractionStyleParams.defaultStyleParams, CaretSlotStyleParams.defaultStyleParams, "/" );
 	}
 	
 	public LSFraction(String barTextRepresentation)
 	{
-		this( FractionStyleParams.defaultStyleParams, TextStyleParams.defaultStyleParams, barTextRepresentation );
+		this( FractionStyleParams.defaultStyleParams, CaretSlotStyleParams.defaultStyleParams, barTextRepresentation );
 	}
 	
-	public LSFraction(FractionStyleParams styleParams, TextStyleParams segmentTextStyleParams)
+	public LSFraction(FractionStyleParams styleParams, CaretSlotStyleParams segmentCaretSlotStyleParams)
 	{
-		this(styleParams, segmentTextStyleParams, "/" );
+		this(styleParams, segmentCaretSlotStyleParams, "/" );
 	}
 	
-	public LSFraction(FractionStyleParams styleParams, TextStyleParams segmentTextStyleParams, String barTextRepresentation)
+	public LSFraction(FractionStyleParams styleParams, CaretSlotStyleParams segmentCaretSlotStyleParams, String barTextRepresentation)
 	{
 		super(styleParams);
 		
 		layoutNode = new LayoutNodeFraction( this );
 		
-		this.segmentTextStyleParams = segmentTextStyleParams;
+		this.segmentCaretSlotStyleParams = segmentCaretSlotStyleParams;
 		
 		children = new LSElement[NUMCHILDREN];
 		segs = new LSSegment[NUMCHILDREN];
@@ -258,7 +258,7 @@ public class LSFraction extends LSContainerNonOverlayed
 
 				if ( bSegmentRequired  &&  !bSegmentPresent )
 				{
-					LSSegment seg = new LSSegment( (ContainerStyleParams)getStyleParams(), segmentTextStyleParams, true, true );
+					LSSegment seg = new LSSegment( (ContainerStyleParams)getStyleParams(), segmentCaretSlotStyleParams, true, true );
 					segs[slot] = seg;
 					LSParagraph para = new LSParagraph( );
 					para.setChildren( Arrays.asList( new LSElement[] { seg } ) );

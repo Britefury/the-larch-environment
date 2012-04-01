@@ -14,6 +14,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 import BritefuryJ.LSpace.AbstractTextRepresentationManager;
+import BritefuryJ.LSpace.LSCaretSlot;
 import BritefuryJ.LSpace.LSContentLeaf;
 import BritefuryJ.LSpace.LSContentLeafEditable;
 import BritefuryJ.LSpace.LSElement;
@@ -417,14 +418,24 @@ public class Caret extends Target implements MarkerListener
 		
 		if ( marker.isAtStartOf( leaf ) )
 		{
+			LSContentLeaf prev = leaf;
 			LSContentLeaf left = leaf.getContentLeafToLeft();
 			boolean bSkippedLeaves = false;
 			
 
-			while ( left != null  &&  !left.isEditable() )
+			while ( !left.isEditable()  ||  left.isCaretSlot() )
 			{
+				if ( left.isCaretSlot()  &&  ((LSCaretSlot)left).shouldCaretStopHere( prev ) )
+				{
+					break;
+				}
+				prev = left;
 				left = left.getContentLeafToLeft();
 				bSkippedLeaves = true;
+				if ( left == null )
+				{
+					break;
+				}
 			}
 
 			if ( left != null  &&  isElementWithinGrabSubtree( left ) )
@@ -453,14 +464,24 @@ public class Caret extends Target implements MarkerListener
 		
 		if ( marker.isAtEndOf( leaf ) )
 		{
+			LSContentLeaf prev = leaf;
 			LSContentLeaf right = leaf.getContentLeafToRight();
 			boolean bSkippedLeaves = false;
 			
 
-			while ( right != null  &&  !right.isEditable() )
+			while ( !right.isEditable()  ||  right.isCaretSlot() )
 			{
+				if ( right.isCaretSlot()  &&  ((LSCaretSlot)right).shouldCaretStopHere( prev ) )
+				{
+					break;
+				}
+				prev = right;
 				right = right.getContentLeafToRight();
 				bSkippedLeaves = true;
+				if ( right == null )
+				{
+					break;
+				}
 			}
 
 			if ( right != null  &&  isElementWithinGrabSubtree( right ) )
@@ -688,6 +709,7 @@ public class Caret extends Target implements MarkerListener
 		
 		if ( getMarker().isAtStartOf( start ) )
 		{
+			LSContentLeaf prev = start;
 			LSContentLeaf left = start.getContentLeafToLeft();
 			if ( left == null )
 			{
@@ -697,22 +719,40 @@ public class Caret extends Target implements MarkerListener
 			{
 				boolean contentDeleted = false;
 				
-				// If @left is not editable, or empty
-				if ( !left.isEditable()  ||  left.getTextRepresentationLength() == 0 )
+				// Delete the textual content within any non-editable or empty elements. Stop when something has been deleted.
+				while ( !left.isEditable()  ||  left.getTextRepresentationLength() == 0 )
 				{
 					// Delete the content
-					contentDeleted |= left.deleteText();
-
+					boolean deleted = left.deleteText();
+					contentDeleted |= deleted;
+					
 					if ( !start.isRealised() )
 					{
 						// Bail out if a response to the deletion of the text is the start element becoming unrealised
 						return true;
 					}
+					
+					prev = left;
+					left = left.getContentLeafToLeft();
+					if ( left == null )
+					{
+						return true;
+					}
+
+					if ( deleted )
+					{
+						break;
+					}
 				}
 				
 				// Jump over non-editable elements until we reach over an editable one
-				while ( !left.isEditable()  ||  left.getTextRepresentationLength() == 0 )
+				while ( !left.isEditable()  ||  left.isCaretSlot() )
 				{
+					if ( left.isCaretSlot()  &&  ((LSCaretSlot)left).shouldCaretStopHere( prev ) )
+					{
+						break;
+					}
+					prev = left;
 					left = left.getContentLeafToLeft();
 					if ( left == null )
 					{
@@ -749,6 +789,7 @@ public class Caret extends Target implements MarkerListener
 		
 		if ( getMarker().isAtEndOf( start ) )
 		{
+			LSContentLeaf prev = start;
 			LSContentLeaf right = start.getContentLeafToRight();
 			if ( right == null )
 			{
@@ -757,22 +798,40 @@ public class Caret extends Target implements MarkerListener
 			else
 			{
 				boolean contentDeleted = false;
-				// If @right is not editable, or empty
-				if ( !right.isEditable()  ||  right.getTextRepresentationLength() == 0 )
+				// Delete the textual content within any non-editable or empty elements. Stop when something has been deleted.
+				while ( !right.isEditable()  ||  right.getTextRepresentationLength() == 0 )
 				{
 					// Delete the content
-					contentDeleted |= right.deleteText();
-
+					boolean deleted = right.deleteText();
+					contentDeleted |= deleted;
+					
 					if ( !start.isRealised() )
 					{
 						// Bail out if a response to the deletion of the text is the start element becoming unrealised
 						return true;
 					}
+					
+					prev = right;
+					right = right.getContentLeafToLeft();
+					if ( right == null )
+					{
+						return true;
+					}
+
+					if ( deleted )
+					{
+						break;
+					}
 				}
 				
 				// Jump over non-editable elements until we reach over an editable one
-				while ( !right.isEditable()  ||  right.getTextRepresentationLength() == 0 )
+				while ( !right.isEditable()  ||  right.isCaretSlot()  ||  right.getTextRepresentationLength() == 0 )
 				{
+					if ( right.isCaretSlot()  &&  ((LSCaretSlot)right).shouldCaretStopHere( prev ) )
+					{
+						break;
+					}
+					prev = right;
 					right = right.getContentLeafToRight();
 					if ( right == null )
 					{

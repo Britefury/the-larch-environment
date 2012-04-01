@@ -33,7 +33,7 @@ public class StyleSheetBenchmark
 		for (int i = 0; i < elements.length; i++)
 		{
 			//elements[i] = new DPText( "Hello world" );
-			elements[i] = new LSBox( "", 10.0, 10.0 );
+			elements[i] = new LSBox( 10.0, 10.0 );
 		}
 		
 		LSColumn box = new LSColumn();
