@@ -10,6 +10,8 @@ import java.util.List;
 
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSOverlay;
+import BritefuryJ.LSpace.Layout.HAlignment;
+import BritefuryJ.LSpace.Layout.VAlignment;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.SequentialPres;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -31,7 +33,15 @@ public class Overlay extends SequentialPres
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		LSOverlay element = new LSOverlay( Primitive.overlayParams.get( style ) );
-		element.setChildren( mapPresent( ctx, Primitive.useOverlayParams( style ), children ) );
+		LSElement[] childElements = mapPresent( ctx, Primitive.useOverlayParams( style ), children );
+		StyleValues childStyle = Primitive.useOverlayParams( style );
+		HAlignment childHAlign = childStyle.get( Primitive.hAlign, HAlignment.class );
+		VAlignment childVAlign = childStyle.get( Primitive.vAlign, VAlignment.class );
+		for (int i = 0; i < childElements.length; i++)
+		{
+			childElements[i] = childElements[i].layoutWrap( childHAlign, childVAlign );
+		}
+		element.setChildren( childElements );
 		return element;
 	}
 }
