@@ -65,7 +65,11 @@ public abstract class UnparsedEditFilter extends SRRichStringEditFilter
 			FragmentView sourceFragment = (FragmentView)sourceElement.getFragmentContext();
 			if ( sourceFragment == fragment  ||  !shouldApplyToInnerFragment( element, sourceElement, fragment, event, model, value ) )
 			{
-				// Source fragment is this fragment - replace this node with an unparsed node
+				// Either:
+				// - Source fragment is this fragment
+				// or:
+				// - This filter should only apply to current fragment, not inner fragments.
+				// Replace this model with an unparsed model
 				if ( logName != null )
 				{
 					Log log = fragment.getView().getLog();
@@ -83,7 +87,7 @@ public abstract class UnparsedEditFilter extends SRRichStringEditFilter
 				SequentialRichStringVisitor visitor = event.getRichStringVisitor();
 				RichString sourceValue = visitor.getRichString( sourceFragmentElement );
 				
-				if ( value.isEmpty()  ||  isValueEmpty( sourceFragmentElement, sourceElement, sourceFragment, event, sourceModel, sourceValue ) )
+				if ( sourceValue.isEmpty()  ||  isValueEmpty( sourceFragmentElement, sourceElement, sourceFragment, event, sourceModel, sourceValue ) )
 				{
 					// Value is empty - replace this node with an unparsed node
 					if ( logName != null )
