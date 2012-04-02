@@ -59,6 +59,11 @@ public class LSOverlay extends LSContainer
 				// Register added entries
 				for (LSElement child: items)
 				{
+					if ( child.getLayoutNode() == null )
+					{
+						throw new ChildHasNoLayoutException();
+					}
+					
 					registerChild( child );
 				}
 	
@@ -83,6 +88,11 @@ public class LSOverlay extends LSContainer
 				
 				if ( newChild != prevChild )
 				{
+					if ( newChild.getLayoutNode() == null )
+					{
+						throw new ChildHasNoLayoutException();
+					}
+					
 					unregisterChild( prevChild );
 					registeredChildren.set( 0, newChild );
 					registerChild( newChild );
@@ -114,6 +124,11 @@ public class LSOverlay extends LSContainer
 			// Register added entries
 			for (LSElement child: added)
 			{
+				if ( child.getLayoutNode() == null )
+				{
+					throw new ChildHasNoLayoutException();
+				}
+				
 				registerChild( child );
 			}
 
