@@ -16,7 +16,7 @@ class PageFinder (object):
 		self._moduleLoader = moduleLoader
 
 
-	def find_module(self, name, fullname, path):
+	def import_resolve(self, name, fullname, path):
 		return None
 
 
@@ -39,7 +39,7 @@ class PackageFinder (object):
 		self._document = self._projectSubject._document
 
 
-	def find_module(self, name, fullname, path):
+	def import_resolve(self, name, fullname, path):
 		item = self._model.contentsMap.get( name )
 
 		if item is not None:
@@ -105,7 +105,7 @@ class RootFinder (object):
 		self._name, _, self._nameSuffix = pythonPackageName.partition( '.' )
 
 
-	def find_module(self, name, fullname, path):
+	def import_resolve(self, name, fullname, path):
 		if name == self._name:
 			if self._nameSuffix == '':
 				return self._projectSubject._packageFinder
