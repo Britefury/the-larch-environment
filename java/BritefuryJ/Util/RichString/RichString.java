@@ -14,6 +14,8 @@ import java.util.List;
 import org.python.core.PySlice;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.ClipboardFilter.ClipboardCopierMemo;
+import BritefuryJ.ClipboardFilter.ClipboardCopyable;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.Graphics.AbstractBorder;
 import BritefuryJ.Graphics.SolidBorder;
@@ -26,7 +28,7 @@ import BritefuryJ.Pres.ObjectPres.UnescapedStringAsSpan;
 import BritefuryJ.Pres.Primitive.Paragraph;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class RichString implements Presentable
+public class RichString implements Presentable, ClipboardCopyable
 {
 	public static abstract class Item
 	{
@@ -682,6 +684,27 @@ public class RichString implements Presentable
 		}
 		
 		return lo;
+	}
+	
+	
+	
+	public Object clipboardCopy(ClipboardCopierMemo memo)
+	{
+		RichStringBuilder builder = new RichStringBuilder();
+		for (RichString.Item item: getItems())
+		{
+			if ( item instanceof RichString.StructuralItem )
+			{
+				RichString.StructuralItem structuralItem = (RichString.StructuralItem)item;
+				builder.appendStructuralValue( memo.copy( structuralItem.getValue() ) );
+			}
+			else if ( item instanceof RichString.TextItem )
+			{
+				RichString.TextItem textItem = (RichString.TextItem)item;
+				builder.appendTextValue( textItem.getValue() );
+			}
+		}
+		return builder.richString();
 	}
 	
 	

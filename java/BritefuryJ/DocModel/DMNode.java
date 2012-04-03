@@ -15,12 +15,13 @@ import org.python.core.PyObject;
 import org.python.core.PyObjectDerived;
 import org.python.core.PyTuple;
 
+import BritefuryJ.ClipboardFilter.ClipboardCopyable;
 import BritefuryJ.DocModel.DMIOReader.BadModuleNameException;
 import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
 import BritefuryJ.DocModel.DMIOWriter.InvalidDataTypeException;
 
 
-public abstract class DMNode
+public abstract class DMNode implements ClipboardCopyable
 {
 	public static class CannotChangeNodeClassException extends RuntimeException
 	{

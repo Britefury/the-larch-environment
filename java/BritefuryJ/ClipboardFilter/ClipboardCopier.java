@@ -13,38 +13,17 @@ import org.python.core.PyString;
 import org.python.core.PyType;
 import org.python.core.__builtin__;
 
-import BritefuryJ.JythonInterface.Jython_copy;
 import BritefuryJ.Util.PolymorphicMap;
 
 public class ClipboardCopier
 {
-	private static final PyObjectClipboardCopier copier_copy = new PyObjectClipboardCopier()
-	{
-		@Override
-		public PyObject copyObject(PyObject x, ClipboardCopierMemo memo)
-		{
-			return Jython_copy.copy( x );
-		}
-	};
-	
-	private static final PyObjectClipboardCopier copier_deepcopy = new PyObjectClipboardCopier()
-	{
-		@Override
-		public PyObject copyObject(PyObject x, ClipboardCopierMemo memo)
-		{
-			return Jython_copy.deepcopy( x );
-		}
-	};
-	
-	
-	
-	private PyString pythonExportMethodName;
+	private PyString pythonCopyMethodName;
 	private PolymorphicMap<Object> objectCopiers = new PolymorphicMap<Object>();
 	
 	
 	protected ClipboardCopier()
 	{
-		this.pythonExportMethodName = Py.newString( "__clipboard_copy__".intern() );
+		this.pythonCopyMethodName = Py.newString( "__clipboard_copy__".intern() );
 	}
 
 	
@@ -69,7 +48,7 @@ public class ClipboardCopier
 		return copier.copyObject( x, memo );
 	}
 	
-	protected Object invokePyObjectCopier(PyObjectClipboardCopier copier, PyObject x, ClipboardCopierMemo memo)
+	protected PyObject invokePyObjectCopier(PyObjectClipboardCopier copier, PyObject x, ClipboardCopierMemo memo)
 	{
 		return copier.copyObject( x, memo );
 	}
@@ -80,9 +59,29 @@ public class ClipboardCopier
 		return x;
 	}
 	
-
-	public Object copyObject(Object x, ClipboardCopierMemo memo)
+	
+	public ClipboardCopierMemo memo()
 	{
+		return new ClipboardCopierMemo( this );
+	}
+
+	public Object copy(Object x)
+	{
+		return memo().copy( x );
+	}
+	
+	public Object copy(Object x, ClipboardCopierMemo memo)
+	{
+		return memo.copy( x );
+	}
+	
+	protected Object createCopy(Object x, ClipboardCopierMemo memo)
+	{
+		if ( x == null )
+		{
+			return null;
+		}
+		
 		Object result = null;
 		
 		
@@ -96,19 +95,19 @@ public class ClipboardCopier
 		{
 			// @x is a Python object - if it offers a copying method, use that
 			pyX = (PyObject)x;
-			PyObject presentMethod = null;
+			PyObject copyMethod = null;
 			try
 			{
-				presentMethod = __builtin__.getattr( pyX, pythonExportMethodName );
+				copyMethod = __builtin__.getattr( pyX, pythonCopyMethodName );
 			}
 			catch (PyException e)
 			{
-				presentMethod = null;
+				copyMethod = null;
 			}
 			
-			if ( presentMethod != null  &&  presentMethod.isCallable() )
+			if ( copyMethod != null  &&  copyMethod.isCallable() )
 			{
-				result = Py.tojava( presentMethod.__call__( memo.memo ),  Object.class );
+				result = Py.tojava( copyMethod.__call__( Py.java2py( memo.memo ) ),  Object.class );
 			}
 			
 			
@@ -121,7 +120,7 @@ public class ClipboardCopier
 				PyObjectClipboardCopier copier = (PyObjectClipboardCopier)objectCopiers.get( typeX );
 				if ( copier != null )
 				{
-					result = invokePyObjectCopier( copier, pyX, memo );
+					result = Py.tojava( invokePyObjectCopier( copier, pyX, memo ),  Object.class );
 				}
 			}
 		}
@@ -148,6 +147,53 @@ public class ClipboardCopier
 	}
 	
 
+	protected PyObject py_createCopy(PyObject x, ClipboardCopierMemo memo)
+	{
+		PyObject result = null;
+		
+		
+		// Python object clipboard copy protocol
+		// @x is a Python object - if it offers a copying method, use that
+		PyObject copyMethod = null;
+		try
+		{
+			copyMethod = __builtin__.getattr( x, pythonCopyMethodName );
+		}
+		catch (PyException e)
+		{
+			copyMethod = null;
+		}
+		
+		if ( copyMethod != null  &&  copyMethod.isCallable() )
+		{
+			result = copyMethod.__call__( Py.java2py( memo.memo ) );
+		}
+		
+		
+		// Copy method did not succeed. Try the registered copiers.
+		if ( result == null )
+		{
+			PyType typeX = x.getType();
+			
+			PyObjectClipboardCopier copier = (PyObjectClipboardCopier)objectCopiers.get( typeX );
+			if ( copier != null )
+			{
+				result = invokePyObjectCopier( copier, x, memo );
+			}
+		}
+		
+		if ( result == null )
+		{
+			// Fallback
+			return (PyObject)defaultCopy( x );
+		}
+		else
+		{
+			return result;
+		}
+	}
+	
+
 	public void registerJavaObjectCopier(Class<?> cls, ObjectClipboardCopier copier)
 	{
 		objectCopiers.put( cls, copier );
@@ -161,12 +207,12 @@ public class ClipboardCopier
 
 	public void registerPythonObjectCopier_copy(PyType type)
 	{
-		objectCopiers.put( type, copier_copy );
+		throw new RuntimeException( "Not implemented - need to implement Python copy for ClipboardCopier" );
 	}
 
 	public void registerPythonObjectCopier_deepcopy(PyType type)
 	{
-		objectCopiers.put( type, copier_deepcopy );
+		throw new RuntimeException( "Not implemented - need to implement Python deepcopy for ClipboardCopier" );
 	}
 
 

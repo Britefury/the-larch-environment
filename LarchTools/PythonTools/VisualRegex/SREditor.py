@@ -42,10 +42,6 @@ class VisualRegexSyntaxRecognizingEditor (SyntaxRecognizingEditor):
 		return isTopLevelFragment( fragment )
 
 
-	def copyStructuralValue(self, x):
-		return deepcopy( x )
-
-
 
 
 VisualRegexSyntaxRecognizingEditor.instance = VisualRegexSyntaxRecognizingEditor()

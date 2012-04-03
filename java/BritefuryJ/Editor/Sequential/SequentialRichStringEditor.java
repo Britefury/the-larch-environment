@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.Editor.Sequential;
 
+import BritefuryJ.ClipboardFilter.ClipboardCopier;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.SequentialRichStringVisitor;
@@ -21,10 +22,6 @@ public abstract class SequentialRichStringEditor extends SequentialEditor
 	// OVERRIDE THESE AS NECESSARY
 	//
 	//
-	
-	public abstract Object copyStructuralValue(Object x);
-
-	
 	
 	public RichString joinRichStringsForInsertion(FragmentView subtreeRootFragment, RichString before, RichString insertion, RichString after)
 	{
@@ -45,27 +42,6 @@ public abstract class SequentialRichStringEditor extends SequentialEditor
 	
 	
 	
-	private RichString copyRichString(RichString richStr)
-	{
-		RichStringBuilder builder = new RichStringBuilder();
-		for (RichString.Item item: richStr.getItems())
-		{
-			if ( item instanceof RichString.StructuralItem )
-			{
-				RichString.StructuralItem structuralItem = (RichString.StructuralItem)item;
-				builder.appendStructuralValue( copyStructuralValue( structuralItem.getValue() ) );
-			}
-			else if ( item instanceof RichString.TextItem )
-			{
-				RichString.TextItem textItem = (RichString.TextItem)item;
-				builder.appendTextValue( textItem.getValue() );
-			}
-		}
-		return builder.richString();
-	}
-	
-	
-	
 	// Override the following methods in SequentialEditor to support RichString objects
 
 	public Object getSequentialContentInSelection(FragmentView subtreeRootFragment, LSElement subtreeRootFragmentElement, TextSelection selection)
@@ -73,7 +49,7 @@ public abstract class SequentialRichStringEditor extends SequentialEditor
 		SequentialRichStringVisitor visitor = new SequentialRichStringVisitor();
 		RichString richStr = visitor.getRichStringInTextSelection( selection );
 		// Copy the selected content - otherwise altering the original data *after* the copy operation will alter the contents of the cut buffer.
-		return copyRichString( richStr );
+		return ClipboardCopier.instance.copy( richStr );
 	}
 
 	public Object spliceForInsertion(FragmentView subtreeRootFragment, LSElement subtreeRootFragmentElement, Marker prefixEnd, Marker suffixStart, Object insertedContent)
@@ -85,7 +61,7 @@ public abstract class SequentialRichStringEditor extends SequentialEditor
 		
 		// Copy the inserted content - the same content can be pasted multiple times - the copies *must* be distinct, else modifying
 		// one pasted copy will alter all the others
-		RichString insertedRichStr = copyRichString( (RichString)insertedContent );
+		RichString insertedRichStr = (RichString)ClipboardCopier.instance.copy( (RichString)insertedContent );
 		
 		// Join
 		return joinRichStringsForInsertion( subtreeRootFragment, before, insertedRichStr, after );

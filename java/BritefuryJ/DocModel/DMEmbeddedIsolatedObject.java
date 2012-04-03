@@ -20,6 +20,7 @@ import org.python.core.PyTuple;
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.ChangeHistory.ChangeHistory;
 import BritefuryJ.ChangeHistory.Trackable;
+import BritefuryJ.ClipboardFilter.ClipboardCopierMemo;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Isolation.IsolationBarrier;
@@ -137,7 +138,21 @@ public class DMEmbeddedIsolatedObject extends DMNode implements DMEmbeddedPyObje
 	{
 		if ( iso != null )
 		{
-			PyObject valueCopy = valueDeepCopyable  ?  Jython_copy.deepcopy( iso.getValue() )  :  iso.getValue();
+			PyObject valueCopy = Jython_copy.deepcopy( iso.getValue(), memo );
+			return new DMEmbeddedIsolatedObject( valueCopy, valueDeepCopyable );
+		}
+		else
+		{
+			return new DMEmbeddedIsolatedObject();
+		}
+	}
+	
+	@Override
+	public Object clipboardCopy(ClipboardCopierMemo memo)
+	{
+		if ( iso != null )
+		{
+			PyObject valueCopy = valueDeepCopyable  ?  memo.copy( iso.getValue() )  :  iso.getValue();
 			return new DMEmbeddedIsolatedObject( valueCopy, valueDeepCopyable );
 		}
 		else

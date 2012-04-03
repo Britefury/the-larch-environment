@@ -24,6 +24,7 @@ import org.python.core.PySlice;
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.ChangeHistory.ChangeHistory;
 import BritefuryJ.ChangeHistory.Trackable;
+import BritefuryJ.ClipboardFilter.ClipboardCopierMemo;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.Incremental.IncrementalValueMonitor;
 import BritefuryJ.IncrementalView.FragmentView;
@@ -402,6 +403,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Presen
 	}
 	
 	
+	@Override
 	protected Object createDeepCopy(PyDictionary memo)
 	{
 		onAccess();
@@ -412,6 +414,22 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Presen
 		for (Object x: value)
 		{
 			ys.add( deepCopyOf( x, memo ) );
+		}
+		
+		return new DMList( ys );
+	}
+	
+	@Override
+	public Object clipboardCopy(ClipboardCopierMemo memo)
+	{
+		onAccess();
+
+		ArrayList<Object> ys = new ArrayList<Object>();
+		ys.ensureCapacity( value.size() );
+		
+		for (Object x: value)
+		{
+			ys.add( memo.copy( x ) );
 		}
 		
 		return new DMList( ys );

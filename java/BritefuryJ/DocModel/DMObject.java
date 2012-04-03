@@ -25,6 +25,7 @@ import org.python.core.PyUnicode;
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.ChangeHistory.ChangeHistory;
 import BritefuryJ.ChangeHistory.Trackable;
+import BritefuryJ.ClipboardFilter.ClipboardCopierMemo;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.DocModel.DMObjectClass.UnknownFieldNameException;
 import BritefuryJ.Incremental.IncrementalValueMonitor;
@@ -259,6 +260,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Pr
 	
 	
 	
+	@Override
 	protected Object createDeepCopy(PyDictionary memo)
 	{
 		onAccess();
@@ -268,6 +270,21 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Pr
 		for (Object x: fieldData)
 		{
 			ys[i++] = deepCopyOf( x, memo );
+		}
+		
+		return new DMObject( objClass, ys );
+	}
+	
+	@Override
+	public Object clipboardCopy(ClipboardCopierMemo memo)
+	{
+		onAccess();
+		Object[] ys = new Object[fieldData.length];
+		
+		int i = 0;
+		for (Object x: fieldData)
+		{
+			ys[i++] = memo.copy( x );
 		}
 		
 		return new DMObject( objClass, ys );

@@ -6,20 +6,59 @@
 //##************************
 package BritefuryJ.ClipboardFilter;
 
-import org.python.core.PyDictionary;
+import java.util.IdentityHashMap;
+
+import org.python.core.Py;
+import org.python.core.PyObject;
 
 public class ClipboardCopierMemo
 {
-	protected PyDictionary memo;
+	protected IdentityHashMap<Object, Object> memo;
+	private ClipboardCopier copier;
 	
 	
-	public ClipboardCopierMemo(PyDictionary memo)
+	protected ClipboardCopierMemo(ClipboardCopier copier)
 	{
-		this.memo = memo;
+		this.memo = new IdentityHashMap<Object, Object>();
+		this.copier = copier;
 	}
 	
-	public ClipboardCopierMemo()
+	
+	public PyObject copy(PyObject x)
 	{
-		this( new PyDictionary() );
+		if ( x == null  ||  x == Py.None )
+		{
+			return x;
+		}
+		
+		if ( memo.containsKey( x ) )
+		{
+			return (PyObject)memo.get( x );
+		}
+		else
+		{
+			PyObject copy = copier.py_createCopy( x, this );
+			memo.put( x, copy );
+			return copy;
+		}
+	}
+
+	public Object copy(Object x)
+	{
+		if ( x == null )
+		{
+			return null;
+		}
+		
+		if ( memo.containsKey( x ) )
+		{
+			return memo.get( x );
+		}
+		else
+		{
+			Object copy = copier.createCopy( x, this );
+			memo.put( x, copy );
+			return copy;
+		}
 	}
 }

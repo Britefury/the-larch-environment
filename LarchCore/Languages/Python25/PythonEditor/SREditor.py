@@ -76,9 +76,6 @@ class PythonSyntaxRecognizingEditor (SyntaxRecognizingEditor):
 	
 	def joinRichStringsForDeletion(self, subtreeRootFragment, before, after):
 		return joinRichStringsAroundDeletionPoint( before, after )
-	
-	def copyStructuralValue(self, x):
-		return deepcopy( x )
 
 	
 	
