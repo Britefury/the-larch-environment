@@ -82,16 +82,16 @@ class MainAppSubject (Subject):
 		
 	
 	
-	def find_module(self, name, fullname, path):
+	def import_resolve(self, name, fullname, path):
 		for appDocument in self._appState.getOpenDocuments():
 			doc = appDocument.getDocument()
 			subject = doc.newSubject( self, self._rootLocation + '.documents.' + appDocument.getRelativeLocation(), None, appDocument.getName() )
 			try:
-				f = subject.find_module
+				resolve = subject.import_resolve
 			except AttributeError:
 				pass
 			else:
-				result = f( name, fullname, path )
+				result = resolve( name, fullname, path )
 				if result is not None:
 					return result
 		return None

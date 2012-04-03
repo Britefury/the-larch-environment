@@ -195,5 +195,5 @@ class ProjectSubject (_RootSubject):
 
 
 
-	def find_module(self, name, fullname, path):
-		return self._rootFinder.find_module( name, fullname, path )
+	def import_resolve(self, name, fullname, path):
+		return self._rootFinder.import_resolve( name, fullname, path )

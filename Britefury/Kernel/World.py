@@ -84,17 +84,17 @@ class World (object):
 		
 	def find_module(self, fullname, path=None):
 		try:
-			app_find_module = self._appStateSubject.find_module
+			app_find_module = self._appStateSubject.import_resolve
 		except AttributeError:
 			return None
 		names = fullname.split( '.' )
 		finder = self._appStateSubject
 		for name in names:
 			try:
-				fm = finder.find_module
+				resolver = finder.import_resolve
 			except AttributeError:
 				return None
-			finder = fm( name, fullname, path )
+			finder = resolver( name, fullname, path )
 			if finder is None:
 				return None
 		return finder
