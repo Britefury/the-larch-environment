@@ -121,7 +121,8 @@ public abstract class AbstractTableEditor<ModelType>
 		{
 			Object contents[][] = selection.getSelectedData();
 			TableCellExportedValue exportContents[][] = exportBlock( selection.getX(), selection.getY(), contents );
-			contents = copyBlock( selection.getX(), selection.getY(), contents );
+			// Copy when values are acquired - user may modify document content afterwards - we do not want these changes to affect the contents of the clipboard
+			contents = copyBlock( contents );
 			return new TableSelectionContents( contents, exportContents );
 		}
 	};
@@ -145,6 +146,9 @@ public abstract class AbstractTableEditor<ModelType>
 
 			ModelType model = (ModelType)target.editorInstance.model;
 			Object[][] subtable = buffer.contents;
+			
+			// Copy the block of data to be pasted - a block may be pasted multiple times - each instance should get its own copy
+			subtable = copyBlock( subtable );
 			
 			putBlock( model, target.x, target.y, subtable, (AbstractTableEditorInstance<ModelType>)target.editorInstance );
 
@@ -346,9 +350,9 @@ public abstract class AbstractTableEditor<ModelType>
 		return textBlock;
 	}
 
-	protected Object[][] copyBlock(int posX, int posY, Object[][] valueBlock)
+	protected Object[][] copyBlock(Object[][] valueBlock)
 	{
-		ClipboardCopierMemo memo = new ClipboardCopierMemo();
+		ClipboardCopierMemo memo = ClipboardCopier.instance.memo();
 		
 		Object destBlock[][] = new Object[valueBlock.length][];
 		for (int b = 0; b < valueBlock.length; b++)
@@ -359,7 +363,7 @@ public abstract class AbstractTableEditor<ModelType>
 			
 			for (int a = 0; a < srcRow.length; a++)
 			{
-				destRow[a] = ClipboardCopier.instance.copyObject( srcRow[a], memo );
+				destRow[a] = ClipboardCopier.instance.copy( srcRow[a], memo );
 			}
 		}
 		
