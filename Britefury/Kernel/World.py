@@ -87,7 +87,17 @@ class World (object):
 			app_find_module = self._appStateSubject.find_module
 		except AttributeError:
 			return None
-		return app_find_module( fullname, path, None )
+		names = fullname.split( '.' )
+		finder = self._appStateSubject
+		for name in names:
+			try:
+				fm = finder.find_module
+			except AttributeError:
+				return None
+			finder = fm( name, fullname, path )
+			if finder is None:
+				return None
+		return finder
 
 	
 	

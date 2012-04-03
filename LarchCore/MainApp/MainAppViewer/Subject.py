@@ -82,7 +82,7 @@ class MainAppSubject (Subject):
 		
 	
 	
-	def find_module(self, fullname, path, document):
+	def find_module(self, name, fullname, path):
 		for appDocument in self._appState.getOpenDocuments():
 			doc = appDocument.getDocument()
 			subject = doc.newSubject( self, self._rootLocation + '.documents.' + appDocument.getRelativeLocation(), None, appDocument.getName() )
@@ -91,7 +91,7 @@ class MainAppSubject (Subject):
 			except AttributeError:
 				pass
 			else:
-				result = f( fullname, path, doc )
+				result = f( name, fullname, path )
 				if result is not None:
 					return result
 		return None

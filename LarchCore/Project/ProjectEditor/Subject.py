@@ -22,7 +22,7 @@ from LarchCore.MainApp import DocumentManagement
 from LarchCore.Project.ProjectPage import ProjectPage
 from LarchCore.Project.ProjectPackage import ProjectPackage
 from LarchCore.Project.ProjectEditor.View import perspective
-from LarchCore.Project.ProjectEditor.ModuleFinder import RootFinder, ModuleFinder
+from LarchCore.Project.ProjectEditor.ModuleFinder import RootFinder, PackageFinder
 
 
 
@@ -173,8 +173,8 @@ class ProjectSubject (_RootSubject):
 	def __init__(self, document, model, enclosingSubject, location, importName, title):
 		super( ProjectSubject, self ).__init__( document, model, enclosingSubject, location, importName, title )
 		assert isinstance( location, Location )
-		self._moduleFinder = ModuleFinder( self )
-		self._rootFinder = RootFinder( self )
+		self._packageFinder = PackageFinder( self, model, location )
+		self._rootFinder = RootFinder( self, model.pythonPackageName )
 		self._rootSubject = _RootSubject( document, model, enclosingSubject, location, importName, title )
 		
 		
@@ -195,5 +195,5 @@ class ProjectSubject (_RootSubject):
 
 
 
-	def find_module(self, fullname, path, document):
-		return self._rootFinder.find_module( fullname, path, document )
+	def find_module(self, name, fullname, path):
+		return self._rootFinder.find_module( name, fullname, path )
