@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.Command;
 
+import java.awt.event.KeyEvent;
 import java.util.List;
 
 public class BoundCommandSet
@@ -58,5 +59,12 @@ public class BoundCommandSet
 				cmdList.add( cmd.bindTo( binding ) );
 			}
 		}
+	}
+	
+	
+	public BoundCommand getCommandForKeyPressed(KeyEvent event)
+	{
+		Command cmd = commandSet.shortcuts.getCommandForKeyPressed( event );
+		return cmd != null  ?  cmd.bindTo( binding )  :  null;
 	}
 }

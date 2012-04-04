@@ -6,19 +6,45 @@
 //##************************
 package BritefuryJ.Command;
 
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
 import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Interactor.KeyElementInteractor;
 
 public class CommandSet implements CommandSetSource
 {
-	protected class CommandSetInteractor implements GatherCommandSetInteractor
+	protected class CommandSetInteractor implements GatherCommandSetInteractor, KeyElementInteractor 
 	{
 		@Override
 		public void gatherCommandSets(LSElement element, List<CommandSet> commandSets)
 		{
 			commandSets.add( CommandSet.this );
+		}
+
+		@Override
+		public boolean keyPressed(LSElement element, KeyEvent event)
+		{
+			Command cmd = shortcuts.getCommandForKeyPressed( event );
+			if ( cmd != null )
+			{
+				cmd.bindTo( element ).execute();
+				return true;
+			}
+			return false;
+		}
+
+		@Override
+		public boolean keyReleased(LSElement element, KeyEvent event)
+		{
+			return false;
+		}
+
+		@Override
+		public boolean keyTyped(LSElement element, KeyEvent event)
+		{
+			return false;
 		}
 	}
 	
@@ -26,18 +52,21 @@ public class CommandSet implements CommandSetSource
 	private String name;
 	protected ArrayList<Command> commands = new ArrayList<Command>();
 	private CommandSetInteractor interactor = new CommandSetInteractor();
+	protected ShortcutTable shortcuts = new ShortcutTable();
 	
 	
 	public CommandSet(String name, List<Command> commands)
 	{
 		this.name = name;
 		this.commands.addAll( commands );
+		shortcuts.addCommands( commands );
 	}
 
 	public CommandSet(String name, Command command)
 	{
 		this.name = name;
 		this.commands.add( command );
+		shortcuts.addCommand( command );
 	}
 	
 	
