@@ -14,9 +14,13 @@ Inspired by the visual regular expression presentation system in SWYN (Say What 
 
 import re
 
+from java.awt import Color
+
 from BritefuryJ.Command import *
 
 from BritefuryJ.DocModel import DMNode
+
+from BritefuryJ.Graphics import *
 
 from BritefuryJ.Pres.Primitive import *
 
@@ -27,6 +31,8 @@ from LarchTools.PythonTools.VisualRegex.Parser import VisualRegexGrammar
 from LarchTools.PythonTools.VisualRegex.View import perspective as VREPerspective
 from LarchTools.PythonTools.VisualRegex.CodeGenerator import VisualRegexCodeGenerator
 
+
+_vreBorder = SolidBorder( 2.0, 4.0, 10.0, 10.0, Color( 0.7, 0.8, 0.7 ), None )
 
 
 class VisualPythonRegex (object):
@@ -65,7 +71,9 @@ class VisualPythonRegex (object):
 
 	def __present__(self, fragment, inherited_state):
 		#return VREPerspective( self.regex )
-		return Paragraph( [ HiddenText( u'\ue000' ), VREPerspective( self.regex ), HiddenText( u'\ue000' ) ] )
+		e = Paragraph( [ HiddenText( u'\ue000' ), VREPerspective( self.regex ), HiddenText( u'\ue000' ) ] )
+		e = _vreBorder.surround( e )
+		return e
 
 
 
