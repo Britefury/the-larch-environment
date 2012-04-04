@@ -25,6 +25,9 @@ from LarchTools.PythonTools.VisualRegex import Schema
 
 
 class VisualRegexGrammar (Grammar):
+	__junk_regex__ = None
+
+
 	@Rule
 	def pythonEscapedChar(self):
 		return ( Literal( '\\' ) + RegEx( '[abnfrt]|(x[0-9a-fA-F]{2})|(u[0-9a-fA-F]{4})|(U[0-9a-fA-F]{8})' ) ).action( lambda input, begin, end, x, bindings: Schema.PythonEscapedChar( char=x[1] ) )

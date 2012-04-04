@@ -59,6 +59,8 @@ def _incrementParens(node):
 
 
 class Python25Grammar (Grammar):
+	__junk_regex__ = '[ ]*'
+
 	#
 	#
 	# BASICS

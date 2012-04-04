@@ -36,6 +36,7 @@ public abstract class ParserExpression
 	
 	
 	protected String debugName = "";
+	protected String junkRegex = "[ ]*";
 	
 	
 	
@@ -44,23 +45,25 @@ public abstract class ParserExpression
 	}
 	
 	
+	public String getJunkRegex()
+	{
+		return junkRegex;
+	}
+	
+	public ParserExpression setJunkRegex(String junkRegex)
+	{
+		this.junkRegex = junkRegex;
+		return this;
+	}
+	
+	
 
 	public ParseResult parseNode(Object input)
 	{
-		return parseNode( input, "[ ]*", (ParseAction)null );
-	}
-
-	public ParseResult parseNode(Object input, String junkRegex)
-	{
-		return parseNode( input, junkRegex, (ParseAction)null );
+		return parseNode( input, (ParseAction)null );
 	}
 
 	public ParseResult parseNode(Object input, ParseAction delegateAction)
-	{
-		return parseNode( input, "[ ]*", delegateAction );
-	}
-
-	public ParseResult parseNode(Object input, String junkRegex, ParseAction delegateAction)
 	{
 		ParserState state = new ParserState( junkRegex, delegateAction );
 		return handleNode( state, input );
@@ -68,31 +71,16 @@ public abstract class ParserExpression
 
 	public ParseResult parseNode(Object input, PyObject delegateAction)
 	{
-		return parseNode( input, "[ ]*", new Action.PyAction( delegateAction ) );
-	}
-
-	public ParseResult parseNode(Object input, String junkRegex, PyObject delegateAction)
-	{
-		return parseNode( input, junkRegex, new Action.PyAction( delegateAction ) );
+		return parseNode( input, new Action.PyAction( delegateAction ) );
 	}
 
 	
 	public TracedParseResult traceParseNode(Object input)
 	{
-		return traceParseNode( input, "[ ]*", (ParseAction)null );
-	}
-
-	public TracedParseResult traceParseNode(Object input, String junkRegex)
-	{
-		return traceParseNode( input, junkRegex, (ParseAction)null );
+		return traceParseNode( input, (ParseAction)null );
 	}
 
 	public TracedParseResult traceParseNode(Object input, ParseAction delegateAction)
-	{
-		return traceParseNode( input, "[ ]*", delegateAction );
-	}
-
-	public TracedParseResult traceParseNode(Object input, String junkRegex, ParseAction delegateAction)
 	{
 		ParserState state = new ParserState( junkRegex, delegateAction );
 		state.enableTrace();
@@ -101,12 +89,7 @@ public abstract class ParserExpression
 
 	public TracedParseResult traceParseNode(Object input, PyObject delegateAction)
 	{
-		return traceParseNode( input, "[ ]*", new Action.PyAction( delegateAction ) );
-	}
-
-	public TracedParseResult traceParseNode(Object input, String junkRegex, PyObject delegateAction)
-	{
-		return traceParseNode( input, junkRegex, new Action.PyAction( delegateAction ) );
+		return traceParseNode( input, new Action.PyAction( delegateAction ) );
 	}
 
 	
@@ -117,20 +100,10 @@ public abstract class ParserExpression
 	
 	public ParseResult parseStringChars(String input)
 	{
-		return parseStringChars( input, "[ ]*", (ParseAction)null );
-	}
-
-	public ParseResult parseStringChars(String input, String junkRegex)
-	{
-		return parseStringChars( input, junkRegex, (ParseAction)null );
+		return parseStringChars( input, (ParseAction)null );
 	}
 
 	public ParseResult parseStringChars(String input, ParseAction delegateAction)
-	{
-		return parseStringChars( input, "[ ]*", delegateAction );
-	}
-
-	public ParseResult parseStringChars(String input, String junkRegex, ParseAction delegateAction)
 	{
 		ParserState state = new ParserState( junkRegex, delegateAction );
 		ParseResult result = handleStringChars( state, input, 0 );
@@ -144,31 +117,16 @@ public abstract class ParserExpression
 
 	public ParseResult parseStringChars(String input, PyObject delegateAction)
 	{
-		return parseStringChars( input, "[ ]*", new Action.PyAction( delegateAction ) );
-	}
-
-	public ParseResult parseStringChars(String input, String junkRegex, PyObject delegateAction)
-	{
-		return parseStringChars( input, junkRegex, new Action.PyAction( delegateAction ) );
+		return parseStringChars( input, new Action.PyAction( delegateAction ) );
 	}
 
 	
 	public TracedParseResult traceParseStringChars(String input)
 	{
-		return traceParseStringChars( input, "[ ]*", (ParseAction)null );
-	}
-
-	public TracedParseResult traceParseStringChars(String input, String junkRegex)
-	{
-		return traceParseStringChars( input, junkRegex, (ParseAction)null );
+		return traceParseStringChars( input, (ParseAction)null );
 	}
 
 	public TracedParseResult traceParseStringChars(String input, ParseAction delegateAction)
-	{
-		return traceParseStringChars( input, "[ ]*", delegateAction );
-	}
-
-	public TracedParseResult traceParseStringChars(String input, String junkRegex, ParseAction delegateAction)
 	{
 		ParserState state = new ParserState( junkRegex, delegateAction );
 		state.enableTrace();
@@ -183,12 +141,7 @@ public abstract class ParserExpression
 
 	public TracedParseResult traceParseStringChars(String input, PyObject delegateAction)
 	{
-		return traceParseStringChars( input, "[ ]*", new Action.PyAction( delegateAction ) );
-	}
-
-	public TracedParseResult traceParseStringChars(String input, String junkRegex, PyObject delegateAction)
-	{
-		return traceParseStringChars( input, junkRegex, new Action.PyAction( delegateAction ) );
+		return traceParseStringChars( input, new Action.PyAction( delegateAction ) );
 	}
 
 	
@@ -196,35 +149,20 @@ public abstract class ParserExpression
 	
 	public ParseResult parseRichStringItems(RichString input)
 	{
-		return parseRichStringItems( input.accessor(), "[ ]*", null );
-	}
-
-	public ParseResult parseRichStringItems(RichString input, String junkRegex)
-	{
-		return parseRichStringItems( input.accessor(), junkRegex, null );
+		return parseRichStringItems( input.accessor(), null );
 	}
 
 	public ParseResult parseRichStringItems(RichString input, ParseAction delegateAction)
 	{
-		return parseRichStringItems( input.accessor(), "[ ]*", delegateAction );
-	}
-
-	public ParseResult parseRichStringItems(RichString input, String junkRegex, ParseAction delegateAction)
-	{
-		return parseRichStringItems( input.accessor(), junkRegex, delegateAction );
+		return parseRichStringItems( input.accessor(), delegateAction );
 	}
 
 	public ParseResult parseRichStringItems(RichString input, PyObject delegateAction)
 	{
-		return parseRichStringItems( input.accessor(), "[ ]*", new Action.PyAction( delegateAction ) );
+		return parseRichStringItems( input.accessor(), new Action.PyAction( delegateAction ) );
 	}
 
-	public ParseResult parseRichStringItems(RichString input, String junkRegex, PyObject delegateAction)
-	{
-		return parseRichStringItems( input.accessor(), junkRegex, new Action.PyAction( delegateAction ) );
-	}
-
-	private ParseResult parseRichStringItems(RichStringAccessor input, String junkRegex, ParseAction delegateAction)
+	private ParseResult parseRichStringItems(RichStringAccessor input, ParseAction delegateAction)
 	{
 		ParserState state = new ParserState( junkRegex, delegateAction );
 		ParseResult result = handleRichStringItems( state, input, 0 );
@@ -239,35 +177,20 @@ public abstract class ParserExpression
 	
 	public TracedParseResult traceParseRichStringItems(RichString input)
 	{
-		return traceParseRichStringItems( input.accessor(), "[ ]*", null );
-	}
-
-	public TracedParseResult traceParseRichStringItems(RichString input, String junkRegex)
-	{
-		return traceParseRichStringItems( input.accessor(), junkRegex, null );
+		return traceParseRichStringItems( input.accessor(), null );
 	}
 
 	public TracedParseResult traceParseRichStringItems(RichString input, ParseAction delegateAction)
 	{
-		return traceParseRichStringItems( input.accessor(), "[ ]*", delegateAction );
-	}
-
-	public TracedParseResult traceParseRichStringItems(RichString input, String junkRegex, ParseAction delegateAction)
-	{
-		return traceParseRichStringItems( input.accessor(), junkRegex, delegateAction );
+		return traceParseRichStringItems( input.accessor(), delegateAction );
 	}
 
 	public TracedParseResult traceParseRichStringItems(RichString input, PyObject delegateAction)
 	{
-		return traceParseRichStringItems( input.accessor(), "[ ]*", new Action.PyAction( delegateAction ) );
+		return traceParseRichStringItems( input.accessor(), new Action.PyAction( delegateAction ) );
 	}
 
-	public TracedParseResult traceParseRichStringItems(RichString input, String junkRegex, PyObject delegateAction)
-	{
-		return traceParseRichStringItems( input.accessor(), junkRegex, new Action.PyAction( delegateAction ) );
-	}
-
-	private TracedParseResult traceParseRichStringItems(RichStringAccessor input, String junkRegex, ParseAction delegateAction)
+	private TracedParseResult traceParseRichStringItems(RichStringAccessor input, ParseAction delegateAction)
 	{
 		ParserState state = new ParserState( junkRegex, delegateAction );
 		state.enableTrace();
@@ -285,20 +208,10 @@ public abstract class ParserExpression
 	
 	public ParseResult parseListItems(List<Object> input)
 	{
-		return parseListItems( input, "[ ]*", (ParseAction)null );
-	}
-
-	public ParseResult parseListItems(List<Object> input, String junkRegex)
-	{
-		return parseListItems( input, junkRegex, (ParseAction)null );
+		return parseListItems( input, (ParseAction)null );
 	}
 
 	public ParseResult parseListItems(List<Object> input, ParseAction delegateAction)
-	{
-		return parseListItems( input, "[ ]*", delegateAction );
-	}
-
-	public ParseResult parseListItems(List<Object> input, String junkRegex, ParseAction delegateAction)
 	{
 		ParserState state = new ParserState( junkRegex, delegateAction );
 		return handleListItems( state, input, 0 );
@@ -306,31 +219,16 @@ public abstract class ParserExpression
 
 	public ParseResult parseListItems(List<Object> input, PyObject delegateAction)
 	{
-		return parseListItems( input, "[ ]*", new Action.PyAction( delegateAction ) );
-	}
-
-	public ParseResult parseListItems(List<Object> input, String junkRegex, PyObject delegateAction)
-	{
-		return parseListItems( input, junkRegex, new Action.PyAction( delegateAction ) );
+		return parseListItems( input, new Action.PyAction( delegateAction ) );
 	}
 
 	
 	public TracedParseResult traceParseListItems(List<Object> input)
 	{
-		return traceParseListItems( input, "[ ]*", (ParseAction)null );
-	}
-
-	public TracedParseResult traceParseListItems(List<Object> input, String junkRegex)
-	{
-		return traceParseListItems( input, junkRegex, (ParseAction)null );
+		return traceParseListItems( input, (ParseAction)null );
 	}
 
 	public TracedParseResult traceParseListItems(List<Object> input, ParseAction delegateAction)
-	{
-		return traceParseListItems( input, "[ ]*", delegateAction );
-	}
-
-	public TracedParseResult traceParseListItems(List<Object> input, String junkRegex, ParseAction delegateAction)
 	{
 		ParserState state = new ParserState( junkRegex, delegateAction );
 		state.enableTrace();
@@ -339,12 +237,7 @@ public abstract class ParserExpression
 
 	public TracedParseResult traceParseListItems(List<Object> input, PyObject delegateAction)
 	{
-		return traceParseListItems( input, "[ ]*", new Action.PyAction( delegateAction ) );
-	}
-
-	public TracedParseResult traceParseListItems(List<Object> input, String junkRegex, PyObject delegateAction)
-	{
-		return traceParseListItems( input, junkRegex, new Action.PyAction( delegateAction ) );
+		return traceParseListItems( input, new Action.PyAction( delegateAction ) );
 	}
 
 	

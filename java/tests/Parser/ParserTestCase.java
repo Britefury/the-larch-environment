@@ -178,7 +178,8 @@ abstract public class ParserTestCase extends TestCase
 
 	public void matchTestString(ParserExpression parser, String input, Object expected, String ignoreCharsRegex, ParseAction delegateAction)
 	{
-		ParseResult result = parser.parseStringChars( input, ignoreCharsRegex, delegateAction );
+		parser.setJunkRegex( ignoreCharsRegex );
+		ParseResult result = parser.parseStringChars( input, delegateAction );
 		
 		if ( !result.isValid() )
 		{
@@ -258,7 +259,8 @@ abstract public class ParserTestCase extends TestCase
 
 	public void bindingsTestString(ParserExpression parser, String input, Map<String, Object> expectedBindings, String ignoreCharsRegex, ParseAction delegateAction)
 	{
-		ParseResult result = parser.parseStringChars( input, ignoreCharsRegex, delegateAction );
+		parser.setJunkRegex( ignoreCharsRegex );
+		ParseResult result = parser.parseStringChars( input, delegateAction );
 		
 		if ( !result.isValid() )
 		{
@@ -320,7 +322,8 @@ abstract public class ParserTestCase extends TestCase
 
 	public void matchTestRichString(ParserExpression parser, RichString input, Object expected, String ignoreCharsRegex, ParseAction delegateAction)
 	{
-		ParseResult result = parser.parseRichStringItems( input, ignoreCharsRegex, delegateAction );
+		parser.setJunkRegex( ignoreCharsRegex );
+		ParseResult result = parser.parseRichStringItems( input, delegateAction );
 		
 		if ( !result.isValid() )
 		{
@@ -399,7 +402,8 @@ abstract public class ParserTestCase extends TestCase
 
 	public void bindingsTestRichString(ParserExpression parser, RichString input, Map<String, Object> expectedBindings, String ignoreCharsRegex, ParseAction delegateAction)
 	{
-		ParseResult result = parser.parseRichStringItems( input, ignoreCharsRegex, delegateAction );
+		parser.setJunkRegex( ignoreCharsRegex );
+		ParseResult result = parser.parseRichStringItems( input, delegateAction );
 		
 		if ( !result.isValid() )
 		{
@@ -463,7 +467,8 @@ abstract public class ParserTestCase extends TestCase
 
 	public void matchTestNode(ParserExpression parser, Object input, Object expected, String ignoreCharsRegex, ParseAction delegateAction)
 	{
-		ParseResult result = parser.parseNode( input, ignoreCharsRegex, delegateAction );
+		parser.setJunkRegex( ignoreCharsRegex );
+		ParseResult result = parser.parseNode( input, delegateAction );
 		
 		if ( !result.isValid() )
 		{
@@ -528,7 +533,8 @@ abstract public class ParserTestCase extends TestCase
 
 	public void bindingsTestNode(ParserExpression parser, Object input, Map<String, Object> expectedBindings, String ignoreCharsRegex, ParseAction delegateAction)
 	{
-		ParseResult result = parser.parseNode( input, ignoreCharsRegex, delegateAction );
+		parser.setJunkRegex( ignoreCharsRegex );
+		ParseResult result = parser.parseNode( input, delegateAction );
 		
 		if ( !result.isValid() )
 		{
@@ -585,7 +591,8 @@ abstract public class ParserTestCase extends TestCase
 
 	public void matchTestList(ParserExpression parser, List<Object> input, Object expected, String ignoreCharsRegex, ParseAction delegateAction)
 	{
-		ParseResult result = parser.parseListItems( input, ignoreCharsRegex, delegateAction );
+		parser.setJunkRegex( ignoreCharsRegex );
+		ParseResult result = parser.parseListItems( input, delegateAction );
 		
 		if ( !result.isValid() )
 		{
@@ -665,7 +672,8 @@ abstract public class ParserTestCase extends TestCase
 
 	public void bindingsTestList(ParserExpression parser, List<Object> input, Map<String, Object> expectedBindings, String ignoreCharsRegex, ParseAction delegateAction)
 	{
-		ParseResult result = parser.parseListItems( input, ignoreCharsRegex, delegateAction );
+		parser.setJunkRegex( ignoreCharsRegex );
+		ParseResult result = parser.parseListItems( input, delegateAction );
 		
 		if ( !result.isValid() )
 		{
@@ -745,7 +753,8 @@ abstract public class ParserTestCase extends TestCase
 	
 	public void matchSubTestString(ParserExpression parser, String input, Object expected, int end, String ignoreCharsRegex)
 	{
-		ParseResult result = parser.parseStringChars( input, ignoreCharsRegex );
+		parser.setJunkRegex( ignoreCharsRegex );
+		ParseResult result = parser.parseStringChars( input );
 
 		if ( !result.isValid() )
 		{
@@ -816,7 +825,8 @@ abstract public class ParserTestCase extends TestCase
 	
 	public void matchSubTestRichString(ParserExpression parser, RichString input, Object expected, int end, String ignoreCharsRegex)
 	{
-		ParseResult result = parser.parseRichStringItems( input, ignoreCharsRegex );
+		parser.setJunkRegex( ignoreCharsRegex );
+		ParseResult result = parser.parseRichStringItems( input );
 
 		if ( !result.isValid() )
 		{
@@ -889,7 +899,8 @@ abstract public class ParserTestCase extends TestCase
 	
 	public void matchSubTestList(ParserExpression parser, List<Object> input, Object expected, int end, String ignoreCharsRegex)
 	{
-		ParseResult result = parser.parseListItems( input, ignoreCharsRegex );
+		parser.setJunkRegex( ignoreCharsRegex );
+		ParseResult result = parser.parseListItems( input );
 
 		if ( !result.isValid() )
 		{
@@ -961,7 +972,8 @@ abstract public class ParserTestCase extends TestCase
 	
 	public void matchFailTestString(ParserExpression parser, String input, String ignoreCharsRegex)
 	{
-		ParseResult result = parser.parseStringChars( input, ignoreCharsRegex );
+		parser.setJunkRegex( ignoreCharsRegex );
+		ParseResult result = parser.parseStringChars( input );
 
 		if ( result.isValid() )
 		{
@@ -988,7 +1000,8 @@ abstract public class ParserTestCase extends TestCase
 	
 	public void matchFailTestRichString(ParserExpression parser, RichString input, String ignoreCharsRegex)
 	{
-		ParseResult result = parser.parseRichStringItems( input, ignoreCharsRegex );
+		parser.setJunkRegex( ignoreCharsRegex );
+		ParseResult result = parser.parseRichStringItems( input );
 
 		if ( result.isValid() )
 		{
@@ -1026,7 +1039,8 @@ abstract public class ParserTestCase extends TestCase
 	
 	public void matchFailTestNode(ParserExpression parser, Object input, String ignoreCharsRegex)
 	{
-		ParseResult result = parser.parseNode( input, ignoreCharsRegex );
+		parser.setJunkRegex( ignoreCharsRegex );
+		ParseResult result = parser.parseNode( input );
 
 		if ( result.isValid() )
 		{
@@ -1064,7 +1078,8 @@ abstract public class ParserTestCase extends TestCase
 	
 	public void matchFailTestList(ParserExpression parser, List<Object> input, String ignoreCharsRegex)
 	{
-		ParseResult result = parser.parseListItems( input, ignoreCharsRegex );
+		parser.setJunkRegex( ignoreCharsRegex );
+		ParseResult result = parser.parseListItems( input );
 
 		if ( result.isValid() )
 		{
@@ -1108,7 +1123,8 @@ abstract public class ParserTestCase extends TestCase
 	
 	public void matchIncompleteTestString(ParserExpression parser, String input, String ignoreCharsRegex)
 	{
-		ParseResult result = parser.parseStringChars( input, ignoreCharsRegex );
+		parser.setJunkRegex( ignoreCharsRegex );
+		ParseResult result = parser.parseStringChars( input );
 
 		if ( !result.isValid() )
 		{
@@ -1140,7 +1156,8 @@ abstract public class ParserTestCase extends TestCase
 	
 	public void matchIncompleteTestRichString(ParserExpression parser, RichString input, String ignoreCharsRegex)
 	{
-		ParseResult result = parser.parseRichStringItems( input, ignoreCharsRegex );
+		parser.setJunkRegex( ignoreCharsRegex );
+		ParseResult result = parser.parseRichStringItems( input );
 
 		if ( !result.isValid() )
 		{

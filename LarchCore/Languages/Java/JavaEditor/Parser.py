@@ -21,6 +21,8 @@ from LarchCore.Languages.Java import Schema
 
 
 class JavaGrammar (Grammar):
+	__junk_regex__ = '[ ]*'
+
 	decimalInteger = RegEx( r"[\-]?[1-9][0-9]*" )  |  Literal( "0" )
 	hexInteger = RegEx( r"0[xX][0-9A-Fa-f]+" )
 	octalInteger = RegEx( r"0[0-7]+" )
