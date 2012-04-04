@@ -644,13 +644,13 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	@Override
 	public void mousePressed(MouseEvent e)
 	{
-		rootElement.mouseDownEvent( getButton( e ), new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), getKeyModifiers( e ) );
+		rootElement.mouseDownEvent( getButton( e ), new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), Modifier.getKeyModifiersFromEvent( e ) );
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e)
 	{
-		rootElement.mouseUpEvent( getButton( e ), new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), getKeyModifiers( e ) );
+		rootElement.mouseUpEvent( getButton( e ), new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), Modifier.getKeyModifiersFromEvent( e ) );
 	}
 
 	@Override
@@ -663,25 +663,25 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	@Override
 	public void mouseMoved(MouseEvent e)
 	{
-		rootElement.mouseMotionEvent( new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), getKeyModifiers( e ), e );
+		rootElement.mouseMotionEvent( new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), Modifier.getKeyModifiersFromEvent( e ), e );
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent e)
 	{
-		rootElement.mouseDragEvent( new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), getKeyModifiers( e ), e );
+		rootElement.mouseDragEvent( new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), Modifier.getKeyModifiersFromEvent( e ), e );
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent e)
 	{
-		rootElement.mouseEnterEvent( new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), getKeyModifiers( e ) );
+		rootElement.mouseEnterEvent( new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), Modifier.getKeyModifiersFromEvent( e ) );
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e)
 	{
-		rootElement.mouseLeaveEvent( new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), getKeyModifiers( e ) );
+		rootElement.mouseLeaveEvent( new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), Modifier.getKeyModifiersFromEvent( e ) );
 	}
 
 
@@ -702,19 +702,19 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	@Override
 	public void keyPressed(KeyEvent e)
 	{
-		rootElement.keyPressEvent( e, getKeyModifiers( e ) );
+		rootElement.keyPressEvent( e, Modifier.getKeyModifiersFromEvent( e ) );
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e)
 	{
-		rootElement.keyReleaseEvent( e, getKeyModifiers( e ) );
+		rootElement.keyReleaseEvent( e, Modifier.getKeyModifiersFromEvent( e ) );
 	}
 
 	@Override
 	public void keyTyped(KeyEvent e)
 	{
-		rootElement.keyTypedEvent( e, getKeyModifiers( e ) );
+		rootElement.keyTypedEvent( e, Modifier.getKeyModifiersFromEvent( e ) );
 	}
 	
 	
@@ -1051,33 +1051,6 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		if ( ( m & InputEvent.BUTTON3_DOWN_MASK )  !=  0 )
 		{
 			modifiers |= Modifier.BUTTON3;
-		}
-		
-		return modifiers;
-	}
-
-	private static int getKeyModifiers(InputEvent e)
-	{
-		int modifiers = 0;
-		
-		if ( e.isControlDown() )
-		{
-			modifiers |= Modifier.CTRL;
-		}
-		
-		if ( e.isShiftDown() )
-		{
-			modifiers |= Modifier.SHIFT;
-		}
-		
-		if ( e.isAltDown() )
-		{
-			modifiers |= Modifier.ALT;
-		}
-		
-		if ( e.isAltGraphDown() )
-		{
-			modifiers |= Modifier.ALT_GRAPH;
 		}
 		
 		return modifiers;

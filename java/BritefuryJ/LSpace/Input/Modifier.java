@@ -81,7 +81,7 @@ public class Modifier
 
 	
 	
-	public static int getKeyModifiers(InputEvent e)
+	public static int getKeyModifiersFromEvent(InputEvent e)
 	{
 		int modifiers = 0;
 		
@@ -106,5 +106,10 @@ public class Modifier
 		}
 		
 		return modifiers;
+	}
+
+	public static int getKeyModifiers(int modifiers)
+	{
+		return modifiers & KEYS_MASK;
 	}
 }
