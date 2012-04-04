@@ -122,7 +122,7 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 
 	public boolean keyTyped(Keyboard keyboard, KeyEvent event)
 	{
-		int modifiers = Modifier.getKeyModifiers( event );
+		int modifiers = Modifier.getKeyModifiersFromEvent( event );
 		
 		boolean bCtrl = ( modifiers & Modifier.KEYS_MASK )  ==  Modifier.CTRL;
 		boolean bAlt = ( modifiers & Modifier.KEYS_MASK )  ==  Modifier.ALT;
@@ -210,7 +210,7 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 				}
 				
 				root.setTarget( target );
-				if ( ( Modifier.getKeyModifiers( event ) & Modifier.SHIFT ) != 0 )
+				if ( ( Modifier.getKeyModifiersFromEvent( event ) & Modifier.SHIFT ) != 0 )
 				{
 					getSelectionManager().dragSelection( prevPoint, target.createSelectionPoint() );
 				}
@@ -320,7 +320,7 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 
 	private static boolean isNavigationKey(KeyEvent event)
 	{
-		int modifiers = Modifier.getKeyModifiers( event );
+		int modifiers = Modifier.getKeyModifiersFromEvent( event );
 		int keyMods = modifiers & Modifier.KEYS_MASK;
 		if  ( keyMods == Modifier.SHIFT  ||  keyMods == 0 )
 		{

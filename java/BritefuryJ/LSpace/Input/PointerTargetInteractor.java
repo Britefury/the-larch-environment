@@ -184,7 +184,7 @@ public class PointerTargetInteractor
 	{
 		public boolean buttonClicked(Pointer pointer, PointerButtonClickedEvent event)
 		{
-			if ( lastMousePressPositionedCaret  &&  event.getButton() == 1  &&  ( event.getModifiers() & ( Modifier.ALT | Modifier.ALT_GRAPH | Modifier.CTRL | Modifier.SHIFT ) )  ==  0 )
+			if ( lastMousePressPositionedCaret  &&  event.getButton() == 1  &&  ( Modifier.getKeyModifiers( event.getModifiers() )  ==  0 ) )
 			{
 				Point2 windowPos = event.getLocalPointerPos();
 				LSRootElement rootElement = event.getPointer().concretePointer().getRootElement();

@@ -439,13 +439,9 @@ public class ObjectDndHandler extends DndHandler
 		{
 			return LINK;
 		}
-		else if ( mods == 0 )
-		{
-			return MOVE;
-		}
 		else
 		{
-			return NONE;
+			return MOVE;
 		}
 	}
 	
@@ -454,8 +450,8 @@ public class ObjectDndHandler extends DndHandler
 		int requestedAspect = 0;
 		
 		int modifiers = pointer.getModifiers();
-		int mods = modifiers & ( Modifier.CTRL | Modifier.SHIFT | Modifier.ALT | Modifier.ALT_GRAPH );
-		if ( mods == ( Modifier.CTRL | Modifier.ALT ) )
+		int mods = Modifier.getKeyModifiers( modifiers );
+		if ( mods == ( Modifier.CTRL | Modifier.ALT )  ||  mods == ( Modifier.SHIFT | Modifier.ALT ) )
 		{
 			requestedAspect = ASPECT_DOC_NODE;
 		}

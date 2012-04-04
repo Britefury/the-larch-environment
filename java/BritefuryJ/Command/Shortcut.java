@@ -64,6 +64,6 @@ public class Shortcut
 	
 	public static Shortcut fromPressedEvent(KeyEvent event)
 	{
-		return new Shortcut( event.getKeyCode(), Modifier.getKeyModifiers( event ) );
+		return new Shortcut( event.getKeyCode(), Modifier.getKeyModifiersFromEvent( event ) );
 	}
 }
