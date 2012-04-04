@@ -39,7 +39,14 @@ class _RuleHelper (object):
 				
 			# Place the expression in the forward declaration
 			self._desc._setForwardDeclarationExpression( rule, expression )
-				
+
+			try:
+				junkRegex = self._grammarInstance.__junk_regex__
+			except AttributeError:
+				junkRegex = None
+
+			self._desc._setJunkRegex( rule, junkRegex )
+
 		return rule
 
 
@@ -67,6 +74,9 @@ class Rule (object):
 	
 	def _setForwardDeclarationExpression(self, forward, expression):
 		forward.setExpression( expression )
+
+	def _setJunkRegex(self, forward, junkRegex):
+		forward.setJunkRegex( junkRegex )
 	
 
 	
@@ -101,6 +111,10 @@ class _RuleList (object):
 		for f, x in zip( forward, expression ):
 			f.setExpression( x )
 
+	def _setJunkRegex(self, forward, junkRegex):
+		for f in forward:
+			f.setJunkRegex( junkRegex )
+
 	
 
 def RuleList(names):
@@ -111,5 +125,5 @@ def RuleList(names):
 	
 
 class Grammar (object):
-	pass
+	__junk_regex__ = None
 	
