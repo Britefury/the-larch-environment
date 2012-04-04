@@ -18,6 +18,7 @@ from javax.swing.filechooser import FileNameExtensionFilter
 from Britefury.Kernel.View.DispatchView import MethodDispatchView
 from Britefury.Dispatch.MethodDispatch import ObjectDispatchMethod
 
+from BritefuryJ.Command import CommandName, Command, CommandSet, Shortcut
 
 from BritefuryJ.AttributeTable import *
 
@@ -90,31 +91,6 @@ def _onDrop_embeddedObject(element, pos, data, action):
 
 
 _embeddedObject_dropDest = ObjectDndHandler.DropDest( FragmentData, _onDrop_embeddedObject )
-
-
-
-
-class WorksheetNodeInteractor (KeyElementInteractor):
-	def __init__(self):
-		pass
-
-
-	def keyPressed(self, element, event):
-		if event.getKeyCode() == KeyEvent.VK_F5:
-			ctx = element.getFragmentContext()
-			node = ctx.getModel()
-			node.refreshResults()
-			return True
-		else:
-			return False
-
-	def keyReleased(self, element, event):
-		return False
-
-	def keyTyped(self, element, event):
-		return False
-
-WorksheetNodeInteractor.instance = WorksheetNodeInteractor()
 
 
 
@@ -305,7 +281,6 @@ class WorksheetEditor (MethodDispatchView):
 
 		
 		w = Page( [ linkHeader, bodyView ] )
-		w = w.withElementInteractor( WorksheetNodeInteractor.instance )
 		w = w.withContextMenuInteractor( _worksheetContextMenuFactory )
 		w = w.withDropDest( _embeddedObject_dropDest )
 		w = WorksheetRichTextEditor.instance.region( w )
@@ -505,6 +480,15 @@ class WorksheetEditor (MethodDispatchView):
 
 
 
+
+def _refreshWorksheet(subject):
+	subject._modelView.refreshResults()
+
+
+_refreshCommand = Command( CommandName( '&Refresh worksheet' ), _refreshWorksheet, Shortcut( KeyEvent.VK_F5, 0 ) )
+_worksheetEditorCommands = CommandSet( 'LarchCore.Worksheet.Editor', [ _refreshCommand ] )
+
+
 _view = WorksheetEditor()
 perspective2 = SequentialEditorPerspective( _view.fragmentViewFunction, WorksheetRichTextEditor.instance )
 
@@ -543,5 +527,8 @@ class WorksheetEditorSubject (Subject):
 	
 	def getChangeHistory(self):
 		return self._document.getChangeHistory()
+
+	def getBoundCommandSets(self):
+		return [ _worksheetEditorCommands.bindTo( self ) ]  +  self._enclosingSubject.getBoundCommandSets()
 
 	

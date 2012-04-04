@@ -5,13 +5,16 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
+from java.awt.event import KeyEvent
+
 from BritefuryJ.LSpace.Browser import Location
 
 from BritefuryJ.DefaultPerspective import DefaultPerspective
 
 from BritefuryJ.Projection import Subject
 
-from BritefuryJ.Command import CommandName, Command, CommandSet
+from BritefuryJ.LSpace.Input import Modifier
+from BritefuryJ.Command import CommandName, Command, CommandSet, Shortcut
 
 from BritefuryJ.Controls import Hyperlink
 from BritefuryJ.Pres.Pres import *
@@ -55,10 +58,10 @@ def _reset(subject):
 
 	
 	
-_saveCommand = Command( CommandName( '&Save' ), _save )
+_saveCommand = Command( CommandName( '&Save' ), _save, Shortcut( 'S', Modifier.CTRL ) )
 _saveAsCommand = Command( CommandName( '&Save &as' ), _saveAs )
-_resetCommand = Command( CommandName( '&Reset' ), _reset )
-_projectCommands = CommandSet( 'LarchCore.Project.Save', [ _saveCommand, _saveAsCommand, _resetCommand ] )
+_resetCommand = Command( CommandName( 'R&eset' ), _reset, Shortcut( 'E', Modifier.CTRL ) )
+_projectCommands = CommandSet( 'LarchCore.Project', [ _saveCommand, _saveAsCommand, _resetCommand ] )
 	
 
 
