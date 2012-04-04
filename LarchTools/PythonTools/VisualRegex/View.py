@@ -175,8 +175,6 @@ _choiceBorder = SolidBorder( 1.0, 4.0, 3.0, 3.0, Color( 0.7, 0.4, 1.0 ), Color( 
 _commentBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 0.4, 0.4, 0.4 ), Color( 0.9, 0.9, 0.9 ) )
 _flagsBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 1.0, 0.6, 0.2 ), Color( 1.0, 1.0, 0.8 ) )
 
-_vreBorder = SolidBorder( 2.0, 4.0, 10.0, 10.0, Color( 0.7, 0.8, 0.7 ), None )
-
 
 _charClasses = {
 	'A' : 'START',
@@ -332,7 +330,6 @@ class VREView (MethodDispatchView):
 		exprView =_editTopLevelNode( expr )
 		seg = Segment( exprView )
 		e = Paragraph( [ seg ] ).alignHPack().alignVRefY()
-		e = _vreBorder.surround( e )
 		e = EditableStructuralItem( VisualRegexSyntaxRecognizingEditor.instance, [ self._exprOuter, self._topLevel ],  model,  e )
 		return e
 
