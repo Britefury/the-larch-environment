@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.LSpace.Input.Keyboard;
 
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 import BritefuryJ.LSpace.LSElement;
@@ -123,7 +122,7 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 
 	public boolean keyTyped(Keyboard keyboard, KeyEvent event)
 	{
-		int modifiers = getKeyModifiers( event );
+		int modifiers = Modifier.getKeyModifiers( event );
 		
 		boolean bCtrl = ( modifiers & Modifier.KEYS_MASK )  ==  Modifier.CTRL;
 		boolean bAlt = ( modifiers & Modifier.KEYS_MASK )  ==  Modifier.ALT;
@@ -211,7 +210,7 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 				}
 				
 				root.setTarget( target );
-				if ( ( getKeyModifiers( event ) & Modifier.SHIFT ) != 0 )
+				if ( ( Modifier.getKeyModifiers( event ) & Modifier.SHIFT ) != 0 )
 				{
 					getSelectionManager().dragSelection( prevPoint, target.createSelectionPoint() );
 				}
@@ -321,7 +320,7 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 
 	private static boolean isNavigationKey(KeyEvent event)
 	{
-		int modifiers = getKeyModifiers( event );
+		int modifiers = Modifier.getKeyModifiers( event );
 		int keyMods = modifiers & Modifier.KEYS_MASK;
 		if  ( keyMods == Modifier.SHIFT  ||  keyMods == 0 )
 		{
@@ -339,34 +338,5 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 	{
 		int keyCode = event.getKeyCode();
 		return keyCode == KeyEvent.VK_CONTROL  ||  keyCode == KeyEvent.VK_SHIFT  ||  keyCode == KeyEvent.VK_ALT  ||  keyCode == KeyEvent.VK_ALT_GRAPH;
-	}
-	
-
-
-	private static int getKeyModifiers(InputEvent e)
-	{
-		int modifiers = 0;
-		
-		if ( e.isControlDown() )
-		{
-			modifiers |= Modifier.CTRL;
-		}
-		
-		if ( e.isShiftDown() )
-		{
-			modifiers |= Modifier.SHIFT;
-		}
-		
-		if ( e.isAltDown() )
-		{
-			modifiers |= Modifier.ALT;
-		}
-		
-		if ( e.isAltGraphDown() )
-		{
-			modifiers |= Modifier.ALT_GRAPH;
-		}
-		
-		return modifiers;
 	}
 }

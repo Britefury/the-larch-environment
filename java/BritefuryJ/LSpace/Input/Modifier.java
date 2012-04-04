@@ -7,6 +7,8 @@
 //##************************
 package BritefuryJ.LSpace.Input;
 
+import java.awt.event.InputEvent;
+
 public class Modifier
 {
 	public static final int CTRL = 0x1;
@@ -50,5 +52,59 @@ public class Modifier
 	public static boolean isAButtonPressed(int modifiers)
 	{
 		return ( modifiers & BUTTONS_MASK ) != 0;
+	}
+	
+	
+	
+	private static void addModifiersToString(StringBuilder b, int modifiers, int mask, String name)
+	{
+		if ( ( modifiers & mask ) != 0 )
+		{
+			if ( b.length() > 1 )
+			{
+				b.append( ", " );
+			}
+			b.append( name );
+		}
+	}
+	
+	public static String keyModifiersToString(int modifiers)
+	{
+		StringBuilder b = new StringBuilder( '<' );
+		addModifiersToString( b, modifiers, CTRL, "CTRL" );
+		addModifiersToString( b, modifiers, SHIFT, "SHIFT" );
+		addModifiersToString( b, modifiers, ALT, "ALT" );
+		addModifiersToString( b, modifiers, ALT_GRAPH, "ALT_GRAPH" );
+		b.append( '>' );
+		return b.toString();
+	}
+
+	
+	
+	public static int getKeyModifiers(InputEvent e)
+	{
+		int modifiers = 0;
+		
+		if ( e.isControlDown() )
+		{
+			modifiers |= CTRL;
+		}
+		
+		if ( e.isShiftDown() )
+		{
+			modifiers |= SHIFT;
+		}
+		
+		if ( e.isAltDown() )
+		{
+			modifiers |= ALT;
+		}
+		
+		if ( e.isAltGraphDown() )
+		{
+			modifiers |= ALT_GRAPH;
+		}
+		
+		return modifiers;
 	}
 }

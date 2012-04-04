@@ -102,7 +102,10 @@ class RootFinder (object):
 	def __init__(self, projectSubject, pythonPackageName):
 		self._document = projectSubject._document
 		self._projectSubject = projectSubject
-		self._name, _, self._nameSuffix = pythonPackageName.partition( '.' )
+		if pythonPackageName is not None:
+			self._name, _, self._nameSuffix = pythonPackageName.partition( '.' )
+		else:
+			self._name = self._nameSuffix = None
 
 
 	def find_module(self, name, fullname, path):
