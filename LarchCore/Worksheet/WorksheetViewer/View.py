@@ -22,6 +22,7 @@ from Britefury.Dispatch.MethodDispatch import ObjectDispatchMethod
 
 from Britefury.Kernel.View.DispatchView import MethodDispatchView
 
+from BritefuryJ.Command import CommandName, Command, CommandSet, Shortcut
 
 from BritefuryJ.AttributeTable import *
 
@@ -230,6 +231,14 @@ class _WorksheetModuleLoader (object):
 
 
 
+def _refreshWorksheet(subject):
+	subject._modelView.refreshResults()
+
+
+_refreshCommand = Command( CommandName( '&Refresh worksheet' ), _refreshWorksheet, Shortcut( KeyEvent.VK_F5, 0 ) )
+_worksheetViewerCommands = CommandSet( 'LarchCore.Worksheet.Viewer', [ _refreshCommand ] )
+
+
 class WorksheetViewerSubject (Subject):
 	def __init__(self, document, model, enclosingSubject, location, importName, title):
 		super( WorksheetViewerSubject, self ).__init__( enclosingSubject )
@@ -268,7 +277,10 @@ class WorksheetViewerSubject (Subject):
 	
 	def getChangeHistory(self):
 		return self._document.getChangeHistory()
-	
+
+	def getBoundCommandSets(self):
+		return [ _worksheetViewerCommands.bindTo( self ) ]  +  self._enclosingSubject.getBoundCommandSets()
+
 	def createModuleLoader(self, document):
 		return _WorksheetModuleLoader( self._model, document )
 	

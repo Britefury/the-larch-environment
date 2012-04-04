@@ -7,6 +7,8 @@
 package BritefuryJ.Command;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
 
 import BritefuryJ.Graphics.SolidBorder;
 
@@ -19,6 +21,43 @@ public class Command
 	
 	private CommandName name;
 	protected CommandAction action;
+	protected ArrayList<Shortcut> shortcuts = new ArrayList<Shortcut>();
+	
+	
+	public Command(CommandName name, CommandAction action, List<Shortcut> shortcuts)
+	{
+		this.name = name;
+		this.action = action;
+		this.shortcuts.addAll( shortcuts );
+	}
+	
+	public Command(String charSeq, String name, CommandAction action, List<Shortcut> shortcuts)
+	{
+		this( new CommandName( charSeq, name ), action, shortcuts );
+	}
+	
+	public Command(String annotatedName, CommandAction action, List<Shortcut> shortcuts)
+	{
+		this( new CommandName( annotatedName ), action, shortcuts );
+	}
+	
+	
+	public Command(CommandName name, CommandAction action, Shortcut shortcut)
+	{
+		this.name = name;
+		this.action = action;
+		this.shortcuts.add( shortcut );
+	}
+	
+	public Command(String charSeq, String name, CommandAction action, Shortcut shortcut)
+	{
+		this( new CommandName( charSeq, name ), action, shortcut );
+	}
+	
+	public Command(String annotatedName, CommandAction action, Shortcut shortcut)
+	{
+		this( new CommandName( annotatedName ), action, shortcut );
+	}
 	
 	
 	public Command(CommandName name, CommandAction action)
@@ -42,6 +81,12 @@ public class Command
 	public CommandName getName()
 	{
 		return name;
+	}
+	
+	
+	public List<Shortcut> getShortcuts()
+	{
+		return shortcuts;
 	}
 	
 	

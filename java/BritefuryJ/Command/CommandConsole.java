@@ -7,6 +7,7 @@
 package BritefuryJ.Command;
 
 import java.awt.Color;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +26,8 @@ import BritefuryJ.LSpace.TreeEventListener;
 import BritefuryJ.LSpace.Browser.BrowserPage;
 import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
 import BritefuryJ.LSpace.Focus.Target;
+import BritefuryJ.LSpace.Input.Keyboard.Keyboard;
+import BritefuryJ.LSpace.Input.Keyboard.KeyboardInteractor;
 import BritefuryJ.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Column;
@@ -44,6 +47,36 @@ import BritefuryJ.Util.RichString.RichString;
 
 public class CommandConsole extends AbstractCommandConsole
 {
+	private class CommandKeyboardInteractor extends KeyboardInteractor
+	{
+		public boolean keyPressed(Keyboard keyboard, KeyEvent event)
+		{
+			for (BoundCommandSet cmdSet: page.getBoundCommandSets())
+			{
+				BoundCommand cmd = cmdSet.getCommandForKeyPressed( event );
+				if ( cmd != null )
+				{
+					cmd.execute();
+					return true;
+				}
+			}
+			return false;
+		}
+
+
+		public boolean keyReleased(Keyboard keyboard, KeyEvent event)
+		{
+			return false;
+		}
+
+
+		public boolean keyTyped(Keyboard keyboard, KeyEvent event)
+		{
+			return false;
+		}
+	}
+	
+	
 	private class CommandConsoleSubject extends Subject
 	{
 		public CommandConsoleSubject()
@@ -179,6 +212,7 @@ public class CommandConsole extends AbstractCommandConsole
 	
 	
 	private CommandConsoleSubject subject = new CommandConsoleSubject();
+	private CommandKeyboardInteractor keyInteractor = new CommandKeyboardInteractor();
 	private ProjectiveBrowserContext browserContext;
 	private BrowserPage page;
 	private PresentationComponent presentation;
@@ -215,6 +249,11 @@ public class CommandConsole extends AbstractCommandConsole
 		this.page = page;
 	}
 
+	@Override
+	public KeyboardInteractor getKeyboardInteractor()
+	{
+		return keyInteractor;
+	}
 
 	@Override
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)

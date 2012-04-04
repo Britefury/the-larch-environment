@@ -28,27 +28,27 @@ public class Keyboard
 
 
 
-	protected void addInteractor(KeyboardInteractor interactor)
+	public void addInteractor(KeyboardInteractor interactor)
 	{
 		interactors.add( interactor );
 	}
 	
-	protected void addInteractor(int priority, KeyboardInteractor interactor)
+	public void addInteractor(int priority, KeyboardInteractor interactor)
 	{
 		interactors.add( priority, interactor );
 	}
 	
-	protected void removeInteractor(KeyboardInteractor interactor)
+	public void removeInteractor(KeyboardInteractor interactor)
 	{
 		interactors.remove( interactor );
 	}
 	
-	protected void interactorGrab(KeyboardInteractor interactor)
+	public void interactorGrab(KeyboardInteractor interactor)
 	{
 		interactors.grab( interactor );
 	}
 	
-	protected void interactorUngrab(KeyboardInteractor interactor)
+	public void interactorUngrab(KeyboardInteractor interactor)
 	{
 		interactors.ungrab( interactor );
 	}
