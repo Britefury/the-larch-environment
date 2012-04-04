@@ -89,7 +89,7 @@ public class LSCaretSlot extends LSContentLeafEditable
 		double deltaY = layout.getAllocationBox().getAllocRefY()  -  layout.getRequisitionBox().getReqRefY();
 		AffineTransform current = pushGraphicsTransform( graphics );
 		graphics.translate( 0.0, deltaY );
-		getVisual().drawCaret( graphics, index );
+		getVisual().drawCaret( graphics, 0 );
 		popGraphicsTransform( graphics, current );
 	}
 

@@ -103,7 +103,7 @@ public class TextAreaTestPage extends SystemPage
 		
 		public void onTextInserted(TextArea.TextAreaControl textArea, int position, String textInserted)
 		{
-			String text = "Inserted text @" + position + ":\n" + textInserted;
+			String text = "Inserted text @" + position + ":\n" + textInserted.replace( "\n", "\\n" );
 			setEventText( text );
 			prevText = prevText.substring( 0, position ) + textInserted + prevText.substring( position );
 			if ( !prevText.equals( textArea.getDisplayedText() ) )
@@ -117,14 +117,15 @@ public class TextAreaTestPage extends SystemPage
 
 		public void onTextRemoved(TextArea.TextAreaControl textArea, int position, int length)
 		{
-			String text = "Removed " + position + " to " + ( position + length );
+			String textRemoved = prevText.substring( position, position + length );
+			String text = "Removed " + position + " to " + ( position + length ) + ":\n" + textRemoved.replace( "\n", "\\n" );
 			setEventText( text );
 			prevText = prevText.substring( 0, position ) + prevText.substring( position + length );
 			if ( !prevText.equals( textArea.getDisplayedText() ) )
 			{
 				@SuppressWarnings("unchecked")
 				List<Object> x = (List<Object>)eventList.getValue();
-				x.add( redText.applyTo( new Label( "Insert event was invalid" ) ).present() );
+				x.add( redText.applyTo( new Label( "Remove event was invalid" ) ).present() );
 				eventList.setLiteralValue( x );
 			}
 		}
@@ -133,12 +134,12 @@ public class TextAreaTestPage extends SystemPage
 		{
 			String text = "Replaced " + position + " to " + ( position + length ) + " with:\n" + replacementText;
 			setEventText( text );
-			prevText = prevText.substring( 0, position ) + replacementText + prevText.substring( position + length );
+			prevText = prevText.substring( 0, position ) + replacementText.replace( "\n", "\\n" ) + prevText.substring( position + length );
 			if ( !prevText.equals( textArea.getDisplayedText() ) )
 			{
 				@SuppressWarnings("unchecked")
 				List<Object> x = (List<Object>)eventList.getValue();
-				x.add( redText.applyTo( new Label( "Insert event was invalid" ) ).present() );
+				x.add( redText.applyTo( new Label( "Replace event was invalid" ) ).present() );
 				eventList.setLiteralValue( x );
 			}
 		}
