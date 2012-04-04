@@ -9,16 +9,14 @@ package BritefuryJ.Controls;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
-import BritefuryJ.LSpace.LSBorder;
-import BritefuryJ.LSpace.LSColumn;
-import BritefuryJ.LSpace.LSElement;
-import BritefuryJ.LSpace.LSRegion;
-import BritefuryJ.LSpace.LSText;
-import BritefuryJ.LSpace.LSWhitespace;
+import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.IncrementalView.ViewFragmentFunction;
 import BritefuryJ.LSpace.ElementValueFunction;
-import BritefuryJ.LSpace.LSRootElement;
+import BritefuryJ.LSpace.LSBorder;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.TextEditEvent;
 import BritefuryJ.LSpace.TextEditEventInsert;
 import BritefuryJ.LSpace.TextEditEventRemove;
@@ -26,13 +24,17 @@ import BritefuryJ.LSpace.TextEditEventReplace;
 import BritefuryJ.LSpace.TreeEventListener;
 import BritefuryJ.LSpace.Clipboard.TextClipboardHandler;
 import BritefuryJ.LSpace.Interactor.KeyElementInteractor;
+import BritefuryJ.LSpace.Layout.HAlignment;
+import BritefuryJ.LSpace.Layout.VAlignment;
 import BritefuryJ.LSpace.Marker.Marker;
 import BritefuryJ.LSpace.TextFocus.Caret;
 import BritefuryJ.LSpace.TextFocus.TextSelection;
 import BritefuryJ.Live.LiveInterface;
 import BritefuryJ.Live.LiveValue;
+import BritefuryJ.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
+import BritefuryJ.Pres.Primitive.Blank;
 import BritefuryJ.Pres.Primitive.Border;
 import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Primitive;
@@ -41,12 +43,32 @@ import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Pres.Primitive.Segment;
 import BritefuryJ.Pres.Primitive.Text;
 import BritefuryJ.Pres.Primitive.Whitespace;
+import BritefuryJ.Projection.Perspective;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
 import BritefuryJ.Util.RichString.RichStringBuilder;
 
 public class TextArea extends ControlPres
 {
+	private static interface TextAreaPresentable
+	{
+		public Pres textAreaPresent(FragmentView fragment, SimpleAttributeTable inheritedState);
+	}
+	
+	
+	private static class TextAreaViewFragmentFn implements ViewFragmentFunction
+	{
+		public Pres createViewFragment(Object x, FragmentView ctx, SimpleAttributeTable inheritedState)
+		{
+			TextAreaPresentable p = (TextAreaPresentable)x;
+			return p.textAreaPresent( ctx, inheritedState );
+		}
+	}
+	
+	protected static Perspective textAreaPerspective = new Perspective( new TextAreaViewFragmentFn() );
+
+	
+	
 	public static class TextAreaListener
 	{
 		public void onAccept(TextAreaControl textArea, String text)
@@ -101,139 +123,7 @@ public class TextArea extends ControlPres
 		}
 		
 		
-		private class TextAreaTextLineTreeEventListener implements TreeEventListener
-		{
-			@Override
-			public boolean onTreeEvent(LSElement element, LSElement sourceElement, Object event)
-			{
-				if ( event instanceof TextEditEvent )
-				{
-					LSText textElement = (LSText)sourceElement;
-					String lineText = textElement.getText();
-					int lineOffset = textElement.getTextRepresentationOffsetInSubtree( textBox );
-					
-					if ( lineText.contains( "\n" ) )
-					{
-						recomputeText();
-					}
-	
-					if ( listener != null )
-					{
-						if ( event instanceof TextEditEventInsert )
-						{
-							TextEditEventInsert insert = (TextEditEventInsert)event;
-							listener.onTextInserted( TextAreaControl.this, lineOffset + insert.getPosition(), insert.getTextInserted() );
-						}
-						else if ( event instanceof TextEditEventRemove )
-						{
-							TextEditEventRemove remove = (TextEditEventRemove)event;
-							listener.onTextRemoved( TextAreaControl.this, lineOffset + remove.getPosition(), remove.getLength() );
-						}
-						else if ( event instanceof TextEditEventReplace )
-						{
-							TextEditEventReplace replace = (TextEditEventReplace)event;
-							listener.onTextReplaced( TextAreaControl.this, lineOffset + replace.getPosition(), replace.getLength(), replace.getReplacement() );
-						}
-					}
-					
-					return true;
-				}
-				return false;
-			}
-		}
-	
-		private class TextAreaNewlineTreeEventListener implements TreeEventListener
-		{
-			@Override
-			public boolean onTreeEvent(LSElement element, LSElement sourceElement, Object event)
-			{
-				if ( event instanceof TextEditEvent )
-				{
-					LSWhitespace whitespaceElement = (LSWhitespace)sourceElement;
-					
-					int lineOffset = whitespaceElement.getTextRepresentationOffsetInSubtree( textBox );
-					
-					if ( !whitespaceElement.getTextRepresentation().equals( "\n" ) )
-					{
-						recomputeText();
-					}
-	
-					if ( listener != null )
-					{
-						if ( event instanceof TextEditEventInsert )
-						{
-							TextEditEventInsert insert = (TextEditEventInsert)event;
-							listener.onTextInserted( TextAreaControl.this, lineOffset + insert.getPosition(), insert.getTextInserted() );
-						}
-						else if ( event instanceof TextEditEventRemove )
-						{
-							TextEditEventRemove remove = (TextEditEventRemove)event;
-							listener.onTextRemoved( TextAreaControl.this, lineOffset + remove.getPosition(), remove.getLength() );
-						}
-						else if ( event instanceof TextEditEventReplace )
-						{
-							TextEditEventReplace replace = (TextEditEventReplace)event;
-							listener.onTextReplaced( TextAreaControl.this, lineOffset + replace.getPosition(), replace.getLength(), replace.getReplacement() );
-						}
-					}
-	
-					return true;
-				}
-				return false;
-			}
-		}
-		
-		
-		private class TextAreaClipboardHandler extends TextClipboardHandler
-		{
-			@Override
-			protected void deleteText(TextSelection selection, Caret caret)
-			{
-				int startPosition = selection.getStartMarker().getClampedIndexInSubtree( textBox );
-				int endPosition = selection.getEndMarker().getClampedIndexInSubtree( textBox );
-	
-				int caretPos = computeNewCaretPositionAfterRemove( getCaretIndex(), startPosition, endPosition - startPosition );
-				String newText = textBox.getTextRepresentationFromStartToMarker( selection.getStartMarker() )  +  textBox.getTextRepresentationFromMarkerToEnd( selection.getEndMarker() );
-				changeText( newText, caretPos );
 				
-				if ( listener != null )
-				{
-					listener.onTextRemoved( TextAreaControl.this, startPosition, endPosition - startPosition );
-				}
-			}
-			
-			@Override
-			protected void insertText(Marker marker, String text)
-			{
-				marker.getElement().insertText( marker, text );
-				
-				// Don't inform the listener - the text edit event will take care of that
-			}
-			
-			@Override
-			protected void replaceText(TextSelection selection, Caret caret, String replacement)
-			{
-				int startPosition = selection.getStartMarker().getClampedIndexInSubtree( textBox );
-				int endPosition = selection.getEndMarker().getClampedIndexInSubtree( textBox );
-	
-				int caretPos = computeNewCaretPositionAfterReplace( getCaretIndex(), startPosition, endPosition - startPosition, replacement.length() );
-				String newText = textBox.getTextRepresentationFromStartToMarker( selection.getStartMarker() )  +  replacement  +  textBox.getTextRepresentationFromMarkerToEnd( selection.getEndMarker() );
-				changeText( newText, caretPos );
-				
-				if ( listener != null )
-				{
-					listener.onTextReplaced( TextAreaControl.this, startPosition, endPosition - startPosition, replacement );
-				}
-			}
-			
-			@Override
-			protected String getText(TextSelection selection)
-			{
-				return textBox.getRootElement().getTextRepresentationInSelection( selection );
-			}
-		}
-		
-		
 		private class ValueFn implements ElementValueFunction
 		{
 			public Object computeElementValue(LSElement element)
@@ -249,19 +139,252 @@ public class TextArea extends ControlPres
 			{
 			}
 		}
+		
+		
+		private class TextAreaBox implements TextAreaPresentable
+		{
+			private class TextAreaClipboardHandler extends TextClipboardHandler
+			{
+				@Override
+				protected void deleteText(TextSelection selection, Caret caret)
+				{
+					int startPosition = selection.getStartMarker().getClampedIndexInSubtree( element );
+					int endPosition = selection.getEndMarker().getClampedIndexInSubtree( element );
+		
+					String newText = element.getTextRepresentationFromStartToMarker( selection.getStartMarker() )  +  element.getTextRepresentationFromMarkerToEnd( selection.getEndMarker() );
+					setText( newText );
+					
+					if ( listener != null )
+					{
+						listener.onTextRemoved( TextAreaControl.this, startPosition, endPosition - startPosition );
+					}
+				}
+				
+				@Override
+				protected void insertText(Marker marker, String text)
+				{
+					marker.getElement().insertText( marker, text );
+					
+					// Don't inform the listener - the text edit event will take care of that
+				}
+				
+				@Override
+				protected void replaceText(TextSelection selection, Caret caret, String replacement)
+				{
+					int startPosition = selection.getStartMarker().getClampedIndexInSubtree( element );
+					int endPosition = selection.getEndMarker().getClampedIndexInSubtree( element );
+		
+					String newText = element.getTextRepresentationFromStartToMarker( selection.getStartMarker() )  +  replacement  +  element.getTextRepresentationFromMarkerToEnd( selection.getEndMarker() );
+					setText( newText );
+					
+					if ( listener != null )
+					{
+						listener.onTextReplaced( TextAreaControl.this, startPosition, endPosition - startPosition, replacement );
+					}
+				}
+				
+				@Override
+				protected String getText(TextSelection selection)
+				{
+					return element.getRootElement().getTextRepresentationInSelection( selection );
+				}
+			}
+			
+			
+
+			private class TextLine implements TextAreaPresentable
+			{
+				private class TextAreaTextLineTreeEventListener implements TreeEventListener
+				{
+					@Override
+					public boolean onTreeEvent(LSElement element, LSElement sourceElement, Object event)
+					{
+						if ( event instanceof TextEditEvent )
+						{
+							String lineText = element.getTextRepresentation();
+							int lineOffset = sourceElement.getTextRepresentationOffsetInSubtree( TextAreaControl.this.element );
+							
+							if ( listener != null )
+							{
+								if ( event instanceof TextEditEventInsert )
+								{
+									TextEditEventInsert insert = (TextEditEventInsert)event;
+									listener.onTextInserted( TextAreaControl.this, lineOffset + insert.getPosition(), insert.getTextInserted() );
+								}
+								else if ( event instanceof TextEditEventRemove )
+								{
+									TextEditEventRemove remove = (TextEditEventRemove)event;
+									listener.onTextRemoved( TextAreaControl.this, lineOffset + remove.getPosition(), remove.getLength() );
+								}
+								else if ( event instanceof TextEditEventReplace )
+								{
+									TextEditEventReplace replace = (TextEditEventReplace)event;
+									listener.onTextReplaced( TextAreaControl.this, lineOffset + replace.getPosition(), replace.getLength(), replace.getReplacement() );
+								}
+							}
+							
+							if ( lineText.indexOf( "\n" )  ==  lineText.length() - 1 )
+							{
+								text = lineText.substring( 0, lineText.length() - 1 );
+								PresentationStateListenerList.onPresentationStateChanged( listeners, TextLine.this );
+							
+								return true;
+							}
+							else
+							{
+								if ( lineText.indexOf( "\n" ) != -1 )
+								{
+									// There are newline characters in the text, just not only at the end
+									lineModified( TextLine.this, lineText );
+								}
+								else
+								{
+									lineJoin( TextLine.this, lineText );
+								}
+								return true;
+							}
+						}
+						return false;
+					}
+				}
+			
+
+				
+				private String text;
+				private PresentationStateListenerList listeners = null;
+				private TextAreaTextLineTreeEventListener textLineTreeEventListener = new TextAreaTextLineTreeEventListener();
+				
+				
+				public TextLine(String t)
+				{
+					this.text = t;
+				}
+				
+				
+				
+				@Override
+				public Pres textAreaPresent(FragmentView fragment, SimpleAttributeTable inheritedState)
+				{
+					listeners = PresentationStateListenerList.addListener( listeners, fragment );
+					
+					Pres textPres = new Text( text );
+					Pres seg = new Segment( false, false, textPres );
+					Pres newline = new Whitespace( "\n" );
+					
+					return new Row( new Object[] { seg, newline } ).withTreeEventListener( textLineTreeEventListener );
+				}
+			}
+			
+			
+			
+
+			
+			private PresentationStateListenerList listeners = null;
+			private ArrayList<TextLine> lines = new ArrayList<TextLine>();
+			private TextAreaClipboardHandler clipboardHandler = new TextAreaClipboardHandler();
+
+			
+			
+			@Override
+			public Pres textAreaPresent(FragmentView fragment, SimpleAttributeTable inheritedState)
+			{
+				listeners = PresentationStateListenerList.addListener( listeners, fragment );
+				
+				Pres textBox = new Column( lines.toArray() ).alignHPack();
+				return new Region( textBox, clipboardHandler ); 
+			}
+			
+			
+			public void setText(String text)
+			{
+				String textLines[];
+				if ( text.endsWith( "\n\n" ) )
+				{
+					// This handles the behaviour of String#split, which will not add a final blank line where the text ends with two new line characters.
+					// To correct for this, add a space character, then remove that final artificial line afterwards
+					text = text + " ";
+					String lines[] = text.split( "\\r?\\n" );
+					textLines = new String[lines.length-1];
+					System.arraycopy( lines, 0, textLines, 0, lines.length - 1 );
+				}
+				else
+				{
+					textLines = text.split( "\\r?\\n" );
+				}
+				
+				
+				lines.clear();
+				for (String line: textLines)
+				{
+					lines.add( new TextLine( line ) );
+				}
+				
+				
+				PresentationStateListenerList.onPresentationStateChanged( listeners, this );
+			}
+			
+			private void lineModified(TextLine line, String lineText)
+			{
+				int index = lines.indexOf( line );
+
+				String lineTextSplitIntoLines[];
+				if ( lineText.endsWith( "\n\n" ) )
+				{
+					// This handles the behaviour of String#split, which will not add a final blank line where the text ends with two new line characters.
+					// To correct for this, add a space character, then remove that final artificial line afterwards
+					lineText = lineText + " ";
+					String lines[] = lineText.split( "\\r?\\n" );
+					lineTextSplitIntoLines = new String[lines.length-1];
+					System.arraycopy( lines, 0, lineTextSplitIntoLines, 0, lines.length - 1 );
+				}
+				else
+				{
+					lineTextSplitIntoLines = lineText.split( "\\r?\\n" );
+				}
+				
+				
+				ArrayList<TextLine> replacementLines = new ArrayList<TextLine>();
+				for (String t: lineTextSplitIntoLines)
+				{
+					replacementLines.add( new TextLine( t ) );
+				}
+				
+				lines.remove( index );
+				lines.addAll( index, replacementLines );
+				
+				PresentationStateListenerList.onPresentationStateChanged( listeners, this );
+			}
+			
+			private void lineJoin(TextLine line, String lineText)
+			{
+				int index = lines.indexOf( line );
+				if ( index < lines.size() - 1 )
+				{
+					// Join with next line
+					TextLine next = lines.get( index + 1 );
+					String joinedText = lineText + next.text;
+					lines.remove( index );
+					lines.set( index, new TextLine( joinedText ) );
+				}
+				else
+				{
+					// Deleted the newline at the end of the last line, just re-create
+					lines.set( index, new TextLine( lineText ) );
+				}
+				PresentationStateListenerList.onPresentationStateChanged( listeners, this );
+			}
+		}
 	
 		
 		
-		private LSElement element;
-		private LSColumn textBox;
+		private LSBorder element;
+		private TextAreaBox box;
 		private LiveInterface value;
 		private TextAreaListener listener;
-		private TextAreaTextLineTreeEventListener textLineTreeEventListener = new TextAreaTextLineTreeEventListener();
-		private TextAreaNewlineTreeEventListener newlineTreeEventListener = new TextAreaNewlineTreeEventListener();
 		
 		
 		
-		protected TextAreaControl(PresentationContext ctx, StyleValues style, LSElement element, LSRegion region, LSColumn textBox, TextAreaListener listener, LiveInterface value)
+		protected TextAreaControl(PresentationContext ctx, StyleValues style, LSBorder element, TextAreaListener listener, LiveInterface value)
 		{
 			super( ctx, style );
 			
@@ -269,13 +392,15 @@ public class TextArea extends ControlPres
 			this.value.addListener( this );
 			
 			this.element = element;
-			this.textBox = textBox;
 			this.listener = listener;
 		
 			element.setValueFunction( new ValueFn() );
 			
-			this.textBox.addElementInteractor( new TextAreaInteractor() );
-			region.setClipboardHandler( new TextAreaClipboardHandler() );
+			box = new TextAreaBox();
+			
+			element.setChild( Pres.coerce( box ).present( ctx, style ).layoutWrap( style.get( Primitive.hAlign, HAlignment.class ), style.get( Primitive.vAlign, VAlignment.class ) ) );
+			
+			this.element.addElementInteractor( new TextAreaInteractor() );
 			
 			queueRebuild();
 		}
@@ -290,24 +415,24 @@ public class TextArea extends ControlPres
 		
 		public String getDisplayedText()
 		{
-			return textBox.getTextRepresentation();
+			return element.getTextRepresentation();
 		}
 		
 		public void setDisplayedText(String text)
 		{
-			changeText( text, getCaretIndex() );
+			box.setText( text );
 		}
 		
 		
 		
 		public void grabCaret()
 		{
-			textBox.grabCaret();
+			element.grabCaret();
 		}
 		
 		public void ungrabCaret()
 		{
-			textBox.ungrabCaret();
+			element.ungrabCaret();
 		}
 	
 		
@@ -319,121 +444,8 @@ public class TextArea extends ControlPres
 				listener.onAccept( this, getDisplayedText() );
 			}
 		}
-	
-	
-	
-		private int computeNewCaretPositionAfterInsert(int caretPos, int insertPos, int insertLength)
-		{
-			if ( caretPos >= insertPos )
-			{
-				return caretPos + insertLength;
-			}
-			else
-			{
-				return caretPos;
-			}
-		}
-		
-		private int computeNewCaretPositionAfterRemove(int caretPos, int removePos, int removeLength)
-		{
-			if ( caretPos >= removePos )
-			{
-				int end = removePos + removeLength;
-				if ( caretPos >= end )
-				{
-					return caretPos - removeLength;
-				}
-				else
-				{
-					return removePos;
-				}
-			}
-			else
-			{
-				return caretPos;
-			}
-		}
-		
-		private int computeNewCaretPositionAfterReplace(int caretPos, int replacePos, int replaceLength, int replacementLength)
-		{
-			if ( replacementLength > replaceLength )
-			{
-				return computeNewCaretPositionAfterInsert( caretPos, replacePos + replaceLength, replacementLength - replaceLength );
-			}
-			else if ( replacementLength < replaceLength )
-			{
-				return computeNewCaretPositionAfterRemove( caretPos, replacePos + replacementLength, replaceLength - replacementLength );
-			}
-			else
-			{
-				return caretPos;
-			}
-		}
-		
-		
-		
-		
-		private int getCaretIndex()
-		{
-			try
-			{
-				return textBox.getRootElement().getCaret().getClampedIndexInSubtree( textBox );
-			}
-			catch (LSElement.IsNotInSubtreeException e)
-			{
-				return -1;
-			}
-		}
-		
-		private void recomputeText()
-		{
-			changeText( textBox.getTextRepresentation(), getCaretIndex() );
-		}
-		
-		private void changeText(String text, int caretPos)
-		{
-			String textLines[];
-			if ( text.endsWith( "\n\n" ) )
-			{
-				// This handles the behaviour of String#split, which will not add a final blank line where the text ends with two new line characters.
-				// To correct for this, add a space character, then remove that final artificial line afterwards
-				text = text + " ";
-				String lines[] = text.split( "\\r?\\n" );
-				textLines = new String[lines.length-1];
-				System.arraycopy( lines, 0, textLines, 0, lines.length - 1 );
-			}
-			else
-			{
-				textLines = text.split( "\\r?\\n" );
-			}
-			
-			
-			ArrayList<LSElement> lineElements = new ArrayList<LSElement>();
-			for (String line: textLines)
-			{
-				Pres textPres = new Text( line );
-				LSElement textElement = textPres.present( ctx, style );
-				Pres seg = new Segment( true, true, textElement );
-				Pres newline = new Whitespace( "\n" );
-				LSElement newlineElement = newline.present( ctx, style );
-				textElement.addTreeEventListener( textLineTreeEventListener );
-				newlineElement.addTreeEventListener( newlineTreeEventListener );
-				
-				Pres linePres = new Row( new Object[] { seg, newlineElement } );
-				LSElement lineElement = linePres.present( ctx, style );
-				lineElements.add( lineElement );
-			}
-			
-			textBox.setChildren( lineElements );
-			
-			if ( caretPos != -1 )
-			{
-				LSRootElement root = textBox.getRootElement();
-				root.getCaret().moveToPositionAndBiasWithinSubtree( textBox, root.getDefaultTextRepresentationManager(), caretPos, Marker.Bias.START );
-			}
-		}
 
-
+		
 		@Override
 		public void onIncrementalMonitorChanged(IncrementalMonitor inc)
 		{
@@ -449,7 +461,7 @@ public class TextArea extends ControlPres
 				public void run()
 				{
 					String text = (String)value.getValue();
-					changeText( text, getCaretIndex() );
+					box.setText( text );
 				}
 			};
 			element.queueImmediateEvent( event );
@@ -504,6 +516,7 @@ public class TextArea extends ControlPres
 	@Override
 	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
+		ctx = new PresentationContext( ctx.getFragment(), textAreaPerspective, ctx.getInheritedState() );
 		style = style.withAttr( Primitive.editable, true );
 		StyleSheet textAreaStyleSheet = style.get( Controls.textAreaAttrs, StyleSheet.class );
 		
@@ -511,13 +524,9 @@ public class TextArea extends ControlPres
 		
 		LiveInterface value = valueSource.getLive();
 
-		Pres textBoxPres = new Column( new Pres[] {} );
-		LSColumn textBox = (LSColumn)textBoxPres.present( ctx, textAreaStyle );
-		Pres regionPres = new Region( textBox );
-		LSRegion region = (LSRegion)regionPres.present( ctx, textAreaStyle );
-		Pres elementPres = new Border( region );
+		Pres elementPres = new Border( new Blank() );
 		LSBorder element = (LSBorder)elementPres.present( ctx, textAreaStyle );
 		
-		return new TextAreaControl( ctx, style, element, region, textBox, listener, value );
+		return new TextAreaControl( ctx, style.withAttr( Primitive.hAlign, HAlignment.PACK ), element, listener, value );
 	}
 }
