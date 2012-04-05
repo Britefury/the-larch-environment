@@ -83,39 +83,24 @@ def _commitInnerUnparsed(model, value):
 	vreReplaceNode( model, deepcopy( unparsed ) )
 
 
-#
-#
-# EDIT LISTENERS
-#
-#
-
-class VREExpressionEditFilter (ParsingEditFilter):
-	def getSyntaxRecognizingEditor(self):
-		return VisualRegexSyntaxRecognizingEditor.instance
-
-	def getLogName(self):
-		return 'Top level expression'
+def _isValidExprOrTargetOuterUnparsed(value):
+	return '\n' not in value
 
 
-	def handleEmptyValue(self, element, fragment, event, model):
-		model['expr'] = Schema.UNPARSED( value=[ '' ] )
-		return HandleEditResult.HANDLED
+def _commitExprOuterValid(model, parsed):
+	expr = model['expr']
+	if parsed != expr:
+		model['expr'] = parsed
 
-	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
-		expr = model['expr']
-		if parsed != expr:
-			model['expr'] = parsed
-		return HandleEditResult.HANDLED
+def _commitExprOuterEmpty(model, parsed):
+	model['expr'] = Schema.UNPARSED( value=[ '' ] )
 
-	def handleParseFailure(self, element, sourceElement, fragment, event, model, value):
-		if '\n' not in value:
-			values = value.getItemValues()
-			if values == []:
-				values = [ '' ]
-			model['expr'] = Schema.UNPARSED( value=values )
-			return HandleEditResult.HANDLED
-		else:
-			return HandleEditResult.NOT_HANDLED
+def _commitExprOuterUnparsed(model, value):
+	values = value.getItemValues()
+	if values == []:
+		values = [ '' ]
+	model['expr'] = Schema.UNPARSED( value=values )
+
 
 
 
@@ -312,7 +297,8 @@ class VREView (MethodDispatchView):
 		editor = VisualRegexSyntaxRecognizingEditor.instance
 
 		self._expr = editor.parsingEditFilter( 'Expression', grammar.regex(), vreReplaceNode )
-		self._exprOuter = VREExpressionEditFilter( grammar.regex() )
+		self._exprOuterValid = editor.parsingEditFilter( 'Expression-outer-valid', grammar.regex(), _commitExprOuterValid, _commitExprOuterEmpty )
+		self._exprOuterInvalid = editor.unparsedEditFilter( 'Expression-outer-invalid', _isValidExprOrTargetOuterUnparsed, _commitExprOuterUnparsed )
 		self._topLevel = editor.topLevelEditFilter()
 
 		self._exprUnparsed = editor.unparsedEditFilter( 'Unparsed expression', _isValidUnparsedValue, _commitUnparsed, _commitInnerUnparsed )
@@ -330,7 +316,7 @@ class VREView (MethodDispatchView):
 		exprView =_editTopLevelNode( expr )
 		seg = Segment( exprView )
 		e = Paragraph( [ seg ] ).alignHPack().alignVRefY()
-		e = EditableStructuralItem( VisualRegexSyntaxRecognizingEditor.instance, [ self._exprOuter, self._topLevel ],  model,  e )
+		e = EditableStructuralItem( VisualRegexSyntaxRecognizingEditor.instance, [ self._exprOuterValid, self._exprOuterInvalid, self._topLevel ],  model,  e )
 		return e
 
 

@@ -446,38 +446,53 @@ abstract public class LSContainerSequence extends LSContainerNonOverlayed
 
 			ArrangedSequenceLayoutNode seqLayout = (ArrangedSequenceLayoutNode)layoutNode;
 			
-			// Visibility culling can be expensive - only perform it if there are more than a certain number of child elements
-			Iterable<LSContainer> culledBranches;
-			Iterable<LSElement> culledLeaves;
-			
 			// Draw branches
-			if ( seqLayout.getNumLeaves() <= VISIBILITY_CULLING_THRESHHOLD )
+			if ( seqLayout == null )
 			{
-				culledBranches = seqLayout.getBranches();
-				culledLeaves = seqLayout.getLeaves();
+				for (LSElement child: registeredChildren)
+				{
+					if ( child.getAABoxInParentSpace().intersects( areaBox ) )
+					{
+						child.getLocalToParentXform().apply( graphics );
+						child.handleDrawBackground( graphics, child.getParentToLocalXform().transform( areaBox ) );
+						graphics.setTransform( currentTransform );
+					}
+				}
 			}
 			else
 			{
-				Object culledBranchesAndLeaves[] = seqLayout.getVisibilityCulledBranchAndLeafLists( areaBox );
-				culledBranches = (Iterable<LSContainer>)culledBranchesAndLeaves[0];
-				culledLeaves = (Iterable<LSElement>)culledBranchesAndLeaves[1];
-			}
-			for (LSElement child: culledBranches)
-			{
-				if ( child.getAABoxInParentSpace().intersects( areaBox ) )
+				// Visibility culling can be expensive - only perform it if there are more than a certain number of child elements
+				Iterable<LSContainer> culledBranches;
+				Iterable<LSElement> culledLeaves;
+				
+				if ( seqLayout.getNumLeaves() <= VISIBILITY_CULLING_THRESHHOLD )
 				{
-					child.getLocalToParentXform().apply( graphics );
-					child.handleDrawSelfBackground( graphics, child.getParentToLocalXform().transform( areaBox ) );
-					graphics.setTransform( currentTransform );
+					culledBranches = seqLayout.getBranches();
+					culledLeaves = seqLayout.getLeaves();
 				}
-			}
-			for (LSElement child: culledLeaves)
-			{
-				if ( child.getAABoxInParentSpace().intersects( areaBox ) )
+				else
 				{
-					child.getLocalToParentXform().apply( graphics );
-					child.handleDrawBackground( graphics, child.getParentToLocalXform().transform( areaBox ) );
-					graphics.setTransform( currentTransform );
+					Object culledBranchesAndLeaves[] = seqLayout.getVisibilityCulledBranchAndLeafLists( areaBox );
+					culledBranches = (Iterable<LSContainer>)culledBranchesAndLeaves[0];
+					culledLeaves = (Iterable<LSElement>)culledBranchesAndLeaves[1];
+				}
+				for (LSElement child: culledBranches)
+				{
+					if ( child.getAABoxInParentSpace().intersects( areaBox ) )
+					{
+						child.getLocalToParentXform().apply( graphics );
+						child.handleDrawSelfBackground( graphics, child.getParentToLocalXform().transform( areaBox ) );
+						graphics.setTransform( currentTransform );
+					}
+				}
+				for (LSElement child: culledLeaves)
+				{
+					if ( child.getAABoxInParentSpace().intersects( areaBox ) )
+					{
+						child.getLocalToParentXform().apply( graphics );
+						child.handleDrawBackground( graphics, child.getParentToLocalXform().transform( areaBox ) );
+						graphics.setTransform( currentTransform );
+					}
 				}
 			}
 		}
@@ -501,38 +516,53 @@ abstract public class LSContainerSequence extends LSContainerNonOverlayed
 
 			ArrangedSequenceLayoutNode seqLayout = (ArrangedSequenceLayoutNode)layoutNode;
 			
-			// Visibility culling can be expensive - only perform it if there are more than a certain number of child elements
-			Iterable<LSContainer> culledBranches;
-			Iterable<LSElement> culledLeaves;
-			
-			// Draw branches
-			if ( seqLayout.getNumLeaves() <= VISIBILITY_CULLING_THRESHHOLD )
+			if ( seqLayout == null )
 			{
-				culledBranches = seqLayout.getBranches();
-				culledLeaves = seqLayout.getLeaves();
+				for (LSElement child: registeredChildren)
+				{
+					if ( child.getAABoxInParentSpace().intersects( areaBox ) )
+					{
+						child.getLocalToParentXform().apply( graphics );
+						child.handleDraw( graphics, child.getParentToLocalXform().transform( areaBox ) );
+						graphics.setTransform( currentTransform );
+					}
+				}
 			}
 			else
 			{
-				Object culledBranchesAndLeaves[] = seqLayout.getVisibilityCulledBranchAndLeafLists( areaBox );
-				culledBranches = (Iterable<LSContainer>)culledBranchesAndLeaves[0];
-				culledLeaves = (Iterable<LSElement>)culledBranchesAndLeaves[1];
-			}
-			for (LSElement child: culledBranches)
-			{
-				if ( child.getAABoxInParentSpace().intersects( areaBox ) )
+				// Visibility culling can be expensive - only perform it if there are more than a certain number of child elements
+				Iterable<LSContainer> culledBranches;
+				Iterable<LSElement> culledLeaves;
+				
+				// Draw branches
+				if ( seqLayout.getNumLeaves() <= VISIBILITY_CULLING_THRESHHOLD )
 				{
-					child.getLocalToParentXform().apply( graphics );
-					child.handleDrawSelf( graphics, child.getParentToLocalXform().transform( areaBox ) );
-					graphics.setTransform( currentTransform );
+					culledBranches = seqLayout.getBranches();
+					culledLeaves = seqLayout.getLeaves();
 				}
-			}
-			for (LSElement child: culledLeaves)
-			{
-				if ( child.getAABoxInParentSpace().intersects( areaBox ) )
+				else
 				{
-					child.getLocalToParentXform().apply( graphics );
-					child.handleDraw( graphics, child.getParentToLocalXform().transform( areaBox ) );
-					graphics.setTransform( currentTransform );
+					Object culledBranchesAndLeaves[] = seqLayout.getVisibilityCulledBranchAndLeafLists( areaBox );
+					culledBranches = (Iterable<LSContainer>)culledBranchesAndLeaves[0];
+					culledLeaves = (Iterable<LSElement>)culledBranchesAndLeaves[1];
+				}
+				for (LSElement child: culledBranches)
+				{
+					if ( child.getAABoxInParentSpace().intersects( areaBox ) )
+					{
+						child.getLocalToParentXform().apply( graphics );
+						child.handleDrawSelf( graphics, child.getParentToLocalXform().transform( areaBox ) );
+						graphics.setTransform( currentTransform );
+					}
+				}
+				for (LSElement child: culledLeaves)
+				{
+					if ( child.getAABoxInParentSpace().intersects( areaBox ) )
+					{
+						child.getLocalToParentXform().apply( graphics );
+						child.handleDraw( graphics, child.getParentToLocalXform().transform( areaBox ) );
+						graphics.setTransform( currentTransform );
+					}
 				}
 			}
 		}

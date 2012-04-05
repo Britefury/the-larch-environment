@@ -28,6 +28,8 @@ import BritefuryJ.LSpace.Layout.VAlignment;
 import BritefuryJ.Projection.AbstractPerspective;
 import BritefuryJ.Projection.ProjectiveBrowserContext;
 import BritefuryJ.Projection.Subject;
+import BritefuryJ.Shortcut.Shortcut;
+import BritefuryJ.Shortcut.ShortcutElementAction;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public abstract class Pres
@@ -252,6 +254,17 @@ public abstract class Pres
 	public AddElementInteractor withElementInteractor(AbstractElementInteractor interactor)
 	{
 		return new AddElementInteractor( this, interactor );
+	}
+	
+	
+	
+	//
+	// Shortcut methods
+	//
+	
+	public AddShortcuts withShortcut(Shortcut shortcut, ShortcutElementAction action)
+	{
+		return new AddShortcuts( this, shortcut, action );
 	}
 	
 	

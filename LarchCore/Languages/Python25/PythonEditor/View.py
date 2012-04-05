@@ -20,11 +20,13 @@ from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, Object
 
 from BritefuryJ.DocModel import DMObjectClass
 
+from BritefuryJ.Shortcut import Shortcut
+
 from BritefuryJ.AttributeTable import *
 from BritefuryJ.Controls import *
 from BritefuryJ.LSpace import ElementValueFunction, TextEditEvent
 from BritefuryJ.LSpace.Interactor import KeyElementInteractor
-from BritefuryJ.LSpace.Input import ObjectDndHandler
+from BritefuryJ.LSpace.Input import ObjectDndHandler, Modifier
 
 from BritefuryJ.Pres import ApplyPerspective
 from BritefuryJ.Pres.Primitive import Paragraph, Segment
@@ -49,7 +51,6 @@ from LarchCore.Languages.Python25 import PythonCommands
 
 from LarchCore.Languages.Python25.PythonEditor.Parser import Python25Grammar
 from LarchCore.Languages.Python25.PythonEditor.PythonEditOperations import *
-from LarchCore.Languages.Python25.PythonEditor.NodeEditor import *
 from LarchCore.Languages.Python25.PythonEditor.SREditor import *
 from LarchCore.Languages.Python25.PythonEditor.Keywords import *
 from LarchCore.Languages.Python25.PythonEditor.Precedence import *
@@ -59,7 +60,27 @@ from BritefuryJ.LSpace.Marker import Marker
 
 
 
-_statementIndentationInteractor = StatementIndentationInteractor()
+_indentShortcut = Shortcut( KeyEvent.VK_TAB, 0 )
+_dedentShortcut = Shortcut( KeyEvent.VK_TAB, Modifier.SHIFT )
+
+
+def _onIndent(element):
+	fragment = element.getFragmentContext()
+	node = fragment.getModel()
+
+	editor = SequentialEditor.getEditorForElement( element )
+	editor.indent( element, fragment, node )
+
+def _onDedent(element):
+	fragment = element.getFragmentContext()
+	node = fragment.getModel()
+
+	editor = SequentialEditor.getEditorForElement( element )
+	editor.dedent( element, fragment, node )
+
+
+def _applyIndentationShortcuts(p):
+	return p.withShortcut( _indentShortcut, _onIndent ).withShortcut( _dedentShortcut, _onDedent )
 
 
 
@@ -102,6 +123,44 @@ def _commitInnerUnparsed(model, value):
 
 
 
+def _isValidExprOrTargetOuterUnparsed(value):
+	return '\n' not in value
+
+
+def _commitExprOuterValid(model, parsed):
+	expr = model['expr']
+	if parsed != expr:
+		model['expr'] = parsed
+
+def _commitExprOuterEmpty(model, parsed):
+	model['expr'] = Schema.UNPARSED( value=[ '' ] )
+
+def _commitExprOuterUnparsed(model, value):
+	values = value.getItemValues()
+	if values == []:
+		values = [ '' ]
+	model['expr'] = Schema.UNPARSED( value=values )
+
+
+def _commitTargetOuterValid(model, parsed):
+	expr = model['target']
+	if parsed != expr:
+		model['target'] = parsed
+
+def _commitTargetOuterEmpty(model, parsed):
+	model['target'] = Schema.UNPARSED( value=[ '' ] )
+
+def _commitTargetOuterUnparsed(model, value):
+	values = value.getItemValues()
+	if values == []:
+		values = [ '' ]
+	model['target'] = Schema.UNPARSED( value=values )
+
+
+
+
+
+
 def compoundStatementEditor(pythonView, inheritedState, model, compoundBlocks):
 	statementContents = []
 
@@ -116,7 +175,7 @@ def compoundStatementEditor(pythonView, inheritedState, model, compoundBlocks):
 
 		headerStatementLine = statementLine( headerContents )
 		headerStatementLine = BreakableStructuralItem( PythonSyntaxRecognizingEditor.instance, headerNode, headerStatementLine )
-		headerStatementLine = headerStatementLine.withElementInteractor( _statementIndentationInteractor )
+		headerStatementLine = _applyIndentationShortcuts( headerStatementLine )
 
 		if headerContainerFn is not None:
 			headerStatementLine = headerContainerFn( headerStatementLine )
@@ -337,7 +396,7 @@ def UnparsedStatement(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
 		v = self._unparsedStatementEditRule.applyToFragment( statementLine( v ), model, inheritedState )
-		v = v.withElementInteractor( _statementIndentationInteractor )
+		v = _applyIndentationShortcuts( v )
 		return v
 	return _setUnwrappedMethod( method, _m )
 		
@@ -355,7 +414,7 @@ def Statement(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
 		v = self._statementEditRule.applyToFragment( statementLine( v ), model, inheritedState )
-		v = v.withElementInteractor( _statementIndentationInteractor )
+		v = _applyIndentationShortcuts( v )
 		return v
 	return _setUnwrappedMethod( method, _m )
 
@@ -366,13 +425,13 @@ def CompoundStatementHeader(method):
 		v = method(self, fragment, inheritedState, model, *args )
 		if isinstance( v, tuple ):
 			e = self._compoundStatementHeaderEditRule.applyToFragment( statementLine( v[0] ), model, inheritedState )
-			e = e.withElementInteractor( _statementIndentationInteractor )
+			e = _applyIndentationShortcuts( e )
 			for f in v[1:]:
 				e = f( e )
 			return e
 		else:
 			v = self._compoundStatementHeaderEditRule.applyToFragment( statementLine( v ), model, inheritedState )
-			v = v.withElementInteractor( _statementIndentationInteractor )
+			v = _applyIndentationShortcuts( v )
 			return v
 	return _setUnwrappedMethod( method, _m )
 
@@ -404,10 +463,9 @@ def SpecialFormStatement(method):
 		v = StructuralItem( model, v )
 		v = specialFormStatementLine( v )
 		v = self._specialFormStatementEditRule.applyToFragment( v, model, inheritedState )
-		v = v.withElementInteractor( _statementIndentationInteractor )
+		v = _applyIndentationShortcuts( v )
 		return v
 	return _setUnwrappedMethod( method, _m )
-
 
 
 
@@ -423,8 +481,10 @@ class Python25View (MethodDispatchView):
 		self._compHdr = editor.partialParsingEditFilter( 'Compound header', grammar.compoundStmtHeader() )
 		self._stmtUnparsed = editor.unparsedEditFilter( 'Unparsed statement', _isValidUnparsedStatementValue, _commitUnparsedStatment, _commitInnerUnparsed )
 		self._topLevel = editor.topLevelEditFilter()
-		self._exprOuter = PythonExpressionEditFilter( grammar.tupleOrExpression() )
-		self._targetOuter = PythonTargetEditFilter( grammar.targetListOrTargetItem() )
+		self._exprOuterValid = editor.parsingEditFilter( 'Expression-outer-valid', grammar.tupleOrExpression(), _commitExprOuterValid, _commitExprOuterEmpty )
+		self._exprOuterInvalid = editor.unparsedEditFilter( 'Expression-outer-invalid', _isValidExprOrTargetOuterUnparsed, _commitExprOuterUnparsed )
+		self._targetOuterValid = editor.parsingEditFilter( 'Target-outer-valid', grammar.targetListOrTargetItem(), _commitTargetOuterValid, _commitTargetOuterEmpty )
+		self._targetOuterInvalid = editor.unparsedEditFilter( 'Target-outer-invalid', _isValidExprOrTargetOuterUnparsed, _commitTargetOuterUnparsed )
 
 		self._expressionEditRule = editor.editRule( _pythonPrecedenceHandler, [ self._expr ] )
 		self._unparsedEditRule = editor.editRule( [ self._expr ] )
@@ -489,7 +549,7 @@ class Python25View (MethodDispatchView):
 			seg = Segment( exprView )
 		e = Paragraph( [ seg ] ).alignHPack().alignVRefY()
 		e = e.withDropDest( _embeddedObject_dropDest )
-		e = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._exprOuter, self._topLevel ],  model,  e )
+		e = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._exprOuterValid, self._exprOuterInvalid, self._topLevel ],  model,  e )
 		e = e.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		e = e.withCommands( PythonCommands.pythonTargetCommands )
 		e = e.withCommands( PythonCommands.pythonCommands )
@@ -507,7 +567,7 @@ class Python25View (MethodDispatchView):
 			targetView = SREInnerFragment( target, PRECEDENCE_NONE, EditMode.DISPLAY )
 			seg = Segment( targetView )
 		t = Paragraph( [ seg ] ).alignHPack().alignVRefY()
-		t = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._targetOuter, self._topLevel ],  model,  t )
+		t = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._targetOuterValid, self._targetOuterInvalid, self._topLevel ],  model,  t )
 		t = t.withContextMenuInteractor( _pythonTargetContextMenuFactory )
 		t = t.withCommands( PythonCommands.pythonTargetCommands )
 		return t

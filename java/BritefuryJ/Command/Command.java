@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import BritefuryJ.Graphics.SolidBorder;
+import BritefuryJ.Shortcut.Shortcut;
 
 public class Command
 {

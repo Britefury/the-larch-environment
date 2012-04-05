@@ -14,7 +14,8 @@ from BritefuryJ.DefaultPerspective import DefaultPerspective
 from BritefuryJ.Projection import Subject
 
 from BritefuryJ.LSpace.Input import Modifier
-from BritefuryJ.Command import CommandName, Command, CommandSet, Shortcut
+from BritefuryJ.Command import CommandName, Command, CommandSet
+from BritefuryJ.Shortcut import Shortcut
 
 from BritefuryJ.Controls import Hyperlink
 from BritefuryJ.Pres.Pres import *

@@ -352,6 +352,10 @@ public abstract class LSContainer extends LSElement
 	{
 		for (LSElement child: registeredChildren)
 		{
+			if ( child == this )
+			{
+				throw new RuntimeException( "LSContainer.handleUnrealise: recursive container" );
+			}
 			child.handleUnrealise( unrealiseRoot );
 		}
 		super.handleUnrealise( unrealiseRoot );

@@ -51,6 +51,10 @@ public class LSProxy extends LSContainerNonOverlayed
 	
 	public void setChild(LSElement child)
 	{
+		if ( child == this )
+		{
+			throw new RuntimeException( "Attempt to make LSProxy recursive" );
+		}
 		LSElement prevChild = getChild();
 		if ( child != prevChild )
 		{

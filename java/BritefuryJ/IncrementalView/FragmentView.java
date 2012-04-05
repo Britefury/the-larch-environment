@@ -352,16 +352,16 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	{
 		setFlag( FLAG_NODE_REFRESH_IN_PROGRESS );
 		
-		incView.onElementChangeFrom( this, fragmentElement );
+		incView.onElementChangeFrom( this, element );
 
-		LSElement newElement = fragmentElement;
+		LSElement newElement = element;
 		if ( testFlag( FLAG_NODE_REFRESH_REQUIRED ) )
 		{
 			// Compute the result for this node, and refresh all children
 			Object refreshState = incr.onRefreshBegin();
 			if ( refreshState != null )
 			{
-				newElement = computeFragmentElement();
+				newElement = computeFragmentContentElement();
 			}
 			incr.onRefreshEnd( refreshState );
 		}
@@ -463,7 +463,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	}
 	
 	
-	private LSElement computeFragmentElement()
+	private LSElement computeFragmentContentElement()
 	{
 		incView.profile_startModelViewMapping();
 
@@ -484,7 +484,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 		
 		if ( fragmentFactory != null )
 		{
-			LSElement r = fragmentFactory.createFragmentElement( incView, this, model );
+			LSElement r = fragmentFactory.createFragmentContentElement( incView, this, model );
 			
 			onComputeNodeResultEnd();
 			incView.profile_stopModelViewMapping();
@@ -571,14 +571,14 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	//
 	//
 	
-	protected void updateNodeResult(Object r)
+	protected void updateNodeResult(LSElement r)
 	{
 		incView.profile_startModifyPresTree();
 		if ( r != element )
 		{
 			if ( r != null )
 			{
-				element = (LSElement)r;
+				element = r;
 				fragmentElement.setChild( element );
 				StyleValues style = getStyleValues();
 				fragmentElement.setAlignment( style.get( Primitive.hAlign, HAlignment.class ), style.get( Primitive.vAlign, VAlignment.class ) );

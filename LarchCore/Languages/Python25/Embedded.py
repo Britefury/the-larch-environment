@@ -15,6 +15,10 @@ from LarchCore.Languages.Python25 import Schema
 from LarchCore.Languages.Python25 import CodeGenerator
 from LarchCore.Languages.Python25.Execution import Execution
 from LarchCore.Languages.Python25 import PythonEditor
+from LarchCore.Languages.Python25.PythonEditor.Parser import Python25Grammar
+
+
+_grammar = Python25Grammar()
 
 
 
@@ -78,39 +82,6 @@ class EmbeddedPython25 (object):
 
 	def withPerspective(self, perspective):
 		return self._WithPerspective( self, perspective )
-
-
-	@staticmethod
-	def module():
-		return EmbeddedPython25( _py25NewModule() )
-
-	@staticmethod
-	def suite():
-		return EmbeddedPython25( _py25NewSuite() )
-
-	@staticmethod
-	def expression():
-		return EmbeddedPython25( _py25NewExpr() )
-
-	@staticmethod
-	def expressionFromText(text):
-		parseResult = _grammar.tupleOrExpressionOrYieldExpression().parseStringChars( text )
-		if parseResult.isValid():
-			return EmbeddedPython25( Schema.PythonExpression( expr=parseResult.getValue() ) )
-		else:
-			return EmbeddedPython25( Schema.PythonExpression( expr=Schema.UNPARSED( value = [ text ] ) ) )
-
-	@staticmethod
-	def target():
-		return EmbeddedPython25( _py25NewTarget() )
-
-	@staticmethod
-	def targetFromText(text):
-		parseResult = _grammar.targetListOrTargetItem().parseStringChars( text )
-		if parseResult.isValid():
-			return EmbeddedPython25( Schema.PythonTarget( target=parseResult.getValue() ) )
-		else:
-			return EmbeddedPython25( Schema.PythonTarget( target=Schema.UNPARSED( value = [ text ] ) ) )
 
 
 
