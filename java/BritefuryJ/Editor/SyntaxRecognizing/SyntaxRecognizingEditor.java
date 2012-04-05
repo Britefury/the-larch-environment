@@ -326,26 +326,47 @@ public abstract class SyntaxRecognizingEditor extends SequentialRichStringEditor
 	
 	public SREditRule editRule(PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners)
 	{
-		return new SREditRule( this, precedenceHandler, editListeners );
+		return new SREditRule( this, false, precedenceHandler, editListeners );
 	}
 	
 	public SREditRule editRule( List<TreeEventListener> editListeners)
 	{
-		return new SREditRule( this, editListeners );
+		return new SREditRule( this, false, null, editListeners );
+	}
+	
+	
+	public SREditRule outerEditRule(PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners)
+	{
+		return new SREditRule( this, true, precedenceHandler, editListeners );
+	}
+	
+	public SREditRule outerEditRule( List<TreeEventListener> editListeners)
+	{
+		return new SREditRule( this, true, null, editListeners );
 	}
 	
 	
 	
 	public SRStructuralEditRule structuralEditRule(PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners)
 	{
-		return new SRStructuralEditRule( this, precedenceHandler, editListeners );
+		return new SRStructuralEditRule( this, false, precedenceHandler, editListeners );
 	}
 	
 	public SRStructuralEditRule structuralEditRule(List<TreeEventListener> editListeners)
 	{
-		return new SRStructuralEditRule( this, editListeners );
+		return new SRStructuralEditRule( this, false, null, editListeners );
 	}
 	
+	
+	public SRStructuralEditRule outerStructuralEditRule(PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners)
+	{
+		return new SRStructuralEditRule( this, true, precedenceHandler, editListeners );
+	}
+	
+	public SRStructuralEditRule outerStructuralEditRule(List<TreeEventListener> editListeners)
+	{
+		return new SRStructuralEditRule( this, true, null, editListeners );
+	}
 	
 	
 	protected boolean isValueEmpty(RichString value)

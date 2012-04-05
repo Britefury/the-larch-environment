@@ -15,7 +15,7 @@ from BritefuryJ.Parser import ParserExpression
 
 from Britefury.Kernel.View.DispatchView import MethodDispatchView
 from Britefury.Kernel.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch
-from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, ObjectDispatchMethod
+from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, ObjectDispatchMethod, redecorateDispatchMethod
 
 
 from BritefuryJ.DocModel import DMObjectClass
@@ -68,14 +68,14 @@ def _onIndent(element):
 	fragment = element.getFragmentContext()
 	node = fragment.getModel()
 
-	editor = SequentialEditor.getEditorForElement( element )
+	editor = PythonSyntaxRecognizingEditor.getEditorForElement( element )
 	editor.indent( element, fragment, node )
 
 def _onDedent(element):
 	fragment = element.getFragmentContext()
 	node = fragment.getModel()
 
-	editor = SequentialEditor.getEditorForElement( element )
+	editor = PythonSyntaxRecognizingEditor.getEditorForElement( element )
 	editor.dedent( element, fragment, node )
 
 
@@ -376,19 +376,13 @@ def _pythonModuleContextMenuFactory(element, menu):
 def _pythonTargetContextMenuFactory(element, menu):
 	return True
 
-	
-def _setUnwrappedMethod(method, m):
-	m.__dispatch_unwrapped_method__ = method
-	m.__name__ = method.__name__
-	return m
-
 
 
 def Unparsed(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
 		return self._unparsedEditRule.applyToFragment( v, model, inheritedState )
-	return _setUnwrappedMethod( method, _m )
+	return redecorateDispatchMethod( method, _m )
 		
 
 
@@ -398,15 +392,31 @@ def UnparsedStatement(method):
 		v = self._unparsedStatementEditRule.applyToFragment( statementLine( v ), model, inheritedState )
 		v = _applyIndentationShortcuts( v )
 		return v
-	return _setUnwrappedMethod( method, _m )
-		
+	return redecorateDispatchMethod( method, _m )
+
+
+
+def TargetTopLevel(method):
+	def _m(self, fragment, inheritedState, model, *args):
+		v = method(self, fragment, inheritedState, model, *args )
+		return self._targetTopLevelEditRule.applyToFragment( v, model, inheritedState )
+	return redecorateDispatchMethod( method, _m )
+
 
 
 def Expression(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
 		return self._expressionEditRule.applyToFragment( v, model, inheritedState )
-	return _setUnwrappedMethod( method, _m )
+	return redecorateDispatchMethod( method, _m )
+
+
+
+def ExpressionTopLevel(method):
+	def _m(self, fragment, inheritedState, model, *args):
+		v = method(self, fragment, inheritedState, model, *args )
+		return self._expressionTopLevelEditRule.applyToFragment( v, model, inheritedState )
+	return redecorateDispatchMethod( method, _m )
 
 
 
@@ -416,7 +426,7 @@ def Statement(method):
 		v = self._statementEditRule.applyToFragment( statementLine( v ), model, inheritedState )
 		v = _applyIndentationShortcuts( v )
 		return v
-	return _setUnwrappedMethod( method, _m )
+	return redecorateDispatchMethod( method, _m )
 
 
 	
@@ -433,7 +443,7 @@ def CompoundStatementHeader(method):
 			v = self._compoundStatementHeaderEditRule.applyToFragment( statementLine( v ), model, inheritedState )
 			v = _applyIndentationShortcuts( v )
 			return v
-	return _setUnwrappedMethod( method, _m )
+	return redecorateDispatchMethod( method, _m )
 
 
 
@@ -445,7 +455,7 @@ def CompoundStatement(method):
 			return f( compoundStatementEditor( self, inheritedState, model, v[0] ) )
 		else:
 			return compoundStatementEditor( self, inheritedState, model, v )
-	return _setUnwrappedMethod( method, _m )
+	return redecorateDispatchMethod( method, _m )
 
 
 
@@ -453,7 +463,7 @@ def SpecialFormExpression(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
 		return StructuralItem( model, v )
-	return _setUnwrappedMethod( method, _m )
+	return redecorateDispatchMethod( method, _m )
 
 
 
@@ -465,7 +475,7 @@ def SpecialFormStatement(method):
 		v = self._specialFormStatementEditRule.applyToFragment( v, model, inheritedState )
 		v = _applyIndentationShortcuts( v )
 		return v
-	return _setUnwrappedMethod( method, _m )
+	return redecorateDispatchMethod( method, _m )
 
 
 
@@ -492,6 +502,8 @@ class Python25View (MethodDispatchView):
 		self._unparsedStatementEditRule = editor.editRule( [ self._stmt, self._compHdr, self._stmtUnparsed ] )
 		self._compoundStatementHeaderEditRule = editor.structuralEditRule( [ self._compHdr, self._stmtUnparsed ] )
 		self._specialFormStatementEditRule = editor.structuralEditRule( [ self._stmt, self._compHdr, self._stmtUnparsed ] )
+		self._targetTopLevelEditRule = editor.outerStructuralEditRule( _pythonPrecedenceHandler, [ self._targetOuterValid, self._targetOuterInvalid, self._topLevel ] )
+		self._expressionTopLevelEditRule = editor.outerStructuralEditRule( _pythonPrecedenceHandler, [ self._exprOuterValid, self._exprOuterInvalid, self._topLevel ] )
 
 		
 	def _makeSuiteEditFilter(self, suite):
@@ -513,11 +525,12 @@ class Python25View (MethodDispatchView):
 			lineViews = SREInnerFragment.map( suite, PRECEDENCE_NONE, EditMode.EDIT )
 		s = suiteView( lineViews ).alignHPack().alignVRefY()
 		s = s.withDropDest( _embeddedObject_dropDest )
-		s = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._makeSuiteEditFilter( suite ), self._topLevel ], suite, s )
 		s = s.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		s = s.withCommands( PythonCommands.pythonTargetCommands )
 		s = s.withCommands( PythonCommands.pythonCommands )
-		return ApplyStyleSheetFromAttribute( PythonEditorStyle.paragraphIndentationStyle, s )
+		s = ApplyStyleSheetFromAttribute( PythonEditorStyle.paragraphIndentationStyle, s )
+		s = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._makeSuiteEditFilter( suite ), self._topLevel ], suite, s )
+		return s
 
 
 
@@ -530,15 +543,17 @@ class Python25View (MethodDispatchView):
 			lineViews = SREInnerFragment.map( suite, PRECEDENCE_NONE, EditMode.EDIT )
 		s = suiteView( lineViews ).alignHPack().alignVRefY()
 		s = s.withDropDest( _embeddedObject_dropDest )
-		s = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._makeSuiteEditFilter( suite ), self._topLevel ], suite, s )
 		s = s.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		s = s.withCommands( PythonCommands.pythonTargetCommands )
 		s = s.withCommands( PythonCommands.pythonCommands )
-		return ApplyStyleSheetFromAttribute( PythonEditorStyle.paragraphIndentationStyle, s )
+		s = ApplyStyleSheetFromAttribute( PythonEditorStyle.paragraphIndentationStyle, s )
+		s = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._makeSuiteEditFilter( suite ), self._topLevel ], suite, s )
+		return s
 
 
 
 	@DMObjectNodeDispatchMethod( Schema.PythonExpression )
+	@ExpressionTopLevel
 	def PythonExpression(self, fragment, inheritedState, model, expr):
 		if expr is None:
 			# Empty document - create a single blank line so that there is something to edit
@@ -549,7 +564,6 @@ class Python25View (MethodDispatchView):
 			seg = Segment( exprView )
 		e = Paragraph( [ seg ] ).alignHPack().alignVRefY()
 		e = e.withDropDest( _embeddedObject_dropDest )
-		e = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._exprOuterValid, self._exprOuterInvalid, self._topLevel ],  model,  e )
 		e = e.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		e = e.withCommands( PythonCommands.pythonTargetCommands )
 		e = e.withCommands( PythonCommands.pythonCommands )
@@ -558,6 +572,7 @@ class Python25View (MethodDispatchView):
 
 
 	@DMObjectNodeDispatchMethod( Schema.PythonTarget )
+	@TargetTopLevel
 	def PythonTarget(self, fragment, inheritedState, model, target):
 		if target is None:
 			# Empty document - create a single blank line so that there is something to edit
@@ -567,7 +582,6 @@ class Python25View (MethodDispatchView):
 			targetView = SREInnerFragment( target, PRECEDENCE_NONE, EditMode.DISPLAY )
 			seg = Segment( targetView )
 		t = Paragraph( [ seg ] ).alignHPack().alignVRefY()
-		t = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._targetOuterValid, self._targetOuterInvalid, self._topLevel ],  model,  t )
 		t = t.withContextMenuInteractor( _pythonTargetContextMenuFactory )
 		t = t.withCommands( PythonCommands.pythonTargetCommands )
 		return t

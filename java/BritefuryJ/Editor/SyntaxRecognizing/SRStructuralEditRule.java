@@ -20,20 +20,15 @@ public class SRStructuralEditRule extends SRAbstractEditRule
 	private List<TreeEventListener> editListeners;
 	
 	
-	public SRStructuralEditRule(SyntaxRecognizingEditor editor, PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners)
+	public SRStructuralEditRule(SyntaxRecognizingEditor editor, boolean outer, PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners)
 	{
-		super( editor, precedenceHandler );
+		super( editor, outer, precedenceHandler );
 		this.editListeners = new ArrayList<TreeEventListener>();
 		this.editListeners.addAll( editListeners );
 	}
 	
-	public SRStructuralEditRule(SyntaxRecognizingEditor editor, List<TreeEventListener> editListeners)
-	{
-		this( editor, null, editListeners );
-	}
-
 	
-	public Pres editFragment(Pres view, Object model, SimpleAttributeTable inheritedState)
+	protected Pres buildFragment(Pres view, Object model, SimpleAttributeTable inheritedState)
 	{
 		return new EditableStructuralItem( editor, editListeners, model, view );
 	}
