@@ -13,35 +13,47 @@ import BritefuryJ.Pres.Pres;
 public abstract class SRAbstractEditRule
 {
 	protected SyntaxRecognizingEditor editor;
+	protected boolean outer;
 	private PrecedenceHandler precedenceHandler;
 	
 	
-	public SRAbstractEditRule(SyntaxRecognizingEditor editor, PrecedenceHandler precedenceHandler)
+	public SRAbstractEditRule(SyntaxRecognizingEditor editor, boolean outer, PrecedenceHandler precedenceHandler)
 	{
 		this.editor = editor;
+		this.outer = outer;
 		this.precedenceHandler = precedenceHandler;
 	}
 	
 
 	public Pres applyToFragment(Pres view, Object model, SimpleAttributeTable inheritedState)
 	{
-		Object editModeObj = inheritedState.getOptional( "__SREditor_edit" );
-		SyntaxRecognizingEditor.EditMode editMode = editModeObj instanceof SyntaxRecognizingEditor.EditMode  ?
-				(SyntaxRecognizingEditor.EditMode)editModeObj  :  SyntaxRecognizingEditor.EditMode.EDIT;
+		boolean edit;
+		
+		if ( !outer )
+		{
+			Object editModeObj = inheritedState.getOptional( "__SREditor_edit" );
+			SyntaxRecognizingEditor.EditMode editMode = editModeObj instanceof SyntaxRecognizingEditor.EditMode  ?
+					(SyntaxRecognizingEditor.EditMode)editModeObj  :  SyntaxRecognizingEditor.EditMode.EDIT;
+			edit = editMode == SyntaxRecognizingEditor.EditMode.EDIT;
+		}
+		else
+		{
+			edit = true;
+		}
 		
 		if ( precedenceHandler != null )
 		{
 			view = precedenceHandler.applyPrecedenceBrackets( model, view, inheritedState );
 		}
 		
-		if ( editMode == SyntaxRecognizingEditor.EditMode.EDIT )
+		if ( edit )
 		{
-			view = editFragment( view, model, inheritedState );
+			view = buildFragment( view, model, inheritedState );
 		}
 		
 		return view;
 	}
 	
 	
-	protected abstract Pres editFragment(Pres view, Object model, SimpleAttributeTable inheritedState);
+	protected abstract Pres buildFragment(Pres view, Object model, SimpleAttributeTable inheritedState);
 }

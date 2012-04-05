@@ -21,7 +21,7 @@ from BritefuryJ.Parser import ParserExpression
 
 from Britefury.Kernel.View.DispatchView import MethodDispatchView
 from Britefury.Kernel.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch
-from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, ObjectDispatchMethod
+from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, ObjectDispatchMethod, redecorateDispatchMethod
 
 
 from BritefuryJ.DocModel import DMObjectClass, DMObject
@@ -100,29 +100,6 @@ def _commitExprOuterUnparsed(model, value):
 	if values == []:
 		values = [ '' ]
 	model['expr'] = Schema.UNPARSED( value=values )
-
-
-
-
-
-def _setUnwrappedMethod(method, m):
-	m.__dispatch_unwrapped_method__ = method
-	m.__name__ = method.__name__
-	return m
-
-
-def Unparsed(method):
-	def _m(self, fragment, inheritedState, model, *args):
-		v = method(self, fragment, inheritedState, model, *args )
-		return self._unparsedEditRule.applyToFragment( v, model, inheritedState )
-	return _setUnwrappedMethod( method, _m )
-
-
-def Expression(method):
-	def _m(self, fragment, inheritedState, model, *args):
-		v = method(self, fragment, inheritedState, model, *args )
-		return self._expressionEditRule.applyToFragment( v, model, inheritedState )
-	return _setUnwrappedMethod( method, _m )
 
 
 
@@ -289,6 +266,30 @@ def _editTopLevelNode(char):
 
 
 
+def Unparsed(method):
+	def _m(self, fragment, inheritedState, model, *args):
+		v = method(self, fragment, inheritedState, model, *args )
+		return self._unparsedEditRule.applyToFragment( v, model, inheritedState )
+	return redecorateDispatchMethod( method, _m )
+
+
+def Expression(method):
+	def _m(self, fragment, inheritedState, model, *args):
+		v = method(self, fragment, inheritedState, model, *args )
+		return self._expressionEditRule.applyToFragment( v, model, inheritedState )
+	return redecorateDispatchMethod( method, _m )
+
+
+def ExpressionTopLevel(method):
+	def _m(self, fragment, inheritedState, model, *args):
+		v = method(self, fragment, inheritedState, model, *args )
+		return self._expressionTopLevelEditRule.applyToFragment( v, model, inheritedState )
+	return redecorateDispatchMethod( method, _m )
+
+
+
+
+
 class VREView (MethodDispatchView):
 	def __init__(self, grammar):
 		super( VREView, self ).__init__()
@@ -306,17 +307,18 @@ class VREView (MethodDispatchView):
 
 		self._expressionEditRule = editor.editRule( [ self._expr, self._exprUnparsed ] )
 		self._unparsedEditRule = editor.editRule( [ self._expr ] )
+		self._expressionTopLevelEditRule = editor.outerStructuralEditRule( [ self._exprOuterValid, self._exprOuterInvalid, self._topLevel ] )
 
 
 
 
 
 	@DMObjectNodeDispatchMethod( Schema.PythonRegEx )
+	@ExpressionTopLevel
 	def PythonRegEx(self, fragment, inheritedState, model, expr):
 		exprView =_editTopLevelNode( expr )
 		seg = Segment( exprView )
 		e = Paragraph( [ seg ] ).alignHPack().alignVRefY()
-		e = EditableStructuralItem( VisualRegexSyntaxRecognizingEditor.instance, [ self._exprOuterValid, self._exprOuterInvalid, self._topLevel ],  model,  e )
 		return e
 
 
