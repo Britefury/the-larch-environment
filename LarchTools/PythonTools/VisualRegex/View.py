@@ -307,7 +307,7 @@ class VREView (MethodDispatchView):
 
 		self._expressionEditRule = editor.editRule( [ self._expr, self._exprUnparsed ] )
 		self._unparsedEditRule = editor.editRule( [ self._expr ] )
-		self._expressionTopLevelEditRule = editor.outerStructuralEditRule( [ self._exprOuterValid, self._exprOuterInvalid, self._topLevel ] )
+		self._expressionTopLevelEditRule = editor.softStructuralEditRule( [ self._exprOuterValid, self._exprOuterInvalid, self._topLevel ] )
 
 
 

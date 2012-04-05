@@ -10,19 +10,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.Editor.Sequential.Item.EditableStructuralItem;
+import BritefuryJ.Editor.Sequential.Item.SoftStructuralItem;
 import BritefuryJ.Editor.SyntaxRecognizing.Precedence.PrecedenceHandler;
 import BritefuryJ.LSpace.TreeEventListener;
 import BritefuryJ.Pres.Pres;
 
-public class SRStructuralEditRule extends SRAbstractEditRule
+public class SRSoftStructuralEditRule extends SRAbstractEditRule
 {
 	private List<TreeEventListener> editListeners;
 	
 	
-	public SRStructuralEditRule(SyntaxRecognizingEditor editor, boolean outer, PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners)
+	public SRSoftStructuralEditRule(SyntaxRecognizingEditor editor, PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners)
 	{
-		super( editor, outer, precedenceHandler );
+		super( editor, precedenceHandler );
 		this.editListeners = new ArrayList<TreeEventListener>();
 		this.editListeners.addAll( editListeners );
 	}
@@ -30,6 +30,6 @@ public class SRStructuralEditRule extends SRAbstractEditRule
 	
 	protected Pres buildFragment(Pres view, Object model, SimpleAttributeTable inheritedState)
 	{
-		return new EditableStructuralItem( editor, editListeners, model, view );
+		return new SoftStructuralItem( editor, editListeners, model, view );
 	}
 }
