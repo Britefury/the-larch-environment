@@ -80,11 +80,6 @@ public class LSCaretSlot extends LSContentLeafEditable
 	@Override
 	public void drawCaret(Graphics2D graphics, Caret c)
 	{
-		int index = c.getIndex();
-		if ( index < 0  ||  index > 1 )
-		{
-			throw new RuntimeException( "LSCaretSlot.drawCaret(): caret marker is out of range; " + index + " is not within the range[0-1]." );
-		}
 		LayoutNode layout = getLayoutNode();
 		double deltaY = layout.getAllocationBox().getAllocRefY()  -  layout.getRequisitionBox().getReqRefY();
 		AffineTransform current = pushGraphicsTransform( graphics );

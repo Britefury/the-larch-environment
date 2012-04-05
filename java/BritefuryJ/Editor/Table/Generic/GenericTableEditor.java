@@ -28,7 +28,7 @@ public class GenericTableEditor extends AbstractTableEditor<GenericTableModelInt
 	{
 		super( showLeftHeader, showTopHeader, growRight, growDown );
 		this.columnTitles = columnTitles;
-		this.blankPres = EditableTextCell.textCell( "", convertValueFn );
+		this.blankPres = EditableTextCell.blankTextCell( "", convertValueFn );
 	}
 	
 	public GenericTableEditor(String columnTitles[], boolean showLeftHeader, boolean showTopHeader, boolean growRight, boolean growDown)

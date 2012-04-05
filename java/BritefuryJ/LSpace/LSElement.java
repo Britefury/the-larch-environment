@@ -62,6 +62,7 @@ import BritefuryJ.LSpace.Interactor.ContextMenuElementInteractor;
 import BritefuryJ.LSpace.Interactor.MotionElementInteractor;
 import BritefuryJ.LSpace.Interactor.PushElementInteractor;
 import BritefuryJ.LSpace.Interactor.RealiseElementInteractor;
+import BritefuryJ.LSpace.Interactor.ShortcutElementInteractor;
 import BritefuryJ.LSpace.Layout.ElementAlignment;
 import BritefuryJ.LSpace.Layout.HAlignment;
 import BritefuryJ.LSpace.Layout.LAllocV;
@@ -87,6 +88,8 @@ import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Pres.Primitive.Spacer;
 import BritefuryJ.Projection.Perspective;
+import BritefuryJ.Shortcut.Shortcut;
+import BritefuryJ.Shortcut.ShortcutElementAction;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.Util.RichString.RichString;
 import BritefuryJ.Util.RichString.RichStringBuilder;
@@ -2054,6 +2057,67 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 		else
 		{
 			return null;
+		}
+	}
+	
+	
+	
+	//
+	//
+	// Keyboard shortcut methods
+	//
+	//
+	
+	public void addShortcut(Shortcut shortcut, ShortcutElementAction action)
+	{
+		ShortcutElementInteractor interactor = null;
+		
+		Iterable<AbstractElementInteractor> interactors = getElementInteractors();
+		if ( interactors != null )
+		{
+			for (AbstractElementInteractor a: interactors)
+			{
+				if ( a instanceof ShortcutElementInteractor )
+				{
+					interactor = (ShortcutElementInteractor)a;
+					break;
+				}
+			}
+		}
+		
+		if ( interactor == null )
+		{
+			interactor = new ShortcutElementInteractor();
+			addElementInteractor( interactor );
+		}
+		
+		interactor.addShortcut( shortcut, action );
+	}
+	
+	public void removeShortcut(Shortcut shortcut)
+	{
+		ShortcutElementInteractor interactor = null;
+		
+		Iterable<AbstractElementInteractor> interactors = getElementInteractors();
+		if ( interactors != null )
+		{
+			for (AbstractElementInteractor a: interactors)
+			{
+				if ( a instanceof ShortcutElementInteractor )
+				{
+					interactor = (ShortcutElementInteractor)a;
+					break;
+				}
+			}
+		}
+		
+		if ( interactor != null )
+		{
+			interactor.removeShortcut( shortcut );
+			if ( interactor.isEmpty() )
+			{
+				removeElementInteractor( interactor );
+			}
 		}
 	}
 	

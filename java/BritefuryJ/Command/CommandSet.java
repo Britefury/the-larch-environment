@@ -38,7 +38,8 @@ public class CommandSet implements CommandSetSource
 		@Override
 		public boolean keyReleased(LSElement element, KeyEvent event)
 		{
-			return false;
+			Command cmd = shortcuts.getCommandForKeyPressed( event );
+			return cmd != null;
 		}
 
 		@Override

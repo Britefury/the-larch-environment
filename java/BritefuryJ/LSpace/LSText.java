@@ -23,6 +23,10 @@ import BritefuryJ.Math.Vector2;
 
 public class LSText extends LSContentLeafEditable
 {
+	protected final static int FLAGS_TEXT_START = FLAGS_CONTENTLEAFEDITABLE_END;
+	protected final static int FLAGS_TEXT_END = FLAGS_TEXT_START;
+
+	
 	protected TextVisual visual;
 	protected String text;
 	

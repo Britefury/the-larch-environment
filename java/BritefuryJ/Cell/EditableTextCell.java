@@ -9,8 +9,8 @@ package BritefuryJ.Cell;
 import java.awt.event.KeyEvent;
 import java.util.IdentityHashMap;
 
+import BritefuryJ.LSpace.LSContentLeafEditable;
 import BritefuryJ.LSpace.LSElement;
-import BritefuryJ.LSpace.LSText;
 import BritefuryJ.LSpace.TextEditEvent;
 import BritefuryJ.LSpace.TreeEventListener;
 import BritefuryJ.LSpace.Clipboard.TextClipboardHandler;
@@ -19,29 +19,86 @@ import BritefuryJ.LSpace.Interactor.KeyElementInteractor;
 import BritefuryJ.LSpace.Marker.Marker;
 import BritefuryJ.LSpace.TextFocus.Caret;
 import BritefuryJ.LSpace.TextFocus.TextSelection;
+import BritefuryJ.ObjectPresentation.PresentationStateListenerList;
+import BritefuryJ.Pres.CompositePres;
+import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Bin;
 import BritefuryJ.Pres.Primitive.Region;
 import BritefuryJ.Pres.Primitive.Segment;
 import BritefuryJ.Pres.Primitive.Text;
+import BritefuryJ.StyleSheet.StyleValues;
 import BritefuryJ.Util.UnaryFn;
 
 public class EditableTextCell
 {
+	private static class Cell extends CompositePres
+	{
+		TreeEventListener textListener = new TreeEventListener()
+		{
+			public boolean onTreeEvent(LSElement element, LSElement sourceElement, Object event)
+			{
+				if ( event instanceof TextEditEvent )
+				{
+					String t = element.getTextRepresentation();
+					if ( !t.contains( "\n" ) )
+					{
+						text = t;
+						PresentationStateListenerList.onPresentationStateChanged( listeners, Cell.this );
+						return true;
+					}
+				}
+				return false;
+			}
+		};
+		
+		private String text;
+		private PresentationStateListenerList listeners = null;
+		
+		
+		public Cell(String text)
+		{
+			this.text = text;
+		}
+		
+		
+		@Override
+		public Pres pres(PresentationContext ctx, StyleValues style)
+		{
+			listeners = PresentationStateListenerList.addListener( listeners, ctx.getFragment() );
+			Pres textPres = new Segment( new Text( text ) ).withTreeEventListener( textListener );
+			return new Bin( new Region( textPres, clipboardHandler ) );
+		}
+	}
+	
+	
 	public static Pres textCellWithCachedListener(String text, UnaryFn textToValue)
 	{
-		TreeEventListener listener = cachedTreeEventListenerFor( textToValue );
-		Pres textPres = new Segment( new Text( text ) );
-		textPres = textPres.withElementInteractor( caretInteractor ).withElementInteractor( keyInteractor ).withTreeEventListener( listener );
-		return new Bin( new Region( textPres, clipboardHandler ) );
+		TreeEventListener commitListener = cachedCommitTreeEventListenerFor( textToValue );
+		return new Bin( new InnerFragment( new Cell( text ) ) ).withElementInteractor( caretInteractor ).withElementInteractor( keyInteractor ).withTreeEventListener( commitListener );
 	}
 
 
 	public static Pres textCell(String text, UnaryFn textToValue)
 	{
-		TreeEventListener listener = treeEventListenerFor( textToValue );
-		Pres textPres = new Segment( new Text( text ) );
-		textPres = textPres.withElementInteractor( caretInteractor ).withElementInteractor( keyInteractor ).withTreeEventListener( listener );
+		TreeEventListener commitListener = commitTreeEventListenerFor( textToValue );
+		return new Bin( new InnerFragment( new Cell( text ) ) ).withElementInteractor( caretInteractor ).withElementInteractor( keyInteractor ).withTreeEventListener( commitListener );
+	}
+
+
+	public static Pres blankTextCellWithCachedListener(String text, UnaryFn textToValue)
+	{
+		TreeEventListener textListener = cachedTreeEventListenerFor( textToValue );
+		Pres textPres = new Segment( new Text( text ) ).withTreeEventListener( textListener ).withElementInteractor( caretInteractor ).withElementInteractor( keyInteractor );
+		return new Bin( new Region( textPres, clipboardHandler ) );
+	}
+
+
+	public static Pres blankTextCell(String text, UnaryFn textToValue)
+	{
+		TreeEventListener textListener = treeEventListenerFor( textToValue );
+		Pres textPres = new Segment( new Text( text ) ).withTreeEventListener( textListener ).withElementInteractor( caretInteractor ).withElementInteractor( keyInteractor );
 		return new Bin( new Region( textPres, clipboardHandler ) );
 	}
 
@@ -51,21 +108,21 @@ public class EditableTextCell
 		@Override
 		protected void deleteText(TextSelection selection, Caret caret)
 		{
-			LSText textElement = (LSText)selection.getStartMarker().getElement();
+			LSContentLeafEditable textElement = (LSContentLeafEditable)selection.getStartMarker().getElement();
 			textElement.removeText( selection.getStartMarker(), selection.getEndMarker() );
 		}
 
 		@Override
 		protected void insertText(Marker marker, String text)
 		{
-			LSText textElement = (LSText)marker.getElement();
+			LSContentLeafEditable textElement = (LSContentLeafEditable)marker.getElement();
 			textElement.insertText( marker, text );
 		}
 		
 		@Override
 		protected void replaceText(TextSelection selection, Caret caret, String replacement)
 		{
-			LSText textElement = (LSText)selection.getStartMarker().getElement();
+			LSContentLeafEditable textElement = (LSContentLeafEditable)selection.getStartMarker().getElement();
 			textElement.replaceText( selection.getStartMarker(), selection.getEndMarker(), replacement );
 		}
 		
@@ -151,7 +208,23 @@ public class EditableTextCell
 	}
 	
 	
-	private static TreeEventListener treeEventListenerFor(final UnaryFn textToValue)
+	private static final IdentityHashMap<UnaryFn, TreeEventListener> textCellCommitTreeEventListeners = new IdentityHashMap<UnaryFn, TreeEventListener>();
+	
+	private static TreeEventListener cachedCommitTreeEventListenerFor(final UnaryFn textToValue)
+	{
+		TreeEventListener listener = textCellCommitTreeEventListeners.get( textToValue );
+		
+		if ( listener == null )
+		{
+			listener = commitTreeEventListenerFor( textToValue );
+			textCellCommitTreeEventListeners.put( textToValue, listener );
+		}
+		
+		return listener;
+	}
+	
+	
+	private static TreeEventListener commitTreeEventListenerFor(final UnaryFn textToValue)
 	{
 		TreeEventListener listener = new TreeEventListener()
 		{
@@ -168,9 +241,30 @@ public class EditableTextCell
 					}
 					return true;
 				}
-				else if ( event instanceof TextEditEvent )
+				return false;
+			}
+		};
+		
+		return listener;
+	}
+	
+	
+	
+	private static TreeEventListener treeEventListenerFor(final UnaryFn textToValue)
+	{
+		TreeEventListener listener = new TreeEventListener()
+		{
+			public boolean onTreeEvent(LSElement element, LSElement sourceElement, Object event)
+			{
+				if ( event instanceof CommitEvent  ||  event instanceof TextEditEvent )
 				{
-					// Ignore text edit events - let the text element have its contents modified, until a commit event is received
+					// Attempt to commit the value
+					String textValue = element.getTextRepresentation();
+					Object value = textToValue.invoke( textValue );
+					if ( value != null )
+					{
+						CellEditPerspective.notifySetCellValue( element, value );
+					}
 					return true;
 				}
 				return false;

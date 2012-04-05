@@ -18,7 +18,8 @@ from javax.swing.filechooser import FileNameExtensionFilter
 from Britefury.Kernel.View.DispatchView import MethodDispatchView
 from Britefury.Dispatch.MethodDispatch import ObjectDispatchMethod
 
-from BritefuryJ.Command import CommandName, Command, CommandSet, Shortcut
+from BritefuryJ.Command import CommandName, Command, CommandSet
+from BritefuryJ.Shortcut import Shortcut
 
 from BritefuryJ.AttributeTable import *
 

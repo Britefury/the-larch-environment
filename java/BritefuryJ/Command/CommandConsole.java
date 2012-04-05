@@ -66,6 +66,14 @@ public class CommandConsole extends AbstractCommandConsole
 
 		public boolean keyReleased(Keyboard keyboard, KeyEvent event)
 		{
+			for (BoundCommandSet cmdSet: page.getBoundCommandSets())
+			{
+				BoundCommand cmd = cmdSet.getCommandForKeyPressed( event );
+				if ( cmd != null )
+				{
+					return true;
+				}
+			}
 			return false;
 		}
 

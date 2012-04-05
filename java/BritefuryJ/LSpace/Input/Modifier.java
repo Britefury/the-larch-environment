@@ -8,6 +8,8 @@
 package BritefuryJ.LSpace.Input;
 
 import java.awt.event.InputEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Modifier
 {
@@ -77,6 +79,24 @@ public class Modifier
 		addModifiersToString( b, modifiers, ALT_GRAPH, "ALT_GRAPH" );
 		b.append( '>' );
 		return b.toString();
+	}
+	
+	private static void addModifiersToStringList(List<String> b, int modifiers, int mask, String name)
+	{
+		if ( ( modifiers & mask ) != 0 )
+		{
+			b.add( name );
+		}
+	}
+	
+	public static List<String> getKeyModifierNames(int modifiers)
+	{
+		ArrayList<String> b = new ArrayList<String>();
+		addModifiersToStringList( b, modifiers, CTRL, "CTRL" );
+		addModifiersToStringList( b, modifiers, SHIFT, "SHIFT" );
+		addModifiersToStringList( b, modifiers, ALT, "ALT" );
+		addModifiersToStringList( b, modifiers, ALT_GRAPH, "ALT_GRAPH" );
+		return b;
 	}
 
 	

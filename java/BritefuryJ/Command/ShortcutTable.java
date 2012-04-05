@@ -10,6 +10,8 @@ import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.List;
 
+import BritefuryJ.Shortcut.Shortcut;
+
 class ShortcutTable
 {
 	private HashMap<Shortcut, Command> shortcutToCommand = new HashMap<Shortcut, Command>();

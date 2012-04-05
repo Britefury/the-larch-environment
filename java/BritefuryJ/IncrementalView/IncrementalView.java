@@ -160,7 +160,7 @@ public class IncrementalView
 
 		
 		
-		public LSElement createFragmentElement(IncrementalView view, FragmentView incrementalNode, Object model)
+		public LSElement createFragmentContentElement(IncrementalView view, FragmentView incrementalNode, Object model)
 		{
 			view.profile_startPresBuild();
 

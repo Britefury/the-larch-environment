@@ -27,16 +27,16 @@ public abstract class LiveInterface extends CompositePres
 {
 	protected static class ElementValueFn implements ElementValueFunction
 	{
-		private LiveInterface unit;
+		private LiveInterface live;
 		
 		public ElementValueFn(LiveInterface unit)
 		{
-			this.unit = unit;
+			this.live = unit;
 		}
 		
 		public Object computeElementValue(LSElement element)
 		{
-			return unit.getStaticValue();
+			return live.getStaticValue();
 		}
 
 		@Override
@@ -52,12 +52,12 @@ public abstract class LiveInterface extends CompositePres
 	
 	public static class ValuePres extends Pres
 	{
-		private LiveInterface unit;
+		private LiveInterface live;
 		
 		
 		private ValuePres(LiveInterface unit)
 		{
-			this.unit = unit;
+			this.live = unit;
 		}
 		
 
@@ -67,12 +67,12 @@ public abstract class LiveInterface extends CompositePres
 			Object value = null;
 			try
 			{
-				value = unit.getValue();
+				value = live.getValue();
 			}
 			catch (Throwable t)
 			{
 				Pres exceptionView = new ApplyPerspective( null, t );
-				return new ErrorBox( "UnitInterface.ValuePres presentation error - exception during unit evaluation", exceptionView ).present( ctx, style );
+				return new ErrorBox( "UnitInterface.ValuePres presentation error - exception during live evaluation", exceptionView ).present( ctx, style );
 			}
 
 			if ( value != null )
