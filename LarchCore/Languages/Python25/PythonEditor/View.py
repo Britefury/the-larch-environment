@@ -174,7 +174,7 @@ def compoundStatementEditor(pythonView, inheritedState, model, compoundBlocks):
 			raise TypeError, 'Compound block should be of the form (headerNode, headerContents, suite)  or  (headerNode, headerContents, suite, headerContainerFn)'
 
 		headerStatementLine = statementLine( headerContents )
-		headerStatementLine = BreakableStructuralItem( PythonSyntaxRecognizingEditor.instance, headerNode, headerStatementLine )
+		headerStatementLine = SoftStructuralItem( PythonSyntaxRecognizingEditor.instance, headerNode, headerStatementLine )
 		headerStatementLine = _applyIndentationShortcuts( headerStatementLine )
 
 		if headerContainerFn is not None:
@@ -190,7 +190,7 @@ def compoundStatementEditor(pythonView, inheritedState, model, compoundBlocks):
 			dedent = StructuralItem( Schema.Dedent(), dedentElement() )
 
 			suiteElement = indentedBlock( indent, lineViews, dedent )
-			suiteElement = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, pythonView._makeCompoundSuiteEditFilter( suite ), Schema.IndentedBlock( suite=suite ), suiteElement )
+			suiteElement = SoftStructuralItem( PythonSyntaxRecognizingEditor.instance, pythonView._makeCompoundSuiteEditFilter( suite ), Schema.IndentedBlock( suite=suite ), suiteElement )
 
 			statementContents.extend( [ headerStatementLine.alignHExpand(), suiteElement.alignHExpand() ] )
 		else:
@@ -412,6 +412,14 @@ def Expression(method):
 
 
 
+def StructuralExpression(method):
+	def _m(self, fragment, inheritedState, model, *args):
+		v = method(self, fragment, inheritedState, model, *args )
+		return self._structuralExpressionEditRule.applyToFragment( v, model, inheritedState )
+	return redecorateDispatchMethod( method, _m )
+
+
+
 def ExpressionTopLevel(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
@@ -497,13 +505,14 @@ class Python25View (MethodDispatchView):
 		self._targetOuterInvalid = editor.unparsedEditFilter( 'Target-outer-invalid', _isValidExprOrTargetOuterUnparsed, _commitTargetOuterUnparsed )
 
 		self._expressionEditRule = editor.editRule( _pythonPrecedenceHandler, [ self._expr ] )
+		self._structuralExpressionEditRule = editor.softStructuralEditRule( _pythonPrecedenceHandler, [ self._expr ] )
 		self._unparsedEditRule = editor.editRule( [ self._expr ] )
-		self._statementEditRule = editor.structuralEditRule( [ self._stmt, self._compHdr, self._stmtUnparsed ] )
+		self._statementEditRule = editor.softStructuralEditRule( [ self._stmt, self._compHdr, self._stmtUnparsed ] )
 		self._unparsedStatementEditRule = editor.editRule( [ self._stmt, self._compHdr, self._stmtUnparsed ] )
-		self._compoundStatementHeaderEditRule = editor.structuralEditRule( [ self._compHdr, self._stmtUnparsed ] )
-		self._specialFormStatementEditRule = editor.structuralEditRule( [ self._stmt, self._compHdr, self._stmtUnparsed ] )
-		self._targetTopLevelEditRule = editor.outerStructuralEditRule( _pythonPrecedenceHandler, [ self._targetOuterValid, self._targetOuterInvalid, self._topLevel ] )
-		self._expressionTopLevelEditRule = editor.outerStructuralEditRule( _pythonPrecedenceHandler, [ self._exprOuterValid, self._exprOuterInvalid, self._topLevel ] )
+		self._compoundStatementHeaderEditRule = editor.softStructuralEditRule( [ self._compHdr, self._stmtUnparsed ] )
+		self._specialFormStatementEditRule = editor.softStructuralEditRule( [ self._stmt, self._compHdr, self._stmtUnparsed ] )
+		self._targetTopLevelEditRule = editor.softStructuralEditRule( _pythonPrecedenceHandler, [ self._targetOuterValid, self._targetOuterInvalid, self._topLevel ] )
+		self._expressionTopLevelEditRule = editor.softStructuralEditRule( _pythonPrecedenceHandler, [ self._exprOuterValid, self._exprOuterInvalid, self._topLevel ] )
 
 		
 	def _makeSuiteEditFilter(self, suite):
@@ -529,7 +538,7 @@ class Python25View (MethodDispatchView):
 		s = s.withCommands( PythonCommands.pythonTargetCommands )
 		s = s.withCommands( PythonCommands.pythonCommands )
 		s = ApplyStyleSheetFromAttribute( PythonEditorStyle.paragraphIndentationStyle, s )
-		s = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._makeSuiteEditFilter( suite ), self._topLevel ], suite, s )
+		s = SoftStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._makeSuiteEditFilter( suite ), self._topLevel ], suite, s )
 		return s
 
 
@@ -547,7 +556,7 @@ class Python25View (MethodDispatchView):
 		s = s.withCommands( PythonCommands.pythonTargetCommands )
 		s = s.withCommands( PythonCommands.pythonCommands )
 		s = ApplyStyleSheetFromAttribute( PythonEditorStyle.paragraphIndentationStyle, s )
-		s = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._makeSuiteEditFilter( suite ), self._topLevel ], suite, s )
+		s = SoftStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._makeSuiteEditFilter( suite ), self._topLevel ], suite, s )
 		return s
 
 
@@ -880,14 +889,12 @@ class Python25View (MethodDispatchView):
 		return spanBinOpView( self._parser, inheritedState, model, x, y, '*' )
 
 	@DMObjectNodeDispatchMethod( Schema.Div )
-	@Expression
+	@StructuralExpression
 	def Div(self, fragment, inheritedState, model, x, y):
 		xPrec, yPrec = computeBinOpViewPrecedenceValues( PRECEDENCE_MULDIVMOD, False )
 		xView = SREInnerFragment( x, xPrec, EditMode.EDIT )
 		yView = SREInnerFragment( y, yPrec, EditMode.EDIT )
-		#<NO_TREE_EVENT_LISTENER>
-		view = div( xView, yView, '/' )
-		return BreakableStructuralItem( PythonSyntaxRecognizingEditor.instance, model, view )
+		return div( xView, yView, '/' )
 
 	@DMObjectNodeDispatchMethod( Schema.Mod )
 	@Expression
@@ -1503,7 +1510,7 @@ class Python25View (MethodDispatchView):
 		dedent = StructuralItem( Schema.Dedent(), dedentElement() )
 
 		suiteElement = badIndentedBlock( indent, lineViews, dedent )
-		suiteElement = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance,
+		suiteElement = SoftStructuralItem( PythonSyntaxRecognizingEditor.instance,
 		                                       PythonSyntaxRecognizingEditor.instance.parsingEditFilter( 'Suite', self._parser.compoundSuite(), _makeSuiteCommitFn( suite ) ),
 		                                       model, suiteElement )
 

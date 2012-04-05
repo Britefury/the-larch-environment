@@ -17,7 +17,7 @@ import BritefuryJ.Editor.Sequential.EditFilter.HandleEditResult;
 import BritefuryJ.Editor.Sequential.SelectionEditTreeEvent;
 import BritefuryJ.Editor.Sequential.SequentialEditor;
 import BritefuryJ.Editor.Sequential.RichStringEditFilter;
-import BritefuryJ.Editor.Sequential.Item.EditableStructuralItem;
+import BritefuryJ.Editor.Sequential.Item.SoftStructuralItem;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.LSpace.LSContentLeafEditable;
 import BritefuryJ.LSpace.LSElement;
@@ -390,28 +390,28 @@ public abstract class RichTextEditor extends SequentialEditor
 	public Pres editableInlineEmbed(Object model, Object child)
 	{
 		child = new Proxy( child );
-		return new EditableStructuralItem( this, inlineEmbedEditListener, model, child );
+		return new SoftStructuralItem( this, inlineEmbedEditListener, model, child );
 	}
 	
 	public Pres editableSpan(Object model, Object child)
 	{
-		return new EditableStructuralItem( this, textEditListener, model, child );
+		return new SoftStructuralItem( this, textEditListener, model, child );
 	}
 	
 	public Pres editableParagraph(Object model, Object child)
 	{
 		child = editableParaStyle.applyTo( child );
-		return new EditableStructuralItem( this, Arrays.asList( new TreeEventListener[] { paraEditListener, paraListItemEditListener } ), model, child );
+		return new SoftStructuralItem( this, Arrays.asList( new TreeEventListener[] { paraEditListener, paraListItemEditListener } ), model, child );
 	}
 	
 	public Pres editableParagraphEmbed(Object model, Object child)
 	{
-		return new EditableStructuralItem( this, paraListItemEditListener, model, child );
+		return new SoftStructuralItem( this, paraListItemEditListener, model, child );
 	}
 	
 	public Pres editableBlock(Object model, Object child)
 	{
-		return new EditableStructuralItem( this, blockEditListener, model, child );
+		return new SoftStructuralItem( this, blockEditListener, model, child );
 	}
 	
 	

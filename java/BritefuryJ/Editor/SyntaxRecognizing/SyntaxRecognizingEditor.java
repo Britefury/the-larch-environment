@@ -326,46 +326,24 @@ public abstract class SyntaxRecognizingEditor extends SequentialRichStringEditor
 	
 	public SREditRule editRule(PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners)
 	{
-		return new SREditRule( this, false, precedenceHandler, editListeners );
+		return new SREditRule( this, precedenceHandler, editListeners );
 	}
 	
 	public SREditRule editRule( List<TreeEventListener> editListeners)
 	{
-		return new SREditRule( this, false, null, editListeners );
-	}
-	
-	
-	public SREditRule outerEditRule(PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners)
-	{
-		return new SREditRule( this, true, precedenceHandler, editListeners );
-	}
-	
-	public SREditRule outerEditRule( List<TreeEventListener> editListeners)
-	{
-		return new SREditRule( this, true, null, editListeners );
+		return new SREditRule( this, null, editListeners );
 	}
 	
 	
 	
-	public SRStructuralEditRule structuralEditRule(PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners)
+	public SRSoftStructuralEditRule softStructuralEditRule(PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners)
 	{
-		return new SRStructuralEditRule( this, false, precedenceHandler, editListeners );
+		return new SRSoftStructuralEditRule( this, precedenceHandler, editListeners );
 	}
 	
-	public SRStructuralEditRule structuralEditRule(List<TreeEventListener> editListeners)
+	public SRSoftStructuralEditRule softStructuralEditRule(List<TreeEventListener> editListeners)
 	{
-		return new SRStructuralEditRule( this, false, null, editListeners );
-	}
-	
-	
-	public SRStructuralEditRule outerStructuralEditRule(PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners)
-	{
-		return new SRStructuralEditRule( this, true, precedenceHandler, editListeners );
-	}
-	
-	public SRStructuralEditRule outerStructuralEditRule(List<TreeEventListener> editListeners)
-	{
-		return new SRStructuralEditRule( this, true, null, editListeners );
+		return new SRSoftStructuralEditRule( this, null, editListeners );
 	}
 	
 	

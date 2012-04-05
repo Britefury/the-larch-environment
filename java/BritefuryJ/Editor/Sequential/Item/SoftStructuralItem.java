@@ -15,7 +15,7 @@ import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
 
-public class EditableStructuralItem extends Pres
+public class SoftStructuralItem extends Pres
 {
 	private SequentialEditor editor;
 	private TreeEventListener editListeners[];
@@ -23,7 +23,15 @@ public class EditableStructuralItem extends Pres
 	private Pres child;
 	
 	
-	public EditableStructuralItem(SequentialEditor editor, TreeEventListener editListener, Object model, Object child)
+	public SoftStructuralItem(SequentialEditor editor, Object model, Object child)
+	{
+		this.editor = editor;
+		this.editListeners = new TreeEventListener[] {};
+		this.child = coerceNonNull( child );
+		this.model = model;
+	}
+
+	public SoftStructuralItem(SequentialEditor editor, TreeEventListener editListener, Object model, Object child)
 	{
 		this.editor = editor;
 		this.editListeners = new TreeEventListener[] { editListener };
@@ -31,7 +39,7 @@ public class EditableStructuralItem extends Pres
 		this.model = model;
 	}
 
-	public EditableStructuralItem(SequentialEditor editor, List<TreeEventListener> editListeners, Object model, Object child)
+	public SoftStructuralItem(SequentialEditor editor, List<TreeEventListener> editListeners, Object model, Object child)
 	{
 		this.editor = editor;
 		this.editListeners = editListeners.toArray( new TreeEventListener[editListeners.size()] );
