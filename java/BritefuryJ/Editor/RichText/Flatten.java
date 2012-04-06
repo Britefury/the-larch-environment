@@ -42,7 +42,7 @@ class Flatten
 	
 	
 	// SHOULD IMPLEMENT AS ITERATOR, BUT I'M BUGGERED IF I AM GOING TO SPEND TIME CONVERTING A NICE PYTHON GENERATOR TO A JAVA ITERATOR......
-	protected static ArrayList<Object> newlineSplit(Iterable<Object> xs)
+	private static ArrayList<Object> newlineSplit(Iterable<Object> xs)
 	{
 		ArrayList<Object> result = new ArrayList<Object>();
 		for (Object x: xs)
@@ -66,7 +66,7 @@ class Flatten
 	}
 	
 	// SHOULD IMPLEMENT AS ITERATOR, BUT I'M BUGGERED IF I AM GOING TO SPEND TIME CONVERTING A NICE PYTHON GENERATOR TO A JAVA ITERATOR......
-	protected static ArrayList<Object> textJoin(Iterable<Object> xs)
+	private static ArrayList<Object> textJoin(Iterable<Object> xs)
 	{
 		ArrayList<Object> result = new ArrayList<Object>();
 		StringBuilder text = new StringBuilder();
@@ -96,7 +96,7 @@ class Flatten
 	}
 
 
-	protected static boolean isPara(Object x)
+	private static boolean isPara(Object x)
 	{
 		return x instanceof EdNode  &&  ((EdNode)x).isParagraph();
 	}
