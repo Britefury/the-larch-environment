@@ -874,11 +874,13 @@ public abstract class RichTextEditor extends SequentialEditor
 	public Object getSequentialContentInSelection(FragmentView editFragment, LSElement editFragmentElement, TextSelection selection)
 	{
 		Visitor v = new NodeVisitor( this );
-		return getFlattenedContentInSelection( v, editFragment, selection );
+		// Copy the acquired content, so that if it is modified after copying, the modifications to not affect pasted copies 
+		List<Object> f = getFlattenedContentInSelection( v, editFragment, selection );
+		return deepCopyFlattened( f );
 	}
 
 
-	private Object getFlattenedContentInSelection(Visitor v, FragmentView editFragment, TextSelection selection)
+	private List<Object> getFlattenedContentInSelection(Visitor v, FragmentView editFragment, TextSelection selection)
 	{
 		v.visitTextSelection( selection );
 		

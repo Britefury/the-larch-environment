@@ -249,7 +249,7 @@ def stringLiteral(format, quotation, value, raw):
 	if format is not None:
 		boxContents.append( ApplyStyleSheetFromAttribute( PythonEditorStyle.literalFormatStyle, Text( format ) ) )
 
-	# Split the value into pieces of escaped and non-escaped contente
+	# Split the value into pieces of escaped and non-escaped content
 	if raw:
 		valuePres = ApplyStyleSheetFromAttribute( PythonEditorStyle.stringLiteralStyle, Text( value ) )
 	else:

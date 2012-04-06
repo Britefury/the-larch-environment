@@ -261,6 +261,22 @@ class EmbeddedPython25Suite (EmbeddedPython25Executable):
 		return self.model['suite']
 
 
+	@classmethod
+	def __import_from_plain_text__(cls, importData):
+		return cls.fromText( importData )
+
+
+	@staticmethod
+	def fromText(text):
+		if not text.endswith( '\n' ):
+			text = text + '\n'
+		parseResult = _grammar.suite().parseStringChars( text )
+		if parseResult.isValid():
+			return EmbeddedPython25Suite( [] )
+		else:
+			return EmbeddedPython25Suite( parseResult.getValue() )
+
+
 
 
 class EmbeddedPython25Module (EmbeddedPython25Executable):
@@ -292,6 +308,22 @@ class EmbeddedPython25Module (EmbeddedPython25Executable):
 	@property
 	def statements(self):
 		return self.model['suite']
+
+
+	@classmethod
+	def __import_from_plain_text__(cls, importData):
+		return cls.fromText( importData )
+
+
+	@staticmethod
+	def fromText(text):
+		if not text.endswith( '\n' ):
+			text = text + '\n'
+		parseResult = _grammar.suite().parseStringChars( text )
+		if parseResult.isValid():
+			return EmbeddedPython25Module( [] )
+		else:
+			return EmbeddedPython25Module( parseResult.getValue() )
 
 
 
