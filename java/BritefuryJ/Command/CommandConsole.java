@@ -42,6 +42,8 @@ import BritefuryJ.Pres.UI.BubblePopup;
 import BritefuryJ.Projection.AbstractPerspective;
 import BritefuryJ.Projection.ProjectiveBrowserContext;
 import BritefuryJ.Projection.Subject;
+import BritefuryJ.Shortcut.Shortcut;
+import BritefuryJ.Shortcut.ShortcutElementAction;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.Util.RichString.RichString;
 
@@ -172,11 +174,6 @@ public class CommandConsole extends AbstractCommandConsole
 		
 		
 		
-		public void execute()
-		{
-			cmd.execute();
-		}
-		
 		
 		@Override
 		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
@@ -218,6 +215,56 @@ public class CommandConsole extends AbstractCommandConsole
 	
 	
 	
+	private static class AutocompleteEntry implements Presentable
+	{
+		private PresentationStateListenerList listeners = null;
+
+		private Pres visual;
+		private BoundCommand cmd;
+		private boolean highlight;
+		
+		
+		public AutocompleteEntry(Pres visual, BoundCommand cmd)
+		{
+			this.visual = visual;
+			this.cmd = cmd;
+		}
+		
+		
+		public void highlight()
+		{
+			highlight = true;
+			listeners = PresentationStateListenerList.onPresentationStateChanged( listeners, this );
+		}
+	
+		public void unhighlight()
+		{
+			highlight = false;
+			listeners = PresentationStateListenerList.onPresentationStateChanged( listeners, this );
+		}
+	
+
+
+		@Override
+		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
+		{
+			listeners = PresentationStateListenerList.addListener( listeners, fragment );
+			
+			if ( highlight )
+			{	
+				return autocompleteHighlightBorder.surround( visual );
+			}
+			else
+			{	
+				return autocompleteBorder.surround( visual );
+			}
+		}
+
+	
+		private static final AbstractBorder autocompleteBorder = new SolidBorder( 1.0, 1.0, 4.0, 4.0, new Color( 1.0f, 1.0f, 1.0f, 0.35f ), new Color( 1.0f, 1.0f, 1.0f, 0.15f ) );
+		private static final AbstractBorder autocompleteHighlightBorder = new SolidBorder( 1.0, 1.0, 4.0, 4.0, new Color( 1.0f, 1.0f, 1.0f, 0.5f ), new Color( 1.0f, 1.0f, 1.0f, 0.3f ) );
+	}
+	
 	
 	private CommandConsoleSubject subject = new CommandConsoleSubject();
 	private CommandKeyboardInteractor keyInteractor = new CommandKeyboardInteractor();
@@ -226,7 +273,19 @@ public class CommandConsole extends AbstractCommandConsole
 	private PresentationComponent presentation;
 	private PresentationStateListenerList listeners = null;
 	private Contents contents;
-	private List<Pres> autocomplete = null;
+	private List<AutocompleteEntry> autocompleteList = null;
+	private AutocompleteEntry autocompleteSelection = null;
+	
+	private static Shortcut autocompleteShortcut = new Shortcut( KeyEvent.VK_TAB, 0 );
+	
+	private ShortcutElementAction autocompleteAction = new ShortcutElementAction()
+	{
+		@Override
+		public void invoke(LSElement element)
+		{
+			onAutocomplete();
+		}
+	};
 	
 	
 	
@@ -258,7 +317,7 @@ public class CommandConsole extends AbstractCommandConsole
 	}
 
 	@Override
-	public KeyboardInteractor getKeyboardInteractor()
+	public KeyboardInteractor getShortcutKeyboardInteractor()
 	{
 		return keyInteractor;
 	}
@@ -270,19 +329,20 @@ public class CommandConsole extends AbstractCommandConsole
 		
 		Pres prompt = promptStyle.applyTo( new Label( "Cmd:" ) );
 		Pres commandEntry = cmdRowStyle.applyTo( new Row( new Object[] { prompt.alignHPack(), contents } ).alignHExpand().alignVRefY().withTreeEventListener( treeEventListener ) );
+		commandEntry = commandEntry.withShortcut( autocompleteShortcut, autocompleteAction );
 		
-		if ( autocomplete != null )
+		if ( autocompleteList != null )
 		{
-			Pres[] acArray = new Pres[autocomplete.size() * 2 - 1];
-			for (int i = 0; i < autocomplete.size(); i++)
+			Object[] acArray = new Object[autocompleteList.size() * 2 - 1];
+			for (int i = 0; i < autocompleteList.size(); i++)
 			{
-				acArray[i*2] = Pres.coerce( autocomplete.get( i ) );
-				if ( i != autocomplete.size() - 1 )
+				acArray[i*2] = autocompleteList.get( i );
+				if ( i != autocompleteList.size() - 1 )
 				{
 					acArray[i*2+1] = new LineBreak();
 				}
 			}
-			Pres ac = cmdAutocompleteStyle.applyTo( new Paragraph( autocomplete.toArray() ) );
+			Pres ac = cmdAutocompleteStyle.applyTo( new Paragraph( acArray ) );
 			
 			Pres col = new Column( new Pres[] { commandEntry, new Spacer( 0.0, 5.0 ), ac } );
 	
@@ -298,6 +358,8 @@ public class CommandConsole extends AbstractCommandConsole
 	
 	private void onEdit(RichString value)
 	{
+		autocompleteList = null;
+		
 		if ( value.isTextual() )
 		{
 			String text = value.textualValue();
@@ -320,15 +382,30 @@ public class CommandConsole extends AbstractCommandConsole
 			{
 				if ( text.contains( "\n" ) )
 				{
+					BoundCommand cmd = null;
+					
 					// Attempt to execute the command
 					if ( contents instanceof CommandContents )
 					{
 						CommandContents cmdC = (CommandContents)contents;
-						
+						cmd = cmdC.cmd;
+					}
+					else if ( autocompleteSelection != null )
+					{
+						cmd = autocompleteSelection.cmd;
+					}
+					else
+					{
+						contents = new UnreckognisedContents( text.replace( "\n", "" ) );
+					}
+	
+					
+					if ( cmd != null )
+					{
 						Throwable error = null;
 						try
 						{
-							cmdC.execute();
+							cmd.execute();
 						}
 						catch (Throwable t)
 						{
@@ -342,14 +419,10 @@ public class CommandConsole extends AbstractCommandConsole
 						}
 						else
 						{
-							contents = new CommandFailedContents( cmdC.cmd.getCommand().getName().getName(), error );
+							contents = new CommandFailedContents( cmd.getCommand().getName().getName(), error );
 						}
 					}
-					else
-					{
-						contents = new UnreckognisedContents( text.replace( "\n", "" ) );
-					}
-	
+
 					PresentationStateListenerList.onPresentationStateChanged( listeners, this );
 				}
 				else
@@ -384,16 +457,16 @@ public class CommandConsole extends AbstractCommandConsole
 							
 							if ( autocompleteCommands.size() > 0 )
 							{
-								autocomplete = new ArrayList<Pres>();
+								autocompleteList = new ArrayList<AutocompleteEntry>();
 								
 								for (BoundCommand c: autocompleteCommands)
 								{
-									autocomplete.add( c.getCommand().getName().autocompleteVisual( autocompleteText ) );
+									Pres visual = c.getCommand().getName().autocompleteVisual( autocompleteText );
+									autocompleteList.add( new AutocompleteEntry( visual, c ) );
 								}
-							}
-							else
-							{
-								autocomplete = null;
+								
+								autocompleteSelection = autocompleteList.get( 0 );
+								autocompleteSelection.highlight();
 							}
 						}
 					}
@@ -409,6 +482,32 @@ public class CommandConsole extends AbstractCommandConsole
 	}
 
 
+
+	private void onAutocomplete()
+	{
+		if ( autocompleteList != null  &&  !autocompleteList.isEmpty() )
+		{
+			autocompleteSelection.unhighlight();
+			int index = autocompleteList.indexOf( autocompleteSelection );
+			if ( index == -1 )
+			{
+				throw new RuntimeException( "No current autocomplete selection" );
+			}
+			
+			int newIndex = index + 1;
+			if ( newIndex >= autocompleteList.size() )
+			{
+				newIndex = 0;
+			}
+			
+			AutocompleteEntry newSelection = autocompleteList.get( newIndex );
+			newSelection.highlight();
+			
+			autocompleteSelection = newSelection;
+		}
+	}
+
+	
 	//
 	// Find a command with the specified name, that is accessible at the current target (e.g. caret) 
 	//

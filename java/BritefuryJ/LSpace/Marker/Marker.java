@@ -517,6 +517,11 @@ public class Marker implements Comparable<Marker>
 		
 		int newIndex = newBias == Bias.END   ?  newPosition + 1 : newPosition;
 		
+		if ( leafFilter == null )
+		{
+			leafFilter = LSContentLeafEditable.editableRealisedFilter;
+		}
+		
 		if ( newPosition < 0 )
 		{
 			try

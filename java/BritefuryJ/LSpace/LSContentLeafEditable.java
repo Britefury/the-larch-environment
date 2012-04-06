@@ -345,7 +345,7 @@ public abstract class LSContentLeafEditable extends LSContentLeaf
 	//
 	//
 	
-	private static ElementFilter editableRealisedFilter = new ElementFilter()
+	public static ElementFilter editableRealisedFilter = new ElementFilter()
 	{
 		@Override
 		public boolean testElement(LSElement element)
