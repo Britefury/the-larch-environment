@@ -526,23 +526,23 @@ public abstract class RichTextEditor extends SequentialEditor
 	{
 		if ( value.endsWith( "\n" ) )
 		{
-			RichString toLast = value.substring( 0, value.length() - 1 );
-			setModelContentsFromEditorModelRichString( model, toLast );
 			if ( log.isRecording() )
 			{
 				log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setParagraphTextContentsFromRichString - with trailing newline" ).vItem( "richStr", value ) );
 			}
+			RichString toLast = value.substring( 0, value.length() - 1 );
+			setModelContentsFromEditorModelRichString( model, toLast );
 			return !toLast.contains( "\n" );
 		}
 		else
 		{
-			setModelContentsFromEditorModelRichString( model, value );
-			EdNode e = modelToEditorModel( model );
-			((EdParagraph)e).suppressNewline();
 			if ( log.isRecording() )
 			{
 				log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setParagraphTextContentsFromRichString - no trailing newline" ).vItem( "richStr", value ) );
 			}
+			setModelContentsFromEditorModelRichString( model, value );
+			EdNode e = modelToEditorModel( model );
+			((EdParagraph)e).suppressNewline();
 		}
 		return false;
 	}

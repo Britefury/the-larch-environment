@@ -28,7 +28,6 @@ from BritefuryJ.DocModel import DMObjectClass, DMObject
 
 from BritefuryJ.AttributeTable import *
 from BritefuryJ.Controls import *
-from BritefuryJ.LSpace import ElementValueFunction, TextEditEvent
 from BritefuryJ.Graphics import *
 from BritefuryJ.LSpace.Interactor import KeyElementInteractor
 from BritefuryJ.LSpace.Input import ObjectDndHandler

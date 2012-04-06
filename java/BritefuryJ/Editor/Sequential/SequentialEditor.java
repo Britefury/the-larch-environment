@@ -8,8 +8,10 @@ package BritefuryJ.Editor.Sequential;
 
 import BritefuryJ.Editor.Sequential.EditFilter.HandleEditResult;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.LSpace.LSContentLeaf;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.EditEvent;
+import BritefuryJ.LSpace.LSRegion;
 import BritefuryJ.LSpace.SequentialRichStringVisitor;
 import BritefuryJ.LSpace.TextEditEvent;
 import BritefuryJ.LSpace.TreeEventListener;
@@ -80,14 +82,24 @@ public abstract class SequentialEditor
 				
 				ClearNeighbourEditEvent clearEvent = new ClearNeighbourEditEvent( editEvent.getRichStringVisitor() );
 				
+				LSRegion eventRegion = LSRegion.regionOf( sourceElement );
+				
 				if ( prevNeighbourCommonAncestor != null  &&  prevNeighbourCommonAncestor.isInSubtreeRootedAt( element ) )
 				{
-					editEvent.getPrevNeighbour().postTreeEventUntil( clearEvent, element );
+					LSContentLeaf prev = editEvent.getPrevNeighbour();
+					if ( LSRegion.regionOf( prev )  ==  eventRegion )
+					{
+						prev.postTreeEventUntil( clearEvent, element );
+					}
 				}
 
 				if ( nextNeighbourCommonAncestor != null  &&  nextNeighbourCommonAncestor.isInSubtreeRootedAt( element ) )
 				{
-					editEvent.getNextNeighbour().postTreeEventUntil( clearEvent, element );
+					LSContentLeaf next = editEvent.getNextNeighbour();
+					if ( LSRegion.regionOf( next )  ==  eventRegion )
+					{
+						next.postTreeEventUntil( clearEvent, element );
+					}
 				}
 			}
 			return false;
