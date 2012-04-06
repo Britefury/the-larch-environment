@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import BritefuryJ.Graphics.AbstractBorder;
-import BritefuryJ.Graphics.SolidBorder;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
@@ -59,7 +58,7 @@ public class CommandName extends CommandMnemonic
 		Pres highlight = autocompleteHighlightStyle.applyTo( new Label( name.substring( index, end ) ) );
 		Pres after = autocompleteStyle.applyTo( new Label( name.substring( end ) ) );*/
 		Pres auto = new Row( elements.toArray( new Pres[0] ) );
-		return autocompleteBorder.surround( auto );
+		return auto;
 	}
 	
 	private void addSegment(List<Pres> elements, String name, int pos, int x, int start, int end)
@@ -103,7 +102,6 @@ public class CommandName extends CommandMnemonic
 
 
 	private static final AbstractBorder cmdBorder = Command.cmdBorder( new Color( 0.0f, 0.5f, 0.0f, 0.8f ), new Color( 0.25f, 0.5f, 0.25f, 0.5f ) );
-	private static final AbstractBorder autocompleteBorder = new SolidBorder( 1.0, 1.0, 4.0, 4.0, new Color( 1.0f, 1.0f, 1.0f, 0.35f ), new Color( 1.0f, 1.0f, 1.0f, 0.15f ) );
 	private static final StyleSheet autocompleteStyle = StyleSheet.style( Primitive.foreground.as( new Color( 1.0f, 1.0f, 1.0f, 0.75f ) ) );
 	private static final StyleSheet autocompleteHighlightStyle = StyleSheet.style( Primitive.foreground.as( new Color( 1.0f, 1.0f, 1.0f, 1.0f ) ), Primitive.fontBold.as( true ) );
 	private static final StyleSheet autocompleteMnemonicStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.5f, 1.0f, 0.5f, 0.75f ) ) );

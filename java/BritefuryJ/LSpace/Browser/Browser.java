@@ -124,7 +124,7 @@ public class Browser
 		{
 			AbstractCommandConsole commandConsole = commandConsoleFactory.createCommandConsole( presComponent );
 			commandBar = new CommandBar( presComponent, commandConsole, pageController );
-			presComponent.getRootElement().getKeyboard().addInteractor( commandConsole.getKeyboardInteractor() );
+			presComponent.getRootElement().getKeyboard().addInteractor( commandConsole.getShortcutKeyboardInteractor() );
 		}
 		
 		resolve();

@@ -37,5 +37,5 @@ public abstract class AbstractCommandConsole implements Presentable
 	public abstract Subject getSubject();
 	public abstract ProjectiveBrowserContext getBrowserContext();
 	public abstract void setPage(BrowserPage page);
-	public abstract KeyboardInteractor getKeyboardInteractor();
+	public abstract KeyboardInteractor getShortcutKeyboardInteractor();
 }
