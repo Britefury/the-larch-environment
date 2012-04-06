@@ -112,9 +112,14 @@ public class LiveFunction extends LiveInterface
 	
 	public Object getValue()
 	{
-		refreshValue();
-		
-		inc.onAccess();
+		try
+		{
+			refreshValue();
+		}
+		finally
+		{		
+			inc.onAccess();
+		}
 		
 		return valueCache;
 	}
