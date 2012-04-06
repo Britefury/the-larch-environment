@@ -19,36 +19,6 @@ import BritefuryJ.Pres.Primitive.SpaceBin;
 
 public class CommandBar
 {
-	KeyboardInteractor presComponentSwitchInteractor = new KeyboardInteractor()
-	{
-		@Override
-		public boolean keyPressed(Keyboard keyboard, KeyEvent event)
-		{
-			return event.getKeyCode() == KeyEvent.VK_ESCAPE;
-		}
-
-		@Override
-		public boolean keyReleased(Keyboard keyboard, KeyEvent event)
-		{
-			if ( event.getKeyCode() == KeyEvent.VK_ESCAPE )
-			{
-				Pres space = new SpaceBin( presentation.getRootElement().getAllocWidth(), -1.0, console  ).alignHExpand();
-				popup = space.popup( presentation.getRootElement(), Anchor.TOP, Anchor.TOP, false, true );
-				commandBarSwitchInteractor.addToKeyboard( popup.getPresentationComponent().getRootElement().getKeyboard() );
-				popup.getPresentationComponent().grabFocus();
-				return true;
-			}
-			return false;
-		}
-
-		@Override
-		public boolean keyTyped(Keyboard keyboard, KeyEvent event)
-		{
-			return false;
-		}
-	};
-
-
 	KeyboardInteractor commandBarSwitchInteractor = new KeyboardInteractor()
 	{
 		@Override
@@ -62,11 +32,21 @@ public class CommandBar
 		{
 			if ( event.getKeyCode() == KeyEvent.VK_ESCAPE )
 			{
-				presentation.grabFocus();
-				popup.closePopup();
-				popup = null;
-				//commandBarArea.setVisible( false );
-				//view.getComponent().getRootElement().closeContainingPopupChain();
+				if ( popup == null )
+				{
+					Pres space = new SpaceBin( presentation.getRootElement().getAllocWidth(), -1.0, console  ).alignHExpand();
+					popup = space.popup( presentation.getRootElement(), Anchor.TOP, Anchor.TOP, false, true );
+					commandBarSwitchInteractor.addToKeyboard( popup.getPresentationComponent().getRootElement().getKeyboard() );
+					popup.getPresentationComponent().grabFocus();
+				}
+				else
+				{
+					presentation.grabFocus();
+					popup.closePopup();
+					popup = null;
+					//commandBarArea.setVisible( false );
+					//view.getComponent().getRootElement().closeContainingPopupChain();
+				}
 				return true;
 			}
 			return false;
@@ -78,8 +58,6 @@ public class CommandBar
 			return false;
 		}
 	};
-	
-	
 	private CommandConsoleListener consoleListener = new CommandConsoleListener()
 	{
 		public void finished(AbstractCommandConsole commandConsole)
@@ -111,7 +89,7 @@ public class CommandBar
 		console.setListener( consoleListener );
 
 		
-		presComponentSwitchInteractor.addToKeyboard( presentation.getRootElement().getKeyboard() );
+		commandBarSwitchInteractor.addToKeyboard( presentation.getRootElement().getKeyboard() );
 	}
 	
 	
