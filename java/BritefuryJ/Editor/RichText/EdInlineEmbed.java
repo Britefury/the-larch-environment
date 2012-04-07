@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.Editor.RichText;
 
+import BritefuryJ.ClipboardFilter.ClipboardCopierMemo;
+
 
 public class EdInlineEmbed extends EdEmbed
 {
@@ -16,9 +18,9 @@ public class EdInlineEmbed extends EdEmbed
 
 
 	@Override
-	protected EdNode deepCopy(RichTextEditor editor)
+	public Object clipboardCopy(ClipboardCopierMemo memo)
 	{
-		return new EdInlineEmbed( editor.deepCopyInlineEmbedValue( value ) );
+		return new EdInlineEmbed( memo.copy( value ) );
 	}
 
 

@@ -8,9 +8,10 @@ package BritefuryJ.Editor.RichText;
 
 import java.util.List;
 
+import BritefuryJ.ClipboardFilter.ClipboardCopyable;
 import BritefuryJ.DefaultPerspective.Presentable;
 
-public abstract class EdNode implements Presentable
+public abstract class EdNode implements Presentable, ClipboardCopyable
 {
 	protected Tag regionStartTag()
 	{
@@ -33,9 +34,6 @@ public abstract class EdNode implements Presentable
 	}
 
 	protected abstract void buildTagList(List<Object> tags);
-	
-	
-	protected abstract EdNode deepCopy(RichTextEditor editor);
 	
 	
 	protected abstract boolean isTextual();

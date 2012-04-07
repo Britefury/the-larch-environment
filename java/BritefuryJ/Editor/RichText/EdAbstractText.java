@@ -9,6 +9,7 @@ package BritefuryJ.Editor.RichText;
 import java.util.ArrayList;
 import java.util.List;
 
+import BritefuryJ.ClipboardFilter.ClipboardCopierMemo;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.RichText.NormalText;
 
@@ -91,19 +92,12 @@ public abstract class EdAbstractText extends EdNode
 	}
 	
 	
-	protected ArrayList<Object> deepCopyContents(RichTextEditor editor)
+	protected ArrayList<Object> copyContents(ClipboardCopierMemo memo)
 	{
 		ArrayList<Object> contentsCopy = new ArrayList<Object>();
 		for (Object x: contents)
 		{
-			if ( x instanceof EdNode )
-			{
-				contentsCopy.add( ( (EdNode)x ).deepCopy( editor ) );
-			}
-			else
-			{
-				contentsCopy.add( x );
-			}
+			contentsCopy.add( memo.copy( x ) );
 		}
 		return contentsCopy;
 	}

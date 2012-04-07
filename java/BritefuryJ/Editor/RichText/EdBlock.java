@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.ClipboardFilter.ClipboardCopierMemo;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Column;
@@ -56,12 +57,12 @@ public class EdBlock extends EdNode
 
 
 	@Override
-	protected EdNode deepCopy(RichTextEditor editor)
+	public Object clipboardCopy(ClipboardCopierMemo memo)
 	{
 		ArrayList<EdNode> contentsCopy = new ArrayList<EdNode>();
 		for (EdNode node: contents)
 		{
-			contentsCopy.add( node.deepCopy( editor ) );
+			contentsCopy.add( (EdNode)memo.copy( node ) );
 		}
 		return new EdBlock( contentsCopy );
 	}
