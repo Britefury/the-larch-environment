@@ -13,7 +13,7 @@ import org.python.core.PyObject;
 
 public class ClipboardCopierMemo
 {
-	protected IdentityHashMap<Object, Object> memo;
+	private IdentityHashMap<Object, Object> memo;
 	private ClipboardCopier copier;
 	
 	

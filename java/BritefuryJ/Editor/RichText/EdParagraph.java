@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.ClipboardFilter.ClipboardCopierMemo;
 import BritefuryJ.Graphics.SolidBorder;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
@@ -92,9 +93,9 @@ public class EdParagraph extends EdAbstractText
 	
 
 	@Override
-	protected EdNode deepCopy(RichTextEditor editor)
+	public Object clipboardCopy(ClipboardCopierMemo memo)
 	{
-		return new EdParagraph( deepCopyContents( editor ), styleAttrs );
+		return new EdParagraph( copyContents( memo ), styleAttrs );
 	}
 
 

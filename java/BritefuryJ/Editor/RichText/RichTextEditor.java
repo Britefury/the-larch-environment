@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import BritefuryJ.ClipboardFilter.ClipboardCopier;
+import BritefuryJ.ClipboardFilter.ClipboardCopierMemo;
 import BritefuryJ.Editor.Sequential.EditFilter;
 import BritefuryJ.Editor.Sequential.EditFilter.HandleEditResult;
 import BritefuryJ.Editor.Sequential.SelectionEditTreeEvent;
@@ -602,15 +604,6 @@ public abstract class RichTextEditor extends SequentialEditor
 	protected abstract Object buildSpan(List<Object> contents, Map<Object, Object> styleAttrs);
 
 	
-	protected abstract Object deepCopyInlineEmbedValue(Object value);
-
-
-	protected Object deepCopyParagraphEmbedValue(Object value)
-	{
-		return deepCopyInlineEmbedValue( value );
-	}
-	
-	
 	private Object buildModelForEditorModel(EdNode editorModel)
 	{
 		return editorModel.buildModel( this );
@@ -876,7 +869,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		Visitor v = new NodeVisitor( this );
 		// Copy the acquired content, so that if it is modified after copying, the modifications to not affect pasted copies 
 		List<Object> f = getFlattenedContentInSelection( v, editFragment, selection );
-		return deepCopyFlattened( f );
+		return clipboardCopyFlattenedList( f );
 	}
 
 
@@ -911,20 +904,14 @@ public abstract class RichTextEditor extends SequentialEditor
 
 
 	
-	private List<? extends Object> deepCopyFlattened(List<? extends Object> flattened)
+	private List<? extends Object> clipboardCopyFlattenedList(List<? extends Object> flattened)
 	{
 		ArrayList<Object> copy = new ArrayList<Object>();
 		copy.ensureCapacity( flattened.size() );
+		ClipboardCopierMemo memo = ClipboardCopier.instance.memo();
 		for (Object x: flattened)
 		{
-			if ( x instanceof EdNode )
-			{
-				copy.add( ( (EdNode)x ).deepCopy( this ) );
-			}
-			else
-			{
-				copy.add( x );
-			}
+			copy.add( memo.copy( x ) );
 		}
 		return copy;
 	}
@@ -940,7 +927,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		v2.visitFromMarkerToEndOfRoot( suffixStart, subtreeRootFragmentElement );
 		ArrayList<Object> splicedFlattened = new ArrayList<Object>();
 		splicedFlattened.addAll( v1.flattened() );
-		splicedFlattened.addAll( deepCopyFlattened( (List<? extends Object>)insertedContent ) );
+		splicedFlattened.addAll( clipboardCopyFlattenedList( (List<? extends Object>)insertedContent ) );
 		splicedFlattened.addAll( v2.flattened() );
 		ArrayList<Object> splicedMerged = Merge.mergeParagraphs( splicedFlattened );
 		return new RichStringBuilder( splicedMerged ).richString();
@@ -969,8 +956,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		
 		// Get the content within the selection
 		Visitor selectionVisitor = new TagsVisitor( this );
-		@SuppressWarnings("unchecked")
-		List<? extends Object> selected = (List<? extends Object>)getFlattenedContentInSelection( selectionVisitor, editFragment, selection );
+		List<Object> selected = getFlattenedContentInSelection( selectionVisitor, editFragment, selection );
 		
 		// Extract style dictionaries
 		ArrayList< Map<Object, Object> > styles = new ArrayList< Map<Object, Object> >();

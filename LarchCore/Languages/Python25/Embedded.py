@@ -69,7 +69,7 @@ class EmbeddedPython25 (object):
 		return EmbeddedPython25( deepcopy( self.model, memo ) )
 
 	def __clipboard_copy__(self, memo):
-		return EmbeddedPython25( deepcopy( self.model, memo ) )
+		return EmbeddedPython25( memo.copy( self.model ) )
 
 
 	def __get_trackable_contents__(self):
@@ -106,7 +106,7 @@ class EmbeddedPython25Target (EmbeddedPython25):
 		return EmbeddedPython25Target( deepcopy( self.model, memo ) )
 
 	def __clipboard_copy__(self, memo):
-		return EmbeddedPython25Target( deepcopy( self.model, memo ) )
+		return EmbeddedPython25Target( memo.copy( self.model ) )
 
 
 	@property
@@ -151,7 +151,7 @@ class EmbeddedPython25Expr (EmbeddedPython25):
 		return EmbeddedPython25Expr( deepcopy( self.model, memo ) )
 
 	def __clipboard_copy__(self, memo):
-		return EmbeddedPython25Expr( deepcopy( self.model, memo ) )
+		return EmbeddedPython25Expr( memo.copy( self.model ) )
 
 
 	@property
@@ -253,7 +253,7 @@ class EmbeddedPython25Suite (EmbeddedPython25Executable):
 		return EmbeddedPython25Suite( deepcopy( self.model, memo ) )
 
 	def __clipboard_copy__(self, memo):
-		return EmbeddedPython25Suite( deepcopy( self.model, memo ) )
+		return EmbeddedPython25Suite( memo.copy( self.model ) )
 
 
 	@property
@@ -271,10 +271,11 @@ class EmbeddedPython25Suite (EmbeddedPython25Executable):
 		if not text.endswith( '\n' ):
 			text = text + '\n'
 		parseResult = _grammar.suite().parseStringChars( text )
+		print 'EmbeddedPython25Suite.fromText: %s' % ( parseResult.getValue()   if parseResult.isValid()   else '<invalid>' )
 		if parseResult.isValid():
-			return EmbeddedPython25Suite( [] )
-		else:
 			return EmbeddedPython25Suite( parseResult.getValue() )
+		else:
+			return EmbeddedPython25Suite( [] )
 
 
 
@@ -302,7 +303,7 @@ class EmbeddedPython25Module (EmbeddedPython25Executable):
 		return EmbeddedPython25Module( deepcopy( self.model, memo ) )
 
 	def __clipboard_copy__(self, memo):
-		return EmbeddedPython25Module( deepcopy( self.model, memo ) )
+		return EmbeddedPython25Module( memo.copy( self.model ) )
 
 
 	@property
@@ -321,9 +322,9 @@ class EmbeddedPython25Module (EmbeddedPython25Executable):
 			text = text + '\n'
 		parseResult = _grammar.suite().parseStringChars( text )
 		if parseResult.isValid():
-			return EmbeddedPython25Module( [] )
-		else:
 			return EmbeddedPython25Module( parseResult.getValue() )
+		else:
+			return EmbeddedPython25Module( [] )
 
 
 

@@ -68,15 +68,6 @@ class WorksheetRichTextEditor (RichTextEditor):
 	def removeInlineEmbed(self, model, embed):
 		model._removeInlineEmbed( embed )
 
-	def deepCopyInlineEmbedValue(self, value):
-		return EditorSchema.InlineEmbeddedObjectEditor.newInlineEmbeddedObjectModel( value['embeddedValue'].getValue() )
-
-	def deepCopyParagraphEmbedValue(self, value):
-		if value.isInstanceOf( Schema.ParagraphEmbeddedObject ):
-			return EditorSchema.ParagraphEmbeddedObjectEditor.newParagraphEmbeddedObjectModel( value['embeddedValue'].getValue() )
-		else:
-			return deepcopy( value )
-
 
 
 WorksheetRichTextEditor.instance = WorksheetRichTextEditor()

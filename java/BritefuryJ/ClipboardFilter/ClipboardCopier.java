@@ -107,7 +107,7 @@ public class ClipboardCopier
 			
 			if ( copyMethod != null  &&  copyMethod.isCallable() )
 			{
-				result = Py.tojava( copyMethod.__call__( Py.java2py( memo.memo ) ),  Object.class );
+				result = Py.tojava( copyMethod.__call__( Py.java2py( memo ) ),  Object.class );
 			}
 			
 			
@@ -166,7 +166,7 @@ public class ClipboardCopier
 		
 		if ( copyMethod != null  &&  copyMethod.isCallable() )
 		{
-			result = copyMethod.__call__( Py.java2py( memo.memo ) );
+			result = copyMethod.__call__( Py.java2py( memo ) );
 		}
 		
 		

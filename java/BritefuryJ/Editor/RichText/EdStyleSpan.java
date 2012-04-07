@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.ClipboardFilter.ClipboardCopierMemo;
 import BritefuryJ.Graphics.FillPainter;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
@@ -90,9 +91,9 @@ public class EdStyleSpan extends EdAbstractText
 	
 	
 	@Override
-	protected EdNode deepCopy(RichTextEditor editor)
+	public Object clipboardCopy(ClipboardCopierMemo memo)
 	{
-		return new EdStyleSpan( deepCopyContents( editor ), styleAttrs );
+		return new EdStyleSpan( copyContents( memo ), styleAttrs );
 	}
 
 
