@@ -203,22 +203,25 @@ public class WeakListenerList <ListenerType> implements Iterable<ListenerType>
 	
 	private void cleanUp()
 	{
-		if ( refQueue.poll() != null )
+		if ( refQueue != null )
 		{
-			for (int i = listeners.size() - 1; i >= 0; i--)
+			if ( refQueue.poll() != null )
 			{
-				WeakReference<ListenerType> ref = listeners.get( i );
-				ListenerType l = ref.get();
-				if ( l == null )
+				for (int i = listeners.size() - 1; i >= 0; i--)
 				{
-					listeners.remove( i );
+					WeakReference<ListenerType> ref = listeners.get( i );
+					ListenerType l = ref.get();
+					if ( l == null )
+					{
+						listeners.remove( i );
+					}
 				}
-			}
-			
-			if ( listeners.isEmpty() )
-			{
-				listeners = null;
-				refQueue = null;
+				
+				if ( listeners.isEmpty() )
+				{
+					listeners = null;
+					refQueue = null;
+				}
 			}
 		}
 	}

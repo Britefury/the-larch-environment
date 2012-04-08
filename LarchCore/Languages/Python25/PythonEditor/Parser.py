@@ -56,6 +56,10 @@ def _incrementParens(node):
 
 
 
+_tripleSString = RegEx( r"'''([^'\n\r\\]|'[^'\n\r\\]|''[^'\n\r\\]|\\.)*'''" )
+_tripleDString = RegEx( r'"""([^"\n\r\\]|"[^"\n\r\\]|""[^"\n\r\\]|\\.)*"""' )
+
+
 
 
 class Python25Grammar (Grammar):
@@ -99,44 +103,47 @@ class Python25Grammar (Grammar):
 	
 	
 	# String literal
-	@Rule
-	def asciiStringSLiteral(self):
-		return singleQuotedString.action( lambda input, begin, end, xs, bindings: Schema.StringLiteral( format='ascii', quotation='single', value=xs[1:-1] ) )
+	def _stringLiteralformat(self, xs):
+		flags = xs[:-1]
+		if flags[0] == 'u'  or  flags[0] == 'U':
+			format = 'unicode'
+		else:
+			format = 'ascii'
+		if flags[1] == 'r'  or  flags[1] == 'R':
+			format += '-regex'
+		return format
+
+
 
 	@Rule
-	def asciiStringDLiteral(self):
-		return doubleQuotedString.action( lambda input, begin, end, xs, bindings: Schema.StringLiteral( format='ascii', quotation='double', value=xs[1:-1] ) )
+	def stringSLiteral(self):
+		return ( ( Literal( 'u' ) | Literal( 'U' ) ).optional() + ( Literal( 'r' ) | Literal( 'R' ) ).optional()  +  singleQuotedString ).action(
+			lambda input, begin, end, xs, bindings: Schema.StringLiteral( format=self._stringLiteralformat( xs ), quotation='single', value=xs[-1][1:-1] ) )
 
 	@Rule
-	def unicodeStringSLiteral(self):
-		return ( Suppress( Literal( 'u' )  |  Literal( 'U' ) ) + singleQuotedString ).action( lambda input, begin, end, xs, bindings: Schema.StringLiteral( format='unicode', quotation='single', value=xs[0][1:-1] ) )
-
-	@Rule
-	def unicodeStringDLiteral(self):
-		return ( Suppress( Literal( 'u' )  |  Literal( 'U' ) ) + doubleQuotedString ).action( lambda input, begin, end, xs, bindings: Schema.StringLiteral( format='unicode', quotation='double', value=xs[0][1:-1] ) )
-
-	@Rule
-	def regexAsciiStringSLiteral(self):
-		return ( Suppress( Literal( 'r' )  |  Literal( 'R' ) ) + singleQuotedString ).action( lambda input, begin, end, xs, bindings: Schema.StringLiteral( format='ascii-regex', quotation='single', value=xs[0][1:-1] ) )
-
-	@Rule
-	def regexAsciiStringDLiteral(self):
-		return ( Suppress( Literal( 'r' )  |  Literal( 'R' ) ) + doubleQuotedString ).action( lambda input, begin, end, xs, bindings: Schema.StringLiteral( format='ascii-regex', quotation='double', value=xs[0][1:-1] ) )
-
-	@Rule
-	def regexUnicodeStringSLiteral(self):
-		return ( Suppress( Literal( 'ur' )  |  Literal( 'uR' )  |  Literal( 'Ur' )  |  Literal( 'UR' ) ) + singleQuotedString ).action(
-			lambda input, begin, end, xs, bindings: Schema.StringLiteral( format='unicode-regex', quotation='single', value=xs[0][1:-1] ) )
-
-	@Rule
-	def regexUnicodeStringDLiteral(self):
-		return ( Suppress( Literal( 'ur' )  |  Literal( 'uR' )  |  Literal( 'Ur' )  |  Literal( 'UR' ) ) + doubleQuotedString ).action(
-			lambda input, begin, end, xs, bindings: Schema.StringLiteral( format='unicode-regex', quotation='double', value=xs[0][1:-1] ) )
+	def stringDLiteral(self):
+		return ( ( Literal( 'u' ) | Literal( 'U' ) ).optional() + ( Literal( 'r' ) | Literal( 'R' ) ).optional()  +  doubleQuotedString ).action(
+			lambda input, begin, end, xs, bindings: Schema.StringLiteral( format=self._stringLiteralformat( xs ), quotation='double', value=xs[-1][1:-1] ) )
 
 	@Rule
 	def shortStringLiteral(self):
-		return self.asciiStringSLiteral() | self.asciiStringDLiteral() | self.unicodeStringSLiteral() | self.unicodeStringDLiteral() | self.regexAsciiStringSLiteral() | self.regexAsciiStringDLiteral() | \
-		       self.regexUnicodeStringSLiteral() | self.regexUnicodeStringDLiteral()
+		return self.stringSLiteral() | self.stringDLiteral()
+
+
+	@Rule
+	def longStringSLiteral(self):
+		return ( ( Literal( 'u' ) | Literal( 'U' ) ).optional() + ( Literal( 'r' ) | Literal( 'R' ) ).optional()  +  _tripleSString ).action(
+			lambda input, begin, end, xs, bindings: Schema.MultilineStringLiteral( format=self._stringLiteralformat( xs ), quotation='single', value=xs[-1][3:-3] ) )
+
+	@Rule
+	def longStringDLiteral(self):
+		return ( ( Literal( 'u' ) | Literal( 'U' ) ).optional() + ( Literal( 'r' ) | Literal( 'R' ) ).optional()  +  _tripleDString ).action(
+			lambda input, begin, end, xs, bindings: Schema.MultilineStringLiteral( format=self._stringLiteralformat( xs ), quotation='double', value=xs[-1][3:-3] ) )
+
+	@Rule
+	def longStringLiteral(self):
+		return self.longStringSLiteral() | self.longStringDLiteral()
+
 
 
 
@@ -186,7 +193,7 @@ class Python25Grammar (Grammar):
 	# Literal
 	@Rule
 	def literal(self):
-		return self.shortStringLiteral() | self.imaginaryLiteral() | self.floatLiteral() | self.integerLiteral()
+		return self.longStringLiteral() | self.shortStringLiteral() | self.imaginaryLiteral() | self.floatLiteral() | self.integerLiteral()
 
 
 	
@@ -1277,6 +1284,18 @@ class TestCase_Python25Parser (ParserTestCase):
 		self._parseStringTest( g.expression(), 'r\"abc\"', Schema.StringLiteral( format='ascii-regex', quotation='double', value='abc' ) )
 		self._parseStringTest( g.expression(), 'ur\'abc\'', Schema.StringLiteral( format='unicode-regex', quotation='single', value='abc' ) )
 		self._parseStringTest( g.expression(), 'ur\"abc\"', Schema.StringLiteral( format='unicode-regex', quotation='double', value='abc' ) )
+
+
+	def test_longStringLiteral(self):
+		g = Python25Grammar()
+		self._parseStringTest( g.expression(),"'''abc'''", Schema.MultilineStringLiteral( format='ascii', quotation='single', value='abc' ) )
+		self._parseStringTest( g.expression(), '"""abc"""', Schema.MultilineStringLiteral( format='ascii', quotation='double', value='abc' ) )
+		self._parseStringTest( g.expression(),"u'''abc'''", Schema.MultilineStringLiteral( format='unicode', quotation='single', value='abc' ) )
+		self._parseStringTest( g.expression(), 'u"""abc"""', Schema.MultilineStringLiteral( format='unicode', quotation='double', value='abc' ) )
+		self._parseStringTest( g.expression(),"r'''abc'''", Schema.MultilineStringLiteral( format='ascii-regex', quotation='single', value='abc' ) )
+		self._parseStringTest( g.expression(), 'r"""abc"""', Schema.MultilineStringLiteral( format='ascii-regex', quotation='double', value='abc' ) )
+		self._parseStringTest( g.expression(),"ur'''abc'''", Schema.MultilineStringLiteral( format='unicode-regex', quotation='single', value='abc' ) )
+		self._parseStringTest( g.expression(), 'ur"""abc"""', Schema.MultilineStringLiteral( format='unicode-regex', quotation='double', value='abc' ) )
 
 
 	def test_integerLiteral(self):

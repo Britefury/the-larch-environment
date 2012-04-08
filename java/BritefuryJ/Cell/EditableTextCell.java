@@ -45,7 +45,7 @@ public class EditableTextCell
 					if ( !t.contains( "\n" ) )
 					{
 						text = t;
-						PresentationStateListenerList.onPresentationStateChanged( listeners, Cell.this );
+						listeners = PresentationStateListenerList.onPresentationStateChanged( listeners, Cell.this );
 						return true;
 					}
 				}
@@ -90,7 +90,7 @@ public class EditableTextCell
 	public static Pres blankTextCellWithCachedListener(String text, UnaryFn textToValue)
 	{
 		TreeEventListener textListener = cachedTreeEventListenerFor( textToValue );
-		Pres textPres = new Segment( new Text( text ) ).withTreeEventListener( textListener ).withElementInteractor( caretInteractor ).withElementInteractor( keyInteractor );
+		Pres textPres = new Segment( new Text( text ) ).withTreeEventListener( textListener ).withElementInteractor( keyInteractor );
 		return new Bin( new Region( textPres, clipboardHandler ) );
 	}
 
@@ -98,7 +98,7 @@ public class EditableTextCell
 	public static Pres blankTextCell(String text, UnaryFn textToValue)
 	{
 		TreeEventListener textListener = treeEventListenerFor( textToValue );
-		Pres textPres = new Segment( new Text( text ) ).withTreeEventListener( textListener ).withElementInteractor( caretInteractor ).withElementInteractor( keyInteractor );
+		Pres textPres = new Segment( new Text( text ) ).withTreeEventListener( textListener ).withElementInteractor( keyInteractor );
 		return new Bin( new Region( textPres, clipboardHandler ) );
 	}
 

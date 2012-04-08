@@ -106,7 +106,14 @@ public class LayoutNodeColumn extends LayoutNodeAbstractBox
 		}
 		else
 		{
-			refPointIndex = -1;
+			if ( getNumLeaves() == 1 )
+			{
+				refPointIndex = 0;
+			}
+			else
+			{
+				refPointIndex = -1;
+			}
 		}
 		
 		VerticalLayout.computeRequisitionY( layoutReqBox, getLeavesRefreshedRequisitionYBoxes(), refPointIndex, getSpacing() );

@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.Editor.Table;
 
+import BritefuryJ.Incremental.IncrementalMonitor;
+import BritefuryJ.Incremental.IncrementalMonitorListener;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.ElementSearchBredthFirst;
 import BritefuryJ.LSpace.TableElement;
@@ -128,7 +130,9 @@ public abstract class AbstractTableEditorInstance <ModelType>
 			@Override
 			public Object evaluate()
 			{
-				return presentTable();
+				Pres t = presentTable();
+				t = new TableEditorPres( t );
+				return new Region( t, AbstractTableEditorInstance.this.editor.clipboardHandler );
 			}
 		};
 		
@@ -155,9 +159,7 @@ public abstract class AbstractTableEditorInstance <ModelType>
 	
 	protected Pres editTable()
 	{
-		Pres table = (Pres)tableUnit.getValue();
-		Pres region = new Region( table, editor.clipboardHandler );
-		return new TableEditorPres( region );
+		return tableUnit;
 	}
 
 	
