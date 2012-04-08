@@ -271,7 +271,6 @@ class EmbeddedPython25Suite (EmbeddedPython25Executable):
 		if not text.endswith( '\n' ):
 			text = text + '\n'
 		parseResult = _grammar.suite().parseStringChars( text )
-		print 'EmbeddedPython25Suite.fromText: %s' % ( parseResult.getValue()   if parseResult.isValid()   else '<invalid>' )
 		if parseResult.isValid():
 			return EmbeddedPython25Suite( parseResult.getValue() )
 		else:
