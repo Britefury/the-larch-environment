@@ -322,6 +322,7 @@ class ProjectView (MethodDispatchView):
 		
 		# Clear imported modules
 		def _onReset(button, event):
+			project.reset()
 			modules = document.unloadAllImportedModules()
 			print 'LarchCore.Project.ProjectEditor.View: unloaded modules:'
 			for module in modules:

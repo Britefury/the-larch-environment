@@ -29,8 +29,8 @@ from BritefuryJ.Editor.Table.Generic import *
 
 from BritefuryJ.StyleSheet import *
 
-from LarchCore.Languages.Python25.PythonCommands import pythonCommands, makeInsertEmbeddedExpressionAtCaretAction, makeWrapSelectionInEmbeddedExpressionAction,\
-makeWrapSelectedStatementRangeInEmbeddedObjectAction, chainActions
+from LarchCore.Languages.Python25.PythonCommands import PythonCommandSet, EmbeddedExpressionAtCaretAction, WrapSelectionInEmbeddedExpressionAction,\
+	WrapSelectedStatementRangeInEmbeddedObjectAction, chainActions
 from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Expr, EmbeddedPython25Suite
 from LarchCore.Languages.Python25 import Schema
 
@@ -390,9 +390,11 @@ class MonitoredExpression (object):
 
 
 
+@EmbeddedExpressionAtCaretAction
 def _newMonitoredExpressionAtCaret(caret):
 	return MonitoredExpression()
 
+@WrapSelectionInEmbeddedExpressionAction
 def _newMonitoredExpressionAtSelection(expr, selection):
 	d = MonitoredExpression()
 	d._expr.model['expr'] = deepcopy( expr )
@@ -400,26 +402,20 @@ def _newMonitoredExpressionAtSelection(expr, selection):
 		d._name = expr['name']
 	return d
 
-_exprMonitoredExpressionAtCaret = makeInsertEmbeddedExpressionAtCaretAction( _newMonitoredExpressionAtCaret )
-_exprMonitoredExpressionAtSelection = makeWrapSelectionInEmbeddedExpressionAction( _newMonitoredExpressionAtSelection )
-
-_mxCommand = Command( '&Monitored E&xpression', chainActions( _exprMonitoredExpressionAtSelection, _exprMonitoredExpressionAtCaret ) )
+_mxCommand = Command( '&Monitored E&xpression', chainActions( _newMonitoredExpressionAtSelection, _newMonitoredExpressionAtCaret ) )
 
 _mxCommands = CommandSet( 'LarchTools.PythonTools.EmbeddedDisplay.MonitoredExpression', [ _mxCommand ] )
 
 
 
 
+@WrapSelectedStatementRangeInEmbeddedObjectAction
 def _newTraceVisAtStatementRange(statements, selection):
 	d = TraceVisualisation()
 	d._suite.model['suite'][:] = deepcopy( statements )
 	return d
 
-_stmtRangeAtSelection = makeWrapSelectedStatementRangeInEmbeddedObjectAction( _newTraceVisAtStatementRange )
 
+_tvCommand = Command( '&Trace &Visualisation', chainActions( _newTraceVisAtStatementRange ) )
 
-_tvCommand = Command( '&Trace &Visualisation', chainActions( _stmtRangeAtSelection ) )
-
-_tvCommands = CommandSet( 'LarchTools.PythonTools.TraceVis', [ _tvCommand ] )
-
-pythonCommands.registerCommandSet( _tvCommands )
+PythonCommandSet( 'LarchTools.PythonTools.TraceVis', [ _tvCommand ] )

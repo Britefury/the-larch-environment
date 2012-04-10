@@ -29,7 +29,7 @@ from BritefuryJ.Editor.Table.Generic import *
 
 from BritefuryJ.StyleSheet import *
 
-from LarchCore.Languages.Python25.PythonCommands import pythonCommands, makeInsertEmbeddedExpressionAtCaretAction, makeWrapSelectionInEmbeddedExpressionAction, chainActions
+from LarchCore.Languages.Python25.PythonCommands import PythonCommandSet, EmbeddedExpressionAtCaretAction, WrapSelectionInEmbeddedExpressionAction, chainActions
 from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Expr
 
 
@@ -95,20 +95,17 @@ class EmbeddedDisplay (object):
 
 
 	
+@EmbeddedExpressionAtCaretAction
 def _newEmbeddedDisplayAtCaret(caret):
 	return EmbeddedDisplay()
 
+@WrapSelectionInEmbeddedExpressionAction
 def _newEmbeddedDisplayAtSelection(expr, selection):
 	d = EmbeddedDisplay()
 	d._expr.model['expr'] = deepcopy( expr )
 	return d
 
-_exprAtCaret = makeInsertEmbeddedExpressionAtCaretAction( _newEmbeddedDisplayAtCaret )
-_exprAtSelection = makeWrapSelectionInEmbeddedExpressionAction( _newEmbeddedDisplayAtSelection )
 
+_edCommand = Command( '&Embedded &Display', chainActions( _newEmbeddedDisplayAtSelection, _newEmbeddedDisplayAtCaret ) )
 
-_edCommand = Command( '&Embedded &Display', chainActions( _exprAtSelection, _exprAtCaret ) )
-
-_edCommands = CommandSet( 'LarchTools.PythonTools.EmbeddedDisplay', [ _edCommand ] )
-
-pythonCommands.registerCommandSet( _edCommands )
+PythonCommandSet( 'LarchTools.PythonTools.EmbeddedDisplay', [ _edCommand ] )

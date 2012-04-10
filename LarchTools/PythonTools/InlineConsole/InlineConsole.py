@@ -25,7 +25,7 @@ from BritefuryJ.Incremental import IncrementalValueMonitor
 from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.StyleSheet import *
 
-from LarchCore.Languages.Python25.PythonCommands import pythonCommands, makeWrapSelectedStatementRangeInEmbeddedObjectAction, makeInsertEmbeddedStatementAtCaretAction, chainActions
+from LarchCore.Languages.Python25.PythonCommands import PythonCommandSet, WrapSelectedStatementRangeInEmbeddedObjectAction, EmbeddedStatementAtCaretAction, chainActions
 from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Suite, removeEmbeddedObjectContainingElement
 from LarchCore.Languages.Python25.Execution import Execution
 
@@ -143,20 +143,16 @@ class InlineConsole (object):
 
 
 
-
+@EmbeddedStatementAtCaretAction
 def _newInlineConsoleAtCaret(caret):
 	return InlineConsole()
 
+@WrapSelectedStatementRangeInEmbeddedObjectAction
 def _newInlineConsoleAtStatementRange(statements, selection):
 	return InlineConsole( deepcopy( statements ) )
 
 
-_inlineConsoleAtCaret = makeInsertEmbeddedStatementAtCaretAction( _newInlineConsoleAtCaret )
-_inlineConsoleAtSelection = makeWrapSelectedStatementRangeInEmbeddedObjectAction( _newInlineConsoleAtStatementRange )
 
+_icCommand = Command( '&Inline &Console', chainActions( _newInlineConsoleAtStatementRange, _newInlineConsoleAtCaret ) )
 
-_icCommand = Command( '&Inline &Console', chainActions( _inlineConsoleAtSelection, _inlineConsoleAtCaret ) )
-
-_icCommands = CommandSet( 'LarchTools.PythonTools.InlineConsole', [ _icCommand ] )
-
-pythonCommands.registerCommandSet( _icCommands )
+PythonCommandSet( 'LarchTools.PythonTools.InlineConsole', [ _icCommand ] )

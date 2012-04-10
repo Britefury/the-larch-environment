@@ -26,7 +26,7 @@ from BritefuryJ.Util.Coroutine import Coroutine
 
 from BritefuryJ.Live import LiveValue
 
-from LarchCore.Languages.Python25.PythonCommands import pythonCommands, makeWrapSelectedStatementRangeInEmbeddedObjectAction, makeInsertEmbeddedStatementAtCaretAction, chainActions
+from LarchCore.Languages.Python25.PythonCommands import PythonCommandSet, WrapSelectedStatementRangeInEmbeddedObjectAction, EmbeddedStatementAtCaretAction, chainActions
 from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Suite
 from LarchCore.Languages.Python25.Execution import Execution
 
@@ -285,33 +285,29 @@ class Stepper (object):
 
 
 
-
+@EmbeddedStatementAtCaretAction
 def _newBreakPointAtCaret(caret):
 	return StepperBreakpoint()
 
 
-_breakPointAtCaret = makeInsertEmbeddedStatementAtCaretAction( _newBreakPointAtCaret )
 
-
-_bpCommand = Command( '&Stepper &Break&point', _breakPointAtCaret )
+_bpCommand = Command( '&Stepper &Break&point', _newBreakPointAtCaret )
 
 _stepperCommands = CommandSet( 'LarchTools.PythonTools.Stepper.StepperBreakpoint', [ _bpCommand ] )
 
 
 
+@EmbeddedStatementAtCaretAction
 def _newStepperAtCaret(caret):
 	return Stepper()
 
+@WrapSelectedStatementRangeInEmbeddedObjectAction
 def _newStepperAtStatementRange(statements, selection):
 	return Stepper( deepcopy( statements ) )
 
 
-_stepperAtCaret = makeInsertEmbeddedStatementAtCaretAction( _newStepperAtCaret )
-_stepperAtSelection = makeWrapSelectedStatementRangeInEmbeddedObjectAction( _newStepperAtStatementRange )
 
+_psCommand = Command( '&Python &S&tepper', chainActions( _newStepperAtStatementRange, _newStepperAtCaret ) )
 
-_psCommand = Command( '&Python &S&tepper', chainActions( _stepperAtSelection, _stepperAtCaret ) )
+PythonCommandSet( 'LarchTools.PythonTools.Stepper', [ _psCommand ] )
 
-_psCommands = CommandSet( 'LarchTools.PythonTools.Stepper', [ _psCommand ] )
-
-pythonCommands.registerCommandSet( _psCommands )

@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2010.
 ##-*************************
-from BritefuryJ.Command import CommandSetRegistry
+from BritefuryJ.Command import CommandSet, CommandSetRegistry
 
 from BritefuryJ.LSpace.TextFocus import TextSelection
 
@@ -86,13 +86,13 @@ def _makeWrapSelectionInEmbeddedObjectAction(getSelectedNodeFn, valueAtSelection
 			
 
 
-def makeInsertEmbeddedExpressionAtCaretAction(valueAtCaretFactory):
+def EmbeddedExpressionAtCaretAction(valueAtCaretFactory):
 	"""
 	valueAtCaretFactory - function( caret )  ->  value
 	"""
 	return _makeInsertEmbeddedObjectExprAtCaretAction( valueAtCaretFactory, embeddedExpression )
 			
-def makeInsertEmbeddedStatementAtCaretAction(valueAtCaretFactory):
+def EmbeddedStatementAtCaretAction(valueAtCaretFactory):
 	"""
 	valueAtCaretFactory - function( caret )  ->  value
 	"""
@@ -100,13 +100,13 @@ def makeInsertEmbeddedStatementAtCaretAction(valueAtCaretFactory):
 
 			
 
-def makeWrapSelectionInEmbeddedExpressionAction(valueAtSelectionFactory):
+def WrapSelectionInEmbeddedExpressionAction(valueAtSelectionFactory):
 	"""
 	valueAtSelectionFactory - function( selected_node, selection )  ->  value
 	"""
 	return _makeWrapSelectionInEmbeddedObjectAction( getSelectedExpression, valueAtSelectionFactory, embeddedExpression )
 
-def makeWrapSelectionInEmbeddedStatementAction(valueAtSelectionFactory):
+def WrapSelectionInEmbeddedStatementAction(valueAtSelectionFactory):
 	"""
 	valueAtSelectionFactory - function( selected_node, selection )  ->  value
 	"""
@@ -114,7 +114,7 @@ def makeWrapSelectionInEmbeddedStatementAction(valueAtSelectionFactory):
 
 
 
-def makeWrapSelectedStatementRangeInEmbeddedObjectAction(valueAtSelectionFactory):
+def WrapSelectedStatementRangeInEmbeddedObjectAction(valueAtSelectionFactory):
 	"""
 	valueAtSelectionFactory - function( statements, selection )  ->  value
 	embedFn - function( value )  ->  AST node
@@ -154,3 +154,18 @@ def chainActions(*actions):
 
 pythonCommands = CommandSetRegistry( 'LarchCore.Languages.Python25' )
 pythonTargetCommands = CommandSetRegistry( 'LarchCore.Languages.Python25.Target' )
+
+
+
+class PythonCommandSet (CommandSet):
+	def __init__(self, name, commands):
+		super( PythonCommandSet, self ).__init__( name, commands )
+		pythonCommands.registerCommandSet( self )
+
+
+
+class PythonTargetCommandSet (CommandSet):
+	def __init__(self, name, commands):
+		super( PythonTargetCommandSet, self ).__init__( name, commands )
+		pythonTargetCommands.registerCommandSet( self )
+

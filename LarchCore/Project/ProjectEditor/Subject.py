@@ -192,6 +192,7 @@ class ProjectSubject (_RootSubject):
 	
 
 	def __resolve__(self, name):
+		self._model.startup()
 		if name == '___project___':
 			return self._rootSubject
 		else:
