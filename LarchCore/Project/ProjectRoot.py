@@ -20,7 +20,7 @@ class ProjectRoot (ProjectContainer):
 	def __init__(self, packageName=None, contents=None):
 		super( ProjectRoot, self ).__init__( contents )
 		self._pythonPackageName = packageName
-		self._starupExecuted = False
+		self._startupExecuted = False
 	
 	
 	def __getstate__(self):
@@ -31,6 +31,7 @@ class ProjectRoot (ProjectContainer):
 	def __setstate__(self, state):
 		super( ProjectRoot, self ).__setstate__( state )
 		self._pythonPackageName = state['pythonPackageName']
+		self._startupExecuted = False
 	
 	def __copy__(self):
 		return ProjectRoot( self._pythonPackageName, self[:] )
@@ -57,14 +58,14 @@ class ProjectRoot (ProjectContainer):
 
 
 	def startup(self):
-		if not self._starupExecuted:
+		if not self._startupExecuted:
 			if self._pythonPackageName is not None:
-				self._starupExecuted = True
+				self._startupExecuted = True
 				importName = self._pythonPackageName + '.' + '__startup__'
 				__import__( importName )
 
 	def reset(self):
-		self._starupExecuted = False
+		self._startupExecuted = False
 	
 	
 	pythonPackageName = property( getPythonPackageName, setPythonPackageName )
