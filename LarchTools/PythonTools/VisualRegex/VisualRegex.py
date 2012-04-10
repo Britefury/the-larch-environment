@@ -24,7 +24,7 @@ from BritefuryJ.Graphics import *
 
 from BritefuryJ.Pres.Primitive import *
 
-from LarchCore.Languages.Python25.PythonCommands import pythonCommands, makeInsertEmbeddedExpressionAtCaretAction, chainActions
+from LarchCore.Languages.Python25.PythonCommands import PythonCommandSet, EmbeddedExpressionAtCaretAction, chainActions
 
 from LarchTools.PythonTools.VisualRegex import Schema
 from LarchTools.PythonTools.VisualRegex.Parser import VisualRegexGrammar
@@ -77,14 +77,13 @@ class VisualPythonRegex (object):
 
 
 
+@EmbeddedExpressionAtCaretAction
 def _newVREAtCaret(caret):
 	return VisualPythonRegex()
 
-_exprAtCaret = makeInsertEmbeddedExpressionAtCaretAction( _newVREAtCaret )
 
 
-_vreCommand = Command( '&Visual &Regular &Expression', _exprAtCaret )
+_vreCommand = Command( '&Visual &Regular &Expression', _newVREAtCaret )
 
-_vreCommands = CommandSet( 'LarchTools.PythonTools.VisualRegex', [ _vreCommand ] )
+PythonCommandSet( 'LarchTools.PythonTools.VisualRegex', [ _vreCommand ] )
 
-pythonCommands.registerCommandSet( _vreCommands )

@@ -20,6 +20,7 @@ class ProjectRoot (ProjectContainer):
 	def __init__(self, packageName=None, contents=None):
 		super( ProjectRoot, self ).__init__( contents )
 		self._pythonPackageName = packageName
+		self._starupExecuted = False
 	
 	
 	def __getstate__(self):
@@ -52,6 +53,18 @@ class ProjectRoot (ProjectContainer):
 		self._incr.onChanged()
 		if self.__change_history__ is not None:
 			self.__change_history__.addChange( lambda: self.setPythonPackageName( name ), lambda: self.setPythonPackageName( oldName ), 'Project root set python package name' )
+
+
+
+	def startup(self):
+		if not self._starupExecuted:
+			if self._pythonPackageName is not None:
+				self._starupExecuted = True
+				importName = self._pythonPackageName + '.' + '__startup__'
+				__import__( importName )
+
+	def reset(self):
+		self._starupExecuted = False
 	
 	
 	pythonPackageName = property( getPythonPackageName, setPythonPackageName )

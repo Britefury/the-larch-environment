@@ -7,8 +7,7 @@
 ##-*************************
 from BritefuryJ.Command import Command, CommandSet
 
-from LarchCore.Languages.Python25.PythonCommands import pythonCommands, makeInsertEmbeddedExpressionAtCaretAction, makeWrapSelectionInEmbeddedExpressionAction,	\
-	makeWrapSelectedStatementRangeInEmbeddedObjectAction, makeInsertEmbeddedStatementAtCaretAction, chainActions
+from LarchCore.Languages.Python25.PythonCommands import PythonCommandSet, EmbeddedExpressionAtCaretAction
 
 from LarchTools.EmbeddedData.IntEditorSpinEntry import IntEditorSpinEntry
 from LarchTools.EmbeddedData.RealEditorSpinEntry import RealEditorSpinEntry
@@ -18,42 +17,40 @@ from LarchTools.EmbeddedData.ColourEditorPicker import ColourEditorPicker
 
 
 
+@EmbeddedExpressionAtCaretAction
 def _newIntSpinEntryAtCaret(caret):
 	return IntEditorSpinEntry()
 
-_intSpinAtCaret = makeInsertEmbeddedExpressionAtCaretAction( _newIntSpinEntryAtCaret )
-_intSpinCommand = Command( '&Integer &Spin &Entry', _intSpinAtCaret )
+_intSpinCommand = Command( '&Integer &Spin &Entry', _newIntSpinEntryAtCaret )
 
 
+@EmbeddedExpressionAtCaretAction
 def _newRealSpinEntryAtCaret(caret):
 	return RealEditorSpinEntry()
 
-_realSpinAtCaret = makeInsertEmbeddedExpressionAtCaretAction( _newRealSpinEntryAtCaret )
-_realSpinCommand = Command( '&Real &Spin &Entry', _realSpinAtCaret )
+_realSpinCommand = Command( '&Real &Spin &Entry', _newRealSpinEntryAtCaret )
 
 
+@EmbeddedExpressionAtCaretAction
 def _newTextEntryAtCaret(caret):
 	return StringEditorTextEntry()
 
-_textEntryAtCaret = makeInsertEmbeddedExpressionAtCaretAction( _newTextEntryAtCaret )
-_textEntryCommand = Command( '&Text &Entry', _textEntryAtCaret )
+_textEntryCommand = Command( '&Text &Entry', _newTextEntryAtCaret )
 
 
+@EmbeddedExpressionAtCaretAction
 def _newTextAreaAtCaret(caret):
 	return StringEditorTextArea()
 
-_textAreaAtCaret = makeInsertEmbeddedExpressionAtCaretAction( _newTextAreaAtCaret )
-_textAreaCommand = Command( '&Text &Area', _textAreaAtCaret )
+_textAreaCommand = Command( '&Text &Area', _newTextAreaAtCaret )
 
 
+@EmbeddedExpressionAtCaretAction
 def _newColourPickerAtcaret(caret):
 	return ColourEditorPicker()
 
-_colourPickerAtCaret = makeInsertEmbeddedExpressionAtCaretAction( _newColourPickerAtcaret )
-_colourPickerCommand = Command( '&C&o&lour picker', _colourPickerAtCaret )
+_colourPickerCommand = Command( '&C&o&lour picker', _newColourPickerAtcaret )
 
 
-_edCommands = CommandSet( 'LarchTools.EmbeddedData', [ _intSpinCommand, _realSpinCommand, _textEntryCommand, _textAreaCommand,
+PythonCommandSet( 'LarchTools.EmbeddedData', [ _intSpinCommand, _realSpinCommand, _textEntryCommand, _textAreaCommand,
                                                        _colourPickerCommand] )
-
-pythonCommands.registerCommandSet( _edCommands )

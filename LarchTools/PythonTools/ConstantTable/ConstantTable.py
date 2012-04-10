@@ -22,7 +22,7 @@ from BritefuryJ.Editor.Table.ObjectList import AttributeColumn, ObjectListTableE
 from Britefury.Util.TrackedList import TrackedListProperty
 
 import LarchCore.Languages.Python25.Schema as Py
-from LarchCore.Languages.Python25.PythonCommands import pythonCommands, makeInsertEmbeddedStatementAtCaretAction
+from LarchCore.Languages.Python25.PythonCommands import PythonCommandSet, EmbeddedStatementAtCaretAction
 from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Target, EmbeddedPython25Expr
 
 
@@ -161,12 +161,11 @@ _tableEditor = ObjectListTableEditor( [ _targetColumn, _valueColumn ], ConstantD
 
 
 
+@EmbeddedStatementAtCaretAction
 def _newConstantTableAtCaret(caret):
 	return ConstantTable()
 
 
-_ctCommand = Command( '&Python &Constant &Table', makeInsertEmbeddedStatementAtCaretAction( _newConstantTableAtCaret ) )
+_ctCommand = Command( '&Python &Constant &Table', _newConstantTableAtCaret )
 
-_ctCommands = CommandSet( 'LarchTools.PythonTools.ConstantTable', [ _ctCommand ] )
-
-pythonCommands.registerCommandSet( _ctCommands )
+PythonCommandSet( 'LarchTools.PythonTools.ConstantTable', [ _ctCommand ] )

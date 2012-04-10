@@ -6,10 +6,8 @@
 //##************************
 package BritefuryJ.Editor.Table;
 
-import BritefuryJ.Incremental.IncrementalMonitor;
-import BritefuryJ.Incremental.IncrementalMonitorListener;
-import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.ElementSearchBredthFirst;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.TableElement;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerMotionEvent;

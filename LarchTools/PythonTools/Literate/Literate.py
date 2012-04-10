@@ -26,8 +26,8 @@ from BritefuryJ.Controls import Controls, DropDownExpander, MenuItem, TextEntry,
 
 from BritefuryJ.StyleSheet import StyleSheet
 
-from LarchCore.Languages.Python25.PythonCommands import pythonCommands, makeInsertEmbeddedExpressionAtCaretAction, makeWrapSelectionInEmbeddedExpressionAction,	\
-	makeWrapSelectedStatementRangeInEmbeddedObjectAction, makeInsertEmbeddedStatementAtCaretAction, chainActions
+from LarchCore.Languages.Python25.PythonCommands import PythonCommandSet, EmbeddedExpressionAtCaretAction, WrapSelectionInEmbeddedExpressionAction,	\
+	WrapSelectedStatementRangeInEmbeddedObjectAction, EmbeddedStatementAtCaretAction, chainActions
 from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Expr, EmbeddedPython25Suite
 
 
@@ -246,34 +246,30 @@ class LiterateSuite (object):
 
 
 
+@EmbeddedExpressionAtCaretAction
 def _newLiterateExpressionAtCaret(caret):
 	return LiterateExpression()
 
+@WrapSelectionInEmbeddedExpressionAction
 def _newLiterateExpressionAtSelection(expr, selection):
 	d = LiterateExpression()
 	d._expr.model['expr'] = deepcopy( expr )
 	return d
 
 
+@EmbeddedStatementAtCaretAction
 def _newLiterateSuiteAtCaret(caret):
 	return LiterateSuite()
 
+@WrapSelectedStatementRangeInEmbeddedObjectAction
 def _newLiterateSuiteAtStatementRange(statements, selection):
 	d = LiterateSuite()
 	d._definition._suite.model['suite'][:] = deepcopy( statements )
 	return d
 
 
-_exprAtCaret = makeInsertEmbeddedExpressionAtCaretAction( _newLiterateExpressionAtCaret )
-_exprAtSelection = makeWrapSelectionInEmbeddedExpressionAction( _newLiterateExpressionAtSelection )
 
-_suiteAtCaret = makeInsertEmbeddedStatementAtCaretAction( _newLiterateSuiteAtCaret )
-_suiteAtSelection = makeWrapSelectedStatementRangeInEmbeddedObjectAction( _newLiterateSuiteAtStatementRange )
+_lxCommand = Command( '&Literate E&xpression', chainActions( _newLiterateExpressionAtSelection, _newLiterateExpressionAtCaret ) )
+_lsCommand = Command( '&Literate &Suite', chainActions( _newLiterateSuiteAtStatementRange, _newLiterateSuiteAtCaret ) )
 
-
-_lxCommand = Command( '&Literate E&xpression', chainActions( _exprAtSelection, _exprAtCaret ) )
-_lsCommand = Command( '&Literate &Suite', chainActions( _suiteAtSelection, _suiteAtCaret ) )
-
-_lCommands = CommandSet( 'LarchTools.PythonTools.Literate', [ _lxCommand, _lsCommand ] )
-
-pythonCommands.registerCommandSet( _lCommands )
+PythonCommandSet( 'LarchTools.PythonTools.Literate', [ _lxCommand, _lsCommand ] )
