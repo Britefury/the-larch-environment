@@ -52,6 +52,7 @@ from BritefuryJ.Editor.Sequential.Item import *
 
 from LarchCore.Languages.Python25 import Python25
 
+from LarchCore.Worksheet.WorksheetCommands import worksheetCommands
 from LarchCore.Worksheet.WorksheetEditor import EditorSchema
 from LarchCore.Worksheet.WorksheetEditor.RichTextEditor import WorksheetRichTextEditor
 
@@ -284,6 +285,7 @@ class WorksheetEditor (MethodDispatchView):
 		w = Page( [ linkHeader, bodyView ] )
 		w = w.withContextMenuInteractor( _worksheetContextMenuFactory )
 		w = w.withDropDest( _embeddedObject_dropDest )
+		w = w.withCommands( worksheetCommands )
 		w = WorksheetRichTextEditor.instance.region( w )
 		return w
 	
