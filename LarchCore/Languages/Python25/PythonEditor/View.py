@@ -218,7 +218,7 @@ def spanCmpOpView(grammar, inheritedState, model, op, y):
 
 
 def _onDrop_embeddedObject(element, pos, data, action):
-	def _displayModelException(e):
+	def _displayException(e):
 		ApplyPerspective( None, Pres.coerce( e ) ).popupAtMousePosition( element, True, True )
 
 	marker = Marker.atPointIn( element, pos, True )
@@ -228,7 +228,7 @@ def _onDrop_embeddedObject(element, pos, data, action):
 			try:
 				modelType = Schema.getEmbeddedObjectModelType( model )
 			except Exception, e:
-				_displayModelException( e )
+				_displayException( e )
 			else:
 				if modelType is Schema.Expr:
 					expr = Schema.EmbeddedObjectExpr( embeddedValue=embeddedValue )
@@ -239,14 +239,20 @@ def _onDrop_embeddedObject(element, pos, data, action):
 		
 		# Display a context menu
 		def _onDropByCopy(control):
-			if marker.isValid():
-				model = data.getModel()
-				_performInsertion( deepcopy( model ) )
-		
+			try:
+				if marker.isValid():
+					model = data.getModel()
+					_performInsertion( deepcopy( model ) )
+			except Exception, e:
+				_displayException( e )
+
 		def _onDropByRef(control):
-			if marker.isValid():
-				model = data.getModel()
-				_performInsertion( model )
+			try:
+				if marker.isValid():
+					model = data.getModel()
+					_performInsertion( model )
+			except Exception, e:
+				_displayException( e )
 
 		menu = VPopupMenu( [ MenuItem.menuItemWithLabel( 'Copy', _onDropByCopy ),
 		                     MenuItem.menuItemWithLabel( 'Reference', _onDropByRef ) ] )

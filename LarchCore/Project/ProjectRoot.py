@@ -60,9 +60,10 @@ class ProjectRoot (ProjectContainer):
 	def startup(self):
 		if not self._startupExecuted:
 			if self._pythonPackageName is not None:
-				self._startupExecuted = True
-				importName = self._pythonPackageName + '.' + '__startup__'
-				__import__( importName )
+				if '__startup__' in self.contentsMap:
+					self._startupExecuted = True
+					importName = self._pythonPackageName + '.' + '__startup__'
+					__import__( importName )
 
 	def reset(self):
 		self._startupExecuted = False
