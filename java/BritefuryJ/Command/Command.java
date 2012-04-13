@@ -7,52 +7,49 @@
 package BritefuryJ.Command;
 
 import java.awt.Color;
-import java.util.ArrayList;
-import java.util.List;
 
 import BritefuryJ.Graphics.SolidBorder;
+import BritefuryJ.LSpace.PageController;
+import BritefuryJ.LSpace.Browser.Location;
 import BritefuryJ.Shortcut.Shortcut;
 
 public class Command
 {
 	public interface CommandAction
 	{
-		public void commandAction(Object context);
+		public void commandAction(Object context, PageController pageController);
 	}
+	
+	
+	private static class HyperlinkAction implements CommandAction
+	{
+		private Location target;
+		
+		public HyperlinkAction(Location target)
+		{
+			this.target = target;
+		}
+
+		
+		@Override
+		public void commandAction(Object context, PageController pageController)
+		{
+			pageController.openLocation( target, PageController.OpenOperation.OPEN_IN_CURRENT_TAB );
+		}
+	}
+	
+	
 	
 	private CommandName name;
 	protected CommandAction action;
-	protected ArrayList<Shortcut> shortcuts = new ArrayList<Shortcut>();
-	
-	
-	public Command(CommandName name, CommandAction action, List<Shortcut> shortcuts)
-	{
-		this.name = name;
-		this.action = action;
-		this.shortcuts.addAll( shortcuts );
-	}
-	
-	public Command(String charSeq, String name, CommandAction action, List<Shortcut> shortcuts)
-	{
-		this( new CommandName( charSeq, name ), action, shortcuts );
-	}
-	
-	public Command(String annotatedName, CommandAction action, List<Shortcut> shortcuts)
-	{
-		this( new CommandName( annotatedName ), action, shortcuts );
-	}
+	protected Shortcut shortcut;
 	
 	
 	public Command(CommandName name, CommandAction action, Shortcut shortcut)
 	{
 		this.name = name;
 		this.action = action;
-		this.shortcuts.add( shortcut );
-	}
-	
-	public Command(String charSeq, String name, CommandAction action, Shortcut shortcut)
-	{
-		this( new CommandName( charSeq, name ), action, shortcut );
+		this.shortcut = shortcut;
 	}
 	
 	public Command(String annotatedName, CommandAction action, Shortcut shortcut)
@@ -67,14 +64,35 @@ public class Command
 		this.action = action;
 	}
 	
-	public Command(String charSeq, String name, CommandAction action)
-	{
-		this( new CommandName( charSeq, name ), action );
-	}
-	
 	public Command(String annotatedName, CommandAction action)
 	{
 		this( new CommandName( annotatedName ), action );
+	}
+	
+	
+
+	public Command(CommandName name, Location targetLocation, Shortcut shortcut)
+	{
+		this.name = name;
+		this.action = new HyperlinkAction( targetLocation );
+		this.shortcut = shortcut;
+	}
+	
+	public Command(String annotatedName, Location targetLocation, Shortcut shortcut)
+	{
+		this( new CommandName( annotatedName ), targetLocation, shortcut );
+	}
+	
+	
+	public Command(CommandName name, Location targetLocation)
+	{
+		this.name = name;
+		this.action = new HyperlinkAction( targetLocation );
+	}
+	
+	public Command(String annotatedName, Location targetLocation)
+	{
+		this( new CommandName( annotatedName ), targetLocation );
 	}
 	
 	
@@ -85,9 +103,9 @@ public class Command
 	}
 	
 	
-	public List<Shortcut> getShortcuts()
+	public Shortcut getShortcut()
 	{
-		return shortcuts;
+		return shortcut;
 	}
 	
 	

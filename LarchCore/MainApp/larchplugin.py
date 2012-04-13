@@ -10,5 +10,7 @@ from LarchCore.MainApp import MainApp
 
 
 def initPlugin(plugin, world):
-	world.setAppStateSubject( plugin, MainApp.newAppStateSubject( world ) )
+	appState = MainApp.newAppState()
+	world.setAppStateSubject( plugin, MainApp.newAppStateSubject( world, appState ) )
+	world.setFragmentInspector( appState.inspectFragment )
 

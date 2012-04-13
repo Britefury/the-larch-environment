@@ -22,8 +22,11 @@ import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSFragment;
 import BritefuryJ.LSpace.FragmentContext;
 import BritefuryJ.LSpace.Browser.Location;
+import BritefuryJ.LSpace.Event.PointerButtonEvent;
+import BritefuryJ.LSpace.Input.Modifier;
 import BritefuryJ.LSpace.Input.ObjectDndHandler;
 import BritefuryJ.LSpace.Input.PointerInputElement;
+import BritefuryJ.LSpace.Interactor.PushElementInteractor;
 import BritefuryJ.LSpace.Layout.HAlignment;
 import BritefuryJ.LSpace.Layout.VAlignment;
 import BritefuryJ.LSpace.PersistentState.PersistentState;
@@ -108,13 +111,39 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 		public Object createSourceData(PointerInputElement sourceElement, int aspect)
 		{
 			LSElement element = (LSElement)sourceElement;
-			FragmentView ctx = (FragmentView)element.getFragmentContext();
-			return new FragmentData( ctx.getModel(), ctx.getFragmentContentElement() );
+			FragmentView fragment = (FragmentView)element.getFragmentContext();
+			return new FragmentData( fragment.getModel(), fragment.getFragmentContentElement() );
 		}
 	};
 	
 
 	private static final ObjectDndHandler.DragSource fragmentDragSource = new ObjectDndHandler.DragSource( FragmentData.class, ObjectDndHandler.ASPECT_DOC_NODE, fragmentDragSourceFn );
+	
+	
+	
+	private static final PushElementInteractor fragmentInspectorInteractor = new PushElementInteractor()
+	{
+		@Override
+		public boolean buttonPress(PointerInputElement element, PointerButtonEvent event)
+		{
+			int keyMods = Modifier.getKeyModifiers( event.getModifiers() );
+			if ( keyMods == ( Modifier.CTRL | Modifier.ALT )  ||  keyMods == ( Modifier.SHIFT | Modifier.ALT ) )
+			{
+				if ( event.getButton() == 3 )
+				{
+					LSElement e = (LSElement)element;
+					FragmentView fragment = (FragmentView)e.getFragmentContext();
+					return fragment.incView.inspectFragment( fragment, e, event );
+				}
+			}
+			return false;
+		}
+
+		@Override
+		public void buttonRelease(PointerInputElement element, PointerButtonEvent event)
+		{
+		}
+	};
 	
 	
 	
@@ -177,6 +206,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 		// Fragment element, with null context, initially; later set in @setContext method
 		fragmentElement = new LSFragment( this );
 		fragmentElement.addDragSource( fragmentDragSource );
+		fragmentElement.addElementInteractor( fragmentInspectorInteractor );
 		element = null;
 		this.persistentState = persistentState;
 	}

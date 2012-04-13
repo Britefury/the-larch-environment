@@ -155,6 +155,15 @@ public class AABox2 implements Serializable
 	}
 	
 	
+	public Point2 closestPointTo(Point2 p)
+	{
+		Point2 c = new Point2();
+		c.x = Math.min( Math.max( p.x, lowerX ), upperX );
+		c.y = Math.min( Math.max( p.y, lowerY ), upperY );
+		return c;
+	}
+	
+	
 	public void addPoint(double x, double y)
 	{
 		if ( isEmpty() )

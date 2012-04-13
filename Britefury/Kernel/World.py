@@ -11,6 +11,8 @@ from Britefury.Kernel.Plugin import Plugin
 from Britefury.Config import Configuration
 from Britefury.Config.PathsConfigPage import getPathsConfig
 
+from BritefuryJ.Projection import ProjectiveBrowserContext
+
 
 
 _internalSchemas = {}
@@ -23,6 +25,17 @@ def _get_attr(x, attrName, default=None):
 	except AttributeError:
 		return default
 
+
+
+class _WorldBrowserContext (ProjectiveBrowserContext):
+	def __init__(self, world):
+		super( _WorldBrowserContext, self ).__init__( True )
+		self._world = world
+
+
+	def inspectFragment(self, fragment, sourceElement, triggeringEvent):
+		return self._world._inspectFragment( fragment, sourceElement, triggeringEvent )
+
 	
 	
 class World (object):
@@ -33,13 +46,18 @@ class World (object):
 		self._appStateSubject = None
 		self._importedModuleRegistry = set()
 		self.configuration = Configuration.Configuration()
-		
-		
+		self._fragmentInspector = None
+
 		for plugin in self._plugins:
 			plugin.initialise( self )
-			
-				
-		
+
+		self._browserContext = _WorldBrowserContext( self )
+		self._browserContext.registerMainSubject( self.getAppStateSubject() )
+		self._browserContext.registerNamedSubject( 'config', self.configuration.subject )
+
+
+
+
 
 	def registerNewDocumentFactory(self, plugin, newDocumentFactory):
 		self.newDocumentFactories.append( newDocumentFactory )
@@ -50,7 +68,25 @@ class World (object):
 		
 	def getAppStateSubject(self):
 		return self._appStateSubject
-	
+
+
+
+	def getBrowserContext(self):
+		return self._browserContext
+
+
+
+	def setFragmentInspector(self, inspector):
+		self._fragmentInspector = inspector
+
+
+
+	def _inspectFragment(self, fragment, sourceElement, triggeringEvent):
+		if self._fragmentInspector is not None:
+			return self._fragmentInspector( fragment, sourceElement, triggeringEvent )
+		else:
+			return False
+
 		
 		
 	def registerImportedModule(self, fullname):
@@ -72,11 +108,8 @@ class World (object):
 	
 	
 	
-	def registerBrowserContext(self, browserContext):
-		browserContext.registerNamedSubject( 'config', self.configuration.subject )
-	
-	
-	
+
+
 	def enableImportHooks(self):
 		sys.meta_path.append( self )
 		

@@ -25,6 +25,7 @@ import BritefuryJ.Editor.Table.ObjectList.ObjectListTableEditor;
 import BritefuryJ.Incremental.IncrementalValueMonitor;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSRootElement;
+import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Focus.Selection;
 import BritefuryJ.LSpace.PersistentState.PersistentStateStore;
 import BritefuryJ.LSpace.PersistentState.PersistentStateTable;
@@ -712,6 +713,17 @@ public class IncrementalView
 			persistentState = stateStoreToLoad.usePersistentState( node );
 		}
 		return persistentState;
+	}
+	
+	
+	
+	//
+	// Fragment inspector methods
+	//
+	
+	protected boolean inspectFragment(FragmentView fragment, LSElement sourceElement, PointerButtonEvent triggeringEvent)
+	{
+		return browserContext.inspectFragment( fragment, sourceElement, triggeringEvent );
 	}
 	
 	

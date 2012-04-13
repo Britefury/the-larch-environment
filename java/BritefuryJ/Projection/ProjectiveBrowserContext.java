@@ -21,11 +21,13 @@ import BritefuryJ.DefaultPerspective.DefaultPerspectiveSubject;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.IncrementalView.BrowserIncrementalView;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Browser.BrowserPage;
 import BritefuryJ.LSpace.Browser.Location;
 import BritefuryJ.LSpace.Browser.PageLocationResolver;
 import BritefuryJ.LSpace.Browser.SystemPages.SystemRootPage;
 import BritefuryJ.LSpace.Clipboard.ClipboardHandlerInterface;
+import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.PersistentState.PersistentStateStore;
 import BritefuryJ.ObjectPresentation.ObjectPresentationLocationResolver;
 import BritefuryJ.ObjectPresentation.ObjectPresentationPerspective;
@@ -120,6 +122,12 @@ public class ProjectiveBrowserContext
 	}
 	
 	
+	
+	public boolean inspectFragment(FragmentView fragment, LSElement sourceElement, PointerButtonEvent triggeringEvent)
+	{
+		return false;
+	}
+
 	
 	public void registerMainSubject(Object subject)
 	{

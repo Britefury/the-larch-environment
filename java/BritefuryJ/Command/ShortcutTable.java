@@ -24,10 +24,7 @@ class ShortcutTable
 	
 	public void addCommand(Command cmd)
 	{
-		for (Shortcut shortcut: cmd.getShortcuts())
-		{
-			shortcutToCommand.put( shortcut, cmd );
-		}
+		shortcutToCommand.put( cmd.getShortcut(), cmd );
 	}
 	
 	public void addCommands(List<Command> commands)

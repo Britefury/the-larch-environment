@@ -13,6 +13,7 @@ import BritefuryJ.Command.Command;
 import BritefuryJ.Command.CommandSet;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSProxy;
+import BritefuryJ.LSpace.PageController;
 import BritefuryJ.Pres.ElementRef;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Column;
@@ -55,7 +56,7 @@ public class CommandConsoleTestPage extends SystemPage
 		}
 
 
-		public void commandAction(Object context)
+		public void commandAction(Object context, PageController pageController)
 		{
 			for (LSElement element: parentElement.getElements())
 			{
@@ -72,7 +73,7 @@ public class CommandConsoleTestPage extends SystemPage
 		}
 
 
-		public void commandAction(Object context)
+		public void commandAction(Object context, PageController pageController)
 		{
 			throw new RuntimeException( "Fail" );
 		}

@@ -12,6 +12,7 @@ from BritefuryJ.LSpace.Browser import Location
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from LarchCore.PythonConsole import ConsoleSchema
+from LarchCore.MainApp import FragmentInspector
 
 
 
@@ -45,7 +46,12 @@ class AppState (object):
 			if doc.hasUnsavedData():
 				return True
 		return False
-		
+
+
+
+	def inspectFragment(self, fragment, sourceElement, triggeringEvent):
+		return FragmentInspector.inspectFragment( fragment, sourceElement, triggeringEvent )
+
 
 
 	def getConsoles(self):

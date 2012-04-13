@@ -232,7 +232,7 @@ class _WorksheetModuleLoader (object):
 
 
 
-def _refreshWorksheet(subject):
+def _refreshWorksheet(subject, pageController):
 	subject._modelView.refreshResults()
 
 

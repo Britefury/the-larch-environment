@@ -484,7 +484,7 @@ class WorksheetEditor (MethodDispatchView):
 
 
 
-def _refreshWorksheet(subject):
+def _refreshWorksheet(subject, pageController):
 	subject._modelView.refreshResults()
 
 

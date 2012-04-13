@@ -12,8 +12,6 @@ from BritefuryJ.Command import CommandConsole
 
 from BritefuryJ.LSpace.Browser import Location
 
-from BritefuryJ.Projection import ProjectiveBrowserContext, Subject
-
 from Britefury.Windows.Window import Window
 
 		
@@ -22,17 +20,15 @@ class WindowManager (object):
 		self._world = world
 		
 		
-		self._browserContext = ProjectiveBrowserContext( True )
-		self._world.registerBrowserContext( self._browserContext )
-		
+		self._browserContext = world.getBrowserContext()
+
 		def _createCommandConsole(presentationComponent):
-			return CommandConsole( self._browserContext, presentationComponent )
+			return CommandConsole( self.getBrowserContext(), presentationComponent )
 		
 		self._createCommandConsole = _createCommandConsole
 
 		self._appState = world.getAppStateSubject().getFocus()
-		self._browserContext.registerMainSubject( world.getAppStateSubject() )
-		
+
 		self._rootWindow = Window( self, self._createCommandConsole, location )
 		self._rootWindow.setCloseRequestListener( self._onWindowCloseRequest )
 		self._openWindows = set( [ self._rootWindow ] )
@@ -50,7 +46,7 @@ class WindowManager (object):
 
 		
 	def getBrowserContext(self):
-		return self._browserContext
+		return self._world.getBrowserContext()
 	
 	
 	def setCloseLastWindowListener(self, listener):

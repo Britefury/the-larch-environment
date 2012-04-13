@@ -44,8 +44,6 @@ public class CommandBar
 					presentation.grabFocus();
 					popup.closePopup();
 					popup = null;
-					//commandBarArea.setVisible( false );
-					//view.getComponent().getRootElement().closeContainingPopupChain();
 				}
 				return true;
 			}
@@ -93,8 +91,8 @@ public class CommandBar
 	}
 	
 	
-	public void setPage(BrowserPage page)
+	public void pageChanged(BrowserPage page)
 	{
-		console.setPage( page );
+		console.pageChanged( page );
 	}
 }

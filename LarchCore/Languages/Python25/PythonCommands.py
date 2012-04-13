@@ -20,7 +20,7 @@ def _makeInsertEmbeddedObjectAtCaretAction(valueAtCaretFactory, embedFn, insertS
 	valueAtCaretFactory - function( caret )  ->  value
 	embedFn - function( value )  ->  AST node
 	"""
-	def _action(context):
+	def _action(context, pageController):
 		element = context
 		rootElement = element.getRootElement()
 
@@ -65,7 +65,7 @@ def _makeWrapSelectionInEmbeddedObjectAction(getSelectedNodeFn, valueAtSelection
 	valueAtSelectionFactory - function( selected_node, selection )  ->  value
 	embedFn - function( value )  ->  AST node
 	"""
-	def _action(context):
+	def _action(context, pageController):
 		element = context
 		rootElement = element.getRootElement()
 		
@@ -119,7 +119,7 @@ def WrapSelectedStatementRangeInEmbeddedObjectAction(valueAtSelectionFactory):
 	valueAtSelectionFactory - function( statements, selection )  ->  value
 	embedFn - function( value )  ->  AST node
 	"""
-	def _action(context):
+	def _action(context, pageController):
 		element = context
 		rootElement = element.getRootElement()
 		
@@ -143,9 +143,9 @@ def WrapSelectedStatementRangeInEmbeddedObjectAction(valueAtSelectionFactory):
 
 
 def chainActions(*actions):
-	def _action(context):
+	def _action(context, pageController):
 		for action in actions:
-			if action( context ):
+			if action( context, pageController ):
 				return True
 		return False
 	return _action
