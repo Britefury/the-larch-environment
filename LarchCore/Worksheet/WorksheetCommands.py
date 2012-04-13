@@ -23,7 +23,7 @@ def InlineEmbeddedObjectAtCaretAction(valueAtCaretFactory):
 	valueAtCaretFactory - function( caret )  ->  value
 	embedFn - function( value )  ->  AST node
 	"""
-	def _action(context):
+	def _action(context, pageController):
 		element = context
 		rootElement = element.getRootElement()
 
@@ -46,7 +46,7 @@ def ParagraphEmbeddedObjectAtCaretAction(valueAtCaretFactory):
 	valueAtCaretFactory - function( caret )  ->  value
 	embedFn - function( value )  ->  AST node
 	"""
-	def _action(context):
+	def _action(context, pageController):
 		element = context
 		rootElement = element.getRootElement()
 
@@ -67,9 +67,9 @@ def ParagraphEmbeddedObjectAtCaretAction(valueAtCaretFactory):
 
 
 def chainActions(*actions):
-	def _action(context):
+	def _action(context, pageController):
 		for action in actions:
-			if action( context ):
+			if action( context, pageController ):
 				return True
 		return False
 	return _action

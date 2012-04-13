@@ -504,15 +504,22 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 	//
 	//
 	
-	public Object[] getVisibilityCulledBranchAndLeafLists(AABox2 localBox)
+	private final static Iterable<LSContainer> noContainers = Arrays.asList( new LSContainer[] {} );
+	private final static Iterable<LSElement> noLeaves = Arrays.asList( new LSElement[] {} );
+	
+	public Iterable<?>[] getVisibilityCulledBranchAndLeafLists(AABox2 localBox)
 	{
 		refreshSubtree();
 		
 		int range[] = getVisibilityCullingRange( localBox );
 		final int rangeStart = range[0], rangeEnd = range[1]; 
-		if ( rangeStart == 0  &&  rangeEnd == leaves.length )
+		if ( rangeStart == -1  ||  rangeEnd == -1 )
 		{
-			return new Object[] { getBranches(), getLeaves() };
+			return new Iterable<?>[] { noContainers, noLeaves };
+		}
+		else if ( rangeStart == 0  &&  rangeEnd == leaves.length )
+		{
+			return new Iterable<?>[] { getBranches(), getLeaves() };
 		}
 		else
 		{
@@ -525,7 +532,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 				}
 			};
 			Iterable<LSElement> culledLeaves = getLeaves().subList( rangeStart, rangeEnd );
-			return new Object[] { culledBranches, culledLeaves };
+			return new Iterable<?>[] { culledBranches, culledLeaves };
 		}
 	}
 	

@@ -29,11 +29,25 @@ public class LayoutNodeViewport extends ArrangedLayoutNode
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		LSViewport viewport = (LSViewport)element;
 		LSElement child = viewport.getChild();
-		if ( child != null )
+		if ( viewport.getXRange() != null )
 		{
-			child.getLayoutNode().refreshRequisitionX();
+			if ( child != null )
+			{
+				child.getLayoutNode().refreshRequisitionX();
+			}
+			layoutReqBox.setRequisitionX( 0.0, 0.0 );
 		}
-		layoutReqBox.setRequisitionX( 0.0, 0.0 );
+		else
+		{
+			if ( child != null )
+			{
+				layoutReqBox.setRequisitionX( child.getLayoutNode().refreshRequisitionX() );
+			}
+			else
+			{
+				layoutReqBox.clearRequisitionX();
+			}
+		}
 	}
 
 	protected void updateRequisitionY()
@@ -41,11 +55,25 @@ public class LayoutNodeViewport extends ArrangedLayoutNode
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		LSViewport viewport = (LSViewport)element;
 		LSElement child = viewport.getChild();
-		if ( child != null )
+		if ( viewport.getYRange() != null )
 		{
-			child.getLayoutNode().refreshRequisitionY();
+			if ( child != null )
+			{
+				child.getLayoutNode().refreshRequisitionY();
+			}
+			layoutReqBox.setRequisitionY( 0.0, 0.0 );
 		}
-		layoutReqBox.setRequisitionY( 0.0, 0.0 );
+		else
+		{
+			if ( child != null )
+			{
+				layoutReqBox.setRequisitionY( child.getLayoutNode().refreshRequisitionY() );
+			}
+			else
+			{
+				layoutReqBox.clearRequisitionY();
+			}
+		}
 	}
 	
 	

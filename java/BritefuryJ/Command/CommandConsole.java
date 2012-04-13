@@ -58,7 +58,7 @@ public class CommandConsole extends AbstractCommandConsole
 				BoundCommand cmd = cmdSet.getCommandForKeyPressed( event );
 				if ( cmd != null )
 				{
-					cmd.execute();
+					cmd.execute( presentation.getRootElement().getPageController() );
 					return true;
 				}
 			}
@@ -311,7 +311,7 @@ public class CommandConsole extends AbstractCommandConsole
 	}
 	
 	@Override
-	public void setPage(BrowserPage page)
+	public void pageChanged(BrowserPage page)
 	{
 		this.page = page;
 	}
@@ -405,7 +405,7 @@ public class CommandConsole extends AbstractCommandConsole
 						Throwable error = null;
 						try
 						{
-							cmd.execute();
+							cmd.execute( presentation.getRootElement().getPageController() );
 						}
 						catch (Throwable t)
 						{

@@ -11,20 +11,40 @@ import BritefuryJ.LSpace.StyleParams.ContainerStyleParams;
 
 public class LSSpaceBin extends LSBin
 {
-	private double minWidth, minHeight;
+	protected final static int FLAGS_SPACEBIN_START = FLAGS_BIN_END;
+	
+	protected final static int FLAG_MAX_SIZE = FLAGS_SPACEBIN_START * 0x1;
+	
+	protected final static int FLAGS_SPACEBIN_END = FLAGS_SPACEBIN_START << 1;
+	
+
+	
+	private double width, height;
 	
 	
-	public LSSpaceBin(double minWidth, double minHeight)
+	public LSSpaceBin(double width, double height)
 	{
-		this( ContainerStyleParams.defaultStyleParams, minWidth, minHeight );
+		this( ContainerStyleParams.defaultStyleParams, width, height, false );
 	}
 	
-	public LSSpaceBin(ContainerStyleParams styleParams, double minWidth, double minHeight)
+	public LSSpaceBin(double width, double height, boolean maxSize)
+	{
+		this( ContainerStyleParams.defaultStyleParams, width, height, maxSize );
+	}
+	
+	public LSSpaceBin(ContainerStyleParams styleParams, double width, double height)
+	{
+		this( styleParams, width, height, false );
+	}
+	
+	public LSSpaceBin(ContainerStyleParams styleParams, double width, double height, boolean maxSize)
 	{
 		super( styleParams );
 		
-		this.minWidth = minWidth;
-		this.minHeight = minHeight;
+		this.width = width;
+		this.height = height;
+		
+		setFlagValue( FLAG_MAX_SIZE, maxSize );
 		
 		layoutNode = new LayoutNodeSpaceBin( this );
 	}
@@ -37,13 +57,19 @@ public class LSSpaceBin extends LSBin
 	//
 	//
 	
-	public double getMinWidth()
+	public double getWidth()
 	{
-		return minWidth;
+		return width;
 	}
 	
-	public double getMinHeight()
+	public double getHeight()
 	{
-		return minHeight;
+		return height;
+	}
+	
+	
+	public boolean isMaxSize()
+	{
+		return testFlag( FLAG_MAX_SIZE );
 	}
 }

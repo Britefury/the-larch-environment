@@ -15,8 +15,8 @@ from LarchCore.MainApp import Application
 def newAppState():
 	return Application.AppState()
 
-def newAppStateSubject(world):
-	return MainAppSubject( newAppState(), world, Location( 'main' ) )
+def newAppStateSubject(world, appState):
+	return MainAppSubject( appState, world, Location( 'main' ) )
 
 
 

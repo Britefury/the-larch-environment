@@ -18,13 +18,20 @@ public class SpaceBin extends Pres
 {
 	private Pres child;
 	private double minWidth, minHeight;
+	private boolean maxSize;
 	
 	
-	public SpaceBin(double minWidth, double minHeight, Object child)
+	public SpaceBin(double minWidth, double minHeight, boolean maxSize, Object child)
 	{
 		this.child = coerce( child );
 		this.minWidth = minWidth;
 		this.minHeight = minHeight;
+		this.maxSize = maxSize;
+	}
+	
+	public SpaceBin(double minWidth, double minHeight, Object child)
+	{
+		this( minWidth, minHeight, false, child );
 	}
 	
 
@@ -32,7 +39,7 @@ public class SpaceBin extends Pres
 	@Override
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		LSSpaceBin bin = new LSSpaceBin( Primitive.containerParams.get( style ), minWidth, minHeight );
+		LSSpaceBin bin = new LSSpaceBin( Primitive.containerParams.get( style ), minWidth, minHeight, maxSize );
 		StyleValues childStyle = Primitive.useContainerParams.get( style );
 		bin.setChild( child.present( ctx, childStyle ).layoutWrap( childStyle.get( Primitive.hAlign, HAlignment.class ), childStyle.get( Primitive.vAlign, VAlignment.class ) ) );
 		return bin;

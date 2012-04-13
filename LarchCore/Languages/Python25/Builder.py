@@ -138,30 +138,33 @@ class Literal (Expr):
 
 
 class StrLit (Literal):
-	def __init__(self, value, format='ascii', quotation='single'):
-		self.value = value
+	def __init__(self, value, format=None, quotation='single'):
+		if format is None:
+			format = 'unicode'   if isinstance( value, unicode )   else 'ascii'
+		self.valueString = repr( value )[1:-1]
 		self.format = format
 		self.quotation = quotation
 	
 	def build(self):
-		r = repr( self.value )
-		try:
-			start = r.index( '\'' )
-		except ValueError:
-			start = r.index( "\"" )
-		r = r[start+1:-1]
-		return Py.StringLiteral( value=r, format=self.format, quotation=self.quotation )
+		return Py.StringLiteral( value=self.valueString, format=self.format, quotation=self.quotation )
 
 	
 	
 class IntLit (Literal):
-	def __init__(self, value, numType='int', format='decimal'):
-		self.value = value
+	def __init__(self, value, numType=None, format='decimal'):
+		if numType is None:
+			numType = 'long'   if isinstance( value, long )   else 'int'
+		if format == 'hex':
+			self.valueString = '%x' % value
+		elif format == 'decimal':
+			self.valueString = str(value)
+		else:
+			self.valueString = str(value)
 		self.numType = numType
 		self.format = format
 		
 	def build(self):
-		return Py.IntLiteral( value=repr( self.value ), format=self.format, numType=self.numType )
+		return Py.IntLiteral( value=self.valueString, format=self.format, numType=self.numType )
 
 
 class FloatLit (Literal):
@@ -219,4 +222,47 @@ class ListLit (Expr):
 	def build(self):
 		return Py.ListLiteral( values=[ x.build()   for x in self.xs ] )
 
+
+
+import unittest
+
+class TestCase_Builder (unittest.TestCase):
+	def _buildTest(self, expected, builder):
+		result = builder.build()
+		self.assertEquals( expected, result )
+
+
+	def test_TargetBuilt(self):
+		self._buildTest( Py.SingleTarget( name='t' ), TargetBuilt( Py.SingleTarget( name='t' ) ) )
+
+	def test_SingleTarget(self):
+		self._buildTest( Py.SingleTarget( name='t' ), SingleTarget( 't' ) )
+
+	def test_TupleTarget(self):
+		self._buildTest( Py.TupleTarget( targets=[ Py.SingleTarget( name='t' ), Py.SingleTarget( name='v' ) ] ), TupleTarget( [ SingleTarget( 't' ), SingleTarget( 'v' ) ] ) )
+
+	def test_ListTarget(self):
+		self._buildTest( Py.ListTarget( targets=[ Py.SingleTarget( name='t' ), Py.SingleTarget( name='v' ) ] ), ListTarget( [ SingleTarget( 't' ), SingleTarget( 'v' ) ] ) )
+
+	def test_Target_coerce(self):
+		t = SingleTarget( 't' )
+		self.assert_( t is Target.coerce( t ) )
+		self._buildTest( Py.SingleTarget( name='t' ), Target.coerce( Embedded.EmbeddedPython25Target( Py.PythonTarget( target=Py.SingleTarget( name='t' ) ) ) ) )
+		self._buildTest( Py.SingleTarget( name='t' ), Target.coerce( Py.SingleTarget( name='t' ) ) )
+		self._buildTest( Py.TupleTarget( targets=[ Py.SingleTarget( name='t' ), Py.SingleTarget( name='v' ) ] ), Target.coerce( ( Py.SingleTarget( name='t' ), Py.SingleTarget( name='v' ) ) ) )
+		self._buildTest( Py.ListTarget( targets=[ Py.SingleTarget( name='t' ), Py.SingleTarget( name='v' ) ] ), Target.coerce( [ Py.SingleTarget( name='t' ), Py.SingleTarget( name='v' ) ] ) )
+
+
+	def test_ExprBuilt(self):
+		self._buildTest( Py.Load( name='x' ), ExprBuilt( Py.Load( name='x' ) ) )
+
+	def test_StrLit(self):
+		self._buildTest( Py.StringLiteral( value='abc\\n', format='ascii', quotation='single' ), StrLit( 'abc\n' ) )
+		self._buildTest( Py.StringLiteral( value='abc\'\\n', format='ascii', quotation='single' ), StrLit( 'abc\'\n' ) )
+		self._buildTest( Py.StringLiteral( value='abc\\n', format='unicode', quotation='double' ), StrLit( 'abc\n', format='unicode', quotation='double' ) )
+
+	def test_IntLit(self):
+		self._buildTest( Py.IntLiteral( value='123', numType='int', format='decimal' ), IntLit( 123 ) )
+		self._buildTest( Py.IntLiteral( value='123', numType='long', format='decimal' ), IntLit( 123L ) )
+		self._buildTest( Py.IntLiteral( value='40', numType='int', format='hex' ), IntLit( 64, format='hex' ) )
 

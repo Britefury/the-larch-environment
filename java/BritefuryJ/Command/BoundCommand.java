@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.Command;
 
+import BritefuryJ.LSpace.PageController;
+
 public class BoundCommand
 {
 	private Command command;
@@ -26,8 +28,8 @@ public class BoundCommand
 	}
 
 
-	protected void execute()
+	protected void execute(PageController pageController)
 	{
-		command.action.commandAction( binding );
+		command.action.commandAction( binding, pageController );
 	}
 }

@@ -554,10 +554,17 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 			lineEndIndex = -( lineEndIndex + 1 );
 		}
 		
-		int rangeStart = lines[lineStartIndex].getRangeStart();
-		int rangeEnd = lines[lineEndIndex - 1].getRangeEnd();
-		
-		return new int[] { rangeStart, rangeEnd };
+		if ( lineStartIndex >= lines.length  ||  lineEndIndex <= 0 )
+		{
+			return new int[] { -1, -1 };
+		}
+		else
+		{
+			int rangeStart = lines[lineStartIndex].getRangeStart();
+			int rangeEnd = lines[lineEndIndex - 1].getRangeEnd();
+			
+			return new int[] { rangeStart, rangeEnd };
+		}
 	}
 	
 	

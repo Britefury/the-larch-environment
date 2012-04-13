@@ -687,7 +687,7 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 	}
 	
 	
-	protected Shape[] getShapes()
+	public Shape[] getShapes()
 	{
 		Vector2 size = getActualSize();
 		return new Shape[] { new Rectangle2D.Double( 0.0, 0.0, size.x, size.y ) };

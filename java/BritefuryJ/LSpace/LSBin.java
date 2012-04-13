@@ -15,6 +15,9 @@ import BritefuryJ.LSpace.StyleParams.ContainerStyleParams;
 
 public class LSBin extends LSContainerNonOverlayed
 {
+	protected final static int FLAGS_BIN_END = FLAGS_CONTAINERNONOVERLAYED_END;
+
+	
 	public LSBin()
 	{
 		this( ContainerStyleParams.defaultStyleParams );

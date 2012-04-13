@@ -122,7 +122,7 @@ public class LSProxy extends LSContainerNonOverlayed
 		}
 	}
 	
-	protected Shape[] getShapes()
+	public Shape[] getShapes()
 	{
 		AABox2 bounds[] = computeBoundingBoxes();
 		Shape shapes[] = new Shape[bounds.length];

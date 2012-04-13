@@ -31,7 +31,7 @@ from LarchCore.Project.ProjectEditor.ModuleFinder import RootFinder, PackageFind
 
 
 
-def _save(subject):
+def _save(subject, pageController):
 	document = subject._document
 	if document.hasFilename():
 		document.save()
@@ -42,7 +42,7 @@ def _save(subject):
 		DocumentManagement.promptSaveDocumentAs( subject.getSubjectContext()['world'], None, handleSaveDocumentAsFn )
 
 
-def _saveAs(subject):
+def _saveAs(subject, pageController):
 	document = subject._document
 	def handleSaveDocumentAsFn(filename):
 		document.saveAs( filename )
@@ -50,7 +50,7 @@ def _saveAs(subject):
 	DocumentManagement.promptSaveDocumentAs( subject.getSubjectContext()['world'], None, handleSaveDocumentAsFn )
 
 
-def _reset(subject):
+def _reset(subject, pageController):
 	document = subject._document
 	modules = document.unloadAllImportedModules()
 	print 'LarchCore.Project.ProjectEditor.Subject: unloaded modules:'

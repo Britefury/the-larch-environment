@@ -29,7 +29,7 @@ public class CommandSetRegistry implements CommandSetSource
 			Command cmd = shortcuts.getCommandForKeyPressed( event );
 			if ( cmd != null )
 			{
-				cmd.bindTo( element ).execute();
+				cmd.bindTo( element ).execute( element.getRootElement().getPageController() );
 				return true;
 			}
 			return false;

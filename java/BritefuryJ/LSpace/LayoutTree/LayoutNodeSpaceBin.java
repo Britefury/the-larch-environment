@@ -23,14 +23,23 @@ public class LayoutNodeSpaceBin extends LayoutNodeBin
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		LSSpaceBin spacer = (LSSpaceBin)element;
 		LSElement child = spacer.getChild();
-		double minWidth = spacer.getMinWidth();
+		double width = spacer.getWidth();
 		if ( child != null )
 		{
 			LReqBoxInterface c = child.getLayoutNode().refreshRequisitionX();
-			if ( minWidth >= 0.0 )
+			if ( width >= 0.0 )
 			{
 				child.getLayoutNode().refreshRequisitionX();
-				layoutReqBox.setRequisitionX( Math.max( minWidth, c.getReqMinWidth() ), Math.max( minWidth, c.getReqMinHAdvance() ), c.getReqPrefWidth(), c.getReqPrefHAdvance() );
+				if ( spacer.isMaxSize() )
+				{
+					layoutReqBox.setRequisitionX( Math.min( width, c.getReqMinWidth() ), Math.min( width, c.getReqPrefWidth() ),
+							Math.min( width, c.getReqMinHAdvance() ), Math.min( width, c.getReqPrefHAdvance() ) );
+				}
+				else
+				{
+					layoutReqBox.setRequisitionX( Math.max( width, c.getReqMinWidth() ), Math.max( width, c.getReqPrefWidth() ),
+							Math.max( width, c.getReqMinHAdvance() ), Math.max( width, c.getReqPrefHAdvance() ) );
+				}
 			}
 			else
 			{
@@ -39,8 +48,11 @@ public class LayoutNodeSpaceBin extends LayoutNodeBin
 		}
 		else
 		{
-			minWidth = Math.max( minWidth, 0.0 );
-			layoutReqBox.setRequisitionX( minWidth, minWidth );
+			if ( !spacer.isMaxSize() )
+			{
+				width = Math.max( width, 0.0 );
+				layoutReqBox.setRequisitionX( width, width );
+			}
 		}
 	}
 
@@ -49,20 +61,36 @@ public class LayoutNodeSpaceBin extends LayoutNodeBin
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		LSSpaceBin spacer = (LSSpaceBin)element;
 		LSElement child = spacer.getChild();
-		double minHeight = spacer.getMinHeight();
+		double height = spacer.getHeight();
 		if ( child != null )
 		{
 			LReqBoxInterface c = child.getLayoutNode().refreshRequisitionY();
-			if ( minHeight >= 0.0 )
+			if ( height >= 0.0 )
 			{
 				child.getLayoutNode().refreshRequisitionY();
-				if ( minHeight > c.getReqHeight() )
+				if ( spacer.isMaxSize() )
 				{
-					layoutReqBox.setRequisitionY( minHeight, 0.0 );
+					if ( height < c.getReqHeight() )
+					{
+						double halfPadding = ( height - c.getReqHeight() ) * 0.5;
+						layoutReqBox.setRequisitionY( height, c.getReqVSpacing(), c.getReqRefY() + halfPadding );
+					}
+					else
+					{
+						layoutReqBox.setRequisitionY( c.getReqHeight(), c.getReqVSpacing(), c.getReqRefY() );
+					}
 				}
 				else
 				{
-					layoutReqBox.setRequisitionY( c.getReqHeight(), c.getReqVSpacing(), c.getReqRefY() );
+					if ( height > c.getReqHeight() )
+					{
+						double halfPadding = ( height - c.getReqHeight() ) * 0.5;
+						layoutReqBox.setRequisitionY( height, c.getReqVSpacing(), c.getReqRefY() + halfPadding );
+					}
+					else
+					{
+						layoutReqBox.setRequisitionY( c.getReqHeight(), c.getReqVSpacing(), c.getReqRefY() );
+					}
 				}
 			}
 			else
@@ -72,8 +100,11 @@ public class LayoutNodeSpaceBin extends LayoutNodeBin
 		}
 		else
 		{
-			minHeight = Math.max( minHeight, 0.0 );
-			layoutReqBox.setRequisitionY( minHeight, 0.0 );
+			if ( !spacer.isMaxSize() )
+			{
+				height = Math.max( height, 0.0 );
+				layoutReqBox.setRequisitionY( height, 0.0 );
+			}
 		}
 	}
 }

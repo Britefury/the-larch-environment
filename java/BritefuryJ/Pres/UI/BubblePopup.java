@@ -10,6 +10,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.Point;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
@@ -39,19 +40,32 @@ public class BubblePopup
 		RIGHT,
 	}
 	
-	private static class BubblePainter implements ElementPainter
+	private static abstract class AbstractBubblePainter implements ElementPainter
 	{
-		private LSElement targetElement;
+		protected static class ArrowLocation
+		{
+			public ArrowEdge arrowEdge;
+			public Point2 arrowPos;
+			
+			public ArrowLocation(ArrowEdge arrowEdge, Point2 arrowPos)
+			{
+				this.arrowPos = arrowPos;
+				this.arrowEdge = arrowEdge;
+			}
+		}
+		
 		private double radius, arrowLength, arrowWidth;
 		
 		
-		private BubblePainter(LSElement targetElement, double radius, double arrowLength, double arrowWidth)
+		private AbstractBubblePainter(double radius, double arrowLength, double arrowWidth)
 		{
-			this.targetElement = targetElement;
 			this.radius = radius;
 			this.arrowLength = arrowLength;
 			this.arrowWidth = arrowWidth;
 		}
+		
+		
+		protected abstract ArrowLocation computeArrowLocation(LSElement element);
 		
 		
 		@Override
@@ -67,6 +81,179 @@ public class BubblePopup
 			Vector2 size = element.getAllocSize();
 
 			Point2 posOnScreen = element.getLocalPointRelativeToScreen( new Point2() );
+			
+			ArrowLocation arrowLoc = computeArrowLocation( element );
+
+			double bubblePosX = arrowLength;
+			double bubblePosY = arrowLength;
+					
+			double bubbleWidth = size.x - arrowLength * 2.0;
+			double bubbleHeight = size.y - arrowLength * 2.0;
+
+			Point2 relativeArrowPos = null;
+			if ( arrowLoc.arrowPos != null )
+			{
+				relativeArrowPos = new Point2( arrowLoc.arrowPos.x - posOnScreen.x - bubblePosX, arrowLoc.arrowPos.y - posOnScreen.y - bubblePosY );
+			}
+			
+			// PATH GOES COUNTER-CLOCKWISE
+			Path2D.Double path = new Path2D.Double();
+			
+			// Compute what is at each corner
+			boolean arrowAtTopLeft = arrowLoc.arrowEdge == ArrowEdge.LEFT && relativeArrowPos.y < cornerOverlapThreshhold  ||
+					arrowLoc.arrowEdge == ArrowEdge.TOP && relativeArrowPos.x < cornerOverlapThreshhold;
+			boolean arrowAtTopRight = arrowLoc.arrowEdge == ArrowEdge.RIGHT && relativeArrowPos.y < cornerOverlapThreshhold  ||
+					arrowLoc.arrowEdge == ArrowEdge.TOP && relativeArrowPos.x > ( bubbleWidth - cornerOverlapThreshhold );
+			boolean arrowAtBottomLeft = arrowLoc.arrowEdge == ArrowEdge.LEFT && relativeArrowPos.y > ( bubbleHeight - cornerOverlapThreshhold )  ||
+					arrowLoc.arrowEdge == ArrowEdge.BOTTOM && relativeArrowPos.x < cornerOverlapThreshhold;
+			boolean arrowAtBottomRight = arrowLoc.arrowEdge == ArrowEdge.RIGHT && relativeArrowPos.y > ( bubbleHeight - cornerOverlapThreshhold )  ||
+					arrowLoc.arrowEdge == ArrowEdge.BOTTOM && relativeArrowPos.x > ( bubbleWidth - cornerOverlapThreshhold );
+
+			
+			// Top left corner
+			if ( arrowAtTopLeft )
+			{
+				// Arrow at corner
+				path.moveTo( bubblePosX + arrowWidth * 0.5, bubblePosY );
+				path.lineTo( 0.0, 0.0 );
+				path.lineTo( bubblePosX, bubblePosY + arrowWidth * 0.5 );
+			}
+			else
+			{
+				// Round corner
+				path.append( new Arc2D.Double( bubblePosX, bubblePosY, radius, radius, 90.0, 90.0, Arc2D.OPEN ), false );
+			}
+			
+			
+			// Left edge
+			if ( !arrowAtTopLeft  &&  !arrowAtBottomLeft  &&  arrowLoc.arrowEdge == ArrowEdge.LEFT )
+			{
+				path.lineTo( bubblePosX, bubblePosY + relativeArrowPos.y - arrowWidth * 0.5 );
+				path.lineTo( 0.0, bubblePosY + relativeArrowPos.y );
+				path.lineTo( bubblePosX, bubblePosY + relativeArrowPos.y + arrowWidth * 0.5 );
+			}
+			
+			
+			// Bottom left corner
+			if ( arrowAtBottomLeft )
+			{
+				// Arrow at corner
+				path.lineTo( bubblePosX, bubblePosY + bubbleHeight - arrowWidth * 0.5 );
+				path.lineTo( 0.0, size.y );
+				path.lineTo( bubblePosX + arrowWidth * 0.5, bubblePosY + bubbleHeight );
+			}
+			else
+			{
+				// Round corner
+				path.append( new Arc2D.Double( bubblePosX, bubblePosY + bubbleHeight - radius, radius, radius, 180.0, 90.0, Arc2D.OPEN ), true );
+			}
+			
+			
+			// Bottom edge
+			if ( !arrowAtBottomLeft  &&  !arrowAtBottomRight  &&  arrowLoc.arrowEdge == ArrowEdge.BOTTOM )
+			{
+				path.lineTo( bubblePosX + relativeArrowPos.x - arrowWidth * 0.5, bubblePosY + bubbleHeight );
+				path.lineTo( bubblePosX + relativeArrowPos.x, size.y );
+				path.lineTo( bubblePosX + relativeArrowPos.x + arrowWidth * 0.5, bubblePosY + bubbleHeight );
+			}
+			
+			
+			// Bottom right corner
+			if ( arrowAtBottomRight )
+			{
+				// Arrow at corner
+				path.lineTo( bubblePosX + bubbleWidth - arrowWidth * 0.5, bubblePosY + bubbleHeight );
+				path.lineTo( size.x, size.y );
+				path.lineTo( bubblePosX + bubbleWidth, bubblePosY + bubbleHeight - arrowWidth * 0.5 );
+			}
+			else
+			{
+				// Round corner
+				path.append( new Arc2D.Double( bubblePosX + bubbleWidth - radius, bubblePosY + bubbleHeight - radius, radius, radius, 270.0, 90.0, Arc2D.OPEN ), true );
+			}
+			
+			
+			// Right edge
+			if ( !arrowAtBottomRight  &&  !arrowAtTopRight  &&  arrowLoc.arrowEdge == ArrowEdge.RIGHT )
+			{
+				path.lineTo( bubblePosX + bubbleWidth, bubblePosY + relativeArrowPos.y + arrowWidth * 0.5 );
+				path.lineTo( size.x, bubblePosY + relativeArrowPos.y );
+				path.lineTo( bubblePosX + bubbleWidth, bubblePosY + relativeArrowPos.y - arrowWidth * 0.5 );
+			}
+			
+			
+			// Top right corner
+			if ( arrowAtTopRight )
+			{
+				// Arrow at corner
+				path.lineTo( bubblePosX + bubbleWidth, bubblePosY + arrowWidth * 0.5 );
+				path.lineTo( size.x, 0.0 );
+				path.lineTo( bubblePosX + bubbleWidth - arrowWidth * 0.5, bubblePosY );
+			}
+			else
+			{
+				// Round corner
+				path.append( new Arc2D.Double( bubblePosX + bubbleWidth - radius, bubblePosY, radius, radius, 0.0, 90.0, Arc2D.OPEN ), true );
+			}
+			
+			
+			// Top edge
+			if ( !arrowAtTopRight  &&  !arrowAtTopLeft  &&  arrowLoc.arrowEdge == ArrowEdge.TOP )
+			{
+				path.lineTo( bubblePosX + relativeArrowPos.x + arrowWidth * 0.5, bubblePosY );
+				path.lineTo( bubblePosX + relativeArrowPos.x, 0.0 );
+				path.lineTo( bubblePosX + relativeArrowPos.x - arrowWidth * 0.5, bubblePosY );
+			}
+			
+			path.closePath();
+			
+			
+			graphics.setPaint( Color.WHITE );
+			graphics.fill( path );
+			
+			graphics.clip( path );
+			
+			graphics.setPaint( new Color( 0.75f, 0.75f, 0.75f ) );
+			graphics.setStroke( new BasicStroke( 2.0f ) );
+			
+			graphics.translate( 0.0, 1.0 );
+			graphics.draw( path );
+			
+			graphics.setTransform( t );
+			graphics.setClip( c );
+			
+			graphics.setPaint( new Color( 0.5f, 0.5f, 0.5f ) );
+			graphics.setStroke( new BasicStroke( 1.0f ) );
+			
+			graphics.draw( path );
+			
+			graphics.setPaint( p );
+			graphics.setStroke( s );
+		}
+
+		@Override
+		public void draw(LSElement element, Graphics2D graphics)
+		{
+		}
+	}
+	
+	
+	
+	private static class ElementBubblePainter extends AbstractBubblePainter
+	{
+		private LSElement targetElement;
+		
+		
+		private ElementBubblePainter(LSElement targetElement, double radius, double arrowLength, double arrowWidth)
+		{
+			super( radius, arrowLength, arrowWidth );
+			this.targetElement = targetElement;
+		}
+		
+		
+		@Override
+		protected ArrowLocation computeArrowLocation(LSElement element)
+		{
 			AABox2 popupAABoxScreen = element.getAABoxRelativeToScreen();
 
 			ArrowEdge arrowEdge;
@@ -127,168 +314,76 @@ public class BubblePopup
 				arrowPos = null;
 			}
 			
-
-			double bubblePosX = arrowLength;
-			double bubblePosY = arrowLength;
-					
-			double bubbleWidth = size.x - arrowLength * 2.0;
-			double bubbleHeight = size.y - arrowLength * 2.0;
-
-			Point2 relativeArrowPos = null;
-			if ( arrowPos != null )
-			{
-				relativeArrowPos = new Point2( arrowPos.x - posOnScreen.x - bubblePosX, arrowPos.y - posOnScreen.y - bubblePosY );
-			}
-			
-			// PATH GOES COUNTER-CLOCKWISE
-			Path2D.Double path = new Path2D.Double();
-			
-			// Compute what is at each corner
-			boolean arrowAtTopLeft = arrowEdge == ArrowEdge.LEFT && relativeArrowPos.y < cornerOverlapThreshhold  ||
-					arrowEdge == ArrowEdge.TOP && relativeArrowPos.x < cornerOverlapThreshhold;
-			boolean arrowAtTopRight = arrowEdge == ArrowEdge.RIGHT && relativeArrowPos.y < cornerOverlapThreshhold  ||
-					arrowEdge == ArrowEdge.TOP && relativeArrowPos.x > ( bubbleWidth - cornerOverlapThreshhold );
-			boolean arrowAtBottomLeft = arrowEdge == ArrowEdge.LEFT && relativeArrowPos.y > ( bubbleHeight - cornerOverlapThreshhold )  ||
-					arrowEdge == ArrowEdge.BOTTOM && relativeArrowPos.x < cornerOverlapThreshhold;
-			boolean arrowAtBottomRight = arrowEdge == ArrowEdge.RIGHT && relativeArrowPos.y > ( bubbleHeight - cornerOverlapThreshhold )  ||
-					arrowEdge == ArrowEdge.BOTTOM && relativeArrowPos.x > ( bubbleWidth - cornerOverlapThreshhold );
-
-			
-			// Top left corner
-			if ( arrowAtTopLeft )
-			{
-				// Arrow at corner
-				path.moveTo( bubblePosX + arrowWidth * 0.5, bubblePosY );
-				path.lineTo( 0.0, 0.0 );
-				path.lineTo( bubblePosX, bubblePosY + arrowWidth * 0.5 );
-			}
-			else
-			{
-				// Round corner
-				path.append( new Arc2D.Double( bubblePosX, bubblePosY, radius, radius, 90.0, 90.0, Arc2D.OPEN ), false );
-			}
-			
-			
-			// Left edge
-			if ( !arrowAtTopLeft  &&  !arrowAtBottomLeft  &&  arrowEdge == ArrowEdge.LEFT )
-			{
-				path.lineTo( bubblePosX, bubblePosY + relativeArrowPos.y - arrowWidth * 0.5 );
-				path.lineTo( 0.0, bubblePosY + relativeArrowPos.y );
-				path.lineTo( bubblePosX, bubblePosY + relativeArrowPos.y + arrowWidth * 0.5 );
-			}
-			
-			
-			// Bottom left corner
-			if ( arrowAtBottomLeft )
-			{
-				// Arrow at corner
-				path.lineTo( bubblePosX, bubblePosY + bubbleHeight - arrowWidth * 0.5 );
-				path.lineTo( 0.0, size.y );
-				path.lineTo( bubblePosX + arrowWidth * 0.5, bubblePosY + bubbleHeight );
-			}
-			else
-			{
-				// Round corner
-				path.append( new Arc2D.Double( bubblePosX, bubblePosY + bubbleHeight - radius, radius, radius, 180.0, 90.0, Arc2D.OPEN ), true );
-			}
-			
-			
-			// Bottom edge
-			if ( !arrowAtBottomLeft  &&  !arrowAtBottomRight  &&  arrowEdge == ArrowEdge.BOTTOM )
-			{
-				path.lineTo( bubblePosX + relativeArrowPos.x - arrowWidth * 0.5, bubblePosY + bubbleHeight );
-				path.lineTo( bubblePosX + relativeArrowPos.x, size.y );
-				path.lineTo( bubblePosX + relativeArrowPos.x + arrowWidth * 0.5, bubblePosY + bubbleHeight );
-			}
-			
-			
-			// Bottom right corner
-			if ( arrowAtBottomRight )
-			{
-				// Arrow at corner
-				path.lineTo( bubblePosX + bubbleWidth - arrowWidth * 0.5, bubblePosY + bubbleHeight );
-				path.lineTo( size.x, size.y );
-				path.lineTo( bubblePosX + bubbleWidth, bubblePosY + bubbleHeight - arrowWidth * 0.5 );
-			}
-			else
-			{
-				// Round corner
-				path.append( new Arc2D.Double( bubblePosX + bubbleWidth - radius, bubblePosY + bubbleHeight - radius, radius, radius, 270.0, 90.0, Arc2D.OPEN ), true );
-			}
-			
-			
-			// Right edge
-			if ( !arrowAtBottomRight  &&  !arrowAtTopRight  &&  arrowEdge == ArrowEdge.RIGHT )
-			{
-				path.lineTo( bubblePosX + bubbleWidth, bubblePosY + relativeArrowPos.y + arrowWidth * 0.5 );
-				path.lineTo( size.x, bubblePosY + relativeArrowPos.y );
-				path.lineTo( bubblePosX + bubbleWidth, bubblePosY + relativeArrowPos.y - arrowWidth * 0.5 );
-			}
-			
-			
-			// Top right corner
-			if ( arrowAtTopRight )
-			{
-				// Arrow at corner
-				path.lineTo( bubblePosX + bubbleWidth, bubblePosY + arrowWidth * 0.5 );
-				path.lineTo( size.x, 0.0 );
-				path.lineTo( bubblePosX + bubbleWidth - arrowWidth * 0.5, bubblePosY );
-			}
-			else
-			{
-				// Round corner
-				path.append( new Arc2D.Double( bubblePosX + bubbleWidth - radius, bubblePosY, radius, radius, 0.0, 90.0, Arc2D.OPEN ), true );
-			}
-			
-			
-			// Top edge
-			if ( !arrowAtTopRight  &&  !arrowAtTopLeft  &&  arrowEdge == ArrowEdge.TOP )
-			{
-				path.lineTo( bubblePosX + relativeArrowPos.x + arrowWidth * 0.5, bubblePosY );
-				path.lineTo( bubblePosX + relativeArrowPos.x, 0.0 );
-				path.lineTo( bubblePosX + relativeArrowPos.x - arrowWidth * 0.5, bubblePosY );
-			}
-			
-			path.closePath();
-			
-			
-			graphics.setPaint( Color.WHITE );
-			graphics.fill( path );
-			
-			graphics.clip( path );
-			
-			graphics.setPaint( new Color( 0.75f, 0.75f, 0.75f ) );
-			graphics.setStroke( new BasicStroke( 2.0f ) );
-			
-			graphics.translate( 0.0, 1.0 );
-			graphics.draw( path );
-			
-			graphics.setTransform( t );
-			graphics.setClip( c );
-			
-			graphics.setPaint( new Color( 0.5f, 0.5f, 0.5f ) );
-			graphics.setStroke( new BasicStroke( 1.0f ) );
-			
-			graphics.draw( path );
-			
-			graphics.setPaint( p );
-			graphics.setStroke( s );
-		}
-
-		@Override
-		public void draw(LSElement element, Graphics2D graphics)
-		{
+			return new ArrowLocation( arrowEdge, arrowPos );
 		}
 	}
 	
 	
 	
-	private static class BubblePres extends CompositePres
+	private static class MouseBubblePainter extends AbstractBubblePainter
+	{
+		private Point2 mousePos;
+		
+		
+		private MouseBubblePainter(Point2  mousePos, double radius, double arrowLength, double arrowWidth)
+		{
+			super( radius, arrowLength, arrowWidth );
+			this.mousePos = mousePos;
+		}
+		
+		
+		@Override
+		protected ArrowLocation computeArrowLocation(LSElement element)
+		{
+			AABox2 popupAABoxScreen = element.getAABoxRelativeToScreen();
+
+			ArrowEdge arrowEdge = null;
+			Point2 arrowPos = null;
+			
+			Point2 closestPointOnPopup = popupAABoxScreen.closestPointTo( mousePos );
+			arrowPos = closestPointOnPopup;
+			
+			// Determine which edge the arrow should come from
+			// First, get the distance to each edge
+			double left = Math.abs( closestPointOnPopup.x - popupAABoxScreen.getLowerX() );
+			double right = Math.abs( closestPointOnPopup.x - popupAABoxScreen.getUpperX() );
+			double top = Math.abs( closestPointOnPopup.y - popupAABoxScreen.getLowerY() );
+			double bottom = Math.abs( closestPointOnPopup.y - popupAABoxScreen.getUpperY() );
+			
+			// Determine which is closest
+			double d = left;
+			arrowEdge = ArrowEdge.LEFT;
+			
+			if ( right < d )
+			{
+				d = right;
+				arrowEdge = ArrowEdge.RIGHT;
+			}
+			
+			if ( top < d )
+			{
+				d = top;
+				arrowEdge = ArrowEdge.TOP;
+			}
+			
+			if ( bottom < d )
+			{
+				d = bottom;
+				arrowEdge = ArrowEdge.BOTTOM;
+			}
+			
+			return new ArrowLocation( arrowEdge, arrowPos );
+		}
+	}
+	
+	
+	
+	private static class ElementBubblePres extends CompositePres
 	{
 		private Pres contents;
 		private LSElement targetElement;
 		
-		private BubblePres(Object contents, LSElement targetElement)
+		private ElementBubblePres(Object contents, LSElement targetElement)
 		{
 			this.contents = Pres.coerce( contents );
 			this.targetElement = targetElement;
@@ -302,7 +397,35 @@ public class BubblePopup
 			double arrowLength = style.get( UI.bubblePopupArrowLength, double.class );
 			double arrowWidth = style.get( UI.bubblePopupArrowWidth, double.class );
 			
-			BubblePainter painter = new BubblePainter( targetElement, radius, arrowLength, arrowWidth );
+			ElementBubblePainter painter = new ElementBubblePainter( targetElement, radius, arrowLength, arrowWidth );
+			
+			double padding = border + arrowLength;
+			
+			return new Bin( contents.pad( padding, padding ) ).withPainter( painter );
+		}
+	}
+	
+	
+	private static class MouseBubblePres extends CompositePres
+	{
+		private Pres contents;
+		private Point2 mousePos;
+		
+		private MouseBubblePres(Object contents, Point2 mousePos)
+		{
+			this.contents = Pres.coerce( contents );
+			this.mousePos = mousePos;
+		}
+
+		@Override
+		public Pres pres(PresentationContext ctx, StyleValues style)
+		{
+			double border = style.get( UI.bubblePopupBorderWidth, double.class );
+			double radius = style.get( UI.bubblePopupCornerRadius, double.class );
+			double arrowLength = style.get( UI.bubblePopupArrowLength, double.class );
+			double arrowWidth = style.get( UI.bubblePopupArrowWidth, double.class );
+			
+			MouseBubblePainter painter = new MouseBubblePainter( mousePos, radius, arrowLength, arrowWidth );
 			
 			double padding = border + arrowLength;
 			
@@ -314,8 +437,19 @@ public class BubblePopup
 	
 	public static PresentationComponent.PresentationPopup popupInBubbleAdjacentTo(Object contents, LSElement target, Anchor targetAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		BubblePres b = new BubblePres( contents, target );
+		ElementBubblePres b = new ElementBubblePres( contents, target );
 		
 		return b.popup( target, targetAnchor, targetAnchor.opposite(), bCloseOnLoseFocus, bRequestFocus );
+	}
+
+	public static PresentationComponent.PresentationPopup popupInBubbleAdjacentToMouse(Object contents, LSElement target, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	{
+		PresentationComponent component = target.getRootElement().getComponent();
+		Point mouse = component.getMousePosition();
+		Point loc = component.getLocationOnScreen();
+		Point2 mousePos = new Point2( (double)( mouse.x + loc.x ), (double)( mouse.y + loc.y ) );
+		MouseBubblePres b = new MouseBubblePres( contents, mousePos );
+		
+		return b.popupAtMousePosition( target, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 	}
 }

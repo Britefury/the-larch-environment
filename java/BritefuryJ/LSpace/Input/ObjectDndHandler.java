@@ -453,7 +453,14 @@ public class ObjectDndHandler extends DndHandler
 		int mods = Modifier.getKeyModifiers( modifiers );
 		if ( mods == ( Modifier.CTRL | Modifier.ALT )  ||  mods == ( Modifier.SHIFT | Modifier.ALT ) )
 		{
-			requestedAspect = ASPECT_DOC_NODE;
+			if ( button == 1 )
+			{
+				requestedAspect = ASPECT_DOC_NODE;
+			}
+			else
+			{
+				requestedAspect = ASPECT_NONE;
+			}
 		}
 		else
 		{
