@@ -78,9 +78,9 @@ public class Primitive
 	public static final InheritedAttributeNonNull foreground = new InheritedAttributeNonNull( primitiveNamespace, "foreground", Paint.class, Color.black );
 	public static final InheritedAttribute hoverForeground = new InheritedAttribute( primitiveNamespace, "hoverForeground", Paint.class, null );
 	public static final InheritedAttributeNonNull mathRootThickness = new InheritedAttributeNonNull( primitiveNamespace, "mathRootThickness", Double.class, 1.5 );
-	public static final InheritedAttributeNonNull paragraphSpacing = new InheritedAttributeNonNull( primitiveNamespace, "paragraphSpacing", Double.class, 0.0 );
-	public static final InheritedAttributeNonNull paragraphLineSpacing = new InheritedAttributeNonNull( primitiveNamespace, "paragraphLineSpacing", Double.class, 0.0 );
-	public static final InheritedAttributeNonNull paragraphIndentation = new InheritedAttributeNonNull( primitiveNamespace, "paragraphIndentation", Double.class, 0.0 );
+	public static final AttributeNonNull paragraphSpacing = new AttributeNonNull( primitiveNamespace, "paragraphSpacing", Double.class, 0.0 );
+	public static final AttributeNonNull paragraphLineSpacing = new AttributeNonNull( primitiveNamespace, "paragraphLineSpacing", Double.class, 0.0 );
+	public static final AttributeNonNull paragraphIndentation = new AttributeNonNull( primitiveNamespace, "paragraphIndentation", Double.class, 0.0 );
 	public static final InheritedAttribute shapePainter = new InheritedAttribute( primitiveNamespace, "shapePainter", Painter.class, new FillPainter( Color.black ) );
 	public static final InheritedAttribute hoverShapePainter = new InheritedAttribute( primitiveNamespace, "hoverShapePainter", Painter.class, null );
 	public static final InheritedAttributeNonNull scriptColumnSpacing = new InheritedAttributeNonNull( primitiveNamespace, "scriptColumnSpacing", Double.class, 1.0 );

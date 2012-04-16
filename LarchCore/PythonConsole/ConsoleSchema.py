@@ -88,7 +88,7 @@ class Console (object):
 		
 	def assignVariable(self, name, value):
 		setattr( self._module, name, value )
-		self._blocks.append( ConsoleVarAssignment( name, type( value ) ) )
+		self._blocks.append( ConsoleVarAssignment( name, value ) )
 		self._incr.onChanged()
 		
 		
@@ -127,16 +127,16 @@ class ConsoleBlock (object):
 
 
 class ConsoleVarAssignment (object):
-	def __init__(self, varName, valueType):
+	def __init__(self, varName, value):
 		self._varName = varName
-		self._valueType = valueType
+		self._value = value
 	
 	
 	def getVarName(self):
 		return self._varName
 	
-	def getValueType(self):
-		return self._valueType
+	def getValue(self):
+		return self._value
 
 		
 	
