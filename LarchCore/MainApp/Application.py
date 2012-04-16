@@ -11,7 +11,7 @@ from BritefuryJ.LSpace.Browser import Location
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
-from LarchCore.PythonConsole import ConsoleSchema
+from LarchCore.PythonConsole import Console
 from LarchCore.MainApp import FragmentInspector
 
 
@@ -96,7 +96,7 @@ class AppConsole (object):
 		self._incr = IncrementalValueMonitor( self )
 		
 		self._index = index
-		self._console = ConsoleSchema.Console( '<console%d>'  %  ( index, ) )
+		self._console = Console.Console( '<console%d>'  %  ( index, ) )
 		
 		
 		

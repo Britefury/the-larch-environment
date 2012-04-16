@@ -31,7 +31,7 @@ class _ConsoleListSubject (object):
 		index = int( key[1:] )
 		for console in self._appState.getConsoles():
 			if console.getIndex() == index:
-				return Console.newConsoleSubject( console.getConsole(), self._enclosingSubject )
+				return Console.ConsoleSubject( console.getConsole(), self._enclosingSubject )
 		raise KeyError, 'No console at index %s'  %  ( key, )
 		
 
