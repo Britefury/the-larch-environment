@@ -21,6 +21,8 @@ from BritefuryJ.ObjectPresentation import PresentationStateListenerList
 
 from BritefuryJ.DefaultPerspective import DefaultPerspective
 
+from LarchCore.PythonConsole import Console
+
 
 _fragSelectorEntryBorder = SolidBorder( 1.0, 3.0, 6.0, 6.0, Color( 0.8, 0.8, 0.8 ), None, Color( 0.5, 0.5, 0.5 ), Color( 0.9, 0.9, 0.9 ) )
 
@@ -28,6 +30,7 @@ _fragContentHighlighterPainter = FilledOutlinePainter( Color( 0.0, 1.0, 0.0, 0.1
 _objectKindStyleJava = StyleSheet.style( Primitive.fontSize( 10 ), Primitive.foreground( Color( 0.0, 0.0, 0.5 ) ) )
 _objectKindStylePython = StyleSheet.style( Primitive.fontSize( 10 ), Primitive.foreground( Color( 0.0, 0.5, 0.0 ) ) )
 _objectKindStyleDocModel = StyleSheet.style( Primitive.fontSize( 10 ), Primitive.foreground( Color( 0.5, 0.5, 0.5 ) ) )
+_consoleStyle = StyleSheet.style( Primitive.editable( True ) )
 
 _objectKindJava = _objectKindStyleJava( Label( 'Java' ) )
 _objectKindPython = _objectKindStylePython( Label( 'Python' ) )
@@ -133,17 +136,8 @@ class _FragmentSelector (object):
 				xs.append( LineBreak() )
 			xs.append( e )
 			first = False
-		entriesList = SpaceBin( 750.0, 0.0, Paragraph( xs ) )
+		entriesList = Paragraph( xs ).alignHPack()
 		return Column( [ title, entriesList ] )
-
-
-
-
-class _FragmentInspector (object):
-	def __init__(self, fragment):
-		self._fragment = fragment
-
-
 
 
 
@@ -157,7 +151,9 @@ class _FragmentInspectorMain (object):
 
 
 	def _onFragmentSelected(self, fragment):
-		self._content = _FragmentInspector( fragment )
+		console = Console.Console( '<popup_console>', False )
+		console.assignVariable( 'm', fragment.model )
+		self._content = ScrolledViewport( _consoleStyle( console ), 640.0, 480.0, True, True, None ).alignVTop()
 		self._listeners = PresentationStateListenerList.onPresentationStateChanged( self._listeners, self )
 
 
@@ -166,7 +162,9 @@ class _FragmentInspectorMain (object):
 
 		title = Heading3( 'Inspector' )
 
-		return Column( [ title, self._content ] )
+		body = Column( [ title, SpaceBin( 0.0, 600.0, True, self._content ) ] )
+
+		return SpaceBin( 800.0, 0.0, body ).alignHExpand()
 
 
 def inspectFragment(fragment, sourceElement, triggeringEvent):

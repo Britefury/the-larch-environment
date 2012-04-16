@@ -126,7 +126,7 @@ class Console (object):
 
 
 
-	def __init__(self, name):
+	def __init__(self, name, showBanner=True):
 		self._incr = IncrementalValueMonitor( self )
 
 		self._blocks = []
@@ -134,6 +134,7 @@ class Console (object):
 		self._before = []
 		self._after = []
 		self._module = imp.new_module( name )
+		self._showBanner = showBanner
 		LoadBuiltins.loadBuiltins( self._module )
 
 
@@ -221,18 +222,21 @@ class Console (object):
 
 
 		# Header
-		bannerVersionText = [ _bannerTextStyle.applyTo( NormalText( v ) )   for v in sys.version.split( '\n' ) ]
-		helpText1 = Row( [ _bannerHelpKeyTextStyle.applyTo( Label( 'Ctrl+Enter' ) ),
-				   _bannerHelpTextStyle.applyTo( Label( ' - execute and evaluate, ' ) ),
-				   _bannerHelpKeyTextStyle.applyTo( Label( 'Ctrl+Shift+Enter' ) ),
-				   _bannerHelpTextStyle.applyTo( Label( ' - execute only' ) ) ] )
-		helpText2 = Row( [ _bannerHelpKeyTextStyle.applyTo( Label( 'Alt+Up' ) ),
-				   _bannerHelpTextStyle.applyTo( Label( ' - previous, ' ) ),
-				   _bannerHelpKeyTextStyle.applyTo( Label( 'Alt+Down' ) ),
-				   _bannerHelpTextStyle.applyTo( Label( ' - next' ) ) ] )
-		bannerText = Column( bannerVersionText + [ helpText1, helpText2 ] ).alignHPack()
+		if self._showBanner:
+			bannerVersionText = [ _bannerTextStyle.applyTo( NormalText( v ) )   for v in sys.version.split( '\n' ) ]
+			helpText1 = Row( [ _bannerHelpKeyTextStyle.applyTo( Label( 'Ctrl+Enter' ) ),
+					   _bannerHelpTextStyle.applyTo( Label( ' - execute and evaluate, ' ) ),
+					   _bannerHelpKeyTextStyle.applyTo( Label( 'Ctrl+Shift+Enter' ) ),
+					   _bannerHelpTextStyle.applyTo( Label( ' - execute only' ) ) ] )
+			helpText2 = Row( [ _bannerHelpKeyTextStyle.applyTo( Label( 'Alt+Up' ) ),
+					   _bannerHelpTextStyle.applyTo( Label( ' - previous, ' ) ),
+					   _bannerHelpKeyTextStyle.applyTo( Label( 'Alt+Down' ) ),
+					   _bannerHelpTextStyle.applyTo( Label( ' - next' ) ) ] )
+			bannerText = Column( bannerVersionText + [ helpText1, helpText2 ] ).alignHPack()
 
-		banner = _bannerBorder.surround( bannerText )
+			banner = _bannerBorder.surround( bannerText )
+		else:
+			banner = None
 
 
 		dropDest = ObjectDndHandler.DropDest( FragmentData, _onDrop )
@@ -264,11 +268,13 @@ class Console (object):
 		dropPromptLive = LiveValue( Blank() )
 		dropPromptView = dropPromptLive
 
+		consoleColumnContents = [ banner ]   if self._showBanner   else []
 		if len( blocks ) > 0:
 			blockList = _consoleBlockListStyle.applyTo( Column( blocks ) ).alignHExpand()
-			return _consoleStyle.applyTo( Column( [ banner, blockList, dropPromptView, m ] ) ).alignHExpand().alignVRefY()
+			consoleColumnContents += [ blockList, dropPromptView, m ]
 		else:
-			return _consoleStyle.applyTo( Column( [ banner, dropPromptView, m.alignVTop() ] ) ).alignHExpand().alignVRefY()
+			consoleColumnContents += [ dropPromptView, m.alignVTop() ]
+		return _consoleStyle.applyTo( Column( consoleColumnContents ) ).alignHExpand().alignVRefY()
 
 
 
