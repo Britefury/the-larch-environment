@@ -9,8 +9,9 @@ from java.awt import Color
 
 from BritefuryJ.Graphics import *
 from BritefuryJ.LSpace import Anchor, ElementPainter
-from BritefuryJ.LSpace.Interactor import HoverElementInteractor
+from BritefuryJ.LSpace.Interactor import HoverElementInteractor, PushElementInteractor
 from BritefuryJ.Pres.Primitive import *
+from BritefuryJ.Pres.RichText import *
 from BritefuryJ.Pres.UI import *
 from BritefuryJ.StyleSheet import *
 from BritefuryJ.Controls import *
@@ -22,7 +23,6 @@ from BritefuryJ.DefaultPerspective import DefaultPerspective
 
 
 _fragSelectorEntryBorder = SolidBorder( 1.0, 3.0, 6.0, 6.0, Color( 0.8, 0.8, 0.8 ), None, Color( 0.5, 0.5, 0.5 ), Color( 0.9, 0.9, 0.9 ) )
-_fragSelectorEntrySelectedBorder = SolidBorder( 1.0, 3.0, 6.0, 6.0, Color( 0.8, 0.8, 0.8 ), None, Color( 0.5, 0.5, 0.5 ), Color( 0.9, 0.9, 0.9 ) )
 
 _fragContentHighlighterPainter = FilledOutlinePainter( Color( 0.0, 1.0, 0.0, 0.1 ), Color( 0.0, 0.5, 0.0, 0.5 ) )
 _objectKindStyleJava = StyleSheet.style( Primitive.fontSize( 10 ), Primitive.foreground( Color( 0.0, 0.0, 0.5 ) ) )
@@ -51,8 +51,9 @@ class _FragmentContentHighlighter (ElementPainter):
 _FragmentContentHighlighter.instance = _FragmentContentHighlighter()
 
 
-class _FragmentSelectorEntryInteractor (HoverElementInteractor):
-	def __init__(self, fragmentElement):
+class _FragmentSelectorEntryInteractor (HoverElementInteractor, PushElementInteractor):
+	def __init__(self, selectorEntry, fragmentElement):
+		self._selectorEntry = selectorEntry
 		self._fragmentElement = fragmentElement
 
 
@@ -65,45 +66,49 @@ class _FragmentSelectorEntryInteractor (HoverElementInteractor):
 		self._fragmentElement.queueFullRedraw()
 
 
+	def buttonPress(self, element, event):
+		if event.button == 1:
+			self._selectorEntry._onClick()
+			return True
+		return False
+
+	def buttonRelease(self, element, event):
+		pass
+
+
 class _FragmentSelectorEntry (object):
-	def __init__(self, fragment):
+	def __init__(self, selector, fragment):
 		self._listeners = None
 
+		self._selector = selector
 		self._fragment = fragment
-		self._interactor = _FragmentSelectorEntryInteractor( fragment.getFragmentElement() )
+		self._interactor = _FragmentSelectorEntryInteractor( self, fragment.getFragmentElement() )
 
 		model = fragment.model
 		modelTypeName = TypeUtils.nameOfTypeOf( model )
 		self._name = modelTypeName.rpartition( '.' )[2]
 		self._kind = TypeUtils.getKindOfObject( model )
 
-		self._selected = False
 
-
-	def select(self):
-		self._selected = True
-		PresentationStateListenerList.onPresentationStateChanged( self._listeners, self )
-
-	def unselect(self):
-		self._selected = False
-		PresentationStateListenerList.onPresentationStateChanged( self._listeners, self )
+	def _onClick(self):
+		self._selector._onFragmentSelected( self._fragment )
 
 
 	def __present__(self, fragment, inheritedState):
 		self._listeners = PresentationStateListenerList.addListener( self._listeners, fragment )
-		border = _fragSelectorEntrySelectedBorder   if self._selected   else _fragSelectorEntryBorder
 		name = Label( self._name )
 		kind = _objectKindMap[self._kind]
 		contents = Column( [ name, Spacer( 0.0, 2.0 ), kind.padX( 10.0, 0.0 ) ] )
-		return border.surround( contents ).withElementInteractor( self._interactor )
+		return _fragSelectorEntryBorder.surround( contents ).withElementInteractor( self._interactor )
 
 
 
 
 class _FragmentSelector (object):
-	def __init__(self, tipFragment):
+	def __init__(self, inspector, tipFragment):
 		self._listeners = None
 
+		self._inspector = inspector
 		self._tipFragment = tipFragment
 		self._fragments = []
 		f = tipFragment
@@ -111,20 +116,25 @@ class _FragmentSelector (object):
 			self._fragments.insert( 0, f )
 			f = f.getParent()
 
-		self._entries = [ _FragmentSelectorEntry( f )   for f in self._fragments ]
-		self._selection = 0
+		self._entries = [ _FragmentSelectorEntry( self, f )   for f in self._fragments ]
 
 
-	def _setSelection(self, selection):
-		self._entries[self._selection].unselect()
-		self._selection = selection
-
+	def _onFragmentSelected(self, fragment):
+		self._inspector._onFragmentSelected( fragment )
 
 
 	def __present__(self, fragment, inheritedState):
 		self._listeners = PresentationStateListenerList.addListener( self._listeners, fragment )
-		entriesList = Row( self._entries )
-		return ScrolledViewport( entriesList, 640.0, 0.0, True, False, None )
+		title = Label( 'Please choose a fragment:' )
+		xs = []
+		first = True
+		for e in self._entries:
+			if not first:
+				xs.append( LineBreak() )
+			xs.append( e )
+			first = False
+		entriesList = SpaceBin( 750.0, 0.0, Paragraph( xs ) )
+		return Column( [ title, entriesList ] )
 
 
 
@@ -134,14 +144,33 @@ class _FragmentInspector (object):
 		self._fragment = fragment
 
 
+
+
+
+
+class _FragmentInspectorMain (object):
+	def __init__(self, tipFragment):
+		self._listeners = None
+
+		self._tipFragment = tipFragment
+		self._content = _FragmentSelector( self, self._tipFragment )
+
+
+	def _onFragmentSelected(self, fragment):
+		self._content = _FragmentInspector( fragment )
+		self._listeners = PresentationStateListenerList.onPresentationStateChanged( self._listeners, self )
+
+
 	def __present__(self, fragment, inheritedState):
-		title = Label( 'Inspector' )
-		selector = _FragmentSelector( self._fragment )
-		return Column( [ title, selector ] )
+		self._listeners = PresentationStateListenerList.addListener( self._listeners, fragment )
+
+		title = Heading3( 'Inspector' )
+
+		return Column( [ title, self._content ] )
 
 
 def inspectFragment(fragment, sourceElement, triggeringEvent):
-	inspector = _FragmentInspector( fragment )
+	inspector = _FragmentInspectorMain( fragment )
 	inspector = DefaultPerspective.instance( inspector )
 
 	BubblePopup.popupInBubbleAdjacentToMouse( inspector, sourceElement, Anchor.TOP, True, True )

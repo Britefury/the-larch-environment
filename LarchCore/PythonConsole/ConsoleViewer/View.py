@@ -27,11 +27,11 @@ from BritefuryJ.AttributeTable import *
 from BritefuryJ.DefaultPerspective import DefaultPerspective
 
 from BritefuryJ.Controls import TextEntry
-from BritefuryJ.LSpace.Interactor import KeyElementInteractor
 from BritefuryJ.StyleSheet import *
 from BritefuryJ.Graphics import *
 from BritefuryJ.LSpace.Browser import Location
-from BritefuryJ.LSpace.Input import ObjectDndHandler
+from BritefuryJ.LSpace.Input import ObjectDndHandler, Modifier
+from BritefuryJ.Shortcut import Shortcut
 
 from BritefuryJ.Pres import InnerFragment, ApplyPerspective
 from BritefuryJ.Pres.Primitive import *
@@ -39,6 +39,8 @@ from BritefuryJ.Pres.RichText import *
 
 from BritefuryJ.Projection import Perspective, Subject
 from BritefuryJ.IncrementalView import FragmentView, FragmentData
+
+from BritefuryJ.Util import TypeUtils
 
 
 from LarchCore.Languages.Python25 import Python25
@@ -49,36 +51,10 @@ from LarchCore.PythonConsole import ConsoleSchema as Schema
 
 
 
-class CurrentModuleInteractor (KeyElementInteractor):
-	def __init__(self, console):
-		self._console = console
-		
-		
-	def keyTyped(self, element, event):
-		return False
-		
-		
-	def keyPressed(self, element, event):
-		if event.getKeyCode() == KeyEvent.VK_ENTER:
-			if event.getModifiers() & KeyEvent.CTRL_MASK  !=  0:
-				bEvaluate = event.getModifiers() & KeyEvent.SHIFT_MASK  ==  0
-				self._console.execute( bEvaluate )
-				return True
-		elif event.getKeyCode() == KeyEvent.VK_UP:
-			if event.getModifiers() & KeyEvent.ALT_MASK  !=  0:
-				self._console.backwards()
-				return True
-		elif event.getKeyCode() == KeyEvent.VK_DOWN:
-			if event.getModifiers() & KeyEvent.ALT_MASK  !=  0:
-				self._console.forwards()
-				return True
-		return False
-	
-	def keyReleased(self, element, event):
-		return False
-
-
-
+_executeShortcut = Shortcut( KeyEvent.VK_ENTER, Modifier.CTRL )
+_executeNoEvalShortcut = Shortcut( KeyEvent.VK_ENTER, Modifier.CTRL | Modifier.SHIFT )
+_historyPreviousShortcut = Shortcut( KeyEvent.VK_UP, Modifier.ALT )
+_historyNextShortcut = Shortcut( KeyEvent.VK_DOWN, Modifier.ALT )
 
 _bannerTextStyle = StyleSheet.style( Primitive.fontFace( 'Serif' ), Primitive.fontSmallCaps( True ), Primitive.editable( False ) )
 _bannerHelpKeyTextStyle = StyleSheet.style( Primitive.fontFace( 'Serif' ), Primitive.fontSmallCaps( True ), Primitive.fontItalic( True ), Primitive.foreground( Color( 0.25, 0.25, 0.25 ) ) )
@@ -94,11 +70,26 @@ _pythonModuleBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.0,
 _dropPromptStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.0, 0.8, 0.0 ), None ) ) )
 
 _varAssignVarNameStyle = StyleSheet.style( Primitive.fontItalic( True ), Primitive.foreground( Color( 0.0, 0.0, 0.5 ) ) )
-_varAssignTypeNameStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.125, 0.0 ) ) )
+_varAssignTypeNameStyle = StyleSheet.style( Primitive.foreground( Color( 0.3, 0.0, 0.3 ) ) )
+_varAssignJavaKindStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.0, 0.4 ) ), Primitive.fontItalic( True ) )
+_varAssignPythonKindStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.4, 0.0 ) ), Primitive.fontItalic( True ) )
+_varAssignDocModelKindStyle = StyleSheet.style( Primitive.foreground( Color( 0.4, 0.4, 0.4 ) ), Primitive.fontItalic( True ) )
 _varAssignMsgStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.125, 0.0 ) ) )
 
 _consoleBlockListStyle = StyleSheet.style( Primitive.columnSpacing( 5.0 ) )
 _consoleStyle = StyleSheet.style( Primitive.columnSpacing( 8.0 ) )
+
+
+_objectKindJava = _varAssignJavaKindStyle( Label( 'Java object' ) )
+_objectKindPython = _varAssignPythonKindStyle( Label( 'Python object' ) )
+_objectKindDocModel = _varAssignDocModelKindStyle( Label( 'DocModel object' ) )
+
+_objectKindMap = {
+	TypeUtils.ObjectKind.JAVA : _objectKindJava,
+	TypeUtils.ObjectKind.PYTHON : _objectKindPython,
+	TypeUtils.ObjectKind.DOCMODEL : _objectKindDocModel,
+	}
+
 
 
 _varNameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*' )
@@ -115,14 +106,14 @@ def _dropPrompt(varNameTextEntryListener):
 
 class ConsoleView (MethodDispatchView):
 	@ObjectDispatchMethod( Schema.Console )
-	def Console(self, ctx, state, node):
-		blocks = InnerFragment.map( node.getBlocks() )
-		currentModule = Python25.python25EditorPerspective.applyTo( InnerFragment( node.getCurrentPythonModule() ) )
+	def Console(self, ctx, state, console):
+		blocks = InnerFragment.map( console.getBlocks() )
+		currentModule = Python25.python25EditorPerspective.applyTo( InnerFragment( console.getCurrentPythonModule() ) )
 	
 		def _onDrop(element, pos, data, action):
 			class _VarNameEntryListener (TextEntry.TextEntryListener):
 				def onAccept(self, entry, text):
-					node.assignVariable( text, data.getModel() )
+					console.assignVariable( text, data.getModel() )
 					_finish( entry )
 				
 				def onCancel(self, entry, text):
@@ -145,20 +136,39 @@ class ConsoleView (MethodDispatchView):
 		
 		# Header
 		bannerVersionText = [ _bannerTextStyle.applyTo( NormalText( v ) )   for v in sys.version.split( '\n' ) ]
-		helpText = Row( [ _bannerHelpKeyTextStyle.applyTo( Label( 'Ctrl+Enter' ) ),
+		helpText1 = Row( [ _bannerHelpKeyTextStyle.applyTo( Label( 'Ctrl+Enter' ) ),
 		                  _bannerHelpTextStyle.applyTo( Label( ' - execute and evaluate, ' ) ),
 		                  _bannerHelpKeyTextStyle.applyTo( Label( 'Ctrl+Shift+Enter' ) ),
 		                  _bannerHelpTextStyle.applyTo( Label( ' - execute only' ) ) ] )
-		bannerText = Column( bannerVersionText + [ helpText ] ).alignHPack()
+		helpText2 = Row( [ _bannerHelpKeyTextStyle.applyTo( Label( 'Alt+Up' ) ),
+				  _bannerHelpTextStyle.applyTo( Label( ' - previous, ' ) ),
+				  _bannerHelpKeyTextStyle.applyTo( Label( 'Alt+Down' ) ),
+				  _bannerHelpTextStyle.applyTo( Label( ' - next' ) ) ] )
+		bannerText = Column( bannerVersionText + [ helpText1, helpText2 ] ).alignHPack()
 		
 		banner = _bannerBorder.surround( bannerText )
 		
 		
 		dropDest = ObjectDndHandler.DropDest( FragmentData, _onDrop )
 
+		def _onExecute(element):
+			console.execute( True )
+
+		def _onExecuteNoEval(element):
+			console.execute( False )
+
+		def _onHistoryPrev(element):
+			console.backwards()
+
+		def _onHistoryNext(element):
+			console.forwards()
+
 		currentModule = Span( [ currentModule ] )
-		currentModule = currentModule.withElementInteractor( CurrentModuleInteractor( node ) )
-		
+		currentModule = currentModule.withShortcut( _executeShortcut, _onExecute )
+		currentModule = currentModule.withShortcut( _executeNoEvalShortcut, _onExecuteNoEval )
+		currentModule = currentModule.withShortcut( _historyPreviousShortcut, _onHistoryPrev )
+		currentModule = currentModule.withShortcut( _historyNextShortcut, _onHistoryNext )
+
 		m = _pythonModuleBorderStyle.applyTo( Border( currentModule.alignHExpand() ) ).alignHExpand()
 		m = m.withDropDest( dropDest )
 		def _ensureCurrentModuleVisible(element, ctx, style):
@@ -207,16 +217,20 @@ class ConsoleView (MethodDispatchView):
 	@ObjectDispatchMethod( Schema.ConsoleVarAssignment )
 	def ConsoleVarAssignment(self, ctx, state, node):
 		varName = node.getVarName()
-		valueType = node.getValueType()
-		valueTypeName = valueType.__name__
+		valueTypeName = TypeUtils.nameOfTypeOf( node.getValue() )
+		valueKind = TypeUtils.getKindOfObject( node.getValue() )
+
+		varNameView = _varAssignVarNameStyle.applyTo( Label( varName ) )
+		typeNameView = _varAssignTypeNameStyle.applyTo( Label( valueTypeName ) )
+		typeKindView = _objectKindMap[valueKind]
 		
-		varNameView = _varAssignVarNameStyle.applyTo( StaticText( varName ) )
-		typeNameView = _varAssignTypeNameStyle.applyTo( StaticText( valueTypeName ) )
-		
-		return Paragraph( [ _varAssignMsgStyle.applyTo( StaticText( 'Variable ' ) ), LineBreak(),
+		return Paragraph( [ _varAssignMsgStyle.applyTo( Label( 'Variable ' ) ), LineBreak(),
 		                    varNameView, LineBreak(),
-		                    _varAssignMsgStyle.applyTo( StaticText( ' was assigned a ' ) ), LineBreak(),
-		                    typeNameView ] ).alignHPack()
+		                    _varAssignMsgStyle.applyTo( Label( ' was assigned a ' ) ), LineBreak(),
+		                    typeNameView, LineBreak(),
+				    _varAssignMsgStyle.applyTo( Label( ' (a ' ) ), LineBreak(),
+				    typeKindView, LineBreak(),
+				    _varAssignMsgStyle.applyTo( Label( ')' ) ) ] ).alignHPack()
 
 
 
