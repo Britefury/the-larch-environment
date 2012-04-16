@@ -35,8 +35,8 @@ if __name__ == '__main__':
 
 	world = World()
 	world.enableImportHooks()
-	console = Console.newConsole( 'Console' )
-	world.setAppStateSubject( None, Console.newConsoleSubject( console, world.getAppStateSubject() ) )
+	console = Console.Console( 'Console' )
+	world.setAppStateSubject( None, Console.ConsoleSubject( console, world.getAppStateSubject() ) )
 	
 
 	if len( sys.argv ) > 1:
