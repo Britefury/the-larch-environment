@@ -174,7 +174,6 @@ class Window (object):
 		# VIEW MENU
 		
 		viewMenu = JMenu( 'View' )
-		viewMenu.add( _action( 'View document model', self._onViewDocModel ) )
 		viewMenu.add( _action( 'Show element tree explorer', self._onShowElementTreeExplorer ) )
 		self._showUndoHistoryItem = JMenuItem( 'Show undo history' )
 		self._showUndoHistoryItem.addActionListener( _action( 'Show undo history', self._onShowUndoHistory ) )
@@ -317,15 +316,6 @@ class Window (object):
 
 		
 
-	def _onViewDocModel(self):
-		currentLoc = self._browser.getCurrentBrowserLocation()
-		browserContext = self._windowManager._browserContext
-		focus = browserContext.resolveLocationAsSubject( currentLoc ).getFocus()
-		modelSubject = _ModelSubject( focus )
-		modelLoc = browserContext.getLocationForObject( modelSubject )
-		self._browser.openLocationInNewWindow( modelLoc )
-	
-	
 	def _onShowElementTreeExplorer(self):
 		currentTab = self._browser.getCurrentBrowser()
 		treeExplorer = currentTab.getRootElement().treeExplorer()
