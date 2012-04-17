@@ -8,8 +8,9 @@
 from java.awt import Color
 
 from BritefuryJ.Graphics import *
-from BritefuryJ.LSpace import Anchor, ElementPainter
+from BritefuryJ.LSpace import Anchor, ElementPainter, PageController
 from BritefuryJ.LSpace.Interactor import HoverElementInteractor, PushElementInteractor
+from BritefuryJ.Pres import LazyPres
 from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.Pres.RichText import *
 from BritefuryJ.Pres.UI import *
@@ -30,7 +31,8 @@ _fragContentHighlighterPainter = FilledOutlinePainter( Color( 0.0, 1.0, 0.0, 0.1
 _objectKindStyleJava = StyleSheet.style( Primitive.fontSize( 10 ), Primitive.foreground( Color( 0.0, 0.0, 0.5 ) ) )
 _objectKindStylePython = StyleSheet.style( Primitive.fontSize( 10 ), Primitive.foreground( Color( 0.0, 0.5, 0.0 ) ) )
 _objectKindStyleDocModel = StyleSheet.style( Primitive.fontSize( 10 ), Primitive.foreground( Color( 0.5, 0.5, 0.5 ) ) )
-_consoleStyle = StyleSheet.style( Primitive.editable( True ) )
+_consoleStyle = StyleSheet.style( Primitive.editable( True ), Primitive.selectable( True ) )
+_inspectorStyle = StyleSheet.style( Primitive.editable( False ), Primitive.selectable( False ) )
 
 _objectKindJava = _objectKindStyleJava( Label( 'Java' ) )
 _objectKindPython = _objectKindStylePython( Label( 'Python' ) )
@@ -72,6 +74,7 @@ class _FragmentSelectorEntryInteractor (HoverElementInteractor, PushElementInter
 	def buttonPress(self, element, event):
 		if event.button == 1:
 			self._selectorEntry._onClick()
+			element.closeContainingPopupChain()
 			return True
 		return False
 
@@ -108,10 +111,9 @@ class _FragmentSelectorEntry (object):
 
 
 class _FragmentSelector (object):
-	def __init__(self, inspector, tipFragment):
+	def __init__(self, tipFragment):
 		self._listeners = None
 
-		self._inspector = inspector
 		self._tipFragment = tipFragment
 		self._fragments = []
 		f = tipFragment
@@ -123,12 +125,13 @@ class _FragmentSelector (object):
 
 
 	def _onFragmentSelected(self, fragment):
-		self._inspector._onFragmentSelected( fragment )
+		inspector = _FragmentInspector( fragment )
+		location = fragment.view.browserContext.getLocationForObject( inspector )
+		fragment.fragmentElement.rootElement.pageController.openLocation( location, PageController.OpenOperation.OPEN_IN_NEW_WINDOW )
 
 
 	def __present__(self, fragment, inheritedState):
 		self._listeners = PresentationStateListenerList.addListener( self._listeners, fragment )
-		title = Label( 'Please choose a fragment:' )
 		xs = []
 		first = True
 		for e in self._entries:
@@ -137,39 +140,47 @@ class _FragmentSelector (object):
 			xs.append( e )
 			first = False
 		entriesList = Paragraph( xs ).alignHPack()
-		return Column( [ title, entriesList ] )
+		return entriesList
 
 
 
+class _FragmentInspector (object):
+	def __init__(self, fragment):
+		self._fragment = fragment
 
-class _FragmentInspectorMain (object):
-	def __init__(self, tipFragment):
-		self._listeners = None
+		self._console = Console.Console( '<popup_console>', False )
+		self._console.assignVariable( 'm', fragment.model )
 
-		self._tipFragment = tipFragment
-		self._content = _FragmentSelector( self, self._tipFragment )
+		self._explorer = fragment.fragmentElement.treeExplorer()
 
 
-	def _onFragmentSelected(self, fragment):
-		console = Console.Console( '<popup_console>', False )
-		console.assignVariable( 'm', fragment.model )
-		self._content = ScrolledViewport( _consoleStyle( console ), 640.0, 480.0, True, True, None ).alignVTop()
-		self._listeners = PresentationStateListenerList.onPresentationStateChanged( self._listeners, self )
+
+	def _explorerPres(self):
+		return ScrolledViewport( self._explorer, 640.0, 480.0, True, True, None ).alignVTop()
+
 
 
 	def __present__(self, fragment, inheritedState):
-		self._listeners = PresentationStateListenerList.addListener( self._listeners, fragment )
+		console = ScrolledViewport( _consoleStyle( self._console ).alignVTop(), 640.0, 480.0, True, True, None )
 
-		title = Heading3( 'Inspector' )
+		def _explorerPres():
+			return self._explorerPres()
 
-		body = Column( [ title, SpaceBin( 0.0, 600.0, True, self._content ) ] )
+		explorer = LazyPres( _explorerPres )
 
-		return SpaceBin( 800.0, 0.0, body ).alignHExpand()
+		tabs = [ [ Label( 'Console' ), console ], [ Label( 'Element explorer' ), explorer ] ]
+		return TabbedBox( tabs, None )
+
 
 
 def inspectFragment(fragment, sourceElement, triggeringEvent):
-	inspector = _FragmentInspectorMain( fragment )
-	inspector = DefaultPerspective.instance( inspector )
+	selector = _FragmentSelector( fragment )
 
-	BubblePopup.popupInBubbleAdjacentToMouse( inspector, sourceElement, Anchor.TOP, True, True )
+	title = Heading3( 'Choose a fragment:' )
+	body = Column( [ title, selector ] )
+
+	content = _inspectorStyle( SpaceBin( 800.0, 0.0, body ) ).alignHExpand()
+	content = DefaultPerspective.instance( content )
+
+	BubblePopup.popupInBubbleAdjacentToMouse( content, sourceElement, Anchor.TOP, True, True )
 	return True

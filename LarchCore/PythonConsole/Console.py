@@ -268,13 +268,13 @@ class Console (object):
 		dropPromptLive = LiveValue( Blank() )
 		dropPromptView = dropPromptLive
 
-		consoleColumnContents = [ banner ]   if self._showBanner   else []
+		consoleColumnContents = [ banner.alignVRefY() ]   if self._showBanner   else []
 		if len( blocks ) > 0:
 			blockList = _consoleBlockListStyle.applyTo( Column( blocks ) ).alignHExpand()
-			consoleColumnContents += [ blockList, dropPromptView, m ]
+			consoleColumnContents += [ blockList.alignVRefY(), dropPromptView.alignVRefY(), m.alignVRefY() ]
 		else:
-			consoleColumnContents += [ dropPromptView, m.alignVTop() ]
-		return _consoleStyle.applyTo( Column( consoleColumnContents ) ).alignHExpand().alignVRefY()
+			consoleColumnContents += [ dropPromptView.alignVRefY(), m.alignVRefY() ]
+		return _consoleStyle.applyTo( Column( consoleColumnContents ) ).alignHExpand().alignVTop()
 
 
 
