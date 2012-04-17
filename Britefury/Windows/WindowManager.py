@@ -22,8 +22,8 @@ class WindowManager (object):
 		
 		self._browserContext = world.getBrowserContext()
 
-		def _createCommandConsole(presentationComponent):
-			return CommandConsole( self.getBrowserContext(), presentationComponent )
+		def _createCommandConsole(presentationComponent, browser):
+			return CommandConsole( browser, self.getBrowserContext(), presentationComponent )
 		
 		self._createCommandConsole = _createCommandConsole
 

@@ -76,9 +76,9 @@ public class BrowserTest implements TabbedBrowser.TabbedBrowserListener
 		CommandConsoleFactory fac = new CommandConsoleFactory()
 		{
 			@Override
-			public AbstractCommandConsole createCommandConsole(PresentationComponent pres)
+			public AbstractCommandConsole createCommandConsole(PresentationComponent pres, Browser browser)
 			{
-				return new CommandConsole( browserContext, pres );
+				return new CommandConsole( browser, browserContext, pres );
 			}
 		};
 		

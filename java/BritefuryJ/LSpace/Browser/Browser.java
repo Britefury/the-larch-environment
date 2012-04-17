@@ -12,6 +12,7 @@ import java.awt.Dimension;
 import java.awt.MediaTracker;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -27,8 +28,11 @@ import javax.swing.TransferHandler;
 import BritefuryJ.ChangeHistory.ChangeHistoryController;
 import BritefuryJ.ChangeHistory.ChangeHistoryListener;
 import BritefuryJ.Command.AbstractCommandConsole;
+import BritefuryJ.Command.BoundCommandSet;
+import BritefuryJ.Command.Command;
 import BritefuryJ.Command.CommandBar;
 import BritefuryJ.Command.CommandConsoleFactory;
+import BritefuryJ.Command.CommandSet;
 import BritefuryJ.Controls.ScrolledViewport;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.PageController;
@@ -51,6 +55,30 @@ public class Browser
 	private static final String COMMAND_BACK = "back";
 	private static final String COMMAND_FORWARD = "forward";
 	private static final String COMMAND_RELOAD = "reload";
+	
+	
+	private static Command.CommandAction cmdViewportOneToOne_action = new Command.CommandAction()
+	{
+		public void commandAction(Object context, PageController pageController)
+		{
+			((Browser)context).viewportOneToOne();
+		}
+	};
+	
+	private static Command.CommandAction cmdViewportReset_action = new Command.CommandAction()
+	{
+		public void commandAction(Object context, PageController pageController)
+		{
+			((Browser)context).viewportReset();
+		}
+	};
+	
+	
+	private static Command cmdViewportOneToOne = new Command( "&Viewport zoom &one-to-one", cmdViewportOneToOne_action );
+	private static Command cmdViewportReset = new Command( "&Viewport &reset", cmdViewportReset_action );
+	
+	
+	private static CommandSet commands = new CommandSet( "Larch.Browser", Arrays.asList( new Command[] { cmdViewportOneToOne, cmdViewportReset } ) );
 
 
 	private JTextField locationField;
@@ -122,7 +150,7 @@ public class Browser
 		
 		if ( commandConsoleFactory != null )
 		{
-			AbstractCommandConsole commandConsole = commandConsoleFactory.createCommandConsole( presComponent );
+			AbstractCommandConsole commandConsole = commandConsoleFactory.createCommandConsole( presComponent, this );
 			commandBar = new CommandBar( presComponent, commandConsole, pageController );
 			presComponent.getRootElement().getKeyboard().addInteractor( commandConsole.getShortcutKeyboardInteractor() );
 		}
@@ -322,6 +350,13 @@ public class Browser
 	{
 		PersistentStateStore store = page.storePersistentState();
 		history.getCurrentState().setPagePersistentState( store );
+	}
+	
+	
+	
+	public Iterable<BoundCommandSet> getBoundCommandSets()
+	{
+		return Arrays.asList( new BoundCommandSet[] { commands.bindTo( this ) } );
 	}
 
 
