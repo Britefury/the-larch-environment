@@ -23,6 +23,7 @@ import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.PresentationComponent;
 import BritefuryJ.LSpace.SequentialRichStringVisitor;
 import BritefuryJ.LSpace.TreeEventListener;
+import BritefuryJ.LSpace.Browser.Browser;
 import BritefuryJ.LSpace.Browser.BrowserPage;
 import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
 import BritefuryJ.LSpace.Focus.Target;
@@ -268,6 +269,7 @@ public class CommandConsole extends AbstractCommandConsole
 	
 	private CommandConsoleSubject subject = new CommandConsoleSubject();
 	private CommandKeyboardInteractor keyInteractor = new CommandKeyboardInteractor();
+	private Browser browser;
 	private ProjectiveBrowserContext browserContext;
 	private BrowserPage page;
 	private PresentationComponent presentation;
@@ -290,8 +292,9 @@ public class CommandConsole extends AbstractCommandConsole
 	
 	
 	
-	public CommandConsole(ProjectiveBrowserContext browserContext, PresentationComponent presentation)
+	public CommandConsole(Browser browser, ProjectiveBrowserContext browserContext, PresentationComponent presentation)
 	{
+		this.browser = browser;
 		this.browserContext = browserContext;
 		this.presentation = presentation;
 		contents = new UnreckognisedContents( "" );
@@ -430,12 +433,7 @@ public class CommandConsole extends AbstractCommandConsole
 					contents = null;
 					
 					// Get command by mnemonic
-					BoundCommand cmd = getTargetCommand( text );
-					
-					if ( cmd == null )
-					{
-						cmd = getPageCommand( text );
-					}
+					BoundCommand cmd = getCommandForMnemonic( text );
 					
 					if ( cmd != null )
 					{
@@ -452,8 +450,7 @@ public class CommandConsole extends AbstractCommandConsole
 							String autocompleteText = text.toLowerCase();
 
 							ArrayList<BoundCommand> autocompleteCommands = new ArrayList<BoundCommand>();
-							buildTargetAutocompleteList( autocompleteCommands, autocompleteText );
-							buildPageAutocompleteList( autocompleteCommands, autocompleteText );
+							buildAutocompleteList( autocompleteCommands, autocompleteText );
 							
 							if ( autocompleteCommands.size() > 0 )
 							{
@@ -509,9 +506,28 @@ public class CommandConsole extends AbstractCommandConsole
 
 	
 	//
-	// Find a command with the specified name, that is accessible at the current target (e.g. caret) 
+	// Find a command with the specified mnemonic 
 	//
-	private BoundCommand getTargetCommand(String name)
+	
+	private BoundCommand getCommandForMnemonic(String mnemonic)
+	{
+		BoundCommand cmd = getTargetCommandForMnemonic( mnemonic );
+		cmd = cmd != null  ?  cmd  :  getPageCommandForMnemonic( mnemonic );
+		cmd = cmd != null  ?  cmd  :  getBrowserCommandForMnemonic( mnemonic );
+		return cmd;
+	}
+
+	private void buildAutocompleteList(List<BoundCommand> autocomplete, String text)
+	{
+		buildTargetAutocompleteList( autocomplete, text );
+		buildPageAutocompleteList( autocomplete, text );
+		buildBrowserAutocompleteList( autocomplete, text );
+	}
+	
+	//
+	// Find commands accessible at the current target (e.g. caret) 
+	//
+	private BoundCommand getTargetCommandForMnemonic(String mnemonic)
 	{
 		Target target = presentation.getRootElement().getTarget();
 		if ( target.isValid() )
@@ -521,7 +537,7 @@ public class CommandConsole extends AbstractCommandConsole
 			
 			for (BoundCommandSet commands: commandSets)
 			{
-				BoundCommand c = commands.getCommand( name );
+				BoundCommand c = commands.getCommand( mnemonic );
 				if ( c != null )
 				{
 					return c;
@@ -549,15 +565,15 @@ public class CommandConsole extends AbstractCommandConsole
 
 	
 	//
-	// Find a command with the specified name, that is accessible in the current page
+	// Find commands accessible in the current page
 	//
-	private BoundCommand getPageCommand(String text)
+	private BoundCommand getPageCommandForMnemonic(String mnemonic)
 	{
 		if ( page != null )
 		{
 			for (BoundCommandSet commands: page.getBoundCommandSets())
 			{
-				BoundCommand c = commands.getCommand( text );
+				BoundCommand c = commands.getCommand( mnemonic );
 				if ( c != null )
 				{
 					return c;
@@ -576,6 +592,32 @@ public class CommandConsole extends AbstractCommandConsole
 			{
 				commands.buildAutocompleteList( autocomplete, text );
 			}
+		}
+	}
+
+	
+	//
+	// Find commands accessible in the current browser
+	//
+	private BoundCommand getBrowserCommandForMnemonic(String mnemonic)
+	{
+		for (BoundCommandSet commands: browser.getBoundCommandSets())
+		{
+			BoundCommand c = commands.getCommand( mnemonic );
+			if ( c != null )
+			{
+				return c;
+			}
+		}
+
+		return null;
+	}
+
+	private void buildBrowserAutocompleteList(List<BoundCommand> autocomplete, String text)
+	{
+		for (BoundCommandSet commands: browser.getBoundCommandSets())
+		{
+			commands.buildAutocompleteList( autocomplete, text );
 		}
 	}
 

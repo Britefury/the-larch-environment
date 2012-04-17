@@ -7,8 +7,9 @@
 package BritefuryJ.Command;
 
 import BritefuryJ.LSpace.PresentationComponent;
+import BritefuryJ.LSpace.Browser.Browser;
 
 public interface CommandConsoleFactory
 {
-	public AbstractCommandConsole createCommandConsole(PresentationComponent pres);
+	public AbstractCommandConsole createCommandConsole(PresentationComponent pres, Browser browser);
 }

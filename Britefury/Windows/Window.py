@@ -178,9 +178,7 @@ class Window (object):
 		self._showUndoHistoryItem = JMenuItem( 'Show undo history' )
 		self._showUndoHistoryItem.addActionListener( _action( 'Show undo history', self._onShowUndoHistory ) )
 		viewMenu.add( self._showUndoHistoryItem )
-		viewMenu.add( _action( 'Reset', self._onReset ) )
-		viewMenu.add( _action( '1:1', self._onOneToOne ) )
-		
+
 		
 		
 		menuBar = JMenuBar()
@@ -328,13 +326,6 @@ class Window (object):
 		if changeHistoryController is not None:
 			location = self._windowManager._browserContext.getLocationForObject( changeHistoryController )
 			self._browser.openLocationInNewWindow( location )
-
-
-	def _onReset(self):
-		self._browser.viewportReset()
-
-	def _onOneToOne(self):
-		self._browser.viewportOneToOne()
 
 
 
