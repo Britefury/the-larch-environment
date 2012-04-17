@@ -114,14 +114,6 @@ class Window (object):
 		
 		
 		
-		# NEW MENU
-		
-		newMenu = JMenu( 'New' )
-		newMenu.add( _action( 'New tab', self._onNewTab ) )
-		newMenu.add( _action( 'New window', self._onNewWindow ) )
-		
-		
-		
 		# EDIT MENU
 		
 		transferActionListener = _TransferActionListener()
@@ -182,7 +174,6 @@ class Window (object):
 		
 		
 		menuBar = JMenuBar()
-		menuBar.add( newMenu )
 		menuBar.add( editMenu )
 		menuBar.add( viewMenu )
 
@@ -288,14 +279,6 @@ class Window (object):
 	
 	
 	
-	def _onNewTab(self):
-		self._browser.openLocationInNewTab( Location( '' ) )
-	
-	
-	def _onNewWindow(self):
-		self._createNewWindow( Location( '' ) )
-		
-		
 	def _createNewWindow(self, location):
 		self._windowManager._createNewWindow( location )
 	

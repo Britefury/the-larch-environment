@@ -57,6 +57,23 @@ public class Browser
 	private static final String COMMAND_RELOAD = "reload";
 	
 	
+	private static Command.CommandAction cmdNewTab_action = new Command.CommandAction()
+	{
+		public void commandAction(Object context, PageController pageController)
+		{
+			pageController.openLocation( new Location( "" ), PageController.OpenOperation.OPEN_IN_NEW_TAB );
+		}
+	};
+	
+	private static Command.CommandAction cmdNewWindow_action = new Command.CommandAction()
+	{
+		public void commandAction(Object context, PageController pageController)
+		{
+			pageController.openLocation( new Location( "" ), PageController.OpenOperation.OPEN_IN_NEW_WINDOW );
+		}
+	};
+	
+	
 	private static Command.CommandAction cmdViewportOneToOne_action = new Command.CommandAction()
 	{
 		public void commandAction(Object context, PageController pageController)
@@ -74,11 +91,13 @@ public class Browser
 	};
 	
 	
+	private static Command cmdNewTab = new Command( "&New &tab", cmdNewTab_action );
+	private static Command cmdNewWindow = new Command( "&New &window", cmdNewWindow_action );
 	private static Command cmdViewportOneToOne = new Command( "&Viewport zoom &one-to-one", cmdViewportOneToOne_action );
 	private static Command cmdViewportReset = new Command( "&Viewport &reset", cmdViewportReset_action );
 	
 	
-	private static CommandSet commands = new CommandSet( "Larch.Browser", Arrays.asList( new Command[] { cmdViewportOneToOne, cmdViewportReset } ) );
+	private static CommandSet commands = new CommandSet( "Larch.Browser", Arrays.asList( new Command[] { cmdNewTab, cmdNewWindow, cmdViewportOneToOne, cmdViewportReset } ) );
 
 
 	private JTextField locationField;
