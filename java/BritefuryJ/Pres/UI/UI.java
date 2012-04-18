@@ -32,7 +32,7 @@ public class UI
 	private static final Color h3Colour = new Color( 0.3f, 0.3f, 0.3f );
 
 
-	public static final InheritedAttributeNonNull uiTextAttrs = new InheritedAttributeNonNull( uiNamespace, "normalTextAttrs", StyleSheet.class,
+	public static final InheritedAttributeNonNull uiTextAttrs = new InheritedAttributeNonNull( uiNamespace, "uiTextAttrs", StyleSheet.class,
 			StyleSheet.style( Primitive.editable.as( false ), Primitive.selectable.as( false ), Primitive.fontFace.as( "Dotum; SansSerif" ) ) );
 
 	public static final InheritedAttributeNonNull normalTextAttrs = new InheritedAttributeNonNull( uiNamespace, "normalTextAttrs", StyleSheet.class,
