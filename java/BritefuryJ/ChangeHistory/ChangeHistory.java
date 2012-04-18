@@ -541,6 +541,19 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 
 		return null;
 	}
+	
+	public static ChangeHistory getChangeHistoryFor(Object x)
+	{
+		Trackable t = asTrackable( x );
+		if ( t != null )
+		{
+			return t.getChangeHistory();
+		}
+		else
+		{
+			return null;
+		}
+	}
 
 
 

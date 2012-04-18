@@ -54,7 +54,9 @@ public class CommandConsole extends AbstractCommandConsole
 	{
 		public boolean keyPressed(Keyboard keyboard, KeyEvent event)
 		{
-			for (BoundCommandSet cmdSet: page.getBoundCommandSets())
+			ArrayList<BoundCommandSet> boundCommandSets = new ArrayList<BoundCommandSet>();
+			page.buildBoundCommandSetList( boundCommandSets );
+			for (BoundCommandSet cmdSet: boundCommandSets)
 			{
 				BoundCommand cmd = cmdSet.getCommandForKeyPressed( event );
 				if ( cmd != null )
@@ -69,7 +71,9 @@ public class CommandConsole extends AbstractCommandConsole
 
 		public boolean keyReleased(Keyboard keyboard, KeyEvent event)
 		{
-			for (BoundCommandSet cmdSet: page.getBoundCommandSets())
+			ArrayList<BoundCommandSet> boundCommandSets = new ArrayList<BoundCommandSet>();
+			page.buildBoundCommandSetList( boundCommandSets );
+			for (BoundCommandSet cmdSet: boundCommandSets)
 			{
 				BoundCommand cmd = cmdSet.getCommandForKeyPressed( event );
 				if ( cmd != null )
@@ -571,7 +575,9 @@ public class CommandConsole extends AbstractCommandConsole
 	{
 		if ( page != null )
 		{
-			for (BoundCommandSet commands: page.getBoundCommandSets())
+			ArrayList<BoundCommandSet> boundCommandSets = new ArrayList<BoundCommandSet>();
+			page.buildBoundCommandSetList( boundCommandSets );
+			for (BoundCommandSet commands: boundCommandSets)
 			{
 				BoundCommand c = commands.getCommand( mnemonic );
 				if ( c != null )
@@ -588,7 +594,9 @@ public class CommandConsole extends AbstractCommandConsole
 	{
 		if ( page != null )
 		{
-			for (BoundCommandSet commands: page.getBoundCommandSets())
+			ArrayList<BoundCommandSet> boundCommandSets = new ArrayList<BoundCommandSet>();
+			page.buildBoundCommandSetList( boundCommandSets );
+			for (BoundCommandSet commands: boundCommandSets)
 			{
 				commands.buildAutocompleteList( autocomplete, text );
 			}
@@ -601,7 +609,9 @@ public class CommandConsole extends AbstractCommandConsole
 	//
 	private BoundCommand getBrowserCommandForMnemonic(String mnemonic)
 	{
-		for (BoundCommandSet commands: browser.getBoundCommandSets())
+		ArrayList<BoundCommandSet> boundCommandSets = new ArrayList<BoundCommandSet>();
+		browser.buildBoundCommandSetList( boundCommandSets );
+		for (BoundCommandSet commands: boundCommandSets)
 		{
 			BoundCommand c = commands.getCommand( mnemonic );
 			if ( c != null )
@@ -615,7 +625,9 @@ public class CommandConsole extends AbstractCommandConsole
 
 	private void buildBrowserAutocompleteList(List<BoundCommand> autocomplete, String text)
 	{
-		for (BoundCommandSet commands: browser.getBoundCommandSets())
+		ArrayList<BoundCommandSet> boundCommandSets = new ArrayList<BoundCommandSet>();
+		browser.buildBoundCommandSetList( boundCommandSets );
+		for (BoundCommandSet commands: boundCommandSets)
 		{
 			commands.buildAutocompleteList( autocomplete, text );
 		}

@@ -98,8 +98,8 @@ public class IncrementalViewPage extends BrowserPage
 	}
 
 
-	public List<BoundCommandSet> getBoundCommandSets()
+	public void buildBoundCommandSetList(List<BoundCommandSet> boundCommandSets)
 	{
-		return subject.getBoundCommandSets();
+		subject.buildBoundCommandSetList( boundCommandSets );
 	}
 }

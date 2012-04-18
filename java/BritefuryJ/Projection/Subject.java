@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.Projection;
 
-import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
@@ -21,6 +20,13 @@ public abstract class Subject
 	public Subject(Subject enclosingSubject)
 	{
 		this.enclosingSubject = enclosingSubject;
+	}
+	
+	
+	
+	public Subject getEnclosingSubject()
+	{
+		return enclosingSubject;
 	}
 	
 	
@@ -61,15 +67,11 @@ public abstract class Subject
 	}
 	
 	
-	public List<BoundCommandSet> getBoundCommandSets()
+	public void buildBoundCommandSetList(List<BoundCommandSet> boundCommandSets)
 	{
 		if ( enclosingSubject != null )
 		{
-			return enclosingSubject.getBoundCommandSets();
-		}
-		else
-		{
-			return Arrays.asList();
+			enclosingSubject.buildBoundCommandSetList( boundCommandSets );
 		}
 	}
 	

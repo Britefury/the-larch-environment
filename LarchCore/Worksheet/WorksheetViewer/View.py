@@ -248,7 +248,6 @@ class WorksheetViewerSubject (Subject):
 		self._model = model
 		# Defer the creation of the model view - it involves executing all the code in the worksheet which can take some time
 		self._modelView = None
-		self._enclosingSubject = enclosingSubject
 		self._location = location
 		self._importName = importName
 		self._editLocation = self._location + '.edit'
@@ -274,13 +273,14 @@ class WorksheetViewerSubject (Subject):
 		return self._title + ' [Ws-User]'
 	
 	def getSubjectContext(self):
-		return self._enclosingSubject.getSubjectContext().withAttrs( location=self._location, editLocation=self._editLocation, viewLocation=self._location )
+		return self.enclosingSubject.getSubjectContext().withAttrs( location=self._location, editLocation=self._editLocation, viewLocation=self._location )
 	
 	def getChangeHistory(self):
 		return self._document.getChangeHistory()
 
-	def getBoundCommandSets(self):
-		return [ _worksheetViewerCommands.bindTo( self ) ]  +  self._enclosingSubject.getBoundCommandSets()
+	def buildBoundCommandSetList(self, cmdSets):
+		cmdSets.add( _worksheetViewerCommands.bindTo( self ) )
+		self.enclosingSubject.buildBoundCommandSetList( cmdSets )
 
 	def createModuleLoader(self, document):
 		return _WorksheetModuleLoader( self._model, document )

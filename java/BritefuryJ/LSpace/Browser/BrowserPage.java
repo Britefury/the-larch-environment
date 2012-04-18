@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.LSpace.Browser;
 
-import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.ChangeHistory.ChangeHistoryController;
@@ -36,8 +35,7 @@ public abstract class BrowserPage
 	}
 
 
-	public List<BoundCommandSet> getBoundCommandSets()
+	public void buildBoundCommandSetList(List<BoundCommandSet> boundCommandSets)
 	{
-		return Arrays.asList();
 	}
 }
