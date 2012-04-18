@@ -46,10 +46,10 @@ class _MemberSubject (Subject):
 	
 	def getSubjectContext(self):
 		return self._pythonSubject.getSubjectContext().withAttrs( location=self._location )
-	
+
 	def getChangeHistory(self):
 		return self._pythonSubject._document.getChangeHistory()
-	
+
 
 class _DefSubject (_MemberSubject):
 	pass
@@ -90,7 +90,6 @@ class Python25Subject (Subject):
 		assert isinstance( location, Location )
 		self._document = document
 		self._model = model
-		self._enclosingSubject = enclosingSubject
 		self._location = location
 		self._importName = importName
 		self._title = title
@@ -106,11 +105,11 @@ class Python25Subject (Subject):
 		return self._title + ' [Py25]'
 	
 	def getSubjectContext(self):
-		return self._enclosingSubject.getSubjectContext().withAttrs( location=self._location )
-	
+		return self.enclosingSubject.getSubjectContext().withAttrs( location=self._location )
+
 	def getChangeHistory(self):
 		return self._document.getChangeHistory()
-	
+
 	
 	def __getattr__(self, name):
 		stmt = _getSuiteStmtByName( self._model['suite'], name )

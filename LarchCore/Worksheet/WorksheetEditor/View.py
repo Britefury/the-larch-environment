@@ -504,7 +504,6 @@ class WorksheetEditorSubject (Subject):
 		self._model = model
 		# Defer the creation of the model view - it involves executing all the code in the worksheet which can take some time
 		self._modelView = None
-		self._enclosingSubject = enclosingSubject
 		self._location = location
 		self._importName = importName
 		self._title = title
@@ -526,12 +525,13 @@ class WorksheetEditorSubject (Subject):
 		return self._title + ' [Ws-Devel]'
 	
 	def getSubjectContext(self):
-		return self._enclosingSubject.getSubjectContext().withAttrs( location=self._location )
+		return self.enclosingSubject.getSubjectContext().withAttrs( location=self._location )
 	
 	def getChangeHistory(self):
 		return self._document.getChangeHistory()
 
-	def getBoundCommandSets(self):
-		return [ _worksheetEditorCommands.bindTo( self ) ]  +  self._enclosingSubject.getBoundCommandSets()
+	def buildBoundCommandSetList(self, cmdSets):
+		cmdSets.add( _worksheetEditorCommands.bindTo( self ) )
+		self.enclosingSubject.buildBoundCommandSetList( cmdSets )
 
 	

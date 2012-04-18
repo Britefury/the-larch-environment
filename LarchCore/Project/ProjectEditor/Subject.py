@@ -120,10 +120,10 @@ class _ProjectIndexSubject (Subject):
 
 	def getChangeHistory(self):
 		return self._indexSubject.getChangeHistory()
-	
-	def getBoundCommandSets(self):
-		return self._indexSubject.getBoundCommandSets()
-	
+
+	def buildBoundCommandSetList(self, cmdSets):
+		self._indexSubject.buildBoundCommandSetList( cmdSets )
+
 	
 
 
@@ -134,7 +134,6 @@ class _RootSubject (Subject):
 		assert isinstance( location, Location )
 		self._document = document
 		self._model = model
-		self._enclosingSubject = enclosingSubject
 		self._location = location
 		self._title = title
 		
@@ -150,13 +149,14 @@ class _RootSubject (Subject):
 		return self._title + ' [Prj]'
 
 	def getSubjectContext(self):
-		return self._enclosingSubject.getSubjectContext().withAttrs( document=self._document, docLocation=self._location, location=self._location )
+		return self.enclosingSubject.getSubjectContext().withAttrs( document=self._document, docLocation=self._location, location=self._location )
 
 	def getChangeHistory(self):
 		return self._document.getChangeHistory()
 	
-	def getBoundCommandSets(self):
-		return [ _projectCommands.bindTo( self ) ]  +  self._enclosingSubject.getBoundCommandSets()
+	def buildBoundCommandSetList(self, cmdSets):
+		cmdSets.add( _projectCommands.bindTo( self ) )
+		self.enclosingSubject.buildBoundCommandSetList( cmdSets )
 
 
 	def __resolve__(self, name):
@@ -186,7 +186,7 @@ class ProjectSubject (_RootSubject):
 	def redirect(self):
 		index = self._model.contentsMap.get( 'index' )
 		if index is not None  and  isinstance( index, ProjectPage ):
-			return _ProjectIndexSubject( self.__resolve__( 'index' ), self._enclosingSubject, self._location + '.___project___' )
+			return _ProjectIndexSubject( self.__resolve__( 'index' ), self.enclosingSubject, self._location + '.___project___' )
 		else:
 			return None
 	

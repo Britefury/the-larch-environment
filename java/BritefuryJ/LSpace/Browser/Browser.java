@@ -13,6 +13,7 @@ import java.awt.MediaTracker;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -373,9 +374,9 @@ public class Browser
 	
 	
 	
-	public Iterable<BoundCommandSet> getBoundCommandSets()
+	public void buildBoundCommandSetList(List<BoundCommandSet> boundCommandSets)
 	{
-		return Arrays.asList( new BoundCommandSet[] { commands.bindTo( this ) } );
+		boundCommandSets.add( commands.bindTo( this ) );
 	}
 
 

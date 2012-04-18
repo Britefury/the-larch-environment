@@ -369,7 +369,6 @@ class ConsoleSubject (Subject):
 	def __init__(self, console, enclosingSubject):
 		super( ConsoleSubject, self ).__init__( enclosingSubject )
 		self._console = console
-		self._enclosingSubject = enclosingSubject
 
 
 	def getFocus(self):
@@ -382,7 +381,7 @@ class ConsoleSubject (Subject):
 		return 'Python console'
 
 	def getSubjectContext(self):
-		return self._enclosingSubject.getSubjectContext()
+		return self.enclosingSubject.getSubjectContext()
 
 	def getChangeHistory(self):
 		return None
