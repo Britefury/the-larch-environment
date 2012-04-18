@@ -9,6 +9,8 @@ from BritefuryJ.ChangeHistory import Trackable
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
+from Britefury.Util.Abstract import abstractmethod
+
 
 
 class ProjectNode (object):
@@ -29,6 +31,12 @@ class ProjectNode (object):
 	
 	def getParent(self):
 		return self._parent
+
+
+
+	@abstractmethod
+	def export(self, path):
+		pass
 
 	
 	def __get_trackable_contents__(self):

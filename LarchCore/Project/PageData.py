@@ -43,7 +43,13 @@ class PageData (object):
 		if isinstance( contents, DMNode ):
 			contents.realiseAsRoot()
 
-	
+
+
+	@abstractmethod
+	def exportAsString(self, filename):
+		pass
+
+
 	@abstractmethod
 	def __new_subject__(self, document, enclosingSubject, location, importName, title):
 		pass
@@ -64,7 +70,7 @@ class PageData (object):
 	def __deepcopy__(self, memo):
 		T = type( self )
 		return T( deepcopy( self.contents, memo ) )
-	
+
 	
 	def __get_trackable_contents__(self):
 		return [ self.contents ]

@@ -6,6 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
 import copy
+import os
 
 from java.lang import Object
 
@@ -13,6 +14,9 @@ from java.awt import Color
 from java.awt import BasicStroke
 
 from java.awt.event import KeyEvent
+
+from javax.swing import JOptionPane, JFileChooser
+from javax.swing.filechooser import FileNameExtensionFilter
 
 from java.util.regex import Pattern
 
@@ -30,12 +34,15 @@ from BritefuryJ.DefaultPerspective import DefaultPerspective
 from BritefuryJ.LSpace.Browser import Location
 from BritefuryJ.Graphics import *
 from BritefuryJ.StyleSheet import StyleSheet
+from BritefuryJ.LSpace import Anchor
 from BritefuryJ.LSpace.Input import ObjectDndHandler
 from BritefuryJ.LSpace.Interactor import ClickElementInteractor
 from BritefuryJ.Controls import *
 from BritefuryJ.Pres import *
 from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.Pres.RichText import *
+from BritefuryJ.Pres.UI import *
+from BritefuryJ.Util import InvokePyFunction
 
 from BritefuryJ.Projection import Perspective
 
@@ -216,7 +223,6 @@ _projectIndexDropDest = ObjectDndHandler.DropDest( ProjectDrag, _projectIndexDro
 
 
 _controlsStyle = StyleSheet.style( Controls.bClosePopupOnActivate( True ) )
-_projectControlsStyle = StyleSheet.style( Primitive.border( SolidBorder( 2.0, 2.0, Color( 131, 149, 172 ), None ) ), Primitive.rowSpacing( 30.0 ) )
 _projectIndexNameStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.25, 0.5 ) ), Primitive.fontBold( True ), Primitive.fontSize( 14 ) )
 _packageNameStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.0, 0.5 ) ), Primitive.fontBold( True ), Primitive.fontSize( 14 ) )
 _itemHoverHighlightStyle = StyleSheet.style( Primitive.hoverBackground( FilledOutlinePainter( Color( 0.8, 0.825, 0.9 ), Color( 0.125, 0.341, 0.574 ), BasicStroke( 1.0 ) ) ) )
@@ -238,22 +244,41 @@ class ProjectView (MethodDispatchView):
 	@ObjectDispatchMethod( ProjectRoot )
 	def ProjectRoot(self, fragment, inheritedState, project):
 		# Save and Save As
-		def _onSave(link, buttonEvent):
+		def _onSave(control, buttonEvent):
 			if document.hasFilename():
 				document.save()
 			else:
 				def handleSaveDocumentAsFn(filename):
 					document.saveAs( filename )
 
-				DocumentManagement.promptSaveDocumentAs( fragment.getSubjectContext()['world'], link.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn )
+				DocumentManagement.promptSaveDocumentAs( fragment.getSubjectContext()['world'], control.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn )
 
 
-		def _onSaveAs(link, buttonEvent):
+		def _onSaveAs(control, buttonEvent):
 			def handleSaveDocumentAsFn(filename):
 				document.saveAs( filename )
 
-			DocumentManagement.promptSaveDocumentAs( fragment.getSubjectContext()['world'], link.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn )
+			DocumentManagement.promptSaveDocumentAs( fragment.getSubjectContext()['world'], control.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn )
 
+
+		def _onExport(control, event):
+			component = control.getElement().getRootElement().getComponent()
+			openDialog = JFileChooser()
+			openDialog.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY )
+			response = openDialog.showDialog( component, 'Export' )
+			if response == JFileChooser.APPROVE_OPTION:
+				sf = openDialog.getSelectedFile()
+				if sf is not None:
+					filename = sf.getPath()
+					if filename is not None  and  os.path.isdir( filename ):
+						response = JOptionPane.showOptionDialog( component, 'Existing content will be overwritten. Proceed?', 'Overwrite existing content',
+						                                         JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, None, [ 'Overwrite', 'Cancel' ], 'Cancel' )
+						if response == JFileChooser.APPROVE_OPTION:
+							def _fn():
+								project.export( filename )
+							result, exc = InvokePyFunction.invoke( _fn )
+							if exc is not None:
+								BubblePopup.popupInBubbleAdjacentTo( DefaultPerspective.instance( exc ), control.getElement(), Anchor.BOTTOM, True, True )
 
 
 
@@ -298,16 +323,21 @@ class ProjectView (MethodDispatchView):
 		linkHeader = LinkHeaderBar( [ homeLink ] )
 
 		# Title
-		title = TitleBarWithSubtitle( 'DOCUMENT', document.getDocumentName() )
+		title = TitleBar( document.getDocumentName() )
 
 
 		# Controls for 'save' and 'save as'
-		saveLink = Hyperlink( 'SAVE', _onSave )
-		saveAsLink = Hyperlink( 'SAVE AS', _onSaveAs )
-		controlsBox = Row( [ saveLink.padX( 10.0 ), saveAsLink.padX( 10.0 ) ] )
-		controlsBorder = _projectControlsStyle.applyTo( Border( controlsBox ) )
+		saveExportHeader = SectionHeading2( 'Save/export' )
+		saveButton = Button.buttonWithLabel( 'SAVE', _onSave )
+		saveAsButton = Button.buttonWithLabel( 'SAVE AS', _onSaveAs )
+		exportButton = Button.buttonWithLabel( 'Export', _onExport )
+		saveBox = Row( [ saveButton.padX( 10.0 ), Spacer( 30.0, 0.0 ), saveAsButton.padX( 10.0 ), Spacer( 50.0, 0.0 ), exportButton.padX( 10.0 ) ] ).alignHLeft()
+		saveExportSection = Section( saveExportHeader, saveBox )
 
 
+
+		# Project
+		projectHeader = SectionHeading2( 'Project' )
 
 		# Python package name
 		pythonPackageNamePrompt = Label( 'Root Python package name: ' )
@@ -324,19 +354,21 @@ class ProjectView (MethodDispatchView):
 		def _onReset(button, event):
 			project.reset()
 			modules = document.unloadAllImportedModules()
-			print 'LarchCore.Project.ProjectEditor.View: unloaded modules:'
-			for module in modules:
-				print '\t' + module
+			heading = SectionHeading2( 'Unloaded modules:' )
+			modules = Column( [ Label( module )   for module in modules ] )
+			report = Section( heading, modules )
+			BubblePopup.popupInBubbleAdjacentTo( report, button.getElement(), Anchor.BOTTOM, True, True )
 		resetPrompt = Label( 'Reset (unload project modules): ' )
 		resetButton = Button.buttonWithLabel( 'Reset', _onReset )
 		reset = Row( [ resetPrompt, resetButton ] )
 
 
+		projectSection = Section( projectHeader, Body( [ pythonPackageNameBox, reset ] ) )
+
+
 		# Project index
-		indexHeader = Heading3( 'Project Index' )
+		indexHeader = SectionHeading2( 'Index' )
 
-
-		# Project contents
 		items = InnerFragment.map( project[:], inheritedState )
 
 		nameElement = _projectIndexNameStyle.applyTo( Label( 'Project' ) )
@@ -349,13 +381,13 @@ class ProjectView (MethodDispatchView):
 		contentsView = Column( [ nameBox.alignHExpand(), itemsBox.padX( _packageContentsIndentation, 0.0 ).alignHExpand() ] )
 
 
-		# Project index box
-		projectIndex = Column( [ indexHeader, contentsView ] )
+		indexSection = Section( indexHeader, contentsView )
+
 
 
 		# The page
 		head = Head( [ linkHeader, title ] )
-		body = Body( [ controlsBorder.pad( 5.0, 10.0 ).alignHLeft(), pythonPackageNameBox, reset, projectIndex ] )
+		body = Column( [ saveExportSection, projectSection, indexSection ] ).alignHPack()
 
 		return StyleSheet.style( Primitive.editable( False ) ).applyTo( Page( [ head, body ] ) )
 

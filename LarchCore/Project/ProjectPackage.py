@@ -47,6 +47,23 @@ class ProjectPackage (ProjectContainer):
 		self._incr.onChanged()
 		if self.__change_history__ is not None:
 			self.__change_history__.addChange( lambda: self.setName( name ), lambda: self.setName( oldName ), 'Package set name' )
-	
-	
+
+
+
+	def export(self, path):
+		myPath = os.path.join( path, self.name )
+		if not os.path.exists( myPath ):
+			os.mkdir( myPath )
+
+		# Create an empty init module if none is present
+		if '__init__' not in self.contentsMap:
+			initPath = os.path.join( myPath, '__init__.py' )
+			f = open( initPath, 'w' )
+			f.write( '' )
+			f.close()
+
+		self.exportContents( mypath )
+
+
+
 	name = property( getName, setName )

@@ -36,6 +36,7 @@ from BritefuryJ.Controls import *
 from BritefuryJ.Pres import *
 from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.Pres.RichText import *
+from BritefuryJ.Pres.UI import *
 
 from BritefuryJ.Projection import Perspective, Subject
 
@@ -100,9 +101,9 @@ def _contentsList(controls, contentsLists, title):
 
 	contentsBox = Column( [ controlsBorder.pad( 2.0, 2.0 ), openDocumentsSeparator, docListBox.pad( 10.0, 2.0 ) ] )
 	
-	heading = Heading3( title )
+	heading = SectionHeading2( title )
 	
-	return Column( [ heading, contentsBox.padX( 5.0, 0.0 ) ] )
+	return Section( heading, contentsBox.padX( 5.0, 0.0 ) )
 						
 						
 						
@@ -187,7 +188,7 @@ class AppView (MethodDispatchView):
 		
 		
 		head = Head( [ linkHeader, title ] )
-		body = Body( [ openDocumentsBox.pad( 10.0, 10.0 ).alignHLeft(), consolesBox.pad( 10.0, 10.0 ).alignHLeft() ] )
+		body = Body( [ openDocumentsBox.pad( 0.0, 10.0 ).alignHLeft(), consolesBox.pad( 0.0, 10.0 ).alignHLeft() ] )
 		return StyleSheet.style( Primitive.editable( False ) ).applyTo( Page( [ head, body ] ) )
 
 

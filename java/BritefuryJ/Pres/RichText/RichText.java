@@ -217,7 +217,7 @@ public class RichText
 	
 	public static StyleValues useH1TextAttrs(StyleValues style)
 	{
-		return style.useAttr( normalTextAttrs ).useAttr( h1TextAttrs );
+		return style.useAttr( headingTextAttrs ).useAttr( h1TextAttrs );
 	}
 
 	
@@ -229,7 +229,7 @@ public class RichText
 	
 	public static StyleValues useH2TextAttrs(StyleValues style)
 	{
-		return style.useAttr( normalTextAttrs ).useAttr( h2TextAttrs );
+		return style.useAttr( headingTextAttrs ).useAttr( h2TextAttrs );
 	}
 
 	
@@ -241,7 +241,7 @@ public class RichText
 	
 	public static StyleValues useH3TextAttrs(StyleValues style)
 	{
-		return style.useAttr( normalTextAttrs ).useAttr( h3TextAttrs );
+		return style.useAttr( headingTextAttrs ).useAttr( h3TextAttrs );
 	}
 
 	
@@ -253,7 +253,7 @@ public class RichText
 	
 	public static StyleValues useH4TextAttrs(StyleValues style)
 	{
-		return style.useAttr( normalTextAttrs ).useAttr( h4TextAttrs );
+		return style.useAttr( headingTextAttrs ).useAttr( h4TextAttrs );
 	}
 
 	
@@ -265,7 +265,7 @@ public class RichText
 	
 	public static StyleValues useH5TextAttrs(StyleValues style)
 	{
-		return style.useAttr( normalTextAttrs ).useAttr( h5TextAttrs );
+		return style.useAttr( headingTextAttrs ).useAttr( h5TextAttrs );
 	}
 
 	
@@ -277,7 +277,7 @@ public class RichText
 	
 	public static StyleValues useH6TextAttrs(StyleValues style)
 	{
-		return style.useAttr( normalTextAttrs ).useAttr( h6TextAttrs );
+		return style.useAttr( headingTextAttrs ).useAttr( h6TextAttrs );
 	}
 
 

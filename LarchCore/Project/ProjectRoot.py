@@ -6,6 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
 from copy import deepcopy
+import os
 
 from BritefuryJ.ChangeHistory import Trackable
 from BritefuryJ.Incremental import IncrementalValueMonitor
@@ -67,6 +68,25 @@ class ProjectRoot (ProjectContainer):
 
 	def reset(self):
 		self._startupExecuted = False
-	
-	
+
+
+
+	def export(self, path):
+		myPath = path
+
+		if self._pythonPackageName is not None:
+			components = self._pythonPackageName.split( '.' )
+			for c in components:
+				myPath = os.path.join( myPath, c )
+				if not os.path.exists( myPath ):
+					os.mkdir( myPath )
+					initPath = os.path.join( myPath, '__init__.py' )
+					f = open( initPath, 'w' )
+					f.write( '' )
+					f.close()
+
+		self.exportContents( myPath )
+
+
+
 	pythonPackageName = property( getPythonPackageName, setPythonPackageName )
