@@ -12,7 +12,6 @@ from BritefuryJ.LSpace import Anchor, ElementPainter, PageController
 from BritefuryJ.LSpace.Interactor import HoverElementInteractor, PushElementInteractor
 from BritefuryJ.Pres import LazyPres
 from BritefuryJ.Pres.Primitive import *
-from BritefuryJ.Pres.RichText import *
 from BritefuryJ.Pres.UI import *
 from BritefuryJ.StyleSheet import *
 from BritefuryJ.Controls import *
@@ -176,8 +175,8 @@ class _FragmentInspector (object):
 def inspectFragment(fragment, sourceElement, triggeringEvent):
 	selector = _FragmentSelector( fragment )
 
-	title = Heading3( 'Choose a fragment:' )
-	body = Column( [ title, selector ] )
+	title = SectionHeading2( 'Choose a fragment:' )
+	body = Section( title, selector )
 
 	content = _inspectorStyle( SpaceBin( 800.0, 0.0, body ) ).alignHExpand()
 	content = DefaultPerspective.instance( content )
