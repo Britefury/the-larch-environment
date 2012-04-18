@@ -26,24 +26,27 @@ public class UI
 
 
 
+	private static final Color titleColour = new Color( 0.15f, 0.15f, 0.15f );
 	private static final Color h1Colour = new Color( 0.2f, 0.2f, 0.2f );
 	private static final Color h2Colour = new Color( 0.25f, 0.25f, 0.25f );
 	private static final Color h3Colour = new Color( 0.3f, 0.3f, 0.3f );
 
 
-	public static final InheritedAttributeNonNull normalTextAttrs = new InheritedAttributeNonNull( uiNamespace, "normalTextAttrs", StyleSheet.class,
-			StyleSheet.style( Primitive.editable.as( false ), Primitive.selectable.as( false ), Primitive.fontFace.as( "Dotum; SansSerif" ),
-					Primitive.foreground.as( Color.BLACK )) );
+	public static final InheritedAttributeNonNull uiTextAttrs = new InheritedAttributeNonNull( uiNamespace, "normalTextAttrs", StyleSheet.class,
+			StyleSheet.style( Primitive.editable.as( false ), Primitive.selectable.as( false ), Primitive.fontFace.as( "Dotum; SansSerif" ) ) );
 
-	public static final InheritedAttributeNonNull headingTextAttrs = new InheritedAttributeNonNull( uiNamespace, "headingTextAttrs", StyleSheet.class,
-			    StyleSheet.style( Primitive.editable.as( false ), Primitive.selectable.as( false ), Primitive.fontFace.as( "Dotum; SansSerif" ) ) );
+	public static final InheritedAttributeNonNull normalTextAttrs = new InheritedAttributeNonNull( uiNamespace, "normalTextAttrs", StyleSheet.class,
+			StyleSheet.style( Primitive.foreground.as( Color.BLACK )) );
+
+	public static final InheritedAttributeNonNull titleTextAttrs = new InheritedAttributeNonNull( uiNamespace, "titleTextAttrs", StyleSheet.class,
+			    StyleSheet.style( Primitive.fontSize.as( 40 ), Primitive.foreground.as( titleColour ) ) );
 
 	public static final InheritedAttributeNonNull h1TextAttrs = new InheritedAttributeNonNull( uiNamespace, "h1TextAttrs", StyleSheet.class,
-			    StyleSheet.style( Primitive.fontSize.as( 32 ), Primitive.foreground.as( h1Colour ) ) );
+			    StyleSheet.style( Primitive.fontSize.as( 22 ), Primitive.foreground.as( h1Colour ) ) );
 	public static final InheritedAttributeNonNull h2TextAttrs = new InheritedAttributeNonNull( uiNamespace, "h2TextAttrs", StyleSheet.class,
-		    StyleSheet.style( Primitive.fontSize.as( 22 ), Primitive.foreground.as( h2Colour ) ) );
+		    StyleSheet.style( Primitive.fontSize.as( 18 ), Primitive.foreground.as( h2Colour ) ) );
 	public static final InheritedAttributeNonNull h3TextAttrs = new InheritedAttributeNonNull( uiNamespace, "h3TextAttrs", StyleSheet.class,
-		    StyleSheet.style( Primitive.fontSize.as( 12 ), Primitive.foreground.as( h3Colour) ) );
+		    StyleSheet.style( Primitive.fontSize.as( 14 ), Primitive.foreground.as( h3Colour) ) );
 	
 	
 	public static final InheritedAttributeNonNull sectionColumnStyle = new InheritedAttributeNonNull( uiNamespace, "sectionColumnStyle", StyleSheet.class,
@@ -55,47 +58,59 @@ public class UI
 
 	public static StyleSheet normalTextStyle(StyleValues style)
 	{
-		return style.get( normalTextAttrs, StyleSheet.class );
+		return style.get( uiTextAttrs, StyleSheet.class ).withAttrs( style.get( normalTextAttrs, StyleSheet.class ) );
 	}
 	
 	public static StyleValues useNormalTextAttrs(StyleValues style)
 	{
-		return style.useAttr( normalTextAttrs );
+		return style.useAttr( uiTextAttrs ).useAttr( normalTextAttrs );
+	}
+
+	
+	
+	public static StyleSheet titleTextStyle(StyleValues style)
+	{
+		return style.get( uiTextAttrs, StyleSheet.class ).withAttrs( style.get( titleTextAttrs, StyleSheet.class ) );
+	}
+	
+	public static StyleValues useTitleTextAttrs(StyleValues style)
+	{
+		return style.useAttr( uiTextAttrs ).useAttr( titleTextAttrs );
 	}
 
 	
 	
 	public static StyleSheet h1TextStyle(StyleValues style)
 	{
-		return style.get( headingTextAttrs, StyleSheet.class ).withAttrs( style.get( h1TextAttrs, StyleSheet.class ) );
+		return style.get( uiTextAttrs, StyleSheet.class ).withAttrs( style.get( h1TextAttrs, StyleSheet.class ) );
 	}
 	
 	public static StyleValues useH1TextAttrs(StyleValues style)
 	{
-		return style.useAttr( headingTextAttrs ).useAttr( h1TextAttrs );
+		return style.useAttr( uiTextAttrs ).useAttr( h1TextAttrs );
 	}
 
 	
 
 	public static StyleSheet h2TextStyle(StyleValues style)
 	{
-		return style.get( headingTextAttrs, StyleSheet.class ).withAttrs( style.get( h2TextAttrs, StyleSheet.class ) );
+		return style.get( uiTextAttrs, StyleSheet.class ).withAttrs( style.get( h2TextAttrs, StyleSheet.class ) );
 	}
 	
 	public static StyleValues useH2TextAttrs(StyleValues style)
 	{
-		return style.useAttr( headingTextAttrs ).useAttr( h2TextAttrs );
+		return style.useAttr( uiTextAttrs ).useAttr( h2TextAttrs );
 	}
 
 	
 
 	public static StyleSheet h3TextStyle(StyleValues style)
 	{
-		return style.get( headingTextAttrs, StyleSheet.class ).withAttrs( style.get( h3TextAttrs, StyleSheet.class ) );
+		return style.get( uiTextAttrs, StyleSheet.class ).withAttrs( style.get( h3TextAttrs, StyleSheet.class ) );
 	}
 	
 	public static StyleValues useH3TextAttrs(StyleValues style)
 	{
-		return style.useAttr( headingTextAttrs ).useAttr( h3TextAttrs );
+		return style.useAttr( uiTextAttrs ).useAttr( h3TextAttrs );
 	}
 }

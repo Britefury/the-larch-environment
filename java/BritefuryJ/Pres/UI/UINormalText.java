@@ -12,19 +12,19 @@ import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
 
-public class NormalText extends TextParagraph
+public class UINormalText extends TextParagraph
 {
-	public NormalText(Object contents[])
+	public UINormalText(Object contents[])
 	{
 		super( contents );
 	}
 	
-	public NormalText(List<Object> contents)
+	public UINormalText(List<Object> contents)
 	{
 		super( contents );
 	}
 	
-	public NormalText(String text)
+	public UINormalText(String text)
 	{
 		super( text );
 	}

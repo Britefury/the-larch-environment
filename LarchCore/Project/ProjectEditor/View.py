@@ -327,7 +327,7 @@ class ProjectView (MethodDispatchView):
 
 
 		# Controls for 'save' and 'save as'
-		saveExportHeader = SectionHeading2( 'Save/export' )
+		saveExportHeader = SectionHeading1( 'Save/export' )
 		saveButton = Button.buttonWithLabel( 'SAVE', _onSave )
 		saveAsButton = Button.buttonWithLabel( 'SAVE AS', _onSaveAs )
 		exportButton = Button.buttonWithLabel( 'Export', _onExport )
@@ -337,7 +337,7 @@ class ProjectView (MethodDispatchView):
 
 
 		# Project
-		projectHeader = SectionHeading2( 'Project' )
+		projectHeader = SectionHeading1( 'Project' )
 
 		# Python package name
 		pythonPackageNamePrompt = Label( 'Root Python package name: ' )
@@ -367,7 +367,7 @@ class ProjectView (MethodDispatchView):
 
 
 		# Project index
-		indexHeader = SectionHeading2( 'Index' )
+		indexHeader = SectionHeading1( 'Index' )
 
 		items = InnerFragment.map( project[:], inheritedState )
 
