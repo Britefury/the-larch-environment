@@ -15,7 +15,6 @@ import BritefuryJ.LSpace.LayoutTree.LayoutNode;
 import BritefuryJ.LSpace.LayoutTree.LayoutNodeLabel;
 import BritefuryJ.LSpace.LayoutTree.LayoutNodeText;
 import BritefuryJ.LSpace.StyleParams.LabelStyleParams;
-import BritefuryJ.LSpace.StyleParams.TextStyleParams;
 import BritefuryJ.LSpace.Util.TextVisual;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -69,7 +68,7 @@ public class LSLabel extends LSElement
 	
 	private void onTextModified(String text)
 	{
-		TextStyleParams textStyleParams = (TextStyleParams) styleParams;
+		LabelStyleParams textStyleParams = (LabelStyleParams) styleParams;
 
 		TextVisual v = TextVisual.getTextVisual( text, textStyleParams.getFont(), textStyleParams.getUnderline(), textStyleParams.getStrikethrough(), textStyleParams.getMixedSizeCaps() );
 		if ( v != visual )
