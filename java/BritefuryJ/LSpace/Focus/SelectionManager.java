@@ -32,18 +32,30 @@ public class SelectionManager
 	
 	public void dragSelection(SelectionPoint from, SelectionPoint to)
 	{
-		if ( initialPoint == null  ||  !initialPoint.isValid() )
+		if ( to != null  &&  to.isValid() )
 		{
 			if ( from != null  &&  from.isValid() )
 			{
 				initialPoint = from;
+				setSelection( initialPoint, to );
+			}
+			else
+			{
+				moveSelection( to );
+			}
+		}
+		else
+		{
+			if ( from != null  &&  from.isValid() )
+			{
+				moveSelection( from );
 			}
 			else
 			{
 				initialPoint = null;
+				rootElement.setSelection( null );
 			}
 		}
-		setSelection( initialPoint, to );
 	}
 	
 	public void dragSelection(SelectionPoint to)
