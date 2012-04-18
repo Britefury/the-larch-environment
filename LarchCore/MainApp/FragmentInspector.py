@@ -175,7 +175,7 @@ class _FragmentInspector (object):
 def inspectFragment(fragment, sourceElement, triggeringEvent):
 	selector = _FragmentSelector( fragment )
 
-	title = SectionHeading2( 'Choose a fragment:' )
+	title = SectionHeading1( 'Choose a fragment:' )
 	body = Section( title, selector )
 
 	content = _inspectorStyle( SpaceBin( 800.0, 0.0, body ) ).alignHExpand()

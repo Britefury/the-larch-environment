@@ -31,9 +31,9 @@ public class TableEditorStyle
 		    StyleSheet.style( Primitive.tableCellBoundaryPaint.as( new Color( 0.75f, 0.75f, 0.75f ) ),
 				    Primitive.tableBorder.as( new SolidBorder( 1.0, 0.0, new Color( 0.5f, 0.5f, 0.5f ), null ) ),
 				    Primitive.tableColumnSpacing.as( 5.0 ), Primitive.tableRowSpacing.as( 5.0 ) ) );
-	public static final InheritedAttribute headerBackgroundPaint = new InheritedAttribute( tableEditorNamespace, "headerBackgroundPaint", Paint.class, new Color( 0.9f, 0.9f, 0.9f ) );
+	public static final InheritedAttribute headerBackgroundPaint = new InheritedAttribute( tableEditorNamespace, "headerBackgroundPaint", Paint.class, new Color( 0.925f, 0.925f, 0.925f ) );
 	public static final InheritedAttributeNonNull headerAttrs = new InheritedAttributeNonNull( tableEditorNamespace, "headerAttrs", StyleSheet.class,
-		    StyleSheet.style( Primitive.fontBold.as( true ) ) );
+		    StyleSheet.style( Primitive.fontBold.as( true ), Primitive.foreground.as( new Color( 0.35f, 0.35f, 0.35f ) ) ) );
 
 
 

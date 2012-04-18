@@ -101,7 +101,7 @@ def _contentsList(controls, contentsLists, title):
 
 	contentsBox = Column( [ controlsBorder.pad( 2.0, 2.0 ), openDocumentsSeparator, docListBox.pad( 10.0, 2.0 ) ] )
 	
-	heading = SectionHeading2( title )
+	heading = SectionHeading1( title )
 	
 	return Section( heading, contentsBox.padX( 5.0, 0.0 ) )
 						
