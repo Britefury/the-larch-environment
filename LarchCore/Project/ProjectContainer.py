@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
+import os
+
 from Britefury.Util.TrackedList import TrackedListProperty
 
 from BritefuryJ.ChangeHistory import Trackable
@@ -99,8 +101,15 @@ class ProjectContainer (ProjectNode):
 		
 	def getContentsMap(self):
 		return self._contentsMapLive.getValue()
-	
-	
+
+
+	def exportContents(self, myPath):
+		for x in self._contents:
+			x.export( myPath )
+
+
+
+
 	def __get_trackable_contents__(self):
 		return self._contents.__get_trackable_contents__()
 	

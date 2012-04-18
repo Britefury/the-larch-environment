@@ -569,7 +569,7 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 			//performAllocationForSpaceRequirements();
 			performAllocation();
 			LayoutNodeRootElement rootLayout = (LayoutNodeRootElement)getLayoutNode();
-			return new Dimension( (int)Math.ceil( rootLayout.getReqMinWidth() ),  (int)Math.ceil( rootLayout.getReqHeight() ) );
+			return new Dimension( (int)Math.ceil( rootLayout.getReqPrefWidth() ),  (int)Math.ceil( rootLayout.getReqHeight() ) );
 		}
 		else
 		{

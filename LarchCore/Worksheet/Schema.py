@@ -15,7 +15,6 @@ schema = DMSchema( 'Worksheet', 'ws', 'LarchCore.Worksheet', 3 )
 
 
 WorksheetNode = schema.newClass( 'WorksheetNode', [] )
-WorksheetPartialNode = schema.newClass( 'WorksheetPartialNode', [] )
 
 
 Worksheet = schema.newClass( 'Worksheet', WorksheetNode, [ 'body' ] )

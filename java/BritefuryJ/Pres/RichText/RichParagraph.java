@@ -20,7 +20,7 @@ import BritefuryJ.Pres.Primitive.Text;
 import BritefuryJ.Pres.Primitive.Whitespace;
 import BritefuryJ.StyleSheet.StyleValues;
 
-abstract class RichParagraph extends AbstractRichText
+abstract public class RichParagraph extends AbstractRichText
 {
 	public RichParagraph(Object contents[])
 	{

@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
+import os
+
 from copy import deepcopy
 
 from BritefuryJ.ChangeHistory import Trackable
@@ -54,8 +56,18 @@ class ProjectPage (ProjectNode):
 	def getData(self):
 		self._incr.onAccess()
 		return self._data
-	
-	
+
+
+	def export(self, path):
+		filename = self.name + '.py'
+		myPath = os.path.join( path, filename )
+		s = self.data.exportAsString( self.name )
+		f = open( myPath, 'w' )
+		f.write( s )
+		f.close()
+
+
+
 	def __get_trackable_contents__(self):
 		return [ self.data ]
 

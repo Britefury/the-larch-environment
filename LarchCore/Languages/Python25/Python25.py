@@ -16,6 +16,7 @@ from LarchCore.Languages.Python25.Embedded import _py25NewModule
 from LarchCore.Languages.Python25.Python25Importer import importPy25File
 from LarchCore.Languages.Python25.PythonEditor.Subject import Python25Subject
 from LarchCore.Languages.Python25.PythonEditor.View import perspective as python25EditorPerspective
+from LarchCore.Languages.Python25.TextExporter import PythonTextExporter
 
 
 from LarchCore.Project.PageData import PageData, registerPageFactory, registerPageImporter
@@ -44,7 +45,11 @@ def isEmptyTopLevel(x):
 class Python25PageData (PageData):
 	def makeEmptyContents(self):
 		return _py25NewModule()
-	
+
+	def exportAsString(self, filename):
+		exporter = PythonTextExporter( filename )
+		return exporter( self.contents )
+
 	def __new_subject__(self, document, enclosingSubject, location, importName, title):
 		return Python25Subject( document, self.contents, enclosingSubject, location, importName, title )
 
