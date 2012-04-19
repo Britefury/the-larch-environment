@@ -51,6 +51,10 @@ public class TextEntry extends ControlPres
 		{
 		}
 
+		public void onTextChanged(TextEntryControl textEntry)
+		{
+		}
+
 		public void onTextInserted(TextEntryControl textEntry, int position, String textInserted)
 		{
 		}
@@ -168,6 +172,7 @@ public class TextEntry extends ControlPres
 					if ( listener != null )
 					{
 						listener.onTextInserted( TextEntryControl.this, insert.getPosition(), insert.getTextInserted() );
+						listener.onTextChanged( TextEntryControl.this );
 					}
 					validate( getDisplayedText() );
 					return true;
@@ -178,6 +183,7 @@ public class TextEntry extends ControlPres
 					if ( listener != null )
 					{
 						listener.onTextRemoved( TextEntryControl.this, remove.getPosition(), remove.getLength() );
+						listener.onTextChanged( TextEntryControl.this );
 					}
 					validate( getDisplayedText() );
 					return true;
@@ -188,6 +194,7 @@ public class TextEntry extends ControlPres
 					if ( listener != null )
 					{
 						listener.onTextReplaced( TextEntryControl.this, replace.getPosition(), replace.getLength(), replace.getReplacement() );
+						listener.onTextChanged( TextEntryControl.this );
 					}
 					validate( getDisplayedText() );
 					return true;
@@ -282,6 +289,12 @@ public class TextEntry extends ControlPres
 		{
 			textElement.setText( x );
 			validate( x );
+		}
+		
+		
+		public boolean isDisplayedTextValid()
+		{
+			return validate( getDisplayedText() );
 		}
 		
 		

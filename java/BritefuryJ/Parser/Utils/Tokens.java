@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.Parser.Utils;
 
+import java.util.regex.Pattern;
+
 import BritefuryJ.Parser.ParseResult;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.RegEx;
@@ -359,20 +361,29 @@ public class Tokens
 	}
 	
 	
-	public static final ParserExpression identifier = new RegEx( "[A-Za-z_][A-Za-z0-9_]*" );
+	public static Pattern identifierPattern = Pattern.compile( "[A-Za-z_][A-Za-z0-9_]*" );
+	public static Pattern decimalIntegerPattern = Pattern.compile( "[\\-]?[0-9]+" );
+	public static Pattern decimalIntegerNoOctalPattern = Pattern.compile( "(?:[1-9][0-9]*)|0" );
+	public static Pattern hexIntegerPattern = Pattern.compile( "0(x|X)[0-9A-Fa-f]+" );
+	public static Pattern hexIntegerWithoutPrefixPattern = Pattern.compile( "[0-9A-Fa-f]+" );
+	public static Pattern octalIntegerPattern = Pattern.compile( "0[0-7]+" );
+	public static Pattern floatingPointPattern = Pattern.compile( "[\\-]?(([0-9]+\\.[0-9]*)|(\\.[0-9]+))(e[\\-]?[0-9]+)?" );
+	
+	
+	public static final ParserExpression identifier = new RegEx( identifierPattern );
 	public static final ParserExpression javaIdentifier = new JavaIdentifier();
 	
-	public static final ParserExpression decimalInteger = new RegEx( "[\\-]?[0-9]+" );
-	public static final ParserExpression decimalIntegerNoOctal = new RegEx( "(?:[1-9][0-9]*)|0" );
+	public static final ParserExpression decimalInteger = new RegEx( decimalIntegerPattern );
+	public static final ParserExpression decimalIntegerNoOctal = new RegEx( decimalIntegerNoOctalPattern );
 	
-	public static final ParserExpression hexInteger = new RegEx( "0(x|X)[0-9A-Fa-f]+" );
-	public static final ParserExpression hexIntegerWithoutPrefix = new RegEx( "[0-9A-Fa-f]+" );
+	public static final ParserExpression hexInteger = new RegEx( hexIntegerPattern );
+	public static final ParserExpression hexIntegerWithoutPrefix = new RegEx( hexIntegerWithoutPrefixPattern );
 
-	public static final ParserExpression octalInteger = new RegEx( "0[0-7]+" );
+	public static final ParserExpression octalInteger = new RegEx( octalIntegerPattern );
 
 	public static final ParserExpression integer = decimalInteger.__or__( hexInteger );
 	
-	public static final ParserExpression floatingPoint = new RegEx( "[\\-]?(([0-9]+\\.[0-9]*)|(\\.[0-9]+))(e[\\-]?[0-9]+)?" );
+	public static final ParserExpression floatingPoint = new RegEx( floatingPointPattern );
 
 	public static final ParserExpression javaCharacterLiteral = new JavaCharacterLiteral();
 

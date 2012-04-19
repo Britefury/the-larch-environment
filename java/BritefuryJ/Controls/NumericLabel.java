@@ -82,7 +82,7 @@ public abstract class NumericLabel extends ControlPres
 		{
 			public void onAccept(TextEntryControl textEntry, String text)
 			{
-				onTextChanged( text );
+				NumericLabelControl.this.onTextChanged( text );
 				showLabel();
 			}
 		};
