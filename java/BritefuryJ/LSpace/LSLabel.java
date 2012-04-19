@@ -13,7 +13,6 @@ import java.awt.geom.AffineTransform;
 
 import BritefuryJ.LSpace.LayoutTree.LayoutNode;
 import BritefuryJ.LSpace.LayoutTree.LayoutNodeLabel;
-import BritefuryJ.LSpace.LayoutTree.LayoutNodeText;
 import BritefuryJ.LSpace.StyleParams.LabelStyleParams;
 import BritefuryJ.LSpace.Util.TextVisual;
 import BritefuryJ.Math.Point2;
@@ -74,7 +73,7 @@ public class LSLabel extends LSElement
 		if ( v != visual )
 		{
 			visual = v;
-			LayoutNodeText layout = (LayoutNodeText)getLayoutNode();
+			LayoutNodeLabel layout = (LayoutNodeLabel)getLayoutNode();
 			layout.setVisual( visual );
 			
 			queueResize();

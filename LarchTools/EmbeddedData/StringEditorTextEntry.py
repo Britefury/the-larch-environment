@@ -25,5 +25,5 @@ class StringEditorTextEntry (Editor):
 		return Model( value )
 
 
-	def __present__(self, fragment, inheritedState):
+	def buildEditorPres(self, fragment, inheritedState):
 		return TextEntry(self._model.liveValue)

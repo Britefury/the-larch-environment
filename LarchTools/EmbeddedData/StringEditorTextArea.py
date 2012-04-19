@@ -25,5 +25,5 @@ class StringEditorTextArea (Editor):
 		return Model( value )
 
 
-	def __present__(self, fragment, inheritedState):
+	def buildEditorPres(self, fragment, inheritedState):
 		return TextArea(self._model.liveValue)

@@ -27,5 +27,5 @@ class ColourEditorPicker (Editor):
 		return Model( value )
 
 
-	def __present__(self, fragment, inheritedState):
+	def buildEditorPres(self, fragment, inheritedState):
 		return ColourPicker( self._model.liveValue )
