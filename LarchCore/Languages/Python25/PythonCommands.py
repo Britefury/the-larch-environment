@@ -15,7 +15,7 @@ from LarchCore.Languages.Python25.Builder import embeddedExpression, embeddedSta
 
 
 
-def _makeInsertEmbeddedObjectAtCaretAction(valueAtCaretFactory, embedFn, insertSpecialFormAtCaretFn):
+def _makeInsertSpecialFormAtCaretAction(specialFormAtCaretFactory, insertSpecialFormAtCaretFn):
 	"""
 	valueAtCaretFactory - function( caret )  ->  value
 	embedFn - function( value )  ->  AST node
@@ -26,15 +26,116 @@ def _makeInsertEmbeddedObjectAtCaretAction(valueAtCaretFactory, embedFn, insertS
 
 		caret = rootElement.getCaret()
 		if caret.isValid()  and  caret.isEditable():
-			value = valueAtCaretFactory( caret )
-			if value is not None:
-				specialForm = embedFn( value )
+			specialForm = specialFormAtCaretFactory( caret )
+			if specialForm is not None:
 				insertSpecialFormAtCaretFn( caret, specialForm )
 				return True
 
 		return False
 
 	return _action
+
+
+def _makeWrapSelectionInSpecialFormAction(getSelectedNodeFn, specialFormAtSelectionFactory):
+	"""
+	getSelectedNodeFn - function( selection )  ->  selected_node
+	valueAtSelectionFactory - function( selected_node, selection )  ->  value
+	embedFn - function( value )  ->  AST node
+	"""
+	def _action(context, pageController):
+		element = context
+		rootElement = element.getRootElement()
+
+		selection = rootElement.getSelection()
+		if isinstance( selection, TextSelection )  and  selection.isValid()  and  selection.isEditable():
+			node = getSelectedNodeFn( selection )
+			if node is not None:
+				specialForm = specialFormAtSelectionFactory( node, selection )
+				if specialForm is not None:
+					pyReplaceNode( node, specialForm )
+					return True
+
+		return False
+
+	return _action
+
+
+
+
+
+
+
+def SpecialFormExprAtCaretAction(specialFormAtCaretFactory):
+	"""
+	specialFormAtCaretFactory - function( caret )  ->  specialForm
+	"""
+	return _makeInsertSpecialFormAtCaretAction(specialFormAtCaretFactory, insertSpecialFormExpressionAtCaret)
+
+
+
+
+def SpecialFormStmtAtCaretAction(specialFormAtCaretFactory):
+	"""
+	specialFormAtCaretFactory - function( caret )  ->  specialForm
+	"""
+	return _makeInsertSpecialFormAtCaretAction(specialFormAtCaretFactory, insertSpecialFormStatementAtCaret)
+
+
+
+
+def WrapSelectionInSpecialFormExprAction(specialFormAtSelectionFactory):
+	"""
+	valueAtSelectionFactory - function( selected_node, selection )  ->  value
+	"""
+	return _makeWrapSelectionInSpecialFormAction( getSelectedExpression, specialFormAtSelectionFactory )
+
+def WrapSelectionInSpecialFormStmtAction(specialFormAtSelectionFactory):
+	"""
+	valueAtSelectionFactory - function( selected_node, selection )  ->  value
+	"""
+	return _makeWrapSelectionInSpecialFormAction( getSelectedStatement, specialFormAtSelectionFactory )
+
+
+
+
+def WrapSelectedStatementRangeInSpecialFormAction(specialFormAtSelectionFactory):
+	"""
+	valueAtSelectionFactory - function( statements, selection )  ->  value
+	embedFn - function( value )  ->  AST node
+	"""
+	def _action(context, pageController):
+		element = context
+		rootElement = element.getRootElement()
+
+		selection = rootElement.getSelection()
+		if isinstance( selection, TextSelection )  and  selection.isValid()  and  selection.isEditable():
+			stmtRange = getSelectedStatementRange( selection )
+			if stmtRange is not None:
+				suite, i, j = stmtRange
+				specialForm = specialFormAtSelectionFactory( list( suite[i:j] ), selection )
+				if specialForm is not None:
+					pyReplaceStatementRangeWithStatement( suite, i, j, specialForm )
+					return True
+
+		return False
+
+	return _action
+
+
+
+
+
+
+def _makeInsertEmbeddedObjectAtCaretAction(valueAtCaretFactory, embedFn, insertSpecialFormAtCaretFn):
+	"""
+	valueAtCaretFactory - function( caret )  ->  value
+	embedFn - function( value )  ->  AST node
+	"""
+	def _specialFormAtCaret(caret):
+		value = valueAtCaretFactory( caret )
+		return embedFn( value )   if value is not None   else None
+
+	return _makeInsertSpecialFormAtCaretAction( _specialFormAtCaret, insertSpecialFormAtCaretFn )
 
 
 
@@ -65,23 +166,11 @@ def _makeWrapSelectionInEmbeddedObjectAction(getSelectedNodeFn, valueAtSelection
 	valueAtSelectionFactory - function( selected_node, selection )  ->  value
 	embedFn - function( value )  ->  AST node
 	"""
-	def _action(context, pageController):
-		element = context
-		rootElement = element.getRootElement()
-		
-		selection = rootElement.getSelection()
-		if isinstance( selection, TextSelection )  and  selection.isValid()  and  selection.isEditable():
-			node = getSelectedNodeFn( selection )
-			if node is not None:
-				value = valueAtSelectionFactory( node, selection )
-				if value is not None:
-					specialForm = embedFn( value )
-					pyReplaceNode( node, specialForm )
-					return True
-	
-		return False
-	
-	return _action
+	def specialFormAtSelection(node, selection):
+		value = valueAtSelectionFactory( node, selection )
+		return embedFn( value )   if value is not None   else None
+
+	return _makeWrapSelectionInSpecialFormAction( getSelectedNodeFn, specialFormAtSelection )
 
 			
 
@@ -119,24 +208,11 @@ def WrapSelectedStatementRangeInEmbeddedObjectAction(valueAtSelectionFactory):
 	valueAtSelectionFactory - function( statements, selection )  ->  value
 	embedFn - function( value )  ->  AST node
 	"""
-	def _action(context, pageController):
-		element = context
-		rootElement = element.getRootElement()
-		
-		selection = rootElement.getSelection()
-		if isinstance( selection, TextSelection )  and  selection.isValid()  and  selection.isEditable():
-			stmtRange = getSelectedStatementRange( selection )
-			if stmtRange is not None:
-				suite, i, j = stmtRange
-				value = valueAtSelectionFactory( list( suite[i:j] ), selection )
-				if value is not None:
-					specialForm = embeddedStatement( value )
-					pyReplaceStatementRangeWithStatement( suite, i, j, specialForm )
-					return True
-	
-		return False
-	
-	return _action
+	def specialFormAtSelection(statements, selection):
+		value = valueAtSelectionFactory( statements, selection )
+		return embeddedStatement( value )   if value is not None   else None
+
+	return WrapSelectedStatementRangeInSpecialFormAction( specialFormAtSelection )
 
 			
 
@@ -168,4 +244,7 @@ class PythonTargetCommandSet (CommandSet):
 	def __init__(self, name, commands):
 		super( PythonTargetCommandSet, self ).__init__( name, commands )
 		pythonTargetCommands.registerCommandSet( self )
+
+
+
 

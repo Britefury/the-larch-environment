@@ -15,6 +15,8 @@ from BritefuryJ.AttributeTable import *
 from BritefuryJ.Controls import *
 from BritefuryJ.StyleSheet import *
 from BritefuryJ.Graphics import *
+from BritefuryJ.Live import LiveFunction
+from BritefuryJ.Controls import *
 from BritefuryJ.Pres import *
 from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.Pres.RichText import *
@@ -272,6 +274,16 @@ def stringLiteral(format, quotation, value, raw):
 	boxContents.extend( [ quotationPres,  valuePres,  quotationPres ] )
 
 	return Row( boxContents )
+
+
+def multilineStringLiteral(valueLiveFunction, isUnicode, isRaw, editFn):
+	class _Listener (TextArea.TextAreaListener):
+		def onTextChanged(self, area):
+			editFn( area.getDisplayedText() )
+
+	t = TextArea( valueLiveFunction, _Listener() )
+
+	return t
 
 
 def intLiteral(format, value):

@@ -171,7 +171,18 @@ class Python25ASTGenerator (object):
 	# String literal
 	@DMObjectNodeDispatchMethod( Schema.StringLiteral )
 	def StringLiteral(self, lineno, ctx, node, format, quotation, value):
-		return _ast.Str( value )
+		s = repr( value )
+		if not format.endswith( 'regex' ):
+			s = s.replace( '\\\\', '\\' )
+		return _ast.Str( eval( s ) )
+
+
+	@DMObjectNodeDispatchMethod( Schema.MultilineStringLiteral )
+	def MultilineStringLiteral(self, node, format, value):
+		s = repr( value )
+		if not format.endswith( 'regex' ):
+			s = s.replace( '\\\\', '\\' )
+		return _ast.Str( eval( s ) )
 
 
 	# Integer literal
