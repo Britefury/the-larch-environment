@@ -32,43 +32,37 @@ public class SelectionManager
 	
 	public void dragSelection(SelectionPoint from, SelectionPoint to)
 	{
-		if ( isValidPoint( initialPoint ) )
+		if ( isValidPoint( from )  &&  ( !isValidPoint( initialPoint )  ||  rootElement.getSelection() == null  ) )
 		{
-			if ( isValidPoint( to ) )
+			// @from is valid
+			// and
+			// either initial is *not* valid or there is no current selection
+			
+			// Set the initial point to @from
+			initialPoint = from;
+		}
+		
+		// We now have a valid initial point, if one is available
+		
+		if ( isValidPoint( to ) )
+		{
+			// @to is valid
+			if ( isValidPoint( initialPoint ) )
 			{
+				// Select from @initialPoint to @to
 				setSelection( initialPoint, to );
 			}
-			else if ( isValidPoint( from ) )
+			else
 			{
-				setSelection( initialPoint, from );
+				// Just use @to
+				moveSelection( to );
 			}
 		}
 		else
 		{
-			if ( isValidPoint( from ) )
-			{
-				if ( isValidPoint( to ) )
-				{
-					initialPoint = from;
-					setSelection( initialPoint, to );
-				}
-				else
-				{
-					moveSelection( from );
-				}
-			}
-			else
-			{
-				if ( isValidPoint( to ) )
-				{
-					moveSelection( to );
-				}
-				else
-				{
-					initialPoint = null;
-					rootElement.setSelection( null );
-				}
-			}
+			// Nothing valid available
+			initialPoint = null;
+			rootElement.setSelection( null );
 		}
 	}
 	
