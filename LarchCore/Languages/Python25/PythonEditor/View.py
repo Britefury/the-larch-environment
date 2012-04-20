@@ -20,6 +20,7 @@ from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, Object
 
 from BritefuryJ.DocModel import DMObjectClass
 
+from BritefuryJ.Command import Command
 from BritefuryJ.Shortcut import Shortcut
 
 from BritefuryJ.AttributeTable import *
@@ -40,6 +41,8 @@ from BritefuryJ.Editor.Sequential.Item import *
 from BritefuryJ.Editor.SyntaxRecognizing.Precedence import PrecedenceHandler
 from BritefuryJ.Editor.SyntaxRecognizing import SREInnerFragment
 from BritefuryJ.Editor.SyntaxRecognizing.SyntaxRecognizingEditor import EditMode
+
+from BritefuryJ.Live import LiveFunction
 
 from BritefuryJ.ModelAccess.DocModel import *
 
@@ -345,35 +348,25 @@ def _embeddedObjectStmtContextMenuFactory(element, menu):
 
 
 
+def _removeSpecialFormExpr(model):
+	pyReplaceNode( model, Schema.Load( name='None' ) )
+
+
+def _specialFormExprContextMenuFactory(element, menu):
+	fragment = element.getFragmentContext()
+	model = fragment.getModel()
+
+	def _onDelete(item):
+		_removeSpecialFormExpr( model )
+
+	menu.add( MenuItem.menuItemWithLabel( 'Delete', _onDelete ) )
+
+	return False
+
+
+
+
 def _pythonModuleContextMenuFactory(element, menu):
-	rootElement = element.getRootElement()
-
-
-	extExprItems = []
-
-	def _onQuoteExpr(item):
-		caret = rootElement.getCaret()
-		if caret.isValid():
-			pyExpr = Schema.Quote( value=Schema.PythonExpression( expr=Schema.Load( name='None' ) ) )
-			insertSpecialFormExpressionAtCaret( caret, pyExpr )
-
-	def _onQuoteSuite(item):
-		caret = rootElement.getCaret()
-		if caret.isValid():
-			pyExpr = Schema.Quote( value=Schema.PythonSuite( suite=[] ) )
-			insertSpecialFormExpressionAtCaret( caret, pyExpr )
-
-	def _onUnquote(item):
-		caret = rootElement.getCaret()
-		if caret.isValid():
-			pyExpr = Schema.Unquote( value=Schema.PythonExpression( expr=Schema.Load( name='None' ) ) )
-			insertSpecialFormExpressionAtCaret( caret, pyExpr )
-
-
-	menu.add( MenuItem.menuItemWithLabel( 'Quote expression', _onQuoteExpr ) )
-	menu.add( MenuItem.menuItemWithLabel( 'Quote suite', _onQuoteSuite ) )
-	menu.add( MenuItem.menuItemWithLabel( 'Unquote', _onUnquote ) )
-
 	return True
 
 
@@ -475,6 +468,7 @@ def CompoundStatement(method):
 def SpecialFormExpression(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
+		v = v.withContextMenuInteractor( _specialFormExprContextMenuFactory )
 		return StructuralItem( model, v )
 	return redecorateDispatchMethod( method, _m )
 
@@ -652,6 +646,25 @@ class Python25View (MethodDispatchView):
 		quote = "'"   if quotation == 'single'   else   '"'
 
 		return stringLiteral( fmt, quote, value, format.endswith( 'regex' ) )
+
+
+	@DMObjectNodeDispatchMethod( Schema.MultilineStringLiteral )
+	@SpecialFormExpression
+	def MultilineStringLiteral(self, fragment, inheritedState, model, format):
+		@LiveFunction
+		def _val():
+			# Check if @model is indeed a MultilineStringLiteral;
+			# the pyReplaceNode function uses the doc model node 'become' method, which changes the node class
+			# and contents in-place, which can result the multi-line string becoming something else
+			if model.isInstanceOf( Schema.MultilineStringLiteral ):
+				return model['value']
+			else:
+				return ''
+
+		def _onEdit(text):
+			model['value'] = text
+		return multilineStringLiteral( _val, format.startswith( 'unicode' ), format.endswith( 'regex' ), _onEdit )
+
 
 	# Integer literal
 	@DMObjectNodeDispatchMethod( Schema.IntLiteral )
@@ -1632,6 +1645,41 @@ class Python25View (MethodDispatchView):
 _parser = Python25Grammar()
 _view = Python25View( _parser )
 perspective = SequentialEditorPerspective( _view.fragmentViewFunction, PythonSyntaxRecognizingEditor.instance )
+
+
+
+
+
+@PythonCommands.SpecialFormExprAtCaretAction
+def _newMultilineString(caret):
+	return Schema.MultilineStringLiteral( value='', format='ascii' )
+
+_multilineStringCommand = Command( '&Mult-line &string', _newMultilineString )
+
+
+@PythonCommands.SpecialFormExprAtCaretAction
+def _newQuoteExpr(caret):
+	return Schema.Quote( value=Schema.PythonExpression( expr=Schema.Load( name='None' ) ) )
+
+_quoteExprCommand = Command( '&Quote e&xpression', _newQuoteExpr )
+
+
+@PythonCommands.SpecialFormExprAtCaretAction
+def _newQuoteStmt(caret):
+	return Schema.Quote( value=Schema.PythonSuite( suite=[] ) )
+
+_quoteStmtCommand = Command( '&Quote &statement', _newQuoteStmt )
+
+
+@PythonCommands.SpecialFormExprAtCaretAction
+def _newUnquote(caret):
+	return Schema.Unquote( value=Schema.PythonExpression( expr=Schema.Load( name='None' ) ) )
+
+_unquoteCommand = Command( '&Un&quote', _newUnquote )
+
+
+PythonCommands.PythonCommandSet( 'LarchCore.Languages.Python25', [ _multilineStringCommand, _quoteExprCommand, _quoteStmtCommand, _unquoteCommand ] )
+
 
 
 

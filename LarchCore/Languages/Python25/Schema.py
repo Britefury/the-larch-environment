@@ -34,7 +34,7 @@ UNPARSED = schema.newClass( 'UNPARSED', Node, [ 'value' ] )
 #
 Literal = schema.newClass( 'Literal', Expr, [] )
 StringLiteral = schema.newClass( 'StringLiteral', Literal, [ 'format', 'quotation', 'value' ] )
-MultilineStringLiteral = schema.newClass( 'MultilineStringLiteral', Literal, [ 'format', 'quotation', 'value' ] )
+MultilineStringLiteral = schema.newClass( 'MultilineStringLiteral', Literal, [ 'format', 'value' ] )
 IntLiteral = schema.newClass( 'IntLiteral', Literal, [ 'format', 'numType', 'value' ] )
 FloatLiteral = schema.newClass( 'FloatLiteral', Literal, [ 'value' ] )
 ImaginaryLiteral = schema.newClass( 'ImaginaryLiteral', Literal, [ 'value' ] )

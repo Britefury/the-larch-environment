@@ -195,7 +195,7 @@ def modifySuiteMinimisingChanges(target, modified):
 
 #
 #
-# STREAM OPERATIONS
+# RICH STRING OPERATIONS
 #
 #
 

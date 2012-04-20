@@ -86,6 +86,10 @@ public class TextArea extends ControlPres
 		public void onTextReplaced(TextAreaControl textArea, int position, int length, String replacementText)
 		{
 		}
+		
+		public void onTextChanged(TextAreaControl textArea)
+		{
+		}
 	}
 	
 	
@@ -157,6 +161,7 @@ public class TextArea extends ControlPres
 					if ( listener != null )
 					{
 						listener.onTextRemoved( TextAreaControl.this, startPosition, endPosition - startPosition );
+						listener.onTextChanged( TextAreaControl.this );
 					}
 				}
 				
@@ -180,6 +185,7 @@ public class TextArea extends ControlPres
 					if ( listener != null )
 					{
 						listener.onTextReplaced( TextAreaControl.this, startPosition, endPosition - startPosition, replacement );
+						listener.onTextChanged( TextAreaControl.this );
 					}
 				}
 				
@@ -210,16 +216,19 @@ public class TextArea extends ControlPres
 								{
 									TextEditEventInsert insert = (TextEditEventInsert)event;
 									listener.onTextInserted( TextAreaControl.this, lineOffset + insert.getPosition(), insert.getTextInserted() );
+									listener.onTextChanged( TextAreaControl.this );
 								}
 								else if ( event instanceof TextEditEventRemove )
 								{
 									TextEditEventRemove remove = (TextEditEventRemove)event;
 									listener.onTextRemoved( TextAreaControl.this, lineOffset + remove.getPosition(), remove.getLength() );
+									listener.onTextChanged( TextAreaControl.this );
 								}
 								else if ( event instanceof TextEditEventReplace )
 								{
 									TextEditEventReplace replace = (TextEditEventReplace)event;
 									listener.onTextReplaced( TextAreaControl.this, lineOffset + replace.getPosition(), replace.getLength(), replace.getReplacement() );
+									listener.onTextChanged( TextAreaControl.this );
 								}
 							}
 							

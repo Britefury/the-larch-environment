@@ -32,28 +32,42 @@ public class SelectionManager
 	
 	public void dragSelection(SelectionPoint from, SelectionPoint to)
 	{
-		if ( to != null  &&  to.isValid() )
+		if ( isValidPoint( initialPoint ) )
 		{
-			if ( from != null  &&  from.isValid() )
+			if ( isValidPoint( to ) )
 			{
-				initialPoint = from;
 				setSelection( initialPoint, to );
 			}
-			else
+			else if ( isValidPoint( from ) )
 			{
-				moveSelection( to );
+				setSelection( initialPoint, from );
 			}
 		}
 		else
 		{
-			if ( from != null  &&  from.isValid() )
+			if ( isValidPoint( from ) )
 			{
-				moveSelection( from );
+				if ( isValidPoint( to ) )
+				{
+					initialPoint = from;
+					setSelection( initialPoint, to );
+				}
+				else
+				{
+					moveSelection( from );
+				}
 			}
 			else
 			{
-				initialPoint = null;
-				rootElement.setSelection( null );
+				if ( isValidPoint( to ) )
+				{
+					moveSelection( to );
+				}
+				else
+				{
+					initialPoint = null;
+					rootElement.setSelection( null );
+				}
 			}
 		}
 	}
@@ -91,5 +105,11 @@ public class SelectionManager
 			Selection selection = posA.createSelectionTo( posB );
 			rootElement.setSelection( selection );
 		}
+	}
+	
+	
+	private static boolean isValidPoint(SelectionPoint p)
+	{
+		return p != null  &&  p.isValid();
 	}
 }

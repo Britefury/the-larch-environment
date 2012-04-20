@@ -180,9 +180,17 @@ class Python25CodeGenerator (object):
 			raise ValueError, 'Unknown string literal format'
 		quote = '"'   if quotation == 'double'   else   "'"
 		return prefix + quote + value + quote
-	
-	
-	
+
+
+	@DMObjectNodeDispatchMethod( Schema.MultilineStringLiteral )
+	def MultilineStringLiteral(self, node, format, value):
+		s = repr( value )
+		if not format.endswith( 'regex' ):
+			s = s.replace( '\\\\', '\\' )
+		return s
+
+
+
 	# Integer literal
 	@DMObjectNodeDispatchMethod( Schema.IntLiteral )
 	def IntLiteral(self, node, format, numType, value):
