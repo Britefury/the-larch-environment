@@ -9,10 +9,10 @@ package BritefuryJ.LSpace;
 
 import java.awt.Graphics2D;
 
-import BritefuryJ.LSpace.LayoutTree.LayoutNodeBorder;
-import BritefuryJ.LSpace.StyleParams.ContainerStyleParams;
 import BritefuryJ.Graphics.AbstractBorder;
 import BritefuryJ.Graphics.FilledBorder;
+import BritefuryJ.LSpace.LayoutTree.LayoutNodeBorder;
+import BritefuryJ.LSpace.StyleParams.ContainerStyleParams;
 
 
 public class LSBorder extends LSBin

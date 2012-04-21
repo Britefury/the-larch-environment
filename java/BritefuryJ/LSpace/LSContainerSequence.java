@@ -434,7 +434,7 @@ abstract public class LSContainerSequence extends LSContainerNonOverlayed
 	{
 		handleDrawSelfBackground( graphics, areaBox );
 		
-		AABox2 clipBox = getLocalClipBox();
+		AABox2 clipBox = getLocalVisibleBoundsClipBox();
 		if ( clipBox != null )
 		{
 			areaBox = areaBox.intersection( clipBox );
@@ -504,7 +504,7 @@ abstract public class LSContainerSequence extends LSContainerNonOverlayed
 	{
 		handleDrawSelf( graphics, areaBox );
 		
-		AABox2 clipBox = getLocalClipBox();
+		AABox2 clipBox = getLocalVisibleBoundsClipBox();
 		if ( clipBox != null )
 		{
 			areaBox = areaBox.intersection( clipBox );

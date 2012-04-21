@@ -37,7 +37,7 @@ public abstract class LSContainerNonOverlayed extends LSContainer
 	{
 		handleDrawSelfBackground( graphics, areaBox );
 		
-		AABox2 clipBox = getLocalClipBox();
+		AABox2 clipBox = getLocalVisibleBoundsClipBox();
 		if ( clipBox != null )
 		{
 			areaBox = areaBox.intersection( clipBox );
@@ -64,7 +64,7 @@ public abstract class LSContainerNonOverlayed extends LSContainer
 	{
 		handleDrawSelf( graphics, areaBox );
 		
-		AABox2 clipBox = getLocalClipBox();
+		AABox2 clipBox = getLocalVisibleBoundsClipBox();
 		if ( clipBox != null )
 		{
 			areaBox = areaBox.intersection( clipBox );

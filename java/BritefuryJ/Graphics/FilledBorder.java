@@ -8,6 +8,7 @@ package BritefuryJ.Graphics;
 
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 
@@ -103,6 +104,19 @@ public class FilledBorder extends AbstractBorder
 		return highlightBackgroundPaint != null;
 	}
 
+	@Override
+	protected Shape getClipShape(Graphics2D graphics, double x, double y, double w, double h)
+	{
+		if ( roundingX != 0.0  ||  roundingY != 0.0 )
+		{
+			return new RoundRectangle2D.Double( x, y, w, h, roundingX, roundingY );
+		}
+		else
+		{
+			return new Rectangle2D.Double( x, y, w, h );
+		}
+	}
+	
 	@Override
 	public void draw(Graphics2D graphics, double x, double y, double w, double h, boolean highlight)
 	{

@@ -201,7 +201,7 @@ public class LSViewport extends LSContainerNonOverlayed implements FiniteViewpor
 		return viewportBehaviour.getWorldToViewXform();
 	}
 	
-	public AABox2 getLocalClipBox()
+	public AABox2 getLocalVisibleBoundsClipBox()
 	{
 		return getLocalAABox();
 	}
@@ -279,16 +279,16 @@ public class LSViewport extends LSContainerNonOverlayed implements FiniteViewpor
 	
 	protected void handleDrawBackground(Graphics2D graphics, AABox2 areaBox)
 	{
-		Shape clipShape = pushClip( graphics );
+		Shape clipShape = pushVisibleBoundsClip( graphics );
 		super.handleDrawBackground( graphics, areaBox );
-		popClip( graphics, clipShape );
+		popVisibleBoundsClip( graphics, clipShape );
 	}
 	
 	protected void handleDraw(Graphics2D graphics, AABox2 areaBox)
 	{
-		Shape clipShape = pushClip( graphics );
+		Shape clipShape = pushVisibleBoundsClip( graphics );
 		super.handleDraw( graphics, areaBox );
-		popClip( graphics, clipShape );
+		popVisibleBoundsClip( graphics, clipShape );
 	}
 
 	

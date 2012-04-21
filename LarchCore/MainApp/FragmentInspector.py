@@ -10,7 +10,7 @@ from java.awt import Color
 from BritefuryJ.Graphics import *
 from BritefuryJ.LSpace import Anchor, ElementPainter, PageController
 from BritefuryJ.LSpace.Interactor import HoverElementInteractor, PushElementInteractor
-from BritefuryJ.Pres import LazyPres
+from BritefuryJ.Pres import LazyPres, Pres
 from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.Pres.UI import *
 from BritefuryJ.StyleSheet import *
@@ -154,21 +154,14 @@ class _FragmentInspector (object):
 
 
 
-	def _explorerPres(self):
-		return ScrolledViewport( self._explorer, 640.0, 480.0, True, True, None ).alignVTop()
-
-
-
 	def __present__(self, fragment, inheritedState):
-		console = ScrolledViewport( _consoleStyle( self._console ).alignVTop(), 640.0, 480.0, True, True, None )
-
 		def _explorerPres():
-			return self._explorerPres()
+			return Pres.coerce( self._explorer )
 
 		explorer = LazyPres( _explorerPres )
 
-		tabs = [ [ Label( 'Console' ), console ], [ Label( 'Element explorer' ), explorer ] ]
-		return TabbedBox( tabs, None )
+		tabs = [ [ Label( 'Console' ), _consoleStyle( self._console ).alignVTop() ], [ Label( 'Element explorer' ), explorer ] ]
+		return TabbedBox( tabs, None ).alignVTop()
 
 
 
