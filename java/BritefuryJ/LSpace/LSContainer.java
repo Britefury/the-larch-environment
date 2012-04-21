@@ -243,7 +243,7 @@ public abstract class LSContainer extends LSElement
 	{
 		Xform2 childToContainer = child.getLocalToParentXform();
 		AABox2 localBox = childToContainer.transform( childBox );
-		AABox2 clipBox = getLocalClipBox();
+		AABox2 clipBox = getLocalVisibleBoundsClipBox();
 		if ( clipBox != null )
 		{
 			localBox = localBox.intersection( getLocalAABox() );

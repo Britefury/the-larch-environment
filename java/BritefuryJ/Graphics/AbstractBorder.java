@@ -9,6 +9,7 @@ package BritefuryJ.Graphics;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.LinearGradientPaint;
+import java.awt.Shape;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
@@ -28,6 +29,11 @@ public abstract class AbstractBorder implements Presentable
 	public abstract double getBottomMargin();
 	
 	public abstract boolean isHighlightable();
+	
+	protected Shape getClipShape(Graphics2D graphics, double x, double y, double w, double h)
+	{
+		return null;
+	}
 	
 	public void draw(Graphics2D graphics, double x, double y, double w, double h, boolean highlight)
 	{

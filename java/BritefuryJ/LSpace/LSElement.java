@@ -670,7 +670,7 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 	}
 	
 	
-	public AABox2 getLocalClipBox()
+	public AABox2 getLocalVisibleBoundsClipBox()
 	{
 		return null;
 	}
@@ -1560,10 +1560,10 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 	//
 	//
 	
-	protected Shape pushClip(Graphics2D graphics)
+	protected Shape pushVisibleBoundsClip(Graphics2D graphics)
 	{
 		Shape clipShape = null;
-		AABox2 localClip = getLocalClipBox();
+		AABox2 localClip = getLocalVisibleBoundsClipBox();
 		if ( localClip != null )
 		{
 			clipShape = graphics.getClip();
@@ -1572,15 +1572,15 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 		return clipShape;
 	}
 	
-	protected void popClip(Graphics2D graphics, Shape clipShape)
+	protected void popVisibleBoundsClip(Graphics2D graphics, Shape clipShape)
 	{
-		if ( getLocalClipBox() != null )
+		if ( getLocalVisibleBoundsClipBox() != null )
 		{
 			graphics.setClip( clipShape );
 		}
 	}
 
-	public void clip(Graphics2D graphics)
+	public void clipToAllocBox(Graphics2D graphics)
 	{
 		graphics.clip( new Rectangle2D.Double( 0.0, 0.0, getActualWidth(), getActualHeight() ) );
 	}

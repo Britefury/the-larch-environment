@@ -43,7 +43,7 @@ public class Drawing extends Pres
 		public void draw(LSElement element, Graphics2D graphics)
 		{
 			Shape prevClip = graphics.getClip();
-			element.clip( graphics );
+			element.clipToAllocBox( graphics );
 			painter.draw( element, graphics );
 			graphics.setClip( prevClip );
 		}

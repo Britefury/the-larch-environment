@@ -648,6 +648,7 @@ class Python25View (MethodDispatchView):
 		return stringLiteral( fmt, quote, value, format.endswith( 'regex' ) )
 
 
+
 	@DMObjectNodeDispatchMethod( Schema.MultilineStringLiteral )
 	@SpecialFormExpression
 	def MultilineStringLiteral(self, fragment, inheritedState, model, format):
@@ -661,9 +662,17 @@ class Python25View (MethodDispatchView):
 			else:
 				return ''
 
+		@LiveFunction
+		def _isUnicode():
+			return model['format'].startswith( 'unicode' )
+
+		@LiveFunction
+		def _isRaw():
+			return model['format'].endswith( 'regex' )
+
 		def _onEdit(text):
 			model['value'] = text
-		return multilineStringLiteral( _val, format.startswith( 'unicode' ), format.endswith( 'regex' ), _onEdit )
+		return multilineStringLiteral( _val, _isUnicode, _isRaw, _onEdit )
 
 
 	# Integer literal

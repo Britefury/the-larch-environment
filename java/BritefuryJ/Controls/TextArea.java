@@ -210,6 +210,24 @@ public class TextArea extends ControlPres
 							String lineText = element.getTextRepresentation();
 							int lineOffset = sourceElement.getTextRepresentationOffsetInSubtree( TextAreaControl.this.element );
 							
+							int indexOfNewline = lineText.indexOf( "\n" );
+							if ( indexOfNewline == -1 )
+							{
+								// No newline characters at all - join with the next line
+								lineJoin( TextLine.this, lineText );
+							}
+							else if ( lineText.length() > 0  &&  indexOfNewline  ==  lineText.length() - 1 )
+							{
+								// The line text has characters and the first newline is at the end - no need to merge or split text lines
+								text = lineText.substring( 0, lineText.length() - 1 );
+								PresentationStateListenerList.onPresentationStateChanged( listeners, TextLine.this );
+							}
+							else
+							{
+								// There are newline characters in the text, just not only at the end - split the line up
+								lineModified( TextLine.this, lineText );
+							}
+							
 							if ( listener != null )
 							{
 								if ( event instanceof TextEditEventInsert )
@@ -231,27 +249,8 @@ public class TextArea extends ControlPres
 									listener.onTextChanged( TextAreaControl.this );
 								}
 							}
-							
-							if ( lineText.indexOf( "\n" )  ==  lineText.length() - 1 )
-							{
-								text = lineText.substring( 0, lineText.length() - 1 );
-								PresentationStateListenerList.onPresentationStateChanged( listeners, TextLine.this );
-							
-								return true;
-							}
-							else
-							{
-								if ( lineText.indexOf( "\n" ) != -1 )
-								{
-									// There are newline characters in the text, just not only at the end
-									lineModified( TextLine.this, lineText );
-								}
-								else
-								{
-									lineJoin( TextLine.this, lineText );
-								}
-								return true;
-							}
+
+							return true;
 						}
 						return false;
 					}
@@ -294,6 +293,12 @@ public class TextArea extends ControlPres
 
 			
 			
+			public TextAreaBox()
+			{
+				lines.add( new TextLine( "" ) );
+			}
+			
+			
 			@Override
 			public Pres textAreaPresent(FragmentView fragment, SimpleAttributeTable inheritedState)
 			{
@@ -304,52 +309,49 @@ public class TextArea extends ControlPres
 			}
 			
 			
+			public String getText()
+			{
+				StringBuilder builder = new StringBuilder();
+				boolean first = true;
+				for (TextLine line: lines)
+				{
+					if ( !first )
+					{
+						builder.append( "\n" );
+					}
+					builder.append( line.text );
+					first = false;
+				}
+				return builder.toString();
+			}
+			
 			public void setText(String text)
 			{
-				String textLines[];
-				if ( text.endsWith( "\n\n" ) )
+				if ( text.length() == 0 )
 				{
-					// This handles the behaviour of String#split, which will not add a final blank line where the text ends with two new line characters.
-					// To correct for this, add a space character, then remove that final artificial line afterwards
-					text = text + " ";
-					String lines[] = text.split( "\\r?\\n" );
-					textLines = new String[lines.length-1];
-					System.arraycopy( lines, 0, textLines, 0, lines.length - 1 );
+					lines.clear();
+					lines.add( new TextLine( "" ) );
 				}
 				else
 				{
-					textLines = text.split( "\\r?\\n" );
+					String textLines[] = text.split( "\\r?\\n", -1 );
+					
+					lines.clear();
+					for (String line: textLines)
+					{
+						lines.add( new TextLine( line ) );
+					}
 				}
-				
-				
-				lines.clear();
-				for (String line: textLines)
-				{
-					lines.add( new TextLine( line ) );
-				}
-				
-				
 				PresentationStateListenerList.onPresentationStateChanged( listeners, this );
 			}
 			
 			private void lineModified(TextLine line, String lineText)
 			{
 				int index = lines.indexOf( line );
+				
+				String withoutLastNewline = lineText.substring( 0, lineText.length() - 1 );
 
-				String lineTextSplitIntoLines[];
-				if ( lineText.endsWith( "\n\n" ) )
-				{
-					// This handles the behaviour of String#split, which will not add a final blank line where the text ends with two new line characters.
-					// To correct for this, add a space character, then remove that final artificial line afterwards
-					lineText = lineText + " ";
-					String lines[] = lineText.split( "\\r?\\n" );
-					lineTextSplitIntoLines = new String[lines.length-1];
-					System.arraycopy( lines, 0, lineTextSplitIntoLines, 0, lines.length - 1 );
-				}
-				else
-				{
-					lineTextSplitIntoLines = lineText.split( "\\r?\\n" );
-				}
+				String lineTextSplitIntoLines[] = withoutLastNewline.split( "\\r?\\n", -1 );
 				
 				
 				ArrayList<TextLine> replacementLines = new ArrayList<TextLine>();
@@ -424,7 +426,7 @@ public class TextArea extends ControlPres
 		
 		public String getDisplayedText()
 		{
-			return element.getTextRepresentation();
+			return box.getText();
 		}
 		
 		public void setDisplayedText(String text)
@@ -470,7 +472,12 @@ public class TextArea extends ControlPres
 				public void run()
 				{
 					String text = (String)value.getValue();
-					box.setText( text );
+					// Only alter the contents if they differ from the desired value
+					// Prevents an infinite loop
+					if ( !text.equals( getDisplayedText() ) )
+					{
+						box.setText( text );
+					}
 				}
 			};
 			element.queueImmediateEvent( event );

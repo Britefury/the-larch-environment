@@ -84,6 +84,19 @@ public class SolidBorder extends AbstractBorder
 
 
 	@Override
+	protected Shape getClipShape(Graphics2D graphics, double x, double y, double w, double h)
+	{
+		if ( roundingX != 0.0  ||  roundingY != 0.0 )
+		{
+			return new RoundRectangle2D.Double( x + thickness*0.5, y + thickness*0.5, w - thickness, h - thickness, roundingX, roundingY );
+		}
+		else
+		{
+			return new Rectangle2D.Double( x + thickness*0.5, y + thickness*0.5, w - thickness, h - thickness );
+		}
+	}
+
+	@Override
 	public void draw(Graphics2D graphics, double x, double y, double w, double h, boolean highlight)
 	{
 		Stroke prevStroke = graphics.getStroke();

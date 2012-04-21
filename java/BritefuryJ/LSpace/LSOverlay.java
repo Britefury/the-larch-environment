@@ -294,7 +294,7 @@ public class LSOverlay extends LSContainer
 		super.handleDraw( graphics, areaBox );
 
 		
-		AABox2 clipBox = getLocalClipBox();
+		AABox2 clipBox = getLocalVisibleBoundsClipBox();
 		if ( clipBox != null )
 		{
 			areaBox = areaBox.intersection( clipBox );
