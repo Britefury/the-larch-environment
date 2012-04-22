@@ -155,12 +155,13 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	protected final static int FLAG_NODE_REFRESH_REQUIRED = 0x2;
 	protected final static int FLAG_NODE_REFRESH_IN_PROGRESS = 0x4;
 	
-	protected final static int FLAG_REFSTATE_NONE = 0x00;
-	protected final static int FLAG_REFSTATE_REFED = 0x08;
-	protected final static int FLAG_REFSTATE_UNREFED = 0x10;
-	protected final static int _FLAG_REFSTATEMASK = 0x18;
+	protected final static int _FLAG_REFSTATE_MULTIPLIER = 0x08;
+	protected final static int FLAG_REFSTATE_NONE = 0x0 * _FLAG_REFSTATE_MULTIPLIER;
+	protected final static int FLAG_REFSTATE_REFED = 0x1 * _FLAG_REFSTATE_MULTIPLIER;
+	protected final static int FLAG_REFSTATE_UNREFED = 0x2 * _FLAG_REFSTATE_MULTIPLIER;
+	protected final static int _FLAG_REFSTATEMASK = 0x3 * _FLAG_REFSTATE_MULTIPLIER;
 	
-	protected final static int FLAGS_INCREMENTALTREENODE_END = 0x20;
+	protected final static int FLAGS_INCREMENTALTREENODE_END = 0x4 * _FLAG_REFSTATE_MULTIPLIER;
 
 	
 	
@@ -373,6 +374,11 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	public void queueRefresh()
 	{
 		incr.onChanged();
+	}
+	
+	public void disableAutoRefresh()
+	{
+		incr.blockAndClearIncomingDependencies();
 	}
 	
 	

@@ -19,9 +19,11 @@ public class IncrementalFunctionMonitor extends IncrementalMonitor
 	}
 	
 	
+	protected final static int FLAG_CYCLE_LOCK = 0x1;
+	protected final static int FLAG_BLOCK_INCOMING_DEPENDENCIES = 0x2;
 	
-	private HashSet<IncrementalMonitor> incomingDependencies;
-	private boolean cycleLock;
+	private HashSet<IncrementalMonitor> incomingDependencies = null;
+	private int flags = 0;
 	
 	
 	
@@ -34,9 +36,6 @@ public class IncrementalFunctionMonitor extends IncrementalMonitor
 	public IncrementalFunctionMonitor(Object owner)
 	{
 		super( owner );
-		
-		incomingDependencies = null;
-		cycleLock = false;
 	}
 	
 	
@@ -64,14 +63,21 @@ public class IncrementalFunctionMonitor extends IncrementalMonitor
 		notifyChanged();
 	}
 	
+	public void blockAndClearIncomingDependencies()
+	{
+		setFlag( FLAG_BLOCK_INCOMING_DEPENDENCIES );
+		incomingDependencies = null;
+	}
+	
 	public Object onRefreshBegin()
 	{
-		if ( cycleLock )
+		if ( testFlag( FLAG_CYCLE_LOCK ) )
 		{
 			throw new IncrementalEvaluationCycleException();
 		}
 		
-		cycleLock = true;
+		clearFlag( FLAG_BLOCK_INCOMING_DEPENDENCIES );
+		setFlag( FLAG_CYCLE_LOCK );
 
 		if ( incrementalState != IncrementalState.REFRESH_NOT_REQUIRED )
 		{
@@ -130,9 +136,9 @@ public class IncrementalFunctionMonitor extends IncrementalMonitor
 			incrementalState = IncrementalState.REFRESH_NOT_REQUIRED;
 		}
 
-		cycleLock = false;
+		clearFlag( FLAG_CYCLE_LOCK );
 	}
-
+	
 	
 	protected void onIncomingDependencyAccess(IncrementalMonitor inc)
 	{
@@ -142,11 +148,14 @@ public class IncrementalFunctionMonitor extends IncrementalMonitor
 
 	protected void addIncomingDependency(IncrementalMonitor dep)
 	{
-		if ( incomingDependencies == null )
+		if ( !testFlag( FLAG_BLOCK_INCOMING_DEPENDENCIES ) )
 		{
-			incomingDependencies = new HashSet<IncrementalMonitor>();
+			if ( incomingDependencies == null )
+			{
+				incomingDependencies = new HashSet<IncrementalMonitor>();
+			}
+			incomingDependencies.add( dep );
 		}
-		incomingDependencies.add( dep );
 	}
 
 	protected void removeIncomingDependency(IncrementalMonitor dep)
@@ -156,5 +165,39 @@ public class IncrementalFunctionMonitor extends IncrementalMonitor
 		{
 			incomingDependencies = null;
 		}
+	}
+
+
+	//
+	//
+	// Flag methods
+	//
+	//
+	
+	protected void clearFlag(int flag)
+	{
+		flags &= ~flag;
+	}
+	
+	protected void setFlag(int flag)
+	{
+		flags |= flag;
+	}
+	
+	protected void setFlagValue(int flag, boolean value)
+	{
+		if ( value )
+		{
+			flags |= flag;
+		}
+		else
+		{
+			flags &= ~flag;
+		}
+	}
+	
+	protected boolean testFlag(int flag)
+	{
+		return ( flags & flag )  !=  0;
 	}
 }

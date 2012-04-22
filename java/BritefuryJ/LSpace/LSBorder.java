@@ -17,7 +17,7 @@ import BritefuryJ.LSpace.StyleParams.ContainerStyleParams;
 
 public class LSBorder extends LSBin
 {
-	public static FilledBorder defaultBorder = new FilledBorder( 0.0, 0.0, 0.0, 0.0 );
+	public static final FilledBorder defaultBorder = new FilledBorder( 0.0, 0.0, 0.0, 0.0 );
 	
 	protected AbstractBorder border;
 	

@@ -9,6 +9,7 @@ package BritefuryJ.IncrementalView;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 
+import BritefuryJ.LSpace.AbstractTextRepresentationManager;
 import BritefuryJ.LSpace.ElementFilter;
 import BritefuryJ.LSpace.LSContentLeafEditable;
 import BritefuryJ.LSpace.LSElement;
@@ -50,7 +51,7 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 		{
 			if ( canReposition() )
 			{
-				return Marker.markerAtPositionAndBiasWithinSubtree( state.subtree, view.getPresentationRootElement().getDefaultTextRepresentationManager(), state.position, state.bias, leafFilter );
+				return state.markerAtNewPosition( view.getPresentationRootElement().getDefaultTextRepresentationManager(), leafFilter );
 			}
 			else
 			{
@@ -63,13 +64,13 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 	private static class MarkerState
 	{
 		private LSElement subtree;
-		private int position;
+		private int positionInSubtree;
 		private Marker.Bias bias;
 		
-		public MarkerState(int position, Marker.Bias bias)
+		public MarkerState(int positionInSubtree, Marker marker)
 		{
-			this.position = position;
-			this.bias = bias;
+			this.positionInSubtree = positionInSubtree;
+			this.bias = marker.getBias();
 		}
 		
 		
@@ -80,13 +81,18 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 
 		public void reposition(int position, Marker.Bias bias)
 		{
-			this.position = position;
+			this.positionInSubtree = position;
 			this.bias = bias;
 		}
 
 		public void reposition(int position)
 		{
-			this.position = position;
+			this.positionInSubtree = position;
+		}
+		
+		public Marker markerAtNewPosition(AbstractTextRepresentationManager textRepresentationManager, ElementFilter leafFilter)
+		{
+			return Marker.markerAtPositionAndBiasWithinSubtree( subtree, textRepresentationManager, positionInSubtree, bias, leafFilter );
 		}
 	}
 	
@@ -106,18 +112,18 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 		}
 		
 		
-		public MarkerState addMarkerStateFor(Marker marker, int position)
+		public MarkerState addMarkerStateFor(Marker marker, int positionInSubtree)
 		{
 			Marker.Bias bias = marker.getBias();
 			for (MarkerState state: markerStates)
 			{
-				if ( state.position == position  &&  state.bias == bias )
+				if ( state.positionInSubtree == positionInSubtree  &&  state.bias == bias )
 				{
 					return state;
 				}
 			}
 			
-			MarkerState state = new MarkerState( position, bias );
+			MarkerState state = new MarkerState( positionInSubtree, marker );
 			markerStates.add( state );
 			return state;
 		}
@@ -169,7 +175,7 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 					{
 						for (MarkerState state: markerStates)
 						{
-							int newPosition = state.position;
+							int newPosition = state.positionInSubtree;
 							Marker.Bias newBias = state.bias;
 							
 							if ( origChangeRegionLength <= 0  &&  newChangeRegionLength > 0 )
@@ -211,11 +217,11 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 								newTextRepresentation.length()  +  " (" + prefixLen + ":" + newChangeRegionLength + ":" + suffixLen + ")" );
 						for (MarkerState state: markerStates)
 						{
-							int newPosition = state.position;
+							int newPosition = state.positionInSubtree;
 							
-							if ( state.position > prefixLen )
+							if ( state.positionInSubtree > prefixLen )
 							{
-								int rel = state.position - prefixLen;
+								int rel = state.positionInSubtree - prefixLen;
 								if ( rel > origChangeRegionLength )
 								{
 									rel += newChangeRegionLength - origChangeRegionLength;
@@ -238,7 +244,7 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 
 						for (MarkerState state: markerStates)
 						{
-							int newPosition = state.position;
+							int newPosition = state.positionInSubtree;
 							Marker.Bias newBias = state.bias;
 							
 							
@@ -283,7 +289,7 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 								// Find the operation which covers the caret
 								for (StringDiff.Operation op: operations)
 								{
-									if ( state.position >= op.aBegin  &&  state.position < op.aEnd )
+									if ( state.positionInSubtree >= op.aBegin  &&  state.positionInSubtree < op.aEnd )
 									{
 										if ( op.opcode == StringDiff.Operation.OpCode.DELETE )
 										{
@@ -294,7 +300,7 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 										else
 										{
 											// Range replaced, equal, or inserted; offset position be delta between starts of ranges
-											newPosition = state.position + op.bBegin - op.aBegin;
+											newPosition = state.positionInSubtree + op.bBegin - op.aBegin;
 										}
 									}
 								}
@@ -391,24 +397,24 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 	
 	public void elementChangeFrom(FragmentView node, LSElement element)
 	{
-		for (MonitoredMarker m: markers)
+		for (MonitoredMarker monitored: markers)
 		{
-			Marker marker = m.marker;
+			Marker marker = monitored.marker;
 			if ( markerToState.get( marker ) == null )
 			{
 				LSElement nodeElement = node.getFragmentContentElement();
 				try
 				{
-					int pos = marker.getPositionInSubtree( nodeElement );
+					int posInSubtree = marker.getPositionInSubtree( nodeElement );
 					
 					NodeState nodeState = validNodeStateFor( node );
-					MarkerState state = nodeState.addMarkerStateFor( marker, pos );
+					MarkerState state = nodeState.addMarkerStateFor( marker, posInSubtree );
 					markerToState.put( marker, state );
-					m.state = state;
+					monitored.state = state;
 				}
 				catch (LSElement.IsNotInSubtreeException e)
 				{
-					// Caret is not in this sub-tree - do nothing
+					// Marker is not in this sub-tree - do nothing
 				}
 			}
 		}
