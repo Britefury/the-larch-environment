@@ -63,6 +63,7 @@ import BritefuryJ.Pres.ObjectPres.VerticalField;
 import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.LineBreak;
+import BritefuryJ.Pres.Primitive.LineBreakCostSpan;
 import BritefuryJ.Pres.Primitive.Paragraph;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Row;
@@ -396,18 +397,8 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 		{
 			String code = "import inspect\n" +
 			"\n" +
-			"def _flatten(xs):\n" +
-			"	ys = []\n" +
-			"	for x in xs:\n" +
-			"		if isinstance( x, list ):\n" +
-			"			ys.extend( _flatten( x ) )\n" +
-			"		else:\n" +
-			"			ys.append( x )\n" +
-			"	return ys\n" +
-			"\n" +
 			"def inspectFunction(f):\n" +
 			"	args, varargs, varkw, defaults = inspect.getargspec( f )\n" +
-			"	args = _flatten( args )\n" +
 			"	kwargs = []\n" + 
 			"	if defaults is not None:\n" +
 			"		kwargs = args[-len(defaults):]\n" +
@@ -429,6 +420,32 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 		return (PyTuple)getPythonInspectFunction().__call__( fun );
 	}
 	
+	
+	private static Pres presentPyFunctionArg(PyObject arg, StyleSheet style)
+	{
+		if ( arg instanceof PyList )
+		{
+			PyObject[] args = ((PyList)arg).getArray();
+			Pres p[] = new Pres[args.length * 3];      // 3 * (n-1)  +  1  +  2  =  n*3
+			int i = 0;
+			p[i++] = fnPunctuationStyle.applyTo( new Label( "(" ) );
+			for (PyObject a: args)
+			{
+				if ( i > 1 )
+				{
+					p[i++] = fnPunctuationStyle.applyTo( new Label( ", " ) );
+					p[i++] = new LineBreak();
+				}
+				p[i++] = presentPyFunctionArg( a, style );
+			}
+			p[i++] = fnPunctuationStyle.applyTo( new Label( ")" ) );
+			return new LineBreakCostSpan( p );
+		}
+		else
+		{
+			return style.applyTo( new StaticText( arg.toString() ) );
+		}
+	}
 	
 	private static Pres presentPyFunctionHeader(PyFunction fun, String name)
 	{
@@ -454,8 +471,9 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 			if ( !bFirst )
 			{
 				header.add( fnPunctuationStyle.applyTo( new StaticText( ", " ) ) );
+				header.add( new LineBreak() );
 			}
-			header.add( fnArgStyle.applyTo( new StaticText( arg.toString() ) ) );
+			header.add( presentPyFunctionArg( arg, fnArgStyle ) );
 			bFirst = false;
 		}
 		for (PyObject arg: ((PyList)kwargs).getArray())
@@ -463,8 +481,9 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 			if ( !bFirst )
 			{
 				header.add( fnPunctuationStyle.applyTo( new StaticText( ", " ) ) );
+				header.add( new LineBreak() );
 			}
-			header.add( fnKWArgStyle.applyTo( new StaticText( arg.toString() ) ) );
+			header.add( presentPyFunctionArg( arg, fnKWArgStyle ) );
 			bFirst = false;
 		}
 		if ( varargs != Py.None )
@@ -472,6 +491,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 			if ( !bFirst )
 			{
 				header.add( fnPunctuationStyle.applyTo( new StaticText( ", " ) ) );
+				header.add( new LineBreak() );
 			}
 			header.add( fnPunctuationStyle.applyTo( new StaticText( "*" ) ) );
 			header.add( fnVarArgStyle.applyTo( new StaticText( varargs.toString() ) ) );
@@ -482,6 +502,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 			if ( !bFirst )
 			{
 				header.add( fnPunctuationStyle.applyTo( new StaticText( ", " ) ) );
+				header.add( new LineBreak() );
 			}
 			header.add( fnPunctuationStyle.applyTo( new StaticText( "**" ) ) );
 			header.add( fnVarArgStyle.applyTo( new StaticText( varkw.toString() ) ) );
