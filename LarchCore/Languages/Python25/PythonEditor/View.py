@@ -652,6 +652,8 @@ class Python25View (MethodDispatchView):
 	@DMObjectNodeDispatchMethod( Schema.MultilineStringLiteral )
 	@SpecialFormExpression
 	def MultilineStringLiteral(self, fragment, inheritedState, model, format):
+		fragment.disableAutoRefresh()
+
 		@LiveFunction
 		def _val():
 			# Check if @model is indeed a MultilineStringLiteral;
@@ -660,6 +662,8 @@ class Python25View (MethodDispatchView):
 			if model.isInstanceOf( Schema.MultilineStringLiteral ):
 				return model['value']
 			else:
+				# A become operation has changed the type of @model - this fragment needs to be refreshed
+				fragment.queueRefresh()
 				return ''
 
 		@LiveFunction
