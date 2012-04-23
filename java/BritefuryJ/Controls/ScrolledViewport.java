@@ -7,31 +7,44 @@
 package BritefuryJ.Controls;
 
 import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSSpaceBin;
 import BritefuryJ.LSpace.PersistentState.PersistentState;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.SpaceBin;
 
 public class ScrolledViewport extends AbstractScrolledViewport
 {
-	private double minWidth, minHeight;
+	private double width, height;
+	private LSSpaceBin.SizeConstraint sizeConstraint;
 	
 	
-	public ScrolledViewport(Object child, double minWidth, double minHeight, boolean scrollX, boolean scrollY, PersistentState state)
+	public ScrolledViewport(Object child, double width, double height, LSSpaceBin.SizeConstraint sizeConstraint, boolean scrollX, boolean scrollY, PersistentState state)
 	{
 		super( child, scrollX, scrollY, state );
-		this.minWidth = minWidth;
-		this.minHeight = minHeight;
+		this.width = width;
+		this.height = height;
+		this.sizeConstraint = sizeConstraint;
 	}
 	
-	public ScrolledViewport(Object child, double minWidth, double minHeight, PersistentState state)
+	public ScrolledViewport(Object child, double width, double height, LSSpaceBin.SizeConstraint sizeConstraint, PersistentState state)
 	{
-		this( child, minWidth, minHeight, true, true, state );
+		this( child, width, height, sizeConstraint, true, true, state );
 	}
 	
+	public ScrolledViewport(Object child, double width, double height, boolean scrollX, boolean scrollY, PersistentState state)
+	{
+		this( child, width, height, LSSpaceBin.SizeConstraint.LARGER, scrollX, scrollY, state );
+	}
+	
+	public ScrolledViewport(Object child, double width, double height, PersistentState state)
+	{
+		this( child, width, height, LSSpaceBin.SizeConstraint.LARGER, true, true, state );
+	}
 
+	
 	@Override
 	protected Pres createViewportBin(LSElement viewport)
 	{
-		return new SpaceBin( minWidth, minHeight, false, viewport );
+		return new SpaceBin( width, height, sizeConstraint, viewport );
 	}
 }

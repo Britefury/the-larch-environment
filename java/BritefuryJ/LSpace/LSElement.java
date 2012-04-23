@@ -984,6 +984,17 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 	}
 	
 	
+	protected void setFlagMaskValue(int mask, int value)
+	{
+		flags = ( flags & ~mask )  |  ( value & mask );
+	}
+	
+	protected int getFlagMaskValue(int mask)
+	{
+		return flags & mask;
+	}
+	
+	
 	protected void clearFlagRealised()
 	{
 		clearFlag( FLAG_REALISED );
