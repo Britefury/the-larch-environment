@@ -37,6 +37,7 @@ from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.Pres.RichText import *
 from BritefuryJ.Pres.ContextMenu import *
 from BritefuryJ.Pres.ObjectPres import *
+from BritefuryJ.Pres.UI import *
 
 from BritefuryJ.Projection import Perspective, Subject
 
@@ -68,7 +69,7 @@ def _worksheetContextMenuFactory(element, menu):
 
 	refreshButton = Button.buttonWithLabel( 'Refresh', _onRefresh )
 	worksheetControls = ControlsRow( [ refreshButton.alignHPack() ] )
-	menu.add( SectionColumn( [ SectionTitle( 'Worksheet' ), worksheetControls ] ) )
+	menu.add( Section( SectionHeading2( 'Worksheet' ), worksheetControls ) )
 	return True
 
 

@@ -40,6 +40,7 @@ from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.Pres.RichText import *
 from BritefuryJ.Pres.ContextMenu import *
 from BritefuryJ.Pres.ObjectPres import *
+from BritefuryJ.Pres.UI import *
 
 from BritefuryJ.EditPerspective import EditPerspective
 
@@ -180,8 +181,8 @@ def _worksheetContextMenuFactory(element, menu):
 	h5ParaStyle = Hyperlink( 'H5', makeParaStyleFn( 'h5' ) )
 	h6ParaStyle = Hyperlink( 'H6', makeParaStyleFn( 'h6' ) )
 	titleParaStyle = Hyperlink( 'Title', makeParaStyleFn( 'title' ) )
-	styles = ControlsRow( [ normalParaStyle, h1ParaStyle, h2ParaStyle, h3ParaStyle, h4ParaStyle, h5ParaStyle, h6ParaStyle, titleParaStyle ] )
-	menu.add( SectionColumn( [ SectionTitle( 'Paragraph style' ), styles ] ).alignHExpand() )
+	paraStyles = ControlsRow( [ normalParaStyle, h1ParaStyle, h2ParaStyle, h3ParaStyle, h4ParaStyle, h5ParaStyle, h6ParaStyle, titleParaStyle ] )
+	menu.add( Section( SectionHeading2( 'Paragraph style' ), paraStyles ).alignHExpand() )
 	
 	
 	def makeToggleStyleFn(attrName):
@@ -205,7 +206,7 @@ def _worksheetContextMenuFactory(element, menu):
 	italicStyle = Button( _italicButtonLabelStyle( SpaceBin( 16.0, 16.0, Label( 'I' ).alignHCentre().alignVCentre() ) ), makeToggleStyleFn( 'italic' ) )
 	boldStyle = Button( _boldButtonLabelStyle( SpaceBin( 16.0, 16.0, Label( 'B' ).alignHCentre().alignVCentre() ) ), makeToggleStyleFn( 'bold' ) )
 	styles = ControlsRow( [ italicStyle, boldStyle ] ).alignHPack()
-	menu.add( SectionColumn( [ SectionTitle( 'Style' ), styles ] ).alignHExpand() )
+	menu.add( Section( SectionHeading2( 'Style' ), styles ).alignHExpand() )
 
 
 	def _onPythonCode(link, event):
@@ -218,7 +219,7 @@ def _worksheetContextMenuFactory(element, menu):
 
 	newCode = Hyperlink( 'Python code', _onPythonCode )
 	codeControls = ControlsRow( [ newCode ] )
-	menu.add( SectionColumn( [ SectionTitle( 'Code' ), codeControls ] ).alignHExpand() )
+	menu.add( Section( SectionHeading2( 'Code' ), codeControls ).alignHExpand() )
 	
 	
 	def _onQuoteLocation(link, event):
@@ -231,7 +232,7 @@ def _worksheetContextMenuFactory(element, menu):
 
 	newQuoteLocation = Hyperlink( 'View of Location', _onQuoteLocation )
 	quoteLocationControls = ControlsRow( [ newQuoteLocation ] )
-	menu.add( SectionColumn( [ SectionTitle( 'Location' ), quoteLocationControls ] ).alignHExpand() )
+	menu.add( Section( SectionHeading2( 'Location' ), quoteLocationControls ).alignHExpand() )
 	
 	
 	def _onRefresh(button, event):
@@ -241,7 +242,7 @@ def _worksheetContextMenuFactory(element, menu):
 
 	refreshButton = Button.buttonWithLabel( 'Refresh', _onRefresh )
 	worksheetControls = ControlsRow( [ refreshButton.alignHPack() ] )
-	menu.add( SectionColumn( [ SectionTitle( 'Worksheet' ), worksheetControls ] ).alignHExpand() )
+	menu.add( Section( SectionHeading2( 'Worksheet' ), worksheetControls ).alignHExpand() )
 	return True
 
 
