@@ -23,29 +23,14 @@ public class LSBorder extends LSBin
 	
 	
 	
-	public LSBorder()
+	public LSBorder(AbstractBorder border, LSElement child)
 	{
-		this( defaultBorder, ContainerStyleParams.defaultStyleParams );
+		this( border, ContainerStyleParams.defaultStyleParams, child );
 	}
 
-	public LSBorder(AbstractBorder border)
+	public LSBorder(AbstractBorder border, ContainerStyleParams styleParams, LSElement child)
 	{
-		this( border, ContainerStyleParams.defaultStyleParams );
-
-		if ( border == null )
-		{
-			throw new RuntimeException( "Cannot have null border" );
-		}
-	}
-
-	public LSBorder(ContainerStyleParams styleParams)
-	{
-		this( defaultBorder, styleParams);
-	}
-	
-	public LSBorder(AbstractBorder border, ContainerStyleParams styleParams)
-	{
-		super(styleParams);
+		super( styleParams, child );
 		
 		if ( border == null )
 		{

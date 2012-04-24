@@ -29,12 +29,12 @@ public class Bin extends Pres
 	@Override
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		LSBin element = new LSBin( Primitive.containerParams.get( style ) );
+		LSElement childElem = null;
 		if ( child != null )
 		{
 			StyleValues childStyle = Primitive.useContainerParams.get( style );
-			element.setChild( child.present( ctx, childStyle ).layoutWrap( childStyle.get( Primitive.hAlign, HAlignment.class ), childStyle.get( Primitive.vAlign, VAlignment.class ) ) );
+			childElem = child.present( ctx, childStyle ).layoutWrap( childStyle.get( Primitive.hAlign, HAlignment.class ), childStyle.get( Primitive.vAlign, VAlignment.class ) );
 		}
-		return element;
+		return new LSBin( Primitive.containerParams.get( style ), childElem );
 	}
 }

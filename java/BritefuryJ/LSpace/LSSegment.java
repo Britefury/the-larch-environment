@@ -31,17 +31,25 @@ public class LSSegment extends LSContainerNonOverlayed
 	// Constructor
 	//
 	
-	public LSSegment(boolean bGuardBegin, boolean bGuardEnd)
-	{
-		this( ContainerStyleParams.defaultStyleParams, CaretSlotStyleParams.defaultStyleParams, bGuardBegin, bGuardEnd );
-	}
-
 	public LSSegment(ContainerStyleParams styleParams, CaretSlotStyleParams caretSlotStyleParams, boolean bGuardBegin, boolean bGuardEnd)
+	{
+		this( styleParams, caretSlotStyleParams, bGuardBegin, bGuardEnd, null );
+	}
+	
+	public LSSegment(ContainerStyleParams styleParams, CaretSlotStyleParams caretSlotStyleParams, boolean bGuardBegin, boolean bGuardEnd, LSElement child)
 	{
 		super( styleParams );
 		this.caretSlotStyleParams = caretSlotStyleParams;
 		setFlagValue( FLAG_GUARD_BEGIN, bGuardBegin );
 		setFlagValue( FLAG_GUARD_END, bGuardEnd );
+
+		if ( child != null )
+		{
+			this.child = child;
+			registeredChildren.add( child );
+			registerChild( child );
+		}
+		
 		refreshGuards();
 	}
 	

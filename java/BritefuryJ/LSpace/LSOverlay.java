@@ -22,31 +22,16 @@ import BritefuryJ.Math.AABox2;
 
 public class LSOverlay extends LSContainer
 {
-	public LSOverlay()
-	{
-		this( ContainerStyleParams.defaultStyleParams, (List<LSElement>)null );
-	}
-
-	public LSOverlay(ContainerStyleParams styleParams)
-	{
-		this( styleParams, (List<LSElement>)null );
-	}
-
-	public LSOverlay(ContainerStyleParams styleParams, LSElement items[])
-	{
-		this( styleParams, Arrays.asList( items ) );
-	}
-
-	public LSOverlay(ContainerStyleParams styleParams, List<LSElement> items)
+	public LSOverlay(ContainerStyleParams styleParams, LSElement[] items)
 	{
 		super( styleParams );
 		
 		layoutNode = new LayoutNodeOverlay( this );
 
-		if ( items != null  &&  items.size() > 0 )
+		if ( items != null  &&  items.length > 0 )
 		{
 			// Set contents of @childEntries list
-			registeredChildren.addAll( items );
+			registeredChildren.addAll( Arrays.asList( items ) );
 	
 			// Register added entries
 			for (LSElement child: items)

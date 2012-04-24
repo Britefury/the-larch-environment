@@ -205,7 +205,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 		
 		
 		// Fragment element, with null context, initially; later set in @setContext method
-		fragmentElement = new LSFragment( this );
+		fragmentElement = new LSFragment( this, null );
 		fragmentElement.addDragSource( fragmentDragSource );
 		fragmentElement.addElementInteractor( fragmentInspectorInteractor );
 		element = null;

@@ -10,14 +10,9 @@ import BritefuryJ.LSpace.StyleParams.ContainerStyleParams;
 
 public class LSLineBreakCostSpan extends LSSpan
 {
-	public LSLineBreakCostSpan()
+	public LSLineBreakCostSpan(ContainerStyleParams styleParams, LSElement[] items)
 	{
-		super( ContainerStyleParams.defaultStyleParams );
-	}
-	
-	public LSLineBreakCostSpan(ContainerStyleParams styleParams)
-	{
-		super( styleParams );
+		super( styleParams, items );
 	}
 	
 	

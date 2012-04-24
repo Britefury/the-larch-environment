@@ -35,9 +35,8 @@ public class Segment extends Pres
 	@Override
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		LSSegment element = new LSSegment( Primitive.containerParams.get( style ), Primitive.caretSlotParams.get( style ), bGuardBegin, bGuardEnd );
-		element.setChild( child.present( ctx, Primitive.useContainerParams.get( style ) ) );
-		return element;
+		LSElement childElement = child.present( ctx, Primitive.useContainerParams.get( style ) );
+		return new LSSegment( Primitive.containerParams.get( style ), Primitive.caretSlotParams.get( style ), bGuardBegin, bGuardEnd, childElement );
 	}
 
 }

@@ -12,14 +12,9 @@ import BritefuryJ.LSpace.StyleParams.AbstractBoxStyleParams;
 
 abstract public class LSAbstractBox extends LSContainerSequence
 {
-	public LSAbstractBox()
+	public LSAbstractBox(AbstractBoxStyleParams styleParams, LSElement[] items)
 	{
-		this( AbstractBoxStyleParams.defaultStyleParams );
-	}
-
-	public LSAbstractBox(AbstractBoxStyleParams styleParams)
-	{
-		super(styleParams);
+		super( styleParams, items );
 	}
 
 

@@ -46,8 +46,8 @@ public class Column extends AbstractBox
 	@Override
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		LSColumn element = new LSColumn( Primitive.columnParams.get( style ) );
-		element.setChildren( mapPresent( ctx, Primitive.useColumnParams( style ), children ) );
+		LSElement[] childElems = mapPresent( ctx, Primitive.useColumnParams( style ), children );
+		LSColumn element = new LSColumn( Primitive.columnParams.get( style ), childElems );
 		if ( refPointIndex != -1 )
 		{
 			element.setRefPointIndex( refPointIndex );

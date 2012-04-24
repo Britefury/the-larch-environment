@@ -171,10 +171,10 @@ public class Table extends Pres
 		StyleValues childStyle = Primitive.useTableParams( style );
 		HAlignment childHAlign = childStyle.get( Primitive.hAlign, HAlignment.class );
 		VAlignment childVAlign = childStyle.get( Primitive.vAlign, VAlignment.class );
-		LSTable table = new LSTable( Primitive.tableParams.get( style ) );
+		LSTable.TableCell[][] elemCells = null;
 		if ( childCells != null )
 		{
-			LSTable.TableCell elemCells[][] = new LSTable.TableCell[childCells.length][];
+			elemCells = new LSTable.TableCell[childCells.length][];
 			for (int y = 0; y < childCells.length; y++)
 			{
 				TableCell row[] = childCells[y];
@@ -186,9 +186,9 @@ public class Table extends Pres
 					elemRow[x] = cell != null  ?  new LSTable.TableCell( cell.child.present( ctx, childStyle ).layoutWrap( childHAlign, childVAlign ), cell.colSpan, cell.rowSpan )  :  null;  
 				}
 			}
-			table.setCells( elemCells );
 		}
 		
+		LSTable table = new LSTable( Primitive.tableParams.get( style ), elemCells );
 		return applyTableBorder( style, table );
 	}
 
@@ -197,8 +197,7 @@ public class Table extends Pres
 		AbstractBorder tableBorder = style.get( Primitive.tableBorder, AbstractBorder.class );
 		if ( tableBorder != null )
 		{
-			LSBorder border = new LSBorder( tableBorder );
-			border.setChild( table );
+			LSBorder border = new LSBorder( tableBorder, table );
 			return border;
 		}
 		else

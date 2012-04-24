@@ -11,14 +11,9 @@ import BritefuryJ.LSpace.StyleParams.GridRowStyleParams;
 
 public class LSGridRow extends LSContainerSequence
 {
-	public LSGridRow()
+	public LSGridRow(GridRowStyleParams styleParams, LSElement[] items)
 	{
-		this( GridRowStyleParams.defaultStyleParams);
-	}
-	
-	public LSGridRow(GridRowStyleParams styleParams)
-	{
-		super(styleParams);
+		super( styleParams, items );
 		
 		layoutNode = new LayoutNodeGridRow( this );
 	}

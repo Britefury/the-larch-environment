@@ -118,9 +118,7 @@ public class DPStressTest
 			elems.add( args[i] );
 		}
 		elems.add( closeParen );
-		LSParagraph call = new LSParagraph( paraStyle );
-		call.extend( elems );
-		return call;
+		return new LSParagraph( paraStyle, elems.toArray( new LSElement[] {} ) );
 	}
 	
 	
@@ -132,17 +130,14 @@ public class DPStressTest
 	
 	protected LSElement createContentNode()
 	{
-		LSColumn box = new LSColumn( );
-		ArrayList<LSElement> children = new ArrayList<LSElement>();
+		LSElement[] children = new LSElement[NUMLINES];
 		
 		for (int i = 0; i < NUMLINES; i++)
 		{
-			children.add( call( attr( name( "obj" ), "method" ), name( "a" ), name( "b" ), name( "c" ), name( "d" ), name( "e" ), name( "f" ) ) );
+			children[i] = call( attr( name( "obj" ), "method" ), name( "a" ), name( "b" ), name( "c" ), name( "d" ), name( "e" ), name( "f" ) );
 		}
 		
-		box.setChildren( children );
-		
-		return box;
+		return new LSColumn( children );
 	}
 
 
@@ -163,8 +158,7 @@ public class DPStressTest
 		LSElement w = createContentNode();
 		long t2 = System.nanoTime();
 		System.out.println( "Element tree creation time: " + (double)( t2 - t1 ) / 1000000000.0 );
-		LSViewport viewport = new LSViewport( new ContainerStyleParams( HAlignment.EXPAND, VAlignment.EXPAND, null, null, null ), new PersistentState() );
-		viewport.setChild( w );
+		LSViewport viewport = new LSViewport( new ContainerStyleParams( HAlignment.EXPAND, VAlignment.EXPAND, null, null, null ), null, null, new PersistentState(), w );
 		presentation.getRootElement().setChild( viewport );
 	     
 	     

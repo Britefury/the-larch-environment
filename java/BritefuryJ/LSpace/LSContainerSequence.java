@@ -29,14 +29,21 @@ abstract public class LSContainerSequence extends LSContainerNonOverlayed
 	protected static final int VISIBILITY_CULLING_THRESHHOLD = 16;
 	
 	
-	public LSContainerSequence()
+	public LSContainerSequence(ContainerStyleParams styleParams, LSElement[] items)
 	{
-		this( ContainerStyleParams.defaultStyleParams );
-	}
+		super( styleParams );
 
-	public LSContainerSequence(ContainerStyleParams styleParams)
-	{
-		super(styleParams);
+		if ( items != null  &&  items.length > 0 )
+		{
+			// Set contents of @childEntries list
+			registeredChildren.addAll( Arrays.asList( items ) );
+	
+			// Register added entries
+			for (LSElement child: items)
+			{
+				registerChild( child );
+			}
+		}
 	}
 
 

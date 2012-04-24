@@ -36,9 +36,7 @@ public class StyleSheetBenchmark
 			elements[i] = new LSBox( 10.0, 10.0 );
 		}
 		
-		LSColumn box = new LSColumn();
-		box.setChildren( elements );
-		return box;
+		return new LSColumn( elements );
 	}
 	
 	public static double directConstructionTest()

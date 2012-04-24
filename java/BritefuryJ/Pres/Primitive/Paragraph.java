@@ -31,8 +31,7 @@ public class Paragraph extends SequentialPres
 	@Override
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		LSParagraph element = new LSParagraph( Primitive.paragraphParams.get( style ) );
-		element.setChildren( mapPresent( ctx, Primitive.useParagraphParams( style ).withAttr( Primitive.hAlign, HAlignment.PACK ), children ) );
-		return element;
+		LSElement[] childElems = mapPresent( ctx, Primitive.useParagraphParams( style ).withAttr( Primitive.hAlign, HAlignment.PACK ), children );
+		return new LSParagraph( Primitive.paragraphParams.get( style ), childElems );
 	}
 }

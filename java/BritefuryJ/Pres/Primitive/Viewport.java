@@ -42,9 +42,8 @@ public class Viewport extends Pres
 	@Override
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		LSViewport element = new LSViewport( Primitive.containerParams.get( style ), xRange, yRange, persistentState );
 		StyleValues childStyle = Primitive.useContainerParams.get( style );
-		element.setChild( child.present( ctx, childStyle ).layoutWrap( childStyle.get( Primitive.hAlign, HAlignment.class ), childStyle.get( Primitive.vAlign, VAlignment.class ) ) );
-		return element;
+		LSElement childElement = child.present( ctx, childStyle ).layoutWrap( childStyle.get( Primitive.hAlign, HAlignment.class ), childStyle.get( Primitive.vAlign, VAlignment.class ) );
+		return new LSViewport( Primitive.containerParams.get( style ), xRange, yRange, persistentState, childElement );
 	}
 }

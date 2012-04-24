@@ -19,19 +19,9 @@ public class LSFlowGrid extends LSContainerSequence implements TableElement
 {
 	private int targetNumColumns = -1;
 	
-	public LSFlowGrid()
+	public LSFlowGrid(TableStyleParams styleParams, int targetNumColumns, LSElement[] items)
 	{
-		this( TableStyleParams.defaultStyleParams, -1 );
-	}
-
-	public LSFlowGrid(TableStyleParams styleParams)
-	{
-		this( styleParams, -1 );
-	}
-	
-	public LSFlowGrid(TableStyleParams styleParams, int targetNumColumns)
-	{
-		super(styleParams);
+		super( styleParams, items );
 		
 		layoutNode = new LayoutNodeFlowGrid( this );
 		this.targetNumColumns = targetNumColumns;

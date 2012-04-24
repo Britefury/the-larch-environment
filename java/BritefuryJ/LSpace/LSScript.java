@@ -34,12 +34,7 @@ public class LSScript extends LSContainerNonOverlayed
 	CaretSlotStyleParams segmentCaretSlotStyleParams;
 
 
-	public LSScript()
-	{
-		this( ScriptStyleParams.defaultStyleSheet, CaretSlotStyleParams.defaultStyleParams);
-	}
-	
-	public LSScript(ScriptStyleParams styleSheet, CaretSlotStyleParams segmentCaretSlotStyleParams)
+	public LSScript(ScriptStyleParams styleSheet, CaretSlotStyleParams segmentCaretSlotStyleParams, LSElement leftSuper, LSElement leftSub, LSElement main, LSElement rightSuper, LSElement rightSub)
 	{
 		super( styleSheet );
 		
@@ -50,6 +45,25 @@ public class LSScript extends LSContainerNonOverlayed
 		children = new LSElement[NUMCHILDREN];
 		segs = new LSSegment[NUMCHILDREN];
 		paras = new LSParagraph[NUMCHILDREN];
+		
+		
+		LSElement[] childElements = new LSElement[] { leftSuper, leftSub, main, rightSuper, rightSub };
+		for (int slot = 0; slot < NUMCHILDREN; slot++)
+		{
+			LSElement child = childElements[slot];
+			if ( child != null )
+			{
+				LSSegment seg = new LSSegment( (ContainerStyleParams)getStyleParams(), segmentCaretSlotStyleParams, isBeginGuardRequired( slot ), isEndGuardRequired( slot ), child );
+				segs[slot] = seg;
+				LSParagraph para = new LSParagraph( new LSElement[] { seg } );
+				paras[slot] = para;
+				
+				registeredChildren.add( para );
+				registerChild( para );
+				
+				children[slot] = child;
+			}
+		}
 	}
 	
 	
@@ -86,10 +100,9 @@ public class LSScript extends LSContainerNonOverlayed
 
 			if ( bSegmentRequired  &&  !bSegmentPresent )
 			{
-				LSSegment seg = new LSSegment( (ContainerStyleParams)getStyleParams(), segmentCaretSlotStyleParams, isBeginGuardRequired( slot ), isEndGuardRequired( slot ) );
+				LSSegment seg = new LSSegment( (ContainerStyleParams)getStyleParams(), segmentCaretSlotStyleParams, isBeginGuardRequired( slot ), isEndGuardRequired( slot ), child );
 				segs[slot] = seg;
-				LSParagraph para = new LSParagraph( );
-				para.setChildren( Arrays.asList( new LSElement[] { seg } ) );
+				LSParagraph para = new LSParagraph( new LSElement[] { seg } );
 				paras[slot] = para;
 				
 				int insertIndex = 0;
@@ -107,10 +120,6 @@ public class LSScript extends LSContainerNonOverlayed
 
 			
 			children[slot] = child;
-			if ( child != null )
-			{
-				segs[slot].setChild( child );
-			}
 			
 			
 			if ( bSegmentPresent  &&  !bSegmentRequired )

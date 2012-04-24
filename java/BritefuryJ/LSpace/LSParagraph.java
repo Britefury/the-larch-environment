@@ -13,14 +13,14 @@ import BritefuryJ.LSpace.StyleParams.ParagraphStyleParams;
 
 public class LSParagraph extends LSContainerSequence
 {
-	public LSParagraph()
+	public LSParagraph(LSElement[] items)
 	{
-		this( ParagraphStyleParams.defaultStyleParams);
+		this( ParagraphStyleParams.defaultStyleParams, items );
 	}
 
-	public LSParagraph(ParagraphStyleParams styleParams)
+	public LSParagraph(ParagraphStyleParams styleParams, LSElement[] items)
 	{
-		super(styleParams);
+		super( styleParams, items );
 		
 		layoutNode = new LayoutNodeParagraph( this );
 	}

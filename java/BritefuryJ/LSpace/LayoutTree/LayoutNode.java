@@ -180,7 +180,10 @@ public abstract class LayoutNode
 			if ( parent != null )
 			{
 				LayoutNode parentLayout = parent.getValidLayoutNode();
-				parentLayout.queueResize();
+				if ( parentLayout != null )
+				{
+					parentLayout.queueResize();
+				}
 			}
 			element.setFlagResizeQueued();
 		}

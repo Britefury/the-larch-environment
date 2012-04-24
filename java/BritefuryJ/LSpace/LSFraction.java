@@ -181,31 +181,6 @@ public class LSFraction extends LSContainerNonOverlayed
 	
 	
 	
-	public LSFraction()
-	{
-		this( FractionStyleParams.defaultStyleParams, CaretSlotStyleParams.defaultStyleParams, null, "/", null );
-	}
-	
-	public LSFraction(String barTextRepresentation)
-	{
-		this( FractionStyleParams.defaultStyleParams, CaretSlotStyleParams.defaultStyleParams, null, barTextRepresentation, null );
-	}
-	
-	public LSFraction(FractionStyleParams styleParams, CaretSlotStyleParams segmentCaretSlotStyleParams)
-	{
-		this( styleParams, segmentCaretSlotStyleParams, null, "/", null );
-	}
-	
-	public LSFraction(FractionStyleParams styleParams, CaretSlotStyleParams segmentCaretSlotStyleParams, String barTextRepresentation)
-	{
-		this( styleParams, segmentCaretSlotStyleParams, null, barTextRepresentation, null );
-	}
-	
-	public LSFraction(FractionStyleParams styleParams, CaretSlotStyleParams segmentCaretSlotStyleParams, LSElement numerator, String barTextRepresentation, LSElement denominator)
-	{
-		this( styleParams, segmentCaretSlotStyleParams, numerator, new DPFractionBar( styleParams.getBarStyleSheet(), barTextRepresentation ), denominator );
-	}
-	
 	public LSFraction(FractionStyleParams styleParams, CaretSlotStyleParams segmentCaretSlotStyleParams, LSElement numerator, LSElement bar, LSElement denominator)
 	{
 		super(styleParams);
@@ -220,17 +195,15 @@ public class LSFraction extends LSContainerNonOverlayed
 		
 		if ( numerator != null )
 		{
-			LSSegment seg = new LSSegment( (ContainerStyleParams)getStyleParams(), segmentCaretSlotStyleParams, true, true );
+			LSSegment seg = new LSSegment( (ContainerStyleParams)getStyleParams(), segmentCaretSlotStyleParams, true, true, numerator );
 			segs[NUMERATOR] = seg;
-			LSParagraph para = new LSParagraph();
-			para.setChildren( Arrays.asList( new LSElement[] { seg } ) );
+			LSParagraph para = new LSParagraph( new LSElement[] { seg } );
 			paras[NUMERATOR] = para;
 			
 			registeredChildren.add( para );
 			registerChild( para );
 
 			children[NUMERATOR] = numerator;
-			segs[NUMERATOR].setChild( numerator );
 		}
 		
 		if ( bar != null )
@@ -243,17 +216,15 @@ public class LSFraction extends LSContainerNonOverlayed
 
 		if ( denominator != null )
 		{
-			LSSegment seg = new LSSegment( (ContainerStyleParams)getStyleParams(), segmentCaretSlotStyleParams, true, true );
+			LSSegment seg = new LSSegment( (ContainerStyleParams)getStyleParams(), segmentCaretSlotStyleParams, true, true, denominator );
 			segs[DENOMINATOR] = seg;
-			LSParagraph para = new LSParagraph();
-			para.setChildren( Arrays.asList( new LSElement[] { seg } ) );
+			LSParagraph para = new LSParagraph( new LSElement[] { seg } );
 			paras[DENOMINATOR] = para;
 			
 			registeredChildren.add( para );
 			registerChild( para );
 
 			children[DENOMINATOR] = denominator;
-			segs[DENOMINATOR].setChild( denominator );
 		}
 	}
 	
@@ -304,10 +275,9 @@ public class LSFraction extends LSContainerNonOverlayed
 
 				if ( bSegmentRequired  &&  !bSegmentPresent )
 				{
-					LSSegment seg = new LSSegment( (ContainerStyleParams)getStyleParams(), segmentCaretSlotStyleParams, true, true );
+					LSSegment seg = new LSSegment( (ContainerStyleParams)getStyleParams(), segmentCaretSlotStyleParams, true, true, child );
 					segs[slot] = seg;
-					LSParagraph para = new LSParagraph( );
-					para.setChildren( Arrays.asList( new LSElement[] { seg } ) );
+					LSParagraph para = new LSParagraph( new LSElement[] { seg } );
 					paras[slot] = para;
 					
 					int insertIndex = 0;
@@ -325,10 +295,6 @@ public class LSFraction extends LSContainerNonOverlayed
 	
 				
 				children[slot] = child;
-				if ( child != null )
-				{
-					segs[slot].setChild( child );
-				}
 				
 				
 				if ( bSegmentPresent  &&  !bSegmentRequired )

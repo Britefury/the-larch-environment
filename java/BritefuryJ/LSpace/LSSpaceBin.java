@@ -35,24 +35,9 @@ public class LSSpaceBin extends LSBin
 	private double width, height;
 	
 	
-	public LSSpaceBin(double width, double height)
+	public LSSpaceBin(ContainerStyleParams styleParams, double width, double height, SizeConstraint sizeConstraint, LSElement child)
 	{
-		this( ContainerStyleParams.defaultStyleParams, width, height, SizeConstraint.LARGER );
-	}
-	
-	public LSSpaceBin(double width, double height, SizeConstraint maxSize)
-	{
-		this( ContainerStyleParams.defaultStyleParams, width, height, maxSize );
-	}
-	
-	public LSSpaceBin(ContainerStyleParams styleParams, double width, double height)
-	{
-		this( styleParams, width, height, SizeConstraint.LARGER );
-	}
-	
-	public LSSpaceBin(ContainerStyleParams styleParams, double width, double height, SizeConstraint sizeConstraint)
-	{
-		super( styleParams );
+		super( styleParams, child );
 		
 		this.width = width;
 		this.height = height;

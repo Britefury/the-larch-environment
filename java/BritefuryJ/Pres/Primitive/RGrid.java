@@ -30,8 +30,8 @@ public class RGrid extends SequentialPres
 	@Override
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		LSRGrid grid = new LSRGrid( Primitive.tableParams.get( style ) );
-		grid.setChildren( mapPresent( ctx, Primitive.useTableParams( style ), children ) );
+		LSElement[] childElems = mapPresent( ctx, Primitive.useTableParams( style ), children );
+		LSRGrid grid = new LSRGrid( Primitive.tableParams.get( style ), childElems );
 		
 		return Table.applyTableBorder( style, grid );
 	}

@@ -59,25 +59,12 @@ public class Script extends Pres
 			childStyle = scriptScriptChildStyle( usedStyle );
 		}
 		
-		LSScript element = new LSScript( Primitive.scriptParams.get( style ), Primitive.caretSlotParams.get( style ) );
-		element.setMainChild( main.present( ctx, usedStyle ) );
-		if ( leftSuper != null )
-		{
-			element.setLeftSuperscriptChild( leftSuper.present( ctx, childStyle ) );
-		}
-		if ( leftSub != null )
-		{
-			element.setLeftSubscriptChild( leftSub.present( ctx, childStyle ) );
-		}
-		if ( rightSuper != null )
-		{
-			element.setRightSuperscriptChild( rightSuper.present( ctx, childStyle ) );
-		}
-		if ( rightSub != null )
-		{
-			element.setRightSubscriptChild( rightSub.present( ctx, childStyle ) );
-		}
-		return element;
+		LSElement leftSuperElem = leftSuper != null  ?  leftSuper.present( ctx, childStyle )  :  null;
+		LSElement leftSubElem = leftSub != null  ?  leftSub.present( ctx, childStyle )  :  null;
+		LSElement rightSuperElem = rightSuper != null  ?  rightSuper.present( ctx, childStyle )  :  null;
+		LSElement rightSubElem = rightSub != null  ?  rightSub.present( ctx, childStyle )  :  null;
+		LSElement mainElem = main.present( ctx, usedStyle );
+		return new LSScript( Primitive.scriptParams.get( style ), Primitive.caretSlotParams.get( style ), leftSuperElem, leftSubElem, mainElem, rightSuperElem, rightSubElem );
 	}
 
 

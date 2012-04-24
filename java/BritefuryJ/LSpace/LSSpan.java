@@ -17,9 +17,9 @@ import BritefuryJ.Math.Point2;
 
 public class LSSpan extends LSContainerSequence
 {
-	public LSSpan(ContainerStyleParams styleParams)
+	public LSSpan(ContainerStyleParams styleParams, LSElement[] items)
 	{
-		super( styleParams );
+		super( styleParams, items );
 	}
 	
 	

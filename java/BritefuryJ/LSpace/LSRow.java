@@ -13,14 +13,14 @@ import BritefuryJ.LSpace.StyleParams.RowStyleParams;
 
 public class LSRow extends LSAbstractBox
 {
-	public LSRow()
+	public LSRow(LSElement[] items)
 	{
-		this( RowStyleParams.defaultStyleParams);
+		this( RowStyleParams.defaultStyleParams, items );
 	}
 	
-	public LSRow(RowStyleParams styleParams)
+	public LSRow(RowStyleParams styleParams, LSElement[] items)
 	{
-		super(styleParams);
+		super( styleParams, items );
 		
 		layoutNode = new LayoutNodeRow( this );
 	}

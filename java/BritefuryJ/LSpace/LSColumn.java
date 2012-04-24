@@ -30,14 +30,14 @@ public class LSColumn extends LSAbstractBox
 	
 
 	
-	public LSColumn()
+	public LSColumn(LSElement[] items)
 	{
-		this( ColumnStyleParams.defaultStyleParams);
+		this( ColumnStyleParams.defaultStyleParams, items );
 	}
 	
-	public LSColumn(ColumnStyleParams styleParams)
+	public LSColumn(ColumnStyleParams styleParams, LSElement[] items)
 	{
-		super(styleParams);
+		super( styleParams, items );
 		
 		layoutNode = new LayoutNodeColumn( this );
 		clearFlag( FLAG_HAS_REFPOINT_INDEX );

@@ -32,7 +32,6 @@ public class Overlay extends SequentialPres
 	@Override
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		LSOverlay element = new LSOverlay( Primitive.overlayParams.get( style ) );
 		LSElement[] childElements = mapPresent( ctx, Primitive.useOverlayParams( style ), children );
 		StyleValues childStyle = Primitive.useOverlayParams( style );
 		HAlignment childHAlign = childStyle.get( Primitive.hAlign, HAlignment.class );
@@ -41,7 +40,6 @@ public class Overlay extends SequentialPres
 		{
 			childElements[i] = childElements[i].layoutWrap( childHAlign, childVAlign );
 		}
-		element.setChildren( childElements );
-		return element;
+		return new LSOverlay( Primitive.overlayParams.get( style ), childElements );
 	}
 }
