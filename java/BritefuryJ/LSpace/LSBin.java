@@ -20,14 +20,30 @@ public class LSBin extends LSContainerNonOverlayed
 	
 	public LSBin()
 	{
-		this( ContainerStyleParams.defaultStyleParams );
+		this( ContainerStyleParams.defaultStyleParams, null );
 	}
 
 	public LSBin(ContainerStyleParams styleParams)
 	{
+		this( styleParams, null );
+	}
+	
+	public LSBin(ContainerStyleParams styleParams, LSElement child)
+	{
 		super(styleParams);
 		
 		layoutNode = new LayoutNodeBin( this );
+
+		if ( child != null )
+		{
+			if ( child.getLayoutNode() == null )
+			{
+				throw new ChildHasNoLayoutException();
+			}
+
+			registeredChildren.add( child );
+			registerChild( child );				
+		}
 	}
 	
 	
