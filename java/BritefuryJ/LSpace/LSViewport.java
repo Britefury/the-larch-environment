@@ -62,22 +62,7 @@ public class LSViewport extends LSContainerNonOverlayed implements FiniteViewpor
 	private FiniteViewportBehaviour viewportBehaviour;
 	
 	
-	public LSViewport(PersistentState state)
-	{
-		this( ContainerStyleParams.defaultStyleParams, null, null, state );
-	}
-
-	public LSViewport(Range xRange, Range yRange, PersistentState state)
-	{
-		this( ContainerStyleParams.defaultStyleParams, xRange, yRange, state );
-	}
-
-	public LSViewport(ContainerStyleParams styleParams, PersistentState state)
-	{
-		this( styleParams, null, null, state );
-	}
-
-	public LSViewport(ContainerStyleParams styleParams, Range xRange, Range yRange, PersistentState state)
+	public LSViewport(ContainerStyleParams styleParams, Range xRange, Range yRange, PersistentState state, LSElement child)
 	{
 		super(styleParams);
 		
@@ -96,7 +81,91 @@ public class LSViewport extends LSContainerNonOverlayed implements FiniteViewpor
 		viewportBehaviour = new FiniteViewportBehaviour( this, xRange, yRange, x );
 		
 		addElementInteractor( interactor );
+		
+		if ( child != null )
+		{
+			if ( child.getLayoutNode() == null )
+			{
+				throw new ChildHasNoLayoutException();
+			}
+
+			registeredChildren.add( child );
+			registerChild( child );				
+		}
 	}
+	
+	
+
+
+	public LSElement getChild()
+	{
+		if ( registeredChildren.size() > 0 )
+		{
+			return registeredChildren.get( 0 );
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	public void setChild(LSElement child)
+	{
+		LSElement prevChild = getChild();
+		if ( child != prevChild )
+		{
+			if ( child != null  &&  child.getLayoutNode() == null )
+			{
+				throw new ChildHasNoLayoutException();
+			}
+
+			if ( prevChild != null )
+			{
+				unregisterChild( prevChild );
+				registeredChildren.remove( 0 );
+			}
+			
+			if ( child != null )
+			{
+				registeredChildren.add( child );
+				registerChild( child );				
+			}
+			
+			onChildListModified();
+			queueResize();
+		}
+	}
+	
+	
+	protected void replaceChildWithEmpty(LSElement child)
+	{
+		assert child == this.getChild();
+		setChild( null );
+	}
+	
+	protected void replaceChild(LSElement child, LSElement replacement)
+	{
+		assert child == this.getChild();
+		setChild( replacement );
+	}
+	
+	
+
+	public List<LSElement> getChildren()
+	{
+		return registeredChildren;
+	}
+
+	
+	public boolean isSingleElementContainer()
+	{
+		return true;
+	}
+
+	
+	
+	
+
 	
 	
 	public Range getXRange()
@@ -207,74 +276,6 @@ public class LSViewport extends LSContainerNonOverlayed implements FiniteViewpor
 	}
 	
 
-	
-	
-	public LSElement getChild()
-	{
-		if ( registeredChildren.size() > 0 )
-		{
-			return registeredChildren.get( 0 );
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
-	public void setChild(LSElement child)
-	{
-		LSElement prevChild = getChild();
-		if ( child != prevChild )
-		{
-			if ( child != null  &&  child.getLayoutNode() == null )
-			{
-				throw new ChildHasNoLayoutException();
-			}
-
-			if ( prevChild != null )
-			{
-				unregisterChild( prevChild );
-				registeredChildren.remove( 0 );
-			}
-			
-			if ( child != null )
-			{
-				registeredChildren.add( child );
-				registerChild( child );				
-			}
-			
-			onChildListModified();
-			queueResize();
-		}
-	}
-	
-	
-	protected void replaceChildWithEmpty(LSElement child)
-	{
-		assert child == this.getChild();
-		setChild( null );
-	}
-	
-	protected void replaceChild(LSElement child, LSElement replacement)
-	{
-		assert child == this.getChild();
-		setChild( replacement );
-	}
-	
-	
-
-	public List<LSElement> getChildren()
-	{
-		return registeredChildren;
-	}
-
-	
-	public boolean isSingleElementContainer()
-	{
-		return true;
-	}
-
-	
 	
 	
 	protected void handleDrawBackground(Graphics2D graphics, AABox2 areaBox)

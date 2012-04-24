@@ -10,7 +10,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import javax.swing.JFrame;
 
@@ -80,9 +79,7 @@ public class DPStress2Test
 	{
 		LSText dot = new LSText( puncStyle, "." );
 		LSText attrName = new LSText( nameStyle, a );
-		LSSpan span = new LSSpan( ContainerStyleParams.defaultStyleParams );
-		span.setChildren( Arrays.asList( x, dot, attrName ) );
-		return span;
+		return new LSSpan( ContainerStyleParams.defaultStyleParams, new LSElement[] { x, dot, attrName } );
 	}
 	
 	public LSElement call(LSElement x, LSElement... args)
@@ -102,9 +99,7 @@ public class DPStress2Test
 			elems.add( args[i] );
 		}
 		elems.add( closeParen );
-		LSSpan span = new LSSpan( ContainerStyleParams.defaultStyleParams );
-		span.extend( elems );
-		return span;
+		return new LSSpan( ContainerStyleParams.defaultStyleParams, elems.toArray( new LSElement[] {} ) );
 	}
 	
 	
@@ -116,20 +111,16 @@ public class DPStress2Test
 	
 	protected LSElement createContentNode()
 	{
-		LSColumn box = new LSColumn( );
-		ArrayList<LSElement> children = new ArrayList<LSElement>();
+		LSElement[] children = new LSElement[NUMLINES];
 		
 		for (int i = 0; i < NUMLINES; i++)
 		{
 			LSElement child = call( attr( name( "obj" ), "method" ), name( "a" ), name( "b" ), name( "c" ), name( "d" ), name( "e" ), name( "f" ) );
-			LSParagraph p = new LSParagraph( paraStyle );
-			p.append( child );
-			children.add( p );
+			LSParagraph p = new LSParagraph( paraStyle, new LSElement[] { child } );
+			children[i] = p;
 		}
 		
-		box.setChildren( children );
-		
-		return box;
+		return new LSColumn( children );
 	}
 
 
@@ -150,8 +141,7 @@ public class DPStress2Test
 		LSElement w = createContentNode();
 		long t2 = System.nanoTime();
 		System.out.println( "Element tree creation time: " + (double)( t2 - t1 ) / 1000000000.0 );
-		LSViewport viewport = new LSViewport( new ContainerStyleParams( HAlignment.EXPAND, VAlignment.EXPAND, null, null, null ), new PersistentState() );
-		viewport.setChild( w );
+		LSViewport viewport = new LSViewport( new ContainerStyleParams( HAlignment.EXPAND, VAlignment.EXPAND, null, null, null ), null, null, new PersistentState(), w );
 		presentation.getRootElement().setChild( viewport );
 	     
 	     

@@ -28,8 +28,6 @@ public class Proxy extends Pres
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		LSElement childElement = child.present( ctx, style );
-		LSProxy proxy = new LSProxy();
-		proxy.setChild( childElement );
-		return proxy;
+		return new LSProxy( childElement );
 	}
 }

@@ -30,8 +30,7 @@ public class Span extends SequentialPres
 	@Override
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		LSSpan element = new LSSpan( Primitive.containerParams.get( style ) );
-		element.setChildren( mapPresent( ctx, Primitive.useContainerParams.get( style ), children ) );
-		return element;
+		LSElement[] childElems = mapPresent( ctx, Primitive.useContainerParams.get( style ), children );
+		return new LSSpan( Primitive.containerParams.get( style ), childElems );
 	}
 }

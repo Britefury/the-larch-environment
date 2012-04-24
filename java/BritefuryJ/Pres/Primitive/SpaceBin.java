@@ -39,9 +39,8 @@ public class SpaceBin extends Pres
 	@Override
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		LSSpaceBin bin = new LSSpaceBin( Primitive.containerParams.get( style ), width, height, sizeConstraint );
 		StyleValues childStyle = Primitive.useContainerParams.get( style );
-		bin.setChild( child.present( ctx, childStyle ).layoutWrap( childStyle.get( Primitive.hAlign, HAlignment.class ), childStyle.get( Primitive.vAlign, VAlignment.class ) ) );
-		return bin;
+		LSElement childElem = child.present( ctx, childStyle ).layoutWrap( childStyle.get( Primitive.hAlign, HAlignment.class ), childStyle.get( Primitive.vAlign, VAlignment.class ) );
+		return new LSSpaceBin( Primitive.containerParams.get( style ), width, height, sizeConstraint, childElem );
 	}
 }

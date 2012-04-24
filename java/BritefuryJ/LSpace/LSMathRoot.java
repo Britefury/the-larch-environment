@@ -22,16 +22,6 @@ public class LSMathRoot extends LSContainerNonOverlayed
 	
 	
 	
-	public LSMathRoot()
-	{
-		this( MathRootStyleParams.defaultStyleParams);
-	}
-
-	public LSMathRoot(MathRootStyleParams styleParams)
-	{
-		this( styleParams, null );
-	}
-
 	public LSMathRoot(MathRootStyleParams styleParams, LSElement child)
 	{
 		super(styleParams);

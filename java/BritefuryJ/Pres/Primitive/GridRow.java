@@ -30,8 +30,7 @@ public class GridRow extends SequentialPres
 	@Override
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		LSGridRow element = new LSGridRow( Primitive.gridRowParams.get( style ) );
-		element.setChildren( mapPresent( ctx, Primitive.useGridRowParams( style ), children ) );
-		return element;
+		LSElement[] childElems = mapPresent( ctx, Primitive.useGridRowParams( style ), children );
+		return new LSGridRow( Primitive.gridRowParams.get( style ), childElems );
 	}
 }

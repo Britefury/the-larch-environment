@@ -61,12 +61,7 @@ public class LSTable extends LSContainerNonOverlayed implements TableElement
 	
 	
 	
-	public LSTable()
-	{
-		this( TableStyleParams.defaultStyleParams);
-	}
-
-	public LSTable(TableStyleParams styleParams)
+	public LSTable(TableStyleParams styleParams, TableCell[][] cellTable)
 	{
 		super(styleParams);
 		
@@ -77,8 +72,30 @@ public class LSTable extends LSContainerNonOverlayed implements TableElement
 		rowStartIndices = new int[0];
 		numColumns = 0;
 		numRows = 0;
+		
+		if ( cellTable != null )
+		{
+			setCells( cellTable );
+		}
 	}
 	
+	public LSTable(TableStyleParams styleParams, LSElement[][] itemTable)
+	{
+		super(styleParams);
+		
+		layoutNode = new LayoutNodeTable( this );
+
+		childEntryTable = new TableChildEntry[0][];
+		childEntries = new ArrayList<TableChildEntry>();
+		rowStartIndices = new int[0];
+		numColumns = 0;
+		numRows = 0;
+		
+		if ( itemTable != null )
+		{
+			setChildren( itemTable );
+		}
+	}
 	
 	
 	public void setChildren(LSElement[][] itemTable)
@@ -916,8 +933,6 @@ public class LSTable extends LSContainerNonOverlayed implements TableElement
 			graphics.setStroke( prevStroke );
 		}
 	}
-
-	
 	
 	
 	

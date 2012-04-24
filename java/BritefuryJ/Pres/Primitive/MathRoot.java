@@ -29,10 +29,9 @@ public class MathRoot extends Pres
 	@Override
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		LSMathRoot element = new LSMathRoot( Primitive.mathRootParams.get( style ) );
 		StyleValues childStyle = Primitive.useMathRootParams( style );
-		element.setChild( child.present( ctx, Primitive.useMathRootParams( style ) ).layoutWrap( childStyle.get( Primitive.hAlign, HAlignment.class ), childStyle.get( Primitive.vAlign, VAlignment.class ) ) );
-		return element;
+		LSElement childElement = child.present( ctx, Primitive.useMathRootParams( style ) ).layoutWrap( childStyle.get( Primitive.hAlign, HAlignment.class ),
+				childStyle.get( Primitive.vAlign, VAlignment.class ) );
+		return new LSMathRoot( Primitive.mathRootParams.get( style ), childElement );
 	}
-
 }

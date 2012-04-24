@@ -51,6 +51,7 @@ import BritefuryJ.LSpace.Layout.LAllocV;
 import BritefuryJ.LSpace.Layout.LReqBoxInterface;
 import BritefuryJ.LSpace.LayoutTree.LayoutNodeRootElement;
 import BritefuryJ.LSpace.Marker.Marker;
+import BritefuryJ.LSpace.StyleParams.ContainerStyleParams;
 import BritefuryJ.LSpace.TextFocus.Caret;
 import BritefuryJ.LSpace.TextFocus.TextSelection;
 import BritefuryJ.Math.AABox2;
@@ -112,7 +113,7 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	
 	public LSRootElement(PresentationComponent component)
 	{
-		super();
+		super( ContainerStyleParams.defaultStyleParams, null );
 		
 		this.component = component;
 		

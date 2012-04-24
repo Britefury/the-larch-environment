@@ -36,6 +36,11 @@ public class Fraction extends Pres
 	
 	private Pres numerator, denominator, bar;
 	
+	public Fraction(Object numerator, Object denominator)
+	{
+		this( numerator, denominator, "/" );
+	}
+	
 	public Fraction(Object numerator, Object denominator, String barTextRepresentation)
 	{
 		this.numerator = coerce( numerator );
@@ -55,13 +60,11 @@ public class Fraction extends Pres
 	@Override
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		LSElement barElement = bar.present( ctx, style );
-		LSFraction element = new LSFraction( Primitive.fractionParams.get( style ), Primitive.caretSlotParams.get( style ), "/" );
 		StyleValues usedStyle = Primitive.useFractionParams( Primitive.useTextParams( style ) );
-		element.setNumeratorChild( numerator.present( ctx, fractionNumeratorStyle( usedStyle ) ) );
-		element.setDenominatorChild( denominator.present( ctx, fractionDenominatorStyle( usedStyle ) ) );
-		element.setBarChild( barElement );
-		return element;
+		LSElement numeratorElem = numerator.present( ctx, fractionNumeratorStyle( usedStyle ) );
+		LSElement barElem = bar.present( ctx, style );
+		LSElement denominatorElem = denominator.present( ctx, fractionDenominatorStyle( usedStyle ) );
+		return new LSFraction( Primitive.fractionParams.get( style ), Primitive.caretSlotParams.get( style ), numeratorElem, barElem, denominatorElem );
 	}
 
 

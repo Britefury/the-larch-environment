@@ -29,8 +29,7 @@ public class Row extends AbstractBox
 	@Override
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		LSRow element = new LSRow( Primitive.rowParams.get( style ) );
-		element.setChildren( mapPresent( ctx, Primitive.useRowParams( style ), children ) );
-		return element;
+		LSElement[] childElems = mapPresent( ctx, Primitive.useRowParams( style ), children );
+		return new LSRow( Primitive.rowParams.get( style ), childElems );
 	}
 }

@@ -48,10 +48,10 @@ public class FlowGrid extends SequentialPres
 	@Override
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		LSFlowGrid grid = new LSFlowGrid( Primitive.tableParams.get( style ), targetNumColumns );
-		grid.setChildren( mapPresent( ctx, Primitive.useTableParams( style ).withAttr( Primitive.hAlign, HAlignment.PACK ), children ) );
+		LSElement[] childElems = mapPresent( ctx, Primitive.useTableParams( style ).withAttr( Primitive.hAlign, HAlignment.PACK ), children );
+		LSFlowGrid grid = new LSFlowGrid( Primitive.tableParams.get( style ), targetNumColumns, childElems );
 		// TODO:
-		// Problem is: the border element expands to take full width, since the preferred width is normally more than is availble.
+		// Problem is: the border element expands to take full width, since the preferred width is normally more than is available.
 		// When row expand is false, then the table should shrink to fit around the grid.
 		// return Table.applyTableBorder( style, grid );
 		return grid;

@@ -21,14 +21,20 @@ public class LSProxy extends LSContainerNonOverlayed
 
 	
 	
-	public LSProxy()
+	public LSProxy(LSElement child)
 	{
-		this( ContainerStyleParams.defaultStyleParams );
+		this( ContainerStyleParams.defaultStyleParams, child );
 	}
 
-	public LSProxy(ContainerStyleParams styleParams)
+	public LSProxy(ContainerStyleParams styleParams, LSElement child)
 	{
 		super(styleParams);
+
+		if ( child != null )
+		{
+			registeredChildren.add( child );
+			registerChild( child );				
+		}
 	}
 	
 	

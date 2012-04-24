@@ -14,16 +14,14 @@ public class LSFragment extends LSProxy
 	protected FragmentContext context;
 
 
-	public LSFragment(FragmentContext context)
+	public LSFragment(FragmentContext context, LSElement child)
 	{
-		super();
-		
-		this.context = context;
+		this( context, ContainerStyleParams.defaultStyleParams, child );
 	}
 
-	public LSFragment(FragmentContext context, ContainerStyleParams styleParams)
+	public LSFragment(FragmentContext context, ContainerStyleParams styleParams, LSElement child)
 	{
-		super(styleParams);
+		super( styleParams, child );
 		
 		this.context = context;
 	}

@@ -23,14 +23,14 @@ public class LSRGrid extends LSContainerSequence implements TableElement
 
 	
 	
-	public LSRGrid()
-	{
-		this( TableStyleParams.defaultStyleParams);
-	}
-	
 	public LSRGrid(TableStyleParams styleParams)
 	{
-		super(styleParams);
+		this( styleParams, null );
+	}
+	
+	public LSRGrid(TableStyleParams styleParams, LSElement[] items)
+	{
+		super( styleParams, items );
 		
 		layoutNode = new LayoutNodeRGrid( this );
 	}

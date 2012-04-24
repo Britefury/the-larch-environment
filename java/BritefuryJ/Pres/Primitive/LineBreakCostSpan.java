@@ -30,8 +30,7 @@ public class LineBreakCostSpan extends SequentialPres
 	@Override
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		LSLineBreakCostSpan element = new LSLineBreakCostSpan( Primitive.containerParams.get( style ) );
-		element.setChildren( mapPresent( ctx, Primitive.useContainerParams.get( style ), children ) );
-		return element;
+		LSElement[] childElems = mapPresent( ctx, Primitive.useContainerParams.get( style ), children );
+		return new LSLineBreakCostSpan( Primitive.containerParams.get( style ), childElems );
 	}
 }

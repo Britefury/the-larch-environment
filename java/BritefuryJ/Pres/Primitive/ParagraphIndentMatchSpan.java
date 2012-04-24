@@ -32,7 +32,6 @@ public class ParagraphIndentMatchSpan extends SequentialPres
 	@Override
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		LSSpan element = new LSSpan( Primitive.containerParams.get( style ) );
 		StyleValues childStyle =  Primitive.useContainerParams.get( style );
 		
 		LSElement childElements[];
@@ -52,7 +51,6 @@ public class ParagraphIndentMatchSpan extends SequentialPres
 			childElements = new LSElement[0];
 		}
 
-		element.setChildren( childElements );
-		return element;
+		return new LSSpan( Primitive.containerParams.get( style ), childElements );
 	}
 }

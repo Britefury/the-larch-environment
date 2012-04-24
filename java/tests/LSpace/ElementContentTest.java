@@ -7,8 +7,6 @@
 //##************************
 package tests.LSpace;
 
-import java.util.Arrays;
-
 import junit.framework.TestCase;
 import BritefuryJ.LSpace.LSBin;
 import BritefuryJ.LSpace.LSBlank;
@@ -18,6 +16,7 @@ import BritefuryJ.LSpace.LSParagraph;
 import BritefuryJ.LSpace.LSRow;
 import BritefuryJ.LSpace.LSText;
 import BritefuryJ.LSpace.PresentationComponent;
+import BritefuryJ.LSpace.StyleParams.ContainerStyleParams;
 
 public class ElementContentTest extends TestCase
 {
@@ -42,9 +41,7 @@ public class ElementContentTest extends TestCase
 	{
 		LSText t0 = new LSText( "abc" );
 
-		LSBin b = new LSBin( );
-		
-		b.setChild( t0 );
+		LSBin b = new LSBin( ContainerStyleParams.defaultStyleParams, t0 );
 		
 		PresentationComponent component = new PresentationComponent();
 		component.getRootElement().setChild( b );
@@ -61,10 +58,7 @@ public class ElementContentTest extends TestCase
 		LSText t2 = new LSText( "mno" );
 		LSText t3 = new LSText( "stu" );
 		
-		LSRow p = new LSRow( );
-		LSElement[] t = { t0, t1, t2, t3 };
-		
-		p.setChildren( Arrays.asList( t ) );
+		LSRow p = new LSRow( new LSElement[] { t0, t1, t2, t3 } );
 		
 		PresentationComponent component = new PresentationComponent();
 		component.getRootElement().setChild( p );
@@ -82,9 +76,7 @@ public class ElementContentTest extends TestCase
 		LSText ta2 = new LSText( "mno" );
 		LSText ta3 = new LSText( "stu" );
 
-		LSRow pa = new LSRow( );
-		LSElement[] ta = { ta0, ta1, ta2, ta3 };
-		pa.setChildren( Arrays.asList( ta ) );
+		LSRow pa = new LSRow( new LSElement[] { ta0, ta1, ta2, ta3 } );
 		
 		LSHiddenText e = new LSHiddenText( );
 		
@@ -94,12 +86,9 @@ public class ElementContentTest extends TestCase
 		LSText tb1 = new LSText( "xy" );
 		LSText tb2 = new LSText( "z" );
 
-		LSRow pb = new LSRow( );
-		LSElement[] tb = { tb0, tb1, tb2 };
-		pb.setChildren( Arrays.asList( tb ) );
+		LSRow pb = new LSRow( new LSElement[] { tb0, tb1, tb2 } );
 		
-		LSBin b = new LSBin( );
-		b.setChild( pb );
+		LSBin b = new LSBin( ContainerStyleParams.defaultStyleParams, pb );
 
 		
 		
@@ -107,9 +96,7 @@ public class ElementContentTest extends TestCase
 		LSText ty = new LSText( "22" );
 		
 		
-		LSRow root = new LSRow( );
-		LSElement[] rootChildren = { pa, e, b, tx, ty };
-		root.setChildren( Arrays.asList( rootChildren ) );
+		LSRow root = new LSRow( new LSElement[] { pa, e, b, tx, ty } );
 		
 		
 		PresentationComponent component = new PresentationComponent();
@@ -229,9 +216,7 @@ public class ElementContentTest extends TestCase
 		LSText ta2 = new LSText( "mno" );
 		LSText ta3 = new LSText( "stu" );
 
-		LSParagraph pa = new LSParagraph( );
-		LSElement[] ta = { ta0, ta1, ta2, ta3 };
-		pa.setChildren( Arrays.asList( ta ) );
+		LSParagraph pa = new LSParagraph( new LSElement[] { ta0, ta1, ta2, ta3 } );
 		
 		LSHiddenText e = new LSHiddenText( );
 		
@@ -241,18 +226,14 @@ public class ElementContentTest extends TestCase
 		LSText tb1 = new LSText( "xy" );
 		LSText tb2 = new LSText( "z" );
 
-		LSParagraph pb = new LSParagraph( );
-		LSElement[] tb = { tb0, tb1, tb2 };
-		pb.setChildren( Arrays.asList( tb ) );
+		LSParagraph pb = new LSParagraph( new LSElement[] { tb0, tb1, tb2 } );
 		
 		
 		LSText tx = new LSText( "11" );
 		LSText ty = new LSText( "22" );
 		
 		
-		LSParagraph root = new LSParagraph( );
-		LSElement[] rootChildren = { pa, e, pb, tx, ty };
-		root.setChildren( Arrays.asList( rootChildren ) );
+		LSParagraph root = new LSParagraph( new LSElement[] { pa, e, pb, tx, ty } );
 		
 		
 		PresentationComponent component = new PresentationComponent();

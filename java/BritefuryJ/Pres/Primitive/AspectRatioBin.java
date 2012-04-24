@@ -32,9 +32,8 @@ public class AspectRatioBin extends Pres
 	@Override
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		LSAspectRatioBin bin = new LSAspectRatioBin( Primitive.containerParams.get( style ), minWidth, aspectRatio );
 		StyleValues childStyle = Primitive.useContainerParams.get( style );
-		bin.setChild( child.present( ctx, childStyle ).layoutWrap( childStyle.get( Primitive.hAlign, HAlignment.class ), childStyle.get( Primitive.vAlign, VAlignment.class ) ) );
-		return bin;
+		LSElement childElem = child.present( ctx, childStyle ).layoutWrap( childStyle.get( Primitive.hAlign, HAlignment.class ), childStyle.get( Primitive.vAlign, VAlignment.class ) );
+		return new LSAspectRatioBin( Primitive.containerParams.get( style ), minWidth, aspectRatio, childElem );
 	}
 }

@@ -14,14 +14,9 @@ public class LSAspectRatioBin extends LSBin
 	private double minWidth, aspectRatio;
 	
 	
-	public LSAspectRatioBin(double minWidth, double aspectRatio)
+	public LSAspectRatioBin(ContainerStyleParams styleParams, double minWidth, double aspectRatio, LSElement child)
 	{
-		this( ContainerStyleParams.defaultStyleParams, minWidth, aspectRatio );
-	}
-	
-	public LSAspectRatioBin(ContainerStyleParams styleParams, double minWidth, double aspectRatio)
-	{
-		super( styleParams );
+		super( styleParams, child );
 		
 		this.minWidth = minWidth;
 		this.aspectRatio = aspectRatio;

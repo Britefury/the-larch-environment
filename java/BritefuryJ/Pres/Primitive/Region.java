@@ -36,8 +36,7 @@ public class Region extends Pres
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		LSElement childElement = child.present( ctx, Primitive.useRegionParams.get( style ) );
-		LSRegion element = new LSRegion( Primitive.regionParams.get( style ) );
-		element.setChild( childElement );
+		LSRegion element = new LSRegion( Primitive.regionParams.get( style ), childElement );
 		if ( clipboardHandler != null )
 		{
 			element.setClipboardHandler( clipboardHandler );

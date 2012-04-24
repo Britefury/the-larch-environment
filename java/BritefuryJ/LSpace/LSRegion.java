@@ -61,14 +61,9 @@ public class LSRegion extends LSProxy
 	
 	
 	
-	public LSRegion()
+	public LSRegion(RegionStyleParams styleParams, LSElement child)
 	{
-		this( RegionStyleParams.defaultStyleParams );
-	}
-
-	public LSRegion(RegionStyleParams styleParams)
-	{
-		super( styleParams );
+		super( styleParams, child );
 	
 		setFlagValue( FLAG_EDITABLE, styleParams.getEditable() );
 		setFlagValue( FLAG_SELECTABLE, styleParams.getSelectable() );

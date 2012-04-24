@@ -109,16 +109,14 @@ public class Pad extends Pres
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		LSElement childElem = child.present( ctx, style );
+		childElem = childElem.layoutWrap( style.get( Primitive.hAlign, HAlignment.class ), style.get( Primitive.vAlign, VAlignment.class ) );
 		if ( padBorder != null )
 		{
-			LSBorder element = new LSBorder( padBorder, Primitive.getContainerStyleParams( style ) );
-			element.setChild( childElem.layoutWrap( style.get( Primitive.hAlign, HAlignment.class ), style.get( Primitive.vAlign, VAlignment.class ) ) );
-			//element.copyAlignmentFlagsFrom( childElem );
-			return element;
+			return new LSBorder( padBorder, Primitive.getContainerStyleParams( style ), childElem );
 		}
 		else
 		{
-			return childElem.layoutWrap( style.get( Primitive.hAlign, HAlignment.class ), style.get( Primitive.vAlign, VAlignment.class ) );
+			return childElem;
 		}
 	}
 }

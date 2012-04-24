@@ -553,8 +553,7 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 		}
 		else
 		{
-			LSRow row = new LSRow();
-			row.setChildren( new LSElement[] { this } );
+			LSRow row = new LSRow( new LSElement[] { this } );
 			row.setAlignment( hAlign, vAlign );
 			return row;
 		}
