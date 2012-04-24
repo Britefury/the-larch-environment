@@ -6,23 +6,23 @@
 //##************************
 package BritefuryJ.IncrementalView;
 
+import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.ChangeHistory.ChangeHistory;
 import BritefuryJ.ChangeHistory.ChangeHistoryController;
 import BritefuryJ.ChangeHistory.ChangeHistoryListener;
 import BritefuryJ.Command.BoundCommandSet;
-import BritefuryJ.Controls.AbstractHyperlink;
-import BritefuryJ.Controls.Hyperlink;
+import BritefuryJ.Command.Command;
+import BritefuryJ.Command.Command.CommandAction;
+import BritefuryJ.Command.CommandSet;
 import BritefuryJ.LSpace.PageController;
 import BritefuryJ.LSpace.Browser.BrowserPage;
 import BritefuryJ.LSpace.Browser.Location;
-import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
 import BritefuryJ.LSpace.PersistentState.PersistentStateStore;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Logging.LogView;
 import BritefuryJ.Pres.Pres;
-import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Projection.ProjectiveBrowserContext;
 import BritefuryJ.Projection.Subject;
 
@@ -33,31 +33,33 @@ public class IncrementalViewPage extends BrowserPage
 	private ChangeHistory changeHistory;
 	private BrowserIncrementalView view;
 	private Subject subject;
+	private ProjectiveBrowserContext browserContext;
+	
+	
+	private static CommandAction pageLogCmdAction = new CommandAction()
+	{
+		public void commandAction(Object context, PageController pageController)
+		{
+			IncrementalViewPage page = (IncrementalViewPage)context;
+			page.showPageLog( pageController );
+		}
+	};
+	
+	private static Command pageLogCommand = new Command( "&Debug: show &page &log", pageLogCmdAction );
+	
+	private static CommandSet pageLogCmdSet = new CommandSet( "Larch.Debug.PageLog", Arrays.asList( new Command[] { pageLogCommand } ) );
 	
 	
 	
-	public IncrementalViewPage(Pres pres, String title, final ProjectiveBrowserContext browserContext, ChangeHistory changeHistory, BrowserIncrementalView view, Subject subject)
+	public IncrementalViewPage(Pres pres, String title, ProjectiveBrowserContext browserContext, ChangeHistory changeHistory, BrowserIncrementalView view, Subject subject)
 	{
 		this.title = title;
 		this.changeHistory = changeHistory;
 		this.view = view;
 		this.subject = subject;
+		this.browserContext = browserContext;
 		
-		Hyperlink.LinkListener listener = new Hyperlink.LinkListener()
-		{
-			public void onLinkClicked(Hyperlink.AbstractHyperlinkControl link, PointerButtonClickedEvent event)
-			{
-				Log log = getLog();
-				log.startRecording();
-				LogView view = new LogView( log );
-				Location location = browserContext.getLocationForObject( view );
-				link.getElement().getRootElement().getPageController().openLocation( location, PageController.OpenOperation.OPEN_IN_NEW_WINDOW );
-			}
-		};
-
-		AbstractHyperlink logLink = new Hyperlink( "Page log", listener );
-//		pagePres = new Column( new Object[] { this.element.alignHExpand(), logLink.pad( 10, 10 ).alignHRight() } );
-		pagePres = new Column( new Object[] { pres.alignHExpand().alignVExpand(), logLink.pad( 10, 10 ).alignHRight().alignVRefY() } );
+		pagePres = pres.withCommands( pageLogCmdSet );
 	}
 	
 	
@@ -101,5 +103,17 @@ public class IncrementalViewPage extends BrowserPage
 	public void buildBoundCommandSetList(List<BoundCommandSet> boundCommandSets)
 	{
 		subject.buildBoundCommandSetList( boundCommandSets );
+		boundCommandSets.add( pageLogCmdSet.bindTo( this ) );
+	}
+
+
+
+	private void showPageLog(PageController pageController)
+	{
+		Log log = getLog();
+		log.startRecording();
+		LogView view = new LogView( log );
+		Location location = browserContext.getLocationForObject( view );
+		pageController.openLocation( location, PageController.OpenOperation.OPEN_IN_NEW_WINDOW );
 	}
 }
