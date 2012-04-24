@@ -29,9 +29,26 @@ public class LSMathRoot extends LSContainerNonOverlayed
 
 	public LSMathRoot(MathRootStyleParams styleParams)
 	{
+		this( styleParams, null );
+	}
+
+	public LSMathRoot(MathRootStyleParams styleParams, LSElement child)
+	{
 		super(styleParams);
 		
 		layoutNode = new LayoutNodeMathRoot( this );
+		
+		if ( child != null )
+		{
+			if ( child.getLayoutNode() == null )
+			{
+				throw new ChildHasNoLayoutException();
+			}
+
+			this.child = child;
+			registeredChildren.add( child );
+			registerChild( child );				
+		}
 	}
 	
 	

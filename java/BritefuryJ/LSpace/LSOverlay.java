@@ -24,14 +24,41 @@ public class LSOverlay extends LSContainer
 {
 	public LSOverlay()
 	{
-		this( ContainerStyleParams.defaultStyleParams );
+		this( ContainerStyleParams.defaultStyleParams, (List<LSElement>)null );
 	}
 
 	public LSOverlay(ContainerStyleParams styleParams)
 	{
+		this( styleParams, (List<LSElement>)null );
+	}
+
+	public LSOverlay(ContainerStyleParams styleParams, LSElement items[])
+	{
+		this( styleParams, Arrays.asList( items ) );
+	}
+
+	public LSOverlay(ContainerStyleParams styleParams, List<LSElement> items)
+	{
 		super( styleParams );
 		
 		layoutNode = new LayoutNodeOverlay( this );
+
+		if ( items != null  &&  items.size() > 0 )
+		{
+			// Set contents of @childEntries list
+			registeredChildren.addAll( items );
+	
+			// Register added entries
+			for (LSElement child: items)
+			{
+				if ( child.getLayoutNode() == null )
+				{
+					throw new ChildHasNoLayoutException();
+				}
+				
+				registerChild( child );
+			}
+		}
 	}
 
 
