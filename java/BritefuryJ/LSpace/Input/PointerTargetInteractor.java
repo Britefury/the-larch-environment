@@ -208,8 +208,12 @@ public class PointerTargetInteractor
 						Caret caret = rootElement.getCaret();
 						SelectionManager selectionManager = rootElement.getSelectionManager();
 						
-						caret.moveTo( Marker.atEndOf( elementToSelect, true ) );
-						caret.makeCurrentTarget();
+						Marker m = Marker.atEndOf( elementToSelect, true );
+						if ( m != null )
+						{
+							caret.moveTo( m );
+							caret.makeCurrentTarget();
+						}
 						selectionManager.selectElement( elementToSelect );
 						return true;
 					}

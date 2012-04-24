@@ -593,7 +593,7 @@ public class Caret extends Target implements MarkerListener
 	
 	public boolean moveTo(Marker m)
 	{
-		if ( isElementWithinGrabSubtree( m.getElement() ) )
+		if ( m.isValid()  &&  isElementWithinGrabSubtree( m.getElement() ) )
 		{
 			marker.moveTo( m );
 			return true;
