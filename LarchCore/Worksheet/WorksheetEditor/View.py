@@ -30,7 +30,7 @@ from BritefuryJ.Pres import InnerFragment, LocationAsInnerFragment
 from BritefuryJ.Controls import *
 from BritefuryJ.LSpace import *
 from BritefuryJ.Graphics import *
-from BritefuryJ.LSpace.Input import ObjectDndHandler
+from BritefuryJ.LSpace.Input import ObjectDndHandler, Modifier
 from BritefuryJ.LSpace.Browser import Location
 from BritefuryJ.LSpace.TextFocus import TextSelection
 from BritefuryJ.LSpace.Marker import Marker
@@ -98,58 +98,35 @@ _embeddedObject_dropDest = ObjectDndHandler.DropDest( FragmentData, _onDrop_embe
 
 
 
-class ParagraphNodeInteractor (KeyElementInteractor):
-	def __init__(self):
-		pass
+def _applyParagraphShortcuts(p):
+	def elementAction(modelAction):
+		def _elemAction(element):
+			model = element.fragmentContext.model
+			return modelAction( model )
+		return _elemAction
+
+	def paraStyleAction(style):
+		def _paraStyle(model):
+			model.setStyle( style )
+		return elementAction( _paraStyle )
+
+	def insertCodeAction(element):
+		marker = Marker.atEndOf( element, True )
+		def _makeParagraph():
+			return EditorSchema.PythonCodeEditor.newPythonCode()
+		WorksheetRichTextEditor.instance.insertParagraphAtMarker( marker, _makeParagraph )
 
 
-	def keyTyped(self, element, event):
-		return False
-
-
-	def keyPressed(self, element, event):
-		if event.getModifiers() & KeyEvent.ALT_MASK  !=  0:
-			ctx = element.getFragmentContext()
-			node = ctx.getModel()
-
-			if event.getKeyCode() == KeyEvent.VK_N:
-				node.setStyle( 'normal' )
-			elif event.getKeyCode() == KeyEvent.VK_1:
-				node.setStyle( 'h1' )
-			elif event.getKeyCode() == KeyEvent.VK_2:
-				node.setStyle( 'h2' )
-			elif event.getKeyCode() == KeyEvent.VK_3:
-				node.setStyle( 'h3' )
-			elif event.getKeyCode() == KeyEvent.VK_4:
-				node.setStyle( 'h4' )
-			elif event.getKeyCode() == KeyEvent.VK_5:
-				node.setStyle( 'h5' )
-			elif event.getKeyCode() == KeyEvent.VK_6:
-				node.setStyle( 'h6' )
-			elif event.getKeyCode() == KeyEvent.VK_T:
-				node.setStyle( 'title' )
-			elif event.getKeyCode() == KeyEvent.VK_C:
-				self._insertPythonCode( ctx, element, node )
-				return True
-			else:
-				return False
-
-			return True
-
-		return False
-
-
-
-	def keyReleased(self, element, event):
-		return False
-
-
-
-	def _insertPythonCode(self, ctx, element, node):
-		#return element.postTreeEvent( InsertPythonCodeOperation( node.getModel() ) )
-		return True
-
-ParagraphNodeInteractor.instance = ParagraphNodeInteractor()
+	p = p.withShortcut( Shortcut( KeyEvent.VK_N, Modifier.ALT ), paraStyleAction( 'normal' ) )
+	p = p.withShortcut( Shortcut( KeyEvent.VK_1, Modifier.ALT ), paraStyleAction( 'h1' ) )
+	p = p.withShortcut( Shortcut( KeyEvent.VK_2, Modifier.ALT ), paraStyleAction( 'h2' ) )
+	p = p.withShortcut( Shortcut( KeyEvent.VK_3, Modifier.ALT ), paraStyleAction( 'h3' ) )
+	p = p.withShortcut( Shortcut( KeyEvent.VK_4, Modifier.ALT ), paraStyleAction( 'h4' ) )
+	p = p.withShortcut( Shortcut( KeyEvent.VK_5, Modifier.ALT ), paraStyleAction( 'h5' ) )
+	p = p.withShortcut( Shortcut( KeyEvent.VK_6, Modifier.ALT ), paraStyleAction( 'h6' ) )
+	p = p.withShortcut( Shortcut( KeyEvent.VK_T, Modifier.ALT ), paraStyleAction( 'title' ) )
+	p = p.withShortcut( Shortcut( KeyEvent.VK_C, Modifier.ALT ), insertCodeAction )
+	return p
 
 
 
@@ -323,7 +300,7 @@ class WorksheetEditor (MethodDispatchView):
 		else:
 			p = NormalText( text )
 		p = WorksheetRichTextEditor.instance.editableParagraph( node, p )
-		p = p.withElementInteractor( ParagraphNodeInteractor.instance )
+		p = _applyParagraphShortcuts( p )
 		return p
 	
 	
@@ -358,7 +335,7 @@ class WorksheetEditor (MethodDispatchView):
 		else:
 			p = NormalText( '' )
 		p = WorksheetRichTextEditor.instance.editableParagraph( node, p )
-		p = p.withElementInteractor( ParagraphNodeInteractor.instance )
+		p = _applyParagraphShortcuts( p )
 		return p
 
 
