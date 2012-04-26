@@ -35,6 +35,11 @@ class TagPStart extends TagStart
 		return new Row( new Object[] { new Label( " " ), Pres.coerceNonNull( styleAttrs ) } );
 	}
 	
+	@Override
+	public String toString()
+	{
+		return "<p>";
+	}
 
 
 	@Override

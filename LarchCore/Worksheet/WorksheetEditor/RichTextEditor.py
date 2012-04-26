@@ -65,9 +65,6 @@ class WorksheetRichTextEditor (RichTextEditor):
 	def deleteParagraphFromBlock(self, block, paragraph):
 		block.deleteEditorNode( paragraph )
 
-	def removeInlineEmbed(self, model, embed):
-		model._removeInlineEmbed( embed )
-
 
 
 WorksheetRichTextEditor.instance = WorksheetRichTextEditor()

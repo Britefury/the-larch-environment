@@ -655,7 +655,6 @@ public abstract class RichTextEditor extends SequentialEditor
 	
 	protected abstract void insertParagraphIntoBlockAfter(Object block, Object para, Object paragraphBefore);
 	protected abstract void deleteParagraphFromBlock(Object block, Object paragraph);
-	protected abstract void removeInlineEmbed(Object spanOrParagraph, Object embed);
 	
 	
 	protected abstract Object buildInlineEmbed(Object value);
@@ -954,7 +953,7 @@ public abstract class RichTextEditor extends SequentialEditor
 			Object regionEnd = modelToRegionEndTag( m );
 			if ( regionStart != null )
 			{
-				v.prefix.add( regionStart );
+				v.prefix.add( 0, regionStart );
 			}
 			if ( regionEnd != null )
 			{
@@ -1034,7 +1033,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		}
 		
 		// Compute the style values to apply
-		Map<Object, Object> values;
+		Map<Object, Object> values = null;
 		if ( styles.size() > 0 )
 		{
 			values = computeStylesFn.invoke( styles );
