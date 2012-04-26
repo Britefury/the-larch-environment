@@ -199,11 +199,11 @@ class Console (object):
 
 		def _onDrop(element, pos, data, action):
 			class _VarNameEntryListener (TextEntry.TextEntryListener):
-				def onAccept(self, entry, text):
+				def onAccept(listenerSelf, entry, text):
 					self.assignVariable( text, data.getModel() )
 					_finish( entry )
 
-				def onCancel(self, entry, text):
+				def onCancel(listenerSelf, entry, text):
 					_finish( entry )
 
 			def _finish(entry):
