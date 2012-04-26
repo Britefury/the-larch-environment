@@ -491,11 +491,24 @@ public abstract class RichTextEditor extends SequentialEditor
 			Object embed = embedPropValue.getValue();
 			LSElement embedElement = embedPropValue.getElement();
 			
+			// Find the text span or paragraph that contains the inline embedded object
 			LSElement.PropertyValue textPropValue = embedElement.findFirstPropertyInAncestors( Arrays.asList( new Object[] { spanPropertyKey, paragraphPropertyKey } ) );
 			if ( textPropValue != null )
 			{
-				Object text = textPropValue.getValue();
-				removeInlineEmbed( text, embed );
+				Object textModel = textPropValue.getValue();
+
+				// Find the paragraph that contains the inline embedded object (may be the same the outer text span)
+				LSElement.PropertyValue paraPropValue = embedElement.findPropertyInAncestors( paragraphPropertyKey );
+				if ( paraPropValue != null )
+				{
+					LSElement paragraphElement = paraPropValue.getElement();
+					FragmentView fragment = (FragmentView)paragraphElement.getFragmentContext();
+					Object paragraphModel = paraPropValue.getValue();
+
+					removeInlineEmbedFromText( fragment.getView().getLog(), paragraphElement, embedElement, paragraphModel, textModel, embed );
+					//removeInlineEmbed( text, embed );
+				}
+				//removeInlineEmbed( textModel, embed );
 			}
 		}
 	}
@@ -900,7 +913,19 @@ public abstract class RichTextEditor extends SequentialEditor
 		setParagraphContentsFromBlockRichString( log, paragraph, new RichStringBuilder( splicedMerged ).richString() );
 	}
 
-
+	protected void removeInlineEmbedFromText(Log log, LSElement paragraphElement, LSElement embedElement, Object paragraphModel, Object textModel, Object embedModel)
+	{
+		Visitor v1 = new TagsVisitor( this );
+		v1.visitFromStartOfRootToElement( embedElement, paragraphElement );
+		Visitor v2 = new TagsVisitor( this );
+		v2.visitFromElementToEndOfRoot( embedElement, paragraphElement );
+		ArrayList<Object> splicedFlattened = new ArrayList<Object>();
+		splicedFlattened.addAll( v1.flattened() );
+		splicedFlattened.addAll( v2.flattened() );
+		ArrayList<Object> splicedMerged = Merge.mergeParagraphs( splicedFlattened );
+		setParagraphContentsFromBlockRichString( log, paragraphModel, new RichStringBuilder( splicedMerged ).richString() );
+		//removeInlineEmbed( textModel, embedModel );
+	}
 
 
 	@Override

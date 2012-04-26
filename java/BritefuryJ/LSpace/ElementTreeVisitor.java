@@ -44,6 +44,42 @@ public abstract class ElementTreeVisitor
 	
 
 	
+	public void visitFromStartOfRootToElement(LSElement elem, LSElement root)
+	{
+		if ( elem != root )
+		{
+			List<LSElement> path = elem.getElementPathFromAncestor( (LSContainer)root );
+			
+			// Start one element down from root, stop before last element (leaf)
+			int indexOfLeafInPath = path.size() - 1;
+			for (int i = 0; i < indexOfLeafInPath; i++)
+			{
+				LSElement e = path.get( i );
+				
+				preOrderVisitElement( e, false );
+
+				if ( shouldVisitChildrenOfElement( e, false ) )
+				{
+					for (LSElement child: e.getChildrenInSequentialOrder())
+					{
+						if ( child != path.get( i + 1 ) )
+						{
+							visitSubtree( child );
+						}
+						else
+						{
+							break;
+						}
+					}
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
+	}
+	
 	public void visitFromStartOfRootToMarker(Marker marker, LSElement root)
 	{
 		LSContentLeafEditable leaf = marker.getElement();
@@ -100,6 +136,51 @@ public abstract class ElementTreeVisitor
 
 	
 	
+	public void visitFromElementToEndOfRoot(LSElement elem, LSElement root)
+	{
+		if ( elem != root )
+		{
+			if ( shouldVisitChildrenOfElement( root , false ) )
+			{
+				List<LSElement> path = elem.getElementPathFromAncestor( (LSContainer)root );
+				
+				// First, scan through the path, and find the range of elements we should visit - we must stop at any element for which shouldVisitChildrenOfElement() returns false
+				int startIndex = 1;
+				for (int i = 0; i < path.size() - 1; i++)
+				{
+					if ( !shouldVisitChildrenOfElement( path.get( i ), false ) )
+					{
+						break;
+					}
+					startIndex = i + 1;
+				}
+				
+				if ( startIndex == path.size() - 1 )
+				{
+					// Skip @elem
+					startIndex--;
+				}
+				for (int i = startIndex; i >= 0; i--)
+				{
+					LSElement e = path.get( i );
+
+					List<LSElement> children = e.getChildrenInSequentialOrder();
+					int childIndex = children.indexOf( path.get( i + 1 ) );
+					
+					if ( (childIndex + 1) < children.size() )
+					{
+						for (LSElement child: children.subList( childIndex + 1, children.size() ))
+						{
+							visitSubtree( child );
+						}
+					}
+
+					postOrderVisitElement( e, false );
+				}
+			}
+		}
+	}
+
 	public void visitFromMarkerToEndOfRoot(Marker marker, LSElement root)
 	{
 		LSContentLeafEditable leaf = marker.getElement();

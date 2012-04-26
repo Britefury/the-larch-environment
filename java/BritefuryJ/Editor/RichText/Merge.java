@@ -24,18 +24,35 @@ class Merge
 	
 	private static void appendSpan(List<Object> xs, EdStyleSpan b)
 	{
-		if ( xs.isEmpty()  ||  !( xs.get( xs.size() - 1 ) instanceof EdStyleSpan ) )
+		Object last = xs.isEmpty()  ?  null  :  xs.get( xs.size() -1 );
+		if ( xs.isEmpty()  ||  !( last instanceof EdStyleSpan ) )
 		{
-			// @xs is empty, or its last item is plain text
+			// @xs is empty,
+			// OR:
+			// its last item is an inline embedded object
+			// OR:
+			// @xs is the contents of a style span itself, the last item is not a style span - it may be a string
+			
 			if ( b.getStyleAttrs().isEmpty() )
 			{
-				// @b has no style attributes - join its contents onto @xs
-				// We don't have to consider the cast where the last and first elements of @xs and @b are text
-				// As the previous stage of the algorithm will not let this happen
-				xs.addAll( b.getContents() );
+				List<Object> bContents = b.getContents();
+				Object bFirst = bContents.isEmpty()  ?  null  :  bContents.get( bContents.size() - 1 );
+				if ( last instanceof String  &&  bFirst instanceof String )
+				{
+					// The last item in @xs and the first item in @b are both strings 
+					// join the strings and append the rest
+					xs.set( xs.size() - 1, ((String)last) + ((String)bFirst) );
+					xs.addAll( bContents.subList( 1, bContents.size() ) );
+				}
+				else
+				{
+					// @b has no style attributes - join its contents onto @xs
+					xs.addAll( b.getContents() );
+				}
 			}
 			else
 			{
+				// @b has style attributes - append it
 				xs.add( b );
 			}
 		}
@@ -45,7 +62,7 @@ class Merge
 		}
 		else
 		{
-			EdStyleSpan a = (EdStyleSpan)xs.get( xs.size() - 1 );
+			EdStyleSpan a = (EdStyleSpan)last;
 			HashMap<Object, Object> aAttrs = a.getStyleAttrs();
 			HashMap<Object, Object> bAttrs = b.getStyleAttrs();
 			Set<Object> aKeys = aAttrs.keySet();
@@ -80,8 +97,17 @@ class Merge
 			
 			if ( common.isEmpty() )
 			{
-				// No attributes in common - just append
-				xs.add( b );
+				if ( aKeys.isEmpty()  && bKeys.isEmpty() )
+				{
+					// Handle the case where no style attributes are present on either @a or @b
+					// Join the contents of @b onto @a
+					appendSpan( a.getContents(), b );
+				}
+				else
+				{
+					// No attributes in common - just append @b to the list
+					xs.add( b );
+				}
 			}
 			else
 			{
@@ -90,6 +116,10 @@ class Merge
 					// The style attributes in @b are a superset of those in @a
 					// Therefore @b can be contained with @a, with the addition of the relevant attrs
 					// Append @b to the contents of @a
+					
+					// Note that this also handles the case where we have two adjacent spans with identical style attributes
+					// The new EdStyleSpan created for the appendSpan() call will create a style span with no attributes
+					// which will be handled by the first clause in appendSpan()
 					HashMap<Object, Object> bMap = new HashMap<Object, Object>();
 					for (Object k: bNotA)
 					{
@@ -168,6 +198,10 @@ class Merge
 	}
 	
 	
+	// Merges spans together, according to style attributes:
+	// Adjacent spans with the same style are joined
+	// Adjacent spans where the style attributes of one are a superset of the attributes of the other are joined such that the
+	// span with the superset of attributes is nested within the other
 	public static ArrayList<Object> mergeSpans(List<Object> xs)
 	{
 		ArrayList<Object> s = new ArrayList<Object>();
@@ -249,7 +283,10 @@ class Merge
 	}
 	
 	
-	
+	// Merges paragraphs
+	// Leaves paragraphs in structural form (appear as EdParagraph or EdParagraphEmbed) as is
+	// Starts a new paragraph when a paragraph start tag (TagPStart) is encountered
+	// Joins any spans within paragraphs using mergeSpans()
 	public static ArrayList<Object> mergeParagraphs(List<Object> xs)
 	{
 		PMerger m = new PMerger();
