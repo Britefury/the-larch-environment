@@ -41,6 +41,7 @@ class Flatten
 	}
 	
 	
+	// Replace newline characters in strings with newline tokens
 	// SHOULD IMPLEMENT AS ITERATOR, BUT I'M BUGGERED IF I AM GOING TO SPEND TIME CONVERTING A NICE PYTHON GENERATOR TO A JAVA ITERATOR......
 	private static ArrayList<Object> newlineSplit(Iterable<Object> xs)
 	{
@@ -54,7 +55,11 @@ class Flatten
 				for (int i = 1; i < lines.size(); i++)
 				{
 					result.add( Newline.instance );
-					result.add( lines.get( i ) );
+					String line = lines.get( i );
+					if ( line.length() > 0 )
+					{
+						result.add( lines.get( i ) );
+					}
 				}
 			}
 			else
@@ -65,6 +70,7 @@ class Flatten
 		return result;
 	}
 	
+	// Join adjacent string with one another
 	// SHOULD IMPLEMENT AS ITERATOR, BUT I'M BUGGERED IF I AM GOING TO SPEND TIME CONVERTING A NICE PYTHON GENERATOR TO A JAVA ITERATOR......
 	private static ArrayList<Object> textJoin(Iterable<Object> xs)
 	{
@@ -101,6 +107,11 @@ class Flatten
 		return x instanceof EdNode  &&  ((EdNode)x).isParagraph();
 	}
 	
+	// Create a flattened version of the sequence of tags and strings in @xs
+	// Paragraph start tags (TagPStart) remain
+	// Newlines are converted to paragraph start tags (TagPStart)
+	// Strings are wrapped in EdStyleSpan objects, with styles determined by the style span start and end tags (TagSStart and TagSEnd)
+	// Paragraphs (editor model paragraphs) that have not been 'flattened out' but remain as structural items are left as is.
 	// SHOULD IMPLEMENT AS ITERATOR, BUT I'M BUGGERED IF I AM GOING TO SPEND TIME CONVERTING A NICE PYTHON GENERATOR TO A JAVA ITERATOR......
 	private static ArrayList<Object> flatten(Iterable<Object> xs)
 	{
