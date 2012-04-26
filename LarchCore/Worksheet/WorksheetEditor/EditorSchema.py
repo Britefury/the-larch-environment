@@ -164,10 +164,6 @@ class ParagraphEditor (AbstractViewSchema.ParagraphAbstractView):
 		self._model['text'] = modelContents
 		self._editorModel.setModelContents( WSEditor.RichTextEditor.WorksheetRichTextEditor.instance, contents )
 
-	def _removeInlineEmbed(self, embed):
-		index = self.getText().index( embed )
-		del self._model['text'][index]
-
 
 	def setStyle(self, style):
 		self._model['style'] = style
@@ -200,10 +196,6 @@ class TextSpanEditor (AbstractViewSchema.TextSpanAbstractView):
 		modelContents = self._textToModel( contents )
 		self._model['text'] = modelContents
 		self._editorModel.setModelContents( WSEditor.RichTextEditor.WorksheetRichTextEditor.instance, contents )
-
-	def _removeInlineEmbed(self, embed):
-		index = self.getText().index( embed )
-		del self._model['text'][index]
 
 	
 	def setStyleAttrs(self, styleMap):

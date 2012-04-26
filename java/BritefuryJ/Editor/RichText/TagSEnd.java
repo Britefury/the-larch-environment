@@ -13,4 +13,10 @@ class TagSEnd extends TagEnd
 	{
 		return "style";
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "</style>";
+	}
 }

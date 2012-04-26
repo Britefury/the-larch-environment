@@ -45,6 +45,12 @@ class TagSStart extends TagStart
 		return new Row( xs );
 	}
 	
+	@Override
+	public String toString()
+	{
+		return "<style " + styleAttrs + ">";
+	}
+	
 
 
 	@Override
