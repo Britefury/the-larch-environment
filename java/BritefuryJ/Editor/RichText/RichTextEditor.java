@@ -16,15 +16,16 @@ import BritefuryJ.ClipboardFilter.ClipboardCopier;
 import BritefuryJ.ClipboardFilter.ClipboardCopierMemo;
 import BritefuryJ.Editor.Sequential.EditFilter;
 import BritefuryJ.Editor.Sequential.EditFilter.HandleEditResult;
+import BritefuryJ.Editor.Sequential.RichStringEditFilter;
 import BritefuryJ.Editor.Sequential.SelectionEditTreeEvent;
 import BritefuryJ.Editor.Sequential.SequentialEditor;
-import BritefuryJ.Editor.Sequential.RichStringEditFilter;
 import BritefuryJ.Editor.Sequential.Item.SoftStructuralItem;
+import BritefuryJ.Editor.Sequential.Item.StructuralItem;
 import BritefuryJ.IncrementalView.FragmentView;
-import BritefuryJ.LSpace.LSContentLeafEditable;
-import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.EditEvent;
 import BritefuryJ.LSpace.ElementTreeVisitor;
+import BritefuryJ.LSpace.LSContentLeafEditable;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.TextEditEvent;
 import BritefuryJ.LSpace.TreeEventListener;
 import BritefuryJ.LSpace.Marker.Marker;
@@ -225,28 +226,33 @@ public abstract class RichTextEditor extends SequentialEditor
 	}
 	
 	
+
+	//
+	// PROPERTY KEYS - for finding elements that represent nodes of specific types
+	//
 	
 	
-	private RichStringEditFilter inlineEmbedEditListener, textEditListener, paraEditListener, paraListItemEditListener, blockEditListener;
+	protected static class RichTextEditorPropertyKey
+	{
+	}
+	
+	// Instance variables, so that each rich text editor has its own set of keys, so that two different editors cannot interfere with one another
+	protected final RichTextEditorPropertyKey inlineEmbedPropertyKey = new RichTextEditorPropertyKey();
+	protected final RichTextEditorPropertyKey spanPropertyKey = new RichTextEditorPropertyKey();
+	protected final RichTextEditorPropertyKey paragraphPropertyKey = new RichTextEditorPropertyKey();
+	protected final RichTextEditorPropertyKey paragraphEmbedPropertyKey = new RichTextEditorPropertyKey();
+	protected final RichTextEditorPropertyKey blockPropertyKey = new RichTextEditorPropertyKey();
+	protected final RichTextEditorPropertyKey blockItemPropertyKey = new RichTextEditorPropertyKey();
+	
+	
+	
+	
+	
+	private RichStringEditFilter textEditListener, paraEditListener, blockEditListener;
 	
 	
 	public RichTextEditor()
 	{
-		HandleRichStringFn onInlineEmbedEdit = new HandleRichStringFn()
-		{
-			@Override
-			public EditFilter.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
-			{
-				if ( event instanceof RichTextEditEvents.RichTextRequest )
-				{
-					RichTextEditEvents.RichTextRequest richTextReq = (RichTextEditEvents.RichTextRequest)event;
-					return richTextReq.invokeOnInlineEmbed( RichTextEditor.this, element, sourceElement, fragment, model, value );
-				}
-				return HandleEditResult.NOT_HANDLED;
-			}
-		};
-
-	
 		HandleRichStringFn onTextEdit = new HandleRichStringFn()
 		{
 			@Override
@@ -260,11 +266,6 @@ public abstract class RichTextEditor extends SequentialEditor
 						handled = setTextContentsFromRichString( fragment.getView().getLog(), model, value );
 					}
 					return handled  ?  EditFilter.HandleEditResult.HANDLED  :  EditFilter.HandleEditResult.PASS_TO_PARENT;
-				}
-				else if ( event instanceof RichTextEditEvents.RichTextRequest )
-				{
-					RichTextEditEvents.RichTextRequest richTextReq = (RichTextEditEvents.RichTextRequest)event;
-					return richTextReq.invokeOnTextSpan( RichTextEditor.this, element, sourceElement, fragment, model, value );
 				}
 				return HandleEditResult.NOT_HANDLED;
 			}
@@ -290,44 +291,9 @@ public abstract class RichTextEditor extends SequentialEditor
 					boolean handled = setParagraphContentsFromBlockRichString( fragment.getView().getLog(), model, value );
 					return handled  ?  EditFilter.HandleEditResult.HANDLED  :  EditFilter.HandleEditResult.PASS_TO_PARENT;
 				}
-				else if ( event instanceof RichTextEditEvents.RichTextRequest )
-				{
-					RichTextEditEvents.RichTextRequest richTextReq = (RichTextEditEvents.RichTextRequest)event;
-					return richTextReq.invokeOnParagraph( RichTextEditor.this, element, sourceElement, fragment, model, value );
-				}
 				return HandleEditResult.NOT_HANDLED;
 			}
 		};
-
-		
-		HandleRichStringFn onParagraphListItemEdit = new HandleRichStringFn()
-		{
-			@Override
-			public EditFilter.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
-			{
-				if ( event instanceof RichTextEditEvents.RichTextRequest )
-				{
-					RichTextEditEvents.RichTextRequest richTextReq = (RichTextEditEvents.RichTextRequest)event;
-					return richTextReq.invokeOnParagraphListItem( RichTextEditor.this, element, sourceElement, fragment, model, value );
-				}
-				return HandleEditResult.NOT_HANDLED;
-			}
-		};
-
-		
-//		HandleRichStringValueFn onParagraphEmbedEdit = new HandleRichStringValueFn()
-//		{
-//			@Override
-//			public EditListener.HandleEditResult handleValue(DPElement element, DPElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
-//			{
-//				if ( event instanceof RichTextEditEvents.RichTextRequest )
-//				{
-//					RichTextEditEvents.RichTextRequest richTextReq = (RichTextEditEvents.RichTextRequest)event;
-//					return richTextReq.invokeOnParagraph( RichTextEditor.this, element, sourceElement, fragment, model, value );
-//				}
-//				return HandleEditResult.NOT_HANDLED;
-//			}
-//		};
 
 		
 		HandleRichStringFn onBlockEdit = new HandleRichStringFn()
@@ -345,20 +311,13 @@ public abstract class RichTextEditor extends SequentialEditor
 					setModelContentsFromEditorModelRichString( model, value );
 					return EditFilter.HandleEditResult.HANDLED;
 				}
-				else if ( event instanceof RichTextEditEvents.RichTextRequest )
-				{
-					RichTextEditEvents.RichTextRequest richTextReq = (RichTextEditEvents.RichTextRequest)event;
-					return richTextReq.invokeOnBlock( RichTextEditor.this, element, sourceElement, fragment, model, value );
-				}
 				return HandleEditResult.NOT_HANDLED;
 			}
 		};
 
 	
-		inlineEmbedEditListener = richStringEditFilter( onInlineEmbedEdit );
 		textEditListener = richStringEditFilter( onTextEdit );
 		paraEditListener = richStringEditFilter( onParagraphEdit );
-		paraListItemEditListener = richStringEditFilter( onParagraphListItemEdit );
 		blockEditListener = richStringEditFilter( onBlockEdit );
 	}
 	
@@ -367,15 +326,6 @@ public abstract class RichTextEditor extends SequentialEditor
 	
 	
 	
-	
-	
-	@Override
-	protected boolean isEditEvent(EditEvent event)
-	{
-		return event instanceof RichTextEditEvents.RichTextRequest;
-	}
-
-
 	
 	
 	//
@@ -392,28 +342,33 @@ public abstract class RichTextEditor extends SequentialEditor
 	public Pres editableInlineEmbed(Object model, Object child)
 	{
 		child = new Proxy( child );
-		return new SoftStructuralItem( this, inlineEmbedEditListener, model, child );
+		Pres p = new StructuralItem( model, child );
+		return p.withProperty( inlineEmbedPropertyKey, model );
 	}
 	
 	public Pres editableSpan(Object model, Object child)
 	{
-		return new SoftStructuralItem( this, textEditListener, model, child );
+		Pres p =  new SoftStructuralItem( this, textEditListener, model, child );
+		return p.withProperty( spanPropertyKey, model );
 	}
 	
 	public Pres editableParagraph(Object model, Object child)
 	{
 		child = editableParaStyle.applyTo( child );
-		return new SoftStructuralItem( this, Arrays.asList( new TreeEventListener[] { paraEditListener, paraListItemEditListener } ), model, child );
+		Pres p = new SoftStructuralItem( this, Arrays.asList( new TreeEventListener[] { paraEditListener } ), model, child );
+		return p.withProperty( paragraphPropertyKey, model ).withProperty( blockItemPropertyKey, model );
 	}
 	
 	public Pres editableParagraphEmbed(Object model, Object child)
 	{
-		return new SoftStructuralItem( this, paraListItemEditListener, model, child );
+		Pres p = new StructuralItem( model, child );
+		return p.withProperty( paragraphEmbedPropertyKey, model ).withProperty( blockItemPropertyKey, model );
 	}
 	
 	public Pres editableBlock(Object model, Object child)
 	{
-		return new SoftStructuralItem( this, blockEditListener, model, child );
+		Pres p = new SoftStructuralItem( this, blockEditListener, model, child );
+		return p.withProperty( blockPropertyKey, model );
 	}
 	
 	
@@ -464,7 +419,7 @@ public abstract class RichTextEditor extends SequentialEditor
 	{
 		if ( caret.isValid()  &&  caret.isEditable() )
 		{
-			caret.getElement().postTreeEvent( new RichTextEditEvents.InsertParagraphRequest( makeParagraph ) );
+			insertParagraphAtMarker( caret.getMarker(), makeParagraph );
 		}
 	}
 	
@@ -472,39 +427,127 @@ public abstract class RichTextEditor extends SequentialEditor
 	{
 		if ( marker.isValid()  &&  marker.getElement().isEditable() )
 		{
-			marker.getElement().postTreeEvent( new RichTextEditEvents.InsertParagraphRequest( makeParagraph ) );
+			LSElement element = marker.getElement();
+			LSElement.PropertyValue paraPropValue = element.findPropertyInAncestors( blockItemPropertyKey );
+			if ( paraPropValue != null )
+			{
+				LSElement paragraphElement = paraPropValue.getElement();
+				Object paragraphBeforeModel = paraPropValue.getValue();
+				
+				LSElement.PropertyValue blockValue = paragraphElement.findPropertyInAncestors( blockPropertyKey );
+				if ( blockValue != null )
+				{
+					Object blockModel = blockValue.getValue();
+					Object para = makeParagraph.invoke();
+					insertParagraphIntoBlockAfter( blockModel, para, paragraphBeforeModel );
+				}
+			}
 		}
 	}
 	
 	public void deleteParagraphContainingElement(LSElement element)
 	{
-		element.postTreeEvent( new RichTextEditEvents.DeleteParagraphRequest() );
+		LSElement.PropertyValue paraPropValue = element.findPropertyInAncestors( blockItemPropertyKey );
+		if ( paraPropValue != null )
+		{
+			Object paragraphModel = paraPropValue.getValue();
+			LSElement paragraphElement = paraPropValue.getElement();
+			
+			LSElement.PropertyValue blockValue = paragraphElement.findPropertyInAncestors( blockPropertyKey );
+			if ( blockValue != null )
+			{
+				Object blockModel = blockValue.getValue();
+				deleteParagraphFromBlock( blockModel, paragraphModel );
+			}
+		}
 	}
 	
 	
 	
 	public void insertInlineEmbedAtMarker(Marker marker, MakeInlineEmbedValueFn makeInlineEmbedValue)
 	{
-		if ( marker.isValid() )
+		if ( marker.isValid()  &&  marker.getElement().isEditable() )
 		{
-			marker.getElement().postTreeEvent( new RichTextEditEvents.InsertInlineEmbedRequest( marker, makeInlineEmbedValue ) );
+			LSElement element = marker.getElement();
+			LSElement.PropertyValue paraPropValue = element.findPropertyInAncestors( paragraphPropertyKey );
+			if ( paraPropValue != null )
+			{
+				LSElement paragraphElement = paraPropValue.getElement();
+				FragmentView fragment = (FragmentView)paragraphElement.getFragmentContext();
+				Object paragraphModel = paraPropValue.getValue();
+				
+				Object embedValue = makeInlineEmbedValue.invoke();
+				EdInlineEmbed embed = new EdInlineEmbed( embedValue );
+				insertInlineEmbed( fragment.getView().getLog(), paragraphElement, paragraphModel, marker, embed );
+			}
 		}
 	}
 	
 	public void deleteInlineEmbedContainingElement(LSElement element)
 	{
-		element.postTreeEvent( new RichTextEditEvents.DeleteInlineEmbedRequest() );
+		LSElement.PropertyValue embedPropValue = element.findPropertyInAncestors( inlineEmbedPropertyKey );
+		if ( embedPropValue != null )
+		{
+			Object embed = embedPropValue.getValue();
+			LSElement embedElement = embedPropValue.getElement();
+			
+			LSElement.PropertyValue textPropValue = embedElement.findFirstPropertyInAncestors( Arrays.asList( new Object[] { spanPropertyKey, paragraphPropertyKey } ) );
+			if ( textPropValue != null )
+			{
+				Object text = textPropValue.getValue();
+				removeInlineEmbed( text, embed );
+			}
+		}
 	}
 	
 	
 	public void applyStyleToSelection(TextSelection selection, ComputeSpanStylesFn computeSpanStyles)
 	{
-		selection.getCommonRoot().postTreeEvent( new RichTextEditEvents.StyleRequest( computeSpanStyles ) );
+		if ( selection.isValid()  &&  selection.isEditable() )
+		{
+			LSElement rootElement = selection.getCommonRoot();
+			if ( rootElement != null )
+			{
+				LSElement.PropertyValue targetPropValue = rootElement.findFirstPropertyInAncestors( Arrays.asList( new Object[] { paragraphPropertyKey, blockPropertyKey } ) );
+				if ( targetPropValue != null )
+				{
+					if ( targetPropValue.getKey() == paragraphPropertyKey )
+					{
+						// Apply modification to closest paragraph
+						Object paragraphModel = targetPropValue.getValue();
+						LSElement paragraphElement = targetPropValue.getElement();
+						FragmentView paragraphFragment = (FragmentView)paragraphElement.getFragmentContext();
+						RichString richStr = richStringWithModifiedSelectionStyle( paragraphElement, selection, computeSpanStyles );
+						setParagraphContentsFromBlockRichString( paragraphFragment.getView().getLog(), paragraphModel, richStr );
+					}
+					else if ( targetPropValue.getKey() == blockPropertyKey )
+					{
+						Object blockModel = targetPropValue.getValue();
+						LSElement blockElement = targetPropValue.getElement();
+						RichString richStr = richStringWithModifiedSelectionStyle( blockElement, (TextSelection)selection, computeSpanStyles );
+						setModelContentsFromEditorModelRichString( blockModel, richStr );
+					}
+				}
+
+				
+				//rootElement.postTreeEvent( new RichTextEditEvents.StyleRequest( computeSpanStyles ) );
+			}
+		}
 	}
 	
 	public void modifyParagraphAtMarker(Marker marker, ModifyParagraphFn modifyParagraph)
 	{
-		marker.getElement().postTreeEvent( new RichTextEditEvents.ParagraphStyleRequest( modifyParagraph ) );
+		if ( marker.isValid()  &&  marker.getElement().isEditable() )
+		{
+			LSElement element = marker.getElement();
+			LSElement.PropertyValue paraPropValue = element.findPropertyInAncestors( paragraphPropertyKey );
+			if ( paraPropValue != null )
+			{
+				Object paragraphModel = paraPropValue.getValue();
+				
+				modifyParagraph.invoke( paragraphModel );
+			}
+		}
 	}
 	
 	
@@ -512,6 +555,10 @@ public abstract class RichTextEditor extends SequentialEditor
 
 
 
+	
+	//
+	// INTERNAL: content modification methods
+	//
 
 
 	protected boolean setTextContentsFromRichString(Log log, Object model, RichString value)
@@ -595,7 +642,7 @@ public abstract class RichTextEditor extends SequentialEditor
 	
 	protected abstract void insertParagraphIntoBlockAfter(Object block, Object para, Object paragraphBefore);
 	protected abstract void deleteParagraphFromBlock(Object block, Object paragraph);
-	protected abstract void removeInlineEmbed(Object textSpan, Object embed);
+	protected abstract void removeInlineEmbed(Object spanOrParagraph, Object embed);
 	
 	
 	protected abstract Object buildInlineEmbed(Object value);
@@ -689,16 +736,9 @@ public abstract class RichTextEditor extends SequentialEditor
 	
 	protected void setModelContentsFromEditorModelRichString(Object model, RichString richString)
 	{
-		ArrayList<Object> values = richString.getItemValues();
-		ArrayList<Object> editorModelValues = new ArrayList<Object>();
-		editorModelValues.ensureCapacity( values.size() );
+		List<Object> modelValues = editorModelListToModelList( richString.getItemValues() );
 		
-		for (Object x: values)
-		{
-			editorModelValues.add( filterValueFromEditorModel( x ) );
-		}
-		
-		setModelContents( model, editorModelValues );
+		setModelContents( model, modelValues );
 	}
 
 

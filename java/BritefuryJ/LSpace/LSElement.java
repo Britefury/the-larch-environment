@@ -343,14 +343,14 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 	public static class PropertyValue
 	{
 		private LSElement element;
-		private Object property;
+		private Object key;
 		private Object value;
 		
 		
-		protected PropertyValue(LSElement element, Object property, Object value)
+		protected PropertyValue(LSElement element, Object key, Object value)
 		{
 			this.element = element;
-			this.property = property;
+			this.key = key;
 			this.value = value;
 		}
 		
@@ -360,9 +360,9 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 			return element;
 		}
 		
-		public Object getProperty()
+		public Object getKey()
 		{
-			return property;
+			return key;
 		}
 		
 		public Object getValue()
@@ -2817,25 +2817,42 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 	//
 	//
 	
-	public PropertyValue getProperty(Object property)
+	public PropertyValue getProperty(Object key)
 	{
-		return properties != null  ?  properties.get( property )  :  null;
+		return properties != null  ?  properties.get( key )  :  null;
 	}
 	
-	public void setProperty(Object property, Object value)
+	public PropertyValue getFirstProperty(Iterable<Object> keys)
+	{
+		if ( properties != null )
+		{
+			for (Object key: keys)
+			{
+				PropertyValue val = properties.get( key );
+				if ( val != null )
+				{
+					return val;
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	public void setProperty(Object key, Object value)
 	{
 		if ( properties == null )
 		{
 			properties = new HashMap<Object, PropertyValue>();
 		}
-		properties.put( property, new PropertyValue( this, property, value ) );
+		properties.put( key, new PropertyValue( this, key, value ) );
 	}
 	
-	public void removeProperty(Object property)
+	public void removeProperty(Object key)
 	{
 		if ( properties != null )
 		{
-			properties.remove( property );
+			properties.remove( key );
 			if ( properties.isEmpty() )
 			{
 				properties = null;
@@ -2845,12 +2862,28 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 	
 	
 	
-	public PropertyValue findPropertyInAncestors(Object property)
+	public PropertyValue findPropertyInAncestors(Object key)
 	{
 		LSElement e = this;
 		while ( e != null )
 		{
-			PropertyValue v = e.getProperty( property );
+			PropertyValue v = e.getProperty( key );
+			if ( v != null )
+			{
+				return v;
+			}
+			e = e.parent;
+		}
+		
+		return null;
+	}
+	
+	public PropertyValue findFirstPropertyInAncestors(Iterable<Object> keys)
+	{
+		LSElement e = this;
+		while ( e != null )
+		{
+			PropertyValue v = e.getFirstProperty( keys );
 			if ( v != null )
 			{
 				return v;

@@ -337,14 +337,14 @@ public abstract class Pres
 	//
 	//
 	
-	public SetProperty withProperty(Object property, Object value)
+	public SetProperty withProperty(Object key, Object value)
 	{
-		return new SetProperty( property, value, this );
+		return new SetProperty( key, value, this );
 	}
 	
-	public RemoveProperty withoutProperty(Object property)
+	public RemoveProperty withoutProperty(Object key)
 	{
-		return new RemoveProperty( property, this );
+		return new RemoveProperty( key, this );
 	}
 	
 	
