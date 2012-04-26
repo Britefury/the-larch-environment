@@ -11,13 +11,13 @@ import BritefuryJ.StyleSheet.StyleValues;
 
 public class SetProperty extends Pres
 {
-	private Object property, value;
+	private Object key, value;
 	private Pres child;
 	
 	
-	public SetProperty(Object property, Object value, Object child)
+	public SetProperty(Object key, Object value, Object child)
 	{
-		this.property = property;
+		this.key = key;
 		this.value = value;
 		this.child = Pres.coerce( child );
 	}
@@ -27,7 +27,7 @@ public class SetProperty extends Pres
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		LSElement e = child.present( ctx, style );
-		e.setProperty( property, value );
+		e.setProperty( key, value );
 		return e;
 	}
 
@@ -40,27 +40,27 @@ public class SetProperty extends Pres
 	//
 	//
 	
-	public SetProperty withProperty(Object property, Object value)
+	public SetProperty withProperty(Object key, Object value)
 	{
-		if ( property.equals( this.property ) )
+		if ( key.equals( this.key ) )
 		{
-			return new SetProperty( property, value, child );
+			return new SetProperty( key, value, child );
 		}
 		else
 		{
-			return new SetProperty( property, value, this );
+			return new SetProperty( key, value, this );
 		}
 	}
 	
-	public RemoveProperty withoutProperty(Object property)
+	public RemoveProperty withoutProperty(Object key)
 	{
-		if ( property.equals( this.property ) )
+		if ( key.equals( this.key ) )
 		{
-			return new RemoveProperty( property, child );
+			return new RemoveProperty( key, child );
 		}
 		else
 		{
-			return new RemoveProperty( property, this );
+			return new RemoveProperty( key, this );
 		}
 	}
 }
