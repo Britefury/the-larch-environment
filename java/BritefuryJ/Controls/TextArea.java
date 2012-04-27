@@ -495,9 +495,25 @@ public class TextArea extends ControlPres
 		}
 		
 		@Override
-		public void onAccept(TextAreaControl textEntry, String text)
+		public void onAccept(TextAreaControl textArea, String text)
 		{
 			value.setLiteralValue( text );
+		}
+	}
+	
+	private static class ChangeListener extends TextAreaListener
+	{
+		private LiveValue value;
+		
+		public ChangeListener(LiveValue value)
+		{
+			this.value = value;
+		}
+		
+		@Override
+		public void onTextChanged(TextAreaControl textArea)
+		{
+			value.setLiteralValue( textArea.getDisplayedText() );
 		}
 	}
 	
@@ -544,5 +560,11 @@ public class TextArea extends ControlPres
 		LSBorder element = (LSBorder)elementPres.present( ctx, textAreaStyle );
 		
 		return new TextAreaControl( ctx, style.withAttr( Primitive.hAlign, HAlignment.PACK ), element, listener, value );
+	}
+	
+	
+	public static TextArea textAreaCommitOnChange(LiveValue value)
+	{
+		return new TextArea( new LiveSourceRef( value ), new ChangeListener( value ) );
 	}
 }
