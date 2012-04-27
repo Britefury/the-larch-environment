@@ -607,6 +607,11 @@ class Python25ASTGenerator (object):
 
 
 	# Embedded object
+	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectLiteral )
+	def EmbeddedObjectLiteral(self,  lineno, ctx, node, embeddedValue):
+		raise ValueError, 'Python25ASTGenerator does not support embedded object literals; a Python25ModuleASTGenerator must be used'
+
+
 	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectExpr )
 	def EmbeddedObjectExpr(self,  lineno, ctx, node, embeddedValue):
 		raise ValueError, 'Python25ASTGenerator does not support embedded object expressions; a Python25ModuleASTGenerator must be used'

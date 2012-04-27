@@ -554,6 +554,11 @@ class Python25CodeGenerator (object):
 	
 	
 	# Embedded object
+	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectLiteral )
+	def EmbeddedObjectLiteral(self, node, embeddedValue):
+		raise ValueError, 'Python25CodeGenerator does not support embedded object literals; a Python25ModuleCodeGenerator must be used'
+
+
 	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectExpr )
 	def EmbeddedObjectExpr(self, node, embeddedValue):
 		raise ValueError, 'Python25CodeGenerator does not support embedded object expressions; a Python25ModuleCodeGenerator must be used'
@@ -961,9 +966,19 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 	@DMObjectNodeDispatchMethod( Schema.Unquote )
 	def Unquote(self, node, value):
 		return self( value )
-		
-		
-	
+
+
+
+	# Embedded object literal
+	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectLiteral )
+	def EmbeddedObjectLiteral(self, node, embeddedValue):
+		value = embeddedValue.getValue()
+
+		# Use the object as a value
+		return self._resource( value )
+
+
+
 	# Embedded object expression
 	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectExpr )
 	def EmbeddedObjectExpr(self, node, embeddedValue):
@@ -1007,7 +1022,7 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 		
 	
 	
-	# Embedded object
+	# Embedded object statement
 	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectStmt )
 	def EmbeddedObjectStmt(self, node, embeddedValue):
 		value = embeddedValue.getValue()

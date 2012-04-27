@@ -51,6 +51,11 @@ class _TextCodeGenerator (CodeGenerator.Python25CodeGenerator):
 
 
 	# Embedded object
+	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectLiteral )
+	def EmbeddedObjectLiteral(self, node, embeddedValue):
+		raise PythonTextExporterEmbeddedObjectsNotSupportedError, 'PythonTextExporter does not support embedded object literals'
+
+
 	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectExpr )
 	def EmbeddedObjectExpr(self, node, embeddedValue):
 		raise PythonTextExporterEmbeddedObjectsNotSupportedError, 'PythonTextExporter does not support embedded object expressions'
