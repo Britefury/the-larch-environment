@@ -14,6 +14,9 @@ from LarchCore.Languages.Python25 import Embedded
 
 
 
+def embeddedLiteral(x):
+	return Py.EmbeddedObjectLiteral( embeddedValue=DMNode.embedIsolated( x, False ) )
+
 def embeddedExpression(x):
 	return Py.EmbeddedObjectExpr( embeddedValue=DMNode.embedIsolated( x, False ) )
 

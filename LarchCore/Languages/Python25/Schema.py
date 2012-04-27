@@ -215,7 +215,8 @@ IndentedBlock = schema.newClass( 'IndentedBlock', CompoundStmt, [ 'suite' ] )
 
 
 # Embedded object
-EmbeddedObjectExpr = schema.newClass( 'EmbeddedObjectExpr', Expr, [ 'embeddedValue' ] )
+EmbeddedObjectLiteral = schema.newClass( 'EmbeddedObjectLiteral', Expr, [ 'embeddedValue' ] )
+EmbeddedObjectExpr = schema.newClass( 'EmbeddedObjectExpr', Expr, [ 'embeddedValue', 'asLiteral' ] )
 EmbeddedObjectStmt = schema.newClass( 'EmbeddedObjectStmt', SimpleStmt, [ 'embeddedValue' ] )
 
 

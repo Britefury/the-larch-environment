@@ -90,8 +90,14 @@ class PythonEditorStyle (object):
 	externalExprTitleStyle = InheritedAttributeNonNull( pythonEditor, 'externalExprTitleStyle', StyleSheet,
 	                                                    StyleSheet.style( Primitive.foreground( Color( 0.0, 0.5, 1.0 ) ), Primitive.fontSize( 10 ) ) )
 
-	embeddedObjectBorderStyle = InheritedAttributeNonNull( pythonEditor, 'embeddedObjectBorderStyle', StyleSheet,
-	                                                     StyleSheet.style( Primitive.border( SolidBorder( 2.0, 2.0, 4.0, 4.0, Color( 0.6, 0.65, 0.8 ), None ) ) ) )
+	embeddedObjectBorder = InheritedAttributeNonNull( pythonEditor, 'embeddedObjectBorder', AbstractBorder,
+	                                                     SolidBorder( 1.5, 1.5, 4.0, 4.0, Color( 0.6, 0.65, 0.8 ), None ) )
+	embeddedObjectLiteralBorder = InheritedAttributeNonNull( pythonEditor, 'embeddedObjectLiteralBorder', AbstractBorder,
+							       SolidBorder( 1.5, 1.5, 4.0, 4.0, Color( 0.4, 0.433, 0.533 ), None ) )
+	embeddedObjectTagLabelStyle = InheritedAttributeNonNull( pythonEditor, 'embeddedObjectTagLabelStyle', StyleSheet,
+								      StyleSheet.style( Primitive.foreground( Color( 0.0, 0.0, 0.0, 0.6 ) ), Primitive.fontSize( 9 ) ) )
+	embeddedObjectTagBorder = InheritedAttributeNonNull( pythonEditor, 'embeddedObjectTagBorder', AbstractBorder,
+							     SolidBorder( 1.0, 1.0, 3.0, 3.0, Color( 0.45, 0.4, 0.533 ), Color( 0.925, 0.9, 0.95 ) ) )
 	embeddedObjectLineStyle = InheritedAttributeNonNull( pythonEditor, 'embeddedObjectLineStyle', StyleSheet,
 	                                                   StyleSheet.style( Primitive.shapePainter( FillPainter( Color( 0.1, 0.2, 0.3 ) ) ) ) )
 	embeddedObjectExpansionLabelStyle = InheritedAttributeNonNull( pythonEditor, 'embeddedObjectExpansionLabelStyle', StyleSheet,
@@ -610,10 +616,44 @@ def externalExpr(ctx, style, exprView, title, deleteButton):
 
 
 @PyPresCombinatorFn
-def embeddedObject(ctx, style, valueView):
-	embeddedObjectBorderStyle = style.get( PythonEditorStyle.embeddedObjectBorderStyle )
+def embeddedObjectLiteral(ctx, style, valueView):
+	embeddedObjectLiteralBorder = style.get( PythonEditorStyle.embeddedObjectLiteralBorder )
+	embeddedObjectTagLabelStyle = style.get( PythonEditorStyle.embeddedObjectTagLabelStyle )
+	embeddedObjectTagBorder = style.get( PythonEditorStyle.embeddedObjectTagBorder )
 
-	box = embeddedObjectBorderStyle.applyTo( Border( valueView.pad( 3.0, 3.0 ) ) ).pad( 1.0, 1.0 )
+	tagLabel = embeddedObjectTagBorder.surround( embeddedObjectTagLabelStyle( Label( 'L' ) ) )
+	contents = Row( [ tagLabel.alignVCentre(), valueView.pad( 2.0, 2.0 ) ] )
+	box = embeddedObjectLiteralBorder.surround( contents ).padX( 1.0, 1.0 )
+
+	segment = Segment( box )
+	return segment.present( ctx, style )
+
+
+
+@PyPresCombinatorFn
+def embeddedObjectExpr(ctx, style, valueView):
+	embeddedObjectBorder = style.get( PythonEditorStyle.embeddedObjectBorder )
+	embeddedObjectTagLabelStyle = style.get( PythonEditorStyle.embeddedObjectTagLabelStyle )
+	embeddedObjectTagBorder = style.get( PythonEditorStyle.embeddedObjectTagBorder )
+
+	tagLabel = embeddedObjectTagBorder.surround( embeddedObjectTagLabelStyle( Label( 'X' ) ) )
+	contents = Row( [ tagLabel.alignVCentre(), valueView.pad( 2.0, 2.0 ) ] )
+	box = embeddedObjectBorder.surround( contents ).padX( 1.0, 1.0 )
+
+	segment = Segment( box )
+	return segment.present( ctx, style )
+
+
+
+@PyPresCombinatorFn
+def embeddedObjectStmt(ctx, style, valueView):
+	embeddedObjectBorder = style.get( PythonEditorStyle.embeddedObjectBorder )
+	embeddedObjectTagLabelStyle = style.get( PythonEditorStyle.embeddedObjectTagLabelStyle )
+	embeddedObjectTagBorder = style.get( PythonEditorStyle.embeddedObjectTagBorder )
+
+	tagLabel = embeddedObjectTagBorder.surround( embeddedObjectTagLabelStyle( Label( 'Stmt' ) ) )
+	contents = Column( [ tagLabel, valueView.pad( 2.0, 2.0 ) ] )
+	box = embeddedObjectBorder.surround( contents ).padX( 1.0, 1.0 )
 
 	segment = Segment( box )
 	return segment.present( ctx, style )

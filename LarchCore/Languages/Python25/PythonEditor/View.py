@@ -226,45 +226,94 @@ def _onDrop_embeddedObject(element, pos, data, action):
 
 	marker = Marker.atPointIn( element, pos, True )
 	if marker is not None  and  marker.isValid():
+		def _performLiteralInsertion(model):
+			isolated = DMNode.embedIsolated( model, False )
+			expr = Schema.EmbeddedObjectLiteral( embeddedValue=isolated )
+			insertSpecialFormExpressionAtMarker( marker, expr )
+
 		def _performInsertion(model):
-			embeddedValue = DMNode.embedIsolated( model, False )
+			isolated = DMNode.embedIsolated( model, False )
 			try:
 				modelType = Schema.getEmbeddedObjectModelType( model )
 			except Exception, e:
 				_displayException( e )
 			else:
 				if modelType is Schema.Expr:
-					expr = Schema.EmbeddedObjectExpr( embeddedValue=embeddedValue )
+					expr = Schema.EmbeddedObjectExpr( embeddedValue=isolated )
 					insertSpecialFormExpressionAtMarker( marker, expr )
 				elif modelType is Schema.Stmt:
-					stmt = Schema.EmbeddedObjectStmt( embeddedValue=embeddedValue )
+					stmt = Schema.EmbeddedObjectStmt( embeddedValue=isolated )
 					insertSpecialFormStatementAtMarker( marker, stmt )
-		
+
+
+		def _makeOnDrop(performDropFn):
+			def _onDrop(control):
+				try:
+					if marker.isValid():
+						performDropFn()
+				except Exception, e:
+					_displayException( e )
+			return _onDrop
+
+
 		# Display a context menu
-		def _onDropByCopy(control):
-			try:
-				if marker.isValid():
-					model = data.getModel()
-					_performInsertion( deepcopy( model ) )
-			except Exception, e:
-				_displayException( e )
+		def _performDropByCopy():
+			model = data.getModel()
+			_performInsertion( deepcopy( model ) )
 
-		def _onDropByRef(control):
-			try:
-				if marker.isValid():
-					model = data.getModel()
-					_performInsertion( model )
-			except Exception, e:
-				_displayException( e )
+		def _performDropByRef():
+			model = data.getModel()
+			_performInsertion( model )
 
-		menu = VPopupMenu( [ MenuItem.menuItemWithLabel( 'Copy', _onDropByCopy ),
-		                     MenuItem.menuItemWithLabel( 'Reference', _onDropByRef ) ] )
+		def _performDropAsLiteralByCopy():
+			model = data.getModel()
+			_performLiteralInsertion( deepcopy( model ) )
+
+		def _performDropAsLiteralByRef():
+			model = data.getModel()
+			_performLiteralInsertion( model )
+
+		menu = VPopupMenu( [ MenuItem.menuItemWithLabel( 'Copy', _makeOnDrop( _performDropByCopy ) ),
+		                     MenuItem.menuItemWithLabel( 'Reference', _makeOnDrop( _performDropByRef ) ),
+				     MenuItem.menuItemWithLabel( 'Copy (as literal)', _makeOnDrop( _performDropAsLiteralByCopy ) ),
+				     MenuItem.menuItemWithLabel( 'Reference (as literal)', _makeOnDrop( _performDropAsLiteralByRef ) ) ] )
 		menu.popupAtMousePosition( marker.getElement() )
 	return True
 
 
 _embeddedObject_dropDest = ObjectDndHandler.DropDest( FragmentData, _onDrop_embeddedObject )
 
+
+
+def _displayExceptionAtPointer(e):
+	ApplyPerspective( None, Pres.coerce( e ) ).popupAtMousePosition( element, True, True )
+
+
+def _convertEmbeddedObjectExprToLiteral(model):
+	isolated = model['embeddedValue']
+	replacement = Schema.EmbeddedObjectLiteral( embeddedValue=isolated )
+	pyReplaceNode( model, replacement )
+
+
+def _convertEmbeddedObjectLiteralToExpression(model):
+	isolated = model['embeddedValue']
+	value = isolated.getValue()
+
+	try:
+		modelType = Schema.getEmbeddedObjectModelType( value )
+		if modelType is Schema.Expr:
+			replacement = Schema.EmbeddedObjectExpr( embeddedValue=isolated )
+		elif modelType is Schema.Stmt:
+			raise ValueError, 'Cannot convert embedded object literal expression to statement'
+		pyReplaceNode( model, replacement )
+	except Exception, e:
+		_displayExceptionAtPointer( e )
+
+
+def _convertEmbeddedObjectStmtToLiteral(model):
+	isolated = model['embeddedValue']
+	replacement = Schema.ExprStmt( expr=Schema.EmbeddedObjectExpr( embeddedValue=isolated, asLiteral='1' ) )
+	pyReplaceNode( model, replacement )
 
 
 def _removeEmbeddedObjectExpr(model):
@@ -323,13 +372,47 @@ _EmbeddedObjectStmtTreeEventListener.instance = _EmbeddedObjectStmtTreeEventList
 
 
 
-def _embeddedObjectExprContextMenuFactory(element, menu):
+def _embeddedObjectLiteralContextMenuFactory(element, menu):
 	fragment = element.getFragmentContext()
 	model = fragment.getModel()
+
+	def _asExpression(item):
+		_convertEmbeddedObjectLiteralToExpression( model )
 
 	def _onDelete(item):
 		_removeEmbeddedObjectExpr( model )
 
+	# Determine if the literal embedded object can be converted to a non-literal - it can't if the result will convert an expression to a statement
+	# If it can, add the menu entry
+	isolated = model['embeddedValue']
+	value = isolated.getValue()
+
+	try:
+		modelType = Schema.getEmbeddedObjectModelType( value )
+		if modelType is Schema.Expr:
+			menu.add( MenuItem.menuItemWithLabel( 'Convert to expression', _asExpression ) )
+		else:
+			pass
+	except:
+		pass
+
+	# Add the delete menu entry
+	menu.add( MenuItem.menuItemWithLabel( 'Delete embedded object', _onDelete ) )
+
+	return False
+
+
+def _embeddedObjectExprContextMenuFactory(element, menu):
+	fragment = element.getFragmentContext()
+	model = fragment.getModel()
+
+	def _asLiteral(item):
+		_convertEmbeddedObjectExprToLiteral( model )
+
+	def _onDelete(item):
+		_removeEmbeddedObjectExpr( model )
+
+	menu.add( MenuItem.menuItemWithLabel( 'Convert to literal', _asLiteral ) )
 	menu.add( MenuItem.menuItemWithLabel( 'Delete embedded object', _onDelete ) )
 
 	return False
@@ -339,9 +422,13 @@ def _embeddedObjectStmtContextMenuFactory(element, menu):
 	fragment = element.getFragmentContext()
 	model = fragment.getModel()
 
+	def _asLiteral(item):
+		_convertEmbeddedObjectStmtToLiteral( model )
+
 	def _onDelete(item):
 		_removeEmbeddedObjectStmt( model )
 
+	menu.add( MenuItem.menuItemWithLabel( 'Convert to literal', _asLiteral ) )
 	menu.add( MenuItem.menuItemWithLabel( 'Delete embedded object', _onDelete ) )
 
 	return False
@@ -482,6 +569,14 @@ def SpecialFormStatement(method):
 		v = self._specialFormStatementEditRule.applyToFragment( v, model, inheritedState )
 		v = _applyIndentationShortcuts( v )
 		return v
+	return redecorateDispatchMethod( method, _m )
+
+
+
+def EmbeddedObjectExpression(method):
+	def _m(self, fragment, inheritedState, model, *args):
+		v = method(self, fragment, inheritedState, model, *args )
+		return StructuralItem( model, v )
 	return redecorateDispatchMethod( method, _m )
 
 
@@ -1150,26 +1245,39 @@ class Python25View (MethodDispatchView):
 			return None
 		else:
 			return modelFn
-	
-	
+
+
+	# Embedded object literal
+	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectLiteral )
+	@EmbeddedObjectExpression
+	def EmbeddedObjectLiteral(self, fragment, inheritedState, model, embeddedValue):
+		value = embeddedValue.getValue()
+		valueView = ApplyPerspective( EditPerspective.instance, value )
+
+		view = embeddedObjectLiteral( valueView )
+		return view.withContextMenuInteractor( _embeddedObjectLiteralContextMenuFactory ).withTreeEventListener( _EmbeddedObjectExprTreeEventListener.instance )
+
+
+
 	# Embedded object expression
 	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectExpr )
-	@SpecialFormExpression
+	@EmbeddedObjectExpression
 	def EmbeddedObjectExpr(self, fragment, inheritedState, model, embeddedValue):
 		value = embeddedValue.getValue()
 		valueView = ApplyPerspective( EditPerspective.instance, value )
+
 		expansionFn = self._getExpansionFn( value )
-		
+
 		if expansionFn is None:
 			# Standard view
-			view = embeddedObject( valueView )
-			return view.withContextMenuInteractor( _embeddedObjectExprContextMenuFactory ).withTreeEventListener( _EmbeddedObjectExprTreeEventListener.instance )
+			view = embeddedObjectExpr( valueView )
 		else:
 			# Macro view
 			def createExpansionView():
 				return Pres.coerce( expansionFn() )
 			view = embeddedObjectMacro( valueView, LazyPres( createExpansionView ) )
-			return view.withContextMenuInteractor( _embeddedObjectExprContextMenuFactory ).withTreeEventListener( _EmbeddedObjectExprTreeEventListener.instance )
+		return view.withContextMenuInteractor( _embeddedObjectExprContextMenuFactory ).withTreeEventListener( _EmbeddedObjectExprTreeEventListener.instance )
+
 
 
 	# Embedded object statement
@@ -1182,7 +1290,7 @@ class Python25View (MethodDispatchView):
 
 		if expansionFn is None:
 			# Standard view
-			view = embeddedObject( valueView )
+			view = embeddedObjectStmt( valueView )
 			return view.withContextMenuInteractor( _embeddedObjectStmtContextMenuFactory ).withTreeEventListener( _EmbeddedObjectStmtTreeEventListener.instance )
 		else:
 			# Macro view
