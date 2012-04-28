@@ -13,7 +13,6 @@ import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerMotionEvent;
 import BritefuryJ.LSpace.Focus.SelectionPoint;
 import BritefuryJ.LSpace.Focus.Target;
-import BritefuryJ.LSpace.Input.PointerInputElement;
 import BritefuryJ.LSpace.Interactor.TargetElementInteractor;
 import BritefuryJ.LSpace.Marker.Marker;
 import BritefuryJ.Live.LiveFunction;
@@ -27,7 +26,8 @@ public abstract class AbstractTableEditorInstance <ModelType>
 {
 	private class TargetInteractor implements TargetElementInteractor
 	{
-		public SelectionPoint targetDragBegin(PointerInputElement element, PointerButtonEvent event)
+		@Override
+		public SelectionPoint targetDragBegin(LSElement element, PointerButtonEvent event)
 		{
 			if ( event.getButton() == 1 )
 			{
@@ -68,11 +68,13 @@ public abstract class AbstractTableEditorInstance <ModelType>
 			return null;
 		}
 
-		public void targetDragEnd(PointerInputElement element, PointerButtonEvent event, Point2 dragStartPos, int dragButton)
+		@Override
+		public void targetDragEnd(LSElement element, PointerButtonEvent event, Point2 dragStartPos, int dragButton)
 		{
 		}
 
-		public SelectionPoint targetDragMotion(PointerInputElement element, PointerMotionEvent event, Point2 dragStartPos, int dragButton)
+		@Override
+		public SelectionPoint targetDragMotion(LSElement element, PointerMotionEvent event, Point2 dragStartPos, int dragButton)
 		{
 			Point2 p = event.getLocalPointerPos();
 			TableElement table = (TableElement)element;

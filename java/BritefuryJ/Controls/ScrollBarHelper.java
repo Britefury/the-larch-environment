@@ -10,11 +10,10 @@ import java.awt.Graphics2D;
 import java.awt.geom.RoundRectangle2D;
 
 import BritefuryJ.Graphics.Painter;
-import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.ElementPainter;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerMotionEvent;
-import BritefuryJ.LSpace.Input.PointerInputElement;
 import BritefuryJ.LSpace.Interactor.DragElementInteractor;
 import BritefuryJ.LSpace.Interactor.PushElementInteractor;
 import BritefuryJ.LSpace.Util.Range;
@@ -59,7 +58,7 @@ class ScrollBarHelper
 		
 	
 		@Override
-		public boolean buttonPress(PointerInputElement element, PointerButtonEvent event)
+		public boolean buttonPress(LSElement element, PointerButtonEvent event)
 		{
 			if ( event.getButton() == 1 )
 			{
@@ -83,14 +82,14 @@ class ScrollBarHelper
 		}
 
 		@Override
-		public void buttonRelease(PointerInputElement element, PointerButtonEvent event)
+		public void buttonRelease(LSElement element, PointerButtonEvent event)
 		{
 		}
 
 		
 		
 		@Override
-		public boolean dragBegin(PointerInputElement element, PointerButtonEvent event)
+		public boolean dragBegin(LSElement element, PointerButtonEvent event)
 		{
 			if ( event.getButton() == 1 )
 			{
@@ -110,15 +109,14 @@ class ScrollBarHelper
 		}
 		
 		@Override
-		public void dragEnd(PointerInputElement element, PointerButtonEvent event, Point2 dragStartPos, int dragButton)
+		public void dragEnd(LSElement element, PointerButtonEvent event, Point2 dragStartPos, int dragButton)
 		{
 		}
 		
 		@Override
-		public void dragMotion(PointerInputElement element, PointerMotionEvent event, Point2 dragStartPos, int dragButton)
+		public void dragMotion(LSElement element, PointerMotionEvent event, Point2 dragStartPos, int dragButton)
 		{
-			LSElement dragbarElement = (LSElement)element;
-			AABox2 box = dragbarElement.getLocalAABox();
+			AABox2 box = element.getLocalAABox();
 			Point2 localPos = event.getPointer().getLocalPos();
 			Vector2 deltaPos = localPos.sub( dragStartPos );
 			

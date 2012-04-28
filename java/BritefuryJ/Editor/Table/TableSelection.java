@@ -82,7 +82,7 @@ public class TableSelection extends Selection
 			double ry0 = table.getRowBoundaryY( ey0 );
 			double rx1 = table.getColumnBoundaryX( ex1 + 1 );
 			double ry1 = table.getRowBoundaryY( ey1 + 1 );
-			AffineTransform current = tableElement.pushGraphicsTransform( graphics );
+			AffineTransform current = tableElement.pushLocalToRootGraphicsTransform( graphics );
 			Shape shape = new Rectangle2D.Double( rx0, ry0, rx1 - rx0, ry1 - ry0 );
 			Paint prevPaint = graphics.getPaint();
 			Stroke prevStroke = graphics.getStroke();

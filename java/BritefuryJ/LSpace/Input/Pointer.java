@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.Stack;
 
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.PresentationComponent;
 import BritefuryJ.LSpace.LSRootElement;
 import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
@@ -29,7 +30,7 @@ public class Pointer extends PointerInterface
 {
 	protected interface ElementUnrealiseListener
 	{
-		public void notifyPointerElementUnrealised(Pointer pointer, PointerInputElement element);
+		public void notifyPointerElementUnrealised(Pointer pointer, LSElement element);
 	}
 	
 	
@@ -56,7 +57,7 @@ public class Pointer extends PointerInterface
 	
 	// Introduced as an optimisation -- elements become 'unrealised' VERY FREQUENTLY, so iterating through all interactors and notifying them is very inefficient.
 	// Keeping a map of listener lists allows certain interactors to register an interest in ONLY the elements that they want to know about.
-	protected IdentityHashMap<PointerInputElement, ArrayList<ElementUnrealiseListener>> unrealiseListeners = new IdentityHashMap<PointerInputElement, ArrayList<ElementUnrealiseListener>>();
+	protected IdentityHashMap<LSElement, ArrayList<ElementUnrealiseListener>> unrealiseListeners = new IdentityHashMap<LSElement, ArrayList<ElementUnrealiseListener>>();
 	
 
 	public Pointer(InputTable inputTable, LSRootElement rootElement, DndController dndController, PresentationComponent component)
@@ -158,7 +159,7 @@ public class Pointer extends PointerInterface
 	
 	// Introduced as an optimisation -- elements become 'unrealised' VERY FREQUENTLY, so iterating through all interactors and notifying them is very inefficient.
 	// Keeping a map of listener lists allows certain interactors to register an interest in ONLY the elements that they want to know about.
-	protected void addUnrealiseListener(PointerInputElement element, ElementUnrealiseListener listener)
+	protected void addUnrealiseListener(LSElement element, ElementUnrealiseListener listener)
 	{
 		ArrayList<ElementUnrealiseListener> listeners = unrealiseListeners.get( element );
 		if ( listeners == null )
@@ -169,7 +170,7 @@ public class Pointer extends PointerInterface
 		listeners.add( listener );
 	}
 	
-	protected void removeUnrealiseListener(PointerInputElement element, ElementUnrealiseListener listener)
+	protected void removeUnrealiseListener(LSElement element, ElementUnrealiseListener listener)
 	{
 		ArrayList<ElementUnrealiseListener> listeners = unrealiseListeners.get( element );
 		if ( listeners != null )
@@ -185,7 +186,7 @@ public class Pointer extends PointerInterface
 	
 	// Introduced as an optimisation -- elements become 'unrealised' VERY FREQUENTLY, so iterating through all interactors and notifying them is very inefficient.
 	// Keeping a map of listener lists allows certain interactors to register an interest in ONLY the elements that they want to know about.
-	protected void onElementUnrealised(PointerInputElement element)
+	protected void onElementUnrealised(LSElement element)
 	{
 		ArrayList<ElementUnrealiseListener> listeners = unrealiseListeners.get( element );
 		if ( listeners != null )
@@ -332,25 +333,25 @@ public class Pointer extends PointerInterface
 
 
 	
-	public void notifyEnterElement(PointerInputElement element)
+	public void notifyEnterElement(LSElement element)
 	{
 		inputTable.addPointerWithinElementBounds( this, element );
 	}
 
-	public void notifyLeaveElement(PointerInputElement element)
+	public void notifyLeaveElement(LSElement element)
 	{
 		inputTable.removePointerWithinElementBounds( this, element );
 	}
 
 	
 	
-	protected <E extends PointerEvent> PointerInputElement getFirstElementUnderPoint(Point2 p)
+	protected <E extends PointerEvent> LSElement getFirstElementUnderPoint(Point2 p)
 	{
-		PointerInputElement element = rootElement;
+		LSElement element = rootElement;
 		
 		while ( element != null )
 		{
-			PointerInputElement childElement = element.getFirstPointerChildAtLocalPoint( p );
+			LSElement childElement = element.getFirstChildAtLocalPoint( p );
 			if ( childElement == null )
 			{
 				return element;
@@ -365,13 +366,13 @@ public class Pointer extends PointerInterface
 		return null;
 	}
 
-	protected <E extends PointerEvent> PointerInputElement getLastElementUnderPoint(Point2 p)
+	protected <E extends PointerEvent> LSElement getLastElementUnderPoint(Point2 p)
 	{
-		PointerInputElement element = rootElement;
+		LSElement element = rootElement;
 		
 		while ( element != null )
 		{
-			PointerInputElement childElement = element.getLastPointerChildAtLocalPoint( p );
+			LSElement childElement = element.getLastChildAtLocalPoint( p );
 			if ( childElement == null )
 			{
 				return element;
@@ -390,12 +391,12 @@ public class Pointer extends PointerInterface
 	
 	
 	@SuppressWarnings("unchecked")
-	protected static <E extends PointerEvent> Stack<E> eventStack(E event, Stack<PointerInputElement> elements)
+	protected static <E extends PointerEvent> Stack<E> eventStack(E event, Stack<LSElement> elements)
 	{
 		Stack<E> eventStack = new Stack<E>();
 		eventStack.ensureCapacity( elements.size() );
 		
-		for (PointerInputElement element: elements)
+		for (LSElement element: elements)
 		{
 			event = (E)element.transformParentToLocalEvent( event );
 			eventStack.add( event );
@@ -404,13 +405,13 @@ public class Pointer extends PointerInterface
 		return eventStack;
 	}
 	
-	protected static Stack<AffineTransform> rootToLocalTransformStack(Stack<PointerInputElement> elements)
+	protected static Stack<AffineTransform> rootToLocalTransformStack(Stack<LSElement> elements)
 	{
 		AffineTransform xform = new AffineTransform();
 		Stack<AffineTransform> xformStack = new Stack<AffineTransform>();
 		xformStack.ensureCapacity( elements.size() );
 		
-		for (PointerInputElement element: elements)
+		for (LSElement element: elements)
 		{
 			xform.concatenate( element.getParentToLocalAffineTransform() );
 			xformStack.add( (AffineTransform)xform.clone() );
@@ -419,11 +420,11 @@ public class Pointer extends PointerInterface
 		return xformStack;
 	}
 	
-	protected static AffineTransform rootToLocalTransform(Stack<PointerInputElement> elements)
+	protected static AffineTransform rootToLocalTransform(Stack<LSElement> elements)
 	{
 		AffineTransform xform = new AffineTransform();
 		
-		for (PointerInputElement element: elements)
+		for (LSElement element: elements)
 		{
 			xform.concatenate( element.getParentToLocalAffineTransform() );
 		}
@@ -432,15 +433,15 @@ public class Pointer extends PointerInterface
 	}
 	
 	
-	protected Stack<PointerInputElement> getFirstElementPathUnderPoint(Point2 p)
+	protected Stack<LSElement> getFirstElementPathUnderPoint(Point2 p)
 	{
-		Stack<PointerInputElement> elements = new Stack<PointerInputElement>();
-		PointerInputElement element = rootElement;
+		Stack<LSElement> elements = new Stack<LSElement>();
+		LSElement element = rootElement;
 		elements.push( element );
 		
 		while ( element != null )
 		{
-			PointerInputElement childElement = element.getFirstPointerChildAtLocalPoint( p );
+			LSElement childElement = element.getFirstChildAtLocalPoint( p );
 			if ( childElement != null )
 			{
 				p = childElement.transformParentToLocalPoint( p );
@@ -453,15 +454,15 @@ public class Pointer extends PointerInterface
 	}
 
 	
-	protected Stack<PointerInputElement> getLastElementPathUnderPoint(Point2 p)
+	protected Stack<LSElement> getLastElementPathUnderPoint(Point2 p)
 	{
-		Stack<PointerInputElement> elements = new Stack<PointerInputElement>();
-		PointerInputElement element = rootElement;
+		Stack<LSElement> elements = new Stack<LSElement>();
+		LSElement element = rootElement;
 		elements.push( element );
 		
 		while ( element != null )
 		{
-			PointerInputElement childElement = element.getLastPointerChildAtLocalPoint( p );
+			LSElement childElement = element.getLastChildAtLocalPoint( p );
 			if ( childElement != null )
 			{
 				p = childElement.transformParentToLocalPoint( p );

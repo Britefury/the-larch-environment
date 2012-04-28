@@ -18,14 +18,13 @@ import BritefuryJ.DefaultPerspective.PrimitivePresenter;
 import BritefuryJ.Incremental.IncrementalFunctionMonitor;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
+import BritefuryJ.LSpace.FragmentContext;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSFragment;
-import BritefuryJ.LSpace.FragmentContext;
 import BritefuryJ.LSpace.Browser.Location;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Input.Modifier;
 import BritefuryJ.LSpace.Input.ObjectDndHandler;
-import BritefuryJ.LSpace.Input.PointerInputElement;
 import BritefuryJ.LSpace.Interactor.PushElementInteractor;
 import BritefuryJ.LSpace.Layout.HAlignment;
 import BritefuryJ.LSpace.Layout.VAlignment;
@@ -108,10 +107,9 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	private static final ObjectDndHandler.SourceDataFn fragmentDragSourceFn = new ObjectDndHandler.SourceDataFn()
 	{
 		@Override
-		public Object createSourceData(PointerInputElement sourceElement, int aspect)
+		public Object createSourceData(LSElement sourceElement, int aspect)
 		{
-			LSElement element = (LSElement)sourceElement;
-			FragmentView fragment = (FragmentView)element.getFragmentContext();
+			FragmentView fragment = (FragmentView)sourceElement.getFragmentContext();
 			return new FragmentData( fragment.getModel(), fragment.getFragmentContentElement() );
 		}
 	};
@@ -124,23 +122,22 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	private static final PushElementInteractor fragmentInspectorInteractor = new PushElementInteractor()
 	{
 		@Override
-		public boolean buttonPress(PointerInputElement element, PointerButtonEvent event)
+		public boolean buttonPress(LSElement element, PointerButtonEvent event)
 		{
 			int keyMods = Modifier.getKeyModifiers( event.getModifiers() );
 			if ( keyMods == ( Modifier.CTRL | Modifier.ALT )  ||  keyMods == ( Modifier.SHIFT | Modifier.ALT ) )
 			{
 				if ( event.getButton() == 3 )
 				{
-					LSElement e = (LSElement)element;
-					FragmentView fragment = (FragmentView)e.getFragmentContext();
-					return fragment.incView.inspectFragment( fragment, e, event );
+					FragmentView fragment = (FragmentView)element.getFragmentContext();
+					return fragment.incView.inspectFragment( fragment, element, event );
 				}
 			}
 			return false;
 		}
 
 		@Override
-		public void buttonRelease(PointerInputElement element, PointerButtonEvent event)
+		public void buttonRelease(LSElement element, PointerButtonEvent event)
 		{
 		}
 	};

@@ -6,13 +6,13 @@
 //##************************
 package BritefuryJ.LSpace.Interactor;
 
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerNavigationEvent;
-import BritefuryJ.LSpace.Input.PointerInputElement;
 
 public interface NavigationElementInteractor extends AbstractElementInteractor
 {
-	boolean navigationGestureBegin(PointerInputElement element, PointerButtonEvent event);
-	void navigationGestureEnd(PointerInputElement element, PointerButtonEvent event);
-	void navigationGesture(PointerInputElement element, PointerNavigationEvent event);
+	boolean navigationGestureBegin(LSElement element, PointerButtonEvent event);
+	void navigationGestureEnd(LSElement element, PointerButtonEvent event);
+	void navigationGesture(LSElement element, PointerNavigationEvent event);
 }

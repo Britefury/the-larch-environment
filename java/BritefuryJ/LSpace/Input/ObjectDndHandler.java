@@ -6,14 +6,18 @@
 //##************************
 package BritefuryJ.LSpace.Input;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import BritefuryJ.Graphics.FilledOutlinePainter;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.ElementPreview;
 import BritefuryJ.LSpace.Clipboard.LocalDataFlavor;
@@ -25,22 +29,27 @@ public class ObjectDndHandler extends DndHandler
 {
 	public static interface SourceDataFn
 	{
-		public Object createSourceData(PointerInputElement sourceElement, int aspect);
+		public Object createSourceData(LSElement sourceElement, int aspect);
 	}
 	
 	public static interface ExportDoneFn
 	{
-		public void exportDone(PointerInputElement sourceElement, Object data, int action);
+		public void exportDone(LSElement sourceElement, Object data, int action);
 	}
 	
 	public static interface DropFn
 	{
-		public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action);
+		public boolean acceptDrop(LSElement destElement, Point2 targetPosition, Object data, int action);
 	}
 	
 	public static interface CanDropFn
 	{
-		public boolean canDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action);
+		public boolean canDrop(LSElement destElement, Point2 targetPosition, Object data, int action);
+	}
+
+	public static interface DropHighlightFn
+	{
+		public boolean drawDrawHighlight(Graphics2D graphics, LSElement destElement, Point2 targetPosition, int action);
 	}
 
 	
@@ -106,19 +115,21 @@ public class ObjectDndHandler extends DndHandler
 	{
 		private Class<?> dataType;
 		private CanDropFn canDropFn;
+		private DropHighlightFn dropHighlightFn;
 		private DropFn dropFn;
 		
 		
-		public DropDest(Class<?> dataType, CanDropFn canDropFn, DropFn dropFn)
+		public DropDest(Class<?> dataType, CanDropFn canDropFn, DropHighlightFn dropHighlightFn, DropFn dropFn)
 		{
 			this.dataType = dataType;
 			this.canDropFn = canDropFn;
+			this.dropHighlightFn = dropHighlightFn;
 			this.dropFn = dropFn;
 		}
 
 		public DropDest(Class<?> dataType, DropFn dropFn)
 		{
-			this( dataType, null, dropFn );
+			this( dataType, null, null, dropFn );
 		}
 		
 		
@@ -135,6 +146,7 @@ public class ObjectDndHandler extends DndHandler
 				
 				return dataType.equals( dx.dataType )  &&
 					( canDropFn != null  ?  canDropFn.equals( dx.canDropFn )  :  canDropFn == dx.canDropFn )  &&
+					( dropHighlightFn != null  ?  dropHighlightFn.equals( dx.dropHighlightFn )  :  dropHighlightFn == dx.dropHighlightFn )  &&
 					( dropFn != null  ?  dropFn.equals( dx.dropFn )  :  dropFn == dx.dropFn );
 			}
 			
@@ -145,8 +157,9 @@ public class ObjectDndHandler extends DndHandler
 		{
 			int a = dataType.hashCode();
 			int b = canDropFn != null  ?  canDropFn.hashCode()  :  0;
-			int c = dropFn != null  ?  dropFn.hashCode()  :  0;
-			return HashUtils.tripleHash( a, b, c );
+			int c = dropHighlightFn != null  ?  dropHighlightFn.hashCode()  :  0;
+			int d = dropFn != null  ?  dropFn.hashCode()  :  0;
+			return HashUtils.quadHash( a, b, c, d );
 		}
 	}
 	
@@ -155,12 +168,14 @@ public class ObjectDndHandler extends DndHandler
 	public static class NonLocalDropDest extends DndPin
 	{
 		private DataFlavor dataFlavor;
+		private DropHighlightFn dropHighlightFn;
 		private DropFn dropFn;
 		
 		
-		public NonLocalDropDest(DataFlavor dataFlavor, DropFn dropFn)
+		public NonLocalDropDest(DataFlavor dataFlavor, DropHighlightFn dropHighlightFn, DropFn dropFn)
 		{
 			this.dataFlavor = dataFlavor;
+			this.dropHighlightFn = dropHighlightFn;
 			this.dropFn = dropFn;
 		}
 		
@@ -177,6 +192,7 @@ public class ObjectDndHandler extends DndHandler
 				NonLocalDropDest dx = (NonLocalDropDest)x;
 				
 				return dataFlavor.equals( dx.dataFlavor )  &&
+					( dropHighlightFn != null  ?  dropHighlightFn.equals( dx.dropHighlightFn )  :  dropHighlightFn == dx.dropHighlightFn )  &&
 					( dropFn != null  ?  dropFn.equals( dx.dropFn )  :  dropFn == dx.dropFn );
 			}
 			
@@ -186,8 +202,9 @@ public class ObjectDndHandler extends DndHandler
 		public int hashCode()
 		{
 			int a = dataFlavor.hashCode();
-			int b = dropFn != null  ?  dropFn.hashCode()  :  0;
-			return HashUtils.doubleHash( a, b );
+			int b = dropHighlightFn != null  ?  dropHighlightFn.hashCode()  :  0;
+			int c = dropFn != null  ?  dropFn.hashCode()  :  0;
+			return HashUtils.tripleHash( a, b, c );
 		}
 	}
 	
@@ -212,7 +229,7 @@ public class ObjectDndHandler extends DndHandler
 	
 	private static class ObjectDndTransferData
 	{
-		private PointerInputElement sourceElement;
+		private LSElement sourceElement;
 		private int sourceAspect;
 		private ObjectDndHandler sourceHandler;
 		private ArrayList<TransferMatch> transferMatches;
@@ -220,7 +237,7 @@ public class ObjectDndHandler extends DndHandler
 		private HashMap<DragSource, Object> dragDataTable = new HashMap<DragSource, Object>();
 		
 		
-		public ObjectDndTransferData(PointerInputElement sourceElement, int sourceAspect, ObjectDndHandler sourceHandler)
+		public ObjectDndTransferData(LSElement sourceElement, int sourceAspect, ObjectDndHandler sourceHandler)
 		{
 			this.sourceElement = sourceElement;
 			this.sourceAspect = sourceAspect;
@@ -262,14 +279,14 @@ public class ObjectDndHandler extends DndHandler
 	
 	private static class ObjectDndTransferable implements Transferable
 	{
-		private PointerInputElement sourceElement;
+		private LSElement sourceElement;
 		private int sourceAspect;
 		private ObjectDndHandler handler;
 		private ObjectDndTransferData objectDndTransferData;
 		private ElementPreview elementPreview;
 		
 		
-		public ObjectDndTransferable(PointerInputElement sourceElement, int aspect, ObjectDndHandler handler)
+		public ObjectDndTransferable(LSElement sourceElement, int aspect, ObjectDndHandler handler)
 		{
 			this.sourceElement = sourceElement;
 			sourceAspect = aspect;
@@ -316,6 +333,151 @@ public class ObjectDndHandler extends DndHandler
 		public boolean isDataFlavorSupported(DataFlavor flavor)
 		{
 			return flavor.equals( ObjectDndDataFlavor.flavor )  ||  ( elementPreview != null  && flavor.equals( ElementPreview.flavor ) );
+		}
+	}
+	
+	
+	private static abstract class ObjectPotentialDrop  implements PotentialDrop
+	{
+		protected static final FilledOutlinePainter defaultPainter = new FilledOutlinePainter( new Color( 1.0f, 0.8f, 0.0f, 0.2f ), new Color( 1.0f, 0.5f, 0.0f, 0.5f ) );
+		
+		protected LSElement destElement;
+		protected DndDropSwing drop;
+		
+
+		public ObjectPotentialDrop(LSElement destElement, DndDropSwing drop)
+		{
+			this.destElement = destElement;
+			this.drop = drop;
+		}
+		
+		
+		@Override
+		public void queueRedraw()
+		{
+			destElement.queueFullRedraw();
+		}
+
+		
+		protected void drawElementHighlight(Graphics2D graphics)
+		{
+			defaultPainter.drawShapes( graphics, destElement.getShapes() );
+		}
+	}
+	
+	private static class LocalPotentialDrop extends ObjectPotentialDrop
+	{
+		protected DropDest dest;
+		
+
+		public LocalPotentialDrop(LSElement destElement, DndDropSwing drop, DropDest dest)
+		{
+			super( destElement, drop );
+			this.dest = dest;
+		}
+		
+		
+		@Override
+		public void draw(Graphics2D graphics)
+		{
+			AffineTransform x = destElement.pushLocalToRootGraphicsTransform( graphics );
+			if ( dest.dropHighlightFn != null )
+			{
+				dest.dropHighlightFn.drawDrawHighlight( graphics, destElement, drop.getTargetPosition(), drop.getDropAction() );
+			}
+			else
+			{
+				drawElementHighlight( graphics );
+			}
+			destElement.popGraphicsTransform( graphics, x );
+		}
+		
+		
+		@Override
+		public boolean equals(Object x)
+		{
+			if ( this == x )
+			{
+				return true;
+			}
+			
+			if ( x instanceof LocalPotentialDrop )
+			{
+				LocalPotentialDrop dx = (LocalPotentialDrop)x;
+				return destElement == dx.destElement  &&  drop.equals( dx.drop )  &&  dest.equals( dx.dest );  
+			}
+			else
+			{
+				return false;
+			}
+		}
+		
+		
+		@Override
+		public int hashCode()
+		{
+			int a = destElement.hashCode();
+			int b = drop.hashCode();
+			int c = dest.hashCode();
+			return HashUtils.tripleHash( a, b, c );
+		}
+	}
+	
+	private static class NonLocalPotentialDrop extends ObjectPotentialDrop
+	{
+		protected NonLocalDropDest dest;
+		
+
+		public NonLocalPotentialDrop(LSElement destElement, DndDropSwing drop, NonLocalDropDest dest)
+		{
+			super( destElement, drop );
+			this.dest = dest;
+		}
+		
+		
+		@Override
+		public void draw(Graphics2D graphics)
+		{
+			AffineTransform x = destElement.pushLocalToRootGraphicsTransform( graphics );
+			if ( dest.dropHighlightFn != null )
+			{
+				dest.dropHighlightFn.drawDrawHighlight( graphics, destElement, drop.getTargetPosition(), drop.getDropAction() );
+			}
+			else
+			{
+				drawElementHighlight( graphics );
+			}
+			destElement.popGraphicsTransform( graphics, x );
+		}
+		
+		
+		@Override
+		public boolean equals(Object x)
+		{
+			if ( this == x )
+			{
+				return true;
+			}
+			
+			if ( x instanceof NonLocalPotentialDrop )
+			{
+				NonLocalPotentialDrop dx = (NonLocalPotentialDrop)x;
+				return destElement == dx.destElement  &&  drop.equals( dx.drop )  &&  dest.equals( dx.dest );  
+			}
+			else
+			{
+				return false;
+			}
+		}
+		
+		
+		@Override
+		public int hashCode()
+		{
+			int a = destElement.hashCode();
+			int b = drop.hashCode();
+			int c = dest.hashCode();
+			return HashUtils.tripleHash( a, b, c );
 		}
 	}
 	
@@ -422,12 +584,12 @@ public class ObjectDndHandler extends DndHandler
 	
 	
 	
-	public boolean isSource(PointerInputElement sourceElement)
+	public boolean isSource(LSElement sourceElement)
 	{
 		return sources != null;
 	}
 
-	public int getSourceRequestedAction(PointerInputElement sourceElement, PointerInterface pointer, int button)
+	public int getSourceRequestedAction(LSElement sourceElement, PointerInterface pointer, int button)
 	{
 		int modifiers = pointer.getModifiers();
 		int mods = modifiers & ( Modifier.CTRL | Modifier.SHIFT );
@@ -445,7 +607,7 @@ public class ObjectDndHandler extends DndHandler
 		}
 	}
 	
-	public int getSourceRequestedAspect(PointerInputElement sourceElement, PointerInterface pointer, int button)
+	public int getSourceRequestedAspect(LSElement sourceElement, PointerInterface pointer, int button)
 	{
 		int requestedAspect = 0;
 		
@@ -477,7 +639,7 @@ public class ObjectDndHandler extends DndHandler
 		}
 	}
 	
-	public Transferable createTransferable(PointerInputElement sourceElement, int aspect)
+	public Transferable createTransferable(LSElement sourceElement, int aspect)
 	{
 		if ( sources != null )
 		{
@@ -493,7 +655,7 @@ public class ObjectDndHandler extends DndHandler
 		return null;
 	}
 	
-	public void exportDone(PointerInputElement sourceElement, Transferable data, int action)
+	public void exportDone(LSElement sourceElement, Transferable data, int action)
 	{
 		if ( data != null )
 		{
@@ -525,13 +687,14 @@ public class ObjectDndHandler extends DndHandler
 	
 	
 	@Override
-	public boolean isDest(PointerInputElement sourceElement)
+	public boolean isDest(LSElement sourceElement)
 	{
 		return dests != null  ||  nonLocalDests != null;
 	}
 
 
-	public boolean canDrop(PointerInputElement destElement, DndDropSwing drop)
+	@Override
+	public PotentialDrop negotiatePotentialDrop(LSElement destElement, DndDropSwing drop)
 	{
 		Transferable transferable = drop.getTransferable();
 		if ( transferable.isDataFlavorSupported( ObjectDndDataFlavor.flavor ) )
@@ -544,16 +707,23 @@ public class ObjectDndHandler extends DndHandler
 			}
 			catch (UnsupportedFlavorException e)
 			{
-				return false;
+				return null;
 			}
 			catch (IOException e)
 			{
-				return false;
+				return null;
 			}
 
 			transferData.transferMatches = negotiateTransferMatches( transferData, destElement, drop );
 			
-			return transferData.transferMatches.size() > 0;
+			if ( transferData.transferMatches.size() > 0 )
+			{
+				return new LocalPotentialDrop( destElement, drop, transferData.transferMatches.get( 0 ).dest );
+			}
+			else
+			{
+				return null;
+			}
 		}
 		else
 		{
@@ -564,16 +734,16 @@ public class ObjectDndHandler extends DndHandler
 					NonLocalDropDest dest = nonLocalDests.get( i );
 					if ( transferable.isDataFlavorSupported( dest.dataFlavor ) )
 					{
-						return true;
+						return new NonLocalPotentialDrop( destElement, drop, dest );
 					}
 				}
 			}
 			
-			return false;
+			return null;
 		}
 	}
 	
-	public boolean acceptDrop(PointerInputElement destElement, DndDropSwing drop)
+	public boolean acceptDrop(LSElement destElement, DndDropSwing drop)
 	{
 		Transferable transferable = drop.getTransferable();
 		
@@ -650,7 +820,7 @@ public class ObjectDndHandler extends DndHandler
 
 	
 	
-	private ArrayList<TransferMatch> negotiateTransferMatches(ObjectDndTransferData transferData, PointerInputElement destElement, DndDropSwing drop)
+	private ArrayList<TransferMatch> negotiateTransferMatches(ObjectDndTransferData transferData, LSElement destElement, DndDropSwing drop)
 	{
 		ArrayList<TransferMatch> matches = new ArrayList<TransferMatch>();
 		
@@ -678,12 +848,22 @@ public class ObjectDndHandler extends DndHandler
 						if ( bCanDrop )
 						{
 							boolean bInserted = false;
+							// Don't insert if this match corresponds to a data type that is a superclass of the data type of an existing match
+							// OR
+							// If the data type of this match is a subclass of the data type of an existing match, replace the existing match
 							for (int i = 0; i < matches.size(); i++)
 							{
 								TransferMatch match = matches.get( i );
 								if ( match.source.dataType.isAssignableFrom( src.dataType ) )
 								{
 									matches.set( i, new TransferMatch( src, dest, dragData, bHasDragData ) );
+									bInserted = true;
+									break;
+								}
+								else if ( src.dataType.isAssignableFrom( match.source.dataType ) )
+								{
+									bInserted = true;
+									break;
 								}
 							}
 							

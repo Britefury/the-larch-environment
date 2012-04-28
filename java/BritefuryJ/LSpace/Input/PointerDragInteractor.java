@@ -9,6 +9,7 @@ package BritefuryJ.LSpace.Input;
 import java.awt.geom.AffineTransform;
 import java.util.Stack;
 
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerMotionEvent;
 import BritefuryJ.LSpace.Interactor.AbstractElementInteractor;
@@ -17,7 +18,7 @@ import BritefuryJ.Math.Point2;
 
 public class PointerDragInteractor extends AbstractPointerDragInteractor
 {
-	private PointerInputElement dragElement = null;
+	private LSElement dragElement = null;
 	private AffineTransform dragElementRootToLocalXform = null;
 	private DragElementInteractor dragInteractor = null;
 
@@ -27,15 +28,15 @@ public class PointerDragInteractor extends AbstractPointerDragInteractor
 	public boolean dragBegin(PointerButtonEvent event)
 	{
 		PointerInterface pointer = event.getPointer();
-		Stack<PointerInputElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
+		Stack<LSElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
 		Stack<PointerButtonEvent> events = Pointer.eventStack( event, elements );
 		
 		while ( !elements.isEmpty() )
 		{
-			PointerInputElement element = elements.peek();
+			LSElement element = elements.peek();
 			PointerButtonEvent elementSpaceEvent = events.peek();
 			
-			if ( element.isPointerInputElementRealised() )
+			if ( element.isRealised() )
 			{
 				Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( DragElementInteractor.class );
 				if ( interactors != null )

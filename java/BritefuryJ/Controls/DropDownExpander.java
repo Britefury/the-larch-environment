@@ -9,9 +9,9 @@ package BritefuryJ.Controls;
 import BritefuryJ.Graphics.AbstractBorder;
 import BritefuryJ.Graphics.Painter;
 import BritefuryJ.LSpace.LSBin;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.AbstractPointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
-import BritefuryJ.LSpace.Input.PointerInputElement;
 import BritefuryJ.LSpace.Interactor.ClickElementInteractor;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
@@ -34,12 +34,12 @@ public class DropDownExpander extends Expander
 		}
 		
 		
-		public boolean testClickEvent(PointerInputElement element, AbstractPointerButtonEvent event)
+		public boolean testClickEvent(LSElement element, AbstractPointerButtonEvent event)
 		{
 			return event.getButton() == 1;
 		}
 
-		public boolean buttonClicked(PointerInputElement element, PointerButtonClickedEvent event)
+		public boolean buttonClicked(LSElement element, PointerButtonClickedEvent event)
 		{
 			control.toggle();
 			return true;

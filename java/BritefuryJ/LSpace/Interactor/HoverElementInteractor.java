@@ -6,11 +6,11 @@
 //##************************
 package BritefuryJ.LSpace.Interactor;
 
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.PointerMotionEvent;
-import BritefuryJ.LSpace.Input.PointerInputElement;
 
 public interface HoverElementInteractor extends AbstractElementInteractor
 {
-	public void pointerEnter(PointerInputElement element, PointerMotionEvent event);
-	public void pointerLeave(PointerInputElement element, PointerMotionEvent event);
+	public void pointerEnter(LSElement element, PointerMotionEvent event);
+	public void pointerLeave(LSElement element, PointerMotionEvent event);
 }

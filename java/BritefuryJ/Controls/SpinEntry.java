@@ -14,7 +14,6 @@ import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerMotionEvent;
 import BritefuryJ.LSpace.Input.Modifier;
-import BritefuryJ.LSpace.Input.PointerInputElement;
 import BritefuryJ.LSpace.Input.PointerInterface;
 import BritefuryJ.LSpace.Interactor.DragElementInteractor;
 import BritefuryJ.Live.LiveFunction;
@@ -59,7 +58,7 @@ public abstract class SpinEntry extends ControlPres
 			
 			
 			@Override
-			public boolean dragBegin(PointerInputElement element, PointerButtonEvent event)
+			public boolean dragBegin(LSElement element, PointerButtonEvent event)
 			{
 				if ( event.getButton() == 1  ||  event.getButton() == 2 )
 				{
@@ -92,14 +91,14 @@ public abstract class SpinEntry extends ControlPres
 
 
 			@Override
-			public void dragEnd(PointerInputElement element, PointerButtonEvent event, Point2 dragStartPos, int dragButton)
+			public void dragEnd(LSElement element, PointerButtonEvent event, Point2 dragStartPos, int dragButton)
 			{
 				pointerToDragStartValue.remove( event.getPointer().concretePointer() );
 			}
 
 
 			@Override
-			public void dragMotion(PointerInputElement element, PointerMotionEvent event, Point2 dragStartPos, int dragButton)
+			public void dragMotion(LSElement element, PointerMotionEvent event, Point2 dragStartPos, int dragButton)
 			{
 				double delta = dragStartPos.y - event.getPointer().getLocalPos().y;
 				

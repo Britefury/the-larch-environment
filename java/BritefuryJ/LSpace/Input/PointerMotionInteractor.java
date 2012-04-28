@@ -9,6 +9,7 @@ package BritefuryJ.LSpace.Input;
 import java.awt.event.MouseEvent;
 import java.util.Stack;
 
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.PointerMotionEvent;
 import BritefuryJ.LSpace.Interactor.AbstractElementInteractor;
 import BritefuryJ.LSpace.Interactor.HoverElementInteractor;
@@ -17,12 +18,12 @@ import BritefuryJ.Math.Point2;
 
 public class PointerMotionInteractor extends PointerInteractor implements Pointer.ElementUnrealiseListener
 {
-	private Stack<PointerInputElement> elementsUnderPointer = new Stack<PointerInputElement>();
-	private PointerInputElement rootElement;
+	private Stack<LSElement> elementsUnderPointer = new Stack<LSElement>();
+	private LSElement rootElement;
 	
 	
 	
-	public PointerMotionInteractor(PointerInputElement rootElement)
+	public PointerMotionInteractor(LSElement rootElement)
 	{
 		this.rootElement = rootElement;
 	}
@@ -52,10 +53,10 @@ public class PointerMotionInteractor extends PointerInteractor implements Pointe
 
 	public void handleMotion(Pointer pointer, PointerMotionEvent event)
 	{
-		PointerInputElement elementUnderPointer = rootElement;
+		LSElement elementUnderPointer = rootElement;
 		
 		int index = 0;
-		for (PointerInputElement element: elementsUnderPointer)
+		for (LSElement element: elementsUnderPointer)
 		{
 			if ( elementUnderPointer == element )
 			{
@@ -65,7 +66,7 @@ public class PointerMotionInteractor extends PointerInteractor implements Pointe
 
 				Point2 localPos = event.getPointer().getLocalPos();
 				
-				elementUnderPointer = element.getFirstPointerChildAtLocalPoint( localPos );
+				elementUnderPointer = element.getFirstChildAtLocalPoint( localPos );
 			}
 			else
 			{
@@ -80,7 +81,7 @@ public class PointerMotionInteractor extends PointerInteractor implements Pointe
 		handleEnter( pointer, elementUnderPointer, event );
 	}
 
-	private void handleEnter(Pointer pointer, PointerInputElement element, PointerMotionEvent event)
+	private void handleEnter(Pointer pointer, LSElement element, PointerMotionEvent event)
 	{
 		while ( element != null )
 		{
@@ -92,7 +93,7 @@ public class PointerMotionInteractor extends PointerInteractor implements Pointe
 			// Handle child elements
 			Point2 localPos = event.getPointer().getLocalPos();
 			
-			PointerInputElement childElement = element.getFirstPointerChildAtLocalPoint( localPos );
+			LSElement childElement = element.getFirstChildAtLocalPoint( localPos );
 			if ( childElement != null )
 			{
 				sendLeaveIntoChildEvent( element, event.withAction( PointerMotionEvent.Action.LEAVE ) );
@@ -109,7 +110,7 @@ public class PointerMotionInteractor extends PointerInteractor implements Pointe
 		if ( index < elementsUnderPointer.size() )
 		{
 			events.push( event );
-			for (PointerInputElement element: elementsUnderPointer.subList( index + 1, elementsUnderPointer.size() ))
+			for (LSElement element: elementsUnderPointer.subList( index + 1, elementsUnderPointer.size() ))
 			{
 				event = (PointerMotionEvent)element.transformParentToLocalEvent( event );
 				events.push( event );
@@ -117,7 +118,7 @@ public class PointerMotionInteractor extends PointerInteractor implements Pointe
 			
 			while ( elementsUnderPointer.size() > index )
 			{
-				PointerInputElement element = elementsUnderPointer.pop();
+				LSElement element = elementsUnderPointer.pop();
 				pointer.addUnrealiseListener( element, this );
 				event = events.pop();
 				
@@ -131,11 +132,11 @@ public class PointerMotionInteractor extends PointerInteractor implements Pointe
 		}
 	}
 
-	public void notifyPointerElementUnrealised(Pointer pointer, PointerInputElement element)
+	public void notifyPointerElementUnrealised(Pointer pointer, LSElement element)
 	{
 		int index = 0;
 		PointerMotionEvent event = new PointerMotionEvent( pointer, PointerMotionEvent.Action.LEAVE );
-		for (PointerInputElement e: elementsUnderPointer)
+		for (LSElement e: elementsUnderPointer)
 		{
 			if ( e == element )
 			{
@@ -152,9 +153,9 @@ public class PointerMotionInteractor extends PointerInteractor implements Pointe
 	}
 	
 	
-	private void sendMotionEvent(PointerInputElement element, PointerMotionEvent event)
+	private void sendMotionEvent(LSElement element, PointerMotionEvent event)
 	{
-		if ( element.isPointerInputElementRealised() )
+		if ( element.isRealised() )
 		{
 			Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( MotionElementInteractor.class );
 			if ( interactors != null )
@@ -168,9 +169,9 @@ public class PointerMotionInteractor extends PointerInteractor implements Pointe
 		}
 	}
 	
-	private void sendEnterEvent(PointerInputElement element, PointerMotionEvent event)
+	private void sendEnterEvent(LSElement element, PointerMotionEvent event)
 	{
-		if ( element.isPointerInputElementRealised() )
+		if ( element.isRealised() )
 		{
 			Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( HoverElementInteractor.class );
 			if ( interactors != null )
@@ -187,9 +188,9 @@ public class PointerMotionInteractor extends PointerInteractor implements Pointe
 		}
 	}
 	
-	private void sendLeaveEvent(PointerInputElement element, PointerMotionEvent event)
+	private void sendLeaveEvent(LSElement element, PointerMotionEvent event)
 	{
-		if ( element.isPointerInputElementRealised() )
+		if ( element.isRealised() )
 		{
 			event.getPointer().concretePointer().notifyLeaveElement( element );
 			element.handlePointerLeave( event );
@@ -206,9 +207,9 @@ public class PointerMotionInteractor extends PointerInteractor implements Pointe
 		}
 	}
 	
-	private void sendLeaveIntoChildEvent(PointerInputElement element, PointerMotionEvent event)
+	private void sendLeaveIntoChildEvent(LSElement element, PointerMotionEvent event)
 	{
-		if ( element.isPointerInputElementRealised() )
+		if ( element.isRealised() )
 		{
 			Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( MotionElementInteractor.class );
 			if ( interactors != null )
@@ -222,9 +223,9 @@ public class PointerMotionInteractor extends PointerInteractor implements Pointe
 		}
 	}
 	
-	private void sendEnterFromChildEvent(PointerInputElement element, PointerMotionEvent event)
+	private void sendEnterFromChildEvent(LSElement element, PointerMotionEvent event)
 	{
-		if ( element.isPointerInputElementRealised() )
+		if ( element.isRealised() )
 		{
 			Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( MotionElementInteractor.class );
 			if ( interactors != null )

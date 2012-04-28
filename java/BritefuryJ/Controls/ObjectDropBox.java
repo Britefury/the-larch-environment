@@ -11,7 +11,6 @@ import BritefuryJ.DefaultPerspective.PrimitivePresenter;
 import BritefuryJ.IncrementalView.FragmentData;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Input.ObjectDndHandler;
-import BritefuryJ.LSpace.Input.PointerInputElement;
 import BritefuryJ.Live.LiveFunction;
 import BritefuryJ.Live.LiveInterface;
 import BritefuryJ.Math.Point2;
@@ -35,7 +34,7 @@ public class ObjectDropBox extends ControlPres
 		private ObjectDropBoxControl control;
 		
 		
-		public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
+		public boolean acceptDrop(LSElement destElement, Point2 targetPosition, Object data, int action)
 		{
 			control.listener.onObjectDropBoxDrop( control, ((FragmentData)data).getModel() );
 			return true;

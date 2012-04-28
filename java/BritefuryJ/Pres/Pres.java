@@ -224,9 +224,9 @@ public abstract class Pres
 		return new AddDropDest( this, dest );
 	}
 	
-	public AddDropDest withDropDest(Class<?> dataType, ObjectDndHandler.CanDropFn canDropFn, ObjectDndHandler.DropFn dropFn)
+	public AddDropDest withDropDest(Class<?> dataType, ObjectDndHandler.CanDropFn canDropFn, ObjectDndHandler.DropHighlightFn highlightFn, ObjectDndHandler.DropFn dropFn)
 	{
-		return new AddDropDest( this, dataType, canDropFn, dropFn );
+		return new AddDropDest( this, dataType, canDropFn, highlightFn, dropFn );
 	}
 	
 	public AddDropDest withDropDest(Class<?> dataType, ObjectDndHandler.DropFn dropFn)
@@ -240,9 +240,14 @@ public abstract class Pres
 		return new AddNonLocalDropDest( this, dest );
 	}
 	
+	public AddNonLocalDropDest withNonLocalDropDest(DataFlavor dataFlavor, ObjectDndHandler.DropHighlightFn highlightFn, ObjectDndHandler.DropFn dropFn)
+	{
+		return new AddNonLocalDropDest( this, dataFlavor, highlightFn, dropFn );
+	}
+	
 	public AddNonLocalDropDest withNonLocalDropDest(DataFlavor dataFlavor, ObjectDndHandler.DropFn dropFn)
 	{
-		return new AddNonLocalDropDest( this, dataFlavor, dropFn );
+		return new AddNonLocalDropDest( this, dataFlavor, null, dropFn );
 	}
 	
 	

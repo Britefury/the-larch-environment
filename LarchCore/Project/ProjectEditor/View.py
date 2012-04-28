@@ -215,8 +215,8 @@ def _projectIndexDrop(element, targetPos, data, action):
 	return False
 
 
-_pageDropDest = ObjectDndHandler.DropDest( ProjectDrag, _canDropOntoPage, _dropOntoPage )
-_packageDropDest = ObjectDndHandler.DropDest( ProjectDrag, _canDropOntoPackage, _dropOntoPackage )
+_pageDropDest = ObjectDndHandler.DropDest( ProjectDrag, _canDropOntoPage, None, _dropOntoPage )
+_packageDropDest = ObjectDndHandler.DropDest( ProjectDrag, _canDropOntoPackage, None, _dropOntoPackage )
 _projectIndexDropDest = ObjectDndHandler.DropDest( ProjectDrag, _projectIndexDrop )
 
 
@@ -258,7 +258,7 @@ class ProjectView (MethodDispatchView):
 			def handleSaveDocumentAsFn(filename):
 				document.saveAs( filename )
 
-			DocumentManagement.promptSaveDocumentAs( fragment.getSubjectContext()['world'], control.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn )
+			DocumentManagement.promptSaveDocumentAs( fragment.getSubjectContext()['world'], control.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn, document.getFilename() )
 
 
 		def _onExport(control, event):

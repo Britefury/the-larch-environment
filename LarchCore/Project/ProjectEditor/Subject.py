@@ -47,7 +47,7 @@ def _saveAs(subject, pageController):
 	def handleSaveDocumentAsFn(filename):
 		document.saveAs( filename )
 
-	DocumentManagement.promptSaveDocumentAs( subject.getSubjectContext()['world'], None, handleSaveDocumentAsFn )
+	DocumentManagement.promptSaveDocumentAs( subject.getSubjectContext()['world'], None, handleSaveDocumentAsFn, document.getFilename() )
 
 
 def _reset(subject, pageController):

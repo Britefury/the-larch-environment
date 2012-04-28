@@ -49,15 +49,15 @@ def promptOpenDocument(world, component, handleOpenedDocumentFn):
 
 				
 # handleSaveDocumentAsFn(filename)
-def promptSaveDocumentAs(world, component, handleSaveDocumentAsFn):
+def promptSaveDocumentAs(world, component, handleSaveDocumentAsFn, existingFilename=None):
 	filename = None
 	bFinished = False
 	while not bFinished:
-		openDialog = JFileChooser()
-		openDialog.setFileFilter( FileNameExtensionFilter( 'Larch project (*.larch)', [ 'larch' ] ) )
-		response = openDialog.showSaveDialog( component )
+		saveDialog = JFileChooser()
+		saveDialog.setFileFilter( FileNameExtensionFilter( 'Larch project (*.larch)', [ 'larch' ] ) )
+		response = saveDialog.showSaveDialog( component )
 		if response == JFileChooser.APPROVE_OPTION:
-			sf = openDialog.getSelectedFile()
+			sf = saveDialog.getSelectedFile()
 			if sf is not None:
 				filenameFromDialog = sf.getPath()
 				if filenameFromDialog is not None:

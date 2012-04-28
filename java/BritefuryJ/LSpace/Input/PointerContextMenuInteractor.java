@@ -10,6 +10,7 @@ import java.util.Stack;
 
 import BritefuryJ.Controls.PopupMenu;
 import BritefuryJ.Controls.VPopupMenu;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Interactor.AbstractElementInteractor;
@@ -48,14 +49,14 @@ public class PointerContextMenuInteractor extends PointerInteractor
 	
 	private static void handleContextButton(Pointer pointer, PopupMenu menu)
 	{
-		Stack<PointerInputElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
+		Stack<LSElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
 		
 		while ( !elements.isEmpty() )
 		{
 			boolean bElementHandled = false;
-			PointerInputElement element = elements.pop();
+			LSElement element = elements.pop();
 			
-			if ( element.isPointerInputElementRealised() )
+			if ( element.isRealised() )
 			{
 				Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( ContextMenuElementInteractor.class );
 				if ( interactors != null )

@@ -6,9 +6,12 @@
 //##************************
 package BritefuryJ.LSpace.Input;
 
+import java.awt.Graphics2D;
 import java.awt.datatransfer.Transferable;
 
 import javax.swing.TransferHandler;
+
+import BritefuryJ.LSpace.LSElement;
 
 public abstract class DndHandler
 {
@@ -21,27 +24,34 @@ public abstract class DndHandler
 	public final static int ASPECT_NONE = 0;
 	public final static int ASPECT_NORMAL = 0x1;
 	public final static int ASPECT_DOC_NODE = 0x2;
+	
+	
+	public static interface PotentialDrop
+	{
+		void draw(Graphics2D graphics);
+		void queueRedraw();
+	}
 
 	
 	
-	public abstract boolean isSource(PointerInputElement sourceElement);
+	public abstract boolean isSource(LSElement sourceElement);
 
-	public int getSourceRequestedAction(PointerInputElement sourceElement, PointerInterface pointer, int button)
+	public int getSourceRequestedAction(LSElement sourceElement, PointerInterface pointer, int button)
 	{
 		return COPY;
 	}
 	
-	public int getSourceRequestedAspect(PointerInputElement sourceElement, PointerInterface pointer, int button)
+	public int getSourceRequestedAspect(LSElement sourceElement, PointerInterface pointer, int button)
 	{
 		return ASPECT_NORMAL;
 	}
 	
-	public Transferable createTransferable(PointerInputElement sourceElement, int aspect)
+	public Transferable createTransferable(LSElement sourceElement, int aspect)
 	{
 		return null;
 	}
 	
-	public void exportDone(PointerInputElement sourceElement, Transferable data, int action)
+	public void exportDone(LSElement sourceElement, Transferable data, int action)
 	{
 	}
 	
@@ -49,14 +59,14 @@ public abstract class DndHandler
 	
 	
 	
-	public abstract boolean isDest(PointerInputElement sourceElement);
+	public abstract boolean isDest(LSElement sourceElement);
 
-	public boolean canDrop(PointerInputElement destElement, DndDropSwing drop)
+	public PotentialDrop negotiatePotentialDrop(LSElement destElement, DndDropSwing drop)
 	{
-		return false;
+		return null;
 	}
 	
-	public boolean acceptDrop(PointerInputElement destElement, DndDropSwing drop)
+	public boolean acceptDrop(LSElement destElement, DndDropSwing drop)
 	{
 		return false;
 	}

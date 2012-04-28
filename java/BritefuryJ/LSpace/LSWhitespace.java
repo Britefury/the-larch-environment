@@ -68,7 +68,7 @@ public class LSWhitespace extends LSContentLeaf
 	{
 		double width = getActualWidth();
 		double height = getActualHeight();
-		AffineTransform current = pushGraphicsTransform( graphics );
+		AffineTransform current = pushLocalToRootGraphicsTransform( graphics );
 		int startIndex = from != null  ?  from.getIndex()  :  0;
 		int endIndex = to != null  ?  to.getIndex()  :  1;
 		double startX = startIndex == 0  ?  0.0  :  width;

@@ -8,7 +8,6 @@ package BritefuryJ.Controls;
 
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
-import BritefuryJ.LSpace.Input.PointerInputElement;
 import BritefuryJ.LSpace.Interactor.PushElementInteractor;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
@@ -34,10 +33,9 @@ public class Button extends ControlPres
 			
 			
 			@Override
-			public boolean buttonPress(PointerInputElement element, PointerButtonEvent event)
+			public boolean buttonPress(LSElement element, PointerButtonEvent event)
 			{
-				LSElement buttonElement = (LSElement)element;
-				if ( buttonElement.isRealised() )
+				if ( element.isRealised() )
 				{
 					if ( listener != null )
 					{
@@ -45,7 +43,7 @@ public class Button extends ControlPres
 					}
 					if ( bClosePopupOnActivate )
 					{
-						buttonElement.closeContainingPopupChain();
+						element.closeContainingPopupChain();
 					}
 					return true;
 				}
@@ -54,7 +52,7 @@ public class Button extends ControlPres
 			}
 
 			@Override
-			public void buttonRelease(PointerInputElement element, PointerButtonEvent event)
+			public void buttonRelease(LSElement element, PointerButtonEvent event)
 			{
 			}
 		}

@@ -6,12 +6,12 @@
 //##************************
 package BritefuryJ.LSpace.Interactor;
 
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.AbstractPointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
-import BritefuryJ.LSpace.Input.PointerInputElement;
 
 public interface ClickElementInteractor extends AbstractElementInteractor
 {
-	public boolean testClickEvent(PointerInputElement element, AbstractPointerButtonEvent event);
-	public boolean buttonClicked(PointerInputElement element, PointerButtonClickedEvent event);
+	public boolean testClickEvent(LSElement element, AbstractPointerButtonEvent event);
+	public boolean buttonClicked(LSElement element, PointerButtonClickedEvent event);
 }

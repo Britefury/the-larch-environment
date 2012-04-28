@@ -24,9 +24,9 @@ public class AddNonLocalDropDest extends Pres
 		this.child = child;
 	}
 	
-	public AddNonLocalDropDest(Pres child, DataFlavor dataFlavor, ObjectDndHandler.DropFn dropFn)
+	public AddNonLocalDropDest(Pres child, DataFlavor dataFlavor, ObjectDndHandler.DropHighlightFn highlightFn, ObjectDndHandler.DropFn dropFn)
 	{
-		this( child, new ObjectDndHandler.NonLocalDropDest( dataFlavor, dropFn ) );
+		this( child, new ObjectDndHandler.NonLocalDropDest( dataFlavor, highlightFn, dropFn ) );
 	}
 	
 	
