@@ -16,7 +16,6 @@ import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSProxy;
 import BritefuryJ.LSpace.Input.DndHandler;
 import BritefuryJ.LSpace.Input.ObjectDndHandler;
-import BritefuryJ.LSpace.Input.PointerInputElement;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Pres.ElementRef;
 import BritefuryJ.Pres.Pres;
@@ -68,7 +67,7 @@ public class DndTestPage extends SystemPage
 		
 		ObjectDndHandler.SourceDataFn sourceDataFn = new ObjectDndHandler.SourceDataFn()
 		{
-			public Object createSourceData(PointerInputElement sourceElement, int aspect)
+			public Object createSourceData(LSElement sourceElement, int aspect)
 			{
 				return factory;
 			}
@@ -90,7 +89,7 @@ public class DndTestPage extends SystemPage
 		
 		ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
 		{
-			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
+			public boolean acceptDrop(LSElement destElement, Point2 targetPosition, Object data, int action)
 			{
 				Pres factory = (Pres)data;
 				for (LSElement element: placeHolder.getElements())

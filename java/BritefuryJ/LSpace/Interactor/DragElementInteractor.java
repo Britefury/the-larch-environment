@@ -6,15 +6,15 @@
 //##************************
 package BritefuryJ.LSpace.Interactor;
 
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerMotionEvent;
-import BritefuryJ.LSpace.Input.PointerInputElement;
 import BritefuryJ.Math.Point2;
 
 
 public interface DragElementInteractor extends AbstractElementInteractor
 {
-	public boolean dragBegin(PointerInputElement element, PointerButtonEvent event);
-	public void dragEnd(PointerInputElement element, PointerButtonEvent event, Point2 dragStartPos, int dragButton);
-	public void dragMotion(PointerInputElement element, PointerMotionEvent event, Point2 dragStartPos, int dragButton);
+	public boolean dragBegin(LSElement element, PointerButtonEvent event);
+	public void dragEnd(LSElement element, PointerButtonEvent event, Point2 dragStartPos, int dragButton);
+	public void dragMotion(LSElement element, PointerMotionEvent event, Point2 dragStartPos, int dragButton);
 }

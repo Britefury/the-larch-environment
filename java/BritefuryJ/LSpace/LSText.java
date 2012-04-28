@@ -195,7 +195,7 @@ public class LSText extends LSContentLeafEditable
 		}
 		LayoutNode layout = getLayoutNode();
 		double deltaY = layout.getAllocationBox().getAllocRefY()  -  layout.getRequisitionBox().getReqRefY();
-		AffineTransform current = pushGraphicsTransform( graphics );
+		AffineTransform current = pushLocalToRootGraphicsTransform( graphics );
 		graphics.translate( 0.0, deltaY );
 		visual.drawCaret( graphics, index );
 		popGraphicsTransform( graphics, current );
@@ -214,7 +214,7 @@ public class LSText extends LSContentLeafEditable
 	{
 		LayoutNode layout = getLayoutNode();
 		double deltaY = layout.getAllocationBox().getAllocRefY()  -  layout.getRequisitionBox().getReqRefY();
-		AffineTransform current = pushGraphicsTransform( graphics );
+		AffineTransform current = pushLocalToRootGraphicsTransform( graphics );
 		graphics.translate( 0.0, deltaY );
 		visual.drawSelection( graphics, startIndex, endIndex );
 		popGraphicsTransform( graphics, current );

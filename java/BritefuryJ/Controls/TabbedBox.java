@@ -14,12 +14,11 @@ import java.awt.geom.Arc2D;
 import java.awt.geom.Path2D;
 import java.util.List;
 
+import BritefuryJ.LSpace.ElementPainter;
 import BritefuryJ.LSpace.LSBin;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSRow;
-import BritefuryJ.LSpace.ElementPainter;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
-import BritefuryJ.LSpace.Input.PointerInputElement;
 import BritefuryJ.LSpace.Interactor.PushElementInteractor;
 import BritefuryJ.LSpace.Layout.HAlignment;
 import BritefuryJ.LSpace.Layout.VAlignment;
@@ -122,14 +121,14 @@ public class TabbedBox extends ControlPres
 		
 		
 		@Override
-		public boolean buttonPress(PointerInputElement element, PointerButtonEvent event)
+		public boolean buttonPress(LSElement element, PointerButtonEvent event)
 		{
 			return event.getButton() == 1;
 		}
 
 
 		@Override
-		public void buttonRelease(PointerInputElement element, PointerButtonEvent event)
+		public void buttonRelease(LSElement element, PointerButtonEvent event)
 		{
 			LSRow header = (LSRow)element;
 			Point2 clickPos = event.getLocalPointerPos();

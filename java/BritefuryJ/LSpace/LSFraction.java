@@ -77,7 +77,7 @@ public class LSFraction extends LSContainerNonOverlayed
 		private void drawCaretAtStart(Graphics2D graphics)
 		{
 			double height = getActualHeight();
-			AffineTransform current = pushGraphicsTransform( graphics );
+			AffineTransform current = pushLocalToRootGraphicsTransform( graphics );
 			graphics.draw( new Line2D.Double( 0.0, -2.0, 0.0, height + 2.0 ) );
 			popGraphicsTransform( graphics, current );
 		}
@@ -86,7 +86,7 @@ public class LSFraction extends LSContainerNonOverlayed
 		{
 			double width = getActualWidth();
 			double height = getActualHeight();
-			AffineTransform current = pushGraphicsTransform( graphics );
+			AffineTransform current = pushLocalToRootGraphicsTransform( graphics );
 			graphics.draw( new Line2D.Double( width, -2.0, width, height + 2.0 ) );
 			popGraphicsTransform( graphics, current );
 		}
@@ -116,7 +116,7 @@ public class LSFraction extends LSContainerNonOverlayed
 		{
 			double width = getActualWidth();
 			double height = getActualHeight();
-			AffineTransform current = pushGraphicsTransform( graphics );
+			AffineTransform current = pushLocalToRootGraphicsTransform( graphics );
 			double startX = startIndex == 0  ?  0.0  :  width;
 			double endX = endIndex == 0  ?  0.0  :  width;
 			Rectangle2D.Double shape = new Rectangle2D.Double( startX, -2.0, endX - startX, height + 4.0 );

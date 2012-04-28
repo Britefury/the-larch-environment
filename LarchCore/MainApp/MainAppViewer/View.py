@@ -217,7 +217,7 @@ class AppView (MethodDispatchView):
 			def handleSaveDocumentAsFn(filename):
 				document.saveAs( filename )
 			
-			DocumentManagement.promptSaveDocumentAs( world, element.getRootElement().getComponent(), handleSaveDocumentAsFn )
+			DocumentManagement.promptSaveDocumentAs( world, element.getRootElement().getComponent(), handleSaveDocumentAsFn, document.getFilename() )
 
 			
 		name = node.getName()

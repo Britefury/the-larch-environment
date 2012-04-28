@@ -14,7 +14,6 @@ import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
-import BritefuryJ.LSpace.Input.PointerInputElement;
 import BritefuryJ.LSpace.Interactor.PushElementInteractor;
 import BritefuryJ.Live.LiveInterface;
 import BritefuryJ.Live.LiveValue;
@@ -38,13 +37,13 @@ public class EditableLabel extends ControlPres
 		private PushElementInteractor labelInteractor = new PushElementInteractor()
 		{
 			@Override
-			public boolean buttonPress(PointerInputElement element, PointerButtonEvent event)
+			public boolean buttonPress(LSElement element, PointerButtonEvent event)
 			{
 				return event.getButton() == 1;
 			}
 
 			@Override
-			public void buttonRelease(PointerInputElement element, PointerButtonEvent event)
+			public void buttonRelease(LSElement element, PointerButtonEvent event)
 			{
 				showTextEntry();
 			}

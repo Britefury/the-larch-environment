@@ -11,7 +11,6 @@ import BritefuryJ.LSpace.LSBin;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.AbstractPointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
-import BritefuryJ.LSpace.Input.PointerInputElement;
 import BritefuryJ.LSpace.Interactor.ClickElementInteractor;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
@@ -73,20 +72,19 @@ public class MenuItem extends ControlPres
 			}
 			
 			@Override
-			public boolean testClickEvent(PointerInputElement element, AbstractPointerButtonEvent event)
+			public boolean testClickEvent(LSElement element, AbstractPointerButtonEvent event)
 			{
 				return event.getButton() == 1;
 			}
 
 			@Override
-			public boolean buttonClicked(PointerInputElement element, PointerButtonClickedEvent event)
+			public boolean buttonClicked(LSElement element, PointerButtonClickedEvent event)
 			{
-				LSElement menuItemElement = (LSElement)element;
-				if ( menuItemElement.isRealised() )
+				if ( element.isRealised() )
 				{
 					if ( bClosePopupOnActivate )
 					{
-						menuItemElement.closeContainingPopupChain();
+						element.closeContainingPopupChain();
 					}
 					listener.onMenuItemClicked( MenuItemControl.this );
 					return true;

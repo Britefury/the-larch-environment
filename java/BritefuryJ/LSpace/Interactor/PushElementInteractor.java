@@ -6,11 +6,11 @@
 //##************************
 package BritefuryJ.LSpace.Interactor;
 
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
-import BritefuryJ.LSpace.Input.PointerInputElement;
 
 public interface PushElementInteractor extends AbstractElementInteractor
 {
-	public boolean buttonPress(PointerInputElement element, PointerButtonEvent event);
-	public void buttonRelease(PointerInputElement element, PointerButtonEvent event);
+	public boolean buttonPress(LSElement element, PointerButtonEvent event);
+	public void buttonRelease(LSElement element, PointerButtonEvent event);
 }

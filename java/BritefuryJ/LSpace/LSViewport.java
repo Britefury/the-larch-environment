@@ -12,7 +12,6 @@ import java.util.List;
 
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerNavigationEvent;
-import BritefuryJ.LSpace.Input.PointerInputElement;
 import BritefuryJ.LSpace.Interactor.NavigationElementInteractor;
 import BritefuryJ.LSpace.LayoutTree.LayoutNodeViewport;
 import BritefuryJ.LSpace.PersistentState.PersistentState;
@@ -29,18 +28,18 @@ public class LSViewport extends LSContainerNonOverlayed implements FiniteViewpor
 	private static class ViewportNavigationInteractor implements NavigationElementInteractor
 	{
 		@Override
-		public boolean navigationGestureBegin(PointerInputElement element, PointerButtonEvent event)
+		public boolean navigationGestureBegin(LSElement element, PointerButtonEvent event)
 		{
 			return true;
 		}
 
 		@Override
-		public void navigationGestureEnd(PointerInputElement element, PointerButtonEvent event)
+		public void navigationGestureEnd(LSElement element, PointerButtonEvent event)
 		{
 		}
 
 		@Override
-		public void navigationGesture(PointerInputElement element, PointerNavigationEvent event)
+		public void navigationGesture(LSElement element, PointerNavigationEvent event)
 		{
 			LSViewport viewport = (LSViewport)element;
 			Xform2 xform = event.createXform();

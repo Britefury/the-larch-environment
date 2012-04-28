@@ -8,6 +8,7 @@ package BritefuryJ.LSpace.Input;
 
 import java.util.Stack;
 
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Interactor.AbstractElementInteractor;
@@ -17,13 +18,13 @@ public class PointerClickInteractor extends PointerInteractor
 {
 	public boolean buttonDown(Pointer pointer, PointerButtonEvent event)
 	{
-		Stack<PointerInputElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
+		Stack<LSElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
 		
 		while ( !elements.isEmpty() )
 		{
-			PointerInputElement element = elements.pop();
+			LSElement element = elements.pop();
 			
-			if ( element.isPointerInputElementRealised() )
+			if ( element.isRealised() )
 			{
 				Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( ClickElementInteractor.class );
 				if ( interactors != null )
@@ -45,13 +46,13 @@ public class PointerClickInteractor extends PointerInteractor
 
 	public boolean buttonUp(Pointer pointer, PointerButtonEvent event)
 	{
-		Stack<PointerInputElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
+		Stack<LSElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
 		
 		while ( !elements.isEmpty() )
 		{
-			PointerInputElement element = elements.pop();
+			LSElement element = elements.pop();
 			
-			if ( element.isPointerInputElementRealised() )
+			if ( element.isRealised() )
 			{
 				Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( ClickElementInteractor.class );
 				if ( interactors != null )
@@ -75,13 +76,13 @@ public class PointerClickInteractor extends PointerInteractor
 	
 	public boolean buttonClicked(Pointer pointer, PointerButtonClickedEvent event)
 	{
-		Stack<PointerInputElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
+		Stack<LSElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
 		
 		while ( !elements.isEmpty() )
 		{
-			PointerInputElement element = elements.pop();
+			LSElement element = elements.pop();
 			
-			if ( element.isPointerInputElementRealised() )
+			if ( element.isRealised() )
 			{
 				Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( ClickElementInteractor.class );
 				if ( interactors != null )

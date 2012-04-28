@@ -12,10 +12,9 @@ import java.awt.Paint;
 import java.awt.Stroke;
 import java.awt.geom.Line2D;
 
-import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.ElementPainter;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
-import BritefuryJ.LSpace.Input.PointerInputElement;
 import BritefuryJ.LSpace.Interactor.PushElementInteractor;
 
 class CheckboxHelper
@@ -74,7 +73,7 @@ class CheckboxHelper
 		
 		
 		@Override
-		public boolean buttonPress(PointerInputElement element, PointerButtonEvent event)
+		public boolean buttonPress(LSElement element, PointerButtonEvent event)
 		{
 			if ( event.getButton() == 1 )
 			{
@@ -88,7 +87,7 @@ class CheckboxHelper
 		}
 
 		@Override
-		public void buttonRelease(PointerInputElement element, PointerButtonEvent event)
+		public void buttonRelease(LSElement element, PointerButtonEvent event)
 		{
 		}
 	}

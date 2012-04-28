@@ -11,16 +11,18 @@ import java.awt.datatransfer.Transferable;
 
 import javax.swing.TransferHandler;
 
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Math.Point2;
+import BritefuryJ.Util.HashUtils;
 
 public class DndDropSwing
 {
-	protected PointerInputElement targetElement;
+	protected LSElement targetElement;
 	protected Point2 targetPosition;
 	protected TransferHandler.TransferSupport support;
 	
 	
-	public DndDropSwing(PointerInputElement targetElement, Point2 targetPosition, TransferHandler.TransferSupport support)
+	public DndDropSwing(LSElement targetElement, Point2 targetPosition, TransferHandler.TransferSupport support)
 	{
 		this.targetElement = targetElement;
 		this.targetPosition = targetPosition;
@@ -71,7 +73,7 @@ public class DndDropSwing
 
 
 
-	public PointerInputElement getTargetElement()
+	public LSElement getTargetElement()
 	{
 		return targetElement;
 	}
@@ -82,5 +84,37 @@ public class DndDropSwing
 	public Point2 getTargetPosition()
 	{
 		return targetPosition;
+	}
+	
+	
+	
+	
+	@Override
+	public boolean equals(Object x)
+	{
+		if ( this == x )
+		{
+			return true;
+		}
+		
+		if ( x instanceof DndDropSwing )
+		{
+			DndDropSwing dx = (DndDropSwing)x;
+			return targetElement == dx.targetElement  &&  targetPosition.equals( dx.targetPosition )  &&  support.equals( dx.support );  
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	
+	@Override
+	public int hashCode()
+	{
+		int a = targetElement.hashCode();
+		int b = targetPosition.hashCode();
+		int c = support.hashCode();
+		return HashUtils.tripleHash( a, b, c );
 	}
 }

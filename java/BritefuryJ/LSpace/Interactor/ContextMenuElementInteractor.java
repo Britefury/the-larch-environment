@@ -7,9 +7,9 @@
 package BritefuryJ.LSpace.Interactor;
 
 import BritefuryJ.Controls.PopupMenu;
-import BritefuryJ.LSpace.Input.PointerInputElement;
+import BritefuryJ.LSpace.LSElement;
 
 public interface ContextMenuElementInteractor extends AbstractElementInteractor
 {
-	boolean contextMenu(PointerInputElement element, PopupMenu menu);
+	boolean contextMenu(LSElement element, PopupMenu menu);
 }

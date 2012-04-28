@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 import javax.swing.TransferHandler;
 
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerMotionEvent;
 import BritefuryJ.Math.Point2;
@@ -19,11 +20,11 @@ import BritefuryJ.Math.Point2;
 public class PointerDndInteractor extends PointerInteractor
 {
 	private DndController dndController;
-	private PointerInputElement rootElement;
-	private DndDragSwing dndDrop;
+	private LSElement rootElement;
+	private DndDragSwing dndDrag;
 	
 	
-	public PointerDndInteractor(PointerInputElement rootElement, DndController dndController)
+	public PointerDndInteractor(LSElement rootElement, DndController dndController)
 	{
 		this.dndController = dndController;
 		this.rootElement = rootElement;
@@ -47,9 +48,9 @@ public class PointerDndInteractor extends PointerInteractor
 
 	
 	
-	public ArrayList<PointerInputElement.DndTarget> getDndTargets(Point2 localPos)
+	public ArrayList<DndTarget> getDndTargets(Point2 localPos)
 	{
-		return PointerInputElement.getDndTargets( rootElement, localPos );
+		return LSElement.getDndTargets( rootElement, localPos );
 	}
 
 
@@ -58,12 +59,12 @@ public class PointerDndInteractor extends PointerInteractor
 	{
 		if ( dndController != null )
 		{
-			ArrayList<PointerInputElement.DndTarget> targets = getDndTargets( event.getPointer().getLocalPos() );
-			for (PointerInputElement.DndTarget target: targets)
+			ArrayList<DndTarget> targets = getDndTargets( event.getPointer().getLocalPos() );
+			for (DndTarget target: targets)
 			{
 				if ( target.isSource() )
 				{
-					PointerInputElement sourceElement = target.getElement();
+					LSElement sourceElement = target.getElement();
 					DndHandler dndHandler = target.getDndHandler();
 					int button = event.getButton();
 				
@@ -73,7 +74,7 @@ public class PointerDndInteractor extends PointerInteractor
 						int requestedAspect = dndHandler.getSourceRequestedAspect( sourceElement, event.getPointer(), button );
 						if ( requestedAspect != DndHandler.ASPECT_NONE )
 						{
-							dndDrop = new DndDragSwing( sourceElement, button );
+							dndDrag = new DndDragSwing( sourceElement, button );
 							return true;
 						}
 					}
@@ -86,33 +87,25 @@ public class PointerDndInteractor extends PointerInteractor
 	
 	private boolean dndDragEvent(PointerMotionEvent event, MouseEvent mouseEvent)
 	{
-		if ( dndController != null )
+		if ( dndController != null  &&  dndDrag != null  &&  !dndDrag.bInProgress )
 		{
-			DndDragSwing drop = dndDrop;
-	
-			if ( drop != null )
+			if ( mouseEvent != null )
 			{
-				if ( !drop.bInProgress )
+				int requestedAction = dndDrag.sourceElement.getDndHandler().getSourceRequestedAction( dndDrag.sourceElement, event.getPointer(), dndDrag.sourceButton );
+				if ( requestedAction != TransferHandler.NONE )
 				{
-					if ( mouseEvent != null )
+					int requestedAspect = dndDrag.sourceElement.getDndHandler().getSourceRequestedAspect( dndDrag.sourceElement, event.getPointer(), dndDrag.sourceButton );
+					if ( requestedAspect != DndHandler.ASPECT_NONE )
 					{
-						int requestedAction = drop.sourceElement.getDndHandler().getSourceRequestedAction( drop.sourceElement, event.getPointer(), drop.sourceButton );
-						if ( requestedAction != TransferHandler.NONE )
+						Transferable transferable = dndDrag.sourceElement.getDndHandler().createTransferable( dndDrag.sourceElement, requestedAspect );
+						if ( transferable != null )
 						{
-							int requestedAspect = drop.sourceElement.getDndHandler().getSourceRequestedAspect( drop.sourceElement, event.getPointer(), drop.sourceButton );
-							if ( requestedAspect != DndHandler.ASPECT_NONE )
-							{
-								Transferable transferable = drop.sourceElement.getDndHandler().createTransferable( drop.sourceElement, requestedAspect );
-								if ( transferable != null )
-								{
-									drop.bInProgress = true;
-									drop.initialise( transferable, requestedAction );
-								
-									dndController.dndInitiateDrag( drop, mouseEvent, requestedAction );
-									
-									return true;
-								}
-							}
+							dndDrag.bInProgress = true;
+							dndDrag.initialise( transferable, requestedAction );
+						
+							dndController.dndInitiateDrag( dndDrag, mouseEvent, requestedAction );
+							
+							return true;
 						}
 					}
 				}
@@ -123,16 +116,11 @@ public class PointerDndInteractor extends PointerInteractor
 
 	private boolean dndButtonUpEvent(PointerButtonEvent event)
 	{
-		if ( dndController != null )
+		if ( dndController != null  &&  dndDrag != null  &&  dndDrag.bInProgress )
 		{
-			DndDragSwing drop = dndDrop;
-			
-			if ( drop != null  &&  drop.bInProgress )
-			{
-				dndDrop = null;
+			dndDrag = null;
 				
-				return true;
-			}
+			return true;
 		}
 		return false;
 	}

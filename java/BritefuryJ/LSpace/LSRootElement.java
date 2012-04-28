@@ -43,9 +43,10 @@ import BritefuryJ.LSpace.Focus.Target;
 import BritefuryJ.LSpace.Input.DndController;
 import BritefuryJ.LSpace.Input.DndDragSwing;
 import BritefuryJ.LSpace.Input.DndDropSwing;
+import BritefuryJ.LSpace.Input.DndHandler;
+import BritefuryJ.LSpace.Input.DndTarget;
 import BritefuryJ.LSpace.Input.InputTable;
 import BritefuryJ.LSpace.Input.Pointer;
-import BritefuryJ.LSpace.Input.PointerInputElement;
 import BritefuryJ.LSpace.Input.Keyboard.Keyboard;
 import BritefuryJ.LSpace.Layout.LAllocV;
 import BritefuryJ.LSpace.Layout.LReqBoxInterface;
@@ -70,6 +71,8 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	private Pointer rootSpaceMouse;
 	private Keyboard keyboard;
 	private InputTable inputTable;
+	
+	private DndHandler.PotentialDrop currentPotentialDrop;
 	
 	private Runnable immediateEventDispatcher;
 	
@@ -426,6 +429,9 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 			drawTarget( graphics );
 		}
 		
+		// Draw DnD highlight
+		drawDndHighlight( graphics );
+		
 		// Draw any element previews
 		drawElementPreviews( graphics );
 		
@@ -471,6 +477,15 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 			graphics.setPaint( new Color( 1.0f, 0.9f, 0.0f, 0.4f ) );
 			selection.draw( graphics );
 			graphics.setPaint( prevPaint );
+		}
+	}
+	
+	
+	private void drawDndHighlight(Graphics2D graphics)
+	{
+		if ( currentPotentialDrop != null )
+		{
+			currentPotentialDrop.draw( graphics );
 		}
 	}
 	
@@ -1071,22 +1086,26 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		Point2 rootPos = new Point2( windowPos.x, windowPos.y );
 
 		boolean success = false;
-		List<PointerInputElement.DndTarget> targets = PointerInputElement.getDndTargets( this, rootPos );
-		for (PointerInputElement.DndTarget target: targets)
+		DndHandler.PotentialDrop potentialDrop = null;
+		List<DndTarget> targets = LSElement.getDndTargets( this, rootPos );
+		for (DndTarget target: targets)
 		{
 			if ( target.isDest() )
 			{
-				PointerInputElement targetElement = target.getElement();
+				LSElement targetElement = target.getElement();
 				Point2 targetPos = target.getElementSpacePos();
 
 				DndDropSwing drop = new DndDropSwing( targetElement, targetPos, transfer );
-				if ( targetElement.getDndHandler().canDrop( targetElement, drop ) )
+				potentialDrop = targetElement.getDndHandler().negotiatePotentialDrop( targetElement, drop );
+				if ( potentialDrop != null )
 				{
 					success = true;
 					break;
 				}
 			}
 		}
+		
+		setPotentialDrop( potentialDrop );
 
 		// Attach element preview
 		attachElementPreview( transfer, rootPos, success );
@@ -1102,15 +1121,18 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		Point windowPos = transfer.getDropLocation().getDropPoint();
 		Point2 rootPos = new Point2( windowPos.x, windowPos.y );
 
+		// Drop is finished
+		setPotentialDrop( null );
+		
 		// Detach element preview
 		detachElementPreview( transfer );
 		
-		List<PointerInputElement.DndTarget> targets = PointerInputElement.getDndTargets( this, rootPos );
-		for (PointerInputElement.DndTarget target: targets)
+		List<DndTarget> targets = LSElement.getDndTargets( this, rootPos );
+		for (DndTarget target: targets)
 		{
 			if ( target.isDest() )
 			{
-				PointerInputElement targetElement = target.getElement();
+				LSElement targetElement = target.getElement();
 				Point2 targetPos = target.getElementSpacePos();
 
 				DndDropSwing drop = new DndDropSwing( targetElement, targetPos, transfer );
@@ -1118,6 +1140,23 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 			}
 		}
 		return false;
+	}
+	
+	
+	protected void setPotentialDrop(DndHandler.PotentialDrop potentialDrop)
+	{
+		if ( potentialDrop != currentPotentialDrop  ||  ( potentialDrop != null  &&  !potentialDrop.equals( currentPotentialDrop ) ) )
+		{
+			if ( currentPotentialDrop != null )
+			{
+				currentPotentialDrop.queueRedraw();
+			}
+			currentPotentialDrop = potentialDrop;
+			if ( currentPotentialDrop != null )
+			{
+				currentPotentialDrop.queueRedraw();
+			}
+		}
 	}
 	
 	

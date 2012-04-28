@@ -340,6 +340,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		{
 			if ( drop != null )
 			{
+				rootElement.setPotentialDrop( null );
 				rootElement.detachElementPreview( data );
 				drop.getSourceElement().getDndHandler().exportDone( drop.getSourceElement(), data, action );
 				drop = null;

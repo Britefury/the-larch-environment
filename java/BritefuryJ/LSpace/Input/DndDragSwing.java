@@ -9,9 +9,11 @@ package BritefuryJ.LSpace.Input;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 
+import BritefuryJ.LSpace.LSElement;
+
 public class DndDragSwing
 {
-	protected PointerInputElement sourceElement;
+	protected LSElement sourceElement;
 	protected int sourceButton;
 	
 	protected boolean bInProgress;
@@ -22,7 +24,7 @@ public class DndDragSwing
 	
 	
 
-	protected DndDragSwing(PointerInputElement sourceElement, int sourceButton)
+	protected DndDragSwing(LSElement sourceElement, int sourceButton)
 	{
 		super();
 		
@@ -49,7 +51,7 @@ public class DndDragSwing
 	
 	
 	
-	public PointerInputElement getSourceElement()
+	public LSElement getSourceElement()
 	{
 		return sourceElement;
 	}

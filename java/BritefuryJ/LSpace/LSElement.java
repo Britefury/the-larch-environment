@@ -28,7 +28,6 @@ import java.awt.Paint;
 import java.awt.Point;
 import java.awt.Shape;
 import java.awt.Stroke;
-import java.awt.datatransfer.DataFlavor;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -52,9 +51,9 @@ import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerEvent;
 import BritefuryJ.LSpace.Event.PointerMotionEvent;
 import BritefuryJ.LSpace.Input.DndHandler;
+import BritefuryJ.LSpace.Input.DndTarget;
 import BritefuryJ.LSpace.Input.Modifier;
 import BritefuryJ.LSpace.Input.ObjectDndHandler;
-import BritefuryJ.LSpace.Input.PointerInputElement;
 import BritefuryJ.LSpace.Input.PointerInterface;
 import BritefuryJ.LSpace.Interactor.AbstractElementInteractor;
 import BritefuryJ.LSpace.Interactor.CaretCrossingElementInteractor;
@@ -98,7 +97,7 @@ import BritefuryJ.Util.RichString.RichStringBuilder;
 
 
 
-abstract public class LSElement extends PointerInputElement implements Presentable
+abstract public class LSElement implements Presentable
 {
 	protected static double NON_TYPESET_CHILD_BASELINE_OFFSET = -5.0;
 	
@@ -899,7 +898,36 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 	}
 	
 	
-	public AffineTransform pushGraphicsTransform(Graphics2D graphics)
+	
+	public PointerEvent transformParentToLocalEvent(PointerEvent event)
+	{
+		return event.transformed( getParentToLocalXform() );
+	}
+	
+	public PointerInterface transformParentToLocalPointer(PointerInterface pointer)
+	{
+		return pointer.transformed( getParentToLocalXform() );
+	}
+	
+	public Point2 transformParentToLocalPoint(Point2 parentPos)
+	{
+		return getParentToLocalXform().transform( parentPos );
+	}
+	
+	public boolean containsParentSpacePoint(Point2 parentPos)
+	{
+		return getAABoxInParentSpace().containsPoint( parentPos );
+	}
+
+	public boolean containsLocalSpacePoint(Point2 localPos)
+	{
+		return getLocalAABox().containsPoint( localPos );
+	}
+	
+
+	
+	
+	public AffineTransform pushLocalToRootGraphicsTransform(Graphics2D graphics)
 	{
 		AffineTransform current = graphics.getTransform();
 		getLocalToRootXform().apply( graphics );
@@ -1664,12 +1692,12 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 	//
 	//
 	
-	protected LSElement getFirstChildAtLocalPoint(Point2 localPos)
+	public LSElement getFirstChildAtLocalPoint(Point2 localPos)
 	{
 		return null;
 	}
 	
-	protected LSElement getLastChildAtLocalPoint(Point2 localPos)
+	public LSElement getLastChildAtLocalPoint(Point2 localPos)
 	{
 		return null;
 	}
@@ -1707,7 +1735,7 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 	}
 	
 
-	protected void handlePointerEnter(PointerMotionEvent event)
+	public void handlePointerEnter(PointerMotionEvent event)
 	{
 		handleHover();
 			
@@ -1718,7 +1746,7 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 		}
 	}
 	
-	protected void handlePointerLeave(PointerMotionEvent event)
+	public void handlePointerLeave(PointerMotionEvent event)
 	{
 		handleHover();
 		
@@ -1758,49 +1786,6 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 	public boolean isHoverActive()
 	{
 		return testFlag( FLAG_HOVER );
-	}
-	
-
-	
-	
-	protected PointerInputElement getFirstPointerChildAtLocalPoint(Point2 localPos)
-	{
-		return getFirstChildAtLocalPoint( localPos );
-	}
-	
-	protected PointerInputElement getLastPointerChildAtLocalPoint(Point2 localPos)
-	{
-		return getLastChildAtLocalPoint( localPos );
-	}
-	
-	protected PointerEvent transformParentToLocalEvent(PointerEvent event)
-	{
-		return event.transformed( getParentToLocalXform() );
-	}
-	
-	protected PointerInterface transformParentToLocalPointer(PointerInterface pointer)
-	{
-		return pointer.transformed( getParentToLocalXform() );
-	}
-	
-	public Point2 transformParentToLocalPoint(Point2 parentPos)
-	{
-		return getParentToLocalXform().transform( parentPos );
-	}
-	
-	public boolean isPointerInputElementRealised()
-	{
-		return isRealised();
-	}
-	
-	public boolean containsParentSpacePoint(Point2 parentPos)
-	{
-		return getAABoxInParentSpace().containsPoint( parentPos );
-	}
-
-	public boolean containsLocalSpacePoint(Point2 localPos)
-	{
-		return getLocalAABox().containsPoint( localPos );
 	}
 	
 
@@ -1910,16 +1895,6 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 		notifyInteractionFieldsModified();
 	}
 	
-	public void addDragSource(Class<?> dataType, int sourceAspects, ObjectDndHandler.SourceDataFn sourceDataFn, ObjectDndHandler.ExportDoneFn exportDoneFn)
-	{
-		addDragSource( new ObjectDndHandler.DragSource( dataType, sourceAspects, sourceDataFn, exportDoneFn ) );
-	}
-	
-	public void addDragSource(Class<?> dataType, int sourceAspects, ObjectDndHandler.SourceDataFn sourceDataFn)
-	{
-		addDragSource( dataType, sourceAspects, sourceDataFn, null );
-	}
-	
 	
 	public void addDropDest(ObjectDndHandler.DropDest dropDest)
 	{
@@ -1929,16 +1904,6 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 		notifyInteractionFieldsModified();
 	}
 	
-	public void addDropDest(Class<?> dataType, ObjectDndHandler.CanDropFn canDropFn, ObjectDndHandler.DropFn dropFn)
-	{
-		addDropDest( new ObjectDndHandler.DropDest( dataType, canDropFn, dropFn ) );
-	}
-	
-	public void addDropDest(Class<?> dataType, ObjectDndHandler.DropFn dropFn)
-	{
-		addDropDest( dataType, null, dropFn );
-	}
-	
 	
 	public void addNonLocalDropDest(ObjectDndHandler.NonLocalDropDest dropDest)
 	{
@@ -1946,11 +1911,6 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 		ensureValidInteractionFields();
 		interactionFields.dndHandler = current.withNonLocalDropDest( dropDest );
 		notifyInteractionFieldsModified();
-	}
-	
-	public void addNonLocalDropDest(DataFlavor dataFlavor, ObjectDndHandler.DropFn dropFn)
-	{
-		addNonLocalDropDest( new ObjectDndHandler.NonLocalDropDest( dataFlavor, dropFn ) );
 	}
 	
 
@@ -1973,6 +1933,31 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 		return interactionFields != null  ?  interactionFields.dndHandler  :  null;
 	}
 	
+	
+	
+	
+	public static ArrayList<DndTarget> getDndTargets(LSElement element, Point2 localPos)
+	{
+		ArrayList<DndTarget> targets = new ArrayList<DndTarget>(); 
+		getDndTargets( element, localPos, targets );
+		return targets;
+	}
+
+	private static void getDndTargets(LSElement element, Point2 localPos, List<DndTarget> targets)
+	{
+		LSElement child = element.getFirstChildAtLocalPoint( localPos );
+		if ( child != null )
+		{
+			getDndTargets( child, child.transformParentToLocalPoint( localPos ), targets );
+		}
+		
+		DndHandler handler = element.getDndHandler();
+		if ( handler != null )
+		{
+			targets.add( new DndTarget( element, handler, localPos ) );
+		}
+	}
+
 	
 	
 	
@@ -2970,19 +2955,17 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 	
 	
 	
-	private static void activateExplorerHighlight(PointerInputElement explorerElement)
+	private static void activateExplorerHighlight(LSElement explorerElement)
 	{
-		LSElement el = (LSElement)explorerElement;
-		FragmentView fragment = (FragmentView)el.getFragmentContext();
+		FragmentView fragment = (FragmentView)explorerElement.getFragmentContext();
 		LSElement model = (LSElement)fragment.getModel();
 		model.addPainter( explorerHeadHoverPainter );
 		model.queueFullRedraw();
 	}
 	
-	private static void deactivateExplorerHighlight(PointerInputElement explorerElement)
+	private static void deactivateExplorerHighlight(LSElement explorerElement)
 	{
-		LSElement el = (LSElement)explorerElement;
-		FragmentView fragment = (FragmentView)el.getFragmentContext();
+		FragmentView fragment = (FragmentView)explorerElement.getFragmentContext();
 		LSElement model = (LSElement)fragment.getModel();
 		model.removePainter( explorerHeadHoverPainter );
 		model.queueFullRedraw();
@@ -2992,7 +2975,8 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 	
 	private static MotionElementInteractor explorerHeaderHoverInteractor = new MotionElementInteractor()
 	{
-		public void pointerEnter(PointerInputElement element, PointerMotionEvent event)
+		@Override
+		public void pointerEnter(LSElement element, PointerMotionEvent event)
 		{
 			if ( ( event.getModifiers() & Modifier.KEYS_MASK )  == 0 )
 			{
@@ -3000,13 +2984,14 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 			}
 		}
 
-		public void pointerLeave(PointerInputElement element, PointerMotionEvent event)
+		@Override
+		public void pointerLeave(LSElement element, PointerMotionEvent event)
 		{
 			deactivateExplorerHighlight( element );
 		}
 		
 		@Override
-		public void pointerMotion(PointerInputElement element, PointerMotionEvent event)
+		public void pointerMotion(LSElement element, PointerMotionEvent event)
 		{
 			// Suppress highlight if any modifier keys are pressed - this is helpful for capturing an element for SVG rendering. 
 			if ( ( event.getModifiers() & Modifier.KEYS_MASK )  != 0 )
@@ -3016,24 +3001,26 @@ abstract public class LSElement extends PointerInputElement implements Presentab
 		}
 
 		@Override
-		public void pointerLeaveIntoChild(PointerInputElement element, PointerMotionEvent event)
+		public void pointerLeaveIntoChild(LSElement element, PointerMotionEvent event)
 		{
 		}
 
 		@Override
-		public void pointerEnterFromChild(PointerInputElement element, PointerMotionEvent event)
+		public void pointerEnterFromChild(LSElement element, PointerMotionEvent event)
 		{
 		}
 	};
 
 	private static PushElementInteractor explorerHeaderInspectInteractor = new PushElementInteractor()
 	{
-		public boolean buttonPress(PointerInputElement element, PointerButtonEvent event)
+		@Override
+		public boolean buttonPress(LSElement element, PointerButtonEvent event)
 		{
 			return event.getButton() == 1;
 		}
 
-		public void buttonRelease(PointerInputElement element, PointerButtonEvent event)
+		@Override
+		public void buttonRelease(LSElement element, PointerButtonEvent event)
 		{
 			LSElement el = (LSElement)element;
 			FragmentView fragment = (FragmentView)el.getFragmentContext();

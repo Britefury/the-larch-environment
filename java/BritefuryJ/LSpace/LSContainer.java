@@ -256,7 +256,7 @@ public abstract class LSContainer extends LSElement
 	
 	
 	
-	protected LSElement getFirstChildAtLocalPoint(Point2 localPos)
+	public LSElement getFirstChildAtLocalPoint(Point2 localPos)
 	{
 		for (LSElement child: registeredChildren)
 		{
@@ -269,7 +269,7 @@ public abstract class LSContainer extends LSElement
 		return null;
 	}
 	
-	protected LSElement getLastChildAtLocalPoint(Point2 localPos)
+	public LSElement getLastChildAtLocalPoint(Point2 localPos)
 	{
 		for (int i = registeredChildren.size() - 1; i >= 0; i--)
 		{

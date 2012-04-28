@@ -10,6 +10,7 @@ import java.awt.geom.AffineTransform;
 import java.util.Iterator;
 import java.util.Stack;
 
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerMotionEvent;
 import BritefuryJ.LSpace.Event.PointerNavigationEvent;
@@ -29,7 +30,7 @@ public class PointerNavigationInteractor extends AbstractPointerDragInteractor
 	private Point2 navigationDragCurrentPos = new Point2();
 	private boolean bNavigationDragInProgress = false;
 	
-	private PointerInputElement navElement = null;
+	private LSElement navElement = null;
 	private NavigationElementInteractor navInteractor = null;
 	
 	
@@ -138,12 +139,12 @@ public class PointerNavigationInteractor extends AbstractPointerDragInteractor
 	
 	private void handleNavigationGestureBegin(PointerInterface pointer, PointerButtonEvent event)
 	{
-		Stack<PointerInputElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
+		Stack<LSElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
 		Stack<PointerButtonEvent> events = Pointer.eventStack( event, elements );
 		
 		while ( !elements.isEmpty() )
 		{
-			PointerInputElement element = elements.peek();
+			LSElement element = elements.peek();
 			PointerButtonEvent elementSpaceEvent = events.peek();
 			
 			Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( NavigationElementInteractor.class );
@@ -185,12 +186,12 @@ public class PointerNavigationInteractor extends AbstractPointerDragInteractor
 
 	private static void handleNavigationGestureClick(PointerInterface pointer, PointerNavigationEvent event)
 	{
-		Stack<PointerInputElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
+		Stack<LSElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
 		Stack<PointerNavigationEvent> events = Pointer.eventStack( event, elements );
 		
 		while ( !elements.isEmpty() )
 		{
-			PointerInputElement element = elements.pop();
+			LSElement element = elements.pop();
 			PointerNavigationEvent elementSpaceEvent = events.pop();
 			
 			Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( NavigationElementInteractor.class );

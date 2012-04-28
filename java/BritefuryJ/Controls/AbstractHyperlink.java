@@ -15,7 +15,6 @@ import BritefuryJ.LSpace.Browser.Location;
 import BritefuryJ.LSpace.Event.AbstractPointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
 import BritefuryJ.LSpace.Input.Modifier;
-import BritefuryJ.LSpace.Input.PointerInputElement;
 import BritefuryJ.LSpace.Interactor.ClickElementInteractor;
 import BritefuryJ.LSpace.Interactor.ContextMenuElementInteractor;
 import BritefuryJ.Pres.Pres;
@@ -80,10 +79,9 @@ public abstract class AbstractHyperlink extends ControlPres
 		
 		
 		@Override
-		public boolean contextMenu(PointerInputElement element, PopupMenu menu)
+		public boolean contextMenu(LSElement element, PopupMenu menu)
 		{
-			final LSElement linkElement = (LSElement)element;
-			final PageController pageController = linkElement.getRootElement().getPageController();
+			final PageController pageController = element.getRootElement().getPageController();
 
 			MenuItem.MenuItemListener openInNewTabListener = new MenuItem.MenuItemListener()
 			{
@@ -184,21 +182,20 @@ public abstract class AbstractHyperlink extends ControlPres
 			}
 			
 			@Override
-			public boolean testClickEvent(PointerInputElement element, AbstractPointerButtonEvent event)
+			public boolean testClickEvent(LSElement element, AbstractPointerButtonEvent event)
 			{
 				return true;
 			}
 
 			@Override
-			public boolean buttonClicked(PointerInputElement element, PointerButtonClickedEvent event)
+			public boolean buttonClicked(LSElement element, PointerButtonClickedEvent event)
 			{
-				LSElement hyperlinkElement = (LSElement)element;
-				if ( hyperlinkElement.isRealised() )
+				if ( element.isRealised() )
 				{
 					listener.onLinkClicked( AbstractHyperlinkControl.this, event );
 					if ( bClosePopupOnActivate )
 					{
-						hyperlinkElement.closeContainingPopupChain();
+						element.closeContainingPopupChain();
 					}
 					return true;
 				}

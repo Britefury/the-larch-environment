@@ -9,6 +9,7 @@ package BritefuryJ.LSpace.Input;
 import java.awt.geom.AffineTransform;
 import java.util.Stack;
 
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Interactor.AbstractElementInteractor;
@@ -16,7 +17,7 @@ import BritefuryJ.LSpace.Interactor.PushElementInteractor;
 
 public class PointerPushInteractor extends PointerInteractor
 {
-	private PointerInputElement pressedElement;
+	private LSElement pressedElement;
 	private AffineTransform pressedElementRootToLocalXform;
 	private PushElementInteractor pressedInteractor;
 	private int pressedButton;
@@ -24,15 +25,15 @@ public class PointerPushInteractor extends PointerInteractor
 	
 	public boolean buttonDown(Pointer pointer, PointerButtonEvent event)
 	{
-		Stack<PointerInputElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
+		Stack<LSElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
 		Stack<PointerButtonEvent> events = Pointer.eventStack( event, elements );
 		
 		while ( !elements.isEmpty() )
 		{
-			PointerInputElement element = elements.peek();
+			LSElement element = elements.peek();
 			PointerButtonEvent elementSpaceEvent = events.peek();
 			
-			if ( element.isPointerInputElementRealised() )
+			if ( element.isRealised() )
 			{
 				Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( PushElementInteractor.class );
 				if ( interactors != null )

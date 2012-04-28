@@ -14,7 +14,6 @@ import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.AbstractPointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
 import BritefuryJ.LSpace.Event.PointerMotionEvent;
-import BritefuryJ.LSpace.Input.PointerInputElement;
 import BritefuryJ.LSpace.Interactor.ClickElementInteractor;
 import BritefuryJ.LSpace.Interactor.HoverElementInteractor;
 import BritefuryJ.Live.LiveFunction;
@@ -49,13 +48,13 @@ public class OptionMenu extends ControlPres
 			
 			
 			@Override
-			public boolean testClickEvent(PointerInputElement element, AbstractPointerButtonEvent event)
+			public boolean testClickEvent(LSElement element, AbstractPointerButtonEvent event)
 			{
 				return event.getButton() == 1;
 			}
 
 			@Override
-			public boolean buttonClicked(PointerInputElement element, PointerButtonClickedEvent event)
+			public boolean buttonClicked(LSElement element, PointerButtonClickedEvent event)
 			{
 				displayDropdown();
 				return true;
@@ -63,13 +62,13 @@ public class OptionMenu extends ControlPres
 			
 			
 			@Override
-			public void pointerEnter(PointerInputElement element, PointerMotionEvent event)
+			public void pointerEnter(LSElement element, PointerMotionEvent event)
 			{
 				((LSBorder)element).setBorder( optionMenuHoverBorder );
 			}
 
 			@Override
-			public void pointerLeave(PointerInputElement element, PointerMotionEvent event)
+			public void pointerLeave(LSElement element, PointerMotionEvent event)
 			{
 				((LSBorder)element).setBorder( optionMenuBorder );
 			}

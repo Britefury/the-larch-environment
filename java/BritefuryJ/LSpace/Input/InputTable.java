@@ -12,6 +12,7 @@ import java.util.WeakHashMap;
 
 import javax.swing.JComponent;
 
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.PresentationComponent;
 import BritefuryJ.LSpace.LSRootElement;
 
@@ -20,16 +21,16 @@ import BritefuryJ.LSpace.LSRootElement;
 
 public class InputTable
 {
-	private WeakHashMap<PointerInputElement, ArrayList<PointerInterface>> pointersWithinBoundsByElement;
+	private WeakHashMap<LSElement, ArrayList<PointerInterface>> pointersWithinBoundsByElement;
 
 	protected Pointer mouse;
-	protected PointerInputElement rootElement;
+	protected LSElement rootElement;
 	protected JComponent component;
 	
 	
 	public InputTable(LSRootElement rootElement, DndController dndController, PresentationComponent component)
 	{
-		pointersWithinBoundsByElement = new WeakHashMap<PointerInputElement, ArrayList<PointerInterface>>();
+		pointersWithinBoundsByElement = new WeakHashMap<LSElement, ArrayList<PointerInterface>>();
 		this.rootElement = rootElement;
 		this.component = component;
 		mouse = new Pointer( this, rootElement, dndController, component );
@@ -43,7 +44,7 @@ public class InputTable
 	
 	
 	
-	public void onElementUnrealised(PointerInputElement element)
+	public void onElementUnrealised(LSElement element)
 	{
 		mouse.onElementUnrealised( element );
 	}
@@ -54,18 +55,18 @@ public class InputTable
 	}
 	
 	
-	public boolean arePointersWithinBoundsOfElement(PointerInputElement element)
+	public boolean arePointersWithinBoundsOfElement(LSElement element)
 	{
 		return pointersWithinBoundsByElement.containsKey( element );
 	}
 	
-	public ArrayList<PointerInterface> getPointersWithinBoundsOfElement(PointerInputElement element)
+	public ArrayList<PointerInterface> getPointersWithinBoundsOfElement(LSElement element)
 	{
 		return pointersWithinBoundsByElement.get( element );
 	}
 	
 	
-	protected void addPointerWithinElementBounds(PointerInterface pointer, PointerInputElement element)
+	protected void addPointerWithinElementBounds(PointerInterface pointer, LSElement element)
 	{
 		ArrayList<PointerInterface> pointersWithinBounds = pointersWithinBoundsByElement.get( element );
 		if ( pointersWithinBounds == null )
@@ -79,7 +80,7 @@ public class InputTable
 		}
 	}
 
-	protected void removePointerWithinElementBounds(PointerInterface pointer, PointerInputElement element)
+	protected void removePointerWithinElementBounds(PointerInterface pointer, LSElement element)
 	{
 		ArrayList<PointerInterface> pointersWithinBounds = pointersWithinBoundsByElement.get( element );
 		if ( pointersWithinBounds != null )

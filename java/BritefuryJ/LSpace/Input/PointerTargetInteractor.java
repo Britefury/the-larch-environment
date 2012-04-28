@@ -26,7 +26,7 @@ import BritefuryJ.Math.Point2;
 
 public class PointerTargetInteractor
 {
-	private PointerInputElement targetDragElement = null;
+	private LSElement targetDragElement = null;
 	private AffineTransform targetDragElementRootToLocalXform = null;
 	private TargetElementInteractor targetDragInteractor = null;
 	private boolean lastMousePressPositionedCaret = false;
@@ -51,15 +51,15 @@ public class PointerTargetInteractor
 				
 				
 				PointerInterface pointer = event.getPointer();
-				Stack<PointerInputElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
+				Stack<LSElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
 				Stack<PointerButtonEvent> events = Pointer.eventStack( event, elements );
 				
 				while ( !elements.isEmpty() )
 				{
-					PointerInputElement element = elements.peek();
+					LSElement element = elements.peek();
 					PointerButtonEvent elementSpaceEvent = events.peek();
 					
-					if ( element.isPointerInputElementRealised() )
+					if ( element.isRealised() )
 					{
 						Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( TargetElementInteractor.class );
 						if ( interactors != null )

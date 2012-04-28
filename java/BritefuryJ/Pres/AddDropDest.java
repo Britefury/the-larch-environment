@@ -22,9 +22,9 @@ public class AddDropDest extends Pres
 		this.child = child;
 	}
 	
-	public AddDropDest(Pres child, Class<?> dataType, ObjectDndHandler.CanDropFn canDropFn, ObjectDndHandler.DropFn dropFn)
+	public AddDropDest(Pres child, Class<?> dataType, ObjectDndHandler.CanDropFn canDropFn, ObjectDndHandler.DropHighlightFn highlightFn, ObjectDndHandler.DropFn dropFn)
 	{
-		this( child, new ObjectDndHandler.DropDest( dataType, canDropFn, dropFn ) );
+		this( child, new ObjectDndHandler.DropDest( dataType, canDropFn, highlightFn, dropFn ) );
 	}
 	
 	public AddDropDest(Pres child, Class<?> dataType, ObjectDndHandler.DropFn dropFn)
