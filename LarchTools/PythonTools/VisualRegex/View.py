@@ -30,7 +30,6 @@ from BritefuryJ.AttributeTable import *
 from BritefuryJ.Controls import *
 from BritefuryJ.Graphics import *
 from BritefuryJ.LSpace.Interactor import KeyElementInteractor
-from BritefuryJ.LSpace.Input import ObjectDndHandler
 
 from BritefuryJ.Pres import ApplyPerspective
 from BritefuryJ.Pres.Primitive import *

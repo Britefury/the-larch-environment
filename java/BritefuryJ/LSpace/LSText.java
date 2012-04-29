@@ -16,7 +16,6 @@ import BritefuryJ.LSpace.LayoutTree.LayoutNode;
 import BritefuryJ.LSpace.LayoutTree.LayoutNodeText;
 import BritefuryJ.LSpace.Marker.Marker;
 import BritefuryJ.LSpace.StyleParams.TextStyleParams;
-import BritefuryJ.LSpace.TextFocus.Caret;
 import BritefuryJ.LSpace.Util.TextVisual;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -186,7 +185,8 @@ public class LSText extends LSContentLeafEditable
 	//
 	//
 	
-	public void drawCaret(Graphics2D graphics, Caret c)
+	@Override
+	public void drawCaret(Graphics2D graphics, Marker c)
 	{
 		int index = c.getIndex();
 		if ( index < 0  ||  ( text.length() > 0  ?  ( index > text.length() )  :  ( index > 1 ) ) )

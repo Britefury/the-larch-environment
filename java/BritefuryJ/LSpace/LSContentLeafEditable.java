@@ -140,7 +140,7 @@ public abstract class LSContentLeafEditable extends LSContentLeaf
 	//
 	//
 	
-	public abstract void drawCaret(Graphics2D graphics, Caret c);
+	public abstract void drawCaret(Graphics2D graphics, Marker c);
 	
 	
 	protected void onCaretEnter(Caret c)

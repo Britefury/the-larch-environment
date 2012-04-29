@@ -75,7 +75,7 @@ public class Caret extends Target implements MarkerListener
 					graphics.setPaint( caretColour );
 				}
 				
-				element.drawCaret( graphics, this );
+				element.drawCaret( graphics, marker );
 				graphics.setPaint( prevPaint );
 			}
 		}

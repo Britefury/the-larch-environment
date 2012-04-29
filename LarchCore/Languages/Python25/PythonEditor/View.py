@@ -220,6 +220,11 @@ def spanCmpOpView(grammar, inheritedState, model, op, y):
 
 
 
+def _highlightDrop_embeddedObject(element, graphics, pos, action):
+	marker = Marker.atPointIn( element, pos, True )
+	if marker is not None  and  marker.isValid():
+		ObjectDndHandler.drawCaretDndHighlight( graphics, element, marker )
+
 def _onDrop_embeddedObject(element, pos, data, action):
 	def _displayException(e):
 		ApplyPerspective( None, Pres.coerce( e ) ).popupAtMousePosition( element, True, True )
@@ -281,7 +286,7 @@ def _onDrop_embeddedObject(element, pos, data, action):
 	return True
 
 
-_embeddedObject_dropDest = ObjectDndHandler.DropDest( FragmentData, _onDrop_embeddedObject )
+_embeddedObject_dropDest = ObjectDndHandler.DropDest( FragmentData, None, _highlightDrop_embeddedObject, _onDrop_embeddedObject )
 
 
 
