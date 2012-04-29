@@ -13,7 +13,6 @@ import BritefuryJ.LSpace.LayoutTree.LayoutNode;
 import BritefuryJ.LSpace.LayoutTree.LayoutNodeCaretSlot;
 import BritefuryJ.LSpace.Marker.Marker;
 import BritefuryJ.LSpace.StyleParams.CaretSlotStyleParams;
-import BritefuryJ.LSpace.TextFocus.Caret;
 import BritefuryJ.LSpace.Util.TextVisual;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -78,7 +77,7 @@ public class LSCaretSlot extends LSContentLeafEditable
 	//
 	
 	@Override
-	public void drawCaret(Graphics2D graphics, Caret c)
+	public void drawCaret(Graphics2D graphics, Marker c)
 	{
 		LayoutNode layout = getLayoutNode();
 		double deltaY = layout.getAllocationBox().getAllocRefY()  -  layout.getRequisitionBox().getReqRefY();

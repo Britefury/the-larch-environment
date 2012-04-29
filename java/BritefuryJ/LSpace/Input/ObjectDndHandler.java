@@ -8,6 +8,7 @@ package BritefuryJ.LSpace.Input;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -18,10 +19,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import BritefuryJ.Graphics.FilledOutlinePainter;
-import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.ElementPreview;
+import BritefuryJ.LSpace.LSContentLeafEditable;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Clipboard.LocalDataFlavor;
+import BritefuryJ.LSpace.Marker.Marker;
 import BritefuryJ.Math.Point2;
+import BritefuryJ.Math.Xform2;
 import BritefuryJ.Util.HashUtils;
 
 
@@ -49,10 +53,15 @@ public class ObjectDndHandler extends DndHandler
 
 	public static interface DropHighlightFn
 	{
-		public boolean drawDrawHighlight(Graphics2D graphics, LSElement destElement, Point2 targetPosition, int action);
+		public void drawDrawHighlight(LSElement destElement, Graphics2D graphics, Point2 targetPosition, int action);
 	}
 
 	
+	
+	public static final Color dndHighlightPaint = new Color( 1.0f, 0.5f, 0.0f );
+	public static final FilledOutlinePainter dndHighlightPainter = new FilledOutlinePainter( new Color( 1.0f, 0.8f, 0.0f, 0.2f ), new Color( 1.0f, 0.5f, 0.0f, 0.5f ) );
+	
+
 	
 	private static class DndPin
 	{
@@ -339,8 +348,6 @@ public class ObjectDndHandler extends DndHandler
 	
 	private static abstract class ObjectPotentialDrop  implements PotentialDrop
 	{
-		protected static final FilledOutlinePainter defaultPainter = new FilledOutlinePainter( new Color( 1.0f, 0.8f, 0.0f, 0.2f ), new Color( 1.0f, 0.5f, 0.0f, 0.5f ) );
-		
 		protected LSElement destElement;
 		protected DndDropSwing drop;
 		
@@ -361,7 +368,7 @@ public class ObjectDndHandler extends DndHandler
 		
 		protected void drawElementHighlight(Graphics2D graphics)
 		{
-			defaultPainter.drawShapes( graphics, destElement.getShapes() );
+			dndHighlightPainter.drawShapes( graphics, destElement.getShapes() );
 		}
 	}
 	
@@ -383,7 +390,7 @@ public class ObjectDndHandler extends DndHandler
 			AffineTransform x = destElement.pushLocalToRootGraphicsTransform( graphics );
 			if ( dest.dropHighlightFn != null )
 			{
-				dest.dropHighlightFn.drawDrawHighlight( graphics, destElement, drop.getTargetPosition(), drop.getDropAction() );
+				dest.dropHighlightFn.drawDrawHighlight( destElement, graphics, drop.getTargetPosition(), drop.getDropAction() );
 			}
 			else
 			{
@@ -441,7 +448,7 @@ public class ObjectDndHandler extends DndHandler
 			AffineTransform x = destElement.pushLocalToRootGraphicsTransform( graphics );
 			if ( dest.dropHighlightFn != null )
 			{
-				dest.dropHighlightFn.drawDrawHighlight( graphics, destElement, drop.getTargetPosition(), drop.getDropAction() );
+				dest.dropHighlightFn.drawDrawHighlight( destElement, graphics, drop.getTargetPosition(), drop.getDropAction() );
 			}
 			else
 			{
@@ -899,6 +906,28 @@ public class ObjectDndHandler extends DndHandler
 			typeToDest = new HashMap<Class<?>, DropDest>();
 			typeToDest.put( type, destForSuperClass );
 			return destForSuperClass;
+		}
+	}
+	
+	
+	
+	public static void drawCaretDndHighlight(Graphics2D graphics, LSElement dndTargetElement, Marker marker)
+	{
+		if ( marker != null  &&  marker.isValid() )
+		{
+			LSContentLeafEditable leaf = marker.getElement();
+			
+			AffineTransform prevX = graphics.getTransform();
+			Paint prevP = graphics.getPaint();
+			
+			Xform2 x = dndTargetElement.getRootToLocalXform();
+			x.apply( graphics );
+			graphics.setPaint( dndHighlightPaint );
+			
+			leaf.drawCaret( graphics, marker );
+			
+			graphics.setPaint( prevP );
+			graphics.setTransform( prevX );
 		}
 	}
 

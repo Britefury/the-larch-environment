@@ -547,7 +547,9 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 			inputTable.onRootElementReallocate();
 			long t2 = System.nanoTime();
 			double typesetTime = (double)(t2-t1) * 1.0e-9;
-			System.out.println( "RootElement.performAllocation(): TYPESET TIME = " + typesetTime  +  ", used memory = "  + ( Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() ) );
+			System.out.println( 
+					String.format( "LSRootElement.performAllocation(): TYPESET TIME = %.6f, used memory = %d",
+							typesetTime, ( Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() ) ) );
 			if ( profile != null )
 			{
 				profile.addMeasurement( new TypesetProfileMeasurement( typesetTime ) );

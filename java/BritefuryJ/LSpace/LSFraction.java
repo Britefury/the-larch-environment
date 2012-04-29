@@ -16,10 +16,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.LSpace.LayoutTree.LayoutNodeFraction;
+import BritefuryJ.LSpace.Marker.Marker;
 import BritefuryJ.LSpace.StyleParams.CaretSlotStyleParams;
 import BritefuryJ.LSpace.StyleParams.ContainerStyleParams;
 import BritefuryJ.LSpace.StyleParams.FractionStyleParams;
-import BritefuryJ.LSpace.TextFocus.Caret;
 import BritefuryJ.Math.Point2;
 
 public class LSFraction extends LSContainerNonOverlayed
@@ -91,7 +91,8 @@ public class LSFraction extends LSContainerNonOverlayed
 			popGraphicsTransform( graphics, current );
 		}
 
-		public void drawCaret(Graphics2D graphics, Caret c)
+		@Override
+		public void drawCaret(Graphics2D graphics, Marker c)
 		{
 			int index = c.getIndex();
 			

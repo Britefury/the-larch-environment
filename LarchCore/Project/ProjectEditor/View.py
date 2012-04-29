@@ -11,6 +11,7 @@ import os
 from java.lang import Object
 
 from java.awt import Color
+from java.awt.geom import Rectangle2D
 from java.awt import BasicStroke
 
 from java.awt.event import KeyEvent
@@ -54,9 +55,6 @@ from LarchCore.Project.ProjectPackage import ProjectPackage
 from LarchCore.Project.ProjectPage import ProjectPage
 from LarchCore.Project.ProjectNode import ProjectNode
 from LarchCore.Project import PageData
-
-
-
 
 
 
@@ -148,6 +146,16 @@ def _canDropOntoPage(element, targetPos, data, action):
 		return model is not data.source
 	return False
 
+def _highlightDropOntoPage(element, graphics, targetPos, action):
+	if action & ObjectDndHandler.COPY_OR_MOVE  !=  0:
+		if targetPos.y > ( element.getActualHeight() * 0.5 ):
+			# Highlight lower part
+			shape = Rectangle2D.Double( 0.0, element.getActualHeight() * 0.75, element.getActualWidth(), element.getActualHeight() * 0.25 )
+		else:
+			# Highlight upper part
+			shape = Rectangle2D.Double( 0.0, 0.0, element.getActualWidth(), element.getActualHeight() * 0.25 )
+		ObjectDndHandler.dndHighlightPainter.drawShape( graphics, shape )
+
 def _dropOntoPage(element, targetPos, data, action):
 	if action & ObjectDndHandler.COPY_OR_MOVE  !=  0:
 		destPage = _getModelOfPackageOrPageNameElement( element )
@@ -184,6 +192,20 @@ def _canDropOntoPackage(element, targetPos, data, action):
 			return True
 	return False
 
+def _highlightDropOntoPackage(element, graphics, targetPos, action):
+	if action & ObjectDndHandler.COPY_OR_MOVE  !=  0:
+		if targetPos.x > ( element.getActualWidth() * 0.5 ):
+			# Highlight right part
+			shape = Rectangle2D.Double( element.getActualWidth() * 0.75, 0.0, element.getActualWidth() * 0.25, element.getActualHeight() )
+		else:
+			if targetPos.y > ( element.getActualHeight() * 0.5 ):
+				# Highlight lower part
+				shape = Rectangle2D.Double( 0.0, element.getActualHeight() * 0.75, element.getActualWidth(), element.getActualHeight() * 0.25 )
+			else:
+				# Highlight upper part
+				shape = Rectangle2D.Double( 0.0, 0.0, element.getActualWidth(), element.getActualHeight() * 0.25 )
+		ObjectDndHandler.dndHighlightPainter.drawShape( graphics, shape )
+
 def _dropOntoPackage(element, targetPos, data, action):
 	if action & ObjectDndHandler.COPY_OR_MOVE  !=  0:
 		destPackage, index = _getDestPackageAndIndex( element, targetPos )
@@ -215,8 +237,8 @@ def _projectIndexDrop(element, targetPos, data, action):
 	return False
 
 
-_pageDropDest = ObjectDndHandler.DropDest( ProjectDrag, _canDropOntoPage, None, _dropOntoPage )
-_packageDropDest = ObjectDndHandler.DropDest( ProjectDrag, _canDropOntoPackage, None, _dropOntoPackage )
+_pageDropDest = ObjectDndHandler.DropDest( ProjectDrag, _canDropOntoPage, _highlightDropOntoPage, _dropOntoPage )
+_packageDropDest = ObjectDndHandler.DropDest( ProjectDrag, _canDropOntoPackage, _highlightDropOntoPackage, _dropOntoPackage )
 _projectIndexDropDest = ObjectDndHandler.DropDest( ProjectDrag, _projectIndexDrop )
 
 
