@@ -14,12 +14,14 @@ import BritefuryJ.StyleSheet.StyleValues;
 
 public class StructuralItem extends Pres
 {
+	private SequentialEditor editor;
 	private Object model;
 	private Pres child;
 	
 	
-	public StructuralItem(Object model, Object child)
+	public StructuralItem(SequentialEditor editor, Object model, Object child)
 	{
+		this.editor = editor;
 		this.model = model;
 		this.child = coerceNonNull( child );
 	}
@@ -29,7 +31,10 @@ public class StructuralItem extends Pres
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		LSElement element = child.present( ctx, style );
-		element.addTreeEventListener( SequentialEditor.getClearNeighbouringStructuralValueListener() );
+		if ( editor.isClearNeighbouringStructuresEnabled() )
+		{
+			element.addTreeEventListener( SequentialEditor.getClearNeighbouringStructuralValueListener() );
+		}
 		element.setFixedValue( model );
 		return element;
 	}

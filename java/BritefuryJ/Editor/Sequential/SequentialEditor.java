@@ -199,6 +199,11 @@ public abstract class SequentialEditor
 		return clearNeighbourListener;
 	}
 	
+	public boolean isClearNeighbouringStructuresEnabled()
+	{
+		return false;
+	}
+	
 	
 	
 	public Region region(Object child)

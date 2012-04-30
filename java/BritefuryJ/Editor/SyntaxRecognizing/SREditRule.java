@@ -36,7 +36,7 @@ public class SREditRule extends SRAbstractEditRule
 		
 		if ( editMode == SyntaxRecognizingEditor.EditMode.EDIT )
 		{
-			view = new EditableSequentialItem( editListeners, view );
+			view = new EditableSequentialItem( editor, editListeners, view );
 		}
 		
 		return view;

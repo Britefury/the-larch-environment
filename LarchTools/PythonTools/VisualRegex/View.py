@@ -332,7 +332,7 @@ class VREView (MethodDispatchView):
 			elif isinstance( x, DMObjectInterface ):
 				view = SREInnerFragment( x, PRECEDENCE_CONTAINER_UNPARSED, EditMode.DISPLAY )
 				#<NO_TREE_EVENT_LISTENER>
-				view = StructuralItem( x, view )
+				view = StructuralItem( VisualRegexSyntaxRecognizingEditor.instance, x, view )
 				return view
 			else:
 				raise TypeError, 'UNPARSED should contain a list of only strings or nodes, not a %s'  %  ( type( x ), )

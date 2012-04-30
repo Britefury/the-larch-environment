@@ -185,11 +185,11 @@ def compoundStatementEditor(pythonView, inheritedState, model, compoundBlocks):
 
 
 		if suite is not None:
-			indent = StructuralItem( Schema.Indent(), indentElement() )
+			indent = StructuralItem( PythonSyntaxRecognizingEditor.instance, Schema.Indent(), indentElement() )
 
 			lineViews = SREInnerFragment.map( suite, PRECEDENCE_NONE, EditMode.EDIT )
 
-			dedent = StructuralItem( Schema.Dedent(), dedentElement() )
+			dedent = StructuralItem( PythonSyntaxRecognizingEditor.instance, Schema.Dedent(), dedentElement() )
 
 			suiteElement = indentedBlock( indent, lineViews, dedent )
 			suiteElement = SoftStructuralItem( PythonSyntaxRecognizingEditor.instance, pythonView._makeCompoundSuiteEditFilter( suite ), Schema.IndentedBlock( suite=suite ), suiteElement )
@@ -561,7 +561,7 @@ def SpecialFormExpression(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
 		v = v.withContextMenuInteractor( _specialFormExprContextMenuFactory )
-		return StructuralItem( model, v )
+		return StructuralItem( PythonSyntaxRecognizingEditor.instance, model, v )
 	return redecorateDispatchMethod( method, _m )
 
 
@@ -569,7 +569,7 @@ def SpecialFormExpression(method):
 def SpecialFormStatement(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
-		v = StructuralItem( model, v )
+		v = StructuralItem( PythonSyntaxRecognizingEditor.instance, model, v )
 		v = specialFormStatementLine( v )
 		v = self._specialFormStatementEditRule.applyToFragment( v, model, inheritedState )
 		v = _applyIndentationShortcuts( v )
@@ -581,7 +581,7 @@ def SpecialFormStatement(method):
 def EmbeddedObjectExpression(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
-		return StructuralItem( model, v )
+		return StructuralItem( PythonSyntaxRecognizingEditor.instance, model, v )
 	return redecorateDispatchMethod( method, _m )
 
 
@@ -714,7 +714,7 @@ class Python25View (MethodDispatchView):
 			elif isinstance( x, DMObjectInterface ):
 				view = SREInnerFragment( x, PRECEDENCE_CONTAINER_UNPARSED, EditMode.DISPLAY )
 				#<NO_TREE_EVENT_LISTENER>
-				view = StructuralItem( x, view )
+				view = StructuralItem( PythonSyntaxRecognizingEditor.instance, x, view )
 				return view
 			else:
 				raise TypeError, 'UNPARSED should contain a list of only strings or nodes, not a %s'  %  ( type( x ), )
@@ -1647,11 +1647,11 @@ class Python25View (MethodDispatchView):
 	# Indented block
 	@DMObjectNodeDispatchMethod( Schema.IndentedBlock )
 	def IndentedBlock(self, fragment, inheritedState, model, suite):
-		indent = StructuralItem( Schema.Indent(), indentElement() )
+		indent = StructuralItem( PythonSyntaxRecognizingEditor.instance, Schema.Indent(), indentElement() )
 
 		lineViews = SREInnerFragment.map( suite, PRECEDENCE_NONE, EditMode.EDIT )
 
-		dedent = StructuralItem( Schema.Dedent(), dedentElement() )
+		dedent = StructuralItem( PythonSyntaxRecognizingEditor.instance, Schema.Dedent(), dedentElement() )
 
 		suiteElement = badIndentedBlock( indent, lineViews, dedent )
 		suiteElement = SoftStructuralItem( PythonSyntaxRecognizingEditor.instance,

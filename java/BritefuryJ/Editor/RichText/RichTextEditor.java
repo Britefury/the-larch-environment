@@ -342,7 +342,7 @@ public abstract class RichTextEditor extends SequentialEditor
 	public Pres editableInlineEmbed(Object model, Object child)
 	{
 		child = new Proxy( child );
-		Pres p = new StructuralItem( model, child );
+		Pres p = new StructuralItem( this, model, child );
 		return p.withProperty( inlineEmbedPropertyKey, model );
 	}
 	
@@ -361,7 +361,7 @@ public abstract class RichTextEditor extends SequentialEditor
 	
 	public Pres editableParagraphEmbed(Object model, Object child)
 	{
-		Pres p = new StructuralItem( model, child );
+		Pres p = new StructuralItem( this, model, child );
 		return p.withProperty( paragraphEmbedPropertyKey, model ).withProperty( blockItemPropertyKey, model );
 	}
 	

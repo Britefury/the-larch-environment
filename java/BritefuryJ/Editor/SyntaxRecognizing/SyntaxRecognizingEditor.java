@@ -351,4 +351,9 @@ public abstract class SyntaxRecognizingEditor extends SequentialRichStringEditor
 	{
 		return value.isTextual()  &&  whitespace.matcher( value.textualValue() ).matches();
 	}
+	
+	public boolean isClearNeighbouringStructuresEnabled()
+	{
+		return true;
+	}
 }
