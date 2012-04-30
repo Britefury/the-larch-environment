@@ -27,7 +27,6 @@ import BritefuryJ.LSpace.ElementTreeVisitor;
 import BritefuryJ.LSpace.LSContentLeafEditable;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.TextEditEvent;
-import BritefuryJ.LSpace.TreeEventListener;
 import BritefuryJ.LSpace.Marker.Marker;
 import BritefuryJ.LSpace.TextFocus.Caret;
 import BritefuryJ.LSpace.TextFocus.TextSelection;
@@ -265,7 +264,7 @@ public abstract class RichTextEditor extends SequentialEditor
 					{
 						handled = setTextContentsFromRichString( fragment.getView().getLog(), model, value );
 					}
-					return handled  ?  EditFilter.HandleEditResult.HANDLED  :  EditFilter.HandleEditResult.PASS_TO_PARENT;
+					return handled  ?  EditFilter.HandleEditResult.HANDLED  :  EditFilter.HandleEditResult.NOT_HANDLED;
 				}
 				return HandleEditResult.NOT_HANDLED;
 			}
@@ -284,12 +283,12 @@ public abstract class RichTextEditor extends SequentialEditor
 					{
 						handled = setParagraphTextContentsFromRichString( fragment.getView().getLog(), model, value );
 					}
-					return handled  ?  EditFilter.HandleEditResult.HANDLED  :  EditFilter.HandleEditResult.PASS_TO_PARENT;
+					return handled  ?  EditFilter.HandleEditResult.HANDLED  :  EditFilter.HandleEditResult.NOT_HANDLED;
 				}
 				else if ( event instanceof SelectionEditTreeEvent )
 				{
-					boolean handled = setParagraphContentsFromBlockRichString( fragment.getView().getLog(), model, value );
-					return handled  ?  EditFilter.HandleEditResult.HANDLED  :  EditFilter.HandleEditResult.PASS_TO_PARENT;
+					boolean handled = setParagraphContentsFromCompleteParagraphRichString( fragment.getView().getLog(), model, value );
+					return handled  ?  EditFilter.HandleEditResult.HANDLED  :  EditFilter.HandleEditResult.NOT_HANDLED;
 				}
 				return HandleEditResult.NOT_HANDLED;
 			}
@@ -355,7 +354,7 @@ public abstract class RichTextEditor extends SequentialEditor
 	public Pres editableParagraph(Object model, Object child)
 	{
 		child = editableParaStyle.applyTo( child );
-		Pres p = new SoftStructuralItem( this, Arrays.asList( new TreeEventListener[] { paraEditListener } ), model, child );
+		Pres p = new SoftStructuralItem( this, paraEditListener, model, child );
 		return p.withProperty( paragraphPropertyKey, model ).withProperty( blockItemPropertyKey, model );
 	}
 	
@@ -531,7 +530,7 @@ public abstract class RichTextEditor extends SequentialEditor
 						LSElement paragraphElement = targetPropValue.getElement();
 						FragmentView paragraphFragment = (FragmentView)paragraphElement.getFragmentContext();
 						RichString richStr = richStringWithModifiedSelectionStyle( paragraphElement, selection, computeSpanStyles );
-						setParagraphContentsFromBlockRichString( paragraphFragment.getView().getLog(), paragraphModel, richStr );
+						setParagraphContentsFromCompleteParagraphRichString( paragraphFragment.getView().getLog(), paragraphModel, richStr );
 					}
 					else if ( targetPropValue.getKey() == blockPropertyKey )
 					{
@@ -610,18 +609,21 @@ public abstract class RichTextEditor extends SequentialEditor
 	}
 
 
-	protected boolean setParagraphContentsFromBlockRichString(Log log, Object paragraph, RichString richStr)
+	protected boolean setParagraphContentsFromCompleteParagraphRichString(Log log, Object paragraph, RichString richStr)
 	{
 		if ( log.isRecording() )
 		{
-			log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setParagraphContentsFromBlockRichString" ).vItem( "richStr", richStr ) );
+			log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setParagraphContentsFromCompleteParagraphRichString" ).vItem( "richStr", richStr ) );
 		}
 		List<Object> items = richStr.getItemValues();
 		if ( items.size() == 1 )
 		{
-			EdParagraph block = (EdParagraph)items.get( 0 );
-			List<? extends Object> contents = block.getContents();
-			setModelContentsFromEditorModelRichString( paragraph, new RichStringBuilder( contents ).richString() );
+			EdParagraph inputPara = (EdParagraph)items.get( 0 );
+			List<? extends Object> contents = inputPara.getContents();
+			RichString contentRichStr = new RichStringBuilder( contents ).richString();
+			setModelContentsFromEditorModelRichString( paragraph, contentRichStr );
+			// No need to return false if newlines detected.
+			// They will have been replaced by paragraphs in an earlier stage of processing.
 			return true;
 		}
 		else
@@ -879,8 +881,16 @@ public abstract class RichTextEditor extends SequentialEditor
 	@Override
 	protected Object textToSequentialForImport(String text)
 	{
-		EdStyleSpan span = new EdStyleSpan( Arrays.asList( new Object[] { text } ), new HashMap<Object, Object>() );
-		return Arrays.asList( new EdNode[] { span } );
+		if ( text.contains( "\n" ) )
+		{
+			// If the text contains newlines, convert to flattened paragraphs
+			return Flatten.flattenParagraphs( Arrays.asList( new Object[] { text } ) );
+		}
+		else
+		{
+			EdStyleSpan span = new EdStyleSpan( Arrays.asList( new Object[] { text } ), new HashMap<Object, Object>() );
+			return Arrays.asList( new EdNode[] { span } );
+		}
 	}
 
 	@Override
@@ -909,7 +919,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		splicedFlattened.add( embed );
 		splicedFlattened.addAll( v2.flattened() );
 		ArrayList<Object> splicedMerged = Merge.mergeParagraphs( splicedFlattened );
-		setParagraphContentsFromBlockRichString( log, paragraph, new RichStringBuilder( splicedMerged ).richString() );
+		setParagraphContentsFromCompleteParagraphRichString( log, paragraph, new RichStringBuilder( splicedMerged ).richString() );
 	}
 
 	protected void removeInlineEmbedFromText(Log log, LSElement paragraphElement, LSElement embedElement, Object paragraphModel, Object textModel, Object embedModel)
@@ -922,8 +932,7 @@ public abstract class RichTextEditor extends SequentialEditor
 		splicedFlattened.addAll( v1.flattened() );
 		splicedFlattened.addAll( v2.flattened() );
 		ArrayList<Object> splicedMerged = Merge.mergeParagraphs( splicedFlattened );
-		setParagraphContentsFromBlockRichString( log, paragraphModel, new RichStringBuilder( splicedMerged ).richString() );
-		//removeInlineEmbed( textModel, embedModel );
+		setParagraphContentsFromCompleteParagraphRichString( log, paragraphModel, new RichStringBuilder( splicedMerged ).richString() );
 	}
 
 
