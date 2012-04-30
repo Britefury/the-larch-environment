@@ -52,7 +52,10 @@ public class SoftStructuralItem extends Pres
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		LSElement element = child.present( ctx, style );
-		element.addTreeEventListener( SequentialEditor.getClearNeighbouringStructuralValueListener() );
+		if ( editor.isClearNeighbouringStructuresEnabled() )
+		{
+			element.addTreeEventListener( SequentialEditor.getClearNeighbouringStructuralValueListener() );
+		}
 		element.setFixedValue( model );
 		element.addTreeEventListener( editor.getClearStructuralValueListener() );
 		for (TreeEventListener listener: editListeners)

@@ -53,13 +53,12 @@ public class IncrementalViewPage extends BrowserPage
 	
 	public IncrementalViewPage(Pres pres, String title, ProjectiveBrowserContext browserContext, ChangeHistory changeHistory, BrowserIncrementalView view, Subject subject)
 	{
+		this.pagePres = pres;
 		this.title = title;
 		this.changeHistory = changeHistory;
 		this.view = view;
 		this.subject = subject;
 		this.browserContext = browserContext;
-		
-		pagePres = pres.withCommands( pageLogCmdSet );
 	}
 	
 	
