@@ -62,16 +62,22 @@ class _FragmentSelectorEntryInteractor (HoverElementInteractor, PushElementInter
 
 
 	def pointerEnter(self, element, event):
-		self._fragmentElement.addPainter( _FragmentContentHighlighter.instance )
-		self._fragmentElement.queueFullRedraw()
+		if self._fragmentElement is not None:
+			self._fragmentElement.addPainter( _FragmentContentHighlighter.instance )
+			self._fragmentElement.queueFullRedraw()
 
 	def pointerLeave(self, element, event):
-		self._fragmentElement.removePainter( _FragmentContentHighlighter.instance )
-		self._fragmentElement.queueFullRedraw()
+		if self._fragmentElement is not None:
+			self._fragmentElement.removePainter( _FragmentContentHighlighter.instance )
+			self._fragmentElement.queueFullRedraw()
 
 
 	def buttonPress(self, element, event):
 		if event.button == 1:
+			if self._fragmentElement is not None:
+				self._fragmentElement.removePainter( _FragmentContentHighlighter.instance )
+				self._fragmentElement.queueFullRedraw()
+				self._fragmentElement = None
 			self._selectorEntry._onClick()
 			element.closeContainingPopupChain()
 			return True
