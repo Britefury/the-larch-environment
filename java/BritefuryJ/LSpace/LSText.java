@@ -262,6 +262,7 @@ public class LSText extends LSContentLeafEditable
 	//
 	//
 	
+	@Override
 	public void insertText(int index, String x)
 	{
 		text = text.substring( 0, index ) + x + text.substring( index );
@@ -270,6 +271,7 @@ public class LSText extends LSContentLeafEditable
 		super.insertText( index, x );
 	}
 
+	@Override
 	public void removeText(int index, int length)
 	{
 		text = text.substring( 0, index ) + text.substring( index + length );
@@ -279,6 +281,7 @@ public class LSText extends LSContentLeafEditable
 	}
 	
 
+	@Override
 	public void replaceText(int index, int length, String x)
 	{
 		text = text.substring( 0, index )  +  x  +  text.substring( index + length );
