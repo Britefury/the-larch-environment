@@ -528,7 +528,7 @@ public abstract class LSContentLeafEditable extends LSContentLeaf
 			{
 				if ( isEditable() )
 				{
-					insertText( caret.getMarker(), String.valueOf( event.getKeyChar() ) );
+					insertText( caret.getMarker(), str );
 				}
 
 				return true;
