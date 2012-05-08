@@ -14,7 +14,7 @@ from LarchTools.EmbeddedData.RealEditorSpinEntry import RealEditorSpinEntry
 from LarchTools.EmbeddedData.StringEditorTextEntry import StringEditorTextEntry
 from LarchTools.EmbeddedData.StringEditorTextArea import StringEditorTextArea
 from LarchTools.EmbeddedData.ColourEditorPicker import ColourEditorPicker
-from LarchTools.EmbeddedData.FilePathEditorTextEntry import FilePathEditorTextEntry
+from LarchTools.EmbeddedData.PathEditorTextEntry import FilePathEditorTextEntry, DirPathEditorTextEntry
 
 
 
@@ -60,5 +60,12 @@ def _newFilePathEntryAtCaret(caret):
 _filePathEntryCommand = Command( '&File &Path &Entry', _newFilePathEntryAtCaret )
 
 
+@EmbeddedExpressionAtCaretAction
+def _newDirPathEntryAtCaret(caret):
+	return DirPathEditorTextEntry()
+
+_dirPathEntryCommand = Command( '&Directory &Path &Entry', _newDirPathEntryAtCaret )
+
+
 PythonCommandSet( 'LarchTools.EmbeddedData', [ _intSpinCommand, _realSpinCommand, _textEntryCommand, _textAreaCommand,
-                                                       _colourPickerCommand, _filePathEntryCommand ] )
+                                                       _colourPickerCommand, _filePathEntryCommand, _dirPathEntryCommand ] )
