@@ -621,7 +621,7 @@ def embeddedObjectLiteral(ctx, style, valueView):
 	embeddedObjectTagLabelStyle = style.get( PythonEditorStyle.embeddedObjectTagLabelStyle )
 	embeddedObjectTagBorder = style.get( PythonEditorStyle.embeddedObjectTagBorder )
 
-	tagLabel = embeddedObjectTagBorder.surround( embeddedObjectTagLabelStyle( Label( 'L' ) ) )
+	tagLabel = embeddedObjectTagBorder.surround( embeddedObjectTagLabelStyle( Label( 'l' ) ) )
 	contents = Row( [ tagLabel.alignVCentre(), valueView.pad( 2.0, 2.0 ) ] )
 	box = embeddedObjectLiteralBorder.surround( contents ).padX( 1.0, 1.0 )
 
@@ -636,7 +636,7 @@ def embeddedObjectExpr(ctx, style, valueView):
 	embeddedObjectTagLabelStyle = style.get( PythonEditorStyle.embeddedObjectTagLabelStyle )
 	embeddedObjectTagBorder = style.get( PythonEditorStyle.embeddedObjectTagBorder )
 
-	tagLabel = embeddedObjectTagBorder.surround( embeddedObjectTagLabelStyle( Label( 'X' ) ) )
+	tagLabel = embeddedObjectTagBorder.surround( embeddedObjectTagLabelStyle( Label( 'e' ) ) )
 	contents = Row( [ tagLabel.alignVCentre(), valueView.pad( 2.0, 2.0 ) ] )
 	box = embeddedObjectBorder.surround( contents ).padX( 1.0, 1.0 )
 
