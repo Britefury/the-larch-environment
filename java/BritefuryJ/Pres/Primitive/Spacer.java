@@ -27,6 +27,6 @@ public class Spacer extends Pres
 	@Override
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		return new LSSpacer( minWidth, minHeight );
+		return new LSSpacer( Primitive.elementParams.get( style ), minWidth, minHeight );
 	}
 }

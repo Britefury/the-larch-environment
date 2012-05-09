@@ -11,6 +11,7 @@ import org.python.core.Py;
 import org.python.core.PyObject;
 
 import BritefuryJ.Incremental.IncrementalFunctionMonitor;
+import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
 
 
@@ -161,6 +162,11 @@ public class LiveFunction extends LiveInterface
 	public void removeListener(IncrementalMonitorListener listener)
 	{
 		inc.removeListener( listener );
+	}
+	
+	public IncrementalMonitor getIncrementalMonitor()
+	{
+		return inc;
 	}
 	
 	

@@ -9,9 +9,10 @@ package BritefuryJ.Live;
 
 
 import BritefuryJ.DefaultPerspective.PrimitivePresenter;
+import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
-import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.ElementValueFunction;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Pres.ApplyPerspective;
 import BritefuryJ.Pres.CompositePres;
 import BritefuryJ.Pres.InnerFragment;
@@ -89,6 +90,7 @@ public abstract class LiveInterface extends CompositePres
 	
 	public abstract void addListener(IncrementalMonitorListener listener);
 	public abstract void removeListener(IncrementalMonitorListener listener);
+	public abstract IncrementalMonitor getIncrementalMonitor();
 	
 	
 	

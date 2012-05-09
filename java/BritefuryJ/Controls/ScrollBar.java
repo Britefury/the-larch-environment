@@ -68,9 +68,9 @@ public abstract class ScrollBar extends ControlPres
 	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
 		double scrollBarSize = style.get( Controls.scrollBarSize, Double.class ); 
-		double dragBoxPadding = style.get( Controls.scrollBarArrowDragboxPadding, Double.class ); 
-		double dragBoxRounding = style.get( Controls.scrollBarArrowDragboxRounding, Double.class );
-		double dragBoxMinSize = style.get( Controls.scrollBarArrowDragboxMinSize, Double.class );
+		double dragBoxPadding = style.get( Controls.scrollBarDragboxPadding, Double.class ); 
+		double dragBoxRounding = style.get( Controls.scrollBarDragboxRounding, Double.class );
+		double dragBoxMinSize = style.get( Controls.scrollBarDragboxMinSize, Double.class );
 		Painter dragBoxPainter = style.get( Controls.scrollBarDragBoxPainter, Painter.class );
 		Painter dragBoxHoverPainter = style.get( Controls.scrollBarDragBoxHoverPainter, Painter.class );
 		
@@ -88,7 +88,5 @@ public abstract class ScrollBar extends ControlPres
 	
 	
 	protected abstract ScrollBarHelper.Axis getAxis();
-	protected abstract Pres createDecArrow(double arrowSize);
-	protected abstract Pres createIncArrow(double arrowSize);
 	protected abstract Pres createDragBox(double scrollBarSize);
 }

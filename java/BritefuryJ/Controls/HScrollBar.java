@@ -8,7 +8,6 @@ package BritefuryJ.Controls;
 
 import BritefuryJ.LSpace.Util.Range;
 import BritefuryJ.Pres.Pres;
-import BritefuryJ.Pres.Primitive.Arrow;
 import BritefuryJ.Pres.Primitive.Box;
 
 public class HScrollBar extends ScrollBar
@@ -22,16 +21,6 @@ public class HScrollBar extends ScrollBar
 	protected ScrollBarHelper.Axis getAxis()
 	{
 		return ScrollBarHelper.Axis.HORIZONTAL;
-	}
-	
-	protected Pres createDecArrow(double arrowSize)
-	{
-		return new Arrow( Arrow.Direction.LEFT, arrowSize ).alignHPack().alignVCentre();
-	}
-	
-	protected Pres createIncArrow(double arrowSize)
-	{
-		return new Arrow( Arrow.Direction.RIGHT, arrowSize ).alignHPack().alignVCentre();
 	}
 	
 	protected Pres createDragBox(double scrollBarSize)

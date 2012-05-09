@@ -129,10 +129,21 @@ public class Controls
 			new FillPainter( Color.WHITE ) );
 	public static final InheritedAttribute scrollBarDragBackgroundHoverPainter = new InheritedAttribute( controlsNamespace, "scrollBarDragBackgroundHoverPainter", Painter.class,
 			new FilledOutlinePainter( Color.WHITE, new Color( 0.75f, 0.75f, 0.75f ), new BasicStroke( 1.0f ) ) );
-	public static final InheritedAttributeNonNull scrollBarArrowDragboxPadding = new InheritedAttributeNonNull( controlsNamespace, "scrollBarArrowDragboxPadding", Double.class, 2.0 );
-	public static final InheritedAttributeNonNull scrollBarArrowDragboxRounding = new InheritedAttributeNonNull( controlsNamespace, "scrollBarArrowDragboxRounding", Double.class, 4.0 );
-	public static final InheritedAttributeNonNull scrollBarArrowDragboxMinSize = new InheritedAttributeNonNull( controlsNamespace, "scrollBarArrowDragboxMinSize", Double.class, 9.0 );
+	public static final InheritedAttributeNonNull scrollBarDragboxPadding = new InheritedAttributeNonNull( controlsNamespace, "scrollBarDragboxPadding", Double.class, 2.0 );
+	public static final InheritedAttributeNonNull scrollBarDragboxRounding = new InheritedAttributeNonNull( controlsNamespace, "scrollBarDragboxRounding", Double.class, 4.0 );
+	public static final InheritedAttributeNonNull scrollBarDragboxMinSize = new InheritedAttributeNonNull( controlsNamespace, "scrollBarDragboxMinSize", Double.class, 9.0 );
 	public static final InheritedAttributeNonNull scrollBarSize = new InheritedAttributeNonNull( controlsNamespace, "scrollBarSize", Double.class, 16.0 );
+	
+	
+	public static final InheritedAttribute sliderBackgroundPainter = new InheritedAttribute( controlsNamespace, "sliderBackgroundPainter", Painter.class,
+			new OutlinePainter( new Color( 0.6f, 0.6f, 0.6f ), new BasicStroke( 1.0f ) ) );
+	public static final InheritedAttribute sliderBackgroundHoverPainter = new InheritedAttribute( controlsNamespace, "sliderBackgroundHoverPainter", Painter.class,
+			new OutlinePainter( new Color( 0.5f, 0.5f, 0.5f ), new BasicStroke( 1.0f ) ) );
+	public static final InheritedAttributeNonNull sliderPivotPaint = new InheritedAttributeNonNull( controlsNamespace, "sliderPivotPaint", Paint.class, new Color( 255, 143, 0 ) );
+	public static final InheritedAttributeNonNull sliderValuePainter = new InheritedAttributeNonNull( controlsNamespace, "sliderValuePainter", Painter.class,
+			new FillPainter( new Color( 255, 194, 51 ) ) );
+	public static final InheritedAttributeNonNull sliderRounding = new InheritedAttributeNonNull( controlsNamespace, "sliderDragboxRounding", Double.class, 6.0 );
+	public static final InheritedAttributeNonNull sliderSize = new InheritedAttributeNonNull( controlsNamespace, "sliderSize", Double.class, 16.0 );
 	
 	
 	public static final InheritedAttributeNonNull objectDropBoxClassNameStyle = new InheritedAttributeNonNull( controlsNamespace, "objectDropBoxClassNameStyle", StyleSheet.class,
