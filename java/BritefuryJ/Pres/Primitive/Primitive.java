@@ -30,6 +30,7 @@ import BritefuryJ.LSpace.StyleParams.CaretSlotStyleParams;
 import BritefuryJ.LSpace.StyleParams.ColumnStyleParams;
 import BritefuryJ.LSpace.StyleParams.ContainerStyleParams;
 import BritefuryJ.LSpace.StyleParams.ContentLeafStyleParams;
+import BritefuryJ.LSpace.StyleParams.ElementStyleParams;
 import BritefuryJ.LSpace.StyleParams.FractionStyleParams;
 import BritefuryJ.LSpace.StyleParams.GridRowStyleParams;
 import BritefuryJ.LSpace.StyleParams.LabelStyleParams;
@@ -124,6 +125,26 @@ public class Primitive
 		}
 	};
 
+	
+	
+	protected static DerivedValueTable<ElementStyleParams> elementParams = new DerivedValueTable<ElementStyleParams>( primitiveNamespace )
+	{
+		protected ElementStyleParams evaluate(AttributeTable attribs)
+		{
+			return new ElementStyleParams(
+					attribs.get( hAlign, HAlignment.class ),
+					attribs.get( vAlign, VAlignment.class ),
+					attribs.get( background, Painter.class ),
+					attribs.get( hoverBackground, Painter.class ),
+					attribs.get( cursor, Cursor.class ) );
+		}
+	};
+	
+	protected static StyleValues useElementParams(StyleValues style)
+	{
+		return style.useAttr( hAlign ).useAttr( vAlign ).useAttr( background ).useAttr( hoverBackground ).useAttr( cursor );
+	}
+	
 	
 	
 	protected static AbstractBorder getBorderParams(StyleValues style)

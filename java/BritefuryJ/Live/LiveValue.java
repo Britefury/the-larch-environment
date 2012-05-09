@@ -7,6 +7,7 @@
 //##************************
 package BritefuryJ.Live;
 
+import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalValueMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
 
@@ -14,7 +15,7 @@ import BritefuryJ.Incremental.IncrementalMonitorListener;
 public class LiveValue extends LiveInterface
 {
 	private IncrementalValueMonitor inc;
-	private Object value;
+	private Object val;
 	
 	
 	
@@ -27,13 +28,13 @@ public class LiveValue extends LiveInterface
 	{
 		super();
 		inc = new IncrementalValueMonitor( this );
-		this.value = value;
+		this.val = value;
 	}
 	
 	
 	public void setLiteralValue(Object value)
 	{
-		this.value = value;
+		this.val = value;
 		inc.onChanged();
 	}
 
@@ -42,12 +43,12 @@ public class LiveValue extends LiveInterface
 	{
 		inc.onAccess();
 		
-		return value;
+		return val;
 	}
 
 	public Object getStaticValue()
 	{
-		return value;
+		return val;
 	}
 
 
@@ -60,5 +61,10 @@ public class LiveValue extends LiveInterface
 	public void removeListener(IncrementalMonitorListener listener)
 	{
 		inc.removeListener( listener );
+	}
+	
+	public IncrementalMonitor getIncrementalMonitor()
+	{
+		return inc;
 	}
 }

@@ -16,7 +16,7 @@ import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Pres.Primitive.SpaceBin;
 import BritefuryJ.Pres.RichText.Body;
-import BritefuryJ.Pres.RichText.Heading2;
+import BritefuryJ.Pres.UI.SectionHeading2;
 import BritefuryJ.StyleSheet.StyleSheet;
 
 public class SpinEntryTestPage extends SystemPage
@@ -50,6 +50,6 @@ public class SpinEntryTestPage extends SystemPage
 			    new SpaceBin( 100.0, -1.0, intSpinEntry.alignHExpand() ), intValue } ).padX( 5.0 ) );
 		Pres spinEntrySectionContents = new Column( new Pres[] { realLine, intLine } );
 		
-		return new Body( new Pres[] { new Heading2( "Spin entries" ), spinEntrySectionContents } );
+		return new Body( new Pres[] { new SectionHeading2( "Spin entries" ), spinEntrySectionContents } );
 	}
 }

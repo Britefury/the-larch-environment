@@ -19,8 +19,8 @@ import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Pres.RichText.Body;
-import BritefuryJ.Pres.RichText.Heading2;
 import BritefuryJ.Pres.RichText.Heading4;
+import BritefuryJ.Pres.UI.SectionHeading2;
 
 public class TestsDirectory extends BrowserPage
 {
@@ -89,6 +89,7 @@ public class TestsDirectory extends BrowserPage
 	public static final PopupTestPage popup = new PopupTestPage();
 	public static final ScrollBarTestPage scrollBar = new ScrollBarTestPage();
 	public static final ScrolledViewportTestPage scrolledViewport = new ScrolledViewportTestPage();
+	public static final SliderTestPage slider = new SliderTestPage();
 	public static final SpinEntryTestPage spinEntry = new SpinEntryTestPage();
 	public static final TabbedBoxTestPage tabbedBox = new TabbedBoxTestPage();
 	public static final TextAreaTestPage textArea = new TextAreaTestPage();
@@ -109,6 +110,7 @@ public class TestsDirectory extends BrowserPage
 		new Hyperlink( "Popup", new Location( "system.tests.popup" ) ),
 		new Hyperlink( "Scroll bar", new Location( "system.tests.scrollBar" ) ),
 		new Hyperlink( "Scrolled viewport", new Location( "system.tests.scrolledViewport" ) ),
+		new Hyperlink( "Slider", new Location( "system.tests.slider" ) ),
 		new Hyperlink( "Spin entry", new Location( "system.tests.spinEntry" ) ),
 		new Hyperlink( "Tabbed box", new Location( "system.tests.tabbedBox" ) ),
 		new Hyperlink( "Text area", new Location( "system.tests.textArea" ) ),
@@ -151,7 +153,7 @@ public class TestsDirectory extends BrowserPage
 	
 	protected Pres createContents()
 	{
-		Pres heading = new Heading2( "Tests" ).alignHCentre();
+		Pres heading = new SectionHeading2( "Tests" ).alignHCentre();
 		
 		ArrayList<Object> testBoxes = new ArrayList<Object>();
 		testBoxes.add( createTestsBox( "Primitive elements:", primitiveLinks ).pad( 25.0, 5.0 ) );
