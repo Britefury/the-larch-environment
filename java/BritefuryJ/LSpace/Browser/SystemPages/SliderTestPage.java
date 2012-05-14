@@ -45,9 +45,9 @@ public class SliderTestPage extends SystemPage
 		IntSlider intSlider = new IntSlider( intValue, -10, 10, 0 );
 		
 		Pres realLine = StyleSheet.style( Primitive.rowSpacing.as( 20.0 ) ).applyTo( new Row( new Object[] { new Label( "Real number: " ),
-			    new SpaceBin( 200.0, -1.0, realSlider.alignHExpand() ), realValue } ).padX( 5.0 ) );
+			    new SpaceBin( 200.0, -1.0, realSlider.alignHExpand() ).alignVCentre(), realValue } ).padX( 5.0 ) );
 		Pres intLine = StyleSheet.style( Primitive.rowSpacing.as( 20.0 ) ).applyTo( new Row( new Object[] { new Label( "Integer: " ),
-			    new SpaceBin( 200.0, -1.0, intSlider.alignHExpand() ), intValue } ).padX( 5.0 ) );
+			    new SpaceBin( 200.0, -1.0, intSlider.alignHExpand() ).alignVCentre(), intValue } ).padX( 5.0 ) );
 		Pres spinEntrySectionContents = new Column( new Pres[] { realLine, intLine } );
 		
 		return new Body( new Pres[] { new SectionHeading2( "Sliders" ), spinEntrySectionContents } );

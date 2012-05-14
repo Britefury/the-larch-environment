@@ -198,25 +198,34 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	//
 	//
 	
+	private Target validTarget(Target t)
+	{
+		return t == null  ?  caret  :  t;
+	}
+	
 	public Target getTarget()
 	{
-		return target == null  ?  caret : target;
+		return validTarget( target );
 	}
 	
 	public void setTarget(Target t)
 	{
 		Target prev = getTarget();
-		if ( prev != null )
-		{
-			prev.notifyDeactivate();
-		}
+		Target cur = validTarget( t );
 		
-		target = t;
-
-		Target cur = getTarget();
-		if ( cur != null )
+		if ( cur != prev )
 		{
-			cur.notifyActivate();
+			if ( prev != null )
+			{
+				prev.notifyDeactivate();
+			}
+			
+			target = t;
+	
+			if ( cur != null )
+			{
+				cur.notifyActivate();
+			}
 		}
 
 		queueFullRedraw();
