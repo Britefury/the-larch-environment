@@ -110,6 +110,16 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 		public Object createSourceData(LSElement sourceElement, int aspect)
 		{
 			FragmentView fragment = (FragmentView)sourceElement.getFragmentContext();
+			
+			while ( fragment.testFlag( FLAG_DISABLE_INSPECTOR ) )
+			{
+				fragment = fragment.getParent();
+				if ( fragment == null )
+				{
+					return null;
+				}
+			}
+			
 			return new FragmentData( fragment.getModel(), fragment.getFragmentContentElement() );
 		}
 	};
@@ -130,7 +140,15 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 				if ( event.getButton() == 3 )
 				{
 					FragmentView fragment = (FragmentView)element.getFragmentContext();
-					return fragment.incView.inspectFragment( fragment, element, event );
+					while ( fragment.testFlag( FLAG_DISABLE_INSPECTOR ) )
+					{
+						fragment = fragment.getParent();
+						if ( fragment == null )
+						{
+							return false;
+						}
+					}
+					return fragment.incView.inspectFragment( fragment, fragment.getFragmentElement(), event );
 				}
 			}
 			return false;
@@ -151,14 +169,15 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	protected final static int FLAG_SUBTREE_REFRESH_REQUIRED = 0x1;
 	protected final static int FLAG_NODE_REFRESH_REQUIRED = 0x2;
 	protected final static int FLAG_NODE_REFRESH_IN_PROGRESS = 0x4;
+	protected final static int FLAG_DISABLE_INSPECTOR = 0x8;
 	
-	protected final static int _FLAG_REFSTATE_MULTIPLIER = 0x08;
+	protected final static int _FLAG_REFSTATE_MULTIPLIER = 0x10;
 	protected final static int FLAG_REFSTATE_NONE = 0x0 * _FLAG_REFSTATE_MULTIPLIER;
 	protected final static int FLAG_REFSTATE_REFED = 0x1 * _FLAG_REFSTATE_MULTIPLIER;
 	protected final static int FLAG_REFSTATE_UNREFED = 0x2 * _FLAG_REFSTATE_MULTIPLIER;
 	protected final static int _FLAG_REFSTATEMASK = 0x3 * _FLAG_REFSTATE_MULTIPLIER;
 	
-	protected final static int FLAGS_INCREMENTALTREENODE_END = 0x4 * _FLAG_REFSTATE_MULTIPLIER;
+	protected final static int FLAGS_FRAGMENTVIEW_END = 0x4 * _FLAG_REFSTATE_MULTIPLIER;
 
 	
 	
@@ -239,6 +258,12 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	public LSElement getFragmentContentElement()
 	{
 		return element;
+	}
+	
+	
+	public void disableInspector()
+	{
+		setFlag( FLAG_DISABLE_INSPECTOR );
 	}
 	
 	
@@ -517,6 +542,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 		
 		if ( fragmentFactory != null )
 		{
+			clearFlag( FLAG_DISABLE_INSPECTOR );
 			LSElement r = fragmentFactory.createFragmentContentElement( incView, this, model );
 			
 			onComputeNodeResultEnd();
