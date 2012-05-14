@@ -161,13 +161,10 @@ public class IncrementalView
 
 		
 		
-		public LSElement createFragmentContentElement(IncrementalView view, FragmentView incrementalNode, Object model)
+		public LSElement createFragmentContentElement(IncrementalView view, FragmentView fragmentView, Object model)
 		{
 			view.profile_startPresBuild();
 
-			// Create the node context
-			FragmentView fragmentView = (FragmentView)incrementalNode;
-			
 			// Create the view fragment
 			Pres fragment;
 			try

@@ -66,6 +66,7 @@ public abstract class LiveInterface extends CompositePres
 		public LSElement present(PresentationContext ctx, StyleValues style)
 		{
 			Object value = null;
+			ctx.getFragment().disableInspector();
 			try
 			{
 				value = live.getValue();
