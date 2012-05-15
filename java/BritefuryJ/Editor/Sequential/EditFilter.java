@@ -9,6 +9,7 @@ package BritefuryJ.Editor.Sequential;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.EditEvent;
+import BritefuryJ.LSpace.LSRegion;
 import BritefuryJ.LSpace.TextEditEvent;
 import BritefuryJ.LSpace.TreeEventListener;
 
@@ -47,32 +48,35 @@ public abstract class EditFilter implements TreeEventListener
 		{
 			EditEvent editEvent = (EditEvent)event;
 			
-			if ( editEvent instanceof TextEditEvent  ||  isSelectionEditEvent( editEvent )  ||  isEditEvent( editEvent ) )
+			if ( LSRegion.regionOf( sourceElement )  ==  LSRegion.regionOf( element ) )
 			{
-				HandleEditResult res = handleEdit( element, sourceElement, editEvent );
-				
-				if ( res == HandleEditResult.HANDLED )
+				if ( editEvent instanceof TextEditEvent  ||  isSelectionEditEvent( editEvent )  ||  isEditEvent( editEvent ) )
 				{
-					FragmentView sourceFragment = (FragmentView)sourceElement.getFragmentContext();
-					sourceFragment.queueRefresh();
-					return true;
-				}
-				else if ( res == HandleEditResult.NO_CHANGE )
-				{
-					return true;
-				}
-				else if ( res == HandleEditResult.NOT_HANDLED )
-				{
-					return false;
-				}
-				else if ( res == HandleEditResult.PASS_TO_PARENT )
-				{
-					element.postTreeEventToParent( editEvent );
-					return true;
-				}
-				else
-				{
-					throw new RuntimeException( "Invalid HandleEditResult" );
+					HandleEditResult res = handleEdit( element, sourceElement, editEvent );
+					
+					if ( res == HandleEditResult.HANDLED )
+					{
+						FragmentView sourceFragment = (FragmentView)sourceElement.getFragmentContext();
+						sourceFragment.queueRefresh();
+						return true;
+					}
+					else if ( res == HandleEditResult.NO_CHANGE )
+					{
+						return true;
+					}
+					else if ( res == HandleEditResult.NOT_HANDLED )
+					{
+						return false;
+					}
+					else if ( res == HandleEditResult.PASS_TO_PARENT )
+					{
+						element.postTreeEventToParent( editEvent );
+						return true;
+					}
+					else
+					{
+						throw new RuntimeException( "Invalid HandleEditResult" );
+					}
 				}
 			}
 		}

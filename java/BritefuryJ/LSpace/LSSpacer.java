@@ -8,6 +8,7 @@ package BritefuryJ.LSpace;
 
 import BritefuryJ.LSpace.LayoutTree.LayoutNodeSpacer;
 import BritefuryJ.LSpace.StyleParams.ElementStyleParams;
+import BritefuryJ.Math.Vector2;
 
 public class LSSpacer extends LSBlank
 {
@@ -44,5 +45,32 @@ public class LSSpacer extends LSBlank
 	public double getMinHeight()
 	{
 		return minHeight;
+	}
+	
+	
+	public void setMinWidth(double minWidth)
+	{
+		this.minWidth = minWidth;
+		queueResize();
+	}
+	
+	public void setMinHeight(double minHeight)
+	{
+		this.minHeight = minHeight;
+		queueResize();
+	}
+	
+	public void setMinSize(double minWidth, double minHeight)
+	{
+		this.minWidth = minWidth;
+		this.minHeight = minHeight;
+		queueResize();
+	}
+
+	public void setMinSize(Vector2 minSize)
+	{
+		this.minWidth = minSize.x;
+		this.minHeight = minSize.y;
+		queueResize();
 	}
 }
