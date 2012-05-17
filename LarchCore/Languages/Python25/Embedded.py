@@ -186,6 +186,12 @@ class EmbeddedPython25Expr (EmbeddedPython25):
 class EmbeddedPython25Executable (EmbeddedPython25):
 	__python_code_type__ = '<larch_executable_code>'
 
+
+	@staticmethod
+	def _exprModelAsStmts(exprModel):
+		return [ Schema.ExprStmt( expr=exprModel ) ]
+
+
 	def compileForModuleExecution(self, module, filename=None):
 		if filename is None:
 			filename = module.__file__
@@ -276,6 +282,14 @@ class EmbeddedPython25Suite (EmbeddedPython25Executable):
 		else:
 			return EmbeddedPython25Suite( [] )
 
+	@staticmethod
+	def fromExprModel(exprModel):
+		return EmbeddedPython25Suite( Schema.PythonSuite( suite=EmbeddedPython25Executable._exprModelAsStmts( deepcopy( exprModel ) ) ) )
+
+	@staticmethod
+	def fromEmbeddedExpr(embeddedExpr):
+		return EmbeddedPython25Suite.fromExprModel( embeddedExpr.model['expr'] )
+
 
 
 
@@ -288,7 +302,7 @@ class EmbeddedPython25Module (EmbeddedPython25Executable):
 		elif model is None:
 			model = _py25NewModule()
 		elif isinstance( model, list )  or  isinstance( model, java.util.List ):
-			model = Schema.PythoModule( suite=model )
+			model = Schema.PythonModule( suite=model )
 		else:
 			raise TypeError, 'Cannot construct EmbeddedPython25Module from %s' % model
 
@@ -324,6 +338,15 @@ class EmbeddedPython25Module (EmbeddedPython25Executable):
 			return EmbeddedPython25Module( parseResult.getValue() )
 		else:
 			return EmbeddedPython25Module( [] )
+
+
+	@staticmethod
+	def fromExprModel(exprModel):
+		return EmbeddedPython25Suite( Schema.PythonModule( suite=EmbeddedPython25Executable._exprModelAsStmts( deepcopy( exprModel ) ) ) )
+
+	@staticmethod
+	def fromEmbeddedExpr(embeddedExpr):
+		return EmbeddedPython25Module.fromExprModel( embeddedExpr.model['expr'] )
 
 
 

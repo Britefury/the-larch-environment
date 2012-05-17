@@ -19,71 +19,97 @@ import BritefuryJ.LSpace.Interactor.KeyElementInteractor;
 import BritefuryJ.LSpace.Marker.Marker;
 import BritefuryJ.LSpace.TextFocus.Caret;
 import BritefuryJ.LSpace.TextFocus.TextSelection;
-import BritefuryJ.ObjectPresentation.PresentationStateListenerList;
-import BritefuryJ.Pres.CompositePres;
-import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;
-import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Bin;
 import BritefuryJ.Pres.Primitive.Region;
 import BritefuryJ.Pres.Primitive.Segment;
 import BritefuryJ.Pres.Primitive.Text;
-import BritefuryJ.StyleSheet.StyleValues;
 import BritefuryJ.Util.UnaryFn;
 
 public class EditableTextCell
 {
-	private static class Cell extends CompositePres
-	{
-		TreeEventListener textListener = new TreeEventListener()
-		{
-			public boolean onTreeEvent(LSElement element, LSElement sourceElement, Object event)
-			{
-				if ( event instanceof TextEditEvent )
-				{
-					String t = element.getTextRepresentation();
-					if ( !t.contains( "\n" ) )
-					{
-						text = t;
-						listeners = PresentationStateListenerList.onPresentationStateChanged( listeners, Cell.this );
-						return true;
-					}
-				}
-				return false;
-			}
-		};
-		
-		private String text;
-		private PresentationStateListenerList listeners = null;
-		
-		
-		public Cell(String text)
-		{
-			this.text = text;
-		}
-		
-		
-		@Override
-		public Pres pres(PresentationContext ctx, StyleValues style)
-		{
-			listeners = PresentationStateListenerList.addListener( listeners, ctx.getFragment() );
-			Pres textPres = new Segment( new Text( text ) ).withTreeEventListener( textListener );
-			return new Bin( new Region( textPres, clipboardHandler ) );
-		}
-	}
+//	private static class Cell extends CompositePres
+//	{
+//		TreeEventListener textListener = new TreeEventListener()
+//		{
+//			public boolean onTreeEvent(LSElement element, LSElement sourceElement, Object event)
+//			{
+//				if ( event instanceof TextEditEvent )
+//				{
+//					String t = element.getTextRepresentation();
+//					if ( !t.contains( "\n" ) )
+//					{
+//						text = t;
+//						valid = textToValue.invoke( t ) != null;
+//						if ( valid )
+//						{
+//							validText = t;
+//						}
+//						listeners = PresentationStateListenerList.onPresentationStateChanged( listeners, Cell.this );
+//						return true;
+//					}
+//				}
+//				return false;
+//			}
+//		};
+//		
+//		private UnaryFn textToValue;
+//		private String text, validText;
+//		private boolean valid;
+//		private PresentationStateListenerList listeners = null;
+//		
+//		
+//		public Cell(UnaryFn textToValue, String text)
+//		{
+//			if ( textToValue.invoke( text ) == null )
+//			{
+//				throw new RuntimeException( "Trying to create editable text cell with invalid textual value" );
+//			}
+//			this.textToValue = textToValue;
+//			this.text = this.validText = text;
+//			this.valid = true;
+//		}
+//		
+//		
+//		@Override
+//		public Pres pres(PresentationContext ctx, StyleValues style)
+//		{
+//			listeners = PresentationStateListenerList.addListener( listeners, ctx.getFragment() );
+//			Pres textPres = new Segment( new Text( text ) ).withTreeEventListener( textListener );
+//			return new Bin( new Region( textPres, clipboardHandler ) );
+//		}
+//	}
 	
 	
+//	public static Pres textCellWithCachedListener(String text, UnaryFn textToValue)
+//	{
+//		TreeEventListener commitListener = cachedCommitTreeEventListenerFor( textToValue );
+//		return new Bin( new InnerFragment( new Cell( textToValue, text ) ) ).withElementInteractor( caretInteractor ).withElementInteractor( keyInteractor ).withTreeEventListener( commitListener );
+//	}
+//
+//
+//	public static Pres textCell(String text, UnaryFn textToValue)
+//	{
+//		TreeEventListener commitListener = commitTreeEventListenerFor( textToValue );
+//		return new Bin( new InnerFragment( new Cell( textToValue, text ) ) ).withElementInteractor( caretInteractor ).withElementInteractor( keyInteractor ).withTreeEventListener( commitListener );
+//	}
+
+
 	public static Pres textCellWithCachedListener(String text, UnaryFn textToValue)
 	{
 		TreeEventListener commitListener = cachedCommitTreeEventListenerFor( textToValue );
-		return new Bin( new InnerFragment( new Cell( text ) ) ).withElementInteractor( caretInteractor ).withElementInteractor( keyInteractor ).withTreeEventListener( commitListener );
+		Pres textPres = new Segment( new Text( text ) );
+		textPres = new Bin( new Region( textPres, clipboardHandler ) );
+		return textPres.withElementInteractor( caretInteractor ).withElementInteractor( keyInteractor ).withTreeEventListener( commitListener );
 	}
 
 
 	public static Pres textCell(String text, UnaryFn textToValue)
 	{
 		TreeEventListener commitListener = commitTreeEventListenerFor( textToValue );
-		return new Bin( new InnerFragment( new Cell( text ) ) ).withElementInteractor( caretInteractor ).withElementInteractor( keyInteractor ).withTreeEventListener( commitListener );
+		Pres textPres = new Segment( new Text( text ) );
+		textPres = new Bin( new Region( textPres, clipboardHandler ) );
+		return textPres.withElementInteractor( caretInteractor ).withElementInteractor( keyInteractor ).withTreeEventListener( commitListener );
 	}
 
 
