@@ -42,6 +42,19 @@ public class ClipboardCopier
 		}
 	}
 	
+	protected PyObject py_copyWithJavaInterface(Object jx, ClipboardCopierMemo memo)
+	{
+		if ( jx instanceof ClipboardCopyable )
+		{
+			ClipboardCopyable c = (ClipboardCopyable)jx;
+			return Py.java2py( c.clipboardCopy( memo ) );
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
 	
 	protected Object invokeObjectCopier(ObjectClipboardCopier copier, Object x, ClipboardCopierMemo memo)
 	{
@@ -55,6 +68,11 @@ public class ClipboardCopier
 	
 	
 	protected Object defaultCopy(Object x)
+	{
+		return x;
+	}
+	
+	protected PyObject py_defaultCopy(PyObject x)
 	{
 		return x;
 	}
@@ -147,45 +165,70 @@ public class ClipboardCopier
 	}
 	
 
-	protected PyObject py_createCopy(PyObject x, ClipboardCopierMemo memo)
+	protected PyObject py_createCopy(PyObject px, ClipboardCopierMemo memo)
 	{
+		if ( px == null  ||  px == Py.None )
+		{
+			return px;
+		}
+		
 		PyObject result = null;
 		
+		// Convert to a Java object  -  needed so that we can try the Java object protocols, for instances
+		// where x is a wrapped Java object
+		Object jx = Py.tojava( px, Object.class );
+		
+		// Java object clipboard copy protocol - Java interface
+		result = py_copyWithJavaInterface( jx, memo );
 		
 		// Python object clipboard copy protocol
-		// @x is a Python object - if it offers a copying method, use that
-		PyObject copyMethod = null;
-		try
-		{
-			copyMethod = __builtin__.getattr( x, pythonCopyMethodName );
-		}
-		catch (PyException e)
-		{
-			copyMethod = null;
-		}
-		
-		if ( copyMethod != null  &&  copyMethod.isCallable() )
-		{
-			result = copyMethod.__call__( Py.java2py( memo ) );
-		}
-		
-		
-		// Copy method did not succeed. Try the registered copiers.
 		if ( result == null )
 		{
-			PyType typeX = x.getType();
+			// @x is a Python object - if it offers a copying method, use that
+			PyObject copyMethod = null;
+			try
+			{
+				copyMethod = __builtin__.getattr( px, pythonCopyMethodName );
+			}
+			catch (PyException e)
+			{
+				copyMethod = null;
+			}
 			
-			PyObjectClipboardCopier copier = (PyObjectClipboardCopier)objectCopiers.get( typeX );
+			if ( copyMethod != null  &&  copyMethod.isCallable() )
+			{
+				result = copyMethod.__call__( Py.java2py( memo ) );
+			}
+			
+			
+			// Presentation method did not succeed. Try the registered copiers.
+			if ( result == null )
+			{
+				// Now try Python object copiers
+				PyType typeX = px.getType();
+				
+				PyObjectClipboardCopier copier = (PyObjectClipboardCopier)objectCopiers.get( typeX );
+				if ( copier != null )
+				{
+					result = invokePyObjectCopier( copier, px, memo );
+				}
+			}
+		}
+		
+		// Java object clipboard copy protocol - registered copiers
+		if ( result == null )
+		{
+			ObjectClipboardCopier copier = (ObjectClipboardCopier)objectCopiers.get( jx.getClass() );
 			if ( copier != null )
 			{
-				result = invokePyObjectCopier( copier, x, memo );
+				result = Py.java2py( invokeObjectCopier( copier, jx, memo ) );
 			}
 		}
 		
 		if ( result == null )
 		{
 			// Fallback
-			return (PyObject)defaultCopy( x );
+			return py_defaultCopy( px );
 		}
 		else
 		{

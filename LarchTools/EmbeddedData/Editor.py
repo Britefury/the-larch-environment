@@ -35,11 +35,11 @@ class Editor (object):
 
 
 	def __getstate__(self):
-		return { 'model' : self._model }
+		return { '_model' : self._model }
 
 
 	def __setstate__(self, state):
-		self._model = state['model']
+		self._model = state.get( '_model', None )
 
 
 	def _newModel(self, value):

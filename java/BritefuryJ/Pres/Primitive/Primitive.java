@@ -539,7 +539,7 @@ public class Primitive
 		protected CaretSlotStyleParams evaluate(AttributeTable attribs)
 		{
 			return new CaretSlotStyleParams(
-					attribs.get( hAlign, HAlignment.class ),
+					HAlignment.PACK,
 					attribs.get( vAlign, VAlignment.class ),
 					attribs.get( background, Painter.class ),
 					attribs.get( hoverBackground, Painter.class ),
