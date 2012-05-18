@@ -43,7 +43,7 @@ from BritefuryJ.Pres import *
 from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.Pres.RichText import *
 from BritefuryJ.Pres.UI import *
-from BritefuryJ.Util import InvokePyFunction
+from BritefuryJ.Util.Jython import JythonException
 
 from BritefuryJ.Projection import Perspective
 
@@ -296,9 +296,11 @@ class ProjectView (MethodDispatchView):
 						response = JOptionPane.showOptionDialog( component, 'Existing content will be overwritten. Proceed?', 'Overwrite existing content',
 						                                         JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, None, [ 'Overwrite', 'Cancel' ], 'Cancel' )
 						if response == JFileChooser.APPROVE_OPTION:
-							def _fn():
+							exc = None
+							try:
 								project.export( filename )
-							result, exc = InvokePyFunction.invoke( _fn )
+							except:
+								exc = JythonException.getCurrentException()
 							if exc is not None:
 								BubblePopup.popupInBubbleAdjacentTo( DefaultPerspective.instance( exc ), control.getElement(), Anchor.BOTTOM, True, True )
 

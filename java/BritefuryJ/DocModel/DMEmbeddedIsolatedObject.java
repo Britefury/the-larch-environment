@@ -24,8 +24,8 @@ import BritefuryJ.ClipboardFilter.ClipboardCopierMemo;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Isolation.IsolationBarrier;
-import BritefuryJ.JythonInterface.Jython_copy;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Util.Jython.Jython_copy;
 
 public class DMEmbeddedIsolatedObject extends DMNode implements DMEmbeddedPyObjectInterface, Presentable, Trackable
 {

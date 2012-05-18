@@ -5,10 +5,10 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 1999-2008.
 //##************************
-package tests.JythonInterface;
+package tests.Util.Jython;
 
 import junit.framework.TestCase;
-import BritefuryJ.JythonInterface.JythonSlice;
+import BritefuryJ.Util.Jython.JythonSlice;
 
 public class TestCase_JythonSlice extends TestCase
 {
