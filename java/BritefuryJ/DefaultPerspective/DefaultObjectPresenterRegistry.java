@@ -662,8 +662,8 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 		{
 			PyException e = (PyException)x;
 			
-			ByteArrayOutputStream buf = new ByteArrayOutputStream();
-			e.printStackTrace( new PrintStream( buf ) );
+			//ByteArrayOutputStream buf = new ByteArrayOutputStream();
+			//e.printStackTrace( new PrintStream( buf ) );
 			String stackTrace = e.toString();
 			String stackTraceLines[] = stackTrace.split( "\n" );
 			Pres stackTraceElements[] = new Pres[stackTraceLines.length];
@@ -712,8 +712,8 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 		{
 			Throwable t = (Throwable)x;
 			
-			ByteArrayOutputStream buf = new ByteArrayOutputStream();
-			t.printStackTrace( new PrintStream( buf ) );
+			//ByteArrayOutputStream buf = new ByteArrayOutputStream();
+			//t.printStackTrace( new PrintStream( buf ) );
 			String stackTrace = t.toString();
 			String stackTraceLines[] = stackTrace.split( "\n" );
 			Pres stackTraceElements[] = new Pres[stackTraceLines.length];
@@ -1117,54 +1117,54 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 	};
 
 
-	private static final StyleSheet staticStyle = StyleSheet.style( Primitive.editable.as( false ) );
+	protected static final StyleSheet staticStyle = StyleSheet.style( Primitive.editable.as( false ) );
 
 
-	private static final StyleSheet punctuationStyle = staticStyle.withValues( Primitive.foreground.as( Color.blue ) );
-	private static final StyleSheet delimStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.1f, 0.3f, 0.4f ) ), Primitive.fontBold.as( true ), Primitive.fontSize.as( 14 ) );
-	private static final StyleSheet setDelimStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.4f, 0.3f, 0.1f ) ), Primitive.fontBold.as( true ), Primitive.fontSize.as( 14 ) );
-	private static final StyleSheet sectionHeadingStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.0f, 0.5f ) ), Primitive.fontBold.as( true ), Primitive.fontFace.as( "Serif" ) );
+	protected static final StyleSheet punctuationStyle = staticStyle.withValues( Primitive.foreground.as( Color.blue ) );
+	protected static final StyleSheet delimStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.1f, 0.3f, 0.4f ) ), Primitive.fontBold.as( true ), Primitive.fontSize.as( 14 ) );
+	protected static final StyleSheet setDelimStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.4f, 0.3f, 0.1f ) ), Primitive.fontBold.as( true ), Primitive.fontSize.as( 14 ) );
+	protected static final StyleSheet sectionHeadingStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.0f, 0.5f ) ), Primitive.fontBold.as( true ), Primitive.fontFace.as( "Serif" ) );
 
 
-	private static final StyleSheet stackTraceStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.75f, 0.1f, 0.4f ) ) );
+	protected static final StyleSheet stackTraceStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.75f, 0.1f, 0.4f ) ) );
 
 
-	private static final StyleSheet javaKeywordStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.0f, 0.5f ) ), Primitive.fontBold.as( true ), Primitive.fontSmallCaps.as( true ) );
-	private static final StyleSheet pythonKeywordStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.0f, 0.5f ) ), Primitive.fontBold.as( true ), Primitive.fontSmallCaps.as( true ) );
+	protected static final StyleSheet javaKeywordStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.0f, 0.5f ) ), Primitive.fontBold.as( true ), Primitive.fontSmallCaps.as( true ) );
+	protected static final StyleSheet pythonKeywordStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.0f, 0.5f ) ), Primitive.fontBold.as( true ), Primitive.fontSmallCaps.as( true ) );
 
-	private static final StyleSheet classPunctuationStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.25f, 0.0f, 0.5f ) ) );
+	protected static final StyleSheet classPunctuationStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.25f, 0.0f, 0.5f ) ) );
 
-	private static final StyleSheet classNameStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.25f, 0.5f ) ) );
+	protected static final StyleSheet classNameStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.25f, 0.5f ) ) );
 
-	private static final StyleSheet typeNameStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.4f ) ) );
+	protected static final StyleSheet typeNameStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.4f ) ) );
 
-	private static final StyleSheet attributeNameStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.0f, 0.25f ) ) );
-	private static final StyleSheet propertyNameStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.5f, 0.0f, 0.15f ) ) );
-	private static final StyleSheet moduleNameStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.0f ) ), Primitive.fontSize.as( 18 ), Primitive.fontBold.as( true ) );
+	protected static final StyleSheet attributeNameStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.0f, 0.25f ) ) );
+	protected static final StyleSheet propertyNameStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.5f, 0.0f, 0.15f ) ) );
+	protected static final StyleSheet moduleNameStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.0f ) ), Primitive.fontSize.as( 18 ), Primitive.fontBold.as( true ) );
 
-	private static final StyleSheet fnPunctuationStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.25f, 0.0f, 0.5f ) ) );
-	private static final StyleSheet fnNameStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.25f, 0.5f ) ) );
-	private static final StyleSheet fnArgStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.25f ) ) );
-	private static final StyleSheet fnKWArgStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.25f ) ), Primitive.fontItalic.as( true ) );
-	private static final StyleSheet fnVarArgStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.25f ) ) );
+	protected static final StyleSheet fnPunctuationStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.25f, 0.0f, 0.5f ) ) );
+	protected static final StyleSheet fnNameStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.25f, 0.5f ) ) );
+	protected static final StyleSheet fnArgStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.25f ) ) );
+	protected static final StyleSheet fnKWArgStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.25f ) ), Primitive.fontItalic.as( true ) );
+	protected static final StyleSheet fnVarArgStyle = staticStyle.withValues( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.25f ) ) );
 
 
-	private static final StyleSheet matchIndentStyle = staticStyle.withValues( Sequence.matchOuterIndentation.as( true ) );
+	protected static final StyleSheet matchIndentStyle = staticStyle.withValues( Sequence.matchOuterIndentation.as( true ) );
 
 	
-	private static final Pres comma = punctuationStyle.applyTo( new StaticText( "," ) );
-	private static final Pres space = staticStyle.applyTo( new StaticText( " " ) );
-	private static final Pres mapSpace = staticStyle.applyTo( new Whitespace( " ", 25.0 ) );
-	private static final Pres openBracket = delimStyle.applyTo( new StaticText( "[" ) );
-	private static final Pres closeBracket = delimStyle.applyTo( new StaticText( "]" ) );
-	private static final Pres openParen = delimStyle.applyTo( new StaticText( "(" ) );
-	private static final Pres closeParen = delimStyle.applyTo( new StaticText( ")" ) );
-	private static final Pres openBrace = delimStyle.applyTo( new StaticText( "{" ) );
-	private static final Pres closeBrace = delimStyle.applyTo( new StaticText( "}" ) );
-	private static final Pres setOpenBrace = setDelimStyle.applyTo( new StaticText( "{" ) );
-	private static final Pres setCloseBrace = setDelimStyle.applyTo( new StaticText( "}" ) );
-	private static final Pres openChevronBracket = delimStyle.applyTo( new Label( "<[" ) );
-	private static final Pres closeChevronBracket = delimStyle.applyTo( new Label( "]>" ) );
+	protected static final Pres comma = punctuationStyle.applyTo( new StaticText( "," ) );
+	protected static final Pres space = staticStyle.applyTo( new StaticText( " " ) );
+	protected static final Pres mapSpace = staticStyle.applyTo( new Whitespace( " ", 25.0 ) );
+	protected static final Pres openBracket = delimStyle.applyTo( new StaticText( "[" ) );
+	protected static final Pres closeBracket = delimStyle.applyTo( new StaticText( "]" ) );
+	protected static final Pres openParen = delimStyle.applyTo( new StaticText( "(" ) );
+	protected static final Pres closeParen = delimStyle.applyTo( new StaticText( ")" ) );
+	protected static final Pres openBrace = delimStyle.applyTo( new StaticText( "{" ) );
+	protected static final Pres closeBrace = delimStyle.applyTo( new StaticText( "}" ) );
+	protected static final Pres setOpenBrace = setDelimStyle.applyTo( new StaticText( "{" ) );
+	protected static final Pres setCloseBrace = setDelimStyle.applyTo( new StaticText( "}" ) );
+	protected static final Pres openChevronBracket = delimStyle.applyTo( new Label( "<[" ) );
+	protected static final Pres closeChevronBracket = delimStyle.applyTo( new Label( "]>" ) );
 	
 
 	public static Pres arrayView(List<Object> children)
@@ -1172,27 +1172,27 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 		return new SpanSequenceView( children, openChevronBracket, closeChevronBracket, comma, space, TrailingSeparator.NEVER );
 	}
 	
-	private static Pres listView(List<Object> children)
+	protected static Pres listView(List<Object> children)
 	{
 		return new SpanSequenceView( children, openBracket, closeBracket, comma, space, TrailingSeparator.NEVER );
 	}
 	
-	private static Pres tupleView(List<Object> children)
+	protected static Pres tupleView(List<Object> children)
 	{
 		return new SpanSequenceView( children, openParen, closeParen, comma, space, TrailingSeparator.ONE_ELEMENT );
 	}
 	
-	private static Pres setView(List<Object> children)
+	protected static Pres setView(List<Object> children)
 	{
 		return new SpanSequenceView( children, setOpenBrace, setCloseBrace, comma, space, TrailingSeparator.NEVER );
 	}
 	
-	private static Pres mapView(List<Object> children)
+	protected static Pres mapView(List<Object> children)
 	{
 		return new SpanSequenceView( children, openBrace, closeBrace, comma, mapSpace, TrailingSeparator.NEVER );
 	}
 
-	private static Pres commaSeparatedListView(List<Object> children)
+	protected static Pres commaSeparatedListView(List<Object> children)
 	{
 		return new SpanSequenceView( children, null, null, comma, space, TrailingSeparator.NEVER );
 	}

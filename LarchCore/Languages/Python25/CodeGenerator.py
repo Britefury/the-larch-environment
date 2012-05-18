@@ -975,7 +975,7 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 		value = embeddedValue.getValue()
 
 		# Use the object as a value
-		return self._resource( value )
+		return self._embeddedValueSrc( value )
 
 
 
@@ -1012,13 +1012,13 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 		except AttributeError:
 			pass
 		else:
-			evalFnSource = self._resource( evalFn )
-			selfSource = self._resource( self )
+			evalFnSource = self._embeddedValueSrc( evalFn )
+			selfSource = self._embeddedValueSrc( self )
 			return evalFnSource + '( globals(), locals(), ' + selfSource + ' )'
 		
 		
 		# Use the object as a value
-		return self._resource( value )
+		return self._embeddedValueSrc( value )
 		
 	
 	
@@ -1055,8 +1055,8 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 		except AttributeError:
 			pass
 		else:
-			execFnSource = self._resource( execFn )
-			selfSource = self._resource( self )
+			execFnSource = self._embeddedValueSrc( execFn )
+			selfSource = self._embeddedValueSrc( self )
 			return Line( execFnSource + '( globals(), locals(), ' + selfSource + ' )',  node )
 
 			
@@ -1069,8 +1069,8 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 		else:
 			# Get the attribute name list
 			names = attrNamesFn()
-			selfSource = self._resource( self )
-			valuesCallSource = self._resource( attrValuesFn ) + '( globals(), locals(), ' + selfSource + ' )'
+			selfSource = self._embeddedValueSrc( self )
+			valuesCallSource = self._embeddedValueSrc( attrValuesFn ) + '( globals(), locals(), ' + selfSource + ' )'
 			if isinstance( names, str )  or  isinstance( names, unicode ):
 				return Line( names + ' = ' + valuesCallSource,   node )
 			else:
@@ -1078,11 +1078,11 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 
 		
 		# Get the object as a value
-		return Line( self._resource( value ),   node )
+		return Line( self._embeddedValueSrc( value ),   node )
 			
 	
 	
-	def _resourceIndex(self, resourceValue):
+	def _embeddedValueIndex(self, resourceValue):
 		rscId = id( resourceValue )
 		try:
 			index = self._resourceValueIdToIndex[rscId]
@@ -1092,15 +1092,21 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 			self._resourceValueIdToIndex[rscId] = index
 		return index
 	
-	def _resource(self, resourceValue):
-		index = self._resourceIndex( resourceValue )
+	def _embeddedValueSrc(self, resourceValue):
+		index = self._embeddedValueIndex( resourceValue )
 		return _runtime_resourceMap_Name + '[%d]'  %  ( index, )
-		
-		
-			
 
-	
-	
+	def embeddedValue(self, resourceValue):
+		index = self._embeddedValueIndex( resourceValue )
+		targetAST = Schema.Load( name=_runtime_resourceMap_Name )
+		indexAST= Schema.IntLiteral( format='decimal', numType='int', value=str( index ) )
+		return Schema.Subscript( target=targetAST, index=indexAST )
+
+
+
+
+
+
 
 def compileForEvaluation(pythonExpression, filename):
 	return Python25CodeGenerator( filename ).compileForEvaluation( pythonExpression )

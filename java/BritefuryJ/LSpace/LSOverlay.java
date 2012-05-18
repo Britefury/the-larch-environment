@@ -14,11 +14,11 @@ import java.util.List;
 
 import org.python.core.PySlice;
 
-import BritefuryJ.JythonInterface.JythonIndex;
-import BritefuryJ.JythonInterface.JythonSlice;
 import BritefuryJ.LSpace.LayoutTree.LayoutNodeOverlay;
 import BritefuryJ.LSpace.StyleParams.ContainerStyleParams;
 import BritefuryJ.Math.AABox2;
+import BritefuryJ.Util.Jython.JythonIndex;
+import BritefuryJ.Util.Jython.JythonSlice;
 
 public class LSOverlay extends LSContainer
 {
