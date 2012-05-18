@@ -28,10 +28,10 @@ import BritefuryJ.ClipboardFilter.ClipboardCopierMemo;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.Incremental.IncrementalValueMonitor;
 import BritefuryJ.IncrementalView.FragmentView;
-import BritefuryJ.JythonInterface.JythonIndex;
-import BritefuryJ.JythonInterface.JythonSlice;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Util.HashUtils;
+import BritefuryJ.Util.Jython.JythonIndex;
+import BritefuryJ.Util.Jython.JythonSlice;
 
 public class DMList extends DMNode implements DMListInterface, Trackable, Presentable
 {

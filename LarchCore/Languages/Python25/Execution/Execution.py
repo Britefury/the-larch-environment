@@ -11,7 +11,7 @@ from java.lang import Throwable
 
 from BritefuryJ.Util.RichString import RichStringBuilder
 
-from BritefuryJ.Util import InvokePyFunction
+from BritefuryJ.Util.Jython import JythonException
 
 from LarchCore.Languages.Python25 import CodeGenerator
 from LarchCore.Languages.Python25.Execution import ExecutionPresCombinators
@@ -88,21 +88,19 @@ def getResultOfExecutionWithinModule(pythonCode, module, bEvaluate):
 	stdout = _OutputStream()
 	stderr = _OutputStream()
 
-	def _compileForEval():
-		return CodeGenerator.compileForModuleExecutionAndEvaluation( module, pythonCode, module.__name__ )
-
-	def _compileForExec():
-		return CodeGenerator.compileForModuleExecution( module, pythonCode, module.__name__ )
-
 	evalCode = execCode = None
 	caughtException = None
 	result = None
 	if bEvaluate:
-		r, caughtException = InvokePyFunction.invoke( _compileForEval )
-		if r is not None:
-			execCode, evalCode = r
+		try:
+			execCode, evalCode = CodeGenerator.compileForModuleExecutionAndEvaluation( module, pythonCode, module.__name__ )
+		except:
+			caughtException = JythonException.getCurrentException()
 	else:
-		execCode, caughtException = InvokePyFunction.invoke( _compileForExec )
+		try:
+			execCode = CodeGenerator.compileForModuleExecution( module, pythonCode, module.__name__ )
+		except:
+			caughtException = JythonException.getCurrentException()
 
 	if execCode is not None  or  evalCode is not None:
 		savedStdout, savedStderr = sys.stdout, sys.stderr
@@ -118,7 +116,12 @@ def getResultOfExecutionWithinModule(pythonCode, module, bEvaluate):
 			else:
 				return None
 
-		result, caughtException = InvokePyFunction.invoke( _exec )
+		try:
+			exec execCode in module.__dict__
+			if evalCode is not None:
+				result = [ eval( evalCode, module.__dict__ ) ]
+		except:
+			caughtException = JythonException.getCurrentException()
 
 		sys.stdout, sys.stderr = savedStdout, savedStderr
 
@@ -129,21 +132,19 @@ def getResultOfExecutionInScopeWithinModule(pythonCode, globals, locals, module,
 	stdout = _OutputStream()
 	stderr = _OutputStream()
 
-	def _compileForEval():
-		return CodeGenerator.compileForModuleExecutionAndEvaluation( module, pythonCode, module.__name__ )
-
-	def _compileForExec():
-		return CodeGenerator.compileForModuleExecution( module, pythonCode, module.__name__ )
-
 	evalCode = execCode = None
 	caughtException = None
 	result = None
 	if bEvaluate:
-		r, caughtException = InvokePyFunction.invoke( _compileForEval )
-		if r is not None:
-			execCode, evalCode = r
+		try:
+			execCode, evalCode = CodeGenerator.compileForModuleExecutionAndEvaluation( module, pythonCode, module.__name__ )
+		except:
+			caughtException = JythonException.getCurrentException()
 	else:
-		execCode, caughtException = InvokePyFunction.invoke( _compileForExec )
+		try:
+			execCode = CodeGenerator.compileForModuleExecution( module, pythonCode, module.__name__ )
+		except:
+			caughtException = JythonException.getCurrentException()
 
 	if globals is None:
 		globals = module.__dict__
@@ -164,7 +165,12 @@ def getResultOfExecutionInScopeWithinModule(pythonCode, globals, locals, module,
 			else:
 				return None
 
-		result, caughtException = InvokePyFunction.invoke( _exec )
+		try:
+			exec execCode in globals, locals
+			if evalCode is not None:
+				result = [ eval( evalCode, globals, locals ) ]
+		except:
+			caughtException = JythonException.getCurrentException()
 
 		sys.stdout, sys.stderr = savedStdout, savedStderr
 

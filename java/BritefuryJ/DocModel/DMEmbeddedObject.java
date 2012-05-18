@@ -23,8 +23,8 @@ import BritefuryJ.ChangeHistory.Trackable;
 import BritefuryJ.ClipboardFilter.ClipboardCopierMemo;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.IncrementalView.FragmentView;
-import BritefuryJ.JythonInterface.Jython_copy;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Util.Jython.Jython_copy;
 
 public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterface, Presentable, Trackable
 {
