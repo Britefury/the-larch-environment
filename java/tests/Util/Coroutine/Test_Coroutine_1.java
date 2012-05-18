@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package tests.Utils.Coroutine;
+package tests.Util.Coroutine;
 
 import junit.framework.TestCase;
 import BritefuryJ.Util.Coroutine.Coroutine;
