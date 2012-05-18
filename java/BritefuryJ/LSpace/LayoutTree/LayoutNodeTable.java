@@ -145,6 +145,10 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 			child.getLayoutNode().refreshAllocationX( prevWidths[i] );
 			i++;
 		}
+		
+		// Re-allocated - column and row lines are now invalid
+		columnLines = null;
+		rowLines = null;
 	}
 	
 	
@@ -180,6 +184,10 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 			child.getLayoutNode().refreshAllocationY( prevAllocVs[i] );
 			i++;
 		}
+		
+		// Re-allocated - column and row lines are now invalid
+		columnLines = null;
+		rowLines = null;
 	}
 	
 
@@ -417,14 +425,6 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 	// BOUNDARIES
 	//
 	//
-	
-	public void queueResize()
-	{
-		super.queueResize();
-		
-		columnLines = null;
-		rowLines = null;
-	}
 	
 	private void refreshBoundaries()
 	{

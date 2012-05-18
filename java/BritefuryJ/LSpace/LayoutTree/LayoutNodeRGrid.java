@@ -170,6 +170,10 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 				child.getLayoutNode().refreshAllocationX( rowPrevWidths[0] );
 			}
 		}
+	
+		// Re-allocated - column and row lines are now invalid
+		columnLines = null;
+		rowLines = null;
 	}
 
 	protected void updateAllocationY()
@@ -191,6 +195,10 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 			child.getLayoutNode().refreshAllocationY( prevAllocVs[i] );
 			i++;
 		}
+		
+		// Re-allocated - column and row lines are now invalid
+		columnLines = null;
+		rowLines = null;
 	}
 	
 	
@@ -332,14 +340,6 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 	}
 	
 	
-	
-	public void queueResize()
-	{
-		super.queueResize();
-		
-		columnLines = null;
-		rowLines = null;
-	}
 	
 	private void refreshBoundaries()
 	{
