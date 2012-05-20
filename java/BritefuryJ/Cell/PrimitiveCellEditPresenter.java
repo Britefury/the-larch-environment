@@ -21,8 +21,7 @@ public class PrimitiveCellEditPresenter
 {
 	public static Pres presentChar(char c, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		String str = Character.toString( c );
-		return charStyle.applyTo( EditableTextCell.textCellWithCachedListener( str, textToChar ) );
+		return charStyle.applyTo( EditableTextCell.textCellWithCachedListener( Character.toString( c ), textToChar ) );
 	}
 	
 	public static Pres presentString(String text, FragmentView fragment, SimpleAttributeTable inheritedState)
@@ -68,14 +67,7 @@ public class PrimitiveCellEditPresenter
 	
 	public static Pres presentBoolean(boolean b, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		if ( b )
-		{
-			return booleanStyle.applyTo( EditableTextCell.textCellWithCachedListener( "True", textToBoolean ) );
-		}
-		else
-		{
-			return booleanStyle.applyTo( EditableTextCell.textCellWithCachedListener( "False", textToBoolean ) );
-		}
+		return booleanStyle.applyTo( EditableTextCell.textCellWithCachedListener( b  ?  "True"  :  "False", textToBoolean ) );
 	}
 	
 	
@@ -103,6 +95,7 @@ public class PrimitiveCellEditPresenter
 		}
 	};
 	
+	
 	private static final TextToValue textToString = new TextToValue()
 	{
 		public Object textToValue(String textValue)
@@ -110,6 +103,7 @@ public class PrimitiveCellEditPresenter
 			return textValue;
 		}
 	};
+	
 	
 	private static final TextToValue textToByte = new TextToValue()
 	{
@@ -127,6 +121,7 @@ public class PrimitiveCellEditPresenter
 		}
 	};
 	
+	
 	private static final TextToValue textToShort = new TextToValue()
 	{
 		public Object textToValue(String textValue)
@@ -142,6 +137,7 @@ public class PrimitiveCellEditPresenter
 			return null;
 		}
 	};
+
 	
 	private static final TextToValue textToInt = new TextToValue()
 	{
@@ -159,6 +155,7 @@ public class PrimitiveCellEditPresenter
 		}
 	};
 	
+	
 	private static final TextToValue textToLong = new TextToValue()
 	{
 		public Object textToValue(String textValue)
@@ -174,6 +171,7 @@ public class PrimitiveCellEditPresenter
 			return null;
 		}
 	};
+	
 	
 	private static final TextToValue textToBigInteger = new TextToValue()
 	{
@@ -191,6 +189,7 @@ public class PrimitiveCellEditPresenter
 		}
 	};
 	
+	
 	private static final TextToValue textToBigDecimal = new TextToValue()
 	{
 		public Object textToValue(String textValue)
@@ -207,6 +206,7 @@ public class PrimitiveCellEditPresenter
 		}
 	};
 	
+	
 	private static final TextToValue textToDouble = new TextToValue()
 	{
 		public Object textToValue(String textValue)
@@ -222,6 +222,7 @@ public class PrimitiveCellEditPresenter
 			return null;
 		}
 	};
+	
 	
 	private static final TextToValue textToBoolean = new TextToValue()
 	{

@@ -1002,7 +1002,7 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 			pass
 		else:
 			# Got a 'model' function - invoke to create AST nodes, then convert them to code
-			model = modelFn()
+			model = modelFn( self )
 			return self( model )
 		
 		
@@ -1045,7 +1045,7 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 			pass
 		else:
 			# Got a 'model' function - invoke to create AST nodes, then convert them to code
-			model = modelFn()
+			model = modelFn( self )
 			return self( model )
 
 		
