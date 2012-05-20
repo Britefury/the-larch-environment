@@ -133,7 +133,7 @@ class ConstantTable (object):
 		self._incr.onChanged()
 		
 		
-	def __py_execmodel__(self):
+	def __py_execmodel__(self, codeGen):
 		assigns = []
 		for definition in self._definitions_:
 			target = definition.target.model['target']

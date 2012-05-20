@@ -66,7 +66,7 @@ class LiterateExpression (object):
 		return [ self._expr ]
 
 
-	def __py_evalmodel__(self):
+	def __py_evalmodel__(self, codeGen):
 		return self._expr.model
 
 	def __py_replacement__(self):
@@ -160,7 +160,7 @@ class LiterateSuite (object):
 		return [ self._definition ]
 
 
-	def __py_execmodel__(self):
+	def __py_execmodel__(self, codeGen):
 		return self._definition._suite.model
 
 	def __py_replacement__(self):

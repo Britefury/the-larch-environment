@@ -45,6 +45,7 @@ class InlineTest (object):
 
 class TestingBlock (object):
 	def __init__(self):
+		self._name = LiveValue( 'test' )
 		self._suite = EmbeddedPython25Suite()
 		self._code = None
 		self._incr = IncrementalValueMonitor()
@@ -54,9 +55,10 @@ class TestingBlock (object):
 
 
 	def __getstate__(self):
-		return { 'suite' : self._suite }
+		return { 'name' : self._name.getValue(), 'suite' : self._suite }
 
 	def __setstate__(self, state):
+		self._name = LiveValue( state['name' ] )
 		self._suite = state['suite']
 		self._code = None
 		self._incr = IncrementalValueMonitor()
@@ -88,18 +90,36 @@ class TestingBlock (object):
 		InlineTest._currentTestingBlock = prevBlock
 
 
-	def __py_exec__(self, _globals, _locals, codeGen):
-		tableState = self._tableView.begin()
-		treeState = self._treeView.begin()
+	def __py_execmodel__(self, codeGen):
+		self._clear()
 
-		exec self._code in _globals, _locals
+		stmts = self._suite.model['suite']
 
-		self._treeView.end( treeState )
-		self._tableView.end( tableState )
+		# Get each inline test to create its method body
+		methods = [ test._createTestMethodDeclaration( self )   for test in self._inlineTests ]
+
+		# Create the class suite
+		first = False
+		clsSuite = []
+		for method in methods:
+			if not first:
+				clsSuite.append( Schema.BlankLine() )
+			clsSuite.append( method )
+
+
+		# Now, we need to create the test class declaration
+		clsName = self._getTestClassName()
+		testCls = Schema.ClassStmt( name=clsName, bases=[], suite=clsSuite )
+
 
 
 	def __py_replacement__(self):
 		return deepcopy( self._suite.model['suite'] )
+
+
+
+	def _getTestClassName(self):
+		return 'Test_' + self._name.value
 
 
 	def __present__(self, fragment, inheritedState):
