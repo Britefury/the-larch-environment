@@ -255,6 +255,9 @@ _pythonPackageNameNotSetCommentStyle = StyleSheet.style( Primitive.foreground( C
 _packageContentsIndentation = 20.0
 
 
+_packageIcon = Image( 'LarchCore/Project/images/Package.png' )
+
+
 _nameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*' )
 _pythonPackageNameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*(\\.[a-zA-Z_][a-zA-Z0-9_]*)*' )
 
@@ -459,9 +462,8 @@ class ProjectView (MethodDispatchView):
 
 		world = fragment.getSubjectContext()['world']
 
-		icon = Image( 'LarchCore/Project/icons/Package.png' )
 		nameElement = _packageNameStyle.applyTo( StaticText( package.name ) )
-		nameBox = _itemHoverHighlightStyle.applyTo( Row( [ icon.padX( 5.0 ).alignHPack().alignVCentre(), nameElement.alignVCentre() ] ) )
+		nameBox = _itemHoverHighlightStyle.applyTo( Row( [ _packageIcon.padX( 5.0 ).alignHPack().alignVCentre(), nameElement.alignVCentre() ] ) )
 
 		# Set drop destination and place in box that is h-packed, otherwise attempting to drop items as children could require the user to
 		# drop somewhere off to the right of the package, since the h-expand applied further up the presentation tree will expand it beyond

@@ -279,9 +279,9 @@ public class Image extends Pres
 		};
 	}
 	
-	public static Image systemIcon(String iconName)
+	public static Image systemImage(String iconName)
 	{
-		return new Image( "icons/" + iconName + ".png" );
+		return new Image( "images/" + iconName + ".png" );
 	}
 
 

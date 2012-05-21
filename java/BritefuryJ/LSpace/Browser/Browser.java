@@ -416,7 +416,7 @@ public class Browser
 	
 	private JButton makeToolButton(String imageFilename, String actionCommand, String tooltipText, String altText, ActionListener listener)
 	{
-		String imagePath = "icons/" + imageFilename;
+		String imagePath = "images/" + imageFilename;
 		
 		JButton button = new JButton();
 		button.setActionCommand( actionCommand );

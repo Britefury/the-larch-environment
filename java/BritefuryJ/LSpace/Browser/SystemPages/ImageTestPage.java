@@ -56,14 +56,14 @@ public class ImageTestPage extends SystemPage
 				new NormalText( "A 64x32 image with a green oval, scaled to 256x128" ),
 				new Image( ellipseImage, 256.0, 128.0 ),
 				new NormalText( "Image from 'back arrow' image file, as file object" ),
-				new Image( new File( "icons/back arrow.png" ) ),
+				new Image( new File( "images/back arrow.png" ) ),
 				new NormalText( "Image from 'forward arrow' image file, as file name string" ),
-				new Image( "icons/forward arrow.png" ),
+				new Image( "images/forward arrow.png" ),
 				new NormalText( "Invalid image filename" ),
 				new Image( "" ),
 				new NormalText( "A 64x32 image with a green oval, with a blue oval displayed on hover" ),
 				new Image( ellipseImage, blueEllipseImage ),
 				new NormalText( "Image from 'back arrow' image file, as file object, with 'forward arrow' image file on hover" ),
-				new Image( new File( "icons/back arrow.png" ), new File( "icons/forward arrow.png" ) ) } );
+				new Image( new File( "images/back arrow.png" ), new File( "images/forward arrow.png" ) ) } );
 	}
 }

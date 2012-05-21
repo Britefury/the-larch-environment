@@ -377,7 +377,7 @@ class WorksheetEditor (MethodDispatchView):
 		optionChoices = [ StaticText( text )   for text in optionTexts ]
 		styleOptionMenu = OptionMenu( optionChoices, choiceValues.index( node.getStyle() ), _onStyleOptionMenu )
 		
-		deleteButton = Button( Image.systemIcon( 'delete' ), _onDeleteButton )
+		deleteButton = Button( Image.systemImage( 'delete' ), _onDeleteButton )
 		
 		headerBox = _pythonCodeHeaderStyle.applyTo( Bin(
 		        StyleSheet.style( Primitive.rowSpacing( 20.0 ) ).applyTo( Row( [
@@ -422,7 +422,7 @@ class WorksheetEditor (MethodDispatchView):
 		optionChoices = [ StaticText( text )   for text in optionTexts ]
 		styleOptionMenu = OptionMenu( optionChoices, choiceValues.index( node.getStyle() ), _onStyleOptionMenu )
 		
-		deleteButton = Button( Image.systemIcon( 'delete' ), _onDeleteButton )
+		deleteButton = Button( Image.systemImage( 'delete' ), _onDeleteButton )
 		
 		locationEditor = TextEntry( node.getLocation(), _LocationEntryListener() )
 		
