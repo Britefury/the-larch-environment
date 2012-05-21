@@ -10,7 +10,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.io.File;
 
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Image;
@@ -55,15 +54,15 @@ public class ImageTestPage extends SystemPage
 				new Image( ellipseImage ),
 				new NormalText( "A 64x32 image with a green oval, scaled to 256x128" ),
 				new Image( ellipseImage, 256.0, 128.0 ),
-				new NormalText( "Image from 'back arrow' image file, as file object" ),
-				new Image( new File( "images/back arrow.png" ) ),
-				new NormalText( "Image from 'forward arrow' image file, as file name string" ),
-				new Image( "images/forward arrow.png" ),
+				new NormalText( "Image from 'back arrow' system image" ),
+				Image.systemImage( "back arrow.png" ),
+				new NormalText( "Image from 'forward arrow' system image, passed as URL" ),
+				new Image( getClass().getResource( "/images/forward arrow.png" ) ),
 				new NormalText( "Invalid image filename" ),
 				new Image( "" ),
 				new NormalText( "A 64x32 image with a green oval, with a blue oval displayed on hover" ),
 				new Image( ellipseImage, blueEllipseImage ),
-				new NormalText( "Image from 'back arrow' image file, as file object, with 'forward arrow' image file on hover" ),
-				new Image( new File( "images/back arrow.png" ), new File( "images/forward arrow.png" ) ) } );
+				new NormalText( "Image from 'back arrow' image file, as URL, with 'forward arrow' image URL on hover" ),
+				new Image( getClass().getResource( "/images/back arrow.png" ), getClass().getResource( "/images/forward arrow.png" ) ) } );
 	}
 }

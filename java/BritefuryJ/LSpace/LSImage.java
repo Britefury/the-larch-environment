@@ -16,6 +16,8 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 import javax.imageio.ImageIO;
 
@@ -182,6 +184,7 @@ public class LSImage extends LSBlank
 		initImage( readImageFile( imageFile ), hoverImageFile != null  ?  readImageFile( hoverImageFile )  :  null );
 	}
 	
+	
 	public LSImage(ElementStyleParams styleParams, String imageFilename, String hoverImageFilename, double imageWidth, double imageHeight)
 	{
 		this( styleParams, new File( imageFilename ), hoverImageFilename != null  ?  new File( hoverImageFilename )  :  null,  imageWidth, imageHeight );
@@ -195,6 +198,28 @@ public class LSImage extends LSBlank
 	public LSImage(ElementStyleParams styleParams, String imageFilename, String hoverImageFilename)
 	{
 		this( styleParams, new File( imageFilename ), hoverImageFilename != null  ?  new File( hoverImageFilename )  :  null );
+	}
+	
+	
+	public LSImage(ElementStyleParams styleParams, URL imageURL, URL hoverImageURL, double imageWidth, double imageHeight)
+	{
+		super( styleParams );
+		
+		initImage( readImageUrl( imageURL ), hoverImageURL != null  ?  readImageUrl( hoverImageURL )  :  null,  imageWidth, imageHeight );
+	}
+	
+	public LSImage(ElementStyleParams styleParams, URL imageURL, URL hoverImageURL, double imageWidth)
+	{
+		super( styleParams );
+		
+		initImage( readImageUrl( imageURL ), hoverImageURL != null  ?  readImageUrl( hoverImageURL )  :  null,  imageWidth );
+	}
+	
+	public LSImage(ElementStyleParams styleParams, URL imageURL, URL hoverImageURL)
+	{
+		super( styleParams );
+		
+		initImage( readImageUrl( imageURL ), hoverImageURL != null  ?  readImageUrl( hoverImageURL )  :  null );
 	}
 	
 	
@@ -250,7 +275,7 @@ public class LSImage extends LSBlank
 	}
 	
 
-	private AbstractImg readImageFile(File file)
+	private static AbstractImg readImageFile(File file)
 	{
 		try
 		{
@@ -267,6 +292,32 @@ public class LSImage extends LSBlank
 			}
 		}
 		catch (IOException e)
+		{
+			return img( getBadImage() );
+		}
+	}
+	
+	private static AbstractImg readImageUrl(URL url)
+	{
+		try
+		{
+			if ( url.getFile().toLowerCase().endsWith( ".svg" ) )
+			{
+				// Load as SVG
+				SVGDiagram diagram = SVGCache.getSVGUniverse().getDiagram( url.toURI() );
+				return img( diagram );
+			}
+			else
+			{
+				// Load as buffered image
+				return img( ImageIO.read( url ) );
+			}
+		}
+		catch (IOException e)
+		{
+			return img( getBadImage() );
+		}
+		catch (URISyntaxException e)
 		{
 			return img( getBadImage() );
 		}
