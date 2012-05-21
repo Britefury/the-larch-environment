@@ -12,6 +12,7 @@ import java.awt.Dimension;
 import java.awt.MediaTracker;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -416,15 +417,23 @@ public class Browser
 	
 	private JButton makeToolButton(String imageFilename, String actionCommand, String tooltipText, String altText, ActionListener listener)
 	{
-		String imagePath = "images/" + imageFilename;
-		
 		JButton button = new JButton();
 		button.setActionCommand( actionCommand );
 		button.setToolTipText( tooltipText );
 		button.addActionListener( listener );
 		button.setFocusable( false );
 		
-		ImageIcon icon = new ImageIcon( imagePath, altText );
+		ImageIcon icon;
+		URL u = getClass().getResource( "/images/" + imageFilename );
+		if ( u != null )
+		{
+			icon = new ImageIcon( u, altText );
+		}
+		else
+		{
+			icon = new ImageIcon( "images/" + imageFilename, altText );
+		}
+		
 		if ( icon.getImageLoadStatus() != MediaTracker.ABORTED  &&  icon.getImageLoadStatus() != MediaTracker.ERRORED )
 		{
 			button.setIcon( icon );
@@ -432,7 +441,7 @@ public class Browser
 		else
 		{
 			button.setText( altText );
-			System.err.println( "Could not load image " + imagePath );
+			System.err.println( "Could not load button image " + imageFilename );
 		}
 		
 		return button;
