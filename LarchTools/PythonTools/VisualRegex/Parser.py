@@ -78,7 +78,7 @@ class VisualRegexGrammar (Grammar):
 	# Character set
 	@Rule
 	def charSetChar(self):
-		return self.escapedChar() | RegEx( '[^\\]\\-\\\\]' ).action( lambda input, begin, end, x, bindings: Schema.LiteralChar( char=x ) )
+		return self.escapedChar() | ( RegEx( '[^\\]\\-\\\\]' ) | Literal( '-' ) ).action( lambda input, begin, end, x, bindings: Schema.LiteralChar( char=x ) )
 
 	@Rule
 	def charSetItemChar(self):
@@ -266,6 +266,10 @@ class TestCase_ReParser (ParserTestCase):
 											    Schema.CharSetRange( min=Schema.LiteralChar( char='0' ), max=Schema.LiteralChar( char='9' ) ),
 											    Schema.CharSetChar( char=Schema.LiteralChar( char='_' ) ) ] ) )
 		self._parseStringTest( g.charSet(), '[^^]', Schema.CharSet( invert='1', items=[ Schema.CharSetChar( char=Schema.LiteralChar( char='^' ) ) ] ) )
+		self._parseStringTest( g.charSet(), '[-]', Schema.CharSet( items=[ Schema.CharSetChar( char=Schema.LiteralChar( char='-' ) ) ] ) )
+		self._parseStringTest( g.charSet(), '[a-]', Schema.CharSet( items=[ Schema.CharSetChar( char=Schema.LiteralChar( char='a' ) ),
+		                                                                   Schema.CharSetChar( char=Schema.LiteralChar( char='-' ) ) ] ) )
+		self._parseStringTest( g.charSet(), '[+--]', Schema.CharSet( items=[ Schema.CharSetRange( min=Schema.LiteralChar( char='+' ), max=Schema.LiteralChar( char='-' ) ) ] ) )
 
 
 	def test_group(self):
