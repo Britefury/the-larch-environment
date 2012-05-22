@@ -118,7 +118,7 @@ _charClassBorder = SolidBorder( 1.0, 1.0, 4.0, 4.0, Color( 0.4, 0.8, 0.0 ), Colo
 #_charClassEscapeStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.25, 0.5, 0.5 ) ) )
 #_charClassBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 0.0, 0.25, 0.5 ), Color( 0.8, 0.9, 1.0 ) )
 
-_groupNameStyle = StyleSheet.style( Primitive.fontItalic( True ) )
+_groupNameStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.65, 0.0 ) ) )
 _commentStyle = StyleSheet.style( Primitive.foreground( Color( 0.3, 0.3, 0.3 ) ) )
 _flagsStyle = StyleSheet.style( Primitive.foreground( Color( 1.0, 0.5, 0.0 ) ) )
 
@@ -129,10 +129,14 @@ _charSetBorder = SolidBorder( 1.0, 4.0, 3.0, 3.0,Color( 0.5, 0.5, 0.6 ), Color( 
 _charSetItemBorder = FilledBorder( 1.0, 1.0, 1.0, 1.0, Color( 0.9, 0.9, 0.9 ) )
 
 _groupBorder = SolidBorder( 1.0, 4.0, 3.0, 3.0, Color( 1.0, 0.7, 0.4 ), Color( 1.0, 1.0, 0.8 ) )
+_nonCapturingGroupBorder = SolidBorder( 1.0, 4.0, 3.0, 3.0, Color( 0.8, 0.8, 0.6 ), Color( 0.9, 0.9, 0.85 ) )
+_lookaheadBorder = SolidBorder( 1.0, 4.0, 3.0, 3.0, Color( 0.5, 1.0, 0.75 ), Color( 0.9, 1.0, 0.95 ) )
+_lookbehindBorder = SolidBorder( 1.0, 4.0, 3.0, 3.0, Color( 0.6, 0.9, 0.75 ), Color( 0.875, 0.925, 0.9 ) )
 _repeatBorder = SolidBorder( 1.0, 1.0, 3.0, 3.0, Color( 0.0, 0.7, 0.0 ), Color( 0.85, 1.0, 0.85 ) )
 _choiceBorder = SolidBorder( 1.0, 4.0, 3.0, 3.0, Color( 0.7, 0.4, 1.0 ), Color( 0.9, 0.8, 1.0 ) )
+_choiceRuleStyle = StyleSheet.style( Primitive.shapePainter( FillPainter( Color( 0.0, 0.0, 0.0, 0.35 ) ) ) )
 
-_commentBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 0.4, 0.4, 0.4 ), Color( 0.9, 0.9, 0.9 ) )
+_commentBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 0.4, 0.4, 0.4 ), Color( 0.8, 0.8, 0.8 ) )
 _flagsBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 1.0, 0.6, 0.2 ), Color( 1.0, 1.0, 0.8 ) )
 
 
@@ -202,21 +206,26 @@ def charSet(invert, items):
 
 def group(subexp, capturing):
 	contents = [ subexp ]   if capturing   else [ _controlCharStyle( Text( '?:' ) ), subexp ]
-	return _groupBorder.surround( Row( [ Segment( Span( [ _controlCharStyle( Text( '(' ) ) ] + contents + [ _controlCharStyle( Text( ')' ) ) ] ) ) ] ) )
+	b = _groupBorder   if capturing   else _nonCapturingGroupBorder
+	return b.surround( Row( [ Segment( Span( [ _controlCharStyle( Text( '(' ) ) ] + contents + [ _controlCharStyle( Text( ')' ) ) ] ) ) ] ) )
 
 def defineNamedGroup(subexp, name):
-	groupName = _groupNameStyle( Text( '<' + name + '>' ) )
-	return _groupBorder.surround( Row( [ _controlCharStyle( Text( '(?P' ) ), groupName, subexp, _controlCharStyle( Text( ')' ) ) ] ) )
+	groupName = Row( [ _controlCharStyle( Text( 'P<' ) ), _groupNameStyle( Text( name ) ), _controlCharStyle( Text( '>' ) ) ] )
+	nameBlock = Script.scriptRSub(  _controlCharStyle( Text( '?' ) ), groupName )
+	return _groupBorder.surround( Row( [ _controlCharStyle( Text( '(' ) ), nameBlock, subexp, _controlCharStyle( Text( ')' ) ) ] ) )
 
 def matchNamedGroup(name):
-	groupName = _groupNameStyle( Text( name ) )
-	return _groupBorder.surround( Row( [ _controlCharStyle( Text( '(?P=' ) ), groupName, _controlCharStyle( Text( ')' ) ) ] ) )
+	groupName = Row( [ _controlCharStyle( Text( 'P=' ) ), _groupNameStyle( Text( name ) ) ] )
+	nameBlock = Script.scriptRSub(  _controlCharStyle( Text( '?' ) ), groupName )
+	return _groupBorder.surround( Row( [ _controlCharStyle( Text( '(' ) ), nameBlock, _controlCharStyle( Text( ')' ) ) ] ) )
 
 def lookahead(subexp, positive):
-	return _groupBorder.surround( Row( [ _controlCharStyle( Text( '(?='   if positive   else '(?!' ) ), subexp, _controlCharStyle( Text( ')' ) ) ] ) )
+	posNegIndicator = _controlCharStyle( Text( '=' ) )   if positive   else _invertControlCharStyle( Text( '!' ) )
+	return _lookaheadBorder.surround( Row( [ _controlCharStyle( Text( '(?' ) ), posNegIndicator, subexp, _controlCharStyle( Text( ')' ) ) ] ) )
 
 def lookbehind(subexp, positive):
-	return _groupBorder.surround( Row( [ _controlCharStyle( Text( '(?<='   if positive   else '(?<!' ) ), subexp, _controlCharStyle( Text( ')' ) ) ] ) )
+	posNegIndicator = _controlCharStyle( Text( '=' ) )   if positive   else _invertControlCharStyle( Text( '!' ) )
+	return _lookbehindBorder.surround( Row( [ _controlCharStyle( Text( '(?<' ) ), posNegIndicator, subexp, _controlCharStyle( Text( ')' ) ) ] ) )
 
 def setFlags(flags):
 	flagsText = _flagsStyle( Text( flags ) )
@@ -249,8 +258,12 @@ def sequence(subexps):
 	return Paragraph( subexps )
 
 def choice(subexps):
-	rows = [ [ subexp, _controlCharStyle( Text( '|' ) ) ]   for subexp in subexps[:-1] ]  +  [ [ subexps[-1], None ] ]
-	return _choiceBorder.surround( Table( rows ) )
+	rows = []
+	for subexp in subexps[:-1]:
+		rows.append( Row( [ subexp.alignHPack(), _controlCharStyle( Text( '|' ).alignHRight() ) ] ).alignHExpand() )
+		rows.append( _choiceRuleStyle.applyTo( Box( 1.0, 1.0 ).pad( 5.0, 3.0 ).alignHExpand() ) )
+	rows.append( subexps[-1].alignHPack() )
+	return _choiceBorder.surround( Column( rows ) )
 
 
 
