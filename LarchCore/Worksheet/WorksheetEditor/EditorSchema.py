@@ -51,10 +51,6 @@ class _Projection (object):
 	def pythonCode(self, worksheet, node):
 		return PythonCodeEditor( worksheet, node )
 	
-	@DMObjectNodeDispatchMethod( Schema.QuoteLocation )
-	def quoteLocation(self, worksheet, node):
-		return QuoteLocationEditor( worksheet, node )
-
 	@DMObjectNodeDispatchMethod( Schema.InlineEmbeddedObject )
 	def inlineEmbeddedObject(self, worksheet, node):
 		return InlineEmbeddedObjectEditor( worksheet, node )
@@ -245,36 +241,6 @@ class PythonCodeEditor (AbstractViewSchema.PythonCodeAbstractView):
 	@staticmethod
 	def newPythonCodeModel():
 		return Schema.PythonCode( style='code_result', code=Python25._py25NewModule() )
-
-	
-	
-class QuoteLocationEditor (AbstractViewSchema.QuoteLocationAbstractView):
-	def __init__(self, worksheet, model):
-		super( QuoteLocationEditor, self ).__init__( worksheet, model )
-		self._editorModel = WSEditor.RichTextEditor.WorksheetRichTextEditor.instance.editorModelParagraphEmbed( model )
-
-		
-	def setLocation(self, location):
-		self._model['location'] = location
-		
-		
-		
-	def setStyle(self, style):
-		try:
-			name = self._styleToName[style]
-		except KeyError:
-			raise ValueError, 'invalid style'
-		self._model['style'] = name
-		
-		
-	@staticmethod
-	def newQuoteLocation():
-		m = QuoteLocationEditor.newQuoteLocationModel()
-		return QuoteLocationEditor( None, m )
-
-	@staticmethod
-	def newQuoteLocationModel():
-		return Schema.QuoteLocation( location='', style='normal' )
 
 
 

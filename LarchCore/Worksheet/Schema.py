@@ -30,9 +30,6 @@ StyleAttr = schema.newClass( 'StyleAttr', WorksheetNode, [ 'name', 'value' ] )
 PythonCode = schema.newClass( 'PythonCode', WorksheetNode, [ 'code', 'style' ] )
 
 
-QuoteLocation = schema.newClass( 'QuoteLocation', WorksheetNode, [ 'location', 'style' ] )
-
-
 InlineEmbeddedObject = schema.newClass( 'InlineEmbeddedObject', WorksheetNode, [ 'embeddedValue' ] )
 ParagraphEmbeddedObject = schema.newClass( 'ParagraphEmbeddedObject', WorksheetNode, [ 'embeddedValue' ] )
 

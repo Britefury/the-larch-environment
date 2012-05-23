@@ -19,9 +19,6 @@ from LarchCore.Worksheet import Schema
 class WorksheetTextExporterError (Exception):
 	pass
 
-class WorksheetTextExporterCannotExportQuoteLocationError (Exception):
-	pass
-
 class WorksheetTextExporterCannotExportEmbeddedObjectError (Exception):
 	pass
 
@@ -75,11 +72,6 @@ class WorksheetTextExporter (object):
 	@DMObjectNodeDispatchMethod( Schema.PythonCode )
 	def PythonCode(self, node):
 		return self._pythonExporter( node['code'] )
-
-
-	@DMObjectNodeDispatchMethod( Schema.QuoteLocation )
-	def QuoteLocation(self, node):
-		raise WorksheetTextExporterCannotExportQuoteLocationError
 
 
 	@DMObjectNodeDispatchMethod( Schema.InlineEmbeddedObject )
