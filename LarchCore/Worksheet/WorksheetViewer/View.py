@@ -165,25 +165,6 @@ class WorksheetViewer (MethodDispatchView):
 			return Blank()
 
 
-	
-	@ObjectDispatchMethod( ViewSchema.QuoteLocationView )
-	def QuoteLocation(self, fragment, inheritedState, node):
-		targetView = StyleSheet.style( Primitive.editable( True ) ).applyTo( LocationAsInnerFragment( Location( node.getLocation() ) ) )
-		
-		if node.isMinimal():
-			return targetView.alignHExpand()
-		else:
-			headerBox = _quoteLocationHeaderStyle.applyTo( Bin(
-				StyleSheet.style( Primitive.rowSpacing( 20.0 ) ).applyTo( Row(
-			                [ Label( 'Location: ' ).alignHExpand(), Label( node.getLocation() ) ] ) ).alignHExpand().pad( 2.0, 2.0 ) ) )
-			
-			boxContents = [ headerBox.alignHExpand(),
-					_quoteLocationBorderStyle.applyTo( Border( targetView.alignHExpand() ).alignHExpand() ) ]
-			box = StyleSheet.style( Primitive.columnSpacing( 5.0 ) ).applyTo( Column( boxContents ) )
-			
-			return _quoteLocationEditorBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
-
-
 
 	@ObjectDispatchMethod( ViewSchema.InlineEmbeddedObjectView )
 	def InlineEmbeddedObject(self, fragment, inheritedState, node):

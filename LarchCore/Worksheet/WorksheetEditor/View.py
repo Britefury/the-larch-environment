@@ -137,6 +137,8 @@ def _applyParagraphShortcuts(p):
 
 _italicButtonLabelStyle = StyleSheet.style( Primitive.fontFace( 'Monospaced' ), Primitive.fontItalic( True ) )
 _boldButtonLabelStyle = StyleSheet.style( Primitive.fontFace( 'Monospaced' ), Primitive.fontBold( True ) )
+_underlineButtonLabelStyle = StyleSheet.style( Primitive.fontFace( 'Monospaced' ), Primitive.fontUnderline( True ) )
+_strikethroughButtonLabelStyle = StyleSheet.style( Primitive.fontFace( 'Monospaced' ), Primitive.fontStrikethrough( True ) )
 
 
 
@@ -187,8 +189,10 @@ def _worksheetContextMenuFactory(element, menu):
 	
 	italicStyle = Button( _italicButtonLabelStyle( SpaceBin( 16.0, 16.0, Label( 'I' ).alignHCentre().alignVCentre() ) ), makeToggleStyleFn( 'italic' ) )
 	boldStyle = Button( _boldButtonLabelStyle( SpaceBin( 16.0, 16.0, Label( 'B' ).alignHCentre().alignVCentre() ) ), makeToggleStyleFn( 'bold' ) )
-	styles = ControlsRow( [ italicStyle, boldStyle ] ).alignHPack()
-	menu.add( Section( SectionHeading2( 'Style' ), styles ).alignHExpand() )
+	underlineStyle = Button( _underlineButtonLabelStyle( SpaceBin( 16.0, 16.0, Label( 'U' ).alignHCentre().alignVCentre() ) ), makeToggleStyleFn( 'underline' ) )
+	strikethroughStyle = Button( _strikethroughButtonLabelStyle( SpaceBin( 16.0, 16.0, Label( 'abc' ).alignHCentre().alignVCentre() ) ), makeToggleStyleFn( 'strikethrough' ) )
+	styles = ControlsRow( [ italicStyle, boldStyle, underlineStyle, strikethroughStyle ] ).alignHPack()
+	menu.add( Section( SectionHeading2( 'Text style' ), styles ).alignHExpand() )
 
 
 	def _onPythonCode(link, event):
@@ -202,19 +206,6 @@ def _worksheetContextMenuFactory(element, menu):
 	newCode = Hyperlink( 'Python code', _onPythonCode )
 	codeControls = ControlsRow( [ newCode ] )
 	menu.add( Section( SectionHeading2( 'Code' ), codeControls ).alignHExpand() )
-	
-	
-	def _onQuoteLocation(link, event):
-		def _makeQuoteLocation():
-			return EditorSchema.QuoteLocationEditor.newQuoteLocation()
-
-		caret = rootElement.getCaret()
-		if caret.isValid():
-			WorksheetRichTextEditor.instance.insertParagraphAtCaret( caret, _makeQuoteLocation )
-
-	newQuoteLocation = Hyperlink( 'View of Location', _onQuoteLocation )
-	quoteLocationControls = ControlsRow( [ newQuoteLocation ] )
-	menu.add( Section( SectionHeading2( 'Location' ), quoteLocationControls ).alignHExpand() )
 	
 	
 	def _onRefresh(button, event):
@@ -391,52 +382,6 @@ class WorksheetEditor (MethodDispatchView):
 		box = StyleSheet.style( Primitive.columnSpacing( 5.0 ) ).applyTo( Column( boxContents ) )
 		
 		p = _pythonCodeEditorBorderStyle.applyTo( Border( box ).alignHExpand() )
-
-		p = WorksheetRichTextEditor.instance.editableParagraphEmbed( node, p )
-		return p
-
-
-	
-	@ObjectDispatchMethod( EditorSchema.QuoteLocationEditor )
-	def QuoteLocation(self, fragment, inheritedState, node):
-		choiceValues = [
-		        EditorSchema.QuoteLocationEditor.STYLE_MINIMAL,
-		        EditorSchema.QuoteLocationEditor.STYLE_NORMAL ]
-		
-		
-		class _LocationEntryListener (TextEntry.TextEntryListener):
-			def onAccept(self, entry, location):
-				node.setLocation( location )
-
-		
-		def _onStyleOptionMenu(optionMenu, prevChoice, choice):
-			style = choiceValues[choice]
-			node.setStyle( style )
-			
-		def _onDeleteButton(button, event):
-			WorksheetRichTextEditor.instance.deleteParagraphContainingElement( button.getElement() )
-
-		targetView = StyleSheet.style( Primitive.editable( True ) ).applyTo( LocationAsInnerFragment( Location( node.getLocation() ) ) )
-		
-		optionTexts = [ 'Minimal', 'Normal' ]
-		optionChoices = [ StaticText( text )   for text in optionTexts ]
-		styleOptionMenu = OptionMenu( optionChoices, choiceValues.index( node.getStyle() ), _onStyleOptionMenu )
-		
-		deleteButton = Button( Image.systemIcon( 'delete' ), _onDeleteButton )
-		
-		locationEditor = TextEntry( node.getLocation(), _LocationEntryListener() )
-		
-		headerBox = _quoteLocationHeaderStyle.applyTo( Bin(
-		        StyleSheet.style( Primitive.rowSpacing( 20.0 ) ).applyTo( Row( [
-		                Row( [ Label( 'Location: ' ) ] ).alignHPack(),
-		                locationEditor.alignHExpand(),
-		                Row( [ styleOptionMenu, deleteButton.alignVCentre() ] ).alignHRight() ] ) ).pad( 2.0, 2.0 ) ) )
-		
-		boxContents = [ headerBox,
-				_quoteLocationBorderStyle.applyTo( Border( targetView ) ) ]
-		box = StyleSheet.style( Primitive.columnSpacing( 5.0 ) ).applyTo( Column( boxContents ) )
-		
-		p = _quoteLocationEditorBorderStyle.applyTo( Border( box ).alignHExpand() )
 
 		p = WorksheetRichTextEditor.instance.editableParagraphEmbed( node, p )
 		return p

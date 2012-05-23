@@ -38,8 +38,6 @@ class WorksheetRichTextEditor (RichTextEditor):
 		assert isinstance( value, DMObject )
 		if value.isInstanceOf( Schema.PythonCode ):
 			return EditorSchema.PythonCodeEditor( None, value )
-		elif value.isInstanceOf( Schema.QuoteLocation ):
-			return EditorSchema.QuoteLocationEditor( None, value )
 		elif value.isInstanceOf( Schema.ParagraphEmbeddedObject ):
 			return EditorSchema.ParagraphEmbeddedObjectEditor( None, value )
 		else:

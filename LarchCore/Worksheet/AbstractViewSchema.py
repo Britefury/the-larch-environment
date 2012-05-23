@@ -168,6 +168,8 @@ class TextSpanAbstractView (_TextAbstractView):
 	_styleMap = {}
 	_styleMap['italic'] = lambda value: Primitive.fontItalic( bool( value ) )
 	_styleMap['bold'] = lambda value: Primitive.fontBold( bool( value ) )
+	_styleMap['underline'] = lambda value: Primitive.fontUnderline( bool( value ) )
+	_styleMap['strikethrough'] = lambda value: Primitive.fontStrikethrough( bool( value ) )
 
 	def __compute_style_map(self):
 		attrs = self._model['styleAttrs']
@@ -263,46 +265,6 @@ class PythonCodeAbstractView (NodeAbstractView):
 	def _refreshResults(self, module):
 		self._result = Execution.getResultOfExecutionWithinModule( self.getCode(), module, self.isResultVisible() )
 		self._incr.onChanged()
-
-	
-	
-class QuoteLocationAbstractView (NodeAbstractView):
-	STYLE_MINIMAL = 0
-	STYLE_NORMAL = 1
-	
-	_styleToName  = { STYLE_MINIMAL : 'minimal',
-	                    STYLE_NORMAL : 'normal' }
-	
-	_nameToStyle  = { 'minimal' : STYLE_MINIMAL,
-	                  'normal' : STYLE_NORMAL }
-	
-	
-	def __init__(self, worksheet, model):
-		NodeAbstractView.__init__( self, worksheet, model )
-		self._incr = IncrementalValueMonitor( self )
-		self._result = None
-		
-		
-	def getLocation(self):
-		return self._model['location']
-	
-
-		
-	def getStyle(self):
-		name = self._model['style']
-		try:
-			return self._nameToStyle[name]
-		except KeyError:
-			return self.STYLE_NORMAL
-	
-
-	def isMinimal(self):
-		style = self.getStyle()
-		return style == self.STYLE_MINIMAL
-		
-		
-	def _refreshResults(self, module):
-		pass
 
 
 
