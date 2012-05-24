@@ -245,8 +245,8 @@ _projectIndexDropDest = ObjectDndHandler.DropDest( ProjectDrag, _projectIndexDro
 
 
 _controlsStyle = StyleSheet.style( Controls.bClosePopupOnActivate( True ) )
-_projectIndexNameStyle = StyleSheet.style( Primitive.foreground( Color( 0.25, 0.35, 0.5 ) ), Primitive.fontSize( 16 ), Primitive.fontFace( 'Dotum; SansSerif' ) )
-_packageNameStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.0, 0.5 ) ), Primitive.fontSize( 14 ), Primitive.fontFace( 'Dotum; SansSerif' ) )
+_projectIndexNameStyle = StyleSheet.style( Primitive.foreground( Color( 0.25, 0.35, 0.5 ) ), Primitive.fontSize( 16 ), Primitive.fontFace( Primitive.lightFontName ) )
+_packageNameStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.0, 0.5 ) ), Primitive.fontSize( 14 ), Primitive.fontFace( Primitive.lightFontName ) )
 _itemHoverHighlightStyle = StyleSheet.style( Primitive.hoverBackground( FilledOutlinePainter( Color( 0.8, 0.825, 0.9 ), Color( 0.125, 0.341, 0.574 ), BasicStroke( 1.0 ) ) ) )
 _pythonPackageNameStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.0, 0.5 ) ) )
 _pythonPackageNameNotSetStyle = StyleSheet.style( Primitive.foreground( Color( 0.5, 0.0, 0.0 ) ) )

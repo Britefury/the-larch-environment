@@ -51,10 +51,16 @@ public class Primitive
 	public static final AttributeNamespace primitiveNamespace = new AttributeNamespace( "primitive" );
 	
 	
+	public static final String sansSerifFontName = "DejaVu Sans; SansSerif";
+	public static final String serifFontName = "Perpetua; Un Batang; Serif";
+	public static final String titleFontName = "Lucida Bright; Bitstream Charter; Serif";
+	public static final String lightFontName = "Dotum; DejaVu Sans ExtraLight; Sawasdee; SansSerif";
+	
+	
 	public static final InheritedAttributeNonNull hAlign = new InheritedAttributeNonNull( primitiveNamespace, "hAlign", HAlignment.class, HAlignment.PACK );
 	public static final InheritedAttributeNonNull vAlign = new InheritedAttributeNonNull( primitiveNamespace, "vAlign", VAlignment.class, VAlignment.REFY );
 
-	public static final InheritedAttributeNonNull fontFace = new InheritedAttributeNonNull( primitiveNamespace, "fontFace", String.class, "DejaVu Sans; SansSerif" );
+	public static final InheritedAttributeNonNull fontFace = new InheritedAttributeNonNull( primitiveNamespace, "fontFace", String.class, sansSerifFontName );
 	public static final InheritedAttributeNonNull fontBold = new InheritedAttributeNonNull( primitiveNamespace, "fontBold", Boolean.class, false );
 	public static final InheritedAttributeNonNull fontItalic = new InheritedAttributeNonNull( primitiveNamespace, "fontItalic", Boolean.class, false );
 	public static final InheritedAttributeNonNull fontUnderline = new InheritedAttributeNonNull( primitiveNamespace, "fontUnderline", Boolean.class, false );

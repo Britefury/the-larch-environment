@@ -35,6 +35,12 @@ public class FontMap
 	}
 	
 	
+	public static Iterable<String> getAvailableFontNames()
+	{
+		return allFontNames;
+	}
+	
+	
 	public static String getAvailableFontName(String name)
 	{
 		String availableName = fontNameToAvailableFontName.get( name );
@@ -58,8 +64,8 @@ public class FontMap
 			
 			if ( !choice.equals( "" ) )
 			{
-				choice = choice.toLowerCase();
-				if ( allFontNames.contains( choice ) )
+				String choiceLower = choice.toLowerCase();
+				if ( allFontNames.contains( choiceLower ) )
 				{
 					return choice;
 				}
