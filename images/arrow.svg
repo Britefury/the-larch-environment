@@ -15,7 +15,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.0 r9654"
-   sodipodi:docname="arrow2.svg">
+   sodipodi:docname="arrow.svg">
   <defs
      id="defs4">
     <linearGradient
@@ -67,6 +67,15 @@
        y1="1035.0444"
        x2="9.5387516"
        y2="1050.0085" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3820"
+       id="linearGradient3063"
+       gradientUnits="userSpaceOnUse"
+       x1="9.4850893"
+       y1="1035.0444"
+       x2="9.5387516"
+       y2="1050.0085" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -82,7 +91,7 @@
      inkscape:current-layer="g3839"
      showgrid="false"
      inkscape:window-width="1920"
-     inkscape:window-height="1150"
+     inkscape:window-height="1138"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1" />
@@ -117,13 +126,13 @@
      inkscape:label="Arrow shadow">
     <g
        id="g3776"
-       transform="translate(0,-3.1839165e-6)">
+       transform="matrix(-1,0,0,1,20,-3.1839165e-6)">
       <path
          transform="translate(0.375,-0.0701)"
          inkscape:connector-curvature="0"
          id="path3817"
          d="m 12.0625,1035.2812 a 1.0661953,1.0661953 0 0 0 -0.625,0.3126 l -6.09375,6.0937 a 1.0661953,1.0661953 0 0 0 0,1.5 l 6.125,6.0937 a 1.0661953,1.0661953 0 0 0 1.5,0 l 0.9375,-0.9374 a 1.0661953,1.0661953 0 0 0 0,-1.5 l -4.375,-4.4063 4.375,-4.375 a 1.0661953,1.0661953 0 0 0 0,-1.5 l -0.96875,-0.9687 a 1.0661953,1.0661953 0 0 0 -0.875,-0.3126 z"
-         style="fill:none;stroke:url(#linearGradient3781);stroke-width:1.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline" />
+         style="fill:none;stroke:url(#linearGradient3063);stroke-width:1.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline" />
       <path
          transform="translate(0.375,-0.0701)"
          d="m 12.0625,1035.2812 a 1.0661953,1.0661953 0 0 0 -0.625,0.3126 l -6.09375,6.0937 a 1.0661953,1.0661953 0 0 0 0,1.5 l 6.125,6.0937 a 1.0661953,1.0661953 0 0 0 1.5,0 l 0.9375,-0.9374 a 1.0661953,1.0661953 0 0 0 0,-1.5 l -4.375,-4.4063 4.375,-4.375 a 1.0661953,1.0661953 0 0 0 0,-1.5 l -0.96875,-0.9687 a 1.0661953,1.0661953 0 0 0 -0.875,-0.3126 z"
