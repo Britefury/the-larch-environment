@@ -39,10 +39,10 @@ class IntEditorSpinEntry (Editor):
 
 	def __setstate__(self, state):
 		super( IntEditorSpinEntry, self ).__setstate__( state )
-		self._min = state['min']
-		self._max = state['max']
-		self._step = state['step']
-		self._page = state['page']
+		self._min = state.get( 'min', -1000000 )
+		self._max = state.get( 'max', 1000000 )
+		self._step = state.get( 'step', 1 )
+		self._page = state.get( 'page', 10 )
 		self._incr = IncrementalValueMonitor()
 
 

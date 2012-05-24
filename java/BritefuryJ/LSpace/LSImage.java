@@ -371,14 +371,14 @@ public class LSImage extends LSBlank
 	
 	
 	
-	private static BufferedImageImg img(BufferedImage img)
+	private static AbstractImg img(BufferedImage img)
 	{
-		return img != null  ?  new BufferedImageImg( img )  :  null;
+		return img != null  ?  new BufferedImageImg( img )  :  new BufferedImageImg( getBadImage() );
 	}
 	
-	private static SVGImg img(SVGDiagram img)
+	private static AbstractImg img(SVGDiagram img)
 	{
-		return img != null  ?  new SVGImg( img )  :  null;
+		return img != null  ?  new SVGImg( img )  :  new BufferedImageImg( getBadImage() );
 	}
 	
 	

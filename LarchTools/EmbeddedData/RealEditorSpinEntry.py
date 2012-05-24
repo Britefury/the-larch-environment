@@ -38,10 +38,10 @@ class RealEditorSpinEntry (Editor):
 
 	def __setstate__(self, state):
 		super( RealEditorSpinEntry, self ).__setstate__( state )
-		self._min = state['min']
-		self._max = state['max']
-		self._step = state['step']
-		self._page = state['page']
+		self._min = state.get( 'min', -1000000.0 )
+		self._max = state.get( 'max', 1000000.0 )
+		self._step = state.get( 'step', 1.0 )
+		self._page = state.get( 'page', 10.0 )
 		self._incr = IncrementalValueMonitor()
 
 
