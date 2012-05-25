@@ -7,13 +7,12 @@
 ##-*************************
 import sys
 import os
-from Britefury import javacopiers, javapicklers
 
-
-sys.path.append( os.path.join( os.getcwd(), 'bin' ) )
+sys.path.append( os.path.join( os.getcwd(), 'larch' ) )
 sys.path.append( os.path.join( os.getcwd(), 'extlibs', 'jericho-html-3.2.jar' ) )
 sys.path.append( os.path.join( os.getcwd(), 'extlibs', 'svgSalamander.jar' ) )
 
+from Britefury.app_larch import start_larch
 
-javacopiers.install_java_copiers()
-javapicklers.install_java_picklers()
+if __name__ == '__main__':
+	start_larch()
