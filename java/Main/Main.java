@@ -11,8 +11,6 @@ import org.python.util.PythonInterpreter;
 
 public class Main
 {
-	private static final String scriptName = "larch.py";
-	
 	public static void main(String[] args) throws PyException
 	{
 		PythonInterpreter interp = new PythonInterpreter();
@@ -20,6 +18,7 @@ public class Main
 		String dir = System.getProperty( "user.dir" );
 		dir = dir.replace( "\\", "\\\\" );
 		interp.exec( "sys.path.append( '" + dir + "' )" );
-		interp.execfile( scriptName );
+		interp.exec( "from Britefury.app_larch import start_larch" );
+		interp.exec( "start_larch()" );
 	}
 }
