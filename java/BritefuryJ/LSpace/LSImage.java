@@ -123,21 +123,21 @@ public class LSImage extends LSBlank
 	{
 		super( styleParams );
 		
-		initImage( img( image ), img( hoverImage ), imageWidth, imageHeight );
+		initImage( img( image ), hoverImg( hoverImage ), imageWidth, imageHeight );
 	}
 	
 	public LSImage(ElementStyleParams styleParams, BufferedImage image, BufferedImage hoverImage, double imageWidth)
 	{
 		super( styleParams );
 		
-		initImage( img( image ), img( hoverImage ), imageWidth );
+		initImage( img( image ), hoverImg( hoverImage ), imageWidth );
 	}
 	
 	public LSImage(ElementStyleParams styleParams, BufferedImage image, BufferedImage hoverImage)
 	{
 		super( styleParams );
 		
-		initImage( img( image ), img( hoverImage ) );
+		initImage( img( image ), hoverImg( hoverImage ) );
 	}
 	
 
@@ -145,21 +145,21 @@ public class LSImage extends LSBlank
 	{
 		super( styleParams );
 		
-		initImage( img( image ), img( hoverImage ), imageWidth, imageHeight );
+		initImage( img( image ), hoverImg( hoverImage ), imageWidth, imageHeight );
 	}
 	
 	public LSImage(ElementStyleParams styleParams, SVGDiagram image, SVGDiagram hoverImage, double imageWidth)
 	{
 		super( styleParams );
 		
-		initImage( img( image ), img( hoverImage ), imageWidth );
+		initImage( img( image ), hoverImg( hoverImage ), imageWidth );
 	}
 	
 	public LSImage(ElementStyleParams styleParams, SVGDiagram image, SVGDiagram hoverImage)
 	{
 		super( styleParams );
 		
-		initImage( img( image ), img( hoverImage ) );
+		initImage( img( image ), hoverImg( hoverImage ) );
 	}
 	
 
@@ -167,21 +167,21 @@ public class LSImage extends LSBlank
 	{
 		super( styleParams );
 		
-		initImage( readImageFile( imageFile ), hoverImageFile != null  ?  readImageFile( hoverImageFile )  :  null,  imageWidth, imageHeight );
+		initImage( readImageFile( imageFile ), readImageFile( hoverImageFile ),  imageWidth, imageHeight );
 	}
 	
 	public LSImage(ElementStyleParams styleParams, File imageFile, File hoverImageFile, double imageWidth)
 	{
 		super( styleParams );
 		
-		initImage( readImageFile( imageFile ), hoverImageFile != null  ?  readImageFile( hoverImageFile )  :  null,  imageWidth );
+		initImage( readImageFile( imageFile ), readImageFile( hoverImageFile ),  imageWidth );
 	}
 	
 	public LSImage(ElementStyleParams styleParams, File imageFile, File hoverImageFile)
 	{
 		super( styleParams );
 		
-		initImage( readImageFile( imageFile ), hoverImageFile != null  ?  readImageFile( hoverImageFile )  :  null );
+		initImage( readImageFile( imageFile ), readImageFile( hoverImageFile ) );
 	}
 	
 	
@@ -205,21 +205,21 @@ public class LSImage extends LSBlank
 	{
 		super( styleParams );
 		
-		initImage( readImageUrl( imageURL ), hoverImageURL != null  ?  readImageUrl( hoverImageURL )  :  null,  imageWidth, imageHeight );
+		initImage( readImageUrl( imageURL ), readImageUrl( hoverImageURL ),  imageWidth, imageHeight );
 	}
 	
 	public LSImage(ElementStyleParams styleParams, URL imageURL, URL hoverImageURL, double imageWidth)
 	{
 		super( styleParams );
 		
-		initImage( readImageUrl( imageURL ), hoverImageURL != null  ?  readImageUrl( hoverImageURL )  :  null,  imageWidth );
+		initImage( readImageUrl( imageURL ), readImageUrl( hoverImageURL ),  imageWidth );
 	}
 	
 	public LSImage(ElementStyleParams styleParams, URL imageURL, URL hoverImageURL)
 	{
 		super( styleParams );
 		
-		initImage( readImageUrl( imageURL ), hoverImageURL != null  ?  readImageUrl( hoverImageURL )  :  null );
+		initImage( readImageUrl( imageURL ), readImageUrl( hoverImageURL ) );
 	}
 	
 	
@@ -277,49 +277,63 @@ public class LSImage extends LSBlank
 
 	private static AbstractImg readImageFile(File file)
 	{
-		try
+		if ( file != null )
 		{
-			if ( file.getName().toLowerCase().endsWith( ".svg" ) )
+			try
 			{
-				// Load as SVG
-				SVGDiagram diagram = SVGCache.getSVGUniverse().getDiagram( file.toURI() );
-				return img( diagram );
+				if ( file.getName().toLowerCase().endsWith( ".svg" ) )
+				{
+					// Load as SVG
+					SVGDiagram diagram = SVGCache.getSVGUniverse().getDiagram( file.toURI() );
+					return img( diagram );
+				}
+				else
+				{
+					// Load as buffered image
+					return img( ImageIO.read( file ) );
+				}
 			}
-			else
+			catch (IOException e)
 			{
-				// Load as buffered image
-				return img( ImageIO.read( file ) );
+				return img( getBadImage() );
 			}
 		}
-		catch (IOException e)
+		else
 		{
-			return img( getBadImage() );
+			return null;
 		}
 	}
 	
 	private static AbstractImg readImageUrl(URL url)
 	{
-		try
+		if ( url != null )
 		{
-			if ( url.getFile().toLowerCase().endsWith( ".svg" ) )
+			try
 			{
-				// Load as SVG
-				SVGDiagram diagram = SVGCache.getSVGUniverse().getDiagram( url.toURI() );
-				return img( diagram );
+				if ( url.getFile().toLowerCase().endsWith( ".svg" ) )
+				{
+					// Load as SVG
+					SVGDiagram diagram = SVGCache.getSVGUniverse().getDiagram( url.toURI() );
+					return img( diagram );
+				}
+				else
+				{
+					// Load as buffered image
+					return img( ImageIO.read( url ) );
+				}
 			}
-			else
+			catch (IOException e)
 			{
-				// Load as buffered image
-				return img( ImageIO.read( url ) );
+				return img( getBadImage() );
+			}
+			catch (URISyntaxException e)
+			{
+				return img( getBadImage() );
 			}
 		}
-		catch (IOException e)
+		else
 		{
-			return img( getBadImage() );
-		}
-		catch (URISyntaxException e)
-		{
-			return img( getBadImage() );
+			return null;
 		}
 	}
 	
@@ -379,6 +393,17 @@ public class LSImage extends LSBlank
 	private static AbstractImg img(SVGDiagram img)
 	{
 		return img != null  ?  new SVGImg( img )  :  new BufferedImageImg( getBadImage() );
+	}
+	
+	
+	private static AbstractImg hoverImg(BufferedImage img)
+	{
+		return img != null  ?  new BufferedImageImg( img )  :  null;
+	}
+	
+	private static AbstractImg hoverImg(SVGDiagram img)
+	{
+		return img != null  ?  new SVGImg( img )  :  null;
 	}
 	
 	
