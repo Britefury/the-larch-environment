@@ -5,7 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
-from Britefury.app_larch import start_larch
+from Britefury import javacopiers, javapicklers
 
-if __name__ == '__main__':
-	start_larch()
+
+javacopiers.install_java_copiers()
+javapicklers.install_java_picklers()

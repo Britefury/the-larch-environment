@@ -39,15 +39,18 @@ def _getUserPluginRootPaths():
 	return getPathsConfig().pluginRootPaths
 
 	
-def _loadPluginsInDir(plugins, pluginDir):
+def _loadPluginsInDir(plugins, pluginDir, isLocal):
 	for dirpath, dirnames, filenames in os.walk( pluginDir ):
 		for filename in filenames:
 			if filename == 'larchplugin.py'  or  filename == 'larchplugin$py.class':
 				fn, ext = os.path.splitext( filename )
 
+				print dirpath
 				pluginName = _pathToDottedName( dirpath )
 				
 				pathComponents = _splitPath( dirpath )
+				if isLocal:
+					del pathComponents[0]
 				pathComponents.append( 'larchplugin' )
 				importName = '.'.join( pathComponents )
 				
@@ -82,10 +85,10 @@ class Plugin (object):
 		plugins = []
 		
 		for pluginDir in _localPluginDirectories:
-			_loadPluginsInDir( plugins, pluginDir )
+			_loadPluginsInDir( plugins, os.path.join( 'larch', pluginDir ), True )
 		
 		for pluginDir in _getUserPluginDirs():
-			_loadPluginsInDir( plugins, pluginDir )
+			_loadPluginsInDir( plugins, pluginDir, False )
 		
 		return plugins
 
