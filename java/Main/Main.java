@@ -14,10 +14,8 @@ public class Main
 	public static void main(String[] args) throws PyException
 	{
 		PythonInterpreter interp = new PythonInterpreter();
-		interp.exec( "import sys" );
-		String dir = System.getProperty( "user.dir" );
-		dir = dir.replace( "\\", "\\\\" );
-		interp.exec( "sys.path.append( '" + dir + "' )" );
+//		interp.exec( "import sys" );
+//		interp.exec( "sys.path.append( 'larch' )" );
 		interp.exec( "from Britefury.app_larch import start_larch" );
 		interp.exec( "start_larch()" );
 	}
