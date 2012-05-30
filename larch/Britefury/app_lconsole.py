@@ -32,7 +32,8 @@ def start_lconsole():
 	world = World()
 	world.enableImportHooks()
 	console = Console.Console( 'Console' )
-	world.setRootSubject( Console.ConsoleSubject( console, WorldDefaultOuterSubject() ) )
+	outerSubject = WorldDefaultOuterSubject( world )
+	world.setRootSubject( Console.ConsoleSubject( console, outerSubject ) )
 
 
 	if len( sys.argv ) > 1:
