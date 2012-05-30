@@ -10,8 +10,9 @@ import sys
 from javax.swing import UIManager
 
 from BritefuryJ.DocModel import DMIOReader, DMNode
+from BritefuryJ.LSpace.Browser import Location
 
-from Britefury.Kernel.World import World
+from Britefury.Kernel.World import World, WorldDefaultOuterSubject
 from Britefury.Kernel.Document import Document
 from Britefury import app
 
@@ -27,19 +28,18 @@ def start_larch():
 
 	world = World()
 	world.enableImportHooks()
-	appState = MainApp.newAppState()
-	world.setRootSubject( MainApp.newAppStateSubject( world, appState ) )
 
 	if len( sys.argv ) > 1:
-		filenames = sys.argv[1:]
-		appStateSubject = world.getRootSubject()
-		for filename in filenames:
-			try:
-				document = appStateSubject.loadDocument( filename )
-				if document is None:
-					print 'Failed to load document from %s'  %  filename
-			except:
-				print 'Failed to load %s'  %  filename
+		filename = sys.argv[1]
+		document = Document.readFile( world, filename )
+		outerSubject = WorldDefaultOuterSubject( world )
+		subject = document.newSubject( outerSubject, Location( 'main' ), None, filename )
+		world.setRootSubject( subject )
+	else:
+		appState = MainApp.newAppState()
+		world.setRootSubject( MainApp.newAppStateSubject( world, appState ) )
+
+
 
 	def _onClose(wm):
 		app.appShutdown()
