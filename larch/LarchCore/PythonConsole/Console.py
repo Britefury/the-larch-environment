@@ -381,7 +381,7 @@ class ConsoleSubject (Subject):
 		return 'Python console'
 
 	def getSubjectContext(self):
-		return self.enclosingSubject.getSubjectContext()
+		return self.enclosingSubject.getSubjectContext()   if self.enclosingSubject is not None   else SimpleAttributeTable.instance
 
 	def getChangeHistory(self):
 		return None

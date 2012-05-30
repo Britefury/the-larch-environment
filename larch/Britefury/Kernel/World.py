@@ -11,7 +11,8 @@ from Britefury.Kernel.Plugin import Plugin
 from Britefury.Config import Configuration
 from Britefury.Config.PathsConfigPage import getPathsConfig
 
-from BritefuryJ.Projection import ProjectiveBrowserContext
+from BritefuryJ.LSpace.Browser import Location
+from BritefuryJ.Projection import Subject, ProjectiveBrowserContext
 
 
 
@@ -43,16 +44,16 @@ class World (object):
 		super( World, self ).__init__()
 		self._plugins = Plugin.loadPlugins()
 		self.newDocumentFactories = []
-		self._appStateSubject = None
+		self._rootSubject = None
 		self._importedModuleRegistry = set()
 		self.configuration = Configuration.Configuration()
 		self._fragmentInspector = None
+		self._browserContext = None
 
 		for plugin in self._plugins:
 			plugin.initialise( self )
 
 		self._browserContext = _WorldBrowserContext( self )
-		self._browserContext.registerMainSubject( self.getAppStateSubject() )
 		self._browserContext.registerNamedSubject( 'config', self.configuration.subject )
 
 
@@ -63,11 +64,13 @@ class World (object):
 		self.newDocumentFactories.append( newDocumentFactory )
 		
 	
-	def setAppStateSubject(self, plugin, appStateSubject):
-		self._appStateSubject = appStateSubject
-		
-	def getAppStateSubject(self):
-		return self._appStateSubject
+	def setRootSubject(self, appStateSubject):
+		self._rootSubject = appStateSubject
+		if self._browserContext is not None:
+			self._browserContext.registerMainSubject( self._rootSubject )
+
+	def getRootSubject(self):
+		return self._rootSubject
 
 
 
@@ -117,11 +120,11 @@ class World (object):
 		
 	def find_module(self, fullname, path=None):
 		try:
-			app_find_module = self._appStateSubject.import_resolve
+			app_find_module = self._rootSubject.import_resolve
 		except AttributeError:
 			return None
 		names = fullname.split( '.' )
-		finder = self._appStateSubject
+		finder = self._rootSubject
 		for name in names:
 			try:
 				resolver = finder.import_resolve
@@ -139,3 +142,25 @@ class DocumentFactory (object):
 		self.menuLabelText = menuLabelText
 		self.newDocumentFn = newDocumentFn
 
+
+
+
+
+
+class WorldDefaultOuterSubject (Subject):
+	def __init__(self, world):
+		super( WorldDefaultOuterSubject, self ).__init__( None )
+		self._world = world
+
+
+	def getFocus(self):
+		return None
+
+	def getPerspective(self):
+		return None
+
+	def getTitle(self):
+		return '<default root subject>'
+
+	def getSubjectContext(self):
+		return SimpleAttributeTable.instance.withAttrs( world=self._world, document=None, docLocation=None, location=Location( '' ) )

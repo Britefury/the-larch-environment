@@ -10,13 +10,9 @@ import os
 
 from javax.swing import UIManager
 
-from Britefury.I18n import i18n
-i18n.initialise()
-
-
 from BritefuryJ.DocModel import DMIOReader, DMNode
 
-from Britefury.Kernel.World import World
+from Britefury.Kernel.World import World, WorldDefaultOuterSubject
 from Britefury.Kernel.Document import Document
 from Britefury import app
 
@@ -36,7 +32,7 @@ def start_lconsole():
 	world = World()
 	world.enableImportHooks()
 	console = Console.Console( 'Console' )
-	world.setAppStateSubject( None, Console.ConsoleSubject( console, world.getAppStateSubject() ) )
+	world.setRootSubject( Console.ConsoleSubject( console, WorldDefaultOuterSubject() ) )
 
 
 	if len( sys.argv ) > 1:

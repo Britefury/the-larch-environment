@@ -6,11 +6,10 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 from LarchCore.MainApp import MainApp
+from LarchCore.MainApp import FragmentInspector
 
 
 
 def initPlugin(plugin, world):
-	appState = MainApp.newAppState()
-	world.setAppStateSubject( plugin, MainApp.newAppStateSubject( world, appState ) )
-	world.setFragmentInspector( appState.inspectFragment )
+	world.setFragmentInspector( FragmentInspector.inspectFragment )
 

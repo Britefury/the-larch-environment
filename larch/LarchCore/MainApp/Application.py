@@ -49,11 +49,6 @@ class AppState (object):
 
 
 
-	def inspectFragment(self, fragment, sourceElement, triggeringEvent):
-		return FragmentInspector.inspectFragment( fragment, sourceElement, triggeringEvent )
-
-
-
 	def getConsoles(self):
 		self._incr.onAccess()
 		return copy( self._consoles )
