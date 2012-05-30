@@ -27,7 +27,7 @@ class WindowManager (object):
 		
 		self._createCommandConsole = _createCommandConsole
 
-		self._appState = world.getAppStateSubject().getFocus()
+		self._appState = world.getRootSubject().getFocus()
 
 		self._rootWindow = Window( self, self._createCommandConsole, location )
 		self._rootWindow.setCloseRequestListener( self._onWindowCloseRequest )

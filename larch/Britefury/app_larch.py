@@ -9,10 +9,6 @@ import sys
 
 from javax.swing import UIManager
 
-from Britefury.I18n import i18n
-i18n.initialise()
-
-
 from BritefuryJ.DocModel import DMIOReader, DMNode
 
 from Britefury.Kernel.World import World
@@ -20,6 +16,8 @@ from Britefury.Kernel.Document import Document
 from Britefury import app
 
 from Britefury.Windows.WindowManager import WindowManager
+
+from LarchCore.MainApp import MainApp
 
 
 
@@ -29,10 +27,12 @@ def start_larch():
 
 	world = World()
 	world.enableImportHooks()
+	appState = MainApp.newAppState()
+	world.setRootSubject( MainApp.newAppStateSubject( world, appState ) )
 
 	if len( sys.argv ) > 1:
 		filenames = sys.argv[1:]
-		appStateSubject = world.getAppStateSubject()
+		appStateSubject = world.getRootSubject()
 		for filename in filenames:
 			try:
 				document = appStateSubject.loadDocument( filename )
