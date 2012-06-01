@@ -133,28 +133,36 @@ public class FlowGridLayout
 
 	public static LReqBox[] computeRequisitionY_hozirontal(LReqBoxInterface reqBox, LReqBoxInterface childReqBoxes[], int childAllocationFlags[], double rowSpacing, int numColumns)
 	{
-		int numRows = childReqBoxes.length / numColumns;
-		if ( childReqBoxes.length % numColumns  >  0 )
+		if ( childReqBoxes.length > 0 )
 		{
-			numRows++;
+			int numRows = childReqBoxes.length / numColumns;
+			if ( childReqBoxes.length % numColumns  >  0 )
+			{
+				numRows++;
+			}
+			
+			LReqBox rowReqBoxes[] = new LReqBox[numRows];
+			
+			int childIndex = 0;
+			for (int i = 0; i < numRows; i++)
+			{
+				LReqBox rowReqBox = new LReqBox();
+				rowReqBoxes[i] = rowReqBox;
+				int end = Math.min( childIndex + numColumns, childReqBoxes.length );
+				computeRowRequisitionY_hozirontal( rowReqBox, childReqBoxes, childAllocationFlags, rowSpacing, childIndex, end );
+				childIndex = end;
+			}
+			
+			int refPointIndex = rowReqBoxes.length == 1  ?  0  :  -1;
+			VerticalLayout.computeRequisitionY( reqBox, rowReqBoxes, refPointIndex, rowSpacing );
+			
+			return rowReqBoxes;
 		}
-		
-		LReqBox rowReqBoxes[] = new LReqBox[numRows];
-		
-		int childIndex = 0;
-		for (int i = 0; i < numRows; i++)
+		else
 		{
-			LReqBox rowReqBox = new LReqBox();
-			rowReqBoxes[i] = rowReqBox;
-			int end = Math.min( childIndex + numColumns, childReqBoxes.length );
-			computeRowRequisitionY_hozirontal( rowReqBox, childReqBoxes, childAllocationFlags, rowSpacing, childIndex, end );
-			childIndex = end;
+			reqBox.clearRequisitionY();
+			return new LReqBox[0];
 		}
-		
-		int refPointIndex = rowReqBoxes.length == 1  ?  0  :  -1;
-		VerticalLayout.computeRequisitionY( reqBox, rowReqBoxes, refPointIndex, rowSpacing );
-		
-		return rowReqBoxes;
 	}
 	
 	

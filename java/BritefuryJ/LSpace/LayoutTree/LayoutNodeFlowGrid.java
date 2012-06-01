@@ -59,7 +59,8 @@ public class LayoutNodeFlowGrid extends ArrangedSequenceLayoutNode
 	{
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		int childAllocFlags[] = getLeavesAlignmentFlags();
-		rowReqBoxes = FlowGridLayout.computeRequisitionY_hozirontal( layoutReqBox, getLeavesRefreshedRequisitionYBoxes(), childAllocFlags, getRowSpacing(), columnBounds.getNumColumns() );
+		int numColumns = columnBounds != null  ?  columnBounds.getNumColumns()  :  0;
+		rowReqBoxes = FlowGridLayout.computeRequisitionY_hozirontal( layoutReqBox, getLeavesRefreshedRequisitionYBoxes(), childAllocFlags, getRowSpacing(), numColumns );
 	}
 	
 	
@@ -100,7 +101,8 @@ public class LayoutNodeFlowGrid extends ArrangedSequenceLayoutNode
 			rowAllocBoxes[i] = new LAllocBox( null );
 		}
 
-		FlowGridLayout.allocateY_horizontal( layoutReqBox, rowReqBoxes, childBoxes, getAllocationBox(), rowAllocBoxes, childAllocBoxes, childAllocFlags, getRowSpacing(), true, columnBounds.getNumColumns() );
+		int numColumns = columnBounds != null  ?  columnBounds.getNumColumns()  :  0;
+		FlowGridLayout.allocateY_horizontal( layoutReqBox, rowReqBoxes, childBoxes, getAllocationBox(), rowAllocBoxes, childAllocBoxes, childAllocFlags, getRowSpacing(), true, numColumns );
 		
 		refreshLeavesAllocationY( prevAllocV );
 	}
@@ -248,7 +250,14 @@ public class LayoutNodeFlowGrid extends ArrangedSequenceLayoutNode
 	public int getNumColumns()
 	{
 		refreshSubtree();
-		return columnBounds.getNumColumns();
+		if ( columnBounds != null )
+		{
+			return columnBounds.getNumColumns();
+		}
+		else
+		{
+			return 0;
+		}
 	}
 
 
@@ -262,23 +271,30 @@ public class LayoutNodeFlowGrid extends ArrangedSequenceLayoutNode
 	public boolean hasChildAt(int x, int y)
 	{
 		refreshSubtree();
-		int numColumns = columnBounds.getNumColumns();
-		return ( y * numColumns + x )  <  leaves.length;
+		if ( columnBounds != null )
+		{
+			int numColumns = columnBounds.getNumColumns();
+			return ( y * numColumns + x )  <  leaves.length;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 
 	public int[] getPositionOfChildCoveringCell(int x, int y)
 	{
 		refreshSubtree();
-		int numColumns = columnBounds.getNumColumns();
-		if ( ( y * numColumns + x )  <  leaves.length )
+		if ( columnBounds != null )
 		{
-			return new int[] { x, y };
+			int numColumns = columnBounds.getNumColumns();
+			if ( ( y * numColumns + x )  <  leaves.length )
+			{
+				return new int[] { x, y };
+			}
 		}
-		else
-		{
-			return null;
-		}
+		return null;
 	}
 
 
@@ -337,19 +353,27 @@ public class LayoutNodeFlowGrid extends ArrangedSequenceLayoutNode
 	public double getColumnBoundaryX(int column)
 	{
 		refreshSubtree();
-		int numColumns = columnBounds.getNumColumns();
 		
-		if ( column == 0 )
+		if ( columnBounds != null )
 		{
-			return columnBounds.lowerX( 0 );
-		}
-		else if ( column == numColumns )
-		{
-			return columnBounds.upperX( column - 1 );
+			int numColumns = columnBounds.getNumColumns();
+			
+			if ( column == 0 )
+			{
+				return columnBounds.lowerX( 0 );
+			}
+			else if ( column == numColumns )
+			{
+				return columnBounds.upperX( column - 1 );
+			}
+			else
+			{
+				return columnBounds.centreLineToRightOf( column - 1 );
+			}
 		}
 		else
 		{
-			return columnBounds.centreLineToRightOf( column - 1 );
+			return 0.0;
 		}
 	}
 
@@ -381,36 +405,39 @@ public class LayoutNodeFlowGrid extends ArrangedSequenceLayoutNode
 	{
 		refreshSubtree();
 		
-		// Columns
-		int numColumns = columnBounds.getNumColumns();
-		int numRows = rowReqBoxes.length;
-		
-		int lastRowLength = leaves.length % numColumns;
-		if ( lastRowLength == 0 )
+		if ( leaves.length > 0 )
 		{
-			lastRowLength = numColumns;
-		}
-		
-		double y0 = getRowBoundaryY( 0 );
-		double y1Full = getRowBoundaryY( numRows );
-		double y1ExceptLast = getRowBoundaryY( numRows - 1 );
-		for (int i = 1; i < numColumns; i++)
-		{
-			double x = columnBounds.centreLineToRightOf( i - 1 );
-			double y1 = i <= lastRowLength  ?  y1Full  :  y1ExceptLast;
+			// Columns
+			int numColumns = columnBounds.getNumColumns();
+			int numRows = rowReqBoxes.length;
 			
-			graphics.draw( new Line2D.Double( x, y0, x, y1 ) );
-		}
-		
-		double x0 = getColumnBoundaryX( 0 );
-		double x1 = getColumnBoundaryX( numColumns );
-		double halfRowSpacing = getRowSpacing() * 0.5;
-		for (int i = 1; i < numRows; i++)
-		{
-			LAllocBox bottom = rowAllocBoxes[i-1];
-			double y = bottom.getAllocPositionInParentSpaceY() + bottom.getAllocHeight()  +  halfRowSpacing;
-
-			graphics.draw( new Line2D.Double( x0, y, x1, y ) );
+			int lastRowLength = leaves.length % numColumns;
+			if ( lastRowLength == 0 )
+			{
+				lastRowLength = numColumns;
+			}
+			
+			double y0 = getRowBoundaryY( 0 );
+			double y1Full = getRowBoundaryY( numRows );
+			double y1ExceptLast = getRowBoundaryY( numRows - 1 );
+			for (int i = 1; i < numColumns; i++)
+			{
+				double x = columnBounds.centreLineToRightOf( i - 1 );
+				double y1 = i <= lastRowLength  ?  y1Full  :  y1ExceptLast;
+				
+				graphics.draw( new Line2D.Double( x, y0, x, y1 ) );
+			}
+			
+			double x0 = getColumnBoundaryX( 0 );
+			double x1 = getColumnBoundaryX( numColumns );
+			double halfRowSpacing = getRowSpacing() * 0.5;
+			for (int i = 1; i < numRows; i++)
+			{
+				LAllocBox bottom = rowAllocBoxes[i-1];
+				double y = bottom.getAllocPositionInParentSpaceY() + bottom.getAllocHeight()  +  halfRowSpacing;
+	
+				graphics.draw( new Line2D.Double( x0, y, x1, y ) );
+			}
 		}
 	}
 
