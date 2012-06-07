@@ -7,6 +7,7 @@
 package BritefuryJ.Projection;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.regex.Pattern;
 
 import org.python.core.Py;
@@ -19,7 +20,7 @@ import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Browser.BrowserPage;
 import BritefuryJ.Browser.Location;
 import BritefuryJ.Browser.PageLocationResolver;
-import BritefuryJ.Browser.TestPages.SystemRootPage;
+import BritefuryJ.Browser.TestPages.TestsRootPage;
 import BritefuryJ.DefaultPerspective.DefaultPerspective;
 import BritefuryJ.DefaultPerspective.DefaultPerspectiveSubject;
 import BritefuryJ.DefaultPerspective.Presentable;
@@ -107,14 +108,18 @@ public class ProjectiveBrowserContext
 	private ObjectPresentationLocationResolver objPresLocationResolver = new ObjectPresentationLocationResolver();
 	
 	private HashMap<String, PyObject> resolverLocals = new HashMap<String, PyObject>();
+	private HashSet<String> systemNames = new HashSet<String>();
 	
 	
 	
-	public ProjectiveBrowserContext(boolean bWithSystemPages)
+	public ProjectiveBrowserContext(boolean bWithTestPages)
 	{
-		if ( bWithSystemPages )
+		// Register the name 'objects' as a system name, so that it cannot be employed for general use
+		systemNames.add( "objects" );
+		
+		if ( bWithTestPages )
 		{
-			resolverLocals.put( "system", Py.java2py( new SystemRootPage() ) );
+			resolverLocals.put( "tests", Py.java2py( new TestsRootPage() ) );
 		}
 		resolverLocals.put( "objects", Py.java2py( objPresLocationResolver ) );
 		
@@ -137,7 +142,7 @@ public class ProjectiveBrowserContext
 	
 	public void registerNamedSubject(String name, Object subject)
 	{
-		if ( name.equals( "system" )  ||  name.equals( "objects" ) )
+		if ( name.equals( "tests" )  ||  name.equals( "objects" ) )
 		{
 			throw new RuntimeException( "Cannot register subject under name '" + name + "'" );
 		}
@@ -146,7 +151,7 @@ public class ProjectiveBrowserContext
 	
 	public void registerNamedSubject(String name, PyObject subject)
 	{
-		if ( name.equals( "system" )  ||  name.equals( "objects" ) )
+		if ( name.equals( "tests" )  ||  name.equals( "objects" ) )
 		{
 			throw new RuntimeException( "Cannot register subject under name '" + name + "'" );
 		}
@@ -317,7 +322,7 @@ public class ProjectiveBrowserContext
 		
 		public Pres getContentsPres()
 		{
-			Pres linkHeader = SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_SYSTEMPAGE );
+			Pres linkHeader = TestsRootPage.createLinkHeader( TestsRootPage.LINKHEADER_SYSTEMPAGE );
 			Pres title = new TitleBar( "Default Root Page" );
 			
 			Pres contents = StyleSheet.style( Primitive.fontSize.as( 16 ) ).applyTo( new Label( "Empty document" ) ).alignHCentre();

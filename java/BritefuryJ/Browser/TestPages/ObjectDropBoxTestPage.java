@@ -17,7 +17,7 @@ import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.RichText.Heading2;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class ObjectDropBoxTestPage extends SystemPage
+public class ObjectDropBoxTestPage extends TestPage
 {
 	protected ObjectDropBoxTestPage()
 	{

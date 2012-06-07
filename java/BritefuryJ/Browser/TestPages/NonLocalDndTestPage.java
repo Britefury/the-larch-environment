@@ -26,7 +26,7 @@ import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class NonLocalDndTestPage extends SystemPage
+public class NonLocalDndTestPage extends TestPage
 {
 	private static StyleSheet styleSheet = StyleSheet.instance;
 	private static StyleSheet textStyle = styleSheet.withValues( Primitive.fontSize.as( 18 ) );

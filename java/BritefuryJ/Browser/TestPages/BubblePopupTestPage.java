@@ -17,7 +17,7 @@ import BritefuryJ.Pres.Primitive.Table;
 import BritefuryJ.Pres.UI.BubblePopup;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class BubblePopupTestPage extends SystemPage
+public class BubblePopupTestPage extends TestPage
 {
 	public String getTitle()
 	{

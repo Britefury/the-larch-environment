@@ -19,7 +19,7 @@ import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.UI.SectionHeading2;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class SpinEntryTestPage extends SystemPage
+public class SpinEntryTestPage extends TestPage
 {
 	protected SpinEntryTestPage()
 	{

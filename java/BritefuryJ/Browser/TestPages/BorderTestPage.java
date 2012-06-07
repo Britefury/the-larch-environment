@@ -15,7 +15,7 @@ import BritefuryJ.Pres.Primitive.Border;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.RichText.Body;
 
-public class BorderTestPage extends SystemPage
+public class BorderTestPage extends TestPage
 {
 	protected BorderTestPage()
 	{

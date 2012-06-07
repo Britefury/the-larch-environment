@@ -19,7 +19,7 @@ import BritefuryJ.Pres.Primitive.Spacer;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.RichText.Heading2;
 
-public class TabbedBoxTestPage extends SystemPage
+public class TabbedBoxTestPage extends TestPage
 {
 	protected TabbedBoxTestPage()
 	{

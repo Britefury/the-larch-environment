@@ -19,7 +19,7 @@ import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.RichText.Heading2;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class FlowGridTestPage extends SystemPage
+public class FlowGridTestPage extends TestPage
 {
 	protected FlowGridTestPage()
 	{

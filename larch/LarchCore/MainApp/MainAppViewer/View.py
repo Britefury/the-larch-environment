@@ -171,7 +171,7 @@ class AppView (MethodDispatchView):
 		openDocViews = InnerFragment.map( node.getOpenDocuments(), state.withAttrs( location='' ) )
 		consoles = InnerFragment.map( node.getConsoles(), state.withAttrs( location='' ) )
 		
-		systemLink = Hyperlink( 'SYSTEM PAGE', Location( 'system' ) )
+		systemLink = Hyperlink( 'TEST PAGES', Location( 'tests' ) )
 		configurationLink = Hyperlink( 'CONFIGURATION PAGE', Location( 'config' ) )
 		linkHeader = LinkHeaderBar( [ configurationLink, systemLink ] )
 		

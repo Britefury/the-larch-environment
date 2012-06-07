@@ -17,7 +17,7 @@ import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class MathRootTestPage extends SystemPage
+public class MathRootTestPage extends TestPage
 {
 	protected MathRootTestPage()
 	{

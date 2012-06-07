@@ -21,7 +21,7 @@ import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Pres.RichText.Heading2;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class AlignmentTestPage extends SystemPage
+public class AlignmentTestPage extends TestPage
 {
 	protected AlignmentTestPage()
 	{

@@ -17,7 +17,7 @@ import BritefuryJ.Pres.Primitive.SpaceBin;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.RichText.Heading2;
 
-public class OptionMenuTestPage extends SystemPage
+public class OptionMenuTestPage extends TestPage
 {
 	protected OptionMenuTestPage()
 	{

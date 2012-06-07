@@ -23,7 +23,7 @@ import BritefuryJ.Pres.RichText.Heading2;
 import BritefuryJ.Pres.RichText.NormalText;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class ButtonTestPage extends SystemPage
+public class ButtonTestPage extends TestPage
 {
 	protected ButtonTestPage()
 	{

@@ -19,7 +19,7 @@ import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class ColumnTestPage extends SystemPage
+public class ColumnTestPage extends TestPage
 {
 	protected ColumnTestPage()
 	{

@@ -20,7 +20,7 @@ import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.RichText.Heading2;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class EditableLabelTestPage extends SystemPage
+public class EditableLabelTestPage extends TestPage
 {
 	protected EditableLabelTestPage()
 	{

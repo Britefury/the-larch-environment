@@ -19,7 +19,7 @@ import BritefuryJ.Pres.Primitive.Span;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class ParagraphWithSpanTestPage extends SystemPage
+public class ParagraphWithSpanTestPage extends TestPage
 {
 	protected ParagraphWithSpanTestPage()
 	{

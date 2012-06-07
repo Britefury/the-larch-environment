@@ -25,7 +25,7 @@ import BritefuryJ.Pres.RichText.Heading2;
 import BritefuryJ.Pres.RichText.NormalText;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class HyperlinkTestPage extends SystemPage
+public class HyperlinkTestPage extends TestPage
 {
 	protected HyperlinkTestPage()
 	{

@@ -18,7 +18,7 @@ import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class RowTestPage extends SystemPage
+public class RowTestPage extends TestPage
 {
 	protected RowTestPage()
 	{

@@ -14,7 +14,7 @@ import BritefuryJ.Pres.Primitive.Text;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class TextTestPage extends SystemPage
+public class TextTestPage extends TestPage
 {
 	protected TextTestPage()
 	{

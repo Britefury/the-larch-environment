@@ -17,7 +17,7 @@ import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.RichText.Heading2;
 
-public class ColourPickerTestPage extends SystemPage
+public class ColourPickerTestPage extends TestPage
 {
 	protected ColourPickerTestPage()
 	{
