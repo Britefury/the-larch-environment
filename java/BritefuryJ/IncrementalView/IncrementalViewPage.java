@@ -9,6 +9,8 @@ package BritefuryJ.IncrementalView;
 import java.util.Arrays;
 import java.util.List;
 
+import BritefuryJ.Browser.BrowserPage;
+import BritefuryJ.Browser.Location;
 import BritefuryJ.ChangeHistory.ChangeHistory;
 import BritefuryJ.ChangeHistory.ChangeHistoryController;
 import BritefuryJ.ChangeHistory.ChangeHistoryListener;
@@ -17,8 +19,6 @@ import BritefuryJ.Command.Command;
 import BritefuryJ.Command.Command.CommandAction;
 import BritefuryJ.Command.CommandSet;
 import BritefuryJ.LSpace.PageController;
-import BritefuryJ.LSpace.Browser.BrowserPage;
-import BritefuryJ.LSpace.Browser.Location;
 import BritefuryJ.LSpace.PersistentState.PersistentStateStore;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Logging.LogView;

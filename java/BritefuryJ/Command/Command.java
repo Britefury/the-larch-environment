@@ -8,9 +8,9 @@ package BritefuryJ.Command;
 
 import java.awt.Color;
 
+import BritefuryJ.Browser.Location;
 import BritefuryJ.Graphics.SolidBorder;
 import BritefuryJ.LSpace.PageController;
-import BritefuryJ.LSpace.Browser.Location;
 import BritefuryJ.Shortcut.Shortcut;
 
 public class Command

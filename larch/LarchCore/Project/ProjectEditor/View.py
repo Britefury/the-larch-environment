@@ -32,7 +32,7 @@ from BritefuryJ.AttributeTable import *
 
 from BritefuryJ.DefaultPerspective import DefaultPerspective
 
-from BritefuryJ.LSpace.Browser import Location
+from BritefuryJ.Browser import Location
 from BritefuryJ.Graphics import *
 from BritefuryJ.StyleSheet import StyleSheet
 from BritefuryJ.LSpace import Anchor

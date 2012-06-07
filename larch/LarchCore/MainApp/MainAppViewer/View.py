@@ -28,7 +28,7 @@ from Britefury.Kernel.Document import Document
 from BritefuryJ.AttributeTable import *
 
 from BritefuryJ.StyleSheet import *
-from BritefuryJ.LSpace.Browser import Location
+from BritefuryJ.Browser import Location
 from BritefuryJ.LSpace import PageController
 from BritefuryJ.Graphics import *
 

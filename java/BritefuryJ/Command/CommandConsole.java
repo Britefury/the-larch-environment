@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.Browser.Browser;
+import BritefuryJ.Browser.BrowserPage;
 import BritefuryJ.ChangeHistory.ChangeHistory;
 import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.DefaultPerspective.Presentable;
@@ -23,8 +25,6 @@ import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.PresentationComponent;
 import BritefuryJ.LSpace.SequentialRichStringVisitor;
 import BritefuryJ.LSpace.TreeEventListener;
-import BritefuryJ.LSpace.Browser.Browser;
-import BritefuryJ.LSpace.Browser.BrowserPage;
 import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
 import BritefuryJ.LSpace.Focus.Target;
 import BritefuryJ.LSpace.Input.Keyboard.Keyboard;

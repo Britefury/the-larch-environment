@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.Browser.Location;
 import BritefuryJ.DefaultPerspective.DefaultPerspective;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.DefaultPerspective.PrimitivePresenter;
@@ -21,7 +22,6 @@ import BritefuryJ.Incremental.IncrementalMonitorListener;
 import BritefuryJ.LSpace.FragmentContext;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSFragment;
-import BritefuryJ.LSpace.Browser.Location;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Input.Modifier;
 import BritefuryJ.LSpace.Input.ObjectDndHandler;

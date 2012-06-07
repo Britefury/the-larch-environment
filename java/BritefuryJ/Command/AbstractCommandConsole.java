@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Command;
 
+import BritefuryJ.Browser.BrowserPage;
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.LSpace.Browser.BrowserPage;
 import BritefuryJ.LSpace.Input.Keyboard.KeyboardInteractor;
 import BritefuryJ.Projection.ProjectiveBrowserContext;
 import BritefuryJ.Projection.Subject;

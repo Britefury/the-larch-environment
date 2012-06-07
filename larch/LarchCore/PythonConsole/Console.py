@@ -28,7 +28,7 @@ from BritefuryJ.AttributeTable import *
 from BritefuryJ.Controls import TextEntry
 from BritefuryJ.StyleSheet import *
 from BritefuryJ.Graphics import *
-from BritefuryJ.LSpace.Browser import Location
+from BritefuryJ.Browser import Location
 from BritefuryJ.LSpace.Input import ObjectDndHandler, Modifier
 from BritefuryJ.Shortcut import Shortcut
 
