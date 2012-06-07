@@ -436,7 +436,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 		{
 			incr.onAccess();
 			// Set the node result
-			updateNodeResult( newElement );
+			setFragmentContentElement( newElement );
 		}
 		
 		
@@ -538,20 +538,20 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 			child = next;
 		}
 		childrenHead = childrenTail = null;
-		onComputeNodeResultBegin();
+		onComputeFragmentElementBegin();
 		
 		if ( fragmentFactory != null )
 		{
 			clearFlag( FLAG_DISABLE_INSPECTOR );
 			LSElement r = fragmentFactory.createFragmentContentElement( incView, this, model );
 			
-			onComputeNodeResultEnd();
+			onComputeFragmentElementEnd();
 			incView.profile_stopModelViewMapping();
 			return r;
 		}
 		else
 		{
-			onComputeNodeResultEnd();
+			onComputeFragmentElementEnd();
 			incView.profile_stopModelViewMapping();
 			return null;
 		}
@@ -617,7 +617,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 				parent.requestSubtreeRefresh();
 			}
 			
-			incView.onNodeRequestRefresh( this );
+			incView.onFragmentViewRequestRefresh( this );
 		}
 	}
 
@@ -630,7 +630,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	//
 	//
 	
-	protected void updateNodeResult(LSElement r)
+	protected void setFragmentContentElement(LSElement r)
 	{
 		incView.profile_startModifyPresTree();
 		if ( r != element )
@@ -654,7 +654,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	
 	
 	
-	protected void onComputeNodeResultBegin()
+	protected void onComputeFragmentElementBegin()
 	{
 		if ( persistentState != null )
 		{
@@ -662,7 +662,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 		}
 	}
 	
-	protected void onComputeNodeResultEnd()
+	protected void onComputeFragmentElementEnd()
 	{
 		if ( persistentState != null )
 		{
@@ -753,7 +753,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 			throw new RuntimeException( "FragmentView2.presentInnerFragment(): @inheritedState cannot be null" );
 		}
 
-		// A call to DocNode.buildNodeView builds the view, and puts it in the DocView's table
+		// A call to IncrementalView.buildFragment builds the fragment, and puts it in the IncrementalView's table
 		FragmentView incrementalNode = incView.buildFragment( model, incView.getUniqueFragmentFactory( perspective, subjectContext, style, inheritedState ) );
 		
 		
@@ -786,7 +786,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	// Complex structure methods
 	//
 	
-	public ArrayList<FragmentView> getNodeViewInstancePathFromRoot()
+	public ArrayList<FragmentView> getFragmentViewInstancePathFromRoot()
 	{
 		ArrayList<FragmentView> path = new ArrayList<FragmentView>();
 		
@@ -800,7 +800,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 		return path;
 	}
 	
-	public ArrayList<FragmentView> getNodeViewInstancePathFromSubtreeRoot(FragmentView root)
+	public ArrayList<FragmentView> getFragmentViewInstancePathFromSubtreeRoot(FragmentView root)
 	{
 		ArrayList<FragmentView> path = new ArrayList<FragmentView>();
 		
