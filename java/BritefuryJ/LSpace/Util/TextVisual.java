@@ -285,6 +285,12 @@ public class TextVisual
 			//reqBox.setRequisitionX( width, advance );
 			reqBox.setRequisitionX( Math.max( width, advance ), advance );
 			reqBox.setRequisitionY( layout.getAscent() + layout.getDescent(), layout.getLeading(), layout.getAscent() );
+			double height = ascent + descent;
+			if ( descent < height * 0.5 )
+			{
+				descent = height * 0.05;
+				ascent = height - descent;
+			}
 			
 			// Squiggle shape
 			squiggleUnderlineShape = new Path2D.Double();
@@ -295,7 +301,7 @@ public class TextVisual
 			
 			for (int i = 0; i < numSquiggleSegments; i++)
 			{
-				squiggleUnderlineShape.lineTo( squiggleX, ( i % 2 ) == 0  ?  ascent  :  ascent + descent );
+				squiggleUnderlineShape.lineTo( squiggleX, ( i % 2 ) == 0  ?  ascent  :  height );
 				squiggleX += squiggleDeltaX;
 			}
 		}
