@@ -13,6 +13,9 @@ import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.AbstractPointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
 import BritefuryJ.LSpace.Interactor.ClickElementInteractor;
+import BritefuryJ.Live.LiveFunction;
+import BritefuryJ.Live.LiveInterface;
+import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Arrow;
@@ -60,11 +63,6 @@ public class DropDownExpander extends Expander
 		this.contents = coerce( contents );
 	}
 	
-	public DropDownExpander(Object header, Object contents, boolean initialState)
-	{
-		this( header, contents, initialState, null );
-	}
-	
 	public DropDownExpander(Object header, Object contents, ExpanderListener listener)
 	{
 		this( header, contents, false, listener );
@@ -73,6 +71,22 @@ public class DropDownExpander extends Expander
 	public DropDownExpander(Object header, Object contents)
 	{
 		this( header, contents, false, null );
+	}
+	
+	public DropDownExpander(Object header, Object contents, LiveInterface state, ExpanderListener listener)
+	{
+		super( state, listener );
+		
+		this.header = coerce( header );
+		this.contents = coerce( contents );
+	}
+	
+	public DropDownExpander(Object header, Object contents, LiveValue state)
+	{
+		super( state );
+		
+		this.header = coerce( header );
+		this.contents = coerce( contents );
 	}
 
 
@@ -100,11 +114,15 @@ public class DropDownExpander extends Expander
 
 		Pres contracted = headerBorder.surround( headerRowStyle.applyTo( new Row(
 				new Pres[] { contractedArrow.alignHPack().alignVCentre(),header.alignHExpand() } ) ) ).withElementInteractor( headerInteractor );
+		
+		LiveInterface state = stateSource.getLive();
 
-		Pres expander = new Bin( initialState  ?  expanded  :  contracted );
+		LiveFunction contentsLive = createContentsFn( state, expanded, contracted );
+		
+		Pres expander = new Bin( contentsLive );
 		LSBin expanderElement = (LSBin)expander.present( ctx, usedStyle );
 		
-		ExpanderControl control = new ExpanderControl( ctx, usedStyle, expanderElement, expanded, contracted, initialState, listener );
+		ExpanderControl control = new ExpanderControl( ctx, usedStyle, expanderElement, state, listener );
 		headerInteractor.control = control;
 		return control;
 	}

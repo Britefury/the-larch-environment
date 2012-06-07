@@ -149,12 +149,10 @@ public class OptionMenu extends ControlPres
 		
 		private void setChoice(int choice)
 		{
-			int current = getChoice();
-			if ( choice != current )
+			int currentChoice = getChoice();
+			if ( choice != currentChoice )
 			{
-				int oldChoice = current;
-				currentChoice.setLiteralValue( choice );
-				listener.onOptionMenuChoice( this, oldChoice, choice );
+				listener.onOptionMenuChoice( this, currentChoice, choice );
 			}
 		}
 	}
@@ -165,15 +163,21 @@ public class OptionMenu extends ControlPres
 	private static class CommitListener implements OptionMenuListener
 	{
 		private LiveValue value;
+		private OptionMenuListener listener;
 		
-		public CommitListener(LiveValue value)
+		public CommitListener(LiveValue value, OptionMenuListener listener)
 		{
 			this.value = value;
+			this.listener = listener;
 		}
 		
 		@Override
 		public void onOptionMenuChoice(OptionMenuControl optionMenu, int previousChoice, int choice)
 		{
+			if ( listener != null )
+			{
+				listener.onOptionMenuChoice( optionMenu, previousChoice, choice );
+			}
 			value.setLiteralValue( choice );
 		}
 	}
@@ -197,7 +201,11 @@ public class OptionMenu extends ControlPres
 	
 	private OptionMenu(Pres choices[], int initialChoice, OptionMenuListener listener)
 	{
-		this( choices, new LiveSourceValue( initialChoice ), listener );
+		LiveValue value = new LiveValue( initialChoice );
+		
+		this.choices = choices;
+		this.valueSource = new LiveSourceRef( value );
+		this.listener = new CommitListener( value, listener );
 	}
 
 	public OptionMenu(List<Object> choices, int initialChoice, OptionMenuListener listener)
@@ -229,7 +237,7 @@ public class OptionMenu extends ControlPres
 	
 	private OptionMenu(Pres choices[], LiveValue value)
 	{
-		this( choices, new LiveSourceRef( value ), new CommitListener( value ) );
+		this( choices, new LiveSourceRef( value ), new CommitListener( value, null ) );
 	}
 
 	public OptionMenu(List<Object> choices, LiveValue value)

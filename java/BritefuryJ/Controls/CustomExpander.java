@@ -12,6 +12,9 @@ import BritefuryJ.LSpace.TreeEventListener;
 import BritefuryJ.LSpace.Event.AbstractPointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
 import BritefuryJ.LSpace.Interactor.ClickElementInteractor;
+import BritefuryJ.Live.LiveFunction;
+import BritefuryJ.Live.LiveInterface;
+import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Bin;
@@ -93,6 +96,24 @@ public class CustomExpander extends Expander
 	}
 	
 	
+	public CustomExpander(Object contracted, Object expanded, LiveInterface state, ExpanderListener listener)
+	{
+		super( state, listener );
+		
+		this.contracted = coerce( contracted );
+		this.expanded = coerce( expanded );
+	}
+	
+	
+	public CustomExpander(Object contracted, Object expanded, LiveValue state)
+	{
+		super( state );
+		
+		this.contracted = coerce( contracted );
+		this.expanded = coerce( expanded );
+	}
+	
+	
 	
 	public static Pres expanderButton(Object button)
 	{
@@ -106,10 +127,13 @@ public class CustomExpander extends Expander
 	{
 		ExpandEventHandler eventHandler = new ExpandEventHandler();
 		
-		Pres expander = new Bin( initialState  ?  expanded  :  contracted ).withTreeEventListener( eventHandler );
+		LiveInterface state = stateSource.getLive();
+		LiveFunction contentsLive = createContentsFn( state, expanded, contracted );
+		
+		Pres expander = new Bin( contentsLive ).withTreeEventListener( eventHandler );
 		LSBin expanderElement = (LSBin)expander.present( ctx, style );
 		
-		ExpanderControl control = new ExpanderControl( ctx, style, expanderElement, expanded, contracted, initialState, listener );
+		ExpanderControl control = new ExpanderControl( ctx, style, expanderElement, state, listener );
 		eventHandler.control = control;
 		return control;
 	}

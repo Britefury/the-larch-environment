@@ -8,16 +8,15 @@ package BritefuryJ.Browser.TestPages;
 
 import BritefuryJ.Controls.DropDownExpander;
 import BritefuryJ.Controls.Expander;
-import BritefuryJ.LSpace.LSElement;
-import BritefuryJ.LSpace.LSLabel;
-import BritefuryJ.Pres.ElementRef;
+import BritefuryJ.Live.LiveFunction;
+import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Border;
 import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.RichText.Body;
-import BritefuryJ.Pres.RichText.Heading2;
 import BritefuryJ.Pres.RichText.Heading3;
+import BritefuryJ.Pres.UI.SectionHeading2;
 
 public class ExpanderTestPage extends TestPage
 {
@@ -37,38 +36,27 @@ public class ExpanderTestPage extends TestPage
 	}
 	
 	
-	private static class ExpanderTextChanger implements DropDownExpander.ExpanderListener
-	{
-		private ElementRef textElementRef;
-		
-		
-		public ExpanderTextChanger(ElementRef textElementRef)
-		{
-			this.textElementRef = textElementRef;
-		}
-
-
-		public void onExpander(DropDownExpander.ExpanderControl expander, boolean bExpanded)
-		{
-			String text = bExpanded  ?  "expanded"  :  "collapsed";
-			for (LSElement element: textElementRef.getElements())
-			{
-				((LSLabel)element).setText( text );
-			}
-		}
-	}
-
-	
-
 	protected Pres createContents()
 	{
+		final LiveValue state = new LiveValue( false );
+		
 		Pres heading = new Label( "Click to expand" );
 		Pres contents = new Border( new Heading3( "The contents of the expander control" ) );
-		ElementRef expandedTextRef = new Label( "Collapsed" ).elementRef();
-		ExpanderTextChanger listener = new ExpanderTextChanger( expandedTextRef );
-		Expander expander = new DropDownExpander( heading, contents, listener );
-		Pres optionMenuSectionContents = new Column( new Pres[] { expandedTextRef, expander } );
 		
-		return new Body( new Pres[] { new Heading2( "Expander" ), optionMenuSectionContents } );
+		LiveFunction.Function statusLiveFn = new LiveFunction.Function()
+		{
+			@Override
+			public Object evaluate()
+			{
+				boolean x = (Boolean)state.getValue();
+				return x  ?  new Label( "Expanded" )  :  new Label( "Collapsed" );
+			}
+		};
+		LiveFunction statusLive = new LiveFunction( statusLiveFn );
+		
+		Expander expander = new DropDownExpander( heading, contents, state );
+		Pres optionMenuSectionContents = new Column( new Pres[] { statusLive, expander } );
+		
+		return new Body( new Pres[] { new SectionHeading2( "Expander" ), optionMenuSectionContents } );
 	}
 }
