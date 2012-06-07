@@ -276,7 +276,6 @@ public class IncrementalView
 	
 	
 	private NodeElementChangeListener elementChangeListener = null;
-	//private DPColumn rootBox = null;
 	
 	private StateStore stateStoreToLoad;
 	
@@ -452,9 +451,9 @@ public class IncrementalView
 	
 	
 	
-	protected void onNodeRequestRefresh(FragmentView node)
+	protected void onFragmentViewRequestRefresh(FragmentView fragment)
 	{
-		if ( node == rootFragment )
+		if ( fragment == rootFragment )
 		{
 			queueRefresh();
 		}
@@ -612,7 +611,7 @@ public class IncrementalView
 		}
 		else
 		{
-			// Try asking the table for an unused incremental tree node for the document node
+			// Try asking the table for an unused fragment view for the model	
 			FragmentView fragment = nodeTable.getUnrefedFragmentForModel( model, fragmentFactory );
 			
 			if ( fragment == null )
