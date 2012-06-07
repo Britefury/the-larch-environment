@@ -16,7 +16,7 @@ import BritefuryJ.Pres.Primitive.Image;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.RichText.NormalText;
 
-public class ImageTestPage extends SystemPage
+public class ImageTestPage extends TestPage
 {
 	protected ImageTestPage()
 	{

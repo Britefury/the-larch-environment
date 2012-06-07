@@ -18,12 +18,12 @@ import BritefuryJ.Pres.RichText.Page;
 import BritefuryJ.Pres.RichText.TitleBar;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public abstract class SystemPage extends BrowserPage
+public abstract class TestPage extends BrowserPage
 {
 	public Pres getContentsPres()
 	{
-		Pres linkHeader = SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE | SystemRootPage.LINKHEADER_SYSTEMPAGE );
-		Pres title = new TitleBar( "System page: " + getTitle() );
+		Pres linkHeader = TestsRootPage.createLinkHeader( TestsRootPage.LINKHEADER_ROOTPAGE | TestsRootPage.LINKHEADER_SYSTEMPAGE );
+		Pres title = new TitleBar( "Test page: " + getTitle() );
 		
 		Pres head = new Head( new Pres[] { linkHeader, title } );
 

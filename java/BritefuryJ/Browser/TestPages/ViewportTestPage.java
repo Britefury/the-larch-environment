@@ -19,7 +19,7 @@ import BritefuryJ.Pres.Primitive.Viewport;
 import BritefuryJ.Pres.RichText.NormalText;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class ViewportTestPage extends SystemPage
+public class ViewportTestPage extends TestPage
 {
 	protected ViewportTestPage()
 	{

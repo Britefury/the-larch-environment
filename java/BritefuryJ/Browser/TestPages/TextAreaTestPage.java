@@ -25,7 +25,7 @@ import BritefuryJ.Pres.RichText.Heading2;
 import BritefuryJ.Pres.RichText.Heading6;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class TextAreaTestPage extends SystemPage
+public class TextAreaTestPage extends TestPage
 {
 	private static final StyleSheet redText = StyleSheet.style( Primitive.foreground.as( Color.RED ) );
 	

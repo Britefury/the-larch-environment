@@ -21,7 +21,7 @@ import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.RichText.Heading2;
 
-public class TextEntryTestPage extends SystemPage
+public class TextEntryTestPage extends TestPage
 {
 	protected TextEntryTestPage()
 	{

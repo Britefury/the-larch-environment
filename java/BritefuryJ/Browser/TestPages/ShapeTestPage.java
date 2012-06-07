@@ -17,7 +17,7 @@ import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Shape;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class ShapeTestPage extends SystemPage
+public class ShapeTestPage extends TestPage
 {
 	protected ShapeTestPage()
 	{

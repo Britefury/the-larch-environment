@@ -19,7 +19,7 @@ import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.UI.SectionHeading2;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class SliderTestPage extends SystemPage
+public class SliderTestPage extends TestPage
 {
 	protected SliderTestPage()
 	{

@@ -18,7 +18,7 @@ import BritefuryJ.Pres.Primitive.Text;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class FractionTestPage extends SystemPage
+public class FractionTestPage extends TestPage
 {
 	private static final StyleSheet styleSheet = StyleSheet.instance;
 	private static final StyleSheet fractionStyle = styleSheet.withValues( Primitive.foreground.as( Color.black ), Primitive.hoverForeground.as( new Color( 0.0f, 0.5f, 0.5f ) ) );

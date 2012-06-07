@@ -13,7 +13,7 @@ import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.RichText.Heading2;
 
-public class CheckboxTestPage extends SystemPage
+public class CheckboxTestPage extends TestPage
 {
 	protected CheckboxTestPage()
 	{

@@ -18,7 +18,7 @@ import BritefuryJ.Pres.Primitive.Text;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class SegmentTestPage extends SystemPage
+public class SegmentTestPage extends TestPage
 {
 	protected SegmentTestPage()
 	{

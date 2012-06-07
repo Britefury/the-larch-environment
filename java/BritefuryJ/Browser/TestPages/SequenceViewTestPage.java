@@ -22,7 +22,7 @@ import BritefuryJ.Pres.Sequence.VerticalInlineSequenceView;
 import BritefuryJ.Pres.Sequence.VerticalSequenceView;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class SequenceViewTestPage extends SystemPage
+public class SequenceViewTestPage extends TestPage
 {
 	protected SequenceViewTestPage()
 	{

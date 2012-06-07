@@ -20,7 +20,7 @@ import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.RichText.Heading2;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class GridTestPage extends SystemPage
+public class GridTestPage extends TestPage
 {
 	protected GridTestPage()
 	{

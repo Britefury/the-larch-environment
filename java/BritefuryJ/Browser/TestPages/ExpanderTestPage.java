@@ -19,7 +19,7 @@ import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.RichText.Heading2;
 import BritefuryJ.Pres.RichText.Heading3;
 
-public class ExpanderTestPage extends SystemPage
+public class ExpanderTestPage extends TestPage
 {
 	protected ExpanderTestPage()
 	{

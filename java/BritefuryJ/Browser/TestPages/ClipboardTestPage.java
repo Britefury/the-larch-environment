@@ -40,7 +40,7 @@ import BritefuryJ.Pres.RichText.Heading5;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
 
-public class ClipboardTestPage extends SystemPage
+public class ClipboardTestPage extends TestPage
 {
 	private static StyleSheet styleSheet = StyleSheet.instance;
 

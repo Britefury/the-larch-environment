@@ -28,7 +28,7 @@ import BritefuryJ.Pres.Primitive.Text;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class ProxyAndSpanTestPage extends SystemPage
+public class ProxyAndSpanTestPage extends TestPage
 {
 	protected ProxyAndSpanTestPage()
 	{

@@ -22,7 +22,7 @@ import BritefuryJ.Pres.Primitive.Text;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class TableTestPage extends SystemPage
+public class TableTestPage extends TestPage
 {
 	protected TableTestPage()
 	{

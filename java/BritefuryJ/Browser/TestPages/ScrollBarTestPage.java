@@ -15,7 +15,7 @@ import BritefuryJ.Pres.Primitive.SpaceBin;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.RichText.Heading2;
 
-public class ScrollBarTestPage extends SystemPage
+public class ScrollBarTestPage extends TestPage
 {
 	protected ScrollBarTestPage()
 	{

@@ -20,7 +20,7 @@ import BritefuryJ.Pres.Primitive.SpaceBin;
 import BritefuryJ.Pres.RichText.NormalText;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class ScrolledViewportTestPage extends SystemPage
+public class ScrolledViewportTestPage extends TestPage
 {
 	protected ScrolledViewportTestPage()
 	{

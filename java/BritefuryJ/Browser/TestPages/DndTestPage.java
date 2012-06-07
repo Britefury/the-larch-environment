@@ -33,7 +33,7 @@ import BritefuryJ.Pres.Primitive.StaticText;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class DndTestPage extends SystemPage
+public class DndTestPage extends TestPage
 {
 	private static StyleSheet mainStyle = StyleSheet.instance;
 	private static StyleSheet mathStyle = StyleSheet.style( Primitive.fontSize.as( 16 ), Primitive.editable.as( false ) );

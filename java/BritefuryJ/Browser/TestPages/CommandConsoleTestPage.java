@@ -25,7 +25,7 @@ import BritefuryJ.Pres.RichText.Heading2;
 import BritefuryJ.Pres.RichText.NormalText;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class CommandConsoleTestPage extends SystemPage
+public class CommandConsoleTestPage extends TestPage
 {
 	protected CommandConsoleTestPage()
 	{
