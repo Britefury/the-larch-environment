@@ -8,10 +8,10 @@ package BritefuryJ.Command;
 
 import java.awt.event.KeyEvent;
 
+import BritefuryJ.Browser.BrowserPage;
 import BritefuryJ.LSpace.Anchor;
 import BritefuryJ.LSpace.PageController;
 import BritefuryJ.LSpace.PresentationComponent;
-import BritefuryJ.LSpace.Browser.BrowserPage;
 import BritefuryJ.LSpace.Input.Keyboard.Keyboard;
 import BritefuryJ.LSpace.Input.Keyboard.KeyboardInteractor;
 import BritefuryJ.Pres.Pres;

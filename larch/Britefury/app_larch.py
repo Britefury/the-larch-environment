@@ -10,7 +10,7 @@ import sys
 from javax.swing import UIManager
 
 from BritefuryJ.DocModel import DMIOReader, DMNode
-from BritefuryJ.LSpace.Browser import Location
+from BritefuryJ.Browser import Location
 
 from Britefury.Kernel.World import World, WorldDefaultOuterSubject
 from Britefury.Kernel.Document import Document

@@ -11,7 +11,7 @@ from BritefuryJ.Controls import *
 
 from BritefuryJ.LSpace import ElementPainter, PageController
 
-from BritefuryJ.LSpace.Browser import Location
+from BritefuryJ.Browser import Location
 
 from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.LSpace.Interactor import *

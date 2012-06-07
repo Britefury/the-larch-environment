@@ -7,7 +7,7 @@
 ##-*************************
 from java.awt.event import KeyEvent
 
-from BritefuryJ.LSpace.Browser import Location
+from BritefuryJ.Browser import Location
 
 from BritefuryJ.DefaultPerspective import DefaultPerspective
 

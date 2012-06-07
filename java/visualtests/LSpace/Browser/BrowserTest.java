@@ -25,14 +25,14 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 
+import BritefuryJ.Browser.Browser;
+import BritefuryJ.Browser.Location;
+import BritefuryJ.Browser.TabbedBrowser;
 import BritefuryJ.Command.AbstractCommandConsole;
 import BritefuryJ.Command.CommandConsole;
 import BritefuryJ.Command.CommandConsoleFactory;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.PresentationComponent;
-import BritefuryJ.LSpace.Browser.Browser;
-import BritefuryJ.LSpace.Browser.Location;
-import BritefuryJ.LSpace.Browser.TabbedBrowser;
 import BritefuryJ.Projection.ProjectiveBrowserContext;
 
 public class BrowserTest implements TabbedBrowser.TabbedBrowserListener

@@ -7,7 +7,7 @@
 ##-*************************
 from copy import copy
 
-from BritefuryJ.LSpace.Browser import Location
+from BritefuryJ.Browser import Location
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
 

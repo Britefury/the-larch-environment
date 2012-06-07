@@ -10,7 +10,7 @@ from BritefuryJ.AttributeTable import SimpleAttributeTable
 
 from BritefuryJ.Command import CommandConsole
 
-from BritefuryJ.LSpace.Browser import Location
+from BritefuryJ.Browser import Location
 
 from Britefury.Windows.Window import Window
 

@@ -9,9 +9,9 @@ package BritefuryJ.Controls;
 import java.util.regex.Matcher;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.Browser.Location;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.PageController;
-import BritefuryJ.LSpace.Browser.Location;
 import BritefuryJ.LSpace.Event.AbstractPointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
 import BritefuryJ.LSpace.Input.Modifier;

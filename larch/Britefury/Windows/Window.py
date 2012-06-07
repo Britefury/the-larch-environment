@@ -24,7 +24,7 @@ from BritefuryJ.ChangeHistory import ChangeHistory, ChangeHistoryListener
 from BritefuryJ.DocModel import DMIOReader, DMIOWriter, DMNode
 
 from BritefuryJ.LSpace import *
-from BritefuryJ.LSpace.Browser import *
+from BritefuryJ.Browser import *
 from BritefuryJ.LSpace.StyleParams import *
 
 

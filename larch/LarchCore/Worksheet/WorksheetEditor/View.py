@@ -31,7 +31,7 @@ from BritefuryJ.Controls import *
 from BritefuryJ.LSpace import *
 from BritefuryJ.Graphics import *
 from BritefuryJ.LSpace.Input import ObjectDndHandler, Modifier
-from BritefuryJ.LSpace.Browser import Location
+from BritefuryJ.Browser import Location
 from BritefuryJ.LSpace.TextFocus import TextSelection
 from BritefuryJ.LSpace.Marker import Marker
 from BritefuryJ.StyleSheet import StyleSheet

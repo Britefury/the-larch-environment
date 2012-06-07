@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Controls;
 
+import BritefuryJ.Browser.Location;
 import BritefuryJ.LSpace.LSElement;
-import BritefuryJ.LSpace.Browser.Location;
 import BritefuryJ.LSpace.Interactor.ContextMenuElementInteractor;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;

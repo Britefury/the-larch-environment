@@ -6,9 +6,9 @@
 //##************************
 package BritefuryJ.Pres;
 
+import BritefuryJ.Browser.Location;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.LSpace.LSElement;
-import BritefuryJ.LSpace.Browser.Location;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class LocationAsInnerFragment extends Pres

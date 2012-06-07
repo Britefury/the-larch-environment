@@ -9,7 +9,7 @@ import os
 
 from BritefuryJ.AttributeTable import SimpleAttributeTable
 
-from BritefuryJ.LSpace.Browser import Location
+from BritefuryJ.Browser import Location
 
 from BritefuryJ.Projection import Subject
 from Britefury.Kernel.Document import Document

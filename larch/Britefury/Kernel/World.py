@@ -12,7 +12,7 @@ from Britefury.Config import Configuration
 from Britefury.Config.PathsConfigPage import getPathsConfig
 
 from BritefuryJ.AttributeTable import SimpleAttributeTable
-from BritefuryJ.LSpace.Browser import Location
+from BritefuryJ.Browser import Location
 from BritefuryJ.Projection import Subject, ProjectiveBrowserContext
 
 

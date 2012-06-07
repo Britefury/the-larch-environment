@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Command;
 
+import BritefuryJ.Browser.Browser;
 import BritefuryJ.LSpace.PresentationComponent;
-import BritefuryJ.LSpace.Browser.Browser;
 
 public interface CommandConsoleFactory
 {

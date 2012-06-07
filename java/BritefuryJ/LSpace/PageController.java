@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.LSpace;
 
-import BritefuryJ.LSpace.Browser.Location;
+import BritefuryJ.Browser.Location;
 
 public interface PageController
 {
