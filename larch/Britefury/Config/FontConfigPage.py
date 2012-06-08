@@ -43,7 +43,7 @@ from Britefury.Config.ConfigurationPage import ConfigurationPage
 # Font chooser
 
 _ge = GraphicsEnvironment.getLocalGraphicsEnvironment()
-_fontNames = _ge.getAvailableFontFamilyNames()
+_fontNames = sorted( [ font.name   for font in _ge.allFonts ] )
 
 _nameStyle = StyleSheet.style( Primitive.fontSize( 10 ), Primitive.foreground( Color( 0.45, 0.45, 0.45 ) ) )
 _hoverStyle = StyleSheet.style( Primitive.hoverBackground( FilledOutlinePainter( Color( 0.95, 0.95, 0.95 ), Color( 0.65, 0.65, 0.65 ) ) ) )
@@ -96,7 +96,8 @@ def _collapsibleFontChooser(title, choiceValue, sampleFn):
 
 
 class FontConfiguration (object):
-	def __init__(self, normal='SansSerif', heading='Serif', title='Serif', uiHeading='SansSerif'):
+	def __init__(self, generic='SansSerif', normal='SansSerif', heading='Serif', title='Serif', uiHeading='SansSerif'):
+		self._generic = LiveValue( generic )
 		self._normal = LiveValue( normal )
 		self._heading = LiveValue( heading )
 		self._title = LiveValue( title )
@@ -105,6 +106,7 @@ class FontConfiguration (object):
 
 	def __getstate__(self):
 		state = {}
+		state['generic'] = self._generic.getStaticValue()
 		state['normal'] = self._normal.getStaticValue()
 		state['heading'] = self._heading.getStaticValue()
 		state['title'] = self._title.getStaticValue()
@@ -112,6 +114,7 @@ class FontConfiguration (object):
 		return state
 
 	def __setstate__(self, state):
+		self._generic = LiveValue( state.get( 'generic', 'SansSerif' ) )
 		self._normal = LiveValue( state.get( 'normal', 'SansSerif' ) )
 		self._heading = LiveValue( state.get( 'standard', 'Serif' ) )
 		self._title = LiveValue( state.get( 'standard', 'Serif' ) )
@@ -119,6 +122,7 @@ class FontConfiguration (object):
 
 
 	def copyFrom(self, config):
+		self._generic.setLiteralValue( config._generic.getStaticValue() )
 		self._normal.setLiteralValue( config._normal.getStaticValue() )
 		self._heading.setLiteralValue( config._heading.getStaticValue() )
 		self._title.setLiteralValue( config._title.getStaticValue() )
@@ -134,10 +138,11 @@ class FontConfiguration (object):
 			else:
 				return fontName + '; ' + defaultFont
 
-		style = StyleSheet.style( RichText.titleTextAttrs( RichText.titleTextAttrs.defaultValue.withValues( Primitive.fontFace( suffix( self._title.getValue(), 'Serif' ) ) ) ),
-		                          RichText.headingTextAttrs( RichText.headingTextAttrs.defaultValue.withValues( Primitive.fontFace( suffix( self._heading.getValue(), 'Serif' ) ) ) ),
-		                          RichText.normalTextAttrs( RichText.normalTextAttrs.defaultValue.withValues( Primitive.fontFace( suffix( self._normal.getValue(), 'SansSerif' ) ) ) ),
-		                          UI.uiTextAttrs( UI.uiTextAttrs.defaultValue.withValues( Primitive.fontFace( suffix( self._uiHeading.getValue(), 'SansSerif' ) ) ) ) )
+		style = StyleSheet.style( Primitive.fontFace( suffix( self._generic.getValue(), 'SansSerif' ) ),
+					RichText.titleTextAttrs( RichText.titleTextAttrs.defaultValue.withValues( Primitive.fontFace( suffix( self._title.getValue(), 'Serif' ) ) ) ),
+		                        RichText.headingTextAttrs( RichText.headingTextAttrs.defaultValue.withValues( Primitive.fontFace( suffix( self._heading.getValue(), 'Serif' ) ) ) ),
+		                        RichText.normalTextAttrs( RichText.normalTextAttrs.defaultValue.withValues( Primitive.fontFace( suffix( self._normal.getValue(), 'SansSerif' ) ) ) ),
+		                        UI.uiTextAttrs( UI.uiTextAttrs.defaultValue.withValues( Primitive.fontFace( suffix( self._uiHeading.getValue(), 'SansSerif' ) ) ) ) )
 		return style
 
 
@@ -168,8 +173,13 @@ class FontConfiguration (object):
 			return style( SectionHeading1( text ) )
 		uiHeadingChooser = _collapsibleFontChooser( 'UI Headings', self._uiHeading, uiHeadingSample )
 
+		def genericSample(fontName, text='The quick brown fox jumps over the lazy dog'):
+			style = StyleSheet.style( Primitive.fontFace( fontName ) )
+			return style( Label( text ) )
+		genericChooser = _collapsibleFontChooser( 'Generic text', self._generic, genericSample )
 
-		chooserColumn = self._chooserColumnStyle( Column( [ titleChooser, headingChooser, normalChooser, uiHeadingChooser ] ) )
+
+		chooserColumn = self._chooserColumnStyle( Column( [ titleChooser, headingChooser, normalChooser, uiHeadingChooser, genericChooser ] ) )
 
 
 		# Sample page
@@ -182,8 +192,9 @@ class FontConfiguration (object):
 			normal1 = normalSample( self._normal.getValue(), 'Normal text will appear like this.' )
 			normal2 = normalSample( self._normal.getValue(), 'Paragraphs of normal text are used for standard content.' )
 			ui1 = uiHeadingSample( self._uiHeading.getValue(), 'UI heading' )
-			buttons = [ Button.buttonWithLabel( 'Button {0}'.format( i ), None )   for i in xrange( 0, 5 )  ]
-			ui = Section( ui1, self._buttonRowStyle( Row( buttons ) ) )
+			genericLabel = Label( 'Generic text (within controls, code, etc) will appear like this.' )
+			buttons = self._buttonRowStyle( Row( [ Button.buttonWithLabel( 'Button {0}'.format( i ), None )   for i in xrange( 0, 5 ) ] ) )
+			ui = Section( ui1, Column( [ genericLabel, Spacer( 0.0, 7.0 ), buttons ] ) )
 			page = Page( [ title, Body( [ heading, normal1, normal2, ui ] ) ] )
 
 			return Column( [ label, Spacer( 0.0, 15.0 ), page ] )
@@ -199,9 +210,9 @@ class FontConfiguration (object):
 
 
 _basicFontConfig = FontConfiguration()
-_windowsFontConfig = FontConfiguration( 'DejaVu Sans; SansSerif', 'Perpetua; Serif', 'Lucida Bright; Serif', 'Dotum; SansSerif' )
-_linuxFontConfig = FontConfiguration( 'SansSerif', 'Un Batang; Serif', 'Bitstream Charter; Serif', 'DejaVu Sans ExtraLight; Sawasdee; SansSerif' )
-_macFontConfig = FontConfiguration( 'DejaVu Sans; SansSerif', 'Perpetua; Serif', 'Lucida Bright; Serif', 'Dotum; SansSerif' )
+_windowsFontConfig = FontConfiguration( generic='DejaVu Sans; SansSerif', normal='DejaVu Sans; SansSerif', heading='Perpetua; Serif', title='Lucida Bright; Serif', uiHeading='Dotum; SansSerif' )
+_linuxFontConfig = FontConfiguration( generic='SansSerif', normal='SansSerif', heading='Un Batang; Serif', title='Bitstream Charter; Serif', uiHeading='DejaVu Sans ExtraLight; Sawasdee; SansSerif' )
+_macFontConfig = FontConfiguration( generic='Geneva; SansSerif', normal='Geneva; SansSerif', heading='Perpetua; Serif', title='CalistoMT; Serif', uiHeading='Gulim; SansSerif' )
 
 
 
