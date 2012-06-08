@@ -7,15 +7,17 @@
 ##-*************************
 from BritefuryJ.GraphViz import GraphViz
 
-from Britefury.Config import PathsConfigPage, GraphVizConfigPage
+from Britefury.Config import PathsConfigPage, GraphVizConfigPage, FontConfigPage
 
 
 def appInit():
 	PathsConfigPage.initPathsConfig()
 	GraphVizConfigPage.initGraphVizConfig()
+	FontConfigPage.initFontConfig()
 
-	
+
 def appShutdown():
 	PathsConfigPage.savePathsConfig()
 	GraphVizConfigPage.saveGraphVizConfig()
 	GraphViz.shutdown()
+	FontConfigPage.saveFontConfig()
