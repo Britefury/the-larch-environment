@@ -59,7 +59,7 @@ public class TimedPopup
 		}
 		else
 		{
-			popup( element, targetAnchor, popupAnchor, PresentationContext.defaultCtx, StyleValues.instance );
+			popup( element, targetAnchor, popupAnchor, PresentationContext.defaultCtx, StyleValues.getRootStyle() );
 		}
 	}
 	
@@ -72,7 +72,7 @@ public class TimedPopup
 		}
 		else
 		{
-			popupAtMousePosition( element, popupAnchor, PresentationContext.defaultCtx, StyleValues.instance );
+			popupAtMousePosition( element, popupAnchor, PresentationContext.defaultCtx, StyleValues.getRootStyle() );
 		}
 	}
 	

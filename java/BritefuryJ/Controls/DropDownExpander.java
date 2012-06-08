@@ -110,7 +110,7 @@ public class DropDownExpander extends Expander
 		
 		Pres expandedHeader = headerBorder.surround( headerRowStyle.applyTo( new Row( 
 				new Pres[] { expandedArrow.alignHPack().alignVCentre(), header.alignHExpand() } ) ) ).withElementInteractor( headerInteractor );
-		Pres expanded = new Column( new Pres[] { expandedHeader, contents.padX( padding ) } );
+		Pres expanded = new Column( new Pres[] { expandedHeader, contents.padX( padding, 0.0 ) } );
 
 		Pres contracted = headerBorder.surround( headerRowStyle.applyTo( new Row(
 				new Pres[] { contractedArrow.alignHPack().alignVCentre(),header.alignHExpand() } ) ) ).withElementInteractor( headerInteractor );

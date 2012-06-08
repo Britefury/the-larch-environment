@@ -155,6 +155,17 @@ public class StyleValues extends AttributeTable
 	
 
 
-
 	public static final StyleValues instance = new StyleValues();
+	private static StyleValues rootStyleValues = instance;
+	
+	
+	public static void setRootStyleSheet(StyleSheet s)
+	{
+		rootStyleValues = instance.withAttrs( s );
+	}
+	
+	public static StyleValues getRootStyle()
+	{
+		return rootStyleValues;
+	}
 }

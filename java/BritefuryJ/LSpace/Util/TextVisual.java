@@ -286,9 +286,9 @@ public class TextVisual
 			reqBox.setRequisitionX( Math.max( width, advance ), advance );
 			reqBox.setRequisitionY( layout.getAscent() + layout.getDescent(), layout.getLeading(), layout.getAscent() );
 			double height = ascent + descent;
-			if ( descent < height * 0.5 )
+			if ( descent < height * 0.025 )
 			{
-				descent = height * 0.05;
+				descent = height * 0.025;
 				ascent = height - descent;
 			}
 			

@@ -20,7 +20,7 @@ import BritefuryJ.StyleSheet.StyleValues;
 
 public abstract class PopupMenu extends Pres
 {
-	private static final StyleValues defaultPopupMenuContentsStyleValues = StyleValues.instance.withAttr( Controls.bClosePopupOnActivate, true );
+	private static final StyleValues defaultPopupMenuContentsStyleValues = StyleValues.getRootStyle().withAttr( Controls.bClosePopupOnActivate, true );
 	private static final StyleSheet popupMenuContentsStyle = StyleSheet.style( Controls.bClosePopupOnActivate.as( true ) );
 	
 	protected ArrayList<Pres> items = new ArrayList<Pres>();

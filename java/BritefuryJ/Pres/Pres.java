@@ -70,7 +70,7 @@ public abstract class Pres
 
 	public LSElement present()
 	{
-		return present( PresentationContext.defaultCtx, StyleValues.instance );
+		return present( PresentationContext.defaultCtx, StyleValues.getRootStyle() );
 	}
 
 	public abstract LSElement present(PresentationContext ctx, StyleValues style);
@@ -451,7 +451,7 @@ public abstract class Pres
 		
 		if ( style == null )
 		{
-			style = StyleValues.instance;
+			style = StyleValues.getRootStyle();
 		}
 
 		return viewPres.present( presCtx, style );

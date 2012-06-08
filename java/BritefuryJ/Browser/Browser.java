@@ -303,7 +303,7 @@ public class Browser
 	{
 		Pres childPres = Pres.coerce( child );
 		ScrolledViewport vp = new ScrolledViewport( childPres, 0.0, 0.0, state );
-		return (ScrolledViewport.ScrolledViewportControl)vp.createControl( PresentationContext.defaultCtx, StyleValues.instance.alignHExpand().alignVExpand() );
+		return (ScrolledViewport.ScrolledViewportControl)vp.createControl( PresentationContext.defaultCtx, StyleValues.getRootStyle().alignHExpand().alignVExpand() );
 	}
 	
 
