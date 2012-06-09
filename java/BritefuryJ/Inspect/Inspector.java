@@ -24,6 +24,7 @@ import BritefuryJ.DefaultPerspective.DefaultPerspective;
 import BritefuryJ.DefaultPerspective.PrimitivePresenter;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.InnerFragment;
+import BritefuryJ.Pres.LazyPres;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Label;
@@ -100,7 +101,7 @@ public class Inspector
 	
 	
 	
-	public static Pres presentJavaObjectInspector(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
+	public static Pres presentJavaObjectInspector(final Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		Pres asString = PrimitivePresenter.presentObjectAsString( x );
 
@@ -111,85 +112,91 @@ public class Inspector
 		contents.add( type );
 		
 		
-		ArrayList<Object> fields = new ArrayList<Object>();
-		Class<?> cls = x.getClass();
-		while ( cls != null )
+		LazyPres.PresFactory fieldsLazyFac = new LazyPres.PresFactory()
 		{
-			for (Field field: cls.getDeclaredFields())
+			@Override
+			public Pres createPres()
 			{
-				int modifiers = field.getModifiers();
-				if ( !Modifier.isStatic( modifiers ) )
+				final ArrayList<Object> fields = new ArrayList<Object>();
+				Class<?> cls = x.getClass();
+				while ( cls != null )
 				{
-					boolean isSmall = false;
-					Object value = null;
-					Pres valuePres = null;
-	
-					boolean isAccessible = field.isAccessible();
-					field.setAccessible( true );
-					try
+					for (Field field: cls.getDeclaredFields())
 					{
-						value = field.get( x );
-					}
-					catch (IllegalArgumentException e1)
-					{
-						valuePres = errorStyle.applyTo( new Label( "<Illegal argument>" ) );
-						isSmall = true;
-					}
-					catch (IllegalAccessException e1)
-					{
-						valuePres = errorStyle.applyTo( new Label( "<Cannot access>" ) );
-						isSmall = true;
-					}
-					field.setAccessible( isAccessible );
-					
-					if ( valuePres == null )
-					{
-						// No exception thrown while getting field value
-						if ( PrimitivePresenter.isSmallPrimitive( value ) )
+						int modifiers = field.getModifiers();
+						if ( !Modifier.isStatic( modifiers ) )
 						{
-							isSmall = true;
-							valuePres = PrimitivePresenter.presentPrimitive( value );
-						}
-						else
-						{
-							valuePres = new InnerFragment( value );
-						}
-					}
-					if ( isSmall )
-					{
-						fields.add( new Row( new Pres[] {
-								PrimitivePresenter.getModifierKeywords( modifiers ),
-								PrimitivePresenter.presentJavaClassName( field.getType(), typeNameStyle ),
-								space,
-								PrimitivePresenter.getAccessNameStyle( modifiers ).applyTo( new Label( field.getName() ) ),
-								space,
-								valuePres } ) );
-					}
-					else
-					{
-						Pres header = new Row( new Pres[] {
-								PrimitivePresenter.getModifierKeywords( modifiers ),
-								PrimitivePresenter.presentJavaClassName( field.getType(), typeNameStyle ),
-								space,
-								PrimitivePresenter.getAccessNameStyle( modifiers ).applyTo( new Label( field.getName() ) ) } );
-						fields.add( new Column( new Pres[] { header, valuePres.padX( 30.0, 0.0 ) } ) );
-					}
-				}
-			}
+							boolean isSmall = false;
+							Object value = null;
+							Pres valuePres = null;
 			
-			cls = cls.getSuperclass();
-		}
-		if ( fields.size() > 0 )
-		{
-			contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Fields" ) ), new Column( fields ) ) );
-		}
+							boolean isAccessible = field.isAccessible();
+							field.setAccessible( true );
+							try
+							{
+								value = field.get( x );
+							}
+							catch (IllegalArgumentException e1)
+							{
+								valuePres = errorStyle.applyTo( new Label( "<Illegal argument>" ) );
+								isSmall = true;
+							}
+							catch (IllegalAccessException e1)
+							{
+								valuePres = errorStyle.applyTo( new Label( "<Cannot access>" ) );
+								isSmall = true;
+							}
+							field.setAccessible( isAccessible );
+							
+							if ( valuePres == null )
+							{
+								// No exception thrown while getting field value
+								if ( PrimitivePresenter.isSmallPrimitive( value ) )
+								{
+									isSmall = true;
+									valuePres = PrimitivePresenter.presentPrimitive( value );
+								}
+								else
+								{
+									valuePres = new InnerFragment( value );
+								}
+							}
+							if ( isSmall )
+							{
+								fields.add( new Row( new Pres[] {
+										PrimitivePresenter.getModifierKeywords( modifiers ),
+										PrimitivePresenter.presentJavaClassName( field.getType(), typeNameStyle ),
+										space,
+										PrimitivePresenter.getAccessNameStyle( modifiers ).applyTo( new Label( field.getName() ) ),
+										space,
+										valuePres } ) );
+							}
+							else
+							{
+								Pres header = new Row( new Pres[] {
+										PrimitivePresenter.getModifierKeywords( modifiers ),
+										PrimitivePresenter.presentJavaClassName( field.getType(), typeNameStyle ),
+										space,
+										PrimitivePresenter.getAccessNameStyle( modifiers ).applyTo( new Label( field.getName() ) ) } );
+								fields.add( new Column( new Pres[] { header, valuePres.padX( 30.0, 0.0 ) } ) );
+							}
+						}
+					}
+					
+					cls = cls.getSuperclass();
+				}
+				
+				return new Column( fields );
+			}
+		};
+		contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Fields" ) ), new LazyPres( fieldsLazyFac ) ) );
 		
 		contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "toString" ) ), asString ) );
 		
 		return new Column( contents );
 	}
 	
-	public static Pres presentPythonObjectInspector(PyObject x, FragmentView fragment, SimpleAttributeTable inheritedState)
+	public static Pres presentPythonObjectInspector(final PyObject x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		Pres asString = PrimitivePresenter.presentObjectAsString( x );
 
@@ -201,67 +208,73 @@ public class Inspector
 		
 		
 		// Attributes
-		ArrayList<Object> attributes = new ArrayList<Object>();
-		PyObject dict = x.fastGetDict();
-		if ( dict != null )
+		LazyPres.PresFactory lazyAttrsFac = new LazyPres.PresFactory()
 		{
-			PyList dictItems;
-			if ( dict instanceof PyDictionary )
+			@Override
+			public Pres createPres()
 			{
-				dictItems = ((PyDictionary)dict).items();
+				ArrayList<Object> attributes = new ArrayList<Object>();
+				PyObject dict = x.fastGetDict();
+				if ( dict != null )
+				{
+					PyList dictItems;
+					if ( dict instanceof PyDictionary )
+					{
+						dictItems = ((PyDictionary)dict).items();
+					}
+					else if ( dict instanceof PyStringMap )
+					{
+						dictItems = ((PyStringMap)dict).items();
+					}
+					else
+					{
+						throw new RuntimeException( "Expected a PyDictionary or a PyStringMap when acquiring __dict__ from a PyObject" );
+					}
+					
+					
+					for (Object dictItem: dictItems)
+					{
+						PyTuple pair = (PyTuple)dictItem;
+						PyObject key = pair.getArray()[0];
+						PyObject value = pair.getArray()[1];
+						String name = key.toString();
+						
+						if ( name.equals( "__dict__" ) )
+						{
+							break;
+						}
+						
+						Pres namePres = attributeNameStyle.applyTo( new Label( name ) );
+						Pres valuePres = null;
+						boolean isSmall = false;
+						
+						if ( PrimitivePresenter.isSmallPrimitivePy( value ) )
+						{
+							isSmall = true;
+							valuePres = PrimitivePresenter.presentPrimitivePy( value );
+						}
+						else
+						{
+							valuePres = new InnerFragment( Py.tojava( value, Object.class ) );
+							isSmall = false;
+						}
+						
+						if ( isSmall )
+						{
+							attributes.add( new Row( new Pres[] { namePres, space, valuePres } ) );
+						}
+						else
+						{
+							attributes.add( new Column( new Pres[] { namePres, valuePres.padX( 15.0, 0.0 ) } ) );
+						}
+					}
+				}
+
+				return new Column( attributes );
 			}
-			else if ( dict instanceof PyStringMap )
-			{
-				dictItems = ((PyStringMap)dict).items();
-			}
-			else
-			{
-				throw new RuntimeException( "Expected a PyDictionary or a PyStringMap when acquiring __dict__ from a PyObject" );
-			}
-			
-			
-			for (Object dictItem: dictItems)
-			{
-				PyTuple pair = (PyTuple)dictItem;
-				PyObject key = pair.getArray()[0];
-				PyObject value = pair.getArray()[1];
-				String name = key.toString();
-				
-				if ( name.equals( "__dict__" ) )
-				{
-					break;
-				}
-				
-				Pres namePres = attributeNameStyle.applyTo( new Label( name ) );
-				Pres valuePres = null;
-				boolean isSmall = false;
-				
-				if ( PrimitivePresenter.isSmallPrimitivePy( value ) )
-				{
-					isSmall = true;
-					valuePres = PrimitivePresenter.presentPrimitivePy( value );
-				}
-				else
-				{
-					valuePres = new InnerFragment( Py.tojava( value, Object.class ) );
-					isSmall = false;
-				}
-				
-				if ( isSmall )
-				{
-					attributes.add( new Row( new Pres[] { namePres, space, valuePres } ) );
-				}
-				else
-				{
-					attributes.add( new Column( new Pres[] { namePres, valuePres.padX( 15.0, 0.0 ) } ) );
-				}
-			}
-		}
+		};
 		
-		if ( attributes.size() > 0 )
-		{
-			contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Attributes" ) ),   new Column( attributes ) ) );
-		}
+		contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Attributes" ) ), new LazyPres( lazyAttrsFac ) ) );
 		
 		contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "__str__" ) ), asString ) );
 		
