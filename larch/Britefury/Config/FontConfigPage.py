@@ -211,7 +211,7 @@ class FontConfiguration (object):
 
 _basicFontConfig = FontConfiguration()
 _windowsFontConfig = FontConfiguration( generic='DejaVu Sans; SansSerif', normal='DejaVu Sans; SansSerif', heading='Perpetua; Serif', title='Lucida Bright; Serif', uiHeading='Dotum; SansSerif' )
-_linuxFontConfig = FontConfiguration( generic='SansSerif', normal='SansSerif', heading='Un Batang; Serif', title='Bitstream Charter; Serif', uiHeading='DejaVu Sans ExtraLight; Sawasdee; SansSerif' )
+_linuxFontConfig = FontConfiguration( generic='SansSerif', normal='SansSerif', heading='Un Batang; Serif', title='Norasi; Serif', uiHeading='DejaVu Sans ExtraLight; Sawasdee; SansSerif' )
 _macFontConfig = FontConfiguration( generic='Geneva; SansSerif', normal='Geneva; SansSerif', heading='Perpetua; Serif', title='CalistoMT; Serif', uiHeading='Gulim; SansSerif' )
 
 
