@@ -255,7 +255,7 @@ _pythonPackageNameNotSetCommentStyle = StyleSheet.style( Primitive.foreground( C
 _packageContentsIndentation = 20.0
 
 
-_packageIcon = Image( 'LarchCore/Project/images/Package.png' )
+_packageIcon = Image( Image.getResource( '/LarchCore/Project/images/Package.png' ) )
 
 
 _nameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*' )

@@ -193,7 +193,7 @@ class FontConfiguration (object):
 			normal2 = normalSample( self._normal.getValue(), 'Paragraphs of normal text are used for standard content.' )
 			ui1 = uiHeadingSample( self._uiHeading.getValue(), 'UI heading' )
 			genericLabel = Label( 'Generic text (within controls, code, etc) will appear like this.' )
-			buttons = self._buttonRowStyle( Row( [ Button.buttonWithLabel( 'Button {0}'.format( i ), None )   for i in xrange( 0, 5 ) ] ) )
+			buttons = self._buttonRowStyle( Row( [ Button.buttonWithLabel( 'Button %d' % ( i, ), None )   for i in xrange( 0, 5 ) ] ) )
 			ui = Section( ui1, Column( [ genericLabel, Spacer( 0.0, 7.0 ), buttons ] ) )
 			page = Page( [ title, Body( [ heading, normal1, normal2, ui ] ) ] )
 
