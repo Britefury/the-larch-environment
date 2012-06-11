@@ -25,6 +25,8 @@ from BritefuryJ.Pres import *
 from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.Pres.ObjectPres import *
 
+from BritefuryJ.Parser.Utils import Tokens
+
 from BritefuryJ.Editor.Table.Generic import *
 
 from BritefuryJ.StyleSheet import *
@@ -35,8 +37,41 @@ from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Expr, Embedded
 from LarchCore.Languages.Python25 import Schema
 
 
+_nameBorder = SolidBorder( 1.0, 2.0, 5.0, 5.0, Color( 0.6, 0.6, 0.6 ), Color( 0.95, 0.95, 0.95 ) )
 
-class InlineTest (object):
+
+
+
+class AbstractIndividualTest (object):
+	def __init__(self, inlineTest):
+		self._inlineTest = inlineTest
+		self._methodName = None
+
+
+	@property
+	def name(self):
+		raise NotImplementedError, 'abstract'
+
+	@property
+	def methodName(self):
+		if self._methodName is None:
+			self._methodName = self._inlineTest._testingBlock._uniqueMethodName( 'test_%s' % self.name )
+		return self._methodName
+
+
+	def reset(self):
+		self._methodName = None
+
+
+	def _createTestMethodDeclaration(self, codeGen):
+		return Schema.DefStmt( name=self.methodName, params=[ Schema.SimpleParam( name='self' ) ], suite=self._createTestMethodBody( codeGen ) )
+
+	def _createTestMethodBody(self, codeGen):
+		raise NotImplementedError, 'abstract'
+
+
+
+class AbstractInlineTest (object):
 	__current_testing_block__ = None
 
 
@@ -44,22 +79,43 @@ class InlineTest (object):
 		self._testingBlock = None
 
 
+	def reset(self):
+		for test in self.individualTests:
+			test.reset()
+
+
+	@property
+	def individualTests(self):
+		raise NotImplementedError, 'abstract'
+
 	def __py_execmodel__(self, codeGen):
-		testingBlock = codeGen.macroStackTop( lambda m: isinstance( m, TestingBlock ) )
-		if testingBlock is not None:
-			testingBlock._registerInlineTest( self )
-			self._testingBlock = testingBlock
+		if self.__current_testing_block__ is not None:
+			self.__current_testing_block__._registerInlineTest( self )
+			self._testingBlock = self.__current_testing_block__
+		return Schema.PythonSuite( suite=[] )
 
 
 
-class TestingBlock (object):
+class IndividualTestMethod (AbstractIndividualTest):
+	def __init__(self):
+		self._name = LiveValue( 'test' )
+
+
+
+
+class InlineTest (AbstractInlineTest):
+	pass
+
+
+
+class TestedBlock (object):
 	def __init__(self):
 		self._name = LiveValue( 'test' )
 		self._suite = EmbeddedPython25Suite()
-		self._incr = IncrementalValueMonitor()
 		self.__change_history__ = None
 
 		self._inlineTests = []
+		self.__usedNames = {}
 
 
 	def __getstate__(self):
@@ -68,10 +124,10 @@ class TestingBlock (object):
 	def __setstate__(self, state):
 		self._name = LiveValue( state['name' ] )
 		self._suite = state['suite']
-		self._incr = IncrementalValueMonitor()
 		self.__change_history__ = None
 
 		self._inlineTests = []
+		self.__usedNames = {}
 
 
 	def __get_trackable_contents__(self):
@@ -83,7 +139,20 @@ class TestingBlock (object):
 
 
 	def _clear(self):
+		for test in self._inlineTests:
+			test.reset()
 		self._inlineTests = []
+		self.__usedNames = {}
+
+
+	def _uniqueMethodName(self, name):
+		if name in self.__usedNames:
+			index = self.__usedNames[name] + 1
+			self.__usedNames[name] += 1
+			return self._uniqueMethodName( name + '_' + str( index ) )
+		else:
+			self.__usedNames[name] = 1
+			return name
 
 
 	def __py_execmodel__(self, codeGen):
@@ -94,11 +163,11 @@ class TestingBlock (object):
 
 		# Use a guard to push self onto the TestingBlock stack
 		def beginGuard(codeGen):
-			prevTestingBlock[0] = InlineTest.__current_testing_block__
-			InlineTest.__current_testing_block__ = self
+			prevTestingBlock[0] = AbstractInlineTest.__current_testing_block__
+			AbstractInlineTest.__current_testing_block__ = self
 
 		def endGuard(codeGen):
-			InlineTest.__current_testing_block__ = prevTestingBlock[0]
+			AbstractInlineTest.__current_testing_block__ = prevTestingBlock[0]
 
 		mainContent = codeGen.guard( beginGuard, self._suite.model, endGuard )
 
@@ -107,7 +176,9 @@ class TestingBlock (object):
 		@codeGen.deferred
 		def unitTestClass(codeGen):
 			# Get each inline test to create its method body
-			methods = [ test._createTestMethodDeclaration( self )   for test in self._inlineTests ]
+			methods = []
+			for test in self._inlineTests:
+				methods.extend( test.individualTests )
 
 			# Create the class suite
 			first = False
@@ -142,42 +213,36 @@ class TestingBlock (object):
 		self._incr.onAccess()
 		suitePres = self._suite
 
-		valuesPres = TabbedBox( [ [ Label( 'Tree' ), self._treeView ],  [ Label( 'Table' ), self._tableView ] ], None )
+		nameLabel = Label( 'Test case name: ' )
+		nameEntry = TextEntry.regexValidated( self._name, Tokens.identifierPattern, 'Please enter a valid identifier' )
+		name = _nameBorder.surround( Row( [ nameLabel.alignHPack(), nameEntry ] ) ).alignHExpand()
 
-		contents = Column( [ suitePres, valuesPres ] )
-		return ObjectBox( 'Trace visualisation', contents ).withContextMenuInteractor( _embeddedDisplayMenu ).withCommands( _mxCommands )
+		contents = Column( [ suitePres, name.padY( 5.0, 0.0 ) ] )
+		return ObjectBox( 'Unit test', contents ).withCommands( _itCommands )
 
 
 
 
 
-#
-#@EmbeddedExpressionAtCaretAction
-#def _newMonitoredExpressionAtCaret(caret):
-#	return MonitoredExpression()
-#
-#@WrapSelectionInEmbeddedExpressionAction
-#def _newMonitoredExpressionAtSelection(expr, selection):
-#	d = MonitoredExpression()
-#	d._expr.model['expr'] = deepcopy( expr )
-#	if expr.isInstanceOf( Schema.Load ):
-#		d._name = expr['name']
-#	return d
-#
-#_mxCommand = Command( '&Monitored E&xpression', chainActions( _newMonitoredExpressionAtSelection, _newMonitoredExpressionAtCaret ) )
-#
-#_mxCommands = CommandSet( 'LarchTools.PythonTools.EmbeddedDisplay.MonitoredExpression', [ _mxCommand ] )
-#
-#
-#
-#
-#@WrapSelectedStatementRangeInEmbeddedObjectAction
-#def _newTraceVisAtStatementRange(statements, selection):
-#	d = TraceVisualisation()
-#	d._suite.model['suite'][:] = deepcopy( statements )
-#	return d
-#
-#
-#_tvCommand = Command( '&Trace &Visualisation', chainActions( _newTraceVisAtStatementRange ) )
-#
-#PythonCommandSet( 'LarchTools.PythonTools.TraceVis', [ _tvCommand ] )
+
+@EmbeddedExpressionAtCaretAction
+def _newInlineTestAtCaret(caret):
+	return InlineTest()
+
+_itCommand = Command( '&Inline &Test', chainActions( _newInlineTestAtCaret ) )
+
+_itCommands = CommandSet( 'LarchTools.PythonTools.InlineTest.Tests', [ _itCommand ] )
+
+
+
+
+@WrapSelectedStatementRangeInEmbeddedObjectAction
+def _newTestedBlockAtStatementRange(statements, selection):
+	d = TestedBlock()
+	d._suite.model['suite'][:] = deepcopy( statements )
+	return d
+
+
+_tbCommand = Command( '&Tested &Block', chainActions( _newTestedBlockAtStatementRange ) )
+
+PythonCommandSet( 'LarchTools.PythonTools.InlineTest', [ _tbCommand ] )
