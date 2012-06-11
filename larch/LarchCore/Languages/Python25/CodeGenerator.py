@@ -9,7 +9,7 @@ from copy import deepcopy
 
 from BritefuryJ.DocModel import DMObject, DMList, DMEmbeddedObject, DMEmbeddedIsolatedObject
 
-from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, methodDispatch
+from Britefury.Dispatch.MethodDispatch import ObjectDispatchMethod, DMObjectNodeDispatchMethod, methodDispatch
 
 from LarchCore.Languages.Python25 import Schema
 from LarchCore.Languages.Python25.PythonEditor.Precedence import *
@@ -876,6 +876,36 @@ _runtime_astMap_Name = '__larch_astMap__'
 _runtime_DMList_Name = '__larch_DMList__'
 
 
+
+class _Factory (object):
+	def buildAST(self, codeGen):
+		raise NotImplementedError, 'abstract'
+
+
+class _Deferred (_Factory):
+	def __init__(self, fn):
+		self.__fn = fn
+
+
+	def buildAST(self, codeGen):
+		return self.__fn( codeGen )
+
+
+class _Guard (_Factory):
+	def __init__(self, beginFn, content, endFn):
+		self.__beginFn = beginFn
+		self.__content = content
+		self.__endFn = endFn
+
+
+	def buildAST(self, codeGen):
+		self.__beginFn( codeGen )
+		result = codeGen( self.__content )
+		self.__endFn( codeGen )
+		return result
+
+
+
 class Python25ModuleCodeGenerator (Python25CodeGenerator):
 	def __init__(self, module, filename, bErrorChecking=True):
 		super( Python25ModuleCodeGenerator, self ).__init__( filename, bErrorChecking )
@@ -906,12 +936,12 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 		self._module = module
 
 
+
 	@property
 	def module(self):
 		return self._module
-			
-			
-			
+
+
 	def _getIndexForAstClass(self, cls):
 		try:
 			return self._revAstMap[cls]
@@ -1004,7 +1034,7 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 			# Got a 'model' function - invoke to create AST nodes, then convert them to code
 			model = modelFn( self )
 			return self( model )
-		
+
 		
 		# Try to use the __py_eval__ method
 		try:
@@ -1048,8 +1078,9 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 			model = modelFn( self )
 			return self( model )
 
-		
-		# Try to use the __py_exec__ method
+
+
+	# Try to use the __py_exec__ method
 		try:
 			execFn = value.__py_exec__
 		except AttributeError:
@@ -1079,9 +1110,17 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 		
 		# Get the object as a value
 		return Line( self._embeddedValueSrc( value ),   node )
-			
-	
-	
+
+
+
+	# AST factory
+	@ObjectDispatchMethod( _Factory )
+	def Factory(self, node):
+		model = node.buildAST( self )
+		return self( model )
+
+
+
 	def _embeddedValueIndex(self, resourceValue):
 		rscId = id( resourceValue )
 		try:
@@ -1101,6 +1140,14 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 		targetAST = Schema.Load( name=_runtime_resourceMap_Name )
 		indexAST= Schema.IntLiteral( format='decimal', numType='int', value=str( index ) )
 		return Schema.Subscript( target=targetAST, index=indexAST )
+
+
+
+	def defer(self, fn):
+		return _Deferred( fn )
+
+	def guard(self, beginFn, content, endFn):
+		return _Guard( beginFn, content, endFn )
 
 
 

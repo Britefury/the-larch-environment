@@ -37,17 +37,25 @@ from LarchCore.Languages.Python25 import Schema
 
 
 class InlineTest (object):
-	_currentTestingBlock = None
+	__current_testing_block__ = None
 
-	def __index__(self):
-		raise NotImplementedError
+
+	def __init__(self):
+		self._testingBlock = None
+
+
+	def __py_execmodel__(self, codeGen):
+		testingBlock = codeGen.macroStackTop( lambda m: isinstance( m, TestingBlock ) )
+		if testingBlock is not None:
+			testingBlock._registerInlineTest( self )
+			self._testingBlock = testingBlock
+
 
 
 class TestingBlock (object):
 	def __init__(self):
 		self._name = LiveValue( 'test' )
 		self._suite = EmbeddedPython25Suite()
-		self._code = None
 		self._incr = IncrementalValueMonitor()
 		self.__change_history__ = None
 
@@ -60,7 +68,6 @@ class TestingBlock (object):
 	def __setstate__(self, state):
 		self._name = LiveValue( state['name' ] )
 		self._suite = state['suite']
-		self._code = None
 		self._incr = IncrementalValueMonitor()
 		self.__change_history__ = None
 
@@ -79,37 +86,46 @@ class TestingBlock (object):
 		self._inlineTests = []
 
 
-	def __py_compile_visit__(self, codeGen):
-		self._clear()
-
-		prevBlock = InlineTest._currentTestingBlock
-		InlineTest._currentTestingBlock = self
-
-		self._code = codeGen.compileForExecution( self._suite.model )
-
-		InlineTest._currentTestingBlock = prevBlock
-
-
 	def __py_execmodel__(self, codeGen):
 		self._clear()
 
-		stmts = self._suite.model['suite']
-
-		# Get each inline test to create its method body
-		methods = [ test._createTestMethodDeclaration( self )   for test in self._inlineTests ]
-
-		# Create the class suite
-		first = False
-		clsSuite = []
-		for method in methods:
-			if not first:
-				clsSuite.append( Schema.BlankLine() )
-			clsSuite.append( method )
+		prevTestingBlock = [ None ]
 
 
-		# Now, we need to create the test class declaration
-		clsName = self._getTestClassName()
-		testCls = Schema.ClassStmt( name=clsName, bases=[], suite=clsSuite )
+		# Use a guard to push self onto the TestingBlock stack
+		def beginGuard(codeGen):
+			prevTestingBlock[0] = InlineTest.__current_testing_block__
+			InlineTest.__current_testing_block__ = self
+
+		def endGuard(codeGen):
+			InlineTest.__current_testing_block__ = prevTestingBlock[0]
+
+		mainContent = codeGen.guard( beginGuard, self._suite.model, endGuard )
+
+
+		# Defer the generation of the unit test class
+		@codeGen.deferred
+		def unitTestClass(codeGen):
+			# Get each inline test to create its method body
+			methods = [ test._createTestMethodDeclaration( self )   for test in self._inlineTests ]
+
+			# Create the class suite
+			first = False
+			clsSuite = []
+			for method in methods:
+				if not first:
+					clsSuite.append( Schema.BlankLine() )
+				clsSuite.append( method )
+
+
+			# Now, we need to create the test class declaration
+			clsName = self._getTestClassName()
+			testCls = Schema.ClassStmt( name=clsName, bases=[], suite=clsSuite )
+			suite = Schema.PythonSuite( suite=[ testCls ] )
+			return suite
+
+		
+		return Schema.PythonSuite( suite=[ mainContent, unitTestClass] )
 
 
 
