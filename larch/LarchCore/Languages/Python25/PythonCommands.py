@@ -233,17 +233,18 @@ pythonTargetCommands = CommandSetRegistry( 'LarchCore.Languages.Python25.Target'
 
 
 
-class PythonCommandSet (CommandSet):
-	def __init__(self, name, commands):
-		super( PythonCommandSet, self ).__init__( name, commands )
-		pythonCommands.registerCommandSet( self )
+def pythonCommandSet(name, commands):
+	commandSet = CommandSet( name, commands )
+	pythonCommands.registerCommandSet( commandSet )
+	return commandSet
 
 
 
-class PythonTargetCommandSet (CommandSet):
-	def __init__(self, name, commands):
-		super( PythonTargetCommandSet, self ).__init__( name, commands )
-		pythonTargetCommands.registerCommandSet( self )
+def pythonTargetCommandSet(name, commands):
+	commandSet = CommandSet( name, commands )
+	pythonTargetCommands.registerCommandSet( commandSet )
+	return commandSet
+
 
 
 

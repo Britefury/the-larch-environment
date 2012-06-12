@@ -26,7 +26,7 @@ from BritefuryJ.Controls import Controls, DropDownExpander, MenuItem, TextEntry,
 
 from BritefuryJ.StyleSheet import StyleSheet
 
-from LarchCore.Languages.Python25.PythonCommands import PythonCommandSet, EmbeddedExpressionAtCaretAction, WrapSelectionInEmbeddedExpressionAction,	\
+from LarchCore.Languages.Python25.PythonCommands import pythonCommandSet, EmbeddedExpressionAtCaretAction, WrapSelectionInEmbeddedExpressionAction,	\
 	WrapSelectedStatementRangeInEmbeddedObjectAction, EmbeddedStatementAtCaretAction, chainActions
 from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Expr, EmbeddedPython25Suite
 
@@ -272,4 +272,4 @@ def _newLiterateSuiteAtStatementRange(statements, selection):
 _lxCommand = Command( '&Literate E&xpression', chainActions( _newLiterateExpressionAtSelection, _newLiterateExpressionAtCaret ) )
 _lsCommand = Command( '&Literate &Suite', chainActions( _newLiterateSuiteAtStatementRange, _newLiterateSuiteAtCaret ) )
 
-PythonCommandSet( 'LarchTools.PythonTools.Literate', [ _lxCommand, _lsCommand ] )
+pythonCommandSet( 'LarchTools.PythonTools.Literate', [ _lxCommand, _lsCommand ] )

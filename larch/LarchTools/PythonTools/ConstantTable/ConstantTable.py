@@ -22,7 +22,7 @@ from BritefuryJ.Editor.Table.ObjectList import AttributeColumn, ObjectListTableE
 from Britefury.Util.TrackedList import TrackedListProperty
 
 import LarchCore.Languages.Python25.Schema as Py
-from LarchCore.Languages.Python25.PythonCommands import PythonCommandSet, EmbeddedStatementAtCaretAction
+from LarchCore.Languages.Python25.PythonCommands import pythonCommandSet, EmbeddedStatementAtCaretAction
 from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Target, EmbeddedPython25Expr
 
 
@@ -168,4 +168,4 @@ def _newConstantTableAtCaret(caret):
 
 _ctCommand = Command( '&Python &Constant &Table', _newConstantTableAtCaret )
 
-PythonCommandSet( 'LarchTools.PythonTools.ConstantTable', [ _ctCommand ] )
+pythonCommandSet( 'LarchTools.PythonTools.ConstantTable', [ _ctCommand ] )

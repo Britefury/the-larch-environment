@@ -29,7 +29,7 @@ from BritefuryJ.Editor.Table.Generic import *
 
 from BritefuryJ.StyleSheet import *
 
-from LarchCore.Languages.Python25.PythonCommands import PythonCommandSet, EmbeddedExpressionAtCaretAction, WrapSelectionInEmbeddedExpressionAction,\
+from LarchCore.Languages.Python25.PythonCommands import pythonCommandSet, EmbeddedExpressionAtCaretAction, WrapSelectionInEmbeddedExpressionAction,\
 	WrapSelectedStatementRangeInEmbeddedObjectAction, chainActions
 from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Expr, EmbeddedPython25Suite
 from LarchCore.Languages.Python25 import Schema
@@ -418,4 +418,4 @@ def _newTraceVisAtStatementRange(statements, selection):
 
 _tvCommand = Command( '&Trace &Visualisation', chainActions( _newTraceVisAtStatementRange ) )
 
-PythonCommandSet( 'LarchTools.PythonTools.TraceVis', [ _tvCommand ] )
+pythonCommandSet( 'LarchTools.PythonTools.TraceVis', [ _tvCommand ] )

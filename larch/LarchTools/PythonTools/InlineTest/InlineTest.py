@@ -31,7 +31,9 @@ from BritefuryJ.Editor.Table.Generic import *
 
 from BritefuryJ.StyleSheet import *
 
-from LarchCore.Languages.Python25.PythonCommands import PythonCommandSet, EmbeddedExpressionAtCaretAction, WrapSelectionInEmbeddedExpressionAction,\
+from Britefury.Util.LiveList import LiveList
+
+from LarchCore.Languages.Python25.PythonCommands import pythonCommandSet, EmbeddedExpressionAtCaretAction, WrapSelectionInEmbeddedExpressionAction,\
 WrapSelectedStatementRangeInEmbeddedObjectAction, chainActions
 from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Expr, EmbeddedPython25Suite
 from LarchCore.Languages.Python25 import Schema
@@ -96,21 +98,67 @@ class AbstractInlineTest (object):
 
 
 
-class IndividualTestMethod (AbstractIndividualTest):
+_standardTestBorder = SolidBorder( 1.5, 2.0, 6.0, 6.0, Color( 0.7, 0.7, 0.7 ), None )
+
+class StandardTestMethod (AbstractIndividualTest):
+	def __init__(self, name='test'):
+		self._name = TrackedLiveValue( name )
+		self._suite = EmbeddedPython25Suite()
+		self.__change_history__ = None
+
+
+	def __getstate__(self):
+		return { 'name' : self._name.getStaticValue(), 'suite' : self._suite }
+
+	def __setstate__(self, state):
+		self._name = TrackedLiveValue( state['name' ] )
+		self._suite = state['suite']
+		self.__change_history__ = None
+
+
+	def __get_trackable_contents__(self):
+		return [ self._name, self._suite ]
+
+
+	def __present__(self, fragment, inheritedState):
+		nameLabel = Label( 'Test case name: ' )
+		nameEntry = EditableLabel.regexValidated( self._name, Tokens.identifierPattern, 'Please enter a valid identifier' )
+		name = _nameBorder.surround( Row( [ nameLabel.alignHPack(), nameEntry ] ) ).alignHExpand()
+
+		return _standardTestBorder.surround()
+
+
+
+
+
+class StandardInlineTest (AbstractInlineTest):
 	def __init__(self):
-		self._name = LiveValue( 'test' )
+		self._tests = LiveList()
+		self._tests.append( StandardTestMethod() )
+		self.__change_history__ = None
 
 
+	def __getstate__(self):
+		return { 'tests' : self._tests }
+
+	def __setstate__(self, state):
+		self._tests = state.get( 'tests', LiveList() )
+		self.__change_history__ = None
 
 
-class InlineTest (AbstractInlineTest):
-	pass
+	def __get_trackable_contents__(self):
+		return [ self._tests ]
+
+
+	def __present__(self, fragment, inheritedState):
+		pass
+
 
 
 
 class TestedBlock (object):
 	def __init__(self):
-		self._name = LiveValue( 'test' )
+		self._name = TrackedLiveValue( 'test' )
 		self._suite = EmbeddedPython25Suite()
 		self.__change_history__ = None
 
@@ -119,10 +167,10 @@ class TestedBlock (object):
 
 
 	def __getstate__(self):
-		return { 'name' : self._name.getValue(), 'suite' : self._suite }
+		return { 'name' : self._name.getStaticValue(), 'suite' : self._suite }
 
 	def __setstate__(self, state):
-		self._name = LiveValue( state['name' ] )
+		self._name = TrackedLiveValue( state['name' ] )
 		self._suite = state['suite']
 		self.__change_history__ = None
 
@@ -131,7 +179,7 @@ class TestedBlock (object):
 
 
 	def __get_trackable_contents__(self):
-		return [ self._suite ]
+		return [ self._name, self._suite ]
 
 
 	def _registerInlineTest(self, test):
@@ -195,7 +243,7 @@ class TestedBlock (object):
 			suite = Schema.PythonSuite( suite=[ testCls ] )
 			return suite
 
-		
+
 		return Schema.PythonSuite( suite=[ mainContent, unitTestClass] )
 
 
@@ -214,24 +262,41 @@ class TestedBlock (object):
 		suitePres = self._suite
 
 		nameLabel = Label( 'Test case name: ' )
-		nameEntry = TextEntry.regexValidated( self._name, Tokens.identifierPattern, 'Please enter a valid identifier' )
+		nameEntry = EditableLabel.regexValidated( self._name, Tokens.identifierPattern, 'Please enter a valid identifier' )
 		name = _nameBorder.surround( Row( [ nameLabel.alignHPack(), nameEntry ] ) ).alignHExpand()
 
 		contents = Column( [ suitePres, name.padY( 5.0, 0.0 ) ] )
-		return ObjectBox( 'Unit test', contents ).withCommands( _itCommands )
+		return ObjectBox( 'Unit test', contents ).withCommands( inlineTestCommands )
 
 
 
 
+#
+# Command set registry and class definition for inline test commands
+#
 
+inlineTestCommands = CommandSetRegistry( 'LarchTools.PythonTools.InlineTest.TestedBlock' )
+
+
+def inlineTestCommandSet(name, commands):
+	commandSet = CommandSet( name, commands )
+	inlineTestCommands.registerCommandSet( commandSet )
+	return commandSet
+
+
+
+
+#
+# Commands for inserting standard tests
+#
 
 @EmbeddedExpressionAtCaretAction
-def _newInlineTestAtCaret(caret):
-	return InlineTest()
+def _newStandardInlineTestAtCaret(caret):
+	return StandardInlineTest()
 
-_itCommand = Command( '&Inline &Test', chainActions( _newInlineTestAtCaret ) )
+_sitCommand = Command( '&Standard &Inline &Test', chainActions( _newStandardInlineTestAtCaret ) )
 
-_itCommands = CommandSet( 'LarchTools.PythonTools.InlineTest.Tests', [ _itCommand ] )
+inlineTestCommandSet( 'LarchTools.PythonTools.InlineTest.StandardTests', [ _sitCommand ] )
 
 
 
@@ -245,4 +310,4 @@ def _newTestedBlockAtStatementRange(statements, selection):
 
 _tbCommand = Command( '&Tested &Block', chainActions( _newTestedBlockAtStatementRange ) )
 
-PythonCommandSet( 'LarchTools.PythonTools.InlineTest', [ _tbCommand ] )
+pythonCommandSet( 'LarchTools.PythonTools.InlineTest', [ _tbCommand ] )

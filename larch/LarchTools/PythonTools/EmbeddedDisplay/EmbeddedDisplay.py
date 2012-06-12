@@ -29,7 +29,7 @@ from BritefuryJ.Editor.Table.Generic import *
 
 from BritefuryJ.StyleSheet import *
 
-from LarchCore.Languages.Python25.PythonCommands import PythonCommandSet, EmbeddedExpressionAtCaretAction, WrapSelectionInEmbeddedExpressionAction, chainActions
+from LarchCore.Languages.Python25.PythonCommands import pythonCommandSet, EmbeddedExpressionAtCaretAction, WrapSelectionInEmbeddedExpressionAction, chainActions
 from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Expr
 
 
@@ -108,4 +108,4 @@ def _newEmbeddedDisplayAtSelection(expr, selection):
 
 _edCommand = Command( '&Embedded &Display', chainActions( _newEmbeddedDisplayAtSelection, _newEmbeddedDisplayAtCaret ) )
 
-PythonCommandSet( 'LarchTools.PythonTools.EmbeddedDisplay', [ _edCommand ] )
+pythonCommandSet( 'LarchTools.PythonTools.EmbeddedDisplay', [ _edCommand ] )

@@ -26,7 +26,7 @@ from BritefuryJ.Util.Coroutine import Coroutine
 
 from BritefuryJ.Live import LiveValue
 
-from LarchCore.Languages.Python25.PythonCommands import PythonCommandSet, WrapSelectedStatementRangeInEmbeddedObjectAction, EmbeddedStatementAtCaretAction, chainActions
+from LarchCore.Languages.Python25.PythonCommands import pythonCommandSet, WrapSelectedStatementRangeInEmbeddedObjectAction, EmbeddedStatementAtCaretAction, chainActions
 from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Suite
 from LarchCore.Languages.Python25.Execution import Execution
 
@@ -309,5 +309,5 @@ def _newStepperAtStatementRange(statements, selection):
 
 _psCommand = Command( '&Python &S&tepper', chainActions( _newStepperAtStatementRange, _newStepperAtCaret ) )
 
-PythonCommandSet( 'LarchTools.PythonTools.Stepper', [ _psCommand ] )
+pythonCommandSet( 'LarchTools.PythonTools.Stepper', [ _psCommand ] )
 
