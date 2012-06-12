@@ -25,7 +25,7 @@ from BritefuryJ.Incremental import IncrementalValueMonitor
 from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.StyleSheet import *
 
-from LarchCore.Languages.Python25.PythonCommands import PythonCommandSet, WrapSelectedStatementRangeInEmbeddedObjectAction, EmbeddedStatementAtCaretAction, chainActions
+from LarchCore.Languages.Python25.PythonCommands import pythonCommandSet, WrapSelectedStatementRangeInEmbeddedObjectAction, EmbeddedStatementAtCaretAction, chainActions
 from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Suite, removeEmbeddedObjectContainingElement
 from LarchCore.Languages.Python25.Execution import Execution
 
@@ -155,4 +155,4 @@ def _newInlineConsoleAtStatementRange(statements, selection):
 
 _icCommand = Command( '&Inline &Console', chainActions( _newInlineConsoleAtStatementRange, _newInlineConsoleAtCaret ) )
 
-PythonCommandSet( 'LarchTools.PythonTools.InlineConsole', [ _icCommand ] )
+pythonCommandSet( 'LarchTools.PythonTools.InlineConsole', [ _icCommand ] )

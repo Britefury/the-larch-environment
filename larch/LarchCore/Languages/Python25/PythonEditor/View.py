@@ -1804,7 +1804,7 @@ def _newUnquote(caret):
 _unquoteCommand = Command( '&Un&quote', _newUnquote )
 
 
-PythonCommands.PythonCommandSet( 'LarchCore.Languages.Python25', [ _multilineStringCommand, _quoteExprCommand, _quoteStmtCommand, _unquoteCommand ] )
+PythonCommands.pythonCommandSet( 'LarchCore.Languages.Python25', [ _multilineStringCommand, _quoteExprCommand, _quoteStmtCommand, _unquoteCommand ] )
 
 
 

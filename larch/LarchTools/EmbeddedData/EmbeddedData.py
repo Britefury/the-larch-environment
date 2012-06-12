@@ -7,7 +7,7 @@
 ##-*************************
 from BritefuryJ.Command import Command, CommandSet
 
-from LarchCore.Languages.Python25.PythonCommands import PythonCommandSet, EmbeddedExpressionAtCaretAction
+from LarchCore.Languages.Python25.PythonCommands import pythonCommandSet, EmbeddedExpressionAtCaretAction
 
 from LarchTools.EmbeddedData.IntEditorSpinEntry import IntEditorSpinEntry
 from LarchTools.EmbeddedData.RealEditorSpinEntry import RealEditorSpinEntry
@@ -67,5 +67,5 @@ def _newDirPathEntryAtCaret(caret):
 _dirPathEntryCommand = Command( '&Directory &Path &Entry', _newDirPathEntryAtCaret )
 
 
-PythonCommandSet( 'LarchTools.EmbeddedData', [ _intSpinCommand, _realSpinCommand, _textEntryCommand, _textAreaCommand,
+pythonCommandSet( 'LarchTools.EmbeddedData', [ _intSpinCommand, _realSpinCommand, _textEntryCommand, _textAreaCommand,
                                                        _colourPickerCommand, _filePathEntryCommand, _dirPathEntryCommand ] )

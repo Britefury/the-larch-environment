@@ -80,7 +80,7 @@ worksheetCommands = CommandSetRegistry( 'LarchCore.Worksheet' )
 
 
 
-class WorksheetCommandSet (CommandSet):
-	def __init__(self, name, commands):
-		super( WorksheetCommandSet, self ).__init__( name, commands )
-		worksheetCommands.registerCommandSet( self )
+def worksheetCommandSet(name, commands):
+	commandSet = CommandSet( name, commands )
+	worksheetCommands.registerCommandSet( commandSet )
+	return commandSet
