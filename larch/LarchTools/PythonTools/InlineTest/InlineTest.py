@@ -14,7 +14,7 @@ from copy import deepcopy
 from BritefuryJ.Command import *
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
-from BritefuryJ.Live import LiveValue
+from BritefuryJ.Live import TrackedLiveValue
 
 from BritefuryJ.Controls import *
 
@@ -23,6 +23,8 @@ from BritefuryJ.Graphics import *
 
 from BritefuryJ.Pres import *
 from BritefuryJ.Pres.Primitive import *
+from BritefuryJ.Pres.RichText import *
+from BritefuryJ.Pres.UI import *
 from BritefuryJ.Pres.ObjectPres import *
 
 from BritefuryJ.Parser.Utils import Tokens
@@ -33,13 +35,14 @@ from BritefuryJ.StyleSheet import *
 
 from Britefury.Util.LiveList import LiveList
 
-from LarchCore.Languages.Python25.PythonCommands import pythonCommandSet, EmbeddedExpressionAtCaretAction, WrapSelectionInEmbeddedExpressionAction,\
-WrapSelectedStatementRangeInEmbeddedObjectAction, chainActions
+from LarchCore.Languages.Python25.PythonCommands import pythonCommandSet, EmbeddedStatementAtCaretAction, WrapSelectedStatementRangeInEmbeddedObjectAction, chainActions
 from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Expr, EmbeddedPython25Suite
 from LarchCore.Languages.Python25 import Schema
 
 
 _nameBorder = SolidBorder( 1.0, 2.0, 5.0, 5.0, Color( 0.6, 0.6, 0.6 ), Color( 0.95, 0.95, 0.95 ) )
+
+_notSet = StyleSheet.style( Primitive.fontItalic( True ) )( Label( 'not set' ) )
 
 
 
@@ -77,6 +80,25 @@ class AbstractInlineTest (object):
 	__current_testing_block__ = None
 
 
+	def reset(self):
+		pass
+
+
+	def statements(self, codeGen):
+		raise NotImplementedError, 'abstract'
+
+	def __py_execmodel__(self, codeGen):
+		if self.__current_testing_block__ is not None:
+			self.__current_testing_block__._registerInlineTest( self )
+			self._testingBlock = self.__current_testing_block__
+		return Schema.PythonSuite( suite=[] )
+
+
+
+class AbstractInlineTestCollection (AbstractInlineTest):
+	__current_testing_block__ = None
+
+
 	def __init__(self):
 		self._testingBlock = None
 
@@ -90,69 +112,45 @@ class AbstractInlineTest (object):
 	def individualTests(self):
 		raise NotImplementedError, 'abstract'
 
-	def __py_execmodel__(self, codeGen):
-		if self.__current_testing_block__ is not None:
-			self.__current_testing_block__._registerInlineTest( self )
-			self._testingBlock = self.__current_testing_block__
-		return Schema.PythonSuite( suite=[] )
+
+	def statements(self, codeGen):
+		statements = []
+		first = False
+		for test in self.individualTests:
+			if not first:
+				statements.append( Schema.BlankLine() )
+			statements.append( test._createTestMethodDeclaration( codeGen ) )
 
 
 
-_standardTestBorder = SolidBorder( 1.5, 2.0, 6.0, 6.0, Color( 0.7, 0.7, 0.7 ), None )
+_standardInlineTestBorder = SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.4, 0.4, 0.5 ), None )
 
-class StandardTestMethod (AbstractIndividualTest):
-	def __init__(self, name='test'):
-		self._name = TrackedLiveValue( name )
+class StandardInlineTest (AbstractInlineTest):
+	def __init__(self):
 		self._suite = EmbeddedPython25Suite()
 		self.__change_history__ = None
 
 
 	def __getstate__(self):
-		return { 'name' : self._name.getStaticValue(), 'suite' : self._suite }
+		return { 'suite' : self._suite }
 
 	def __setstate__(self, state):
-		self._name = TrackedLiveValue( state['name' ] )
 		self._suite = state['suite']
 		self.__change_history__ = None
 
 
 	def __get_trackable_contents__(self):
-		return [ self._name, self._suite ]
+		return [ self._suite ]
+
+
+	def statements(self, codeGen):
+		return self._suite.model['suite']
 
 
 	def __present__(self, fragment, inheritedState):
-		nameLabel = Label( 'Test case name: ' )
-		nameEntry = EditableLabel.regexValidated( self._name, Tokens.identifierPattern, 'Please enter a valid identifier' )
-		name = _nameBorder.surround( Row( [ nameLabel.alignHPack(), nameEntry ] ) ).alignHExpand()
+		title = SectionHeading2( 'Tests:' )
 
-		return _standardTestBorder.surround()
-
-
-
-
-
-class StandardInlineTest (AbstractInlineTest):
-	def __init__(self):
-		self._tests = LiveList()
-		self._tests.append( StandardTestMethod() )
-		self.__change_history__ = None
-
-
-	def __getstate__(self):
-		return { 'tests' : self._tests }
-
-	def __setstate__(self, state):
-		self._tests = state.get( 'tests', LiveList() )
-		self.__change_history__ = None
-
-
-	def __get_trackable_contents__(self):
-		return [ self._tests ]
-
-
-	def __present__(self, fragment, inheritedState):
-		pass
-
+		return _standardInlineTestBorder.surround( Column( [ title, self._suite ] ) )
 
 
 
@@ -217,34 +215,32 @@ class TestedBlock (object):
 		def endGuard(codeGen):
 			AbstractInlineTest.__current_testing_block__ = prevTestingBlock[0]
 
-		mainContent = codeGen.guard( beginGuard, self._suite.model, endGuard )
+		mainContent = codeGen.guard( beginGuard, Schema.PythonSuite( suite=self._suite.model['suite'] ), endGuard )
 
 
 		# Defer the generation of the unit test class
 		@codeGen.deferred
 		def unitTestClass(codeGen):
-			# Get each inline test to create its method body
-			methods = []
-			for test in self._inlineTests:
-				methods.extend( test.individualTests )
-
 			# Create the class suite
-			first = False
+			first = True
 			clsSuite = []
-			for method in methods:
+			for test in self._inlineTests:
 				if not first:
 					clsSuite.append( Schema.BlankLine() )
-				clsSuite.append( method )
+				clsSuite.extend( test.statements( codeGen ) )
+				first = False
+			if len( clsSuite ) == 0:
+				clsSuite.append( Schema.PassStmt() )
 
 
 			# Now, we need to create the test class declaration
 			clsName = self._getTestClassName()
-			testCls = Schema.ClassStmt( name=clsName, bases=[], suite=clsSuite )
+			testCls = Schema.ClassStmt( name=clsName, decorators=[], bases=[ Schema.Load( name='object' ) ], suite=clsSuite )
 			suite = Schema.PythonSuite( suite=[ testCls ] )
 			return suite
 
 
-		return Schema.PythonSuite( suite=[ mainContent, unitTestClass] )
+		return Schema.PythonSuite( suite=[ mainContent, unitTestClass ] )
 
 
 
@@ -258,14 +254,15 @@ class TestedBlock (object):
 
 
 	def __present__(self, fragment, inheritedState):
-		self._incr.onAccess()
 		suitePres = self._suite
 
+		title = SectionHeading2( 'Tested block' )
+
 		nameLabel = Label( 'Test case name: ' )
-		nameEntry = EditableLabel.regexValidated( self._name, Tokens.identifierPattern, 'Please enter a valid identifier' )
+		nameEntry = EditableLabel.regexValidated( self._name, _notSet, Tokens.identifierPattern, 'Please enter a valid identifier' )
 		name = _nameBorder.surround( Row( [ nameLabel.alignHPack(), nameEntry ] ) ).alignHExpand()
 
-		contents = Column( [ suitePres, name.padY( 5.0, 0.0 ) ] )
+		contents = Column( [ title, suitePres, name.padY( 5.0, 0.0 ) ] )
 		return ObjectBox( 'Unit test', contents ).withCommands( inlineTestCommands )
 
 
@@ -290,7 +287,7 @@ def inlineTestCommandSet(name, commands):
 # Commands for inserting standard tests
 #
 
-@EmbeddedExpressionAtCaretAction
+@EmbeddedStatementAtCaretAction
 def _newStandardInlineTestAtCaret(caret):
 	return StandardInlineTest()
 
@@ -301,6 +298,10 @@ inlineTestCommandSet( 'LarchTools.PythonTools.InlineTest.StandardTests', [ _sitC
 
 
 
+@EmbeddedStatementAtCaretAction
+def _newTestedBlockAtCaret(caret):
+	return TestedBlock()
+
 @WrapSelectedStatementRangeInEmbeddedObjectAction
 def _newTestedBlockAtStatementRange(statements, selection):
 	d = TestedBlock()
@@ -308,6 +309,6 @@ def _newTestedBlockAtStatementRange(statements, selection):
 	return d
 
 
-_tbCommand = Command( '&Tested &Block', chainActions( _newTestedBlockAtStatementRange ) )
+_tbCommand = Command( '&Tested &Block', chainActions( _newTestedBlockAtStatementRange, _newTestedBlockAtCaret ) )
 
 pythonCommandSet( 'LarchTools.PythonTools.InlineTest', [ _tbCommand ] )
