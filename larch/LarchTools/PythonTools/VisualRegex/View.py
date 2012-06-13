@@ -107,11 +107,11 @@ _unparsedTextStyle = StyleSheet.style( Primitive.textSquiggleUnderlinePaint( Col
 _controlCharStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.0, 0.0, 0.5 ) ) )
 _invertControlCharStyle = StyleSheet.style( Primitive.foreground( Color( 1.0, 0.0, 0.0, 0.5 ) ) )
 
-_specialCharStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.5, 0.0 ) ), Primitive.fontSize( 10 ) )
-_specialBorder = SolidBorder( 1.0, 1.0, 4.0, 4.0, Color( 0.0, 0.8, 0.0 ), Color( 0.9, 1.0, 0.9 ) )
+_specialCharStyle = StyleSheet.style( Primitive.foreground( Color( 0.25, 0.25, 0.35 ) ), Primitive.fontSize( 10 ) )
+_specialBorder = SolidBorder( 1.0, 1.0, 4.0, 4.0, Color( 0.6, 0.6, 0.7 ), Color( 0.75, 0.75, 0.85 ) )
 
-_charClassStyle = StyleSheet.style( Primitive.foreground( Color( 0.25, 0.5, 0.0 ) ), Primitive.fontSize( 10 ) )
-_charClassBorder = SolidBorder( 1.0, 1.0, 4.0, 4.0, Color( 0.4, 0.8, 0.0 ), Color( 0.95, 1.0, 0.9 ) )
+_charClassStyle = StyleSheet.style( Primitive.foreground( Color( 0.2, 0.3, 0.4 ) ), Primitive.fontSize( 10 ) )
+_charClassBorder = SolidBorder( 1.0, 1.0, 4.0, 4.0, Color( 0.6, 0.65, 0.7 ), Color( 0.8, 0.85, 0.9 ) )
 
 
 #_charClassStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.25, 0.5 ) ) )
@@ -128,12 +128,12 @@ _pythonEscapeBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 0.75, 0.6, 0.5 ), 
 _charSetBorder = SolidBorder( 1.0, 4.0, 3.0, 3.0,Color( 0.5, 0.5, 0.6 ), Color( 0.7, 0.7, 0.8 ) )
 _charSetItemBorder = FilledBorder( 1.0, 1.0, 1.0, 1.0, Color( 0.9, 0.9, 0.9 ) )
 
-_groupBorder = SolidBorder( 1.0, 4.0, 3.0, 3.0, Color( 1.0, 0.7, 0.4 ), Color( 1.0, 1.0, 0.8 ) )
-_nonCapturingGroupBorder = SolidBorder( 1.0, 4.0, 3.0, 3.0, Color( 0.8, 0.8, 0.6 ), Color( 0.9, 0.9, 0.85 ) )
+_groupBorder = SolidBorder( 1.0, 4.0, 3.0, 3.0, Color( 0.0, 0.7, 0.0 ), Color( 0.85, 1.0, 0.85 ) )
+_nonCapturingGroupBorder = SolidBorder( 1.0, 4.0, 3.0, 3.0, Color( 0.55, 0.6, 0.55 ), Color( 0.8, 0.85, 0.8 ) )
 _lookaheadBorder = SolidBorder( 1.0, 4.0, 3.0, 3.0, Color( 0.5, 1.0, 0.75 ), Color( 0.9, 1.0, 0.95 ) )
 _lookbehindBorder = SolidBorder( 1.0, 4.0, 3.0, 3.0, Color( 0.6, 0.9, 0.75 ), Color( 0.875, 0.925, 0.9 ) )
-_repeatBorder = SolidBorder( 1.0, 1.0, 3.0, 3.0, Color( 0.0, 0.7, 0.0 ), Color( 0.85, 1.0, 0.85 ) )
-_choiceBorder = SolidBorder( 1.0, 4.0, 3.0, 3.0, Color( 0.7, 0.4, 1.0 ), Color( 0.9, 0.8, 1.0 ) )
+_repeatBorder = SolidBorder( 1.0, 1.0, 3.0, 3.0, Color( 0.7, 0.4, 1.0 ), Color( 0.9, 0.8, 1.0 ) )
+_choiceBorder = SolidBorder( 1.0, 4.0, 3.0, 3.0, Color( 1.0, 0.7, 0.4 ), Color( 1.0, 1.0, 0.8 ) )
 _choiceRuleStyle = StyleSheet.style( Primitive.shapePainter( FillPainter( Color( 0.0, 0.0, 0.0, 0.35 ) ) ) )
 
 _commentBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 0.4, 0.4, 0.4 ), Color( 0.8, 0.8, 0.8 ) )

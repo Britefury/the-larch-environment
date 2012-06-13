@@ -7,7 +7,7 @@
 ##-*************************
 from copy import deepcopy
 
-from BritefuryJ.DocModel import DMObject, DMList, DMEmbeddedObject, DMEmbeddedIsolatedObject
+from BritefuryJ.DocModel import DMObject, DMList, DMEmbeddedObject, DMEmbeddedIsolatedObject, DMSchema, DMObjectClass, DMNode
 
 from Britefury.Dispatch.MethodDispatch import ObjectDispatchMethod, DMObjectNodeDispatchMethod, methodDispatch
 
@@ -877,8 +877,23 @@ _runtime_DMList_Name = '__larch_DMList__'
 
 
 
+
+
+
+#
+#
+# HACK - to get around the fact that we cannot just put normal objects into the document model
+#
+#
+
+_cgHelperSchema = DMSchema( 'Python25CGHelper', 'pych', 'LarchCore.Languages.Python25.CodeGeneratorHelper', 0 )
+
+_FactoryWrapper = _cgHelperSchema.newClass( '_FactoryWrapper', Schema.Node, [ 'embeddedFactory' ] )
+
+
+
 class _Factory (object):
-	def buildAST(self, codeGen):
+	def generateCode(self, codeGen):
 		raise NotImplementedError, 'abstract'
 
 
@@ -887,8 +902,8 @@ class _Deferred (_Factory):
 		self.__fn = fn
 
 
-	def buildAST(self, codeGen):
-		return self.__fn( codeGen )
+	def generateCode(self, codeGen):
+		return codeGen( self.__fn( codeGen ) )
 
 
 class _Guard (_Factory):
@@ -898,7 +913,7 @@ class _Guard (_Factory):
 		self.__endFn = endFn
 
 
-	def buildAST(self, codeGen):
+	def generateCode(self, codeGen):
 		self.__beginFn( codeGen )
 		result = codeGen( self.__content )
 		self.__endFn( codeGen )
@@ -1114,10 +1129,10 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 
 
 	# AST factory
-	@ObjectDispatchMethod( _Factory )
-	def Factory(self, node):
-		model = node.buildAST( self )
-		return self( model )
+	@DMObjectNodeDispatchMethod( _FactoryWrapper )
+	def _FactoryWrapper(self, node, embeddedFactory):
+		factory = embeddedFactory.getValue()
+		return factory.generateCode( self )
 
 
 
@@ -1143,11 +1158,15 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 
 
 
-	def defer(self, fn):
-		return _Deferred( fn )
+	def deferred(self, fn):
+		return self._factory( _Deferred( fn ) )
 
 	def guard(self, beginFn, content, endFn):
-		return _Guard( beginFn, content, endFn )
+		return self._factory( _Guard( beginFn, content, endFn ) )
+
+
+	def _factory(self, fac):
+		return _FactoryWrapper( embeddedFactory=DMNode.embed( fac, False ) )
 
 
 
