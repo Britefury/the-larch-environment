@@ -6,6 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
 import LarchTools.PythonTools.InlineTest.InlineTest
+import LarchTools.PythonTools.InlineTest.InlineTestTable
 
 
 
