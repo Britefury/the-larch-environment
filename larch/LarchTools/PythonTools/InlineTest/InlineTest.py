@@ -5,8 +5,6 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
-import unittest
-
 from java.awt import Color
 
 from java.util.regex import Pattern
@@ -37,6 +35,7 @@ from BritefuryJ.StyleSheet import *
 
 from Britefury.Util.LiveList import LiveList
 from Britefury.Util.UniqueNameTable import UniqueNameTable
+from BritefuryJ.Util.Jython import JythonException
 
 from LarchCore.Languages.Python25.PythonCommands import pythonCommandSet, EmbeddedStatementAtCaretAction, WrapSelectedStatementRangeInEmbeddedObjectAction, chainActions
 from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Expr, EmbeddedPython25Suite
@@ -50,34 +49,82 @@ _notSet = StyleSheet.style( Primitive.fontItalic( True ) )( Label( 'not set' ) )
 
 
 
+_testValueBorder = SolidBorder( 1.5, 2.5, 4.0, 4.0, Color( 0.75, 0.0, 0.0 ), None )
 
 
-class AbstractIndividualTest (object):
-	def __init__(self, inlineTest):
-		self._inlineTest = inlineTest
-		self._methodName = None
+_comparisonStyle = StyleSheet.style( Primitive.fontBold( True ), Primitive.foreground( Color( 0.75, 0.0, 0.0 ) ) )
 
 
-	@property
-	def name(self):
-		raise NotImplementedError, 'abstract'
-
-	@property
-	def methodName(self):
-		if self._methodName is None:
-			self._methodName = self._inlineTest._testingBlock._uniqueMethodName( 'test_%s' % self.name )
-		return self._methodName
+class TestCase (object):
+	def assertEqual(self, first, second):
+		if not ( first == second ):
+			raise AssertionError, Row( [ _testValueBorder.surround( first ), _comparisonStyle( Label( 'not ==' ) ), _testValueBorder.surround( second ) ] )
 
 
-	def reset(self):
-		self._methodName = None
+	def assertNotEqual(self, first, second):
+		if not ( first != second ):
+			raise AssertionError, Row( [ _testValueBorder.surround( first ), _comparisonStyle( Label( 'not !=' ) ), _testValueBorder.surround( second ) ] )
 
 
-	def _createTestMethodDeclaration(self, codeGen):
-		return Schema.DefStmt( name=self.methodName, params=[ Schema.SimpleParam( name='self' ) ], suite=self._createTestMethodBody( codeGen ) )
+	def assertTrue(self, first):
+		if not first:
+			raise AssertionError, Row( [ _comparisonStyle( Label( 'Not True' ) ) ] )
 
-	def _createTestMethodBody(self, codeGen):
-		raise NotImplementedError, 'abstract'
+
+	def assertFalse(self, first):
+		if first:
+			raise AssertionError, Row( [ _comparisonStyle( Label( 'Not False' ) ) ] )
+
+
+	def assertIs(self, first, second):
+		if not ( first is second ):
+			raise AssertionError, Row( [ _testValueBorder.surround( first ), _comparisonStyle( Label( 'is not' ) ), _testValueBorder.surround( second ) ] )
+
+
+	def assertIsNot(self, first, second):
+		if not ( first is not second ):
+			raise AssertionError, Row( [ _testValueBorder.surround( first ), _comparisonStyle( Label( 'is' ) ), _testValueBorder.surround( second ) ] )
+
+
+	def assertIn(self, first, second):
+		if not ( first in second ):
+			raise AssertionError, Row( [ _testValueBorder.surround( first ), _comparisonStyle( Label( 'not in' ) ), _testValueBorder.surround( second ) ] )
+
+
+	def assertNotIn(self, first, second):
+		if not ( first not in second ):
+			raise AssertionError, Row( [ _testValueBorder.surround( first ), _comparisonStyle( Label( 'in' ) ), _testValueBorder.surround( second ) ] )
+
+
+	def assertIsInstance(self, first, second):
+		if not isinstance( first, second ):
+			raise AssertionError, Row( [ _testValueBorder.surround( first ), _comparisonStyle( Label( 'is not instance of' ) ), _testValueBorder.surround( second ) ] )
+
+
+	def assertNotIsInstance(self, first, second):
+		if isinstance( first, second ):
+			raise AssertionError, Row( [ _testValueBorder.surround( first ), _comparisonStyle( Label( 'is instance of' ) ), _testValueBorder.surround( second ) ] )
+
+
+	def assertGreater(self, first, second):
+		if not ( first > second ):
+			raise AssertionError, Row( [ _testValueBorder.surround( first ), _comparisonStyle( Label( 'not >' ) ), _testValueBorder.surround( second ) ] )
+
+
+	def assertGreaterEqual(self, first, second):
+		if not ( first >= second ):
+			raise AssertionError, Row( [ _testValueBorder.surround( first ), _comparisonStyle( Label( 'not >=' ) ), _testValueBorder.surround( second ) ] )
+
+
+	def assertLess(self, first, second):
+		if not ( first < second ):
+			raise AssertionError, Row( [ _testValueBorder.surround( first ), _comparisonStyle( Label( 'not <' ) ), _testValueBorder.surround( second ) ] )
+
+
+	def assertLessEqual(self, first, second):
+		if not ( first <= second ):
+			raise AssertionError, Row( [ _testValueBorder.surround( first ), _comparisonStyle( Label( 'not <=' ) ), _testValueBorder.surround( second ) ] )
+
 
 
 
@@ -88,10 +135,21 @@ class AbstractInlineTest (object):
 	def __init__(self):
 		self.__testedBlock = None
 		self.__testClassName = None
+		self._testClass = None
+
+
+	def __getstate__(self):
+		return {}
+
+	def __setstate__(self, state):
+		self.__testedBlock = None
+		self.__testClassName = None
+		self._testClass = None
 
 
 	def reset(self):
 		self.__testClassName = None
+		self._testClass = None
 
 
 	@property
@@ -108,18 +166,31 @@ class AbstractInlineTest (object):
 
 	@property
 	def _baseClass(self):
-		return unittest.TestCase
+		return TestCase
+
+
+	def run(self):
+		instance = self._testClass()
+		self._runTestsOnInstance( instance )
+
+
+	def _runTestsOnInstance(self, instance):
+		raise NotImplementedError, 'abstract'
+
+
+	def _registerTestClass(self, testCls):
+		self._testClass = testCls
 
 
 	def _createTestClass(self, codeGen):
 		baseClassAsAST = codeGen.embeddedValue( self._baseClass )
-		body = self._createTestClassBody( codeGen, self.__testedBlock )
+		body = self._createTestClassBodyStmts( codeGen, self.__testedBlock )
 		if len( body ) == 0:
 			body.append( Schema.PassStmt() )
 		return Schema.ClassStmt( name=self._className, decorators=[], bases=[ baseClassAsAST ], suite=body )
 
 
-	def _createTestClassBody(self, codeGen):
+	def _createTestClassBodyStmts(self, codeGen, testedBlock):
 		raise NotImplementedError, 'abstract;'
 
 
@@ -131,62 +202,95 @@ class AbstractInlineTest (object):
 
 
 
-class AbstractInlineTestCollection (AbstractInlineTest):
-	__current_testing_block__ = None
-
-
-	def __init__(self):
-		self._testingBlock = None
-
-
-	def reset(self):
-		for test in self.individualTests:
-			test.reset()
-
-
-	@property
-	def individualTests(self):
-		raise NotImplementedError, 'abstract'
-
-
-	def statements(self, codeGen):
-		statements = []
-		first = False
-		for test in self.individualTests:
-			if not first:
-				statements.append( Schema.BlankLine() )
-			statements.append( test._createTestMethodDeclaration( codeGen ) )
-
-
-
 _standardInlineTestBorder = SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.4, 0.4, 0.5 ), None )
 
 class StandardInlineTest (AbstractInlineTest):
-	def __init__(self):
+	def __init__(self, name='test'):
+		super( StandardInlineTest, self ).__init__()
+		self._name = TrackedLiveValue( name )
 		self._suite = EmbeddedPython25Suite()
 		self.__change_history__ = None
 
+		self.__passes = None
+		self.__failures = None
+
+		self._incr = IncrementalValueMonitor()
+
 
 	def __getstate__(self):
-		return { 'suite' : self._suite }
+		state = super( StandardInlineTest, self ).__getstate__()
+		state['name'] = self._name.getStaticValue()
+		state['suite'] = self._suite
+		return state
 
 	def __setstate__(self, state):
+		super( StandardInlineTest, self ).__setstate__( state )
+		self._name = TrackedLiveValue( state['name'] )
 		self._suite = state['suite']
 		self.__change_history__ = None
 
+		self.__passes = None
+		self.__failures = None
+
+		self._incr = IncrementalValueMonitor()
+
 
 	def __get_trackable_contents__(self):
-		return [ self._suite ]
+		return [ self._name, self._suite ]
 
 
-	def statements(self, codeGen):
+	def reset(self):
+		super( StandardInlineTest, self ).reset()
+		self.__passes = None
+		self.__failures = None
+		self._incr.onChanged()
+
+
+
+	def _runTestsOnInstance(self, instance):
+		self.__passes = 0
+		self.__failures = []
+
+		for name in self._testClass.__dict__:
+			if name.startswith( 'test' ):
+				# Run this test method
+				try:
+					getattr( instance, name )()
+				except Exception:
+					caughtException = JythonException.getCurrentException()
+					self.__failures.append( (name, caughtException) )
+				else:
+					self.__passes += 1
+
+		self._incr.onChanged()
+
+
+
+	@property
+	def _desiredClassName(self):
+		return 'Test_' + self._name.getValue()
+
+	def _createTestClassBodyStmts(self, codeGen, testedBlock):
 		return self._suite.model['suite']
 
 
 	def __present__(self, fragment, inheritedState):
+		self._incr.onAccess()
+
 		title = SectionHeading2( 'Tests:' )
 
-		return _standardInlineTestBorder.surround( Column( [ title, self._suite ] ) )
+		nameEntry = EditableLabel.regexValidated( self._name, _notSet, Tokens.identifierPattern, 'Please enter a valid identifier' )
+		nameEditor = _nameBorder.surround( Row( [ Label( 'Name: '), nameEntry ] ) )
+
+		results = []
+		if self.__passes is not None  and  self.__failures is not None:
+			resultsTitle = SectionHeading3( 'Test results:' )
+			passes = Label( '%d / %d tests passed' % ( self.__passes, self.__passes + len( self.__failures ) ) )
+			failuresLabel = Label( '%d tests failed:' % len( self.__failures ) )
+			failures = [ Column( [ Label( name ), exception ] )   for name, exception in self.__failures ]
+			results = [ Column( [ resultsTitle, passes, failuresLabel ] + failures ) ]
+
+		return _standardInlineTestBorder.surround( Column( [ title, nameEditor, self._suite ] + results ) )
 
 
 
@@ -222,11 +326,16 @@ class TestedBlock (object):
 		for test in self._inlineTests:
 			test.reset()
 		self._inlineTests = []
-		self.__classNames.clear(0)
+		self.__classNames.clear()
 
 
 	def _uniqueClassName(self, name):
 		return self.__classNames.uniqueName( name )
+
+
+	def runTests(self):
+		for test in self._inlineTests:
+			test.run()
 
 
 	def __py_execmodel__(self, codeGen):
@@ -248,20 +357,28 @@ class TestedBlock (object):
 
 		# Defer the generation of the unit test class
 		@codeGen.deferred
-		def unitTestClasses(codeGen):
+		def unitTesting(codeGen):
 			# Create the class suite
 			first = True
-			classes = []
+			testing = []
 			for test in self._inlineTests:
 				if not first:
-					classes.append( Schema.BlankLine() )
-				classes.append( test._createTestClass( codeGen ) )
+					testing.append( Schema.BlankLine() )
+					testing.append( Schema.BlankLine() )
+				testing.append( test._createTestClass( codeGen ) )
 				first = False
 
-			return Schema.PythonSuite( suite=classes )
+			testing.append( Schema.BlankLine() )
+			testing.append( Schema.BlankLine() )
+
+			for test in self._inlineTests:
+				testAst = codeGen.embeddedValue( test )
+				testing.append( Schema.ExprStmt( expr=Schema.Call( target=Schema.AttributeRef( target=testAst, name='_registerTestClass' ), args=[ Schema.Load( name=test._className ) ] ) ) )
+
+			return Schema.PythonSuite( suite=testing )
 
 
-		return Schema.PythonSuite( suite=[ mainContent, unitTestClasses ] )
+		return Schema.PythonSuite( suite=[ mainContent, unitTesting ] )
 
 
 
@@ -271,8 +388,15 @@ class TestedBlock (object):
 
 
 	def __present__(self, fragment, inheritedState):
+		def _onRun(button, event):
+			self.runTests()
+
 		title = SectionHeading2( 'Tested block' )
-		contents = Column( [ title, self._suite ] )
+
+		runButton = Button.buttonWithLabel( 'Run tests', _onRun )
+		controls = Row( [ runButton ] )
+
+		contents = Column( [ title, self._suite, controls ] )
 		return ObjectBox( 'Unit test', contents ).withCommands( inlineTestCommands )
 
 
