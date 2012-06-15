@@ -7,8 +7,6 @@
 ##-*************************
 from java.awt import Color
 
-from java.util.regex import Pattern
-
 from copy import deepcopy
 
 from BritefuryJ.Command import *
@@ -18,7 +16,6 @@ from BritefuryJ.Live import TrackedLiveValue
 
 from BritefuryJ.Controls import *
 
-from BritefuryJ.LSpace.Interactor import *
 from BritefuryJ.Graphics import *
 
 from BritefuryJ.Pres import *
@@ -29,11 +26,8 @@ from BritefuryJ.Pres.ObjectPres import *
 
 from BritefuryJ.Parser.Utils import Tokens
 
-from BritefuryJ.Editor.Table.Generic import *
-
 from BritefuryJ.StyleSheet import *
 
-from Britefury.Util.LiveList import LiveList
 from Britefury.Util.UniqueNameTable import UniqueNameTable
 from BritefuryJ.Util.Jython import JythonException
 
@@ -191,7 +185,7 @@ class AbstractInlineTest (object):
 
 
 	def _createTestClassBodyStmts(self, codeGen, testedBlock):
-		raise NotImplementedError, 'abstract;'
+		raise NotImplementedError, 'abstract'
 
 
 	def __py_execmodel__(self, codeGen):
@@ -275,6 +269,9 @@ class StandardInlineTest (AbstractInlineTest):
 
 
 	def __present__(self, fragment, inheritedState):
+		def _onRun(button, event):
+			self.run()
+
 		self._incr.onAccess()
 
 		title = SectionHeading2( 'Tests:' )
@@ -290,7 +287,10 @@ class StandardInlineTest (AbstractInlineTest):
 			failures = [ Column( [ Label( name ), exception ] )   for name, exception in self.__failures ]
 			results = [ Column( [ resultsTitle, passes, failuresLabel ] + failures ) ]
 
-		return _standardInlineTestBorder.surround( Column( [ title, nameEditor, self._suite ] + results ) )
+		runButton = Button.buttonWithLabel( 'Run tests', _onRun )
+		controls = Row( [ runButton ] )
+
+		return _standardInlineTestBorder.surround( Column( [ title, nameEditor, self._suite ] + results + [ controls ] ) )
 
 
 
@@ -393,7 +393,7 @@ class TestedBlock (object):
 
 		title = SectionHeading2( 'Tested block' )
 
-		runButton = Button.buttonWithLabel( 'Run tests', _onRun )
+		runButton = Button.buttonWithLabel( 'Run all tests', _onRun )
 		controls = Row( [ runButton ] )
 
 		contents = Column( [ title, self._suite, controls ] )
