@@ -673,10 +673,35 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 				stackTraceElements[i] = stackTraceStyle.applyTo( new StaticText( stackTraceLines[i] ) );
 			}
 			
-			Pres fields[] = {
-					new VerticalField( "Message", new InnerFragment( e.value ) ),
-					new VerticalField( "Traceback", new Column( stackTraceElements ) )
-			};
+			Pres[] fields;
+			
+			if ( e.value instanceof PyBaseException )
+			{
+				PyBaseException b = (PyBaseException)e.value;
+				Pres args;
+				if ( b.args instanceof PyTuple  &&  b.args.__len__() == 1 )
+				{
+					PyTuple a = (PyTuple)b.args;
+					args = new InnerFragment( a.get( 0 ) );
+				}
+				else
+				{
+					args = new Paragraph( new Object[] { b.args } );
+				}
+				fields = new Pres[] {
+						new VerticalField( "Type", new Label( b.getType().getName() ) ),
+						new VerticalField( "Arguments", args ),
+						new VerticalField( "Traceback", new Column( stackTraceElements ) )
+				};
+			}
+			else
+			{
+				fields = new Pres[] {
+						new VerticalField( "Message", new InnerFragment( e.value ) ),
+						new VerticalField( "Traceback", new Column( stackTraceElements ) )
+				};
+			}
+			
 			
 			return new ErrorBoxWithFields( "PYTHON EXCEPTION", fields );
 		}
@@ -690,17 +715,12 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 		{
 			PyBaseException e = (PyBaseException)x;
 			
-			String lines[] = e.toString().split( "\n" );
-			Pres lineTexts[] = new Pres[lines.length];
+			Pres type = new Label( e.getType().getName() );
+			Pres value = Pres.coerce( e.args );
 			
-			for (int i = 0; i < lines.length; i++)
-			{
-				lineTexts[i] = new Label( lines[i] );
-			}
+			Pres contents = new Column( new Pres[] { type, value } );
 			
-			Pres contents = new Column( lineTexts );
-			
-			return new ErrorBox( "PYTHON EXCEPTION", contents );
+			return new ErrorBox( "PYTHON BASE EXCEPTION", contents );
 		}
 	};
 

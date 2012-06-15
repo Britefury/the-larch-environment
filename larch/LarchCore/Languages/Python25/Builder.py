@@ -60,7 +60,7 @@ class Expr (_Builder):
 		elif isinstance( x, Expr ):
 			return x
 		elif isinstance( x, Embedded.EmbeddedPython25Expr ):
-			return ExprBuild( x.expression )
+			return ExprBuilt( x.expression )
 		elif isinstance( x, DMNode )  and  x.isInstanceOf( Py.Expr ):
 			return ExprBuilt( x )
 		elif isinstance( x, str ):
@@ -232,7 +232,7 @@ import unittest
 class TestCase_Builder (unittest.TestCase):
 	def _buildTest(self, expected, builder):
 		result = builder.build()
-		self.assertEquals( expected, result )
+		self.assertEqual( expected, result )
 
 
 	def test_TargetBuilt(self):
