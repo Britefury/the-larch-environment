@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
+import unittest
+
 from java.awt import Color
 
 from java.util.regex import Pattern
@@ -34,6 +36,7 @@ from BritefuryJ.Editor.Table.Generic import *
 from BritefuryJ.StyleSheet import *
 
 from Britefury.Util.LiveList import LiveList
+from Britefury.Util.UniqueNameTable import UniqueNameTable
 
 from LarchCore.Languages.Python25.PythonCommands import pythonCommandSet, EmbeddedStatementAtCaretAction, WrapSelectedStatementRangeInEmbeddedObjectAction, chainActions
 from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Expr, EmbeddedPython25Suite
@@ -43,6 +46,8 @@ from LarchCore.Languages.Python25 import Schema
 _nameBorder = SolidBorder( 1.0, 2.0, 5.0, 5.0, Color( 0.6, 0.6, 0.6 ), Color( 0.95, 0.95, 0.95 ) )
 
 _notSet = StyleSheet.style( Primitive.fontItalic( True ) )( Label( 'not set' ) )
+
+
 
 
 
@@ -80,17 +85,48 @@ class AbstractInlineTest (object):
 	__current_testing_block__ = None
 
 
+	def __init__(self):
+		self.__testedBlock = None
+		self.__testClassName = None
+
+
 	def reset(self):
-		pass
+		self.__testClassName = None
 
 
-	def statements(self, codeGen):
+	@property
+	def _desiredClassName(self):
 		raise NotImplementedError, 'abstract'
+
+
+	@property
+	def _className(self):
+		if self.__testClassName is None:
+			self.__testClassName = self.__testedBlock._uniqueClassName( self._desiredClassName )
+		return self.__testClassName
+
+
+	@property
+	def _baseClass(self):
+		return unittest.TestCase
+
+
+	def _createTestClass(self, codeGen):
+		baseClassAsAST = codeGen.embeddedValue( self._baseClass )
+		body = self._createTestClassBody( codeGen, self.__testedBlock )
+		if len( body ) == 0:
+			body.append( Schema.PassStmt() )
+		return Schema.ClassStmt( name=self._className, decorators=[], bases=[ baseClassAsAST ], suite=body )
+
+
+	def _createTestClassBody(self, codeGen):
+		raise NotImplementedError, 'abstract;'
+
 
 	def __py_execmodel__(self, codeGen):
 		if self.__current_testing_block__ is not None:
 			self.__current_testing_block__._registerInlineTest( self )
-			self._testingBlock = self.__current_testing_block__
+			self.__testedBlock = self.__current_testing_block__
 		return Schema.PythonSuite( suite=[] )
 
 
@@ -156,28 +192,26 @@ class StandardInlineTest (AbstractInlineTest):
 
 class TestedBlock (object):
 	def __init__(self):
-		self._name = TrackedLiveValue( 'test' )
 		self._suite = EmbeddedPython25Suite()
 		self.__change_history__ = None
 
 		self._inlineTests = []
-		self.__usedNames = {}
+		self.__classNames = UniqueNameTable()
 
 
 	def __getstate__(self):
-		return { 'name' : self._name.getStaticValue(), 'suite' : self._suite }
+		return { 'suite' : self._suite }
 
 	def __setstate__(self, state):
-		self._name = TrackedLiveValue( state['name' ] )
 		self._suite = state['suite']
 		self.__change_history__ = None
 
 		self._inlineTests = []
-		self.__usedNames = {}
+		self.__classNames = UniqueNameTable()
 
 
 	def __get_trackable_contents__(self):
-		return [ self._name, self._suite ]
+		return [ self._suite ]
 
 
 	def _registerInlineTest(self, test):
@@ -188,17 +222,11 @@ class TestedBlock (object):
 		for test in self._inlineTests:
 			test.reset()
 		self._inlineTests = []
-		self.__usedNames = {}
+		self.__classNames.clear(0)
 
 
-	def _uniqueMethodName(self, name):
-		if name in self.__usedNames:
-			index = self.__usedNames[name] + 1
-			self.__usedNames[name] += 1
-			return self._uniqueMethodName( name + '_' + str( index ) )
-		else:
-			self.__usedNames[name] = 1
-			return name
+	def _uniqueClassName(self, name):
+		return self.__classNames.uniqueName( name )
 
 
 	def __py_execmodel__(self, codeGen):
@@ -220,27 +248,20 @@ class TestedBlock (object):
 
 		# Defer the generation of the unit test class
 		@codeGen.deferred
-		def unitTestClass(codeGen):
+		def unitTestClasses(codeGen):
 			# Create the class suite
 			first = True
-			clsSuite = []
+			classes = []
 			for test in self._inlineTests:
 				if not first:
-					clsSuite.append( Schema.BlankLine() )
-				clsSuite.extend( test.statements( codeGen ) )
+					classes.append( Schema.BlankLine() )
+				classes.append( test._createTestClass( codeGen ) )
 				first = False
-			if len( clsSuite ) == 0:
-				clsSuite.append( Schema.PassStmt() )
+
+			return Schema.PythonSuite( suite=classes )
 
 
-			# Now, we need to create the test class declaration
-			clsName = self._getTestClassName()
-			testCls = Schema.ClassStmt( name=clsName, decorators=[], bases=[ Schema.Load( name='object' ) ], suite=clsSuite )
-			suite = Schema.PythonSuite( suite=[ testCls ] )
-			return suite
-
-
-		return Schema.PythonSuite( suite=[ mainContent, unitTestClass ] )
+		return Schema.PythonSuite( suite=[ mainContent, unitTestClasses ] )
 
 
 
@@ -249,20 +270,9 @@ class TestedBlock (object):
 
 
 
-	def _getTestClassName(self):
-		return 'Test_' + self._name.value
-
-
 	def __present__(self, fragment, inheritedState):
-		suitePres = self._suite
-
 		title = SectionHeading2( 'Tested block' )
-
-		nameLabel = Label( 'Test case name: ' )
-		nameEntry = EditableLabel.regexValidated( self._name, _notSet, Tokens.identifierPattern, 'Please enter a valid identifier' )
-		name = _nameBorder.surround( Row( [ nameLabel.alignHPack(), nameEntry ] ) ).alignHExpand()
-
-		contents = Column( [ title, suitePres, name.padY( 5.0, 0.0 ) ] )
+		contents = Column( [ title, self._suite ] )
 		return ObjectBox( 'Unit test', contents ).withCommands( inlineTestCommands )
 
 
