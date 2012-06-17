@@ -423,7 +423,7 @@ public class Caret extends Target implements MarkerListener
 			boolean bSkippedLeaves = false;
 			
 
-			while ( !left.isEditable()  ||  left.isCaretSlot() )
+			while ( left != null  &&  ( !left.isEditable()  ||  left.isCaretSlot() ) )
 			{
 				if ( left.isCaretSlot()  &&  ((LSCaretSlot)left).shouldCaretStopHere( prev ) )
 				{
@@ -432,10 +432,6 @@ public class Caret extends Target implements MarkerListener
 				prev = left;
 				left = left.getContentLeafToLeft();
 				bSkippedLeaves = true;
-				if ( left == null )
-				{
-					break;
-				}
 			}
 
 			if ( left != null  &&  isElementWithinGrabSubtree( left ) )
@@ -469,7 +465,7 @@ public class Caret extends Target implements MarkerListener
 			boolean bSkippedLeaves = false;
 			
 
-			while ( !right.isEditable()  ||  right.isCaretSlot() )
+			while ( right != null  &&  ( !right.isEditable()  ||  right.isCaretSlot() ) )
 			{
 				if ( right.isCaretSlot()  &&  ((LSCaretSlot)right).shouldCaretStopHere( prev ) )
 				{
@@ -478,10 +474,6 @@ public class Caret extends Target implements MarkerListener
 				prev = right;
 				right = right.getContentLeafToRight();
 				bSkippedLeaves = true;
-				if ( right == null )
-				{
-					break;
-				}
 			}
 
 			if ( right != null  &&  isElementWithinGrabSubtree( right ) )

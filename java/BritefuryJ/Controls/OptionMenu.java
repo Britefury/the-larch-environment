@@ -13,9 +13,7 @@ import BritefuryJ.LSpace.LSBorder;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.AbstractPointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
-import BritefuryJ.LSpace.Event.PointerMotionEvent;
 import BritefuryJ.LSpace.Interactor.ClickElementInteractor;
-import BritefuryJ.LSpace.Interactor.HoverElementInteractor;
 import BritefuryJ.Live.LiveFunction;
 import BritefuryJ.Live.LiveInterface;
 import BritefuryJ.Live.LiveValue;
@@ -23,7 +21,6 @@ import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Arrow;
 import BritefuryJ.Pres.Primitive.Bin;
-import BritefuryJ.Pres.Primitive.Border;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.StyleSheet.StyleSheet;
@@ -40,7 +37,7 @@ public class OptionMenu extends ControlPres
 	
 	public static class OptionMenuControl extends Control
 	{
-		private class OptionMenuInteractor implements ClickElementInteractor, HoverElementInteractor
+		private class OptionMenuInteractor implements ClickElementInteractor
 		{
 			private OptionMenuInteractor()
 			{
@@ -58,19 +55,6 @@ public class OptionMenu extends ControlPres
 			{
 				displayDropdown();
 				return true;
-			}
-			
-			
-			@Override
-			public void pointerEnter(LSElement element, PointerMotionEvent event)
-			{
-				((LSBorder)element).setBorder( optionMenuHoverBorder );
-			}
-
-			@Override
-			public void pointerLeave(LSElement element, PointerMotionEvent event)
-			{
-				((LSBorder)element).setBorder( optionMenuBorder );
 			}
 		}
 		
@@ -95,20 +79,16 @@ public class OptionMenu extends ControlPres
 		
 
 		private LSBorder element;
-		private BritefuryJ.Graphics.AbstractBorder optionMenuBorder, optionMenuHoverBorder;
 		private PopupMenu choiceMenu;
 		private Pres choices[];
 		private LiveInterface currentChoice;
 		private OptionMenuListener listener;
 		
 		
-		protected OptionMenuControl(PresentationContext ctx, StyleValues style, LSBorder element, Pres choices[], LiveInterface currentChoice, OptionMenuListener listener,
-				BritefuryJ.Graphics.AbstractBorder optionMenuBorder, BritefuryJ.Graphics.AbstractBorder optionMenuHoverBorder)
+		protected OptionMenuControl(PresentationContext ctx, StyleValues style, LSBorder element, Pres choices[], LiveInterface currentChoice, OptionMenuListener listener)
 		{
 			super( ctx, style );
 			this.element = element;
-			this.optionMenuBorder = optionMenuBorder;
-			this.optionMenuHoverBorder = optionMenuHoverBorder;
 			this.choices = choices;
 			this.currentChoice = currentChoice;
 			this.listener = listener;
@@ -280,13 +260,12 @@ public class OptionMenu extends ControlPres
 		LiveFunction optionCurrentLive = new LiveFunction( optionCurrentFn );
 		
 		BritefuryJ.Graphics.AbstractBorder border = style.get( Controls.optionMenuBorder, BritefuryJ.Graphics.AbstractBorder.class );
-		BritefuryJ.Graphics.AbstractBorder hoverBorder = style.get( Controls.optionMenuHoverBorder, BritefuryJ.Graphics.AbstractBorder.class );
-		StyleSheet optionStyle = StyleSheet.style( Primitive.rowSpacing.as( style.get( Controls.optionMenuContentsSpacing, Double.class ) ), Primitive.border.as( border ) );
+		StyleSheet optionStyle = StyleSheet.style( Primitive.rowSpacing.as( style.get( Controls.optionMenuContentsSpacing, Double.class ) ) );
 		Pres optionContents = new Row( new Pres[] { coerce( optionCurrentLive ).alignHExpand(), arrow.alignHPack().alignVCentre() } );
-		Pres optionMenu = optionStyle.applyTo( new Border( optionContents ) ); 
+		Pres optionMenu = optionStyle.applyTo( border.surround( optionContents ) ); 
 		LSBorder optionMenuElement = (LSBorder)optionMenu.present( ctx, style );
 		
 		
-		return new OptionMenuControl( ctx, style, optionMenuElement, choices, value, listener, border, hoverBorder );
+		return new OptionMenuControl( ctx, style, optionMenuElement, choices, value, listener );
 	}
 }

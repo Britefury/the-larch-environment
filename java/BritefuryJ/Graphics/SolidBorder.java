@@ -84,7 +84,7 @@ public class SolidBorder extends AbstractBorder
 
 
 	@Override
-	protected Shape getClipShape(Graphics2D graphics, double x, double y, double w, double h)
+	public Shape getClipShape(Graphics2D graphics, double x, double y, double w, double h)
 	{
 		if ( roundingX != 0.0  ||  roundingY != 0.0 )
 		{
@@ -97,12 +97,35 @@ public class SolidBorder extends AbstractBorder
 	}
 
 	@Override
+	public void drawBackground(Graphics2D graphics, double x, double y, double w, double h, boolean highlight)
+	{
+		Paint background = highlight  &&  highlightBackgroundPaint != null   ?   highlightBackgroundPaint   :   backgroundPaint;
+
+		if ( background != null )
+		{
+			Shape borderShape;
+			if ( roundingX != 0.0  ||  roundingY != 0.0 )
+			{
+				borderShape = new RoundRectangle2D.Double( x + thickness*0.5, y + thickness*0.5, w - thickness, h - thickness, roundingX, roundingY );
+			}
+			else
+			{
+				borderShape = new Rectangle2D.Double( x + thickness*0.5, y + thickness*0.5, w - thickness, h - thickness );
+			}
+		
+			Paint prevPaint = graphics.getPaint();
+			graphics.setPaint( background );
+			graphics.fill( borderShape );
+			graphics.setPaint( prevPaint );
+		}
+	}
+	
+	@Override
 	public void draw(Graphics2D graphics, double x, double y, double w, double h, boolean highlight)
 	{
 		Stroke prevStroke = graphics.getStroke();
 		Paint prevPaint = graphics.getPaint();
 		
-		Paint background = highlight  &&  highlightBackgroundPaint != null   ?   highlightBackgroundPaint   :   backgroundPaint;
 		Paint border = highlight  &&  highlightBorderPaint != null   ?   highlightBorderPaint   :   borderPaint;
 
 		Shape borderShape;
@@ -114,13 +137,6 @@ public class SolidBorder extends AbstractBorder
 		{
 			borderShape = new Rectangle2D.Double( x + thickness*0.5, y + thickness*0.5, w - thickness, h - thickness );
 		}
-		
-		if ( background != null )
-		{
-			graphics.setPaint( background );
-			graphics.fill( borderShape );
-		}
-
 		
 		
 		Stroke s = new BasicStroke( (float)thickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL );

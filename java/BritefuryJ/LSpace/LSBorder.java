@@ -79,6 +79,11 @@ public class LSBorder extends LSBin
 	
 	protected void drawBackground(Graphics2D graphics)
 	{
+		border.drawBackground( graphics, 0.0, 0.0, getActualWidth(), getActualHeight(), isHoverActive() );
+	}
+	
+	protected void draw(Graphics2D graphics)
+	{
 		border.draw( graphics, 0.0, 0.0, getActualWidth(), getActualHeight(), isHoverActive() );
 	}
 }

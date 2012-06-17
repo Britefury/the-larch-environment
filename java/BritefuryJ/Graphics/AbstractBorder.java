@@ -30,9 +30,13 @@ public abstract class AbstractBorder implements Presentable
 	
 	public abstract boolean isHighlightable();
 	
-	protected Shape getClipShape(Graphics2D graphics, double x, double y, double w, double h)
+	public Shape getClipShape(Graphics2D graphics, double x, double y, double w, double h)
 	{
 		return null;
+	}
+	
+	public void drawBackground(Graphics2D graphics, double x, double y, double w, double h, boolean highlight)
+	{
 	}
 	
 	public void draw(Graphics2D graphics, double x, double y, double w, double h, boolean highlight)

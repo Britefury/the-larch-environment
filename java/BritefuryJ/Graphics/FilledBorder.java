@@ -105,7 +105,7 @@ public class FilledBorder extends AbstractBorder
 	}
 
 	@Override
-	protected Shape getClipShape(Graphics2D graphics, double x, double y, double w, double h)
+	public Shape getClipShape(Graphics2D graphics, double x, double y, double w, double h)
 	{
 		if ( roundingX != 0.0  ||  roundingY != 0.0 )
 		{
@@ -118,7 +118,7 @@ public class FilledBorder extends AbstractBorder
 	}
 	
 	@Override
-	public void draw(Graphics2D graphics, double x, double y, double w, double h, boolean highlight)
+	public void drawBackground(Graphics2D graphics, double x, double y, double w, double h, boolean highlight)
 	{
 		Paint p = highlight  &&  highlightBackgroundPaint != null   ?   highlightBackgroundPaint   :   backgroundPaint;
 		if ( p != null )

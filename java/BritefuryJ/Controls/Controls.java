@@ -54,13 +54,11 @@ public class Controls
 
 	
 	public static final InheritedAttributeNonNull optionMenuBorder = new InheritedAttributeNonNull( controlsNamespace, "optionMenuBorder", AbstractBorder.class,
-			new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.0f, 0.125f, 0.25f ), new Color( 0.9f, 0.925f, 0.95f ) ) );
-	public static final InheritedAttributeNonNull optionMenuHoverBorder = new InheritedAttributeNonNull( controlsNamespace, "optionMenuHoverBorder", AbstractBorder.class,
-			new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.0f, 0.0f, 0.3f ), new Color( 0.95f, 0.975f, 1.0f ) ) );
+			new SolidBorder( 1.5, 2.0, 8.0, 8.0, new Color( 0.7f, 0.7f, 0.7f ), new Color( 0.925f, 0.925f, 0.925f  ), new Color( 0.6f, 0.6f, 0.6f ), new Color( 0.875f, 0.875f, 0.875f ) ) );
 	public static final InheritedAttributeNonNull optionMenuContentsSpacing = new InheritedAttributeNonNull( controlsNamespace, "optionMenuContentsSpacing", Double.class, 5.0 );
 	public static final InheritedAttributeNonNull optionMenuArrowSize = new InheritedAttributeNonNull( controlsNamespace, "optionMenuArrowSize", Double.class, 16.0 );
 	public static final InheritedAttributeNonNull optionMenuArrowPainter = new InheritedAttributeNonNull( controlsNamespace, "optionMenuArrowPainter", Painter.class,
-			new FilledOutlinePainter( new Color( 0.7f, 0.8f, 0.9f ), new Color( 0.0f, 0.25f, 0.5f ), new BasicStroke( 1.0f ) ) );
+			 new FilledOutlinePainter( new Color( 0.775f, 0.775f, 0.85f ), new Color( 0.525f, 0.525f, 0.6f ), new BasicStroke( 1.0f ) ) );
 
 	
 	public static final InheritedAttributeNonNull dropDownExpanderHeaderContentsSpacing = new InheritedAttributeNonNull( controlsNamespace, "dropDownExpanderHeaderContentsSpacing", Double.class, 5.0 );
@@ -88,7 +86,7 @@ public class Controls
 
 	
 	public static final InheritedAttributeNonNull textEntryBorder = new InheritedAttributeNonNull( controlsNamespace, "textEntryBorder", AbstractBorder.class,
-			new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.0f, 0.125f, 0.25f ), new Color( 0.9f, 0.925f, 0.95f  ) ) );
+			new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.4f, 0.4f, 0.5f ), new Color( 0.9f, 0.9f, 0.95f  ) ) );
 	public static final InheritedAttributeNonNull textEntryInvalidBorder = new InheritedAttributeNonNull( controlsNamespace, "textEntryInvalidBorder", AbstractBorder.class,
 			new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.6f, 0.0f, 0.0f ), new Color( 1.0f, 0.85f, 0.85f ) ) );
 
@@ -109,7 +107,9 @@ public class Controls
 		
 	public static final InheritedAttributeNonNull spinEntryArrowSize = new InheritedAttributeNonNull( controlsNamespace, "spinEntryArrowSize", Double.class, 16.0 );
 	public static final InheritedAttributeNonNull spinEntryArrowAttrs = new InheritedAttributeNonNull( controlsNamespace, "spinEntryArrowAttrs", StyleSheet.class,
-		    StyleSheet.style( Primitive.columnSpacing.as( 2.0 ), Primitive.shapePainter.as( new FilledOutlinePainter( new Color( 0.7f, 0.8f, 0.9f ), new Color( 0.0f, 0.25f, 0.5f ), new BasicStroke( 1.0f ) ) ), Primitive.hoverShapePainter.as( new FilledOutlinePainter( new Color( 0.85f, 0.9f, 0.95f ), new Color( 0.0f, 0.5f, 0.75f ), new BasicStroke( 1.0f ) ) ) ) );
+		    StyleSheet.style( Primitive.columnSpacing.as( 2.0 ),
+				    Primitive.shapePainter.as( new FilledOutlinePainter( new Color( 0.85f, 0.85f, 0.85f ), new Color( 0.6f, 0.6f, 0.6f ), new BasicStroke( 1.0f ) ) ),
+				    Primitive.hoverShapePainter.as( new FillPainter( new Color( 0, 111, 128 ) ) ) ) );
 	public static final InheritedAttributeNonNull spinEntryHSpacing = new InheritedAttributeNonNull( controlsNamespace, "spinEntryHSpacing", Double.class, 2.0 );
 	
 	
@@ -156,16 +156,16 @@ public class Controls
 	public static final InheritedAttributeNonNull bClosePopupOnActivate = new InheritedAttributeNonNull( controlsNamespace, "bClosePopupOnActivate", Boolean.class, false );
 	
 	public static final InheritedAttributeNonNull menuItemHoverBackground = new InheritedAttributeNonNull( controlsNamespace, "menuItemHoverBackground", Painter.class,
-			new FillPainter( new Color( 0.6f, 0.7f, 0.85f ) ) );
+			new FillPainter( new Color( 0.775f, 0.8f, 0.825f ) ) );
 	public static final InheritedAttributeNonNull menuItemXPadding = new InheritedAttributeNonNull( controlsNamespace, "menuItemXPadding", Double.class, 5.0 );
 	public static final InheritedAttributeNonNull menuItemYPadding = new InheritedAttributeNonNull( controlsNamespace, "menuItemYPadding", Double.class, 5.0 );
 	public static final InheritedAttributeNonNull menuItemSubmenuArrowSize = new InheritedAttributeNonNull( controlsNamespace, "menuItemSubmenuArrowSize", Double.class, 12.0 );
 	public static final InheritedAttributeNonNull menuItemSubmenuArrowSpacing = new InheritedAttributeNonNull( controlsNamespace, "menuItemSubmenuArrowSpacing", Double.class, 5.0 );
 	public static final InheritedAttributeNonNull menuItemSubmenuArrowPainter = new InheritedAttributeNonNull( controlsNamespace, "menuItemSubmenuArrowPainter", Painter.class,
-			new FilledOutlinePainter( new Color( 0.7f, 0.8f, 0.9f ), new Color( 0.0f, 0.25f, 0.5f ), new BasicStroke( 1.0f ) ) );
+			 new FilledOutlinePainter( new Color( 0.85f, 0.85f, 0.85f ), new Color( 0.6f, 0.6f, 0.6f ), new BasicStroke( 1.0f ) ) );
 	
 	public static final InheritedAttributeNonNull popupMenuAttrs = new InheritedAttributeNonNull( controlsNamespace, "popupMenuAttrs", StyleSheet.class,
-		    StyleSheet.style( Primitive.border.as( new SolidBorder( 1.0, 2.0, Color.black, Color.white ) ), Primitive.rowSpacing.as( 10.0 ) ) );
+		    StyleSheet.style( Primitive.border.as( new SolidBorder( 1.5, 2.0, new Color( 0.6f, 0.6f, 0.6f ), Color.white ) ), Primitive.rowSpacing.as( 10.0 ) ) );
 
 	
 	public static final InheritedAttributeNonNull tooltipBorder = new InheritedAttributeNonNull( controlsNamespace, "tooltipBorder", AbstractBorder.class,
@@ -211,7 +211,7 @@ public class Controls
 
 	public static StyleValues useOptionMenuAttrs(StyleValues style)
 	{
-		return style.useAttr( optionMenuBorder ).useAttr( optionMenuHoverBorder ).useAttr( optionMenuContentsSpacing ).useAttr( optionMenuArrowSize ).useAttr( optionMenuArrowPainter );
+		return style.useAttr( optionMenuBorder ).useAttr( optionMenuContentsSpacing ).useAttr( optionMenuArrowSize ).useAttr( optionMenuArrowPainter );
 	}
 	
 	

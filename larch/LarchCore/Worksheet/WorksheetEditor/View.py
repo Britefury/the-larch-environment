@@ -61,9 +61,8 @@ from LarchCore.Worksheet.WorksheetEditor.RichTextEditor import WorksheetRichText
 
 _editableStyle = StyleSheet.style( Primitive.editable( True ) )
 
-_pythonCodeHeaderStyle = StyleSheet.style( Primitive.background( FillPainter( Color( 0.75, 0.8, 0.925 ) ) ) )
 _pythonCodeBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) ) )
-_pythonCodeEditorBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 2.0, 5.0, 20.0, 20.0, Color( 0.4, 0.5, 0.6 ), None ) ) )
+_pythonCodeBox = BorderWithHeaderBar( SolidBorder( 1.5, 4.0, 10.0, 10.0, Color( 0.4, 0.4, 0.5 ), None ), Color( 0.75, 0.75, 0.8 ) )
 
 _quoteLocationHeaderStyle = StyleSheet.style( Primitive.background( FillPainter( Color( 0.75, 0.8, 0.925 ) ) ) )
 _quoteLocationBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) ) )
@@ -370,22 +369,21 @@ class WorksheetEditor (MethodDispatchView):
 		
 		deleteButton = Button( Image.systemIcon( 'delete' ), _onDeleteButton )
 		
-		headerBox = _pythonCodeHeaderStyle.applyTo( Bin(
-		        StyleSheet.style( Primitive.rowSpacing( 20.0 ) ).applyTo( Row( [
-		                Row( [ Label( 'Python code' ) ] ).alignHLeft(),
-		                Row( [ styleOptionMenu, deleteButton.alignVCentre() ] ).alignHRight() ] ) ).pad( 2.0, 2.0 ) ) )
-		
-		boxContents = [ headerBox,
-				_pythonCodeBorderStyle.applyTo( Border( codeView ) ) ]
+		headerBox = Bin(
+			StyleSheet.style( Primitive.rowSpacing( 20.0 ) ).applyTo( Row( [
+				Row( [ Label( 'Python code' ) ] ).alignHLeft(),
+				Row( [ styleOptionMenu, deleteButton.alignVCentre() ] ).alignHRight() ] ) ).pad( 2.0, 2.0 ) )
+
+
+		boxContents = [ _pythonCodeBorderStyle.applyTo( Border( codeView ) ) ]
 		if executionResultView is not None:
 			boxContents.append( executionResultView.alignHExpand() )
 		box = StyleSheet.style( Primitive.columnSpacing( 5.0 ) ).applyTo( Column( boxContents ) )
-		
-		p = _pythonCodeEditorBorderStyle.applyTo( Border( box ).alignHExpand() )
+
+		p = _pythonCodeBox.surround( headerBox.padY( 0.0, 3.0 ), box.padY( 5.0, 0.0 ) )
 
 		p = WorksheetRichTextEditor.instance.editableParagraphEmbed( node, p )
-		return p
-
+		return p.alignHExpand()
 
 
 	@ObjectDispatchMethod( EditorSchema.InlineEmbeddedObjectEditor )
