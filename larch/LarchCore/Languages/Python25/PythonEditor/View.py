@@ -1791,10 +1791,10 @@ _quoteExprCommand = Command( '&Quote e&xpression', _newQuoteExpr )
 
 
 @PythonCommands.SpecialFormExprAtCaretAction
-def _newQuoteStmt(caret):
+def _newQuoteSuite(caret):
 	return Schema.Quote( value=Schema.PythonSuite( suite=[] ) )
 
-_quoteStmtCommand = Command( '&Quote &statement', _newQuoteStmt )
+_quoteStmtCommand = Command( '&Quote &suite', _newQuoteSuite )
 
 
 @PythonCommands.SpecialFormExprAtCaretAction

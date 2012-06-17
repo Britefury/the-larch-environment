@@ -7,6 +7,12 @@
 ##-*************************
 import unittest
 import sys
+import os
+
+sys.path.append( os.path.join( os.getcwd(), 'larch' ) )
+sys.path.append( os.path.join( os.getcwd(), 'bin' ) )
+sys.path.append( os.path.join( os.getcwd(), 'extlibs', 'jericho-html-3.2.jar' ) )
+sys.path.append( os.path.join( os.getcwd(), 'extlibs', 'svgSalamander.jar' ) )
 
 import Britefury.Tests.BritefuryJ.Parser.Utils.Operators
 import Britefury.Tests.BritefuryJ.Isolation.Test_IsolationPickle
