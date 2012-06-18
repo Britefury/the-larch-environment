@@ -196,7 +196,7 @@ class AbstractInlineTest (object):
 
 
 
-_standardInlineTestBorder = SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.4, 0.4, 0.5 ), None )
+_standardInlineTestBorder = SolidBorder( 1.5, 3.0, 5.0, 5.0, Color( 0.4, 0.4, 0.5 ), None )
 _standardCodeBorder = SolidBorder( 1.5, 3.0, 5.0, 5.0, Color( 0.6, 0.6, 0.6 ), None )
 _standardResultsBorder = SolidBorder( 1.5, 3.0, 5.0, 5.0, Color( 0.7, 0.7, 0.7 ), Color( 0.95, 0.95, 0.95 ) )
 _standardPassStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.5, 0.0 ) ) )
@@ -274,15 +274,18 @@ class StandardInlineTest (AbstractInlineTest):
 		return self._suite.model['suite']
 
 
+	__embed_hide_frame__ = True
+
 	def __present__(self, fragment, inheritedState):
 		self._incr.onAccess()
 
-		title = SectionHeading2( 'Tests:' )
+		title = SectionHeading2( 'Unit tests' )
 
-		nameEntry = EditableLabel.regexValidated( self._name, _notSet, Tokens.identifierPattern, 'Please enter a valid identifier' )
-		nameEditor = _nameBorder.surround( Row( [ Label( 'Name: '), nameEntry ] ) )
+		nameEntry = _nameBorder.surround( EditableLabel.regexValidated( self._name, _notSet, Tokens.identifierPattern, 'Please enter a valid identifier' ) )
 
-		contents = [ title, nameEditor.pad( 5.0, 5.0 ), _standardCodeBorder.surround( self._suite ).padY( 3.0 ).alignHExpand() ]
+		header = Row( [ title, Spacer( 25.0, 0.0 ), nameEntry ] )
+
+		contents = [ header.padY( 0.0, 5.0 ), _standardCodeBorder.surround( self._suite ).padY( 3.0 ).alignHExpand() ]
 
 		if self.__passes is not None  and  self.__failures is not None:
 			resultsTitle = SectionHeading3( 'Test results:' )
@@ -394,6 +397,8 @@ class TestedBlock (object):
 		return deepcopy( self._suite.model['suite'] )
 
 
+
+	__embed_hide_frame__ = True
 
 	def __present__(self, fragment, inheritedState):
 		title = SectionHeading2( 'Tested block' )
