@@ -148,13 +148,14 @@ class AbstractInlineTestTableRow (object):
 
 
 	def _testValue(self, kind, data, excType=None):
+		print 'AbstractInlineTestTableRow._testValue: kind=' + kind
 		self._actual.setLiteralValue( ( kind, data ) )
 		expected = self._expected.getStaticValue()
 		if expected is not None:
 			expectedKind, expectedData = expected
 			if kind == expectedKind:
 				if expectedKind == 'exception':
-					if isinstance( data, expectedData ):
+					if excType == expectedData:
 						self.__result.setLiteralValue( _resultPass )
 					else:
 						title = _resultFailStyle( Label( 'FAIL' ) )
