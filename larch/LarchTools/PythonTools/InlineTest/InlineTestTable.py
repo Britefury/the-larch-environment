@@ -249,7 +249,7 @@ AbstractInlineTestTableRow._expectedColumn = AttributeColumn( 'Expected', 'expec
 
 _nameBorder = SolidBorder( 1.0, 2.0, 5.0, 5.0, Color( 0.6, 0.6, 0.6 ), Color( 0.95, 0.95, 0.95 ) )
 _notSet = StyleSheet.style( Primitive.fontItalic( True ) )( Label( 'not set' ) )
-_inlineTestTableBorder = SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.4, 0.4, 0.5 ), None )
+_inlineTestTableBorder = SolidBorder( 1.5, 3.0, 5.0, 5.0, Color( 0.4, 0.4, 0.5 ), None )
 
 
 class AbstractInlineTestTable (AbstractInlineTest):
@@ -323,18 +323,21 @@ class AbstractInlineTestTable (AbstractInlineTest):
 
 
 
-	def __present__(self, fragment, inheritedState):
-		title = SectionHeading2( 'Tests:' )
+	__embed_hide_frame__ = True
 
-		nameEntry = EditableLabel.regexValidated( self._name, _notSet, Tokens.identifierPattern, 'Please enter a valid identifier' )
-		nameEditor = _nameBorder.surround( Row( [ Label( 'Name: '), nameEntry ] ) )
+	def __present__(self, fragment, inheritedState):
+		title = SectionHeading2( 'Unit tests' )
+
+		nameEntry = _nameBorder.surround( EditableLabel.regexValidated( self._name, _notSet, Tokens.identifierPattern, 'Please enter a valid identifier' ) )
+
+		header = Row( [ title, Spacer( 25.0, 0.0 ), nameEntry ] )
 
 		if self._tableEditor is NotImplemented:
 			raise NotImplementedError, 'Table editor is abstract'
 
 		table = self._tableEditor.editTable( self._tests )
 
-		return _inlineTestTableBorder.surround( Column( [ title, nameEditor, table ] ) )
+		return _inlineTestTableBorder.surround( Column( [ header, Spacer( 0.0, 5.0 ), table ] ) )
 
 
 

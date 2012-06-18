@@ -68,6 +68,8 @@ class VisualPythonRegex (object):
 	def __py_eval__(self, _globals, _locals, codeGen):
 		return self._codeGen( self.regex )
 
+	__embed_hide_frame__ = True
+
 
 	def __present__(self, fragment, inherited_state):
 		#return VREPerspective( self.regex )

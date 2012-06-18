@@ -56,10 +56,6 @@ _editableStyle = StyleSheet.style( Primitive.editable( True ) )
 _pythonCodeBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) ) )
 _pythonCodeEditorBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.5, 4.0, 10.0, 10.0, Color( 0.4, 0.4, 0.5 ), None ) ) )
 
-_quoteLocationHeaderStyle = StyleSheet.style( Primitive.background( FillPainter( Color( 0.75, 0.8, 0.925 ) ) ) )
-_quoteLocationBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) ) )
-_quoteLocationEditorBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 2.0, 5.0, 20.0, 20.0, Color( 0.4, 0.5, 0.6 ), None ) ) )
-
 
 def _worksheetContextMenuFactory(element, menu):
 	def _onRefresh(button, event):
@@ -178,7 +174,10 @@ class WorksheetViewer (MethodDispatchView):
 	def ParagraphEmbeddedObject(self, fragment, inheritedState, node):
 		value = node.getValue()
 		valueView = _editableStyle.applyTo( ApplyPerspective( None, value ) )
-		p = ObjectBorder( valueView )
+
+		hideFrame = getattr( value, '__embed_hide_frame__', False )
+		p = ObjectBorder( valueView )   if not hideFrame   else valueView
+
 		return p
 
 

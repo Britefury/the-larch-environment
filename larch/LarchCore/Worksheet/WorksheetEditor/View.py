@@ -386,7 +386,10 @@ class WorksheetEditor (MethodDispatchView):
 	def InlineEmbeddedObject(self, fragment, inheritedState, node):
 		value = node.getValue()
 		valueView = _editableStyle.applyTo( ApplyPerspective( EditPerspective.instance, value ) )
-		p = ObjectBorder( valueView )
+
+		hideFrame = getattr( value, '__embed_hide_frame__', False )
+		p = ObjectBorder( valueView )   if not hideFrame   else valueView
+
 		p = p.withContextMenuInteractor( _inlineEmbeddedObjectContextMenuFactory )
 		p = WorksheetRichTextEditor.instance.editableInlineEmbed( node, p )
 		return p
@@ -397,7 +400,10 @@ class WorksheetEditor (MethodDispatchView):
 	def ParagraphEmbeddedObject(self, fragment, inheritedState, node):
 		value = node.getValue()
 		valueView = _editableStyle.applyTo( ApplyPerspective( EditPerspective.instance, value ) )
-		p = ObjectBorder( valueView )
+
+		hideFrame = getattr( value, '__embed_hide_frame__', False )
+		p = ObjectBorder( valueView )   if not hideFrame   else valueView
+
 		p = p.withContextMenuInteractor( _paragraphEmbeddedObjectContextMenuFactory )
 		p = WorksheetRichTextEditor.instance.editableParagraphEmbed( node, p )
 		return p

@@ -1273,9 +1273,11 @@ class Python25View (MethodDispatchView):
 
 		expansionFn = self._getExpansionFn( value )
 
+		hideFrame = getattr( value, '__embed_hide_frame__', False )
+
 		if expansionFn is None:
 			# Standard view
-			view = embeddedObjectExpr( valueView )
+			view = embeddedObjectExpr( valueView, hideFrame )
 		else:
 			# Macro view
 			def createExpansionView():
@@ -1293,9 +1295,11 @@ class Python25View (MethodDispatchView):
 		valueView = ApplyPerspective( EditPerspective.instance, value )
 		expansionFn = self._getExpansionFn( value )
 
+		hideFrame = getattr( value, '__embed_hide_frame__', False )
+
 		if expansionFn is None:
 			# Standard view
-			view = embeddedObjectStmt( valueView )
+			view = embeddedObjectStmt( valueView, hideFrame )
 			return view.withContextMenuInteractor( _embeddedObjectStmtContextMenuFactory ).withTreeEventListener( _EmbeddedObjectStmtTreeEventListener.instance )
 		else:
 			# Macro view

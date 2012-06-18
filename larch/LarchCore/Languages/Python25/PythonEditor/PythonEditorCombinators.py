@@ -616,7 +616,7 @@ def externalExpr(ctx, style, exprView, title, deleteButton):
 
 
 @PyPresCombinatorFn
-def embeddedObjectLiteral(ctx, style, valueView):
+def embeddedObjectLiteral(ctx, style, valueView, hideFrame):
 	embeddedObjectLiteralBorder = style.get( PythonEditorStyle.embeddedObjectLiteralBorder )
 	embeddedObjectTagLabelStyle = style.get( PythonEditorStyle.embeddedObjectTagLabelStyle )
 	embeddedObjectTagBorder = style.get( PythonEditorStyle.embeddedObjectTagBorder )
@@ -631,14 +631,17 @@ def embeddedObjectLiteral(ctx, style, valueView):
 
 
 @PyPresCombinatorFn
-def embeddedObjectExpr(ctx, style, valueView):
-	embeddedObjectBorder = style.get( PythonEditorStyle.embeddedObjectBorder )
-	embeddedObjectTagLabelStyle = style.get( PythonEditorStyle.embeddedObjectTagLabelStyle )
-	embeddedObjectTagBorder = style.get( PythonEditorStyle.embeddedObjectTagBorder )
+def embeddedObjectExpr(ctx, style, valueView, hideFrame):
+	if hideFrame:
+		box = valueView
+	else:
+		embeddedObjectBorder = style.get( PythonEditorStyle.embeddedObjectBorder )
+		embeddedObjectTagLabelStyle = style.get( PythonEditorStyle.embeddedObjectTagLabelStyle )
+		embeddedObjectTagBorder = style.get( PythonEditorStyle.embeddedObjectTagBorder )
 
-	tagLabel = embeddedObjectTagBorder.surround( embeddedObjectTagLabelStyle( Label( 'e' ) ) )
-	contents = Row( [ tagLabel.alignVCentre(), valueView.pad( 2.0, 2.0 ) ] )
-	box = embeddedObjectBorder.surround( contents ).padX( 1.0, 1.0 )
+		tagLabel = embeddedObjectTagBorder.surround( embeddedObjectTagLabelStyle( Label( 'e' ) ) )
+		contents = Row( [ tagLabel.alignVCentre(), valueView.pad( 2.0, 2.0 ) ] )
+		box = embeddedObjectBorder.surround( contents ).padX( 1.0, 1.0 )
 
 	segment = Segment( box )
 	return segment.present( ctx, style )
@@ -646,14 +649,17 @@ def embeddedObjectExpr(ctx, style, valueView):
 
 
 @PyPresCombinatorFn
-def embeddedObjectStmt(ctx, style, valueView):
-	embeddedObjectBorder = style.get( PythonEditorStyle.embeddedObjectBorder )
-	embeddedObjectTagLabelStyle = style.get( PythonEditorStyle.embeddedObjectTagLabelStyle )
-	embeddedObjectTagBorder = style.get( PythonEditorStyle.embeddedObjectTagBorder )
+def embeddedObjectStmt(ctx, style, valueView, hideFrame):
+	if hideFrame:
+		box = valueView
+	else:
+		embeddedObjectBorder = style.get( PythonEditorStyle.embeddedObjectBorder )
+		embeddedObjectTagLabelStyle = style.get( PythonEditorStyle.embeddedObjectTagLabelStyle )
+		embeddedObjectTagBorder = style.get( PythonEditorStyle.embeddedObjectTagBorder )
 
-	tagLabel = embeddedObjectTagBorder.surround( embeddedObjectTagLabelStyle( Label( 'Stmt' ) ) )
-	contents = Column( [ tagLabel, valueView.pad( 2.0, 2.0 ) ] )
-	box = embeddedObjectBorder.surround( contents ).padX( 1.0, 1.0 )
+		tagLabel = embeddedObjectTagBorder.surround( embeddedObjectTagLabelStyle( Label( 'Stmt' ) ) )
+		contents = Column( [ tagLabel, valueView.pad( 2.0, 2.0 ) ] )
+		box = embeddedObjectBorder.surround( contents ).padX( 1.0, 1.0 )
 
 	segment = Segment( box )
 	return segment.present( ctx, style )

@@ -47,7 +47,9 @@ public class FlowGridLayout
 			// Spacing does not appear on the left hand side at all, so offset x by half the spacing
 			x += spacing * 0.5;
 			
-			return (int)Math.floor( x / ( width + spacing ) );
+			int col = (int)Math.floor( x / ( width + spacing ) );
+			col = Math.max( 0, Math.min( col, numColumns - 1 ) );
+			return col;
 		}
 	}
 	
