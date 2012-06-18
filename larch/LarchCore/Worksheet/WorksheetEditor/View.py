@@ -62,11 +62,7 @@ from LarchCore.Worksheet.WorksheetEditor.RichTextEditor import WorksheetRichText
 _editableStyle = StyleSheet.style( Primitive.editable( True ) )
 
 _pythonCodeBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) ) )
-_pythonCodeBox = BorderWithHeaderBar( SolidBorder( 1.5, 4.0, 10.0, 10.0, Color( 0.4, 0.4, 0.5 ), None ), Color( 0.75, 0.75, 0.8 ) )
-
-_quoteLocationHeaderStyle = StyleSheet.style( Primitive.background( FillPainter( Color( 0.75, 0.8, 0.925 ) ) ) )
-_quoteLocationBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) ) )
-_quoteLocationEditorBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 2.0, 5.0, 20.0, 20.0, Color( 0.4, 0.5, 0.6 ), None ) ) )
+_pythonCodeBox = BorderWithHeaderBar( SolidBorder( 1.5, 4.0, 10.0, 10.0, Color( 0.4, 0.4, 0.5 ), None ), Color( 0.825, 0.825, 0.875 ) )
 
 
 
@@ -372,7 +368,7 @@ class WorksheetEditor (MethodDispatchView):
 		headerBox = Bin(
 			StyleSheet.style( Primitive.rowSpacing( 20.0 ) ).applyTo( Row( [
 				Row( [ Label( 'Python code' ) ] ).alignHLeft(),
-				Row( [ styleOptionMenu, deleteButton.alignVCentre() ] ).alignHRight() ] ) ).pad( 2.0, 2.0 ) )
+				Row( [ styleOptionMenu, deleteButton.alignVCentre() ] ).alignHRight() ] ) ) )
 
 
 		boxContents = [ _pythonCodeBorderStyle.applyTo( Border( codeView ) ) ]

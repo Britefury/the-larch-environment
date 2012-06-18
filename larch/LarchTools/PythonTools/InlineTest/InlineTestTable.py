@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
+import sys
+
 from java.awt import Color
 
 from copy import deepcopy
@@ -110,14 +112,18 @@ class AbstractInlineTestTableRow (object):
 
 	def _createMethodAST(self, codeGen):
 		valueStmts, resultVarName = self._createValueStmtsAndResultVarName( codeGen )
+
 		JythonExceptionAST = codeGen.embeddedValue( JythonException )
-		getCaugheExceptionCallAST = Schema.Call( target=Schema.AttributeRef( target=JythonExceptionAST, name='getCaughtException' ), args=[] )
+		sysAST = codeGen.embeddedValue( sys )
+		getCurrentExceptionCallAST = Schema.Call( target=Schema.AttributeRef( target=JythonExceptionAST, name='getCurrentException' ), args=[] )
+		getExcInfoTypeAST = Schema.Subscript( target=Schema.Call( target=Schema.AttributeRef( target=sysAST, name='exc_info' ), args=[] ),
+						      index=Schema.IntLiteral( format='decimal', numType='int', value='0' ) )
 		selfAST = codeGen.embeddedValue( self )
 		testValueAST = Schema.AttributeRef( target=selfAST, name='_testValue' )
 		kindExceptionAST = Schema.StringLiteral( format='ascii', quotation='single', value='exception' )
 		kindValueAST = Schema.StringLiteral( format='ascii', quotation='single', value='value' )
 
-		exceptStmts = [ Schema.ExprStmt( expr=Schema.Call( target=testValueAST, args=[ kindExceptionAST, getCaugheExceptionCallAST ] ) ) ]
+		exceptStmts = [ Schema.ExprStmt( expr=Schema.Call( target=testValueAST, args=[ kindExceptionAST, getCurrentExceptionCallAST, getExcInfoTypeAST ] ) ) ]
 		elseStmts = [ Schema.ExprStmt( expr=Schema.Call( target=testValueAST, args=[ kindValueAST, Schema.Load( name=resultVarName ) ] ) ) ]
 		methodBody = [ Schema.TryStmt( suite=valueStmts, exceptBlocks=[ Schema.ExceptBlock( suite=exceptStmts ) ], elseSuite=elseStmts ) ]
 
@@ -128,11 +134,10 @@ class AbstractInlineTestTableRow (object):
 
 	@staticmethod
 	def _statementsForExecutionAndEvaluationIntoValue(stmts, varName):
-		execModule = None
-		evalExpr = None
-		for i, stmt in reversed( list( enumerate( stmts ) ) ):
+		for i in xrange( len( stmts ) - 1, -1, -1 ):
+			stmt = stmts[i]
 			if stmt.isInstanceOf( Schema.ExprStmt ):
-				return deepcopy( stmts[:i] ) + [ Schema.AssignStmt( targets=[ Schema.SingleTarget( name=varName ) ], value=deepcopy( stmt['expr'] ) ) ] + deepcopy( stmts[i+1:] )
+				return stmts[:i] + [ Schema.AssignStmt( targets=[ Schema.SingleTarget( name=varName ) ], value=stmt['expr'] ) ] + stmts[i+1:]
 			elif stmt.isInstanceOf( Schema.BlankLine )  or  stmt.isInstanceOf( Schema.CommentStmt ):
 				pass
 			else:
@@ -142,7 +147,7 @@ class AbstractInlineTestTableRow (object):
 
 
 
-	def _testValue(self, kind, data):
+	def _testValue(self, kind, data, excType=None):
 		self._actual.setLiteralValue( ( kind, data ) )
 		expected = self._expected.getStaticValue()
 		if expected is not None:
@@ -153,7 +158,7 @@ class AbstractInlineTestTableRow (object):
 						self.__result.setLiteralValue( _resultPass )
 					else:
 						title = _resultFailStyle( Label( 'FAIL' ) )
-						heading = Label( 'Expected exception of type %s, got:' % expectedData.__name )
+						heading = Label( 'Expected exception of type %s, got:' % expectedData.__name__ )
 						res = Column( [ title, heading, data ] )
 						self.__result.setLiteralValue( res )
 				elif expectedKind == 'value':
@@ -171,7 +176,7 @@ class AbstractInlineTestTableRow (object):
 				resContents = [ _resultFailStyle( Label( 'FAIL' ) ) ]
 
 				if expectedKind == 'exception':
-					resContents.append( Label( 'Expected exception of type %s:' % expectedData.__name ) )
+					resContents.append( Label( 'Expected exception of type %s:' % expectedData.__name__ ) )
 				elif expectedKind == 'value':
 					resContents.append( Label( 'Expected:' ) )
 					resContents.append( expectedData )
@@ -191,7 +196,7 @@ class AbstractInlineTestTableRow (object):
 		else:
 			def _onFix(button, event):
 				if kind == 'exception':
-					self._expected.setLiteralValue( ( kind, type( data ) ) )
+					self._expected.setLiteralValue( ( kind, excType ) )
 				elif kind == 'value':
 					self._expected.setLiteralValue( ( kind, data ) )
 				else:
@@ -199,8 +204,8 @@ class AbstractInlineTestTableRow (object):
 				self.__result.setLiteralValue( _resultNone )
 
 			fixButton = Button.buttonWithLabel( 'Set expected result', _onFix )
-			title = Label( 'No expected result' )
-			self.__result.setLiteralValue( Column( [ title, fixButton ] ).alignVTop() )
+			title = Label( 'No expected result, received:' )
+			self.__result.setLiteralValue( Column( [ title, Pres.coerce( data ).pad( 5.0, 0.0, 5.0, 5.0 ), fixButton ] ).alignHPack().alignVTop() )
 
 
 
@@ -228,9 +233,16 @@ class AbstractInlineTestTableRow (object):
 			return Blank()
 
 
+	@expected.setter
+	def expected(self, x):
+		if x is None:
+			self._expected.setLiteralValue( None )
+
+
+
 
 AbstractInlineTestTableRow._resultColumn = AttributeColumn( 'Result', 'result' )
-AbstractInlineTestTableRow._expectedColumn = AttributeColumn( 'Expected', 'expected' )
+AbstractInlineTestTableRow._expectedColumn = AttributeColumn( 'Expected', 'expected', None, None )
 
 
 
@@ -311,9 +323,6 @@ class AbstractInlineTestTable (AbstractInlineTest):
 
 
 	def __present__(self, fragment, inheritedState):
-		def _onRun(button, event):
-			self.run()
-
 		title = SectionHeading2( 'Tests:' )
 
 		nameEntry = EditableLabel.regexValidated( self._name, _notSet, Tokens.identifierPattern, 'Please enter a valid identifier' )
@@ -324,11 +333,7 @@ class AbstractInlineTestTable (AbstractInlineTest):
 
 		table = self._tableEditor.editTable( self._tests )
 
-		runButton = Button.buttonWithLabel( 'Run tests', _onRun )
-		controls = Row( [ runButton ] )
-
-
-		return _inlineTestTableBorder.surround( Column( [ title, nameEditor, table, controls ] ) )
+		return _inlineTestTableBorder.surround( Column( [ title, nameEditor, table ] ) )
 
 
 
