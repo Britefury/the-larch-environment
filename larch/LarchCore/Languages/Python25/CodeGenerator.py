@@ -872,7 +872,6 @@ class Python25CodeGenerator (object):
 		
 
 _runtime_resourceMap_Name = '__larch_resourceMap__'
-_runtime_astMap_Name = '__larch_astMap__'
 _runtime_DMList_Name = '__larch_DMList__'
 
 
@@ -931,17 +930,6 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 			self._resourceMap = []
 			setattr( module, _runtime_resourceMap_Name, self._resourceMap )
 			
-		try:
-			self._astMap = getattr( module, _runtime_astMap_Name )
-		except AttributeError:
-			self._astMap = []
-			setattr( module, _runtime_astMap_Name, self._astMap )
-		
-		# Needed by _getIndexForAstClass
-		self._revAstMap = {}
-		for i, cls in enumerate( self._astMap ):
-			self._revAstMap[cls] = i
-		
 		setattr( module, _runtime_DMList_Name, DMList )
 		
 		self._resourceValueIdToIndex = {}
@@ -957,17 +945,6 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 		return self._module
 
 
-	def _getIndexForAstClass(self, cls):
-		try:
-			return self._revAstMap[cls]
-		except KeyError:
-			index = len( self._astMap )
-			self._astMap.append( cls )
-			self._revAstMap[cls] = index
-			return index
-		
-		
-		
 	def _quotedNode(self, node):
 		if node is None:
 			return 'None'
@@ -978,10 +955,9 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 				return '(' + self( node ) + ')'
 			else:
 				cls = node.getDMObjectClass()
-				clsIndex = self._getIndexForAstClass( cls )
-				
-				astMapExpr = _runtime_astMap_Name + '[%d]' % clsIndex
-				
+
+				astMapExpr = self._embeddedValueSrc( cls )
+
 				args = []
 				for i, field in enumerate( cls.getFields() ):
 					value = node.get( i )
@@ -991,9 +967,7 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 		elif isinstance( node, DMList ):
 			return _runtime_DMList_Name + '( [' + ', '.join( [ self._quotedNode( v )   for v in node ] ) + '] )'
 		elif isinstance( node, DMEmbeddedObject )  or  isinstance( node, DMEmbeddedIsolatedObject ):
-			index = len( self._resourceMap )
-			self._resourceMap.append( deepcopy( node ) )
-			return _runtime_resourceMap_Name + '[%d]'  %  ( index, )
+			return self._embeddedValueSrc( deepcopy( node ) )
 		else:
 			raise TypeError, 'Cannot quote a %s'  %  type( node )
 		
@@ -1155,6 +1129,10 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 		targetAST = Schema.Load( name=_runtime_resourceMap_Name )
 		indexAST= Schema.IntLiteral( format='decimal', numType='int', value=str( index ) )
 		return Schema.Subscript( target=targetAST, index=indexAST )
+
+
+
+
 
 
 

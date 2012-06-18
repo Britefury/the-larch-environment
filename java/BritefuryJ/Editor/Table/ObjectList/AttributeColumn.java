@@ -36,16 +36,24 @@ public class AttributeColumn extends AbstractColumn
 		this.title = title;
 		this.attrname = __builtin__.intern( attrname );
 		
-		if ( type instanceof PyJavaType )
+		if ( type != null )
 		{
-			PyJavaType jtype = (PyJavaType)type;
-			this.cls = Py.tojava( jtype, Class.class );
-			this.type = null;
+			if ( type instanceof PyJavaType )
+			{
+				PyJavaType jtype = (PyJavaType)type;
+				this.cls = Py.tojava( jtype, Class.class );
+				this.type = null;
+			}
+			else
+			{
+				this.cls = null;
+				this.type = type;
+			}
 		}
 		else
 		{
 			this.cls = null;
-			this.type = type;
+			this.type = null;
 		}
 		if ( defaultValue.isCallable() )
 		{
@@ -63,16 +71,24 @@ public class AttributeColumn extends AbstractColumn
 		this.title = title;
 		this.attrname = __builtin__.intern( attrname );
 		
-		if ( type instanceof PyJavaType )
+		if ( type != null )
 		{
-			PyJavaType jtype = (PyJavaType)type;
-			this.cls = Py.tojava( jtype, Class.class );
-			this.type = null;
+			if ( type instanceof PyJavaType )
+			{
+				PyJavaType jtype = (PyJavaType)type;
+				this.cls = Py.tojava( jtype, Class.class );
+				this.type = null;
+			}
+			else
+			{
+				this.cls = null;
+				this.type = type;
+			}
 		}
 		else
 		{
 			this.cls = null;
-			this.type = type;
+			this.type = null;
 		}
 		this.defaultValueCallable = type;
 		this.defaultValue = null;

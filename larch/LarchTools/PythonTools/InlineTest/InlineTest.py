@@ -197,6 +197,12 @@ class AbstractInlineTest (object):
 
 
 _standardInlineTestBorder = SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.4, 0.4, 0.5 ), None )
+_standardCodeBorder = SolidBorder( 1.5, 3.0, 5.0, 5.0, Color( 0.6, 0.6, 0.6 ), None )
+_standardResultsBorder = SolidBorder( 1.5, 3.0, 5.0, 5.0, Color( 0.7, 0.7, 0.7 ), Color( 0.95, 0.95, 0.95 ) )
+_standardPassStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.5, 0.0 ) ) )
+_standardFailStyle = StyleSheet.style( Primitive.foreground( Color( 0.5, 0.0, 0.0 ) ) )
+_standardFailedTestStyle = StyleSheet.style( Primitive.foreground( Color( 0.75, 0.0, 0.0 ) ) )
+_standardResultsBorder = SolidBorder( 1.5, 3.0, 5.0, 5.0, Color( 0.7, 0.7, 0.7 ), Color( 0.95, 0.95, 0.95 ) )
 
 class StandardInlineTest (AbstractInlineTest):
 	def __init__(self, name='test'):
@@ -269,9 +275,6 @@ class StandardInlineTest (AbstractInlineTest):
 
 
 	def __present__(self, fragment, inheritedState):
-		def _onRun(button, event):
-			self.run()
-
 		self._incr.onAccess()
 
 		title = SectionHeading2( 'Tests:' )
@@ -279,20 +282,23 @@ class StandardInlineTest (AbstractInlineTest):
 		nameEntry = EditableLabel.regexValidated( self._name, _notSet, Tokens.identifierPattern, 'Please enter a valid identifier' )
 		nameEditor = _nameBorder.surround( Row( [ Label( 'Name: '), nameEntry ] ) )
 
-		results = []
+		contents = [ title, nameEditor.pad( 5.0, 5.0 ), _standardCodeBorder.surround( self._suite ).padY( 3.0 ).alignHExpand() ]
+
 		if self.__passes is not None  and  self.__failures is not None:
 			resultsTitle = SectionHeading3( 'Test results:' )
-			passes = Label( '%d / %d tests passed' % ( self.__passes, self.__passes + len( self.__failures ) ) )
-			failuresLabel = Label( '%d tests failed:' % len( self.__failures ) )
-			failures = [ Column( [ Label( name ), exception ] )   for name, exception in self.__failures ]
-			results = [ Column( [ resultsTitle, passes, failuresLabel ] + failures ) ]
-
-		runButton = Button.buttonWithLabel( 'Run tests', _onRun )
-		controls = Row( [ runButton ] )
-
-		return _standardInlineTestBorder.surround( Column( [ title, nameEditor, self._suite ] + results + [ controls ] ) )
+			passes = _standardPassStyle( Label( '%d / %d test(s) passed' % ( self.__passes, self.__passes + len( self.__failures ) ) ) )
+			failuresLabel = _standardFailStyle( Label( '%d test(s) failed:' % len( self.__failures ) ) )
+			failures = [ Column( [ _standardFailedTestStyle( Label( name ) ), Pres.coerce( exception ).padX( 5.0, 0.0 ) ] ).padX( 5.0, 0.0 )   for name, exception in self.__failures ]
+			results = _standardResultsBorder.surround( Column( [ resultsTitle, passes, failuresLabel ] + failures ) ).pad( 3.0, 3.0 )
+			contents.append( results )
 
 
+		return _standardInlineTestBorder.surround( Column( contents ) )
+
+
+
+
+_testedBlockBorder = SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.5, 0.5, 0.45 ), None )
 
 class TestedBlock (object):
 	def __init__(self):
@@ -375,6 +381,8 @@ class TestedBlock (object):
 				testAst = codeGen.embeddedValue( test )
 				testing.append( Schema.ExprStmt( expr=Schema.Call( target=Schema.AttributeRef( target=testAst, name='_registerTestClass' ), args=[ Schema.Load( name=test._className ) ] ) ) )
 
+			testing.append( Schema.ExprStmt( expr=Schema.Call( target=Schema.AttributeRef( target=codeGen.embeddedValue( self ), name='runTests' ), args=[] ) ) )
+
 			return Schema.PythonSuite( suite=testing )
 
 
@@ -388,16 +396,10 @@ class TestedBlock (object):
 
 
 	def __present__(self, fragment, inheritedState):
-		def _onRun(button, event):
-			self.runTests()
-
 		title = SectionHeading2( 'Tested block' )
 
-		runButton = Button.buttonWithLabel( 'Run all tests', _onRun )
-		controls = Row( [ runButton ] )
-
-		contents = Column( [ title, self._suite, controls ] )
-		return ObjectBox( 'Unit test', contents ).withCommands( inlineTestCommands )
+		contents = Column( [ title, self._suite ] )
+		return _testedBlockBorder.surround( contents ).withCommands( inlineTestCommands )
 
 
 
