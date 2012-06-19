@@ -187,7 +187,7 @@ class Python2CodeGenerator (object):
 	def IntLiteral(self, node, format, numType, value):
 		if numType == 'int':
 			if format == 'decimal':
-				valueString = '{0}'.format( value )
+				valueString = '{0}'.format( int( value, 10 ) )
 			elif format == 'hex':
 				valueString = '0x{0:x}'.format( int( value, 16 ) )
 			elif format == 'bin':
@@ -198,7 +198,7 @@ class Python2CodeGenerator (object):
 				raise Python2CodeGeneratorInvalidFormatError, 'invalid integer literal format'
 		elif numType == 'long':
 			if format == 'decimal':
-				valueString = '{0}L'.format( long( value ) )
+				valueString = '{0}L'.format( long( value, 10 ) )
 			elif format == 'hex':
 				valueString = '0x{0:x}L'.format( long( value, 16 ) )
 			elif format == 'bin':
@@ -292,9 +292,24 @@ class Python2CodeGenerator (object):
 	@DMObjectNodeDispatchMethod( Schema.DictLiteral )
 	def DictLiteral(self, node, values):
 		return '{ '  +  ', '.join( [ self( i, PRECEDENCE_CONTAINER_ELEMENT )   for i in values ] )  +  ' }'
-	
-	
-	
+
+	@DMObjectNodeDispatchMethod( Schema.DictComp )
+	def DictComp(self, node, resultExpr, comprehensionItems):
+		return '{ ' + self( resultExpr, PRECEDENCE_CONTAINER_ELEMENT ) + '   ' + '   '.join( [ self( x, PRECEDENCE_CONTAINER_ELEMENT )   for x in comprehensionItems ] )  +  ' }'
+
+
+
+	# Set literal
+	@DMObjectNodeDispatchMethod( Schema.SetLiteral )
+	def SetLiteral(self, node, values):
+		return '{ '  +  ', '.join( [ self( i, PRECEDENCE_CONTAINER_ELEMENT )   for i in values ] )  +  ' }'
+
+	@DMObjectNodeDispatchMethod( Schema.SetComp )
+	def SetComp(self, node, resultExpr, comprehensionItems):
+		return '{ ' + self( resultExpr, PRECEDENCE_CONTAINER_ELEMENT ) + '   ' + '   '.join( [ self( x, PRECEDENCE_CONTAINER_ELEMENT )   for x in comprehensionItems ] )  +  ' }'
+
+
+
 	# Yield expression and yield atom
 	@DMObjectNodeDispatchMethod( Schema.YieldExpr )
 	def YieldExpr(self, node, value):
@@ -1247,8 +1262,12 @@ class TestCase_Python2CodeGenerator (unittest.TestCase):
 		self._testSX( '(py IntLiteral format=oct numType=long value=123)', '0o123L' )
 		self.assertRaises( Python2CodeGeneratorInvalidFormatError, lambda: self._testSX( '(py IntLiteral format=foo numType=long value=1a4)', '' ) )
 		self.assertRaises( Python2CodeGeneratorInvalidFormatError, lambda: self._testSX( '(py IntLiteral format=hex numType=foo value=1a4)', '' ) )
-		
-		
+		# Ensure that 0 prefix results in decimal
+		self._testSX( '(py IntLiteral format=decimal numType=int value=00123)', '123' )
+		self._testSX( '(py IntLiteral format=decimal numType=long value=00123)', '123L' )
+
+
+
 	def test_FloatLiteral(self):
 		self._testSX( '(py FloatLiteral value=123.0)', '123.0' )
 		
@@ -1309,8 +1328,21 @@ class TestCase_Python2CodeGenerator (unittest.TestCase):
 		
 	def test_DictLiteral(self):
 		self._testSX( '(py DictLiteral values=[(py DictKeyValuePair key=(py Load name=a) value=(py Load name=b)) (py DictKeyValuePair key=(py Load name=c) value=(py Load name=d))])', '{ a:b, c:d }' )
-		
-	
+
+
+	def test_DictComp(self):
+		self._testSX( '(py DictComp resultExpr=(py DictKeyValuePair key=(py Load name=a) value=(py Load name=b)) '+\
+		              'comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs)) (py ComprehensionIf condition=(py Load name=a))])', '{ a:b   for a in xs   if a }' )
+
+
+	def test_SetLiteral(self):
+		self._testSX( '(py SetLiteral values=[(py Load name=a) (py Load name=c)])', '{ a, c }' )
+
+
+	def test_SetComp(self):
+		self._testSX( '(py SetComp resultExpr=(py Load name=a) comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs)) (py ComprehensionIf condition=(py Load name=a))])', '{ a   for a in xs   if a }' )
+
+
 	def test_YieldExpr(self):
 		self._testSX( '(py YieldExpr value=(py Load name=a))', '(yield a)' )
 		self._testSX( '(py YieldExpr value=`null`)', '(yield)' )
