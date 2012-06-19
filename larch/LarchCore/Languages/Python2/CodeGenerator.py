@@ -11,8 +11,8 @@ from BritefuryJ.DocModel import DMObject, DMList, DMEmbeddedObject, DMEmbeddedIs
 
 from Britefury.Dispatch.MethodDispatch import ObjectDispatchMethod, DMObjectNodeDispatchMethod, methodDispatch
 
-from LarchCore.Languages.Python25 import Schema
-from LarchCore.Languages.Python25.PythonEditor.Precedence import *
+from LarchCore.Languages.Python2 import Schema
+from LarchCore.Languages.Python2.PythonEditor.Precedence import *
 
 
 class Line (object):
@@ -62,29 +62,29 @@ _emptyBlock = Block( [] )
 
 
 
-class Python25CodeGeneratorError (Exception):
+class Python2CodeGeneratorError (Exception):
 	pass
 
 
-class Python25CodeGeneratorUnparsedError (Python25CodeGeneratorError):
+class Python2CodeGeneratorUnparsedError (Python2CodeGeneratorError):
 	pass
 
 
-class Python25CodeGeneratorIndentationError (Python25CodeGeneratorError):
+class Python2CodeGeneratorIndentationError (Python2CodeGeneratorError):
 	pass
 
 
-class Python25CodeGeneratorInvalidFormatError (Python25CodeGeneratorError):
+class Python2CodeGeneratorInvalidFormatError (Python2CodeGeneratorError):
 	pass
 
 
 
-class Python25CodeGenerator (object):
+class Python2CodeGenerator (object):
 	__dispatch_num_args__ = 0
 	
 	
 	def __init__(self, filename, bErrorChecking=True):
-		super( Python25CodeGenerator, self ).__init__()
+		super( Python2CodeGenerator, self ).__init__()
 		self._filename = filename
 		self._bErrorChecking = bErrorChecking
 
@@ -161,7 +161,7 @@ class Python25CodeGenerator (object):
 
 	@DMObjectNodeDispatchMethod( Schema.UNPARSED )
 	def UNPARSED(self, node, value):
-		raise Python25CodeGeneratorUnparsedError
+		raise Python2CodeGeneratorUnparsedError
 	
 	
 	# String literal
@@ -200,16 +200,16 @@ class Python25CodeGenerator (object):
 			elif format == 'hex':
 				valueString = '0x%x'  %  int( value, 16 )
 			else:
-				raise Python25CodeGeneratorInvalidFormatError, 'invalid integer literal format'
+				raise Python2CodeGeneratorInvalidFormatError, 'invalid integer literal format'
 		elif numType == 'long':
 			if format == 'decimal':
 				valueString = '%dL'  %  long( value )
 			elif format == 'hex':
 				valueString = '0x%xL'  %  long( value, 16 )
 			else:
-				raise Python25CodeGeneratorInvalidFormatError, 'invalid integer literal format'
+				raise Python2CodeGeneratorInvalidFormatError, 'invalid integer literal format'
 		else:
-			raise Python25CodeGeneratorInvalidFormatError, 'invalid integer literal type'
+			raise Python2CodeGeneratorInvalidFormatError, 'invalid integer literal type'
 				
 		return valueString
 
@@ -544,11 +544,11 @@ class Python25CodeGenerator (object):
 	# Quote and Unquote
 	@DMObjectNodeDispatchMethod( Schema.Quote )
 	def Quote(self, node, value):
-		raise ValueError, 'Python25CodeGenerator does not support quote expressions; a Python25ModuleCodeGenerator must be used'
+		raise ValueError, 'Python2CodeGenerator does not support quote expressions; a Python2ModuleCodeGenerator must be used'
 	
 	@DMObjectNodeDispatchMethod( Schema.Unquote )
 	def Unquote(self, node, value):
-		raise ValueError, 'Python25CodeGenerator does not support unquote expressions; a Python25ModuleCodeGenerator must be used'
+		raise ValueError, 'Python2CodeGenerator does not support unquote expressions; a Python2ModuleCodeGenerator must be used'
 	
 	
 	
@@ -556,17 +556,17 @@ class Python25CodeGenerator (object):
 	# Embedded object
 	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectLiteral )
 	def EmbeddedObjectLiteral(self, node, embeddedValue):
-		raise ValueError, 'Python25CodeGenerator does not support embedded object literals; a Python25ModuleCodeGenerator must be used'
+		raise ValueError, 'Python2CodeGenerator does not support embedded object literals; a Python2ModuleCodeGenerator must be used'
 
 
 	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectExpr )
 	def EmbeddedObjectExpr(self, node, embeddedValue):
-		raise ValueError, 'Python25CodeGenerator does not support embedded object expressions; a Python25ModuleCodeGenerator must be used'
+		raise ValueError, 'Python2CodeGenerator does not support embedded object expressions; a Python2ModuleCodeGenerator must be used'
 	
 	
 	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectStmt )
 	def EmbeddedObjectStmt (self, node, embeddedValue):
-		raise ValueError, 'Python25CodeGenerator does not support embedded object statements; a Python25ModuleCodeGenerator must be used'
+		raise ValueError, 'Python2CodeGenerator does not support embedded object statements; a Python2ModuleCodeGenerator must be used'
 		
 	
 	
@@ -579,7 +579,7 @@ class Python25CodeGenerator (object):
 	# Expression statement
 	@DMObjectNodeDispatchMethod( Schema.UnparsedStmt )
 	def UnparsedStmt(self, node, value):
-		raise Python25CodeGeneratorUnparsedError
+		raise Python2CodeGeneratorUnparsedError
 	
 	
 	# Assert statement
@@ -829,7 +829,7 @@ class Python25CodeGenerator (object):
 	@DMObjectNodeDispatchMethod( Schema.IndentedBlock )
 	def IndentedBlock(self, node, suite):
 		if self._bErrorChecking:
-			raise Python25CodeGeneratorIndentationError, 'Indentation error'
+			raise Python2CodeGeneratorIndentationError, 'Indentation error'
 		return Block( [ self( stmt )   for stmt in suite ] ).indent()
 	
 	
@@ -885,7 +885,7 @@ _runtime_DMList_Name = '__larch_DMList__'
 #
 #
 
-_cgHelperSchema = DMSchema( 'Python25CGHelper', 'pych', 'LarchCore.Languages.Python25.CodeGeneratorHelper', 0 )
+_cgHelperSchema = DMSchema( 'Python2CGHelper', 'pych', 'LarchCore.Languages.Python2.CodeGeneratorHelper', 0 )
 
 _FactoryWrapper = _cgHelperSchema.newClass( '_FactoryWrapper', Schema.Node, [ 'embeddedFactory' ] )
 
@@ -920,9 +920,9 @@ class _Guard (_Factory):
 
 
 
-class Python25ModuleCodeGenerator (Python25CodeGenerator):
+class Python2ModuleCodeGenerator (Python2CodeGenerator):
 	def __init__(self, module, filename, bErrorChecking=True):
-		super( Python25ModuleCodeGenerator, self ).__init__( filename, bErrorChecking )
+		super( Python2ModuleCodeGenerator, self ).__init__( filename, bErrorChecking )
 		
 		try:
 			self._resourceMap = getattr( module, _runtime_resourceMap_Name )
@@ -1153,25 +1153,25 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 
 
 def compileForEvaluation(pythonExpression, filename):
-	return Python25CodeGenerator( filename ).compileForEvaluation( pythonExpression )
+	return Python2CodeGenerator( filename ).compileForEvaluation( pythonExpression )
 
 
 def compileForExecution(pythonCode, filename):
-	return Python25CodeGenerator( filename ).compileForExecution( pythonCode )
+	return Python2CodeGenerator( filename ).compileForExecution( pythonCode )
 
 
 def compileForExecutionAndEvaluation(pythonCode, filename):
-	return Python25CodeGenerator( filename ).compileForExecutionAndEvaluation( pythonCode )
+	return Python2CodeGenerator( filename ).compileForExecutionAndEvaluation( pythonCode )
 
 				
 				
 				
 def compileForModuleExecution(module, pythonCode, filename):
-	return Python25ModuleCodeGenerator( module, filename ).compileForExecution( pythonCode )
+	return Python2ModuleCodeGenerator( module, filename ).compileForExecution( pythonCode )
 
 
 def compileForModuleExecutionAndEvaluation(module, pythonCode, filename):
-	return Python25ModuleCodeGenerator( module, filename ).compileForExecutionAndEvaluation( pythonCode )
+	return Python2ModuleCodeGenerator( module, filename ).compileForExecutionAndEvaluation( pythonCode )
 
 				
 				
@@ -1179,12 +1179,12 @@ def compileForModuleExecutionAndEvaluation(module, pythonCode, filename):
 from BritefuryJ.DocModel import DMIOReader
 import unittest
 
-class TestCase_Python25CodeGenerator (unittest.TestCase):
+class TestCase_Python2CodeGenerator (unittest.TestCase):
 	def _testSX(self, sx, expected):
-		sx = '{ py=LarchCore.Languages.Python25<5> : ' + sx + ' }'
+		sx = '{ py=LarchCore.Languages.Python2<5> : ' + sx + ' }'
 		data = DMIOReader.readFromString( sx )
 		
-		gen = Python25CodeGenerator( '<test>' )
+		gen = Python2CodeGenerator( '<test>' )
 		result = str( gen( data ) )
 		
 		if result != expected:
@@ -1200,7 +1200,7 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 		
 		
 	def _testGenSX(self, gen, sx, expected):
-		sx = '{ py=LarchCore.Languages.Python25<5> : ' + sx + ' }'
+		sx = '{ py=LarchCore.Languages.Python2<5> : ' + sx + ' }'
 		data = DMIOReader.readFromString( sx )
 		
 		result = str( gen( data ) )
@@ -1224,7 +1224,7 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 		
 		
 	def test_UNPARSED(self):
-		self.assertRaises( Python25CodeGeneratorUnparsedError, lambda: self._testSX( '(py UNPARSED value=Test)', '' ) )
+		self.assertRaises( Python2CodeGeneratorUnparsedError, lambda: self._testSX( '(py UNPARSED value=Test)', '' ) )
 		
 		
 	def test_StringLiteral(self):
@@ -1236,8 +1236,8 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 		self._testSX( '(py IntLiteral format=hex numType=int value=1a4)', '0x1a4' )
 		self._testSX( '(py IntLiteral format=decimal numType=long value=123)', '123L' )
 		self._testSX( '(py IntLiteral format=hex numType=long value=1a4)', '0x1a4L' )
-		self.assertRaises( Python25CodeGeneratorInvalidFormatError, lambda: self._testSX( '(py IntLiteral format=foo numType=long value=1a4)', '' ) )
-		self.assertRaises( Python25CodeGeneratorInvalidFormatError, lambda: self._testSX( '(py IntLiteral format=hex numType=foo value=1a4)', '' ) )
+		self.assertRaises( Python2CodeGeneratorInvalidFormatError, lambda: self._testSX( '(py IntLiteral format=foo numType=long value=1a4)', '' ) )
+		self.assertRaises( Python2CodeGeneratorInvalidFormatError, lambda: self._testSX( '(py IntLiteral format=hex numType=foo value=1a4)', '' ) )
 		
 		
 	def test_FloatLiteral(self):
@@ -1557,8 +1557,8 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 
 
 	def test_IndentedBlock(self):
-		self._testGenSX( Python25CodeGenerator( '<test>', False ), '(py IndentedBlock suite=[(py ExprStmt expr=(py Load name=b))])', '\tb\n' )
-		self.assertRaises( Python25CodeGeneratorIndentationError, lambda: self._testSX( '(py IndentedBlock suite=[(py ExprStmt expr=(py Load name=b))])', '' ) )
+		self._testGenSX( Python2CodeGenerator( '<test>', False ), '(py IndentedBlock suite=[(py ExprStmt expr=(py Load name=b))])', '\tb\n' )
+		self.assertRaises( Python2CodeGeneratorIndentationError, lambda: self._testSX( '(py IndentedBlock suite=[(py ExprStmt expr=(py Load name=b))])', '' ) )
 		
 
 	def test_CommentStmt(self):

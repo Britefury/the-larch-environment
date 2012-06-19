@@ -9,7 +9,7 @@ from java.util import List
 
 from BritefuryJ.DocModel import DMObjectInterface, DMListInterface, DMClassAttribute
 
-from LarchCore.Languages.Python25 import Schema
+from LarchCore.Languages.Python2 import Schema
 
 
 PRECEDENCE_NONE = -1

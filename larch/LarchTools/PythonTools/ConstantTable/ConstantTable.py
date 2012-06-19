@@ -21,16 +21,16 @@ from BritefuryJ.Editor.Table.ObjectList import AttributeColumn, ObjectListTableE
 
 from Britefury.Util.TrackedList import TrackedListProperty
 
-import LarchCore.Languages.Python25.Schema as Py
-from LarchCore.Languages.Python25.PythonCommands import pythonCommandSet, EmbeddedStatementAtCaretAction
-from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Target, EmbeddedPython25Expr
+import LarchCore.Languages.Python2.Schema as Py
+from LarchCore.Languages.Python2.PythonCommands import pythonCommandSet, EmbeddedStatementAtCaretAction
+from LarchCore.Languages.Python2.Embedded import EmbeddedPython2Target, EmbeddedPython2Expr
 
 
 
 class ConstantDefinition (object):
 	def __init__(self):
-		self._target = EmbeddedPython25Target()
-		self._value = EmbeddedPython25Expr()
+		self._target = EmbeddedPython2Target()
+		self._value = EmbeddedPython2Expr()
 		self._incr = IncrementalValueMonitor()
 		self.__change_history__ = None
 		
@@ -154,8 +154,8 @@ class ConstantTable (object):
 
 
 
-_targetColumn = AttributeColumn( 'Name', 'target', EmbeddedPython25Target )
-_valueColumn = AttributeColumn( 'Value', 'value', EmbeddedPython25Expr )
+_targetColumn = AttributeColumn( 'Name', 'target', EmbeddedPython2Target )
+_valueColumn = AttributeColumn( 'Value', 'value', EmbeddedPython2Expr )
 
 _tableEditor = ObjectListTableEditor( [ _targetColumn, _valueColumn ], ConstantDefinition, False, True, True, True )
 

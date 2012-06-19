@@ -36,9 +36,9 @@ from Britefury.Util.LiveList import LiveList
 from Britefury.Util.UniqueNameTable import UniqueNameTable
 from BritefuryJ.Util.Jython import JythonException
 
-from LarchCore.Languages.Python25.PythonCommands import pythonCommandSet, EmbeddedStatementAtCaretAction, WrapSelectedStatementRangeInEmbeddedObjectAction, chainActions
-from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Expr, EmbeddedPython25Suite
-from LarchCore.Languages.Python25 import Schema
+from LarchCore.Languages.Python2.PythonCommands import pythonCommandSet, EmbeddedStatementAtCaretAction, WrapSelectedStatementRangeInEmbeddedObjectAction, chainActions
+from LarchCore.Languages.Python2.Embedded import EmbeddedPython2Expr, EmbeddedPython2Suite
+from LarchCore.Languages.Python2 import Schema
 
 from LarchTools.PythonTools.InlineTest.InlineTest import AbstractInlineTest, inlineTestCommandSet
 
@@ -364,7 +364,7 @@ class AbstractInlineTestTable (AbstractInlineTest):
 class SimpleInlineTableTestRow (AbstractInlineTestTableRow):
 	def __init__(self):
 		super( SimpleInlineTableTestRow, self ).__init__()
-		self._suite = EmbeddedPython25Suite()
+		self._suite = EmbeddedPython2Suite()
 
 
 	def __getstate__(self):
@@ -404,7 +404,7 @@ class SimpleInlineTableTestRow (AbstractInlineTestTableRow):
 		self._suite = x
 
 
-SimpleInlineTableTestRow._codeColumn = AttributeColumn( 'Code', 'code', EmbeddedPython25Suite )
+SimpleInlineTableTestRow._codeColumn = AttributeColumn( 'Code', 'code', EmbeddedPython2Suite )
 
 
 

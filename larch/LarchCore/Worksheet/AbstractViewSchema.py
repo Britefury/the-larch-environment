@@ -19,7 +19,7 @@ from BritefuryJ.StyleSheet import StyleSheet
 
 from Britefury import LoadBuiltins
 
-from LarchCore.Languages.Python25.Execution import Execution
+from LarchCore.Languages.Python2.Execution import Execution
 
 
 

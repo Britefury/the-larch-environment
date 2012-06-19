@@ -14,7 +14,7 @@ from BritefuryJ.Pres import InnerFragment
 
 from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, methodDispatch
 
-from LarchCore.Languages.Python25 import Python25
+from LarchCore.Languages.Python2 import Python2
 
 from LarchCore.Worksheet import Schema
 from LarchCore.Worksheet import AbstractViewSchema
@@ -240,7 +240,7 @@ class PythonCodeEditor (AbstractViewSchema.PythonCodeAbstractView):
 
 	@staticmethod
 	def newPythonCodeModel():
-		return Schema.PythonCode( style='code_result', code=Python25._py25NewModule() )
+		return Schema.PythonCode( style='code_result', code=Python2._py25NewModule() )
 
 
 

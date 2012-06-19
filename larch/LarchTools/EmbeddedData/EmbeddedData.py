@@ -7,7 +7,7 @@
 ##-*************************
 from BritefuryJ.Command import Command, CommandSet
 
-from LarchCore.Languages.Python25.PythonCommands import pythonCommandSet, EmbeddedExpressionAtCaretAction
+from LarchCore.Languages.Python2.PythonCommands import pythonCommandSet, EmbeddedExpressionAtCaretAction
 
 from LarchTools.EmbeddedData.IntEditorSpinEntry import IntEditorSpinEntry
 from LarchTools.EmbeddedData.RealEditorSpinEntry import RealEditorSpinEntry

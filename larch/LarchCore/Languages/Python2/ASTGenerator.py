@@ -13,12 +13,12 @@ from BritefuryJ.DocModel import DMObject, DMList, DMEmbeddedObject, DMEmbeddedIs
 
 from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, methodDispatch
 
-from LarchCore.Languages.Python25 import Schema
-from LarchCore.Languages.Python25.PythonEditor.Precedence import *
+from LarchCore.Languages.Python2 import Schema
+from LarchCore.Languages.Python2.PythonEditor.Precedence import *
 
 
 
-# Jython 2.5 bugfix
+# Jython 2.x bugfix
 if _ast.Attribute is _ast.AugAssign:
 	print 'Applying Jython 2.5.2 _ast module bugfix (getting correct value for _ast.Attribute)'
 
@@ -32,23 +32,23 @@ if _ast.Attribute is _ast.AugAssign:
 
 
 
-class Python25ASTGeneratorError (Exception):
+class Python2ASTGeneratorError (Exception):
 	pass
 
 
-class Python25ASTGeneratorUnparsedError (Python25ASTGeneratorError):
+class Python2ASTGeneratorUnparsedError (Python2ASTGeneratorError):
 	pass
 
 
-class Python25ASTGeneratorIndentationError (Python25ASTGeneratorError):
+class Python2ASTGeneratorIndentationError (Python2ASTGeneratorError):
 	pass
 
 
-class Python25ASTGeneratorInvalidFormatError (Python25ASTGeneratorError):
+class Python2ASTGeneratorInvalidFormatError (Python2ASTGeneratorError):
 	pass
 
 
-class Python25ASTGeneratorInvalidStructureError (Python25ASTGeneratorError):
+class Python2ASTGeneratorInvalidStructureError (Python2ASTGeneratorError):
 	pass
 
 
@@ -99,12 +99,12 @@ _augAssignOpTable = {
 }
 
 
-class Python25ASTGenerator (object):
+class Python2ASTGenerator (object):
 	__dispatch_num_args__ = 2
 
 
 	def __init__(self, filename, bErrorChecking=True):
-		super( Python25ASTGenerator, self ).__init__()
+		super( Python2ASTGenerator, self ).__init__()
 		self._filename = filename
 		self._bErrorChecking = bErrorChecking
 
@@ -165,7 +165,7 @@ class Python25ASTGenerator (object):
 
 	@DMObjectNodeDispatchMethod( Schema.UNPARSED )
 	def UNPARSED(self, lineno, ctx, node, value):
-		raise Python25ASTGeneratorUnparsedError
+		raise Python2ASTGeneratorUnparsedError
 
 
 	# String literal
@@ -194,16 +194,16 @@ class Python25ASTGenerator (object):
 			elif format == 'hex':
 				return  _ast.Num( int( value, 16 ) )
 			else:
-				raise Python25ASTGeneratorInvalidFormatError, 'invalid integer literal format'
+				raise Python2ASTGeneratorInvalidFormatError, 'invalid integer literal format'
 		elif numType == 'long':
 			if format == 'decimal':
 				return  _ast.Num( long( value ) )
 			elif format == 'hex':
 				return  _ast.Num( long( value, 16 ) )
 			else:
-				raise Python25ASTGeneratorInvalidFormatError, 'invalid integer literal format'
+				raise Python2ASTGeneratorInvalidFormatError, 'invalid integer literal format'
 		else:
-			raise Python25ASTGeneratorInvalidFormatError, 'invalid integer literal type'
+			raise Python2ASTGeneratorInvalidFormatError, 'invalid integer literal type'
 
 
 	# Float literal
@@ -266,22 +266,22 @@ class Python25ASTGenerator (object):
 				generators.append( gen )
 			elif x.isInstanceOf( Schema.ComprehensionIf ):
 				if gen is None:
-					raise Python25ASTGeneratorInvalidStructureError, 'ComprehensionIf must come after ComprehensionFor'
+					raise Python2ASTGeneratorInvalidStructureError, 'ComprehensionIf must come after ComprehensionFor'
 				expr = self( x['condition'], lineno, ctx )
 				gen.ifs.append( expr )
 			else:
-				raise Python25ASTGeneratorInvalidStructureError, 'List comprehensions and generator expressions can only contain comprehension items'
+				raise Python2ASTGeneratorInvalidStructureError, 'List comprehensions and generator expressions can only contain comprehension items'
 		return generators
 
 			
 	@DMObjectNodeDispatchMethod( Schema.ComprehensionFor )
 	def ComprehensionFor(self, lineno, ctx, node, target, source):
-		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned ComprehensionFor'
+		raise Python2ASTGeneratorInvalidStructureError, 'Cannot process orphaned ComprehensionFor'
 
 
 	@DMObjectNodeDispatchMethod( Schema.ComprehensionIf )
 	def ComprehensionIf(self, lineno, ctx, node, condition):
-		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned ComprehensionIf'
+		raise Python2ASTGeneratorInvalidStructureError, 'Cannot process orphaned ComprehensionIf'
 
 
 	@DMObjectNodeDispatchMethod( Schema.ListComp )
@@ -302,7 +302,7 @@ class Python25ASTGenerator (object):
 	# Dictionary literal
 	@DMObjectNodeDispatchMethod( Schema.DictKeyValuePair )
 	def DictKeyValuePair(self, lineno, ctx, node, key, value):
-		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned DictKeyValuePair'
+		raise Python2ASTGeneratorInvalidStructureError, 'Cannot process orphaned DictKeyValuePair'
 
 	@DMObjectNodeDispatchMethod( Schema.DictLiteral )
 	def DictLiteral(self, lineno, ctx, node, values):
@@ -368,15 +368,15 @@ class Python25ASTGenerator (object):
 	# Call
 	@DMObjectNodeDispatchMethod( Schema.CallKWArg )
 	def CallKWArg(self, lineno, ctx, node, name, value):
-		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned CallKWArg'
+		raise Python2ASTGeneratorInvalidStructureError, 'Cannot process orphaned CallKWArg'
 
 	@DMObjectNodeDispatchMethod( Schema.CallArgList )
 	def CallArgList(self, lineno, ctx, node, value):
-		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned CallArgList'
+		raise Python2ASTGeneratorInvalidStructureError, 'Cannot process orphaned CallArgList'
 
 	@DMObjectNodeDispatchMethod( Schema.CallKWArgList )
 	def CallKWArgList(self, lineno, ctx, node, value):
-		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned CallKWArgList'
+		raise Python2ASTGeneratorInvalidStructureError, 'Cannot process orphaned CallKWArgList'
 
 	@DMObjectNodeDispatchMethod( Schema.Call )
 	def Call(self, lineno, ctx, node, target, args):
@@ -388,17 +388,17 @@ class Python25ASTGenerator (object):
 		for a in args:
 			if a.isInstanceOf( Schema.CallKWArg ):
 				if arglist is not None  or  kwarglist is not None:
-					raise Python25ASTGeneratorInvalidStructureError, 'keyword argument after argument list or keyword argument list'
+					raise Python2ASTGeneratorInvalidStructureError, 'keyword argument after argument list or keyword argument list'
 				kwargvs.append( _ast.keyword( a['name'], self( a['value'], lineno, _load ) ) )
 			elif a.isInstanceOf( Schema.CallArgList ):
 				if kwarglist is not None:
-					raise Python25ASTGeneratorInvalidStructureError, 'argument list after keyword argument list'
+					raise Python2ASTGeneratorInvalidStructureError, 'argument list after keyword argument list'
 				arglist = self( a['value'], lineno, _load )
 			elif a.isInstanceOf( Schema.CallKWArgList ):
 				kwarglist = self( a['value'], lineno, _load )
 			else:
 				if len( kwargvs ) > 0  or  arglist is not None  or  kwarglist is not None:
-					raise Python25ASTGeneratorInvalidStructureError, 'argument after keyword arguments, argument list or keyword argument list'
+					raise Python2ASTGeneratorInvalidStructureError, 'argument after keyword arguments, argument list or keyword argument list'
 				argvs.append( self( a, lineno, _load ) )
 		return _ast.Call( func, argvs, kwargvs, arglist, kwarglist )
 
@@ -488,43 +488,43 @@ class Python25ASTGenerator (object):
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpLte )
 	def CmpOpLte(self, lineno, ctx, node, y):
-		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpLte'
+		raise Python2ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpLte'
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpLt )
 	def CmpOpLt(self, lineno, ctx, node, y):
-		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpLt'
+		raise Python2ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpLt'
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpGte )
 	def CmpOpGte(self, lineno, ctx, node, y):
-		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpGte'
+		raise Python2ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpGte'
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpGt )
 	def CmpOpGt(self, lineno, ctx, node, y):
-		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpGt'
+		raise Python2ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpGt'
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpEq )
 	def CmpOpEq(self, lineno, ctx, node, y):
-		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpEq'
+		raise Python2ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpEq'
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpNeq )
 	def CmpOpNeq(self, lineno, ctx, node, y):
-		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpNeq'
+		raise Python2ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpNeq'
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpIsNot )
 	def CmpOpIsNot(self, lineno, ctx, node, y):
-		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpIsNot'
+		raise Python2ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpIsNot'
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpIs )
 	def CmpOpIs(self, lineno, ctx, node, y):
-		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpIs'
+		raise Python2ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpIs'
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpNotIn )
 	def CmpOpNotIn(self, lineno, ctx, node, y):
-		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpNotIn'
+		raise Python2ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpNotIn'
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpIn )
 	def CmpOpIn(self, lineno, ctx, node, y):
-		raise Python25ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpIn'
+		raise Python2ASTGeneratorInvalidStructureError, 'Cannot process orphaned CmpOpIn'
 
 
 
@@ -597,11 +597,11 @@ class Python25ASTGenerator (object):
 	# Quote and Unquote
 	@DMObjectNodeDispatchMethod( Schema.Quote )
 	def Quote(self,  lineno, ctx, node, value):
-		raise ValueError, 'Python25ASTGenerator does not support quote expressions; a Python25ModuleASTGenerator must be used'
+		raise ValueError, 'Python2ASTGenerator does not support quote expressions; a Python2ModuleASTGenerator must be used'
 
 	@DMObjectNodeDispatchMethod( Schema.Unquote )
 	def Unquote(self,  lineno, ctx, node, value):
-		raise ValueError, 'Python25ASTGenerator does not support unquote expressions; a Python25ModuleASTGenerator must be used'
+		raise ValueError, 'Python2ASTGenerator does not support unquote expressions; a Python2ModuleASTGenerator must be used'
 
 
 
@@ -609,17 +609,17 @@ class Python25ASTGenerator (object):
 	# Embedded object
 	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectLiteral )
 	def EmbeddedObjectLiteral(self,  lineno, ctx, node, embeddedValue):
-		raise ValueError, 'Python25ASTGenerator does not support embedded object literals; a Python25ModuleASTGenerator must be used'
+		raise ValueError, 'Python2ASTGenerator does not support embedded object literals; a Python2ModuleASTGenerator must be used'
 
 
 	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectExpr )
 	def EmbeddedObjectExpr(self,  lineno, ctx, node, embeddedValue):
-		raise ValueError, 'Python25ASTGenerator does not support embedded object expressions; a Python25ModuleASTGenerator must be used'
+		raise ValueError, 'Python2ASTGenerator does not support embedded object expressions; a Python2ModuleASTGenerator must be used'
 
 
 	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectStmt )
 	def EmbeddedObjectStmt (self,  lineno, ctx, node, embeddedValue):
-		raise ValueError, 'Python25ASTGenerator does not support embedded object statements; a Python25ModuleASTGenerator must be used'
+		raise ValueError, 'Python2ASTGenerator does not support embedded object statements; a Python2ModuleASTGenerator must be used'
 
 
 
@@ -632,7 +632,7 @@ class Python25ASTGenerator (object):
 	# Expression statement
 	@DMObjectNodeDispatchMethod( Schema.UnparsedStmt )
 	def UnparsedStmt(self, lineno, ctx, node, value):
-		raise Python25ASTGeneratorUnparsedError
+		raise Python2ASTGeneratorUnparsedError
 
 
 	# Assert statement
@@ -797,12 +797,12 @@ _del = _ast.Del()
 
 
 
-class TestCase_Python25ASTGenerator (unittest.TestCase):
+class TestCase_Python2ASTGenerator (unittest.TestCase):
 	def _testSXAST(self, sx, expected, ctx=_load):
-		sx = '{ py=LarchCore.Languages.Python25<5> : ' + sx + ' }'
+		sx = '{ py=LarchCore.Languages.Python2<5> : ' + sx + ' }'
 		data = DMIOReader.readFromString( sx )
 
-		gen = Python25ASTGenerator( '<test>' )
+		gen = Python2ASTGenerator( '<test>' )
 		result = gen( data, 0, ctx )
 
 		resultStr = _astToString( result )
@@ -821,7 +821,7 @@ class TestCase_Python25ASTGenerator (unittest.TestCase):
 
 
 	def _testGenSXAST(self, gen, sx, expected, mode):
-		sx = '{ py=LarchCore.Languages.Python25<5> : ' + sx + ' }'
+		sx = '{ py=LarchCore.Languages.Python2<5> : ' + sx + ' }'
 		data = DMIOReader.readFromString( sx )
 
 		result = gen( data, 0, ctx )
@@ -892,7 +892,7 @@ class TestCase_Python25ASTGenerator (unittest.TestCase):
 
 
 	def test_UNPARSED(self):
-		self.assertRaises( Python25ASTGeneratorUnparsedError, lambda: self._testSXAST( '(py UNPARSED value=Test)', '' ) )
+		self.assertRaises( Python2ASTGeneratorUnparsedError, lambda: self._testSXAST( '(py UNPARSED value=Test)', '' ) )
 
 
 	def test_StringLiteral(self):
@@ -904,8 +904,8 @@ class TestCase_Python25ASTGenerator (unittest.TestCase):
 		self._testExprSX( '(py IntLiteral format=hex numType=int value=1a4)', '0x1a4' )
 		self._testExprSX( '(py IntLiteral format=decimal numType=long value=123)', '123L' )
 		self._testExprSX( '(py IntLiteral format=hex numType=long value=1a4)', '0x1a4L' )
-		self.assertRaises( Python25ASTGeneratorInvalidFormatError, lambda: self._testSXAST( '(py IntLiteral format=foo numType=long value=1a4)', None ) )
-		self.assertRaises( Python25ASTGeneratorInvalidFormatError, lambda: self._testSXAST( '(py IntLiteral format=hex numType=foo value=1a4)', None ) )
+		self.assertRaises( Python2ASTGeneratorInvalidFormatError, lambda: self._testSXAST( '(py IntLiteral format=foo numType=long value=1a4)', None ) )
+		self.assertRaises( Python2ASTGeneratorInvalidFormatError, lambda: self._testSXAST( '(py IntLiteral format=hex numType=foo value=1a4)', None ) )
 
 
 	def test_FloatLiteral(self):

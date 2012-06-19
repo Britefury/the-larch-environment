@@ -22,8 +22,8 @@ from Britefury.Tests.BritefuryJ.Parser.ParserTestCase import ParserTestCase
 
 from Britefury.Grammar.Grammar import Grammar, Rule, RuleList
 
-from LarchCore.Languages.Python25 import Schema
-from LarchCore.Languages.Python25.PythonEditor.Keywords import *
+from LarchCore.Languages.Python2 import Schema
+from LarchCore.Languages.Python2.PythonEditor.Keywords import *
 
 
 
@@ -56,7 +56,7 @@ def _incrementParens(node):
 
 
 
-class Python25Grammar (Grammar):
+class Python2Grammar (Grammar):
 	__junk_regex__ = '[ ]*'
 
 	#
@@ -1242,7 +1242,7 @@ class Python25Grammar (Grammar):
 import unittest
 
 
-class TestCase_Python25Parser (ParserTestCase):
+class TestCase_Python2Parser (ParserTestCase):
 	def _pythonRichString(self, *args):
 		b = RichStringBuilder()
 		for x in args:
@@ -1256,7 +1256,7 @@ class TestCase_Python25Parser (ParserTestCase):
 	
 	
 	def test_shortStringLiteral(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.expression(), '\'abc\'', Schema.StringLiteral( format='ascii', quotation='single', value='abc' ) )
 		self._parseStringTest( g.expression(), '\"abc\"', Schema.StringLiteral( format='ascii', quotation='double', value='abc' ) )
 		self._parseStringTest( g.expression(), 'u\'abc\'', Schema.StringLiteral( format='unicode', quotation='single', value='abc' ) )
@@ -1268,7 +1268,7 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 	def test_integerLiteral(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.expression(), '123', Schema.IntLiteral( format='decimal', numType='int', value='123' ) )
 		self._parseStringTest( g.expression(), '123L', Schema.IntLiteral( format='decimal', numType='long', value='123' ) )
 		self._parseStringTest( g.expression(), '0x123', Schema.IntLiteral( format='hex', numType='int', value='0x123' ) )
@@ -1276,17 +1276,17 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 	def test_floatLiteral(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.expression(), '123.0', Schema.FloatLiteral( value='123.0' ) )
 
 
 	def test_imaginaryLiteral(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.expression(), '123.0j', Schema.ImaginaryLiteral( value='123.0j' ) )
 
 
 	def testTargets(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.targetListOrTargetItem(), 'a', Schema.SingleTarget( name='a' ) )
 		self._parseStringTest( g.targetListOrTargetItem(), '(a)', Schema.SingleTarget( name='a', parens='1' ) )
 
@@ -1321,7 +1321,7 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 	def testTupleLiteral(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.expression(), '()', Schema.TupleLiteral( values=[], parens='1' ) )
 		self._parseStringTest( g.expression(), '(())', Schema.TupleLiteral( values=[], parens='2' ) )
 		self._parseStringTest( g.expression(), '(a)', Schema.Load( name='a', parens='1' ) )
@@ -1332,14 +1332,14 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 	def testListLiteral(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.expression(), '[]', Schema.ListLiteral( values=[] ) )
 		self._parseStringTest( g.expression(), '[a,b]', Schema.ListLiteral( values=[ Schema.Load( name='a' ), Schema.Load( name='b' ) ] ) )
 		self._parseStringTest( g.expression(), '[a,b,]', Schema.ListLiteral( values=[ Schema.Load( name='a' ), Schema.Load( name='b' ) ], trailingSeparator='1' ) )
 
 
 	def testListComprehension(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.expression(), '[i  for i in a]', Schema.ListComp( resultExpr=Schema.Load( name='i' ),
 										    comprehensionItems=[ Schema.ComprehensionFor( target=Schema.SingleTarget( name='i' ), source=Schema.Load( name='a' ) ) ]
 										    ) )
@@ -1367,7 +1367,7 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 	def testGeneratorExpression(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.expression(), '(i  for i in a)', Schema.GeneratorExpr( resultExpr=Schema.Load( name='i' ),
 											 comprehensionItems=[ Schema.ComprehensionFor( target=Schema.SingleTarget( name='i' ), source=Schema.Load( name='a' ) ) ]
 											 ) )
@@ -1394,7 +1394,7 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 	def testDictLiteral(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.expression(), '{a:x,b:y}', Schema.DictLiteral( values=[ Schema.DictKeyValuePair( key=Schema.Load( name='a' ), value=Schema.Load( name='x' ) ),
 											  Schema.DictKeyValuePair( key=Schema.Load( name='b' ), value=Schema.Load( name='y' ) ) ] ) )
 		self._parseStringTest( g.expression(), '{a:x,b:y,}', Schema.DictLiteral( values=[ Schema.DictKeyValuePair( key=Schema.Load( name='a' ), value=Schema.Load( name='x' ) ),
@@ -1402,19 +1402,19 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 	def testYieldExpr(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.expression(), '(yield 2+3)', Schema.YieldExpr( value=Schema.Add( x=Schema.IntLiteral( format='decimal', numType='int', value='2' ), y=Schema.IntLiteral( format='decimal', numType='int', value='3' ) ) ) )
 		self._parseStringTest( g.expression(), '(yield)', Schema.YieldExpr( value=None ) )
 
 
 
 	def testAttributeRef(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.expression(), 'a.b', Schema.AttributeRef( target=Schema.Load( name='a' ), name='b' ) )
 
 
 	def testSubscript(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.expression(), 'a[x]', Schema.Subscript( target=Schema.Load( name='a' ), index=Schema.Load( name='x' ) ) )
 		self._parseStringTest( g.expression(), 'a[x:p]', Schema.Subscript( target=Schema.Load( name='a' ), index=Schema.SubscriptSlice( lower=Schema.Load( name='x' ), upper=Schema.Load( name='p' ) ) ) )
 		self._parseStringTest( g.expression(), 'a[x:]', Schema.Subscript( target=Schema.Load( name='a' ), index=Schema.SubscriptSlice( lower=Schema.Load( name='x' ), upper=None ) ) )
@@ -1439,7 +1439,7 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 	def testCall(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.expression(), 'a()', Schema.Call( target=Schema.Load( name='a' ), args=[] ) )
 		self._parseStringTest( g.expression(), 'a(f)', Schema.Call( target=Schema.Load( name='a' ), args=[ Schema.Load( name='f' ) ] ) )
 		self._parseStringTest( g.expression(), 'a(f,)', Schema.Call( target=Schema.Load( name='a' ), args=[ Schema.Load( name='f' ) ], argsTrailingSeparator='1' ) )
@@ -1465,7 +1465,7 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 	def testOperators(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.expression(), 'a**b', Schema.Pow( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ) )
 		self._parseStringTest( g.expression(), '~a', Schema.Invert( x=Schema.Load( name='a' ) ) )
 		self._parseStringTest( g.expression(), '-a', Schema.Negate( x=Schema.Load( name='a' ) ) )
@@ -1496,12 +1496,12 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 	def testOperatorPrecedence(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.expression(), 'a + b < c', Schema.Cmp( x=Schema.Add( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ), ops=[ Schema.CmpOpLt( y=Schema.Load( name='c' ) ) ] ) )
 
 
 	def testParens(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.expression(), '(a)', Schema.Load( name='a', parens='1' ) )
 		self._parseStringTest( g.expression(), '(((a)))', Schema.Load( name='a', parens='3' ) )
 		self._parseStringTest( g.expression(), '(a+b)', Schema.Add( parens='1', x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ) )
@@ -1509,7 +1509,7 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 	def testParams(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.params(), '', [ [], None ] )
 		self._parseStringTest( g.params(), 'f', [ [ Schema.SimpleParam( name='f' ) ], None ] )
 		self._parseStringTest( g.params(), 'f,', [ [ Schema.SimpleParam( name='f' ) ], '1' ] )
@@ -1550,7 +1550,7 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 	def testLambda(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.expression(), 'lambda f,m=a,*p,**w: f+m+p+w', Schema.LambdaExpr( 
 			params=[ Schema.SimpleParam( name='f' ), Schema.DefaultValueParam( param=Schema.SimpleParam( name='m' ), defaultValue=Schema.Load( name='a' ) ), Schema.ParamList( name='p' ), Schema.KWParamList( name='w' ) ],
 			expr=Schema.Add( x=Schema.Add( x=Schema.Add( x=Schema.Load( name='f' ), y=Schema.Load( name='m' ) ), y=Schema.Load( name='p' ) ), y=Schema.Load( name='w' ) ) ) )
@@ -1558,7 +1558,7 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 	def testConditionalExpr(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.expression(), 'x   if y else   z', Schema.ConditionalExpr( condition=Schema.Load( name='y' ), expr=Schema.Load( name='x' ), elseExpr=Schema.Load( name='z' ) ) )
 		self._parseStringTest( g.expression(), '(x   if y else   z)   if w else   q', Schema.ConditionalExpr( condition=Schema.Load( name='w' ), expr=Schema.ConditionalExpr( parens='1', condition=Schema.Load( name='y' ), expr=Schema.Load( name='x' ), elseExpr=Schema.Load( name='z' ) ), elseExpr=Schema.Load( name='q' ) ) )
 		self._parseStringTest( g.expression(), 'w   if (x   if y else   z) else   q', Schema.ConditionalExpr( condition=Schema.ConditionalExpr( parens='1', condition=Schema.Load( name='y' ), expr=Schema.Load( name='x' ), elseExpr=Schema.Load( name='z' ) ), expr=Schema.Load( name='w' ), elseExpr=Schema.Load( name='q' ) ) )
@@ -1568,7 +1568,7 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 	def testTupleOrExpression(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.tupleOrExpression(), 'a', Schema.Load( name='a' ) )
 		self._parseStringTest( g.tupleOrExpression(), 'a,b', Schema.TupleLiteral( values=[ Schema.Load( name='a' ), Schema.Load( name='b' ) ] ) )
 		self._parseStringTest( g.tupleOrExpression(), 'a,2', Schema.TupleLiteral( values=[ Schema.Load( name='a' ), Schema.IntLiteral( format='decimal', numType='int', value='2' ) ] ) )
@@ -1580,14 +1580,14 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 	def test_structuralAtom(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		s = self._pythonRichString( Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ) )
 		self._parseRichStringTest( g.atom(), s, Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ) )
 
 		
 		
 	def test_embeddedStructuralExpression(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		s = self._pythonRichString( Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ) )
 		self._parseRichStringTest( g.tupleOrExpression(), s, Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ) )
 		s = self._pythonRichString( 'return ', Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ), '\n' )
@@ -1598,14 +1598,14 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 		
 	def testAssertStmt(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.singleLineStatementValid(), 'assert x\n', Schema.AssertStmt( condition=Schema.Load( name='x' ), fail=None ) )
 		self._parseStringTest( g.singleLineStatementValid(), 'assert x,y\n', Schema.AssertStmt( condition=Schema.Load( name='x' ), fail=Schema.Load( name='y' ) ) )
 		self._parseNodeTest( g.singleLineStatementValid(), Schema.AssertStmt( condition=Schema.Load( name='x' ), fail=None ), Schema.AssertStmt( condition=Schema.Load( name='x' ), fail=None ) )
 
 
 	def testAssignmentStmt(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.singleLineStatementValid(), 'a=x\n', Schema.AssignStmt( targets=[ Schema.SingleTarget( name='a' ) ], value=Schema.Load( name='x' ) ) )
 		self._parseStringTest( g.singleLineStatementValid(), 'a=b=x\n', Schema.AssignStmt( targets=[ Schema.SingleTarget( name='a' ), Schema.SingleTarget( name='b' ) ], value=Schema.Load( name='x' ) ) )
 		self._parseStringTest( g.singleLineStatementValid(), 'a,b=c,d=x\n', Schema.AssignStmt( targets=[ Schema.TupleTarget( targets=[ Schema.SingleTarget( name='a' ),  Schema.SingleTarget( name='b' ) ] ),
@@ -1616,7 +1616,7 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 	def testAugAssignStmt(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.singleLineStatementValid(), 'a += b\n', Schema.AugAssignStmt( op='+=', target=Schema.SingleTarget( name='a' ), value=Schema.Load( name='b' ) ) )
 		self._parseStringTest( g.singleLineStatementValid(), 'a -= b\n', Schema.AugAssignStmt( op='-=', target=Schema.SingleTarget( name='a' ), value=Schema.Load( name='b' ) ) )
 		self._parseStringTest( g.singleLineStatementValid(), 'a *= b\n', Schema.AugAssignStmt( op='*=', target=Schema.SingleTarget( name='a' ), value=Schema.Load( name='b' ) ) )
@@ -1632,29 +1632,29 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 	def testPassStmt(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.singleLineStatementValid(), 'pass\n', Schema.PassStmt() )
 
 
 	def testDelStmt(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.singleLineStatementValid(), 'del x\n', Schema.DelStmt( target=Schema.SingleTarget( name='x' ) ) )
 
 
 	def testReturnStmt(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.singleLineStatementValid(), 'return x\n', Schema.ReturnStmt( value=Schema.Load( name='x' ) ) )
 		self._parseStringTest( g.singleLineStatementValid(), 'return\n', Schema.ReturnStmt() )
 
 
 	def testYieldStmt(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.singleLineStatementValid(), 'yield x\n', Schema.YieldStmt( value=Schema.Load( name='x' ) ) )
 		self._parseStringTest( g.singleLineStatementValid(), 'yield\n', Schema.YieldStmt() )
 
 
 	def testRaiseStmt(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.singleLineStatementValid(), 'raise\n', Schema.RaiseStmt( excType=None, excValue=None, traceback=None ) )
 		self._parseStringTest( g.singleLineStatementValid(), 'raise x\n', Schema.RaiseStmt( excType=Schema.Load( name='x' ), excValue=None, traceback=None ) )
 		self._parseStringTest( g.singleLineStatementValid(), 'raise x,y\n', Schema.RaiseStmt( excType=Schema.Load( name='x' ), excValue=Schema.Load( name='y' ), traceback=None ) )
@@ -1662,17 +1662,17 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 	def testBreakStmt(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.singleLineStatementValid(), 'break\n', Schema.BreakStmt() )
 
 
 	def testContinueStmt(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.singleLineStatementValid(), 'continue\n', Schema.ContinueStmt() )
 
 
 	def testImportStmt(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g._moduleIdentifier(), 'abc', 'abc' )
 		self._parseStringTest( g.moduleName(), 'abc', 'abc' )
 		self._parseStringTest( g.moduleName(), 'abc.xyz', 'abc.xyz' )
@@ -1718,13 +1718,13 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 	def testGlobalStmt(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.singleLineStatementValid(), 'global x\n', Schema.GlobalStmt( vars=[ Schema.GlobalVar( name='x' ) ] ) )
 		self._parseStringTest( g.singleLineStatementValid(), 'global x, y\n', Schema.GlobalStmt( vars=[ Schema.GlobalVar( name='x' ), Schema.GlobalVar( name='y' ) ] ) )
 
 
 	def testExecStmt(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.singleLineStatementValid(), 'exec a\n', Schema.ExecStmt( source=Schema.Load( name='a' ), globals=None, locals=None ) )
 		self._parseStringTest( g.singleLineStatementValid(), 'exec a in b\n', Schema.ExecStmt( source=Schema.Load( name='a' ), globals=Schema.Load( name='b' ), locals=None ) )
 		self._parseStringTest( g.singleLineStatementValid(), 'exec a in b,c\n', Schema.ExecStmt( source=Schema.Load( name='a' ), globals=Schema.Load( name='b' ), locals=Schema.Load( name='c' ) ) )
@@ -1732,7 +1732,7 @@ class TestCase_Python25Parser (ParserTestCase):
 
 		
 	def testPrintStmt(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.singleLineStatementValid(), 'print\n', Schema.PrintStmt( values=[] ) )
 		self._parseStringTest( g.singleLineStatementValid(), 'print a\n', Schema.PrintStmt( values=[ Schema.Load( name='a' ) ] ) )
 		self._parseStringTest( g.singleLineStatementValid(), 'print a,\n', Schema.PrintStmt( values=[ Schema.Load( name='a' ) ] ) )
@@ -1749,35 +1749,35 @@ class TestCase_Python25Parser (ParserTestCase):
 	#
 		
 	def testIfStmtHeader(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.ifStmtHeader(), 'if a:\n', Schema.IfStmtHeader( condition=Schema.Load( name='a' ) ) )
 		self._parseNodeTest( g.ifStmtHeader(), Schema.IfStmtHeader( condition=Schema.Load( name='a' ) ), Schema.IfStmtHeader( condition=Schema.Load( name='a' ) ) )
 		self._parseNodeTest( g.compoundStmtHeader(), Schema.IfStmtHeader( condition=Schema.Load( name='a' ) ), Schema.IfStmtHeader( condition=Schema.Load( name='a' ) ) )
 
 
 	def testElIfStmtHeader(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.elifStmtHeader(), 'elif a:\n', Schema.ElifStmtHeader( condition=Schema.Load( name='a' ) ) )
 		self._parseNodeTest( g.elifStmtHeader(), Schema.ElifStmtHeader( condition=Schema.Load( name='a' ) ), Schema.ElifStmtHeader( condition=Schema.Load( name='a' ) ) )
 		self._parseNodeTest( g.compoundStmtHeader(), Schema.ElifStmtHeader( condition=Schema.Load( name='a' ) ), Schema.ElifStmtHeader( condition=Schema.Load( name='a' ) ) )
 
 
 	def testElseStmtHeader(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.elseStmtHeader(), 'else:\n', Schema.ElseStmtHeader() )
 		self._parseNodeTest( g.elseStmtHeader(), Schema.ElseStmtHeader(), Schema.ElseStmtHeader() )
 		self._parseNodeTest( g.compoundStmtHeader(), Schema.ElseStmtHeader(), Schema.ElseStmtHeader() )
 
 
 	def testWhileStmtHeader(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.whileStmtHeader(), 'while a:\n', Schema.WhileStmtHeader( condition=Schema.Load( name='a' ) ) )
 		self._parseNodeTest( g.whileStmtHeader(), Schema.WhileStmtHeader( condition=Schema.Load( name='a' ) ), Schema.WhileStmtHeader( condition=Schema.Load( name='a' ) ) )
 		self._parseNodeTest( g.compoundStmtHeader(), Schema.WhileStmtHeader( condition=Schema.Load( name='a' ) ), Schema.WhileStmtHeader( condition=Schema.Load( name='a' ) ) )
 
 
 	def testForStmtHeader(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.forStmtHeader(), 'for x in y:\n', Schema.ForStmtHeader( target=Schema.SingleTarget( name='x' ), source=Schema.Load( name='y' ) ) )
 		self._parseNodeTest( g.forStmtHeader(), Schema.ForStmtHeader( target=Schema.SingleTarget( name='x' ), source=Schema.Load( name='y' ) ),
 				     Schema.ForStmtHeader( target=Schema.SingleTarget( name='x' ), source=Schema.Load( name='y' ) ) )
@@ -1786,14 +1786,14 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 	def testTryStmtHeader(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.tryStmtHeader(), 'try:\n', Schema.TryStmtHeader() )
 		self._parseNodeTest( g.tryStmtHeader(), Schema.TryStmtHeader(), Schema.TryStmtHeader() )
 		self._parseNodeTest( g.compoundStmtHeader(), Schema.TryStmtHeader(), Schema.TryStmtHeader() )
 
 
 	def testExceptStmtHeader(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.exceptStmtHeader(), 'except:\n', Schema.ExceptStmtHeader( exception=None, target=None ) )
 		self._parseStringTest( g.exceptStmtHeader(), 'except x:\n', Schema.ExceptStmtHeader( exception=Schema.Load( name='x' ), target=None ) )
 		self._parseStringTest( g.exceptStmtHeader(), 'except x, y:\n', Schema.ExceptStmtHeader( exception=Schema.Load( name='x' ), target=Schema.SingleTarget( name='y' ) ) )
@@ -1802,14 +1802,14 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 	def testFinallyStmtHeader(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.finallyStmtHeader(), 'finally:\n', Schema.FinallyStmtHeader() )
 		self._parseNodeTest( g.finallyStmtHeader(), Schema.FinallyStmtHeader(), Schema.FinallyStmtHeader() )
 		self._parseNodeTest( g.compoundStmtHeader(), Schema.FinallyStmtHeader(), Schema.FinallyStmtHeader() )
 
 
 	def testWithStmtHeader(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.withStmtHeader(), 'with a:\n', Schema.WithStmtHeader( expr=Schema.Load( name='a' ), target=None ) )
 		self._parseStringTest( g.withStmtHeader(), 'with a as b:\n', Schema.WithStmtHeader( expr=Schema.Load( name='a' ), target=Schema.SingleTarget( name='b' ) ) )
 		self._parseNodeTest( g.withStmtHeader(), Schema.WithStmtHeader( expr=Schema.Load( name='a' ), target=None ), Schema.WithStmtHeader( expr=Schema.Load( name='a' ), target=None ) )
@@ -1817,7 +1817,7 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 	def testDecoStmtHeader(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.decoStmtHeader(), '@f\n', Schema.DecoStmtHeader( name='f', args=None ) )
 		self._parseStringTest( g.decoStmtHeader(), '@f(x)\n', Schema.DecoStmtHeader( name='f', args=[ Schema.Load( name='x' ) ] ) )
 		self._parseNodeTest( g.decoStmtHeader(), Schema.DecoStmtHeader( name='f', args=None ), Schema.DecoStmtHeader( name='f', args=None ) )
@@ -1825,7 +1825,7 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 	def testDefStmtHeader(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.defStmtHeader(), 'def f():\n', Schema.DefStmtHeader( name='f', params=[] ) )
 		self._parseStringTest( g.defStmtHeader(), 'def f(x):\n', Schema.DefStmtHeader( name='f', params=[ Schema.SimpleParam( name='x' ) ] ) )
 		self._parseNodeTest( g.defStmtHeader(), Schema.DefStmtHeader( name='f', params=[] ), Schema.DefStmtHeader( name='f', params=[] ) )
@@ -1833,7 +1833,7 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 	def testClassStmtHeader(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.classStmtHeader(), 'class Q:\n', Schema.ClassStmtHeader( name='Q', bases=None ) )
 		self._parseStringTest( g.classStmtHeader(), 'class Q (x):\n', Schema.ClassStmtHeader( name='Q', bases=[ Schema.Load( name='x' ) ] ) )
 		self._parseStringTest( g.classStmtHeader(), 'class Q (x,):\n', Schema.ClassStmtHeader( name='Q', bases=[ Schema.Load( name='x' ) ], basesTrailingSeparator='1' ) )
@@ -1845,7 +1845,7 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 	def testCommentStmt(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.commentStmt(), '#x\n', Schema.CommentStmt( comment='x' ) )
 		self._parseStringTest( g.commentStmt(), '#' + string.printable.replace( '\n', '' ) + '\n', Schema.CommentStmt( comment=string.printable.replace( '\n', '' ) ) )
 		self._parseNodeTest( g.commentStmt(), Schema.CommentStmt( comment=string.printable.replace( '\n', '' ) ), Schema.CommentStmt( comment=string.printable.replace( '\n', '' ) ) )
@@ -1853,7 +1853,7 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 	def testBlankLine(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.blankLine(), '\n', Schema.BlankLine() )
 
 
@@ -1861,7 +1861,7 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 	def testFnCallStStmt(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.expression(), 'x.y()', Schema.Call( target=Schema.AttributeRef( target=Schema.Load( name='x' ), name='y' ), args=[] ) )
 		self._parseStringTest( g.singleLineStatementValid(), 'x.y()\n', Schema.ExprStmt( expr=Schema.Call( target=Schema.AttributeRef( target=Schema.Load( name='x' ), name='y' ), args=[] ) ) )
 		self._parseNodeTest( g.singleLineStatementValid(), Schema.ExprStmt( expr=Schema.Call( target=Schema.AttributeRef( target=Schema.Load( name='x' ), name='y' ), args=[] ) ),
@@ -1871,14 +1871,14 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 	def testDictInList(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.singleLineStatementValid(), 'y = [ x, { a : b } ]\n', Schema.AssignStmt( targets=[ Schema.SingleTarget( name='y' ) ], value=Schema.ListLiteral( values=[ Schema.Load( name='x' ), Schema.DictLiteral( values=[ Schema.DictKeyValuePair( key=Schema.Load( name='a' ), value=Schema.Load( name='b' ) ) ] ) ] ) ) )
 		
 		
 		
 		
 	def test_unparsed(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseStringTest( g.singleLineStatement(), 'foo bar xyz\n', Schema.UnparsedStmt( value=Schema.UNPARSED( value=[ 'foo bar xyz' ] ) ) )
 		self._parseStringTest( g.singleLineStatement(), 'as\n', Schema.UnparsedStmt( value=Schema.UNPARSED( value=[ 'as' ] ) ) )
 		self._parseStringTest( g.suite(), 'as\n', [ Schema.UnparsedStmt( value=Schema.UNPARSED( value=[ 'as' ] ) ) ] )
@@ -1889,7 +1889,7 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 		
 	def test_emptyIndentation(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseListTest( g.emptyIndentation(),
 				     [
 					     Schema.Indent(),
@@ -1927,7 +1927,7 @@ class TestCase_Python25Parser (ParserTestCase):
 
 		
 	def test_singleIndentedSuite(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseListTest( g.singleIndentedSuite(),
 				     [
 					     Schema.Indent(),
@@ -1941,7 +1941,7 @@ class TestCase_Python25Parser (ParserTestCase):
 
 		
 	def test_compoundSuite(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseListTest( g.compoundSuite(),
 				     [
 					     Schema.Indent(),
@@ -1968,7 +1968,7 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 		
 	def test_indentedBlock(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseListTest( g.suiteItem(),
 				     [
 					     Schema.Indent(),
@@ -1987,7 +1987,7 @@ class TestCase_Python25Parser (ParserTestCase):
 
 		
 	def test_ifStmt(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseListTest( g.suiteItem(),
 				     [
 					     Schema.IfStmtHeader( condition=Schema.Load( name='a' ) ),
@@ -2037,7 +2037,7 @@ class TestCase_Python25Parser (ParserTestCase):
 
 		
 	def test_whileStmt(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseListTest( g.suiteItem(),
 				     [
 					     Schema.WhileStmtHeader( condition=Schema.Load( name='a' ) ),
@@ -2067,7 +2067,7 @@ class TestCase_Python25Parser (ParserTestCase):
 	
 		
 	def test_forStmt(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseListTest( g.suiteItem(),
 				     [
 					     Schema.ForStmtHeader( target=Schema.SingleTarget( name='a' ), source=Schema.Load( name='x' ) ),
@@ -2097,7 +2097,7 @@ class TestCase_Python25Parser (ParserTestCase):
 
 		
 	def test_tryStmt(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseListTest( g.suiteItem(),
 				     [
 					     Schema.TryStmtHeader(),
@@ -2257,7 +2257,7 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 		
 	def test_withStmt(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseListTest( g.suiteItem(),
 				     [
 					     Schema.WithStmtHeader( expr=Schema.SingleTarget( name='a' ), target=Schema.Load( name='x' ) ),
@@ -2268,7 +2268,7 @@ class TestCase_Python25Parser (ParserTestCase):
 	
 		
 	def test_defStmt(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseListTest( g.suiteItem(),
 				     [
 					     Schema.DefStmtHeader( name='f', params=[ Schema.SimpleParam( name='x' ) ] ),
@@ -2303,7 +2303,7 @@ class TestCase_Python25Parser (ParserTestCase):
 	
 		
 	def test_classStmt(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseListTest( g.suiteItem(),
 				     [
 					     Schema.ClassStmtHeader( name='A', bases=[ Schema.Load( name='x' ) ] ),
@@ -2338,7 +2338,7 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 		
 	def test_nestedStructure(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseListTest( g.suiteItem(),
 				     [
 					     Schema.ClassStmtHeader( name='A', bases=[ Schema.Load( name='x' ) ] ),
@@ -2356,7 +2356,7 @@ class TestCase_Python25Parser (ParserTestCase):
 	
 		
 	def test_suite(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseListTest( g.suite(),
 				     [
 					     Schema.CommentStmt( comment='x' ),
@@ -2369,7 +2369,7 @@ class TestCase_Python25Parser (ParserTestCase):
 	
 		
 	def test_header_indentedBlock(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseListTest( g.suite(),
 				     [
 					     Schema.WhileStmtHeader( condition=Schema.Load( name='x' ) ),
@@ -2381,7 +2381,7 @@ class TestCase_Python25Parser (ParserTestCase):
 	
 		
 	def test_headers(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		self._parseListTest( g.suite(),
 				     [
 					     Schema.IfStmtHeader( condition=Schema.Load( name='x' ) ),
@@ -2395,13 +2395,13 @@ class TestCase_Python25Parser (ParserTestCase):
 
 		
 	def test_richStringSuite(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		s = self._pythonRichString( 'while a:\n', Schema.Indent(), 'continue\n', Schema.Dedent() )
 		self._parseRichStringTest( g.suite(), s, [ Schema.WhileStmt( condition=Schema.Load( name='a' ), suite=[ Schema.ContinueStmt() ] ) ] )
 		
 		
 	def test_embeddedStructural(self):
-		g = Python25Grammar()
+		g = Python2Grammar()
 		#s = self._pythonRichString( 'x = ', Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ), '\n' )
 		s = self._pythonRichString( 'x = ', Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ), ' + c\n' )
 		self._parseRichStringTest( g.suite(), s, [ Schema.AssignStmt( targets=[ Schema.SingleTarget( name='x' ) ], value=Schema.Add( x=Schema.Div( x=Schema.Load( name='a' ), y=Schema.Load( name='b' ) ), y=Schema.Load( name='c' ) ) ) ] )
@@ -2414,11 +2414,11 @@ def parserViewTest():
 	#result, pos, dot = subscript.traceParseStringChars( 'a.b' )
 	#print dot
 
-	#g = Python25Grammar()
+	#g = Python2Grammar()
 	#g.singleLineStatementValid().parseStringChars( 'raise' )
 
 	from BritefuryJ.ParserDebugViewer import ParseViewFrame
 
-	g = Python25Grammar()
+	g = Python2Grammar()
 	result = g.expression().traceParseStringChars( '[i for i in a]' )
 	ParseViewFrame( result )

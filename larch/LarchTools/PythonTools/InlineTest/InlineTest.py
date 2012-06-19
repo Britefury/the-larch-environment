@@ -31,9 +31,9 @@ from BritefuryJ.StyleSheet import *
 from Britefury.Util.UniqueNameTable import UniqueNameTable
 from BritefuryJ.Util.Jython import JythonException
 
-from LarchCore.Languages.Python25.PythonCommands import pythonCommandSet, EmbeddedStatementAtCaretAction, WrapSelectedStatementRangeInEmbeddedObjectAction, chainActions
-from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Expr, EmbeddedPython25Suite
-from LarchCore.Languages.Python25 import Schema
+from LarchCore.Languages.Python2.PythonCommands import pythonCommandSet, EmbeddedStatementAtCaretAction, WrapSelectedStatementRangeInEmbeddedObjectAction, chainActions
+from LarchCore.Languages.Python2.Embedded import EmbeddedPython2Expr, EmbeddedPython2Suite
+from LarchCore.Languages.Python2 import Schema
 
 
 _nameBorder = SolidBorder( 1.0, 2.0, 5.0, 5.0, Color( 0.6, 0.6, 0.6 ), Color( 0.95, 0.95, 0.95 ) )
@@ -218,7 +218,7 @@ class StandardInlineTest (AbstractInlineTest):
 	def __init__(self, name='test'):
 		super( StandardInlineTest, self ).__init__()
 		self._name = TrackedLiveValue( name )
-		self._suite = EmbeddedPython25Suite()
+		self._suite = EmbeddedPython2Suite()
 		self.__change_history__ = None
 
 		self.__passes = None
@@ -315,7 +315,7 @@ _testedBlockBorder = SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.5, 0.5, 0.45 ), N
 
 class TestedBlock (object):
 	def __init__(self):
-		self._suite = EmbeddedPython25Suite()
+		self._suite = EmbeddedPython2Suite()
 		self.__change_history__ = None
 
 		self._inlineTests = []

@@ -21,7 +21,7 @@ from Britefury.Windows.WindowManager import WindowManager
 
 from LarchCore.PythonConsole import Console
 
-from LarchCore.Languages.Python25.Python25Importer import importPy25File
+from LarchCore.Languages.Python2.Python2Importer import importPy25File
 
 
 

@@ -10,7 +10,7 @@ from BritefuryJ.DocModel import DMSchema, DMObjectClass, DMNode
 
 
 
-schema = DMSchema( 'Python25', 'py', 'LarchCore.Languages.Python25', 5 )
+schema = DMSchema( 'Python2', 'py', 'LarchCore.Languages.Python2', 5 )
 
 
 #

@@ -11,8 +11,8 @@ from BritefuryJ.DocModel import DMObject, DMList, DMEmbeddedObject, DMEmbeddedIs
 
 from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, methodDispatch
 
-from LarchCore.Languages.Python25 import CodeGenerator
-from LarchCore.Languages.Python25 import Schema
+from LarchCore.Languages.Python2 import CodeGenerator
+from LarchCore.Languages.Python2 import Schema
 
 
 
@@ -33,7 +33,7 @@ class PythonTextExporterCannotExportUnquoteError (PythonTextExporterError):
 	pass
 
 
-class _TextCodeGenerator (CodeGenerator.Python25CodeGenerator):
+class _TextCodeGenerator (CodeGenerator.Python2CodeGenerator):
 	def __init__(self, filename):
 		super( _TextCodeGenerator, self ).__init__( filename )
 

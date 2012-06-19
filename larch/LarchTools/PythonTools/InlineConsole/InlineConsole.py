@@ -25,9 +25,9 @@ from BritefuryJ.Incremental import IncrementalValueMonitor
 from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.StyleSheet import *
 
-from LarchCore.Languages.Python25.PythonCommands import pythonCommandSet, WrapSelectedStatementRangeInEmbeddedObjectAction, EmbeddedStatementAtCaretAction, chainActions
-from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Suite, removeEmbeddedObjectContainingElement
-from LarchCore.Languages.Python25.Execution import Execution
+from LarchCore.Languages.Python2.PythonCommands import pythonCommandSet, WrapSelectedStatementRangeInEmbeddedObjectAction, EmbeddedStatementAtCaretAction, chainActions
+from LarchCore.Languages.Python2.Embedded import EmbeddedPython2Suite, removeEmbeddedObjectContainingElement
+from LarchCore.Languages.Python2.Execution import Execution
 
 
 
@@ -69,7 +69,7 @@ class _InlineConsoleInteractor (KeyElementInteractor):
 
 class InlineConsole (object):
 	def __init__(self, suite=None):
-		self._suite = EmbeddedPython25Suite( suite )
+		self._suite = EmbeddedPython2Suite( suite )
 		self._scopeGlobals = {}
 		self._scopeLocals = {}
 		self._module = None

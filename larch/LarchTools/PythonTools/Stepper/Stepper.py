@@ -26,9 +26,9 @@ from BritefuryJ.Util.Coroutine import Coroutine
 
 from BritefuryJ.Live import LiveValue
 
-from LarchCore.Languages.Python25.PythonCommands import pythonCommandSet, WrapSelectedStatementRangeInEmbeddedObjectAction, EmbeddedStatementAtCaretAction, chainActions
-from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Suite
-from LarchCore.Languages.Python25.Execution import Execution
+from LarchCore.Languages.Python2.PythonCommands import pythonCommandSet, WrapSelectedStatementRangeInEmbeddedObjectAction, EmbeddedStatementAtCaretAction, chainActions
+from LarchCore.Languages.Python2.Embedded import EmbeddedPython2Suite
+from LarchCore.Languages.Python2.Execution import Execution
 
 
 
@@ -46,7 +46,7 @@ _breakPointArrow = Arrow( Arrow.Direction.RIGHT, 8.0 )
 class StepperCode (object):
 	def __init__(self, stepper, suite):
 		self._stepper = stepper
-		self._suite = EmbeddedPython25Suite( suite )
+		self._suite = EmbeddedPython2Suite( suite )
 		self.__change_history__ = None
 
 

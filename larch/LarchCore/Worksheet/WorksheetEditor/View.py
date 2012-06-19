@@ -51,7 +51,7 @@ from BritefuryJ.LSpace.Interactor import KeyElementInteractor
 from BritefuryJ.Editor.Sequential import SequentialEditorPerspective
 from BritefuryJ.Editor.Sequential.Item import *
 
-from LarchCore.Languages.Python25 import Python25
+from LarchCore.Languages.Python2 import Python2
 
 from LarchCore.Worksheet.WorksheetCommands import worksheetCommands
 from LarchCore.Worksheet.WorksheetEditor import EditorSchema
@@ -349,7 +349,7 @@ class WorksheetEditor (MethodDispatchView):
 		def _onDeleteButton(button, event):
 			WorksheetRichTextEditor.instance.deleteParagraphContainingElement( button.getElement() )
 
-		codeView = Python25.python25EditorPerspective.applyTo( InnerFragment( node.getCode() ) )
+		codeView = Python2.python2EditorPerspective.applyTo( InnerFragment( node.getCode() ) )
 		
 		executionResultView = None
 		executionResult = node.getResult()

@@ -19,10 +19,10 @@ from BritefuryJ.Editor.Sequential import SequentialClipboardHandler, SelectionEd
 
 from BritefuryJ.Editor.SyntaxRecognizing import SyntaxRecognizingEditor
 
-from LarchCore.Languages.Python25 import Schema
+from LarchCore.Languages.Python2 import Schema
 
-from LarchCore.Languages.Python25.PythonEditor.Precedence import *
-from LarchCore.Languages.Python25.PythonEditor.PythonEditOperations import *
+from LarchCore.Languages.Python2.PythonEditor.Precedence import *
+from LarchCore.Languages.Python2.PythonEditor.PythonEditOperations import *
 
 
 

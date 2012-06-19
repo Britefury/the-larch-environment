@@ -11,14 +11,14 @@ import java.util.List
 
 from BritefuryJ.DocModel import DMNode
 
-from LarchCore.Languages.Python25 import Schema
-from LarchCore.Languages.Python25 import CodeGenerator
-from LarchCore.Languages.Python25.Execution import Execution
-from LarchCore.Languages.Python25 import PythonEditor
-from LarchCore.Languages.Python25.PythonEditor.Parser import Python25Grammar
+from LarchCore.Languages.Python2 import Schema
+from LarchCore.Languages.Python2 import CodeGenerator
+from LarchCore.Languages.Python2.Execution import Execution
+from LarchCore.Languages.Python2 import PythonEditor
+from LarchCore.Languages.Python2.PythonEditor.Parser import Python2Grammar
 
 
-_grammar = Python25Grammar()
+_grammar = Python2Grammar()
 
 
 
@@ -38,7 +38,7 @@ def _py25NewTarget():
 
 
 
-class EmbeddedPython25 (object):
+class EmbeddedPython2 (object):
 	class _WithPerspective (object):
 		def __init__(self, embeddedPy, perspective):
 			self._embeddedPy = embeddedPy
@@ -63,13 +63,13 @@ class EmbeddedPython25 (object):
 
 
 	def __copy__(self):
-		return EmbeddedPython25( self.model )
+		return EmbeddedPython2( self.model )
 
 	def __deepcopy__(self, memo):
-		return EmbeddedPython25( deepcopy( self.model, memo ) )
+		return EmbeddedPython2( deepcopy( self.model, memo ) )
 
 	def __clipboard_copy__(self, memo):
-		return EmbeddedPython25( memo.copy( self.model ) )
+		return EmbeddedPython2( memo.copy( self.model ) )
 
 
 	def __get_trackable_contents__(self):
@@ -85,7 +85,7 @@ class EmbeddedPython25 (object):
 
 
 
-class EmbeddedPython25Target (EmbeddedPython25):
+class EmbeddedPython2Target (EmbeddedPython2):
 	def __init__(self, model=None):
 		if isinstance( model, DMNode )  and  model.isInstanceOf( Schema.PythonTarget ):
 			pass
@@ -94,19 +94,19 @@ class EmbeddedPython25Target (EmbeddedPython25):
 		elif isinstance( model, DMNode ):
 			model = Schema.PythonTarget( target=model )
 		else:
-			raise TypeError, 'Cannot construct EmbeddedPython25Target from %s' % model
+			raise TypeError, 'Cannot construct EmbeddedPython2Target from %s' % model
 
-		super(EmbeddedPython25Target, self).__init__( model )
+		super(EmbeddedPython2Target, self).__init__( model )
 
 
 	def __copy__(self):
-		return EmbeddedPython25Target( self.model )
+		return EmbeddedPython2Target( self.model )
 
 	def __deepcopy__(self, memo):
-		return EmbeddedPython25Target( deepcopy( self.model, memo ) )
+		return EmbeddedPython2Target( deepcopy( self.model, memo ) )
 
 	def __clipboard_copy__(self, memo):
-		return EmbeddedPython25Target( memo.copy( self.model ) )
+		return EmbeddedPython2Target( memo.copy( self.model ) )
 
 
 	@property
@@ -123,14 +123,14 @@ class EmbeddedPython25Target (EmbeddedPython25):
 	def fromText(text):
 		parseResult = _grammar.targetListOrTargetItem().parseStringChars( text )
 		if parseResult.isValid():
-			return EmbeddedPython25Target( Schema.PythonTarget( target=parseResult.getValue() ) )
+			return EmbeddedPython2Target( Schema.PythonTarget( target=parseResult.getValue() ) )
 		else:
-			return EmbeddedPython25Target( Schema.PythonTarget( target=Schema.UNPARSED( value = [ text ] ) ) )
+			return EmbeddedPython2Target( Schema.PythonTarget( target=Schema.UNPARSED( value = [ text ] ) ) )
 
 
 
 
-class EmbeddedPython25Expr (EmbeddedPython25):
+class EmbeddedPython2Expr (EmbeddedPython2):
 	def __init__(self, model=None):
 		if isinstance( model, DMNode )  and  model.isInstanceOf( Schema.PythonExpression ):
 			pass
@@ -139,19 +139,19 @@ class EmbeddedPython25Expr (EmbeddedPython25):
 		elif isinstance( model, DMNode ):
 			model = Schema.PythonExpression( expr=model )
 		else:
-			raise TypeError, 'Cannot construct EmbeddedPython25Expr from %s' % model
+			raise TypeError, 'Cannot construct EmbeddedPython2Expr from %s' % model
 
-		super(EmbeddedPython25Expr, self).__init__( model )
+		super(EmbeddedPython2Expr, self).__init__( model )
 
 
 	def __copy__(self):
-		return EmbeddedPython25Expr( self.model )
+		return EmbeddedPython2Expr( self.model )
 
 	def __deepcopy__(self, memo):
-		return EmbeddedPython25Expr( deepcopy( self.model, memo ) )
+		return EmbeddedPython2Expr( deepcopy( self.model, memo ) )
 
 	def __clipboard_copy__(self, memo):
-		return EmbeddedPython25Expr( memo.copy( self.model ) )
+		return EmbeddedPython2Expr( memo.copy( self.model ) )
 
 
 	@property
@@ -176,14 +176,14 @@ class EmbeddedPython25Expr (EmbeddedPython25):
 	def fromText(text):
 		parseResult = _grammar.tupleOrExpressionOrYieldExpression().parseStringChars( text )
 		if parseResult.isValid():
-			return EmbeddedPython25Expr( Schema.PythonExpression( expr=parseResult.getValue() ) )
+			return EmbeddedPython2Expr( Schema.PythonExpression( expr=parseResult.getValue() ) )
 		else:
-			return EmbeddedPython25Expr( Schema.PythonExpression( expr=Schema.UNPARSED( value = [ text ] ) ) )
+			return EmbeddedPython2Expr( Schema.PythonExpression( expr=Schema.UNPARSED( value = [ text ] ) ) )
 
 
 
 
-class EmbeddedPython25Executable (EmbeddedPython25):
+class EmbeddedPython2Executable (EmbeddedPython2):
 	__python_code_type__ = '<larch_executable_code>'
 
 
@@ -236,7 +236,7 @@ class EmbeddedPython25Executable (EmbeddedPython25):
 
 
 
-class EmbeddedPython25Suite (EmbeddedPython25Executable):
+class EmbeddedPython2Suite (EmbeddedPython2Executable):
 	__python_code_type__ = '<larch_suite>'
 
 	def __init__(self, model=None):
@@ -247,19 +247,19 @@ class EmbeddedPython25Suite (EmbeddedPython25Executable):
 		elif isinstance( model, list )  or  isinstance( model, java.util.List ):
 			model = Schema.PythonSuite( suite=model )
 		else:
-			raise TypeError, 'Cannot construct EmbeddedPython25Suite from %s' % model
+			raise TypeError, 'Cannot construct EmbeddedPython2Suite from %s' % model
 
-		super(EmbeddedPython25Suite, self).__init__( model )
+		super(EmbeddedPython2Suite, self).__init__( model )
 
 
 	def __copy__(self):
-		return EmbeddedPython25Suite( self.model )
+		return EmbeddedPython2Suite( self.model )
 
 	def __deepcopy__(self, memo):
-		return EmbeddedPython25Suite( deepcopy( self.model, memo ) )
+		return EmbeddedPython2Suite( deepcopy( self.model, memo ) )
 
 	def __clipboard_copy__(self, memo):
-		return EmbeddedPython25Suite( memo.copy( self.model ) )
+		return EmbeddedPython2Suite( memo.copy( self.model ) )
 
 
 	@property
@@ -278,22 +278,22 @@ class EmbeddedPython25Suite (EmbeddedPython25Executable):
 			text = text + '\n'
 		parseResult = _grammar.suite().parseStringChars( text )
 		if parseResult.isValid():
-			return EmbeddedPython25Suite( parseResult.getValue() )
+			return EmbeddedPython2Suite( parseResult.getValue() )
 		else:
-			return EmbeddedPython25Suite( [] )
+			return EmbeddedPython2Suite( [] )
 
 	@staticmethod
 	def fromExprModel(exprModel):
-		return EmbeddedPython25Suite( Schema.PythonSuite( suite=EmbeddedPython25Executable._exprModelAsStmts( deepcopy( exprModel ) ) ) )
+		return EmbeddedPython2Suite( Schema.PythonSuite( suite=EmbeddedPython2Executable._exprModelAsStmts( deepcopy( exprModel ) ) ) )
 
 	@staticmethod
 	def fromEmbeddedExpr(embeddedExpr):
-		return EmbeddedPython25Suite.fromExprModel( embeddedExpr.model['expr'] )
+		return EmbeddedPython2Suite.fromExprModel( embeddedExpr.model['expr'] )
 
 
 
 
-class EmbeddedPython25Module (EmbeddedPython25Executable):
+class EmbeddedPython2Module (EmbeddedPython2Executable):
 	__python_code_type__ = '<larch_module>'
 
 	def __init__(self, model=None):
@@ -304,19 +304,19 @@ class EmbeddedPython25Module (EmbeddedPython25Executable):
 		elif isinstance( model, list )  or  isinstance( model, java.util.List ):
 			model = Schema.PythonModule( suite=model )
 		else:
-			raise TypeError, 'Cannot construct EmbeddedPython25Module from %s' % model
+			raise TypeError, 'Cannot construct EmbeddedPython2Module from %s' % model
 
-		super(EmbeddedPython25Module, self).__init__( model )
+		super(EmbeddedPython2Module, self).__init__( model )
 
 
 	def __copy__(self):
-		return EmbeddedPython25Module( self.model )
+		return EmbeddedPython2Module( self.model )
 
 	def __deepcopy__(self, memo):
-		return EmbeddedPython25Module( deepcopy( self.model, memo ) )
+		return EmbeddedPython2Module( deepcopy( self.model, memo ) )
 
 	def __clipboard_copy__(self, memo):
-		return EmbeddedPython25Module( memo.copy( self.model ) )
+		return EmbeddedPython2Module( memo.copy( self.model ) )
 
 
 	@property
@@ -335,18 +335,18 @@ class EmbeddedPython25Module (EmbeddedPython25Executable):
 			text = text + '\n'
 		parseResult = _grammar.suite().parseStringChars( text )
 		if parseResult.isValid():
-			return EmbeddedPython25Module( parseResult.getValue() )
+			return EmbeddedPython2Module( parseResult.getValue() )
 		else:
-			return EmbeddedPython25Module( [] )
+			return EmbeddedPython2Module( [] )
 
 
 	@staticmethod
 	def fromExprModel(exprModel):
-		return EmbeddedPython25Suite( Schema.PythonModule( suite=EmbeddedPython25Executable._exprModelAsStmts( deepcopy( exprModel ) ) ) )
+		return EmbeddedPython2Suite( Schema.PythonModule( suite=EmbeddedPython2Executable._exprModelAsStmts( deepcopy( exprModel ) ) ) )
 
 	@staticmethod
 	def fromEmbeddedExpr(embeddedExpr):
-		return EmbeddedPython25Module.fromExprModel( embeddedExpr.model['expr'] )
+		return EmbeddedPython2Module.fromExprModel( embeddedExpr.model['expr'] )
 
 
 

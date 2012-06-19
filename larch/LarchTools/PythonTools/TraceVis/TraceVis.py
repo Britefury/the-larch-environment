@@ -29,10 +29,10 @@ from BritefuryJ.Editor.Table.Generic import *
 
 from BritefuryJ.StyleSheet import *
 
-from LarchCore.Languages.Python25.PythonCommands import pythonCommandSet, EmbeddedExpressionAtCaretAction, WrapSelectionInEmbeddedExpressionAction,\
+from LarchCore.Languages.Python2.PythonCommands import pythonCommandSet, EmbeddedExpressionAtCaretAction, WrapSelectionInEmbeddedExpressionAction,\
 	WrapSelectedStatementRangeInEmbeddedObjectAction, chainActions
-from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Expr, EmbeddedPython25Suite
-from LarchCore.Languages.Python25 import Schema
+from LarchCore.Languages.Python2.Embedded import EmbeddedPython2Expr, EmbeddedPython2Suite
+from LarchCore.Languages.Python2 import Schema
 
 
 
@@ -219,7 +219,7 @@ class _TreeView (object):
 
 class TraceVisualisation (object):
 	def __init__(self):
-		self._suite = EmbeddedPython25Suite()
+		self._suite = EmbeddedPython2Suite()
 		self._code = None
 		self._incr = IncrementalValueMonitor()
 		self.__change_history__ = None
@@ -331,7 +331,7 @@ class MonitoredExpression (object):
 
 	def __init__(self):
 		self._name = 'value'
-		self._expr = EmbeddedPython25Expr()
+		self._expr = EmbeddedPython2Expr()
 		self._suite = None
 		self._code = None
 		self._incr = IncrementalValueMonitor()

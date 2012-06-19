@@ -26,9 +26,9 @@ from BritefuryJ.Controls import Controls, DropDownExpander, MenuItem, TextEntry,
 
 from BritefuryJ.StyleSheet import StyleSheet
 
-from LarchCore.Languages.Python25.PythonCommands import pythonCommandSet, EmbeddedExpressionAtCaretAction, WrapSelectionInEmbeddedExpressionAction,	\
+from LarchCore.Languages.Python2.PythonCommands import pythonCommandSet, EmbeddedExpressionAtCaretAction, WrapSelectionInEmbeddedExpressionAction,	\
 	WrapSelectedStatementRangeInEmbeddedObjectAction, EmbeddedStatementAtCaretAction, chainActions
-from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Expr, EmbeddedPython25Suite
+from LarchCore.Languages.Python2.Embedded import EmbeddedPython2Expr, EmbeddedPython2Suite
 
 
 
@@ -46,7 +46,7 @@ _dragSource = ObjectDndHandler.DragSource( FragmentData, ObjectDndHandler.ASPECT
 class LiterateExpression (object):
 	def __init__(self, expr=None):
 		if expr is None:
-			expr = EmbeddedPython25Expr()
+			expr = EmbeddedPython2Expr()
 		self._expr = expr
 
 		self._incr = IncrementalValueMonitor()
@@ -100,7 +100,7 @@ class LiterateSuiteDefinition (object):
 		self._name = name
 
 		if suite is None:
-			suite = EmbeddedPython25Suite()
+			suite = EmbeddedPython2Suite()
 		self._suite = suite
 
 		self._incr = IncrementalValueMonitor()
