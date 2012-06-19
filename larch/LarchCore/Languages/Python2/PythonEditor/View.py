@@ -789,27 +789,18 @@ class Python2View (MethodDispatchView):
 	def IntLiteral(self, fragment, inheritedState, model, format, numType, value):
 		boxContents = []
 
-		if numType == 'long':
-			if format == 'hex':
-				valueString = '0x{0:x}L'.format( long( value, 16 ) )
-			elif format == 'bin':
-				valueString = '0b{0:b}L'.format( long( value, 2 ) )
-			elif format == 'oct':
-				valueString = '0o{0:o}L'.format( long( value, 8 ) )
-			else:
-				valueString = '{0}L'.format( long( value ) )
+		if format == 'hex':
+			valueString = '0x' + value
+		elif format == 'bin':
+			valueString = '0b' + value
+		elif format == 'oct':
+			valueString = '0o' + value
+		else:
+			valueString = value
 
+		if numType == 'long':
 			fmt = 'L'
 		else:
-			if format == 'hex':
-				valueString = '0x{0:x}'.format( int( value, 16 ) )
-			elif format == 'bin':
-				valueString = '0b{0:b}'.format( int( value, 2 ) )
-			elif format == 'oct':
-				valueString = '0o{0:o}'.format( int( value, 8 ) )
-			else:
-				valueString = '{0}'.format( value )
-
 			fmt = None
 
 		return intLiteral( fmt, valueString )
@@ -921,6 +912,28 @@ class Python2View (MethodDispatchView):
 	def DictLiteral(self, fragment, inheritedState, model, values, trailingSeparator):
 		elementViews = SREInnerFragment.map( values, PRECEDENCE_CONTAINER_ELEMENT )
 		return dictLiteral( elementViews, trailingSeparator is not None )
+
+	@DMObjectNodeDispatchMethod( Schema.DictComp )
+	@Expression
+	def DictComp(self, fragment, inheritedState, model, resultExpr, comprehensionItems):
+		exprView = SREInnerFragment( resultExpr, PRECEDENCE_CONTAINER_ELEMENT )
+		itemViews = SREInnerFragment.map( comprehensionItems, PRECEDENCE_CONTAINER_ELEMENT )
+		return dictComp( exprView, itemViews )
+
+
+	# List literal
+	@DMObjectNodeDispatchMethod( Schema.SetLiteral )
+	@Expression
+	def SetLiteral(self, fragment, inheritedState, model, values, trailingSeparator):
+		elementViews = SREInnerFragment.map( values, PRECEDENCE_CONTAINER_ELEMENT )
+		return setLiteral( elementViews, trailingSeparator is not None )
+
+	@DMObjectNodeDispatchMethod( Schema.SetComp )
+	@Expression
+	def SetComp(self, fragment, inheritedState, model, resultExpr, comprehensionItems):
+		exprView = SREInnerFragment( resultExpr, PRECEDENCE_CONTAINER_ELEMENT )
+		itemViews = SREInnerFragment.map( comprehensionItems, PRECEDENCE_CONTAINER_ELEMENT )
+		return setComp( exprView, itemViews )
 
 
 	# Yield expression

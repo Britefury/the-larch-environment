@@ -190,7 +190,7 @@ class Python2ASTGenerator (object):
 	def IntLiteral(self, lineno, ctx, node, format, numType, value):
 		if numType == 'int':
 			if format == 'decimal':
-				return  _ast.Num( int( value ) )
+				return  _ast.Num( int( value, 10 ) )
 			elif format == 'hex':
 				return  _ast.Num( int( value, 16 ) )
 			elif format == 'bin':
@@ -201,7 +201,7 @@ class Python2ASTGenerator (object):
 				raise Python2ASTGeneratorInvalidFormatError, 'invalid integer literal format'
 		elif numType == 'long':
 			if format == 'decimal':
-				return  _ast.Num( long( value ) )
+				return  _ast.Num( long( value, 10 ) )
 			elif format == 'hex':
 				return  _ast.Num( long( value, 16 ) )
 			elif format == 'bin':
@@ -321,6 +321,25 @@ class Python2ASTGenerator (object):
 				ks.append( self( p['key'], lineno, ctx ) )
 				vs.append( self( p['value'], lineno, ctx ) )
 		return _ast.Dict( ks, vs )
+
+
+	@DMObjectNodeDispatchMethod( Schema.DictComp )
+	def DictComp(self, lineno, ctx, node, resultExpr, comprehensionItems):
+		raise NotImplementedError, 'Not yet implemented, structure of _ast.DictComp is not known'
+
+
+
+	# Dictionary literal
+	@DMObjectNodeDispatchMethod( Schema.SetLiteral )
+	def SetLiteral(self, lineno, ctx, node, values):
+		return _ast.Set( [ self( v, lineno, ctx )   for v in values ],  ctx )
+
+
+	@DMObjectNodeDispatchMethod( Schema.SetComp )
+	def SetComp(self, lineno, ctx, node, resultExpr, comprehensionItems):
+		expr = self( resultExpr, lineno, ctx )
+		generators = self._comprehensionGenerators( lineno, ctx, comprehensionItems )
+		return _ast.SetComp( expr, generators )
 
 
 
@@ -918,6 +937,9 @@ class TestCase_Python2ASTGenerator (unittest.TestCase):
 		self._testExprSX( '(py IntLiteral format=oct numType=long value=123)', '0o123L' )
 		self.assertRaises( Python2ASTGeneratorInvalidFormatError, lambda: self._testSXAST( '(py IntLiteral format=foo numType=long value=1a4)', None ) )
 		self.assertRaises( Python2ASTGeneratorInvalidFormatError, lambda: self._testSXAST( '(py IntLiteral format=hex numType=foo value=1a4)', None ) )
+		# Ensure that 0 prefix results in decimal
+		self._testExprSX( '(py IntLiteral format=decimal numType=int value=00123)', '123' )
+		self._testExprSX( '(py IntLiteral format=decimal numType=long value=00123)', '123L' )
 
 
 	def test_FloatLiteral(self):
@@ -980,6 +1002,19 @@ class TestCase_Python2ASTGenerator (unittest.TestCase):
 
 	def test_DictLiteral(self):
 		self._testExprSX( '(py DictLiteral values=[(py DictKeyValuePair key=(py Load name=a) value=(py Load name=b)) (py DictKeyValuePair key=(py Load name=c) value=(py Load name=d))])', '{ a:b, c:d }' )
+
+
+	def test_SetLiteral(self):
+		print 'test_SetLiteral DISABLED'
+		#self._testExprSX( '(py SetLiteral values=[(py Load name=a) (py Load name=b) (py Load name=c)])', '{ a, b, c }' )
+
+
+	def test_SetComp(self):
+		self._testExprSX( '(py SetComp resultExpr=(py Load name=a) comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs))])', '{ a  for a in xs }' )
+		self._testExprSX( '(py SetComp resultExpr=(py Load name=a) comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs)) (py ComprehensionIf condition=(py Load name=a))])',
+		                  '{ a  for a in xs   if a }' )
+		self._testExprSX( '(py SetComp resultExpr=(py Load name=a) comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs)) (py ComprehensionIf condition=(py Load name=a)) (py ComprehensionIf condition=(py Load name=b))])',
+		                  '{ a  for a in xs  if a  if b }' )
 
 
 	def test_YieldExpr(self):

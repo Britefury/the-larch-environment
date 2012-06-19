@@ -299,9 +299,33 @@ class _ExprImporter (_Importer):
 	# Dictionary literal
 	def Dict(self, node):
 		return Schema.DictLiteral( values=[ Schema.DictKeyValuePair( key=_expr( k ), value=_expr( v ) )   for k, v in zip( node.keys, node.values ) ] )
-	
-	
-	
+
+
+
+	# List comprehension
+	def DictComp(self, node):
+		gens = []
+		for x in node.generators:
+			gens.extend( _listComp( x ) )
+		return Schema.DictComp( resultExpr=Schema.DictKeyValuePair( key=_expr( node.key ), value=_expr( node.value ) ), comprehensionItems=gens )
+
+
+
+	# Set literal
+	def Set(self, node):
+		return Schema.SetLiteral( values=[ _expr( x )   for x in node.elts ] )
+
+
+
+	# Set comprehension
+	def SetComp(self, node):
+		gens = []
+		for x in node.generators:
+			gens.extend( _listComp( x ) )
+		return Schema.SetComp( resultExpr=_expr( node.elt ), comprehensionItems=gens )
+
+
+
 	# Yield expresion
 	def Yield(self, node):
 		return Schema.YieldExpr( value=_expr( node.value ) )
@@ -986,8 +1010,20 @@ class ImporterTestCase (unittest.TestCase):
 	
 	def testDict(self):
 		self._exprTest( '{a:b, c:d}',  Schema.DictLiteral( values=[ Schema.DictKeyValuePair( key=Schema.Load( name='a' ), value=Schema.Load( name='b' ) ), Schema.DictKeyValuePair( key=Schema.Load( name='c' ), value=Schema.Load( name='d' ) ) ] ) )
-		
-		
+
+
+	def testDictComp(self):
+		self._exprTest( '{a:b   for a in x}',   Schema.DictComp( resultExpr=Schema.DictKeyValuePair( key=Schema.Load( name='a' ), value=Schema.Load( name='b' ) ), comprehensionItems=[ Schema.ComprehensionFor( target=Schema.SingleTarget( name='a' ), source=Schema.Load( name='x' ) ) ] ) )
+
+
+	def testSet(self):
+		self._exprTest( '{a, c}',  Schema.SetLiteral( values=[ Schema.Load( name='a' ), Schema.Load( name='c' ) ] ) )
+
+
+	def testSetComp(self):
+		self._exprTest( '{a   for a in x}',   Schema.SetComp( resultExpr=Schema.Load( name='a' ), comprehensionItems=[ Schema.ComprehensionFor( target=Schema.SingleTarget( name='a' ), source=Schema.Load( name='x' ) ) ] ) )
+
+
 	def testYieldExpr(self):
 		self._exprTest( '(yield a)', Schema.YieldExpr( value=Schema.Load( name='a' ) ) )
 		

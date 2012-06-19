@@ -400,6 +400,26 @@ def dictLiteral(items, bTrailingSeparator):
 	seq = SpanSequenceView( items, _openBrace, _closeBrace, _comma, _space, TrailingSeparator.ALWAYS   if bTrailingSeparator   else TrailingSeparator.NEVER )
 	return ApplyStyleSheetFromAttribute( PythonEditorStyle.sequenceStyle, seq )
 
+@PyPresCombinatorFn
+def dictComp(ctx, style, resultExpr, comprehensionItems):
+	comprehensionSpacing = style.get( PythonEditorStyle.comprehensionSpacing )
+	itemViewsSpaced = []
+	if len( comprehensionItems ) > 0:
+		for x in comprehensionItems[:-1]:
+			itemViewsSpaced.append( x )
+			itemViewsSpaced.append( Whitespace( ' ', comprehensionSpacing ) )
+			itemViewsSpaced.append( _lineBreak )
+		itemViewsSpaced.append( comprehensionItems[-1] )
+	return LineBreakCostSpan( [ _openBrace,  resultExpr,  Whitespace( ' ', comprehensionSpacing ) ]  +  itemViewsSpaced  +  [ _closeBrace ] ).present( ctx, style )
+
+
+def setLiteral(items, bTrailingSeparator):
+	seq = SpanSequenceView( items, _openBrace, _closeBrace, _comma, _space, TrailingSeparator.ALWAYS   if bTrailingSeparator   else TrailingSeparator.NEVER )
+	return ApplyStyleSheetFromAttribute( PythonEditorStyle.sequenceStyle, seq )
+
+# Just re-use dictComp, since they are the same
+setComp = dictComp
+
 
 def yieldExpr(value):
 	if value is not None:

@@ -48,7 +48,7 @@ def stringPrefixToFormat(prefix):
 
 
 
-schema = DMSchema( 'Python2', 'py', 'LarchCore.Languages.Python2', 5 )
+schema = DMSchema( 'Python2', 'py', 'LarchCore.Languages.Python2', 6 )
 
 
 #
@@ -102,6 +102,10 @@ GeneratorExpr = schema.newClass( 'GeneratorExpr', Expr, [ 'resultExpr', 'compreh
 # Dictionary
 DictKeyValuePair = schema.newClass( 'DictKeyValuePair', Node, [ 'key', 'value' ] )
 DictLiteral = schema.newClass( 'DictLiteral', Expr, [ 'values', 'trailingSeparator' ] )
+DictComp = schema.newClass( 'DictComp', Expr, [ 'resultExpr', 'comprehensionItems' ] )
+# Set
+SetLiteral = schema.newClass( 'SetLiteral', Expr, [ 'values', 'trailingSeparator' ] )
+SetComp = schema.newClass( 'SetComp', Expr, [ 'resultExpr', 'comprehensionItems' ] )
 # Yield
 YieldExpr = schema.newClass( 'YieldExpr', Expr, [ 'value' ] )
 # Attribute reference

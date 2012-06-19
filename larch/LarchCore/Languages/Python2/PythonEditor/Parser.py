@@ -344,6 +344,26 @@ class Python2Grammar (Grammar):
 			lambda input, begin, end, xs, bindings, bTrailingSep: Schema.DictLiteral( values=xs, trailingSeparator='1' if bTrailingSep else None ) )
 
 
+	@Rule
+	def dictComprehension(self):
+		return ( Literal( '{' )  +  self.keyValuePair()  +  self.listCompFor()  +  ZeroOrMore( self.listCompItem() )  +  Literal( '}' ) ).action(
+			lambda input, begin, end, xs, bindings: Schema.DictComp( resultExpr=xs[1], comprehensionItems=[ xs[2] ] + xs[3] ) )
+
+
+
+	# Set literal
+	@Rule
+	def setLiteral(self):
+		return SeparatedList( self.expression(), '{', '}', 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).listAction(
+			lambda input, begin, end, xs, bindings, bTrailingSep: Schema.SetLiteral( values=xs, trailingSeparator='1' if bTrailingSep else None ) )
+
+
+	@Rule
+	def setComprehension(self):
+		return ( Literal( '{' )  +  self.expression()  +  self.listCompFor()  +  ZeroOrMore( self.listCompItem() )  +  Literal( '}' ) ).action(
+			lambda input, begin, end, xs, bindings: Schema.SetComp( resultExpr=xs[1], comprehensionItems=[ xs[2] ] + xs[3] ) )
+
+
 
 
 	# Yield expression
@@ -361,7 +381,7 @@ class Python2Grammar (Grammar):
 	# Enclosure
 	@Rule
 	def enclosure(self):
-		return self.parenForm() | self.tupleLiteral() | self.listLiteral() | self.listComprehension() | self.generatorExpression() | self.dictLiteral() | self.yieldAtom()
+		return self.parenForm() | self.tupleLiteral() | self.listLiteral() | self.listComprehension() | self.generatorExpression() | self.dictLiteral() | self.dictComprehension() | self.setLiteral() | self.setComprehension() | self.yieldAtom()
 
 
 
@@ -1429,10 +1449,50 @@ class TestCase_Python2Parser (ParserTestCase):
 
 	def testDictLiteral(self):
 		g = Python2Grammar()
+		self._parseStringTest( g.expression(), '{}', Schema.DictLiteral( values=[] ) )
 		self._parseStringTest( g.expression(), '{a:x,b:y}', Schema.DictLiteral( values=[ Schema.DictKeyValuePair( key=Schema.Load( name='a' ), value=Schema.Load( name='x' ) ),
 											  Schema.DictKeyValuePair( key=Schema.Load( name='b' ), value=Schema.Load( name='y' ) ) ] ) )
 		self._parseStringTest( g.expression(), '{a:x,b:y,}', Schema.DictLiteral( values=[ Schema.DictKeyValuePair( key=Schema.Load( name='a' ), value=Schema.Load( name='x' ) ),
 											   Schema.DictKeyValuePair( key=Schema.Load( name='b' ), value=Schema.Load( name='y' ) ) ], trailingSeparator='1' ) )
+
+
+	def tesDictComprehension(self):
+		g = Python2Grammar()
+		self._parseStringTest( g.expression(), '{i:i  for i in a}', Schema.DictComp( resultExpr=Schema.DictKeyValuePair( key=Schema.Load( name='i' ), value=Schema.Load( name='i' ) ),
+		                                                                          comprehensionItems=[ Schema.ComprehensionFor( target=Schema.SingleTarget( name='i' ), source=Schema.Load( name='a' ) ) ]
+		) )
+		self._parseStringFailTest( g.expression(), '{i:i  if x}', )
+		self._parseStringTest( g.expression(), '{i:i  for i in a  if x}', Schema.DictComp( resultExpr=Schema.DictKeyValuePair( key=Schema.Load( name='i' ), value=Schema.Load( name='i' ) ),
+		                                                                                comprehensionItems=[ Schema.ComprehensionFor( target=Schema.SingleTarget( name='i' ), source=Schema.Load( name='a' ) ),
+		                                                                                                     Schema.ComprehensionIf( condition=Schema.Load( name='x' ) ) ]
+		) )
+		self._parseStringTest( g.expression(), '{i:i  for i in a  for j in b}', Schema.DictComp( resultExpr=Schema.DictKeyValuePair( key=Schema.Load( name='i' ), value=Schema.Load( name='i' ) ),
+		                                                                                      comprehensionItems=[ Schema.ComprehensionFor( target=Schema.SingleTarget( name='i' ), source=Schema.Load( name='a' ) ),
+		                                                                                                           Schema.ComprehensionFor( target=Schema.SingleTarget( name='j' ), source=Schema.Load( name='b' ) ) ]
+		) )
+
+
+	def testSetLiteral(self):
+		g = Python2Grammar()
+		self._parseStringTest( g.expression(), '{a,b}', Schema.SetLiteral( values=[ Schema.Load( name='a' ), Schema.Load( name='b' ) ] ) )
+		self._parseStringTest( g.expression(), '{a,b,}', Schema.SetLiteral( values=[ Schema.Load( name='a' ), Schema.Load( name='b' ) ], trailingSeparator='1' ) )
+		self._parseStringTest( g.expression(), '{}', Schema.DictLiteral( values=[] ) )
+
+
+	def testSetComprehension(self):
+		g = Python2Grammar()
+		self._parseStringTest( g.expression(), '{i  for i in a}', Schema.SetComp( resultExpr=Schema.Load( name='i' ),
+		                                                                           comprehensionItems=[ Schema.ComprehensionFor( target=Schema.SingleTarget( name='i' ), source=Schema.Load( name='a' ) ) ]
+		) )
+		self._parseStringFailTest( g.expression(), '{i  if x}', )
+		self._parseStringTest( g.expression(), '{i  for i in a  if x}', Schema.SetComp( resultExpr=Schema.Load( name='i' ),
+		                                                                                 comprehensionItems=[ Schema.ComprehensionFor( target=Schema.SingleTarget( name='i' ), source=Schema.Load( name='a' ) ),
+		                                                                                                      Schema.ComprehensionIf( condition=Schema.Load( name='x' ) ) ]
+		) )
+		self._parseStringTest( g.expression(), '{i  for i in a  for j in b}', Schema.SetComp( resultExpr=Schema.Load( name='i' ),
+		                                                                                       comprehensionItems=[ Schema.ComprehensionFor( target=Schema.SingleTarget( name='i' ), source=Schema.Load( name='a' ) ),
+		                                                                                                            Schema.ComprehensionFor( target=Schema.SingleTarget( name='j' ), source=Schema.Load( name='b' ) ) ]
+		) )
 
 
 	def testYieldExpr(self):
