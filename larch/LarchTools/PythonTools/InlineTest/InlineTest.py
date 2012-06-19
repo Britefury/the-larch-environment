@@ -163,9 +163,14 @@ class AbstractInlineTest (object):
 		return TestCase
 
 
+	def createInstance(self):
+		return self._testClass()   if self._testClass is not None   else None
+
+
 	def run(self):
-		instance = self._testClass()
-		self._runTestsOnInstance( instance )
+		instance = self.createInstance()
+		if instance is not None:
+			self._runTestsOnInstance( instance )
 
 
 	def _runTestsOnInstance(self, instance):
@@ -174,6 +179,11 @@ class AbstractInlineTest (object):
 
 	def _registerTestClass(self, testCls):
 		self._testClass = testCls
+
+
+	@property
+	def _scope(self):
+		return self.__testedBlock._scope   if self.__testedBlock is not None   else ( None, None, None )
 
 
 	def _createTestClass(self, codeGen):
@@ -311,6 +321,10 @@ class TestedBlock (object):
 		self._inlineTests = []
 		self.__classNames = UniqueNameTable()
 
+		self.__module = None
+		self.__globalScope = None
+		self.__localScope = None
+
 
 	def __getstate__(self):
 		return { 'suite' : self._suite }
@@ -321,6 +335,10 @@ class TestedBlock (object):
 
 		self._inlineTests = []
 		self.__classNames = UniqueNameTable()
+
+		self.__module = None
+		self.__globalScope = None
+		self.__localScope = None
 
 
 	def __get_trackable_contents__(self):
@@ -345,6 +363,17 @@ class TestedBlock (object):
 	def runTests(self):
 		for test in self._inlineTests:
 			test.run()
+
+
+	def _registerScope(self, module, globalScope, localScope):
+		self.__module = module
+		self.__globalScope = globalScope
+		self.__localScope = localScope
+
+
+	@property
+	def _scope(self):
+		return self.__module, self.__globalScope, self.__localScope
 
 
 	def __py_execmodel__(self, codeGen):
@@ -384,7 +413,12 @@ class TestedBlock (object):
 				testAst = codeGen.embeddedValue( test )
 				testing.append( Schema.ExprStmt( expr=Schema.Call( target=Schema.AttributeRef( target=testAst, name='_registerTestClass' ), args=[ Schema.Load( name=test._className ) ] ) ) )
 
-			testing.append( Schema.ExprStmt( expr=Schema.Call( target=Schema.AttributeRef( target=codeGen.embeddedValue( self ), name='runTests' ), args=[] ) ) )
+			selfAST = codeGen.embeddedValue( self )
+			moduleAST = codeGen.embeddedValue( codeGen.module )
+			globalsAST = Schema.Call( target=Schema.Load( name='globals' ), args=[] )
+			localsAST = Schema.Call( target=Schema.Load( name='locals' ), args=[] )
+			testing.append( Schema.ExprStmt( expr=Schema.Call( target=Schema.AttributeRef( target=selfAST, name='runTests' ), args=[] ) ) )
+			testing.append( Schema.ExprStmt( expr=Schema.Call( target=Schema.AttributeRef( target=selfAST, name='_registerScope' ), args=[ moduleAST, globalsAST, localsAST ] ) ) )
 
 			return Schema.PythonSuite( suite=testing )
 

@@ -50,7 +50,6 @@ _resultNone = StyleSheet.style( Primitive.foreground( Color( 0.4, 0.4, 0.4 ) ) )
 
 
 
-
 class AbstractInlineTestTableRow (object):
 	def __init__(self):
 		self.__testTable = None
@@ -110,6 +109,23 @@ class AbstractInlineTestTableRow (object):
 		raise NotImplementedError, 'abstract'
 
 
+	@property
+	def _scope(self):
+		return self.__testTable._scope   if self.__testTable is not None   else ( None, None, None )
+
+
+	def _debug(self):
+		return None
+
+
+	def __debugWrap(self, p):
+		d = self._debug()
+		if d is not None:
+			return Column( [ p, Pres.coerce( d ).alignHPack() ] ).alignVTop()
+		else:
+			return p
+
+
 	def _createMethodAST(self, codeGen):
 		valueStmts, resultVarName = self._createValueStmtsAndResultVarName( codeGen )
 
@@ -148,7 +164,6 @@ class AbstractInlineTestTableRow (object):
 
 
 	def _testValue(self, kind, data, excType=None):
-		print 'AbstractInlineTestTableRow._testValue: kind=' + kind
 		self._actual.setLiteralValue( ( kind, data ) )
 		expected = self._expected.getStaticValue()
 		if expected is not None:
@@ -216,7 +231,7 @@ class AbstractInlineTestTableRow (object):
 
 	@property
 	def result(self):
-		return self.__result
+		return self.__debugWrap( self.__result )
 
 
 	@property
