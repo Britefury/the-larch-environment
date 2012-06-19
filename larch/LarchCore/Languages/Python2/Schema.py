@@ -10,6 +10,44 @@ from BritefuryJ.DocModel import DMSchema, DMObjectClass, DMNode
 
 
 
+_stringFormatToPrefix = {
+	'' : '',
+	'ascii' : '',
+	'unicode' : 'u',
+	'bytes' : 'b',
+	'ascii-regex' : 'r',
+	'unicode-regex' : 'ur',
+	'bytes-regex' : 'br',
+	'regex' : 'r'
+}
+
+
+_stringPrefixToFormat = {
+	'' : 'ascii',
+        'u' : 'unicode',
+	'b' : 'bytes',
+	'r' : 'regex',
+        'ur' : 'unicode-regex',
+        'br' : 'bytes-regex'
+}
+
+
+def stringFormatToPrefix(format):
+	try:
+		return _stringFormatToPrefix[format]
+	except KeyError:
+		raise ValueError, 'Unknown string format {0}'.format( format )
+
+
+def stringPrefixToFormat(prefix):
+	try:
+		return _stringPrefixToFormat[prefix]
+	except KeyError:
+		raise ValueError, 'Unknown string prefix {0}'.format( prefix )
+
+
+
+
 schema = DMSchema( 'Python2', 'py', 'LarchCore.Languages.Python2', 5 )
 
 
@@ -179,7 +217,8 @@ ForStmtHeader = schema.newClass( 'ForStmtHeader', CompountStmtHeader, [ 'target'
 TryStmtHeader = schema.newClass( 'TryStmtHeader', CompountStmtHeader, [] )
 ExceptStmtHeader = schema.newClass( 'ExceptStmtHeader', CompountStmtHeader, [ 'exception', 'target' ] )
 FinallyStmtHeader = schema.newClass( 'FinallyStmtHeader', CompountStmtHeader, [] )
-WithStmtHeader = schema.newClass( 'WithStmtHeader', CompountStmtHeader, [ 'expr', 'target' ] )
+WithContext = schema.newClass( 'WithContext', Node, [ 'expr', 'target' ] )
+WithStmtHeader = schema.newClass( 'WithStmtHeader', CompountStmtHeader, [ 'contexts' ] )
 DecoStmtHeader = schema.newClass( 'DecoStmtHeader', CompountStmtHeader, [ 'name', 'args', 'argsTrailingSeparator' ] )
 DefStmtHeader = schema.newClass( 'DefStmtHeader', CompountStmtHeader, [ 'name', 'params', 'paramsTrailingSeparator' ] )
 ClassStmtHeader = schema.newClass( 'ClassStmtHeader', CompountStmtHeader, [ 'name', 'bases', 'basesTrailingSeparator' ] )
@@ -198,7 +237,7 @@ WhileStmt = schema.newClass( 'WhileStmt', CompoundStmt, [ 'condition', 'suite', 
 ForStmt = schema.newClass( 'ForStmt', CompoundStmt, [ 'target', 'source', 'suite', 'elseSuite' ] )
 TryStmt = schema.newClass( 'TryStmt', CompoundStmt, [ 'suite', 'exceptBlocks', 'elseSuite', 'finallySuite' ] )
 ExceptBlock = schema.newClass( 'ExceptBlock', CompoundComponent, [ 'exception', 'target', 'suite' ] )
-WithStmt = schema.newClass( 'WithStmt', CompoundStmt, [ 'expr', 'target', 'suite' ] )
+WithStmt = schema.newClass( 'WithStmt', CompoundStmt, [ 'contexts', 'suite' ] )
 Decorator = schema.newClass( 'Decorator', CompoundComponent, [ 'name', 'args', 'argsTrailingSeparator' ] )
 DefStmt = schema.newClass( 'DefStmt', CompoundStmt, [ 'decorators', 'name', 'params', 'paramsTrailingSeparator', 'suite' ] )
 ClassStmt = schema.newClass( 'ClassStmt', CompoundStmt, [ 'decorators', 'name', 'bases', 'basesTrailingSeparator', 'suite' ] )

@@ -244,6 +244,9 @@ class _ExprImporter (_Importer):
 		elif isinstance( value, unicode ):
 			format = 'unicode'
 			r = repr( value )[1:]
+		elif isinstance( value, bytes ):
+			format = 'bytes'
+			r = repr( value )[1:]
 		else:
 			raise ValueError, 'Str: could not determine format of %s' % value
 		q = r[0]
@@ -579,11 +582,20 @@ class _CompoundStmtImporter (_Importer):
 	
 	
 	# With
+	def _withContext(self, withNode):
+		expr = _expr( withNode.context_expr )
+		target = _target( withNode.optional_vars )   if withNode.optional_vars is not None   else   None
+		return Schema.WithContext( expr=expr, target=target )
+
 	def With(self, structTab, node):
-		expr = _expr( node.expr )
-		target = _target( node.vars )   if node.vars is not None   else   None
+		contexts = [ self._withContext( node ) ]
+
+		while len( node.body ) == 1  and  isinstance( node.body[0], _ast.With ):
+			node = node.body[0]
+			contexts.append( self._withContext( node ) )
+
 		suite = _flattenedCompound( structTab, node.body )
-		return [ Schema.WithStmt( expr=expr, target=target, suite=suite ) ]
+		return [ Schema.WithStmt( contexts=contexts, suite=suite ) ]
 	
 	
 	# Function
@@ -928,8 +940,9 @@ class ImporterTestCase (unittest.TestCase):
 	def testStr(self):
 		self._exprTest( "'a'", Schema.StringLiteral( format='ascii', quotation='single', value='a' ) )
 		self._exprTest( "u'a'", Schema.StringLiteral( format='unicode', quotation='single', value=u'a' ) )
-		
-		
+		self._exprTest( "b'a'", Schema.StringLiteral( format='ascii', quotation='single', value=b'a' ) )
+
+
 	def testNum(self):
 		self._exprTest( '1', Schema.IntLiteral( format='decimal', numType='int', value='1' ) )
 		self._exprTest( '1L', Schema.IntLiteral( format='decimal', numType='long', value='1' ) )
@@ -1324,21 +1337,29 @@ finally:
 
 		
 		
-	#def testWith(self):
-		#src1 = \
-#"""
-#with a:
-	#x
-#"""
-		#src2 = \
-#"""
-#with a as b:
-	#x
-#"""
-		#self._compStmtTest( src1, [ [ 'withStmt', [ 'var', 'a' ], None, [ [ 'var', 'x' ] ] ] ] )
-		#self._compStmtTest( src2, [ [ 'withStmt', [ 'var', 'a' ], [ 'singleTarget', 'b' ], [ [ 'var', 'x' ] ] ] ] )
+	def testWith(self):
+		src1 = \
+"""
+with a:
+	x
+"""
+		src2 = \
+"""
+with a as b:
+	x
+"""
+		src3 =\
+"""
+with a as b, c as d, e:
+	  x
+"""
+		self._compStmtTest( src1, [ Schema.BlankLine(), Schema.WithStmt( contexts=[ Schema.WithContext( expr=Schema.Load( name='a' ) ) ], suite=[ Schema.ExprStmt( expr=Schema.Load( name='x' ) ) ] ) ] )
+		self._compStmtTest( src2, [ Schema.BlankLine(), Schema.WithStmt( contexts=[ Schema.WithContext( expr=Schema.Load( name='a' ), target=Schema.SingleTarget( name='b' ) ) ], suite=[ Schema.ExprStmt( expr=Schema.Load( name='x' ) ) ] ) ] )
+		self._compStmtTest( src3, [ Schema.BlankLine(), Schema.WithStmt( contexts=[ Schema.WithContext( expr=Schema.Load( name='a' ), target=Schema.SingleTarget( name='b' ) ),
+		                                                                            Schema.WithContext( expr=Schema.Load( name='c' ), target=Schema.SingleTarget( name='d' ) ),
+		                                                                            Schema.WithContext( expr=Schema.Load( name='e' ) ) ], suite=[ Schema.ExprStmt( expr=Schema.Load( name='x' ) ) ] ) ] )
 
-	
+
 	def testFunction(self):
 		src1 = \
 """

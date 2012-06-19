@@ -163,21 +163,12 @@ class Python2CodeGenerator (object):
 	def UNPARSED(self, node, value):
 		raise Python2CodeGeneratorUnparsedError
 	
-	
+
+
 	# String literal
 	@DMObjectNodeDispatchMethod( Schema.StringLiteral )
 	def StringLiteral(self, node, format, quotation, value):
-		prefix = ''
-		if format == 'ascii':
-			prefix = ''
-		elif format == 'unicode':
-			prefix = 'u'
-		elif format == 'ascii-regex':
-			prefix = 'r'
-		elif format == 'unicode-regex':
-			prefix = 'ur'
-		else:
-			raise ValueError, 'Unknown string literal format'
+		prefix = Schema.stringFormatToPrefix( format )
 		quote = '"'   if quotation == 'double'   else   "'"
 		return prefix + quote + value + quote
 
@@ -196,16 +187,24 @@ class Python2CodeGenerator (object):
 	def IntLiteral(self, node, format, numType, value):
 		if numType == 'int':
 			if format == 'decimal':
-				valueString = '%d'  %  int( value )
+				valueString = '{0}'.format( value )
 			elif format == 'hex':
-				valueString = '0x%x'  %  int( value, 16 )
+				valueString = '0x{0:x}'.format( int( value, 16 ) )
+			elif format == 'bin':
+				valueString = '0b{0:b}'.format( int( value, 2 ) )
+			elif format == 'oct':
+				valueString = '0o{0:o}'.format( int( value, 8 ) )
 			else:
 				raise Python2CodeGeneratorInvalidFormatError, 'invalid integer literal format'
 		elif numType == 'long':
 			if format == 'decimal':
-				valueString = '%dL'  %  long( value )
+				valueString = '{0}L'.format( long( value ) )
 			elif format == 'hex':
-				valueString = '0x%xL'  %  long( value, 16 )
+				valueString = '0x{0:x}L'.format( long( value, 16 ) )
+			elif format == 'bin':
+				valueString = '0b{0:b}L'.format( long( value, 2 ) )
+			elif format == 'oct':
+				valueString = '0o{0:o}L'.format( long( value, 8 ) )
 			else:
 				raise Python2CodeGeneratorInvalidFormatError, 'invalid integer literal format'
 		else:
@@ -790,9 +789,13 @@ class Python2CodeGenerator (object):
 	
 
 	# With statement
+	@DMObjectNodeDispatchMethod( Schema.WithContext )
+	def WithContext(self, node, expr, target):
+		return self( expr, PRECEDENCE_STMT )  +  ( ( ' as ' + self( target, PRECEDENCE_STMT ) )   if target is not None   else   '' )
+
 	@DMObjectNodeDispatchMethod( Schema.WithStmt )
-	def WithStmt(self, node, expr, target, suite):
-		return self._indentedSuite( Line( 'with '  +  self( expr, PRECEDENCE_STMT )  +  ( ' as ' + self( target, PRECEDENCE_STMT )   if target is not None   else   '' )  +  ':',   node ),   suite )
+	def WithStmt(self, node, contexts, suite):
+		return self._indentedSuite( Line( 'with '  +  ', '.join( [ self( ctx )   for ctx in contexts ] )  +  ':',   node ),   suite )
 	
 	
 	# Decorator
@@ -1229,13 +1232,19 @@ class TestCase_Python2CodeGenerator (unittest.TestCase):
 		
 	def test_StringLiteral(self):
 		self._testSX( '(py StringLiteral format=ascii quotation=single value="Hi there")', '\'Hi there\'' )
-		
-		
+		self._testSX( '(py StringLiteral format=unicode quotation=single value="Hi there")', 'u\'Hi there\'' )
+		self._testSX( '(py StringLiteral format=bytes quotation=single value="Hi there")', 'b\'Hi there\'' )
+
+
 	def test_IntLiteral(self):
 		self._testSX( '(py IntLiteral format=decimal numType=int value=123)', '123' )
-		self._testSX( '(py IntLiteral format=hex numType=int value=1a4)', '0x1a4' )
 		self._testSX( '(py IntLiteral format=decimal numType=long value=123)', '123L' )
+		self._testSX( '(py IntLiteral format=hex numType=int value=1a4)', '0x1a4' )
 		self._testSX( '(py IntLiteral format=hex numType=long value=1a4)', '0x1a4L' )
+		self._testSX( '(py IntLiteral format=bin numType=int value=101)', '0b101' )
+		self._testSX( '(py IntLiteral format=bin numType=long value=101)', '0b101L' )
+		self._testSX( '(py IntLiteral format=oct numType=int value=123)', '0o123' )
+		self._testSX( '(py IntLiteral format=oct numType=long value=123)', '0o123L' )
 		self.assertRaises( Python2CodeGeneratorInvalidFormatError, lambda: self._testSX( '(py IntLiteral format=foo numType=long value=1a4)', '' ) )
 		self.assertRaises( Python2CodeGeneratorInvalidFormatError, lambda: self._testSX( '(py IntLiteral format=hex numType=foo value=1a4)', '' ) )
 		
@@ -1529,8 +1538,10 @@ class TestCase_Python2CodeGenerator (unittest.TestCase):
 
 
 	def test_withStmt(self):
-		self._testSX( '(py WithStmt expr=(py Load name=a) target=`null` suite=[(py ExprStmt expr=(py Load name=b))])', 'with a:\n\tb\n' )
-		self._testSX( '(py WithStmt expr=(py Load name=a) target=(py Load name=x) suite=[(py ExprStmt expr=(py Load name=b))])', 'with a as x:\n\tb\n' )
+		self._testSX( '(py WithStmt contexts=[(py WithContext expr=(py Load name=a) target=`null`)] suite=[(py ExprStmt expr=(py Load name=b))])', 'with a:\n\tb\n' )
+		self._testSX( '(py WithStmt contexts=[(py WithContext expr=(py Load name=a) target=(py SingleTarget name=x))] suite=[(py ExprStmt expr=(py Load name=b))])', 'with a as x:\n\tb\n' )
+		self._testSX( '(py WithStmt contexts=[(py WithContext expr=(py Load name=a) target=(py SingleTarget name=x)) (py WithContext expr=(py Load name=b) target=(py SingleTarget name=y)) '+\
+		              '(py WithContext expr=(py Load name=c) target=`null`)] suite=[(py ExprStmt expr=(py Load name=b))])', 'with a as x, b as y, c:\n\tb\n' )
 
 
 	def test_decorator(self):

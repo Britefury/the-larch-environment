@@ -42,6 +42,7 @@ yieldKeyword = 'yield'
 
 keywords = [ 'and', 'as', 'assert', 'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'exec', 'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda', 'not', 'or', 'pass', 'print', 'raise', 'return', 'try', 'while', 'with', 'yield' ]
 keywordsSet = set( keywords )
+nonIdentifierKeywordsSet = set( [ k   for k in keywords   if k != 'print' ] )
 
 
 augAssignOps = [ '+=', '-=', '*=', '/=', '%=', '**=', '>>=', '<<=', '&=', '^=', '|=' ]

@@ -193,6 +193,10 @@ class Python2ASTGenerator (object):
 				return  _ast.Num( int( value ) )
 			elif format == 'hex':
 				return  _ast.Num( int( value, 16 ) )
+			elif format == 'bin':
+				return  _ast.Num( int( value, 2 ) )
+			elif format == 'oct':
+				return  _ast.Num( int( value, 8 ) )
 			else:
 				raise Python2ASTGeneratorInvalidFormatError, 'invalid integer literal format'
 		elif numType == 'long':
@@ -200,6 +204,10 @@ class Python2ASTGenerator (object):
 				return  _ast.Num( long( value ) )
 			elif format == 'hex':
 				return  _ast.Num( long( value, 16 ) )
+			elif format == 'bin':
+				return  _ast.Num( long( value, 2 ) )
+			elif format == 'oct':
+				return  _ast.Num( long( value, 8 ) )
 			else:
 				raise Python2ASTGeneratorInvalidFormatError, 'invalid integer literal format'
 		else:
@@ -901,9 +909,13 @@ class TestCase_Python2ASTGenerator (unittest.TestCase):
 
 	def test_IntLiteral(self):
 		self._testExprSX( '(py IntLiteral format=decimal numType=int value=123)', '123' )
-		self._testExprSX( '(py IntLiteral format=hex numType=int value=1a4)', '0x1a4' )
 		self._testExprSX( '(py IntLiteral format=decimal numType=long value=123)', '123L' )
+		self._testExprSX( '(py IntLiteral format=hex numType=int value=1a4)', '0x1a4' )
 		self._testExprSX( '(py IntLiteral format=hex numType=long value=1a4)', '0x1a4L' )
+		self._testExprSX( '(py IntLiteral format=bin numType=int value=101)', '0b101' )
+		self._testExprSX( '(py IntLiteral format=bin numType=long value=101)', '0b101L' )
+		self._testExprSX( '(py IntLiteral format=oct numType=int value=123)', '0o123' )
+		self._testExprSX( '(py IntLiteral format=oct numType=long value=123)', '0o123L' )
 		self.assertRaises( Python2ASTGeneratorInvalidFormatError, lambda: self._testSXAST( '(py IntLiteral format=foo numType=long value=1a4)', None ) )
 		self.assertRaises( Python2ASTGeneratorInvalidFormatError, lambda: self._testSXAST( '(py IntLiteral format=hex numType=foo value=1a4)', None ) )
 

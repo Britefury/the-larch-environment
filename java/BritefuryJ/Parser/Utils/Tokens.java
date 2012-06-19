@@ -366,7 +366,10 @@ public class Tokens
 	public static Pattern decimalIntegerNoOctalPattern = Pattern.compile( "(?:[1-9][0-9]*)|0" );
 	public static Pattern hexIntegerPattern = Pattern.compile( "0(x|X)[0-9A-Fa-f]+" );
 	public static Pattern hexIntegerWithoutPrefixPattern = Pattern.compile( "[0-9A-Fa-f]+" );
+	public static Pattern binIntegerPattern = Pattern.compile( "0(b|B)[01]+" );
+	public static Pattern binIntegerWithoutPrefixPattern = Pattern.compile( "[01]+" );
 	public static Pattern octalIntegerPattern = Pattern.compile( "0[0-7]+" );
+	public static Pattern oct0xIntegerPattern = Pattern.compile( "0(o|O)[0-7]+" );
 	public static Pattern floatingPointPattern = Pattern.compile( "[\\-]?(([0-9]+\\.[0-9]*)|(\\.[0-9]+))(e[\\-]?[0-9]+)?" );
 	
 	
@@ -379,7 +382,12 @@ public class Tokens
 	public static final ParserExpression hexInteger = new RegEx( hexIntegerPattern );
 	public static final ParserExpression hexIntegerWithoutPrefix = new RegEx( hexIntegerWithoutPrefixPattern );
 
+	public static final ParserExpression binInteger = new RegEx( binIntegerPattern );
+	public static final ParserExpression binIntegerWithoutPrefix = new RegEx( binIntegerWithoutPrefixPattern );
+
 	public static final ParserExpression octalInteger = new RegEx( octalIntegerPattern );
+
+	public static final ParserExpression oct0xInteger = new RegEx( oct0xIntegerPattern );
 
 	public static final ParserExpression integer = decimalInteger.__or__( hexInteger );
 	

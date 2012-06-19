@@ -160,7 +160,7 @@ def _initKeywords(keywords):
 		#keyword = keyword[0].upper() + keyword[1:]
 		_keywordMap[keyword] = ApplyStyleSheetFromAttribute( PythonEditorStyle.keywordStyle, Text( keyword, keyword ) )
 
-_initKeywords( [ 'as', 'assert', 'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'exec', 'finally', 'for', 'from', 'global', 'lambda', 'if', 'import', 'in', 'pass', 'print', 'raise', 'return', 'try', 'while', 'yield' ] )
+_initKeywords( [ 'as', 'assert', 'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'exec', 'finally', 'for', 'from', 'global', 'lambda', 'if', 'import', 'in', 'pass', 'print', 'raise', 'return', 'try', 'while', 'with', 'yield' ] )
 
 
 
@@ -254,7 +254,7 @@ _non_escaped_string_re = re.compile( r'(\\(?:[abnfrt\\' + '\'\"' + r']|(?:x[0-9a
 def stringLiteral(format, quotation, value, raw):
 	boxContents = []
 
-	if format is not None:
+	if format is not None  and  format != '':
 		boxContents.append( ApplyStyleSheetFromAttribute( PythonEditorStyle.literalFormatStyle, Text( format ) ) )
 
 	# Split the value into pieces of escaped and non-escaped content
@@ -282,7 +282,7 @@ def stringLiteral(format, quotation, value, raw):
 	return Row( boxContents )
 
 
-def multilineStringLiteral(valueLiveFunction, isUnicode, isRaw, editFn):
+def multilineStringLiteral(valueLiveFunction, formatLive, isRaw, editFn):
 	class _Listener (TextArea.TextAreaListener):
 		def onTextChanged(self, area):
 			editFn( area.getDisplayedText() )
@@ -898,7 +898,7 @@ def exceptStmtHeader(exception, target):
 	if exception is not None:
 		elements.extend( [ _space,  exception ] )
 	if target is not None:
-		elements.extend( [ _comma,  _space,  _lineBreak,  target ] )
+		elements.extend( [ _space, _keyword( 'as' ),  _space,  _lineBreak,  target ] )
 	elements.append( _colon )
 	return Span( elements )
 
@@ -907,10 +907,21 @@ def finallyStmtHeader():
 	return Span( [ _keyword( 'finally' ),  _colon ] )
 
 
-def withStmtHeader(expr, target):
-	elements = [ _keyword( 'with' ),  _space,  exprView ]
+def withContext(expr, target):
+	elements = [ expr ]
 	if target is not None:
-		elements.extend( [ _space,  _keyword( 'as' ),  _space,  _lineBreak,  target ] )
+		elements.extend( [ _space,  _keyword( 'as' ),  _space, target ] )
+	return Span( elements )
+
+def withStmtHeader(contexts):
+	elements = [ _keyword( 'with' ),  _space ]
+	first = True
+	for ctx in contexts:
+		if not first:
+			elements.append( _comma )
+			elements.append( _space )
+		elements.append( ctx )
+		first = False
 	elements.append( _colon )
 	return Span( elements )
 
