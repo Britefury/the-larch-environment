@@ -14,7 +14,7 @@ from copy import deepcopy
 from BritefuryJ.DocModel import DMObject, DMNode
 
 from BritefuryJ.Parser import Action, Condition, Suppress, Literal, Keyword, RegEx, Word, Sequence, Combine, Choice, Optional, Repetition, ZeroOrMore, OneOrMore, Peek, PeekNot, SeparatedList, ObjectNode
-from BritefuryJ.Parser.Utils.Tokens import identifier, decimalInteger, hexInteger, integer, singleQuotedString, doubleQuotedString, quotedString, floatingPoint
+from BritefuryJ.Parser.Utils.Tokens import identifier, decimalInteger, hexInteger, binInteger, oct0xInteger, singleQuotedString, doubleQuotedString, quotedString, floatingPoint
 from BritefuryJ.Parser.Utils.OperatorParser import PrefixLevel, SuffixLevel, InfixLeftLevel, InfixRightLevel, InfixChainLevel, UnaryOperator, BinaryOperator, ChainOperator, OperatorTable
 from BritefuryJ.Util.RichString import RichStringBuilder
 
@@ -31,7 +31,7 @@ from LarchCore.Languages.Python2.PythonEditor.Keywords import *
 #
 #
 # !!!!!! NOTES !!!!!!
-# Octal integers not handled correctly
+# Octal integer starting within 0 are NOT handled at all. Octal integers starting with 0o will work
 #
 # from-import statements are parsed, but information on whether the imports were wrapped in parens, or had a trailing separator, is not obtained
 #
@@ -69,7 +69,7 @@ class Python2Grammar (Grammar):
 	# Python identifier
 	@Rule
 	def pythonIdentifier(self):
-		return identifier  &  ( lambda input, begin, end, x, bindings: x not in keywordsSet )
+		return identifier  &  ( lambda input, begin, end, x, bindings: x not in nonIdentifierKeywordsSet )
 
 
 	@Rule
@@ -101,6 +101,8 @@ class Python2Grammar (Grammar):
 		flags = xs[:-1]
 		if flags[0] == 'u'  or  flags[0] == 'U':
 			format = 'unicode'
+		elif flags[0] == 'b'  or  flags[0] == 'b':
+			format = 'bytes'
 		else:
 			format = 'ascii'
 		if flags[1] == 'r'  or  flags[1] == 'R':
@@ -111,12 +113,12 @@ class Python2Grammar (Grammar):
 
 	@Rule
 	def stringSLiteral(self):
-		return ( ( Literal( 'u' ) | Literal( 'U' ) ).optional() + ( Literal( 'r' ) | Literal( 'R' ) ).optional()  +  singleQuotedString ).action(
+		return ( ( Literal( 'u' ) | Literal( 'U' ) | Literal( 'b' ) | Literal( 'B' ) ).optional() + ( Literal( 'r' ) | Literal( 'R' ) ).optional()  +  singleQuotedString ).action(
 			lambda input, begin, end, xs, bindings: Schema.StringLiteral( format=self._stringLiteralformat( xs ), quotation='single', value=xs[-1][1:-1] ) )
 
 	@Rule
 	def stringDLiteral(self):
-		return ( ( Literal( 'u' ) | Literal( 'U' ) ).optional() + ( Literal( 'r' ) | Literal( 'R' ) ).optional()  +  doubleQuotedString ).action(
+		return ( ( Literal( 'u' ) | Literal( 'U' ) | Literal( 'b' ) | Literal( 'B' ) ).optional() + ( Literal( 'r' ) | Literal( 'R' ) ).optional()  +  doubleQuotedString ).action(
 			lambda input, begin, end, xs, bindings: Schema.StringLiteral( format=self._stringLiteralformat( xs ), quotation='double', value=xs[-1][1:-1] ) )
 
 	@Rule
@@ -142,15 +144,31 @@ class Python2Grammar (Grammar):
 
 	@Rule
 	def hexIntLiteral(self):
-		return hexInteger.action( lambda input, begin, end, xs, bindings: Schema.IntLiteral( format='hex', numType='int', value=xs ) )
+		return hexInteger.action( lambda input, begin, end, xs, bindings: Schema.IntLiteral( format='hex', numType='int', value=xs[2:] ) )
 
 	@Rule
 	def hexLongLiteral(self):
-		return ( hexInteger + Suppress( Literal( 'l' )  |  Literal( 'L' ) ) ).action( lambda input, begin, end, xs, bindings: Schema.IntLiteral( format='hex', numType='long', value=xs[0] ) )
+		return ( hexInteger + Suppress( Literal( 'l' )  |  Literal( 'L' ) ) ).action( lambda input, begin, end, xs, bindings: Schema.IntLiteral( format='hex', numType='long', value=xs[0][2:] ) )
+
+	@Rule
+	def binIntLiteral(self):
+		return binInteger.action( lambda input, begin, end, xs, bindings: Schema.IntLiteral( format='bin', numType='int', value=xs[2:] ) )
+
+	@Rule
+	def binLongLiteral(self):
+		return ( binInteger + Suppress( Literal( 'l' )  |  Literal( 'L' ) ) ).action( lambda input, begin, end, xs, bindings: Schema.IntLiteral( format='bin', numType='long', value=xs[0][2:] ) )
+
+	@Rule
+	def octIntLiteral(self):
+		return oct0xInteger.action( lambda input, begin, end, xs, bindings: Schema.IntLiteral( format='oct', numType='int', value=xs[2:] ) )
+
+	@Rule
+	def octLongLiteral(self):
+		return ( oct0xInteger + Suppress( Literal( 'l' )  |  Literal( 'L' ) ) ).action( lambda input, begin, end, xs, bindings: Schema.IntLiteral( format='oct', numType='long', value=xs[0][2:] ) )
 
 	@Rule
 	def integerLiteral(self):
-		return self.hexLongLiteral() | self.hexIntLiteral() | self.decimalLongLiteral() | self.decimalIntLiteral()
+		return self.hexLongLiteral() | self.hexIntLiteral() | self.binLongLiteral() | self.binIntLiteral() | self.octLongLiteral() | self.octIntLiteral() | self.decimalLongLiteral() | self.decimalIntLiteral()
 
 
 
@@ -872,16 +890,18 @@ class Python2Grammar (Grammar):
 	# Print statement
 	@Rule
 	def printStmt(self):
-		normalForm = ( Keyword( printKeyword )  +  SeparatedList( self.expression(), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.PrintStmt( values=xs[1] ) )
-		chevronForm = ( Keyword( printKeyword )  +  Literal( '>>' )  +  self.expression()  +  ( Literal( ',' )  +
-													SeparatedList( self.expression(), 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ).optional() + Literal( '\n' ) ).action(
-														lambda input, begin, end, xs, bindings: Schema.PrintStmt( destination=xs[2], values=xs[3][1]   if xs[3] is not None   else   [] ) )
-		return normalForm | chevronForm
+		return ( Keyword( printKeyword )  +  SeparatedList( self.expression(), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.PrintStmt( values=xs[1] ) )
+
+	@Rule
+	def redirectedPrintStmt(self):
+		return ( Keyword( printKeyword )  +  Literal( '>>' )  +  self.expression()  +  ( Literal( ',' )  +
+		                                                                                        SeparatedList( self.expression(), 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ).optional() + Literal( '\n' ) ).action(
+			lambda input, begin, end, xs, bindings: Schema.PrintStmt( destination=xs[2], values=xs[3][1]   if xs[3] is not None   else   [] ) )
 
 
 
 
-	
+
 	#
 	#
 	# COMPOUND STATEMENT HEADERS
@@ -949,7 +969,7 @@ class Python2Grammar (Grammar):
 
 	@Rule
 	def exceptExcIntoTargetStmtHeader(self):
-		return ( Keyword( exceptKeyword )  +  self.expression()  +  ','  +  self.targetItem() + ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.ExceptStmtHeader( exception=xs[1], target=xs[3] ) )
+		return ( Keyword( exceptKeyword )  +  self.expression()  +  ( Literal( ',' ) | Keyword( asKeyword ) )  +  self.targetItem() + ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.ExceptStmtHeader( exception=xs[1], target=xs[3] ) )
 
 	@Rule
 	def exceptStmtHeader(self):
@@ -969,10 +989,15 @@ class Python2Grammar (Grammar):
 
 	# With statement
 	@Rule
+	def withContext(self):
+		return ( self.expression()  +  ( Keyword( asKeyword )  +  self.targetItem() ).optional() ).action(
+			lambda input, begin, end, xs, bindings: Schema.WithContext( expr=xs[0], target=xs[1][1]   if xs[1] is not None   else None ) )
+
+	@Rule
 	def withStmtHeader(self):
 		return ObjectNode( Schema.WithStmtHeader )  |  \
-		       ( Keyword( withKeyword )  +  self.expression()  +  Optional( Keyword( asKeyword )  +  self.targetItem() )  +  ':' + Literal( '\n' ) ).action(
-			lambda input, begin, end, xs, bindings: Schema.WithStmtHeader( expr=xs[1], target=xs[2][1]   if xs[2] is not None   else   None ) )
+		       ( Keyword( withKeyword )  + SeparatedList( self.withContext(), 1, -1, SeparatedList.TrailingSeparatorPolicy.NEVER )  +  ':' + Literal( '\n' ) ).action(
+			lambda input, begin, end, xs, bindings: Schema.WithStmtHeader( contexts=xs[1] ) )
 
 
 
@@ -1112,7 +1137,7 @@ class Python2Grammar (Grammar):
 	@Rule
 	def withStmt(self):
 		return ( self.withStmtHeader()  +  self.compoundSuite() ).action(
-			lambda input, begin, end, xs, bindings: Schema.WithStmt( expr=xs[0]['expr'], target=xs[0]['target'], suite=xs[1] ) )
+			lambda input, begin, end, xs, bindings: Schema.WithStmt( contexts=xs[0]['contexts'], suite=xs[1] ) )
 		
 
 	@Rule
@@ -1158,10 +1183,11 @@ class Python2Grammar (Grammar):
 
 	@Rule
 	def simpleStmt(self):
+		# Try to match print statement last; this way it can be used as a function
 		return ObjectNode( Schema.SimpleStmt )  |  \
 			self.specialFormStmtWrapper_temporary()  |  \
 		       self.assertStmt() | self.assignmentStmt() | self.augAssignStmt() | self.passStmt() | self.delStmt() | self.returnStmt() | self.yieldStmt() | self.raiseStmt() | self.breakStmt() | \
-		       self.continueStmt() | self.importStmt() | self.globalStmt() | self.execStmt() | self.printStmt() | self.exprStmt()
+		       self.continueStmt() | self.importStmt() | self.globalStmt() | self.execStmt() | self.redirectedPrintStmt() | self.exprStmt() | self.printStmt()
 
 	@Rule
 	def compoundStmtHeader(self):
@@ -1261,18 +1287,26 @@ class TestCase_Python2Parser (ParserTestCase):
 		self._parseStringTest( g.expression(), '\"abc\"', Schema.StringLiteral( format='ascii', quotation='double', value='abc' ) )
 		self._parseStringTest( g.expression(), 'u\'abc\'', Schema.StringLiteral( format='unicode', quotation='single', value='abc' ) )
 		self._parseStringTest( g.expression(), 'u\"abc\"', Schema.StringLiteral( format='unicode', quotation='double', value='abc' ) )
+		self._parseStringTest( g.expression(), 'b\'abc\'', Schema.StringLiteral( format='bytes', quotation='single', value='abc' ) )
+		self._parseStringTest( g.expression(), 'b\"abc\"', Schema.StringLiteral( format='bytes', quotation='double', value='abc' ) )
 		self._parseStringTest( g.expression(), 'r\'abc\'', Schema.StringLiteral( format='ascii-regex', quotation='single', value='abc' ) )
 		self._parseStringTest( g.expression(), 'r\"abc\"', Schema.StringLiteral( format='ascii-regex', quotation='double', value='abc' ) )
 		self._parseStringTest( g.expression(), 'ur\'abc\'', Schema.StringLiteral( format='unicode-regex', quotation='single', value='abc' ) )
 		self._parseStringTest( g.expression(), 'ur\"abc\"', Schema.StringLiteral( format='unicode-regex', quotation='double', value='abc' ) )
+		self._parseStringTest( g.expression(), 'br\'abc\'', Schema.StringLiteral( format='bytes-regex', quotation='single', value='abc' ) )
+		self._parseStringTest( g.expression(), 'br\"abc\"', Schema.StringLiteral( format='bytes-regex', quotation='double', value='abc' ) )
 
 
 	def test_integerLiteral(self):
 		g = Python2Grammar()
 		self._parseStringTest( g.expression(), '123', Schema.IntLiteral( format='decimal', numType='int', value='123' ) )
 		self._parseStringTest( g.expression(), '123L', Schema.IntLiteral( format='decimal', numType='long', value='123' ) )
-		self._parseStringTest( g.expression(), '0x123', Schema.IntLiteral( format='hex', numType='int', value='0x123' ) )
-		self._parseStringTest( g.expression(), '0x123L', Schema.IntLiteral( format='hex', numType='long', value='0x123' ) )
+		self._parseStringTest( g.expression(), '0x123', Schema.IntLiteral( format='hex', numType='int', value='123' ) )
+		self._parseStringTest( g.expression(), '0x123L', Schema.IntLiteral( format='hex', numType='long', value='123' ) )
+		self._parseStringTest( g.expression(), '0b101', Schema.IntLiteral( format='bin', numType='int', value='101' ) )
+		self._parseStringTest( g.expression(), '0b101L', Schema.IntLiteral( format='bin', numType='long', value='101' ) )
+		self._parseStringTest( g.expression(), '0o123', Schema.IntLiteral( format='oct', numType='int', value='123' ) )
+		self._parseStringTest( g.expression(), '0o123L', Schema.IntLiteral( format='oct', numType='long', value='123' ) )
 
 
 	def test_floatLiteral(self):
@@ -1733,7 +1767,6 @@ class TestCase_Python2Parser (ParserTestCase):
 		
 	def testPrintStmt(self):
 		g = Python2Grammar()
-		self._parseStringTest( g.singleLineStatementValid(), 'print\n', Schema.PrintStmt( values=[] ) )
 		self._parseStringTest( g.singleLineStatementValid(), 'print a\n', Schema.PrintStmt( values=[ Schema.Load( name='a' ) ] ) )
 		self._parseStringTest( g.singleLineStatementValid(), 'print a,\n', Schema.PrintStmt( values=[ Schema.Load( name='a' ) ] ) )
 		self._parseStringTest( g.singleLineStatementValid(), 'print a, b\n', Schema.PrintStmt( values=[ Schema.Load( name='a' ), Schema.Load( name='b' ) ] ) )
@@ -1741,9 +1774,11 @@ class TestCase_Python2Parser (ParserTestCase):
 		self._parseStringTest( g.singleLineStatementValid(), 'print >> x, a\n', Schema.PrintStmt( destination=Schema.Load( name='x' ), values=[ Schema.Load( name='a' ) ] ) )
 		self._parseStringTest( g.singleLineStatementValid(), 'print >> x, a,\n', Schema.PrintStmt( destination=Schema.Load( name='x' ), values=[ Schema.Load( name='a' ) ] ) )
 		self._parseStringTest( g.singleLineStatementValid(), 'print >> x, a, b\n', Schema.PrintStmt( destination=Schema.Load( name='x' ), values=[ Schema.Load( name='a' ), Schema.Load( name='b' ) ] ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'print\n', Schema.ExprStmt( expr=Schema.Load( name='print' ) ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'print(a)\n', Schema.ExprStmt( expr=Schema.Call( target=Schema.Load( name='print' ), args=[ Schema.Load( name='a' ) ] ) ) )
 
-		
-	
+
+
 	#
 	# Compound statement headers
 	#
@@ -1810,10 +1845,15 @@ class TestCase_Python2Parser (ParserTestCase):
 
 	def testWithStmtHeader(self):
 		g = Python2Grammar()
-		self._parseStringTest( g.withStmtHeader(), 'with a:\n', Schema.WithStmtHeader( expr=Schema.Load( name='a' ), target=None ) )
-		self._parseStringTest( g.withStmtHeader(), 'with a as b:\n', Schema.WithStmtHeader( expr=Schema.Load( name='a' ), target=Schema.SingleTarget( name='b' ) ) )
-		self._parseNodeTest( g.withStmtHeader(), Schema.WithStmtHeader( expr=Schema.Load( name='a' ), target=None ), Schema.WithStmtHeader( expr=Schema.Load( name='a' ), target=None ) )
-		self._parseNodeTest( g.compoundStmtHeader(), Schema.WithStmtHeader( expr=Schema.Load( name='a' ), target=None ), Schema.WithStmtHeader( expr=Schema.Load( name='a' ), target=None ) )
+		self._parseStringTest( g.withStmtHeader(), 'with a:\n', Schema.WithStmtHeader( contexts=[ Schema.WithContext( expr=Schema.Load( name='a' ), target=None ) ] ) )
+		self._parseStringTest( g.withStmtHeader(), 'with a as b:\n', Schema.WithStmtHeader( contexts=[ Schema.WithContext( expr=Schema.Load( name='a' ), target=Schema.SingleTarget( name='b' ) ) ] ) )
+		self._parseStringTest( g.withStmtHeader(), 'with a as b, c as d, e:\n', Schema.WithStmtHeader( contexts=[ Schema.WithContext( expr=Schema.Load( name='a' ), target=Schema.SingleTarget( name='b' ) ),
+		                                                                                                          Schema.WithContext( expr=Schema.Load( name='c' ), target=Schema.SingleTarget( name='d' ) ),
+		                                                                                                          Schema.WithContext( expr=Schema.Load( name='e' ) ) ] ) )
+		self._parseNodeTest( g.withStmtHeader(), Schema.WithStmtHeader( contexts=[ Schema.WithContext( expr=Schema.Load( name='a' ), target=None ) ] ),
+		                     Schema.WithStmtHeader( contexts=[ Schema.WithContext( expr=Schema.Load( name='a' ), target=None ) ] ) )
+		self._parseNodeTest( g.compoundStmtHeader(), Schema.WithStmtHeader( contexts=[ Schema.WithContext( expr=Schema.Load( name='a' ), target=None ) ] ),
+		                     Schema.WithStmtHeader( contexts=[ Schema.WithContext( expr=Schema.Load( name='a' ), target=None ) ] ) )
 
 
 	def testDecoStmtHeader(self):
@@ -2260,11 +2300,11 @@ class TestCase_Python2Parser (ParserTestCase):
 		g = Python2Grammar()
 		self._parseListTest( g.suiteItem(),
 				     [
-					     Schema.WithStmtHeader( expr=Schema.SingleTarget( name='a' ), target=Schema.Load( name='x' ) ),
+					     Schema.WithStmtHeader(contexts=[ Schema.WithContext( expr=Schema.Load( name='a' ), target=None ) ] ),
 					     Schema.Indent(),
 					     	Schema.BlankLine(),
 					     Schema.Dedent() ],
-				     Schema.WithStmt( expr=Schema.SingleTarget( name='a' ), target=Schema.Load( name='x' ), suite=[ Schema.BlankLine() ] ) )
+				     Schema.WithStmt( contexts=[ Schema.WithContext( expr=Schema.Load( name='a' ), target=None ) ], suite=[ Schema.BlankLine() ] ) )
 	
 		
 	def test_defStmt(self):

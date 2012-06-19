@@ -736,12 +736,10 @@ class Python2View (MethodDispatchView):
 
 
 	# String literal
-	__strLit_fmtTable = { 'ascii' : None,  'unicode' : 'u',  'ascii-regex' : 'r',  'unicode-regex' : 'ur' }
-
 	@DMObjectNodeDispatchMethod( Schema.StringLiteral )
 	@Expression
 	def StringLiteral(self, fragment, inheritedState, model, format, quotation, value):
-		fmt = self.__strLit_fmtTable[format]
+		fmt = Schema.stringFormatToPrefix( format )
 
 		quote = "'"   if quotation == 'single'   else   '"'
 
@@ -767,8 +765,14 @@ class Python2View (MethodDispatchView):
 				return ''
 
 		@LiveFunction
-		def _isUnicode():
-			return model['format'].startswith( 'unicode' )
+		def _format():
+			f = model['format']
+			if f.startswith( 'unicode' ):
+				return 'unicode'
+			elif f.startswith( 'bytes' ):
+				return 'bytes'
+			else:
+				return 'ascii'
 
 		@LiveFunction
 		def _isRaw():
@@ -776,7 +780,7 @@ class Python2View (MethodDispatchView):
 
 		def _onEdit(text):
 			model['value'] = text
-		return multilineStringLiteral( _val, _isUnicode, _isRaw, _onEdit )
+		return multilineStringLiteral( _val, _format, _isRaw, _onEdit )
 
 
 	# Integer literal
@@ -787,15 +791,25 @@ class Python2View (MethodDispatchView):
 
 		if numType == 'long':
 			if format == 'hex':
-				valueString = '0x%x'  %  long( value, 16 )
+				valueString = '0x{0:x}L'.format( long( value, 16 ) )
+			elif format == 'bin':
+				valueString = '0b{0:b}L'.format( long( value, 2 ) )
+			elif format == 'oct':
+				valueString = '0o{0:o}L'.format( long( value, 8 ) )
 			else:
-				valueString = '%d'  %  long( value )
+				valueString = '{0}L'.format( long( value ) )
+
 			fmt = 'L'
 		else:
 			if format == 'hex':
-				valueString = '0x%x'  %  int( value, 16 )
+				valueString = '0x{0:x}'.format( int( value, 16 ) )
+			elif format == 'bin':
+				valueString = '0b{0:b}'.format( int( value, 2 ) )
+			elif format == 'oct':
+				valueString = '0o{0:o}'.format( int( value, 8 ) )
 			else:
-				valueString = '%d'  %  int( value )
+				valueString = '{0}'.format( value )
+
 			fmt = None
 
 		return intLiteral( fmt, valueString )
@@ -1594,15 +1608,20 @@ class Python2View (MethodDispatchView):
 
 
 	# With statement
-	def _withStmtHeaderElement(self, inheritedState, expr, target):
-		exprView = SREInnerFragment( expr, PRECEDENCE_STMT )
-		targetView = SREInnerFragment( target, PRECEDENCE_STMT )   if target is not None   else None
-		return withStmtHeader( exprView, targetView )
+	@DMObjectNodeDispatchMethod( Schema.WithContext )
+	def WithContext(self, fragment, inheritedState, model, expr, target):
+		exprView = SREInnerFragment( expr, PRECEDENCE_CONTAINER_ELEMENT )
+		targetView = SREInnerFragment( target, PRECEDENCE_CONTAINER_ELEMENT )   if target is not None   else None
+		return withContext( exprView, targetView )
+
+	def _withStmtHeaderElement(self, inheritedState, contexts):
+		contextViews = SREInnerFragment.map( contexts, PRECEDENCE_STMT )
+		return withStmtHeader( contextViews )
 
 	@DMObjectNodeDispatchMethod( Schema.WithStmtHeader )
 	@CompoundStatementHeader
-	def WithStmtHeader(self, fragment, inheritedState, model, expr, target):
-		return self._withStmtHeaderElement( inheritedState, expr, target )
+	def WithStmtHeader(self, fragment, inheritedState, model, contexts):
+		return self._withStmtHeaderElement( inheritedState, contexts )
 
 
 
@@ -1732,8 +1751,8 @@ class Python2View (MethodDispatchView):
 	# With statement
 	@DMObjectNodeDispatchMethod( Schema.WithStmt )
 	@CompoundStatement
-	def WithStmt(self, fragment, inheritedState, model, expr, target, suite):
-		return [ ( Schema.WithStmtHeader( expr=expr, target=target ), self._withStmtHeaderElement( inheritedState, expr, target ), suite ) ]
+	def WithStmt(self, fragment, inheritedState, model, contexts, suite):
+		return [ ( Schema.WithStmtHeader( contexts=contexts ), self._withStmtHeaderElement( inheritedState, contexts ), suite ) ]
 
 
 
