@@ -24,7 +24,7 @@ from BritefuryJ.Graphics import *
 
 from BritefuryJ.Pres.Primitive import *
 
-from LarchCore.Languages.Python25.PythonCommands import pythonCommandSet, EmbeddedExpressionAtCaretAction, chainActions
+from LarchCore.Languages.Python2.PythonCommands import pythonCommandSet, EmbeddedExpressionAtCaretAction, chainActions
 
 from LarchTools.PythonTools.VisualRegex import Schema
 from LarchTools.PythonTools.VisualRegex.Parser import VisualRegexGrammar

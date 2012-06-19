@@ -11,12 +11,12 @@ import java.util.List
 
 from BritefuryJ.DocModel import DMNode
 
-from LarchCore.Languages.Python25 import Schema
-from LarchCore.Languages.Python25.Embedded import _py25NewModule
-from LarchCore.Languages.Python25.Python25Importer import importPy25File
-from LarchCore.Languages.Python25.PythonEditor.Subject import Python25Subject
-from LarchCore.Languages.Python25.PythonEditor.View import perspective as python25EditorPerspective
-from LarchCore.Languages.Python25.TextExporter import PythonTextExporter
+from LarchCore.Languages.Python2 import Schema
+from LarchCore.Languages.Python2.Embedded import _py25NewModule
+from LarchCore.Languages.Python2.Python2Importer import importPy25File
+from LarchCore.Languages.Python2.PythonEditor.Subject import Python2Subject
+from LarchCore.Languages.Python2.PythonEditor.View import perspective as python2EditorPerspective
+from LarchCore.Languages.Python2.TextExporter import PythonTextExporter
 
 
 from LarchCore.Project.PageData import PageData, registerPageFactory, registerPageImporter
@@ -42,7 +42,7 @@ def isEmptyTopLevel(x):
 
 
 
-class Python25PageData (PageData):
+class Python2PageData (PageData):
 	def makeEmptyContents(self):
 		return _py25NewModule()
 
@@ -51,15 +51,15 @@ class Python25PageData (PageData):
 		return exporter( self.contents )
 
 	def __new_subject__(self, document, enclosingSubject, location, importName, title):
-		return Python25Subject( document, self.contents, enclosingSubject, location, importName, title )
+		return Python2Subject( document, self.contents, enclosingSubject, location, importName, title )
 
 
 def _py25ImportPage(filename):
 	content = importPy25File( filename )
-	return Python25PageData( content )	
+	return Python2PageData( content )
 	
 
-registerPageFactory( 'Python 2.5', Python25PageData, 'Python' )
-registerPageImporter( 'Python 2.5', 'Python 2.5 source (*.py)', 'py', _py25ImportPage )
+registerPageFactory( 'Python 2', Python2PageData, 'Python' )
+registerPageImporter( 'Python 2', 'Python 2 source (*.py)', 'py', _py25ImportPage )
 
 

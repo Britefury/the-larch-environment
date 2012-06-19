@@ -9,8 +9,8 @@ from Britefury.Util.Abstract import abstractmethod
 
 from BritefuryJ.DocModel import DMNode
 
-import LarchCore.Languages.Python25.Schema as Py
-from LarchCore.Languages.Python25 import Embedded
+import LarchCore.Languages.Python2.Schema as Py
+from LarchCore.Languages.Python2 import Embedded
 
 
 
@@ -225,7 +225,7 @@ class GenExp (Expr):
 def target(x):
 	if isinstance( x, Target ):
 		return x
-	elif isinstance( x, Embedded.EmbeddedPython25Target ):
+	elif isinstance( x, Embedded.EmbeddedPython2Target ):
 		return TargetBuilt( x.target )
 	elif isinstance( x, DMNode )  and  x.isInstanceOf( Py.Target ):
 		return TargetBuilt( x )
@@ -243,7 +243,7 @@ def expr(x):
 		return none_
 	elif isinstance( x, Expr ):
 		return x
-	elif isinstance( x, Embedded.EmbeddedPython25Expr ):
+	elif isinstance( x, Embedded.EmbeddedPython2Expr ):
 		return ExprBuilt( x.expression )
 	elif isinstance( x, DMNode )  and  x.isInstanceOf( Py.Expr ):
 		return ExprBuilt( x )
@@ -304,7 +304,7 @@ class TestCase_Builder (unittest.TestCase):
 	def test_Target_coerce(self):
 		t = SingleTarget( 't' )
 		self.assert_( t is target( t ) )
-		self._buildTest( Py.SingleTarget( name='t' ), target( Embedded.EmbeddedPython25Target( Py.PythonTarget( target=Py.SingleTarget( name='t' ) ) ) ) )
+		self._buildTest( Py.SingleTarget( name='t' ), target( Embedded.EmbeddedPython2Target( Py.PythonTarget( target=Py.SingleTarget( name='t' ) ) ) ) )
 		self._buildTest( Py.SingleTarget( name='t' ), target( Py.SingleTarget( name='t' ) ) )
 		self._buildTest( Py.TupleTarget( targets=[ Py.SingleTarget( name='t' ), Py.SingleTarget( name='v' ) ] ), target( ( Py.SingleTarget( name='t' ), Py.SingleTarget( name='v' ) ) ) )
 		self._buildTest( Py.ListTarget( targets=[ Py.SingleTarget( name='t' ), Py.SingleTarget( name='v' ) ] ), target( [ Py.SingleTarget( name='t' ), Py.SingleTarget( name='v' ) ] ) )

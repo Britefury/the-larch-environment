@@ -11,7 +11,7 @@ from BritefuryJ.DocModel import DMObject, DMList, DMEmbeddedObject, DMEmbeddedIs
 
 from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, methodDispatch
 
-from LarchCore.Languages.Python25.TextExporter import PythonTextExporter
+from LarchCore.Languages.Python2.TextExporter import PythonTextExporter
 from LarchCore.Worksheet import Schema
 
 

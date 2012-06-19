@@ -13,8 +13,8 @@ from BritefuryJ.Util.RichString import RichStringBuilder
 
 from BritefuryJ.Util.Jython import JythonException
 
-from LarchCore.Languages.Python25 import CodeGenerator
-from LarchCore.Languages.Python25.Execution import ExecutionPresCombinators
+from LarchCore.Languages.Python2 import CodeGenerator
+from LarchCore.Languages.Python2.Execution import ExecutionPresCombinators
 
 
 class _OutputStream (object):

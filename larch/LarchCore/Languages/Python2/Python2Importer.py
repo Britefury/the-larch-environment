@@ -8,7 +8,7 @@
 import _ast
 
 
-from LarchCore.Languages.Python25 import Schema
+from LarchCore.Languages.Python2 import Schema
 
 
 

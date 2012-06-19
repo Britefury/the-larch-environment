@@ -169,7 +169,7 @@ class TestCase_VisualRegexCodeGenerator (unittest.TestCase):
 		sx = '{ vre=LarchTools.PythonTools.VisualRegex<0> : ' + sx + ' }'
 		data = DMIOReader.readFromString( sx )
 
-		gen = VisualRegexCodeGenerator( '<test>' )
+		gen = VisualRegexCodeGenerator()
 		result = str( gen( data ) )
 
 		if result != expected:

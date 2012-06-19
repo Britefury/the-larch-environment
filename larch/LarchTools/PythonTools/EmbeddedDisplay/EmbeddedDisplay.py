@@ -29,14 +29,14 @@ from BritefuryJ.Editor.Table.Generic import *
 
 from BritefuryJ.StyleSheet import *
 
-from LarchCore.Languages.Python25.PythonCommands import pythonCommandSet, EmbeddedExpressionAtCaretAction, WrapSelectionInEmbeddedExpressionAction, chainActions
-from LarchCore.Languages.Python25.Embedded import EmbeddedPython25Expr
+from LarchCore.Languages.Python2.PythonCommands import pythonCommandSet, EmbeddedExpressionAtCaretAction, WrapSelectionInEmbeddedExpressionAction, chainActions
+from LarchCore.Languages.Python2.Embedded import EmbeddedPython2Expr
 
 
 
 class EmbeddedDisplay (object):
 	def __init__(self):
-		self._expr = EmbeddedPython25Expr()
+		self._expr = EmbeddedPython2Expr()
 		self._code = None
 		self._values = []
 		self._incr = IncrementalValueMonitor()

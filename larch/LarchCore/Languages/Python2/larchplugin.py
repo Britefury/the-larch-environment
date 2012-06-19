@@ -5,11 +5,11 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from LarchCore.Languages.Python25.PythonConfig import Python25ConfigurationPage
-from LarchCore.Languages.Python25 import Python25
+from LarchCore.Languages.Python2.PythonConfig import Python2ConfigurationPage
+from LarchCore.Languages.Python2 import Python2
 
 
 
 def initPlugin(plugin, world):
-	world.configuration.registerConfigurationPage( Python25ConfigurationPage() )
+	world.configuration.registerConfigurationPage( Python2ConfigurationPage() )
 

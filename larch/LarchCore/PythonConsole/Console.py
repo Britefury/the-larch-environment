@@ -44,9 +44,9 @@ from BritefuryJ.IncrementalView import FragmentView, FragmentData
 from BritefuryJ.Util import TypeUtils
 
 
-from LarchCore.Languages.Python25 import Python25
-from LarchCore.Languages.Python25.Execution.ExecutionPresCombinators import execStdout, execStderr, execException, execResult
-from LarchCore.Languages.Python25.Execution import Execution
+from LarchCore.Languages.Python2 import Python2
+from LarchCore.Languages.Python2.Execution.ExecutionPresCombinators import execStdout, execStderr, execException, execResult
+from LarchCore.Languages.Python2.Execution import Execution
 
 
 
@@ -130,7 +130,7 @@ class Console (object):
 		self._incr = IncrementalValueMonitor( self )
 
 		self._blocks = []
-		self._currentPythonModule = Python25.py25NewModuleAsRoot()
+		self._currentPythonModule = Python2.py25NewModuleAsRoot()
 		self._before = []
 		self._after = []
 		self._module = imp.new_module( name )
@@ -150,12 +150,12 @@ class Console (object):
 	def _commit(self, module, execResult):
 		self._blocks.append( ConsoleBlock( module, execResult ) )
 		for a in self._after:
-			if not Python25.isEmptyTopLevel(a):
+			if not Python2.isEmptyTopLevel(a):
 				self._before.append( a )
-		if not Python25.isEmptyTopLevel(module):
+		if not Python2.isEmptyTopLevel(module):
 			self._before.append( deepcopy( module ) )
 		self._after = []
-		self._currentPythonModule = Python25.py25NewModuleAsRoot()
+		self._currentPythonModule = Python2.py25NewModuleAsRoot()
 		self._incr.onChanged()
 
 	def backwards(self):
@@ -181,12 +181,12 @@ class Console (object):
 
 	def execute(self, bEvaluate=True):
 		module = self.getCurrentPythonModule()
-		if not Python25.isEmptyTopLevel(module):
+		if not Python2.isEmptyTopLevel(module):
 			execResult = Execution.getResultOfExecutionWithinModule( module, self._module, bEvaluate )
 			self._commit( module, execResult )
 
 	def executeModule(self, module, bEvaluate=True):
-		if not Python25.isEmptyTopLevel(module):
+		if not Python2.isEmptyTopLevel(module):
 			execResult = Execution.getResultOfExecutionWithinModule( module, self._module, bEvaluate )
 			self._commit( module, execResult )
 
@@ -195,7 +195,7 @@ class Console (object):
 
 	def __present__(self, fragment, inheritedState):
 		blocks = InnerFragment.map( self.getBlocks() )
-		currentModule = Python25.python25EditorPerspective.applyTo( InnerFragment( self.getCurrentPythonModule() ) )
+		currentModule = Python2.python2EditorPerspective.applyTo( InnerFragment( self.getCurrentPythonModule() ) )
 
 		def _onDrop(element, pos, data, action):
 			class _VarNameEntryListener (TextEntry.TextEntryListener):
@@ -308,7 +308,7 @@ class ConsoleBlock (object):
 		stdoutStream = executionResult.getStdOutStream()
 		stderrStream = executionResult.getStdErrStream()
 
-		moduleView = StyleSheet.style( Primitive.editable( False ) ).applyTo( Python25.python25EditorPerspective.applyTo( InnerFragment( pythonModule ) ) )
+		moduleView = StyleSheet.style( Primitive.editable( False ) ).applyTo( Python2.python2EditorPerspective.applyTo( InnerFragment( pythonModule ) ) )
 		caughtExceptionView = ApplyPerspective.defaultPerspective( InnerFragment( caughtException ) )   if caughtException is not None   else None
 		resultView = ApplyPerspective.defaultPerspective( InnerFragment( result[0] ) )   if result is not None   else None
 

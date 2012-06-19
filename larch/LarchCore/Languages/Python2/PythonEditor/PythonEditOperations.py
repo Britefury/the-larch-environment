@@ -26,10 +26,10 @@ from BritefuryJ.Util.RichString import RichStringBuilder, RichString
 
 
 
-from LarchCore.Languages.Python25 import Schema
+from LarchCore.Languages.Python2 import Schema
 
-from LarchCore.Languages.Python25.PythonEditor.Parser import Python25Grammar
-from LarchCore.Languages.Python25.PythonEditor.Precedence import *
+from LarchCore.Languages.Python2.PythonEditor.Parser import Python2Grammar
+from LarchCore.Languages.Python2.PythonEditor.Precedence import *
 
 
 class NotImplementedError (Exception):

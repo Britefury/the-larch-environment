@@ -47,16 +47,16 @@ from BritefuryJ.Live import LiveFunction
 from BritefuryJ.ModelAccess.DocModel import *
 
 
-from LarchCore.Languages.Python25 import Schema
-from LarchCore.Languages.Python25 import PythonCommands
+from LarchCore.Languages.Python2 import Schema
+from LarchCore.Languages.Python2 import PythonCommands
 
 
-from LarchCore.Languages.Python25.PythonEditor.Parser import Python25Grammar
-from LarchCore.Languages.Python25.PythonEditor.PythonEditOperations import *
-from LarchCore.Languages.Python25.PythonEditor.SREditor import *
-from LarchCore.Languages.Python25.PythonEditor.Keywords import *
-from LarchCore.Languages.Python25.PythonEditor.Precedence import *
-from LarchCore.Languages.Python25.PythonEditor.PythonEditorCombinators import *
+from LarchCore.Languages.Python2.PythonEditor.Parser import Python2Grammar
+from LarchCore.Languages.Python2.PythonEditor.PythonEditOperations import *
+from LarchCore.Languages.Python2.PythonEditor.SREditor import *
+from LarchCore.Languages.Python2.PythonEditor.Keywords import *
+from LarchCore.Languages.Python2.PythonEditor.Precedence import *
+from LarchCore.Languages.Python2.PythonEditor.PythonEditorCombinators import *
 
 from BritefuryJ.LSpace.Marker import Marker
 
@@ -586,9 +586,9 @@ def EmbeddedObjectExpression(method):
 
 
 
-class Python25View (MethodDispatchView):
+class Python2View (MethodDispatchView):
 	def __init__(self, grammar):
-		super( Python25View, self ).__init__()
+		super( Python2View, self ).__init__()
 		self._parser = grammar
 		
 		editor = PythonSyntaxRecognizingEditor.instance
@@ -707,7 +707,7 @@ class Python25View (MethodDispatchView):
 	def UNPARSED(self, fragment, inheritedState, model, value):
 		def _viewItem(x):
 			if x is model:
-				raise ValueError, 'Python25View.UNPARSED: self-referential unparsed node'
+				raise ValueError, 'Python2View.UNPARSED: self-referential unparsed node'
 			if isinstance( x, str )  or  isinstance( x, unicode ):
 				view = unparseableText( x )
 				return view
@@ -1772,8 +1772,8 @@ class Python25View (MethodDispatchView):
 
 
 
-_parser = Python25Grammar()
-_view = Python25View( _parser )
+_parser = Python2Grammar()
+_view = Python2View( _parser )
 perspective = SequentialEditorPerspective( _view.fragmentViewFunction, PythonSyntaxRecognizingEditor.instance )
 
 
@@ -1808,7 +1808,7 @@ def _newUnquote(caret):
 _unquoteCommand = Command( '&Un&quote', _newUnquote )
 
 
-PythonCommands.pythonCommandSet( 'LarchCore.Languages.Python25', [ _multilineStringCommand, _quoteExprCommand, _quoteStmtCommand, _unquoteCommand ] )
+PythonCommands.pythonCommandSet( 'LarchCore.Languages.Python2', [ _multilineStringCommand, _quoteExprCommand, _quoteStmtCommand, _unquoteCommand ] )
 
 
 

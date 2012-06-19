@@ -11,9 +11,9 @@ from BritefuryJ.Browser import Location
 
 from BritefuryJ.Projection import Subject
 
-from LarchCore.Languages.Python25 import Schema
-from LarchCore.Languages.Python25.CodeGenerator import compileForModuleExecution
-from LarchCore.Languages.Python25.PythonEditor.View import perspective
+from LarchCore.Languages.Python2 import Schema
+from LarchCore.Languages.Python2.CodeGenerator import compileForModuleExecution
+from LarchCore.Languages.Python2.PythonEditor.View import perspective
 
 
 def _getSuiteStmtByName(suite, name):
@@ -67,7 +67,7 @@ class _ClassSubject (_MemberSubject):
 
 
 	
-class _Python25ModuleLoader (object):
+class _Python2ModuleLoader (object):
 	def __init__(self, model, document):
 		self._model = model
 		self._document = document
@@ -84,9 +84,9 @@ class _Python25ModuleLoader (object):
 	
 	
 	
-class Python25Subject (Subject):
+class Python2Subject (Subject):
 	def __init__(self, document, model, enclosingSubject, location, importName, title):
-		super( Python25Subject, self ).__init__( enclosingSubject )
+		super( Python2Subject, self ).__init__( enclosingSubject )
 		assert isinstance( location, Location )
 		self._document = document
 		self._model = model
@@ -123,6 +123,6 @@ class Python25Subject (Subject):
 	
 	
 	def createModuleLoader(self, document):
-		return _Python25ModuleLoader( self._model, document )
+		return _Python2ModuleLoader( self._model, document )
 	
 	

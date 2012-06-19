@@ -12,15 +12,15 @@ from Britefury.Config.ConfigurationPage import ConfigurationPage
 
 
 
-class Python25ConfigurationPage (ConfigurationPage):
+class Python2ConfigurationPage (ConfigurationPage):
 	def getSubjectTitle(self):
-		return '[CFG] Python 2.5'
+		return '[CFG] Python 2'
 	
 	def getTitleText(self):
-		return 'Python 2.5 Configuration'
+		return 'Python 2 Configuration'
 	
 	def getLinkText(self):
-		return 'Python 2.5 editor'
+		return 'Python 2 editor'
 
 	def __present_contents__(self, fragment, inheritedState):
 		return Label( '<NOT YET IMPLEMENTED>' )

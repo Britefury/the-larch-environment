@@ -9,9 +9,9 @@ from BritefuryJ.Command import CommandSet, CommandSetRegistry
 
 from BritefuryJ.LSpace.TextFocus import TextSelection
 
-from LarchCore.Languages.Python25.PythonEditor.PythonEditOperations import insertSpecialFormExpressionAtCaret, insertSpecialFormStatementAtCaret, pyReplaceStatementRangeWithStatement, \
+from LarchCore.Languages.Python2.PythonEditor.PythonEditOperations import insertSpecialFormExpressionAtCaret, insertSpecialFormStatementAtCaret, pyReplaceStatementRangeWithStatement, \
 	getSelectedExpression, getSelectedStatement, getSelectedStatementRange, pyReplaceNode
-from LarchCore.Languages.Python25.Builder import embeddedExpression, embeddedStatement
+from LarchCore.Languages.Python2.Builder import embeddedExpression, embeddedStatement
 
 
 
@@ -228,8 +228,8 @@ def chainActions(*actions):
 
 
 
-pythonCommands = CommandSetRegistry( 'LarchCore.Languages.Python25' )
-pythonTargetCommands = CommandSetRegistry( 'LarchCore.Languages.Python25.Target' )
+pythonCommands = CommandSetRegistry( 'LarchCore.Languages.Python2' )
+pythonTargetCommands = CommandSetRegistry( 'LarchCore.Languages.Python2.Target' )
 
 
 

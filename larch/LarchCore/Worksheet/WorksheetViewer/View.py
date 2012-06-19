@@ -42,8 +42,8 @@ from BritefuryJ.Pres.UI import *
 from BritefuryJ.Projection import Perspective, Subject
 
 
-from LarchCore.Languages.Python25 import Python25
-from LarchCore.Languages.Python25.CodeGenerator import compileForModuleExecution
+from LarchCore.Languages.Python2 import Python2
+from LarchCore.Languages.Python2.CodeGenerator import compileForModuleExecution
 
 from LarchCore.Worksheet import Schema
 from LarchCore.Worksheet.WorksheetViewer import ViewSchema
@@ -130,7 +130,7 @@ class WorksheetViewer (MethodDispatchView):
 	def PythonCode(self, fragment, inheritedState, node):
 		if node.isVisible():
 			if node.isCodeVisible():
-				codeView = Python25.python25EditorPerspective.applyTo( InnerFragment( node.getCode() ) )
+				codeView = Python2.python2EditorPerspective.applyTo( InnerFragment( node.getCode() ) )
 				if node.isCodeEditable():
 					codeView = StyleSheet.style( Primitive.editable( True ) ).applyTo( codeView )
 			else:
