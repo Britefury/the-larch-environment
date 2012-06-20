@@ -21,6 +21,7 @@ class AppState (object):
 		self._incr = IncrementalValueMonitor( self )
 		
 		self._openDocuments = []
+		self._docToAppDoc = {}
 		self._documentIDCounter = 1
 		self._consoles = []
 		
@@ -34,11 +35,18 @@ class AppState (object):
 		relativeLocation = 'Doc%03d'  %  ( self._documentIDCounter, )
 		location = documentCollectionLocation + '.' + relativeLocation
 		self._documentIDCounter += 1
-		appDocument = AppDocument( document, relativeLocation )
+		appDocument = AppDocument( document, relativeLocation, self )
 		document.setLocation( location )
 		self._openDocuments.append( appDocument )
+		self._docToAppDoc[document] = appDocument
 		self._incr.onChanged()
 		return appDocument
+
+	def closeDocument(self, document):
+		appDocument = self._docToAppDoc[document]
+		del self._docToAppDoc[document]
+		self._openDocuments.remove( appDocument )
+		self._incr.onChanged()
 		
 		
 	def hasUnsavedData(self):
@@ -60,11 +68,12 @@ class AppState (object):
 		
 	
 class AppDocument (object):
-	def __init__(self, doc, relativeLocation):
+	def __init__(self, doc, relativeLocation, appState):
 		self._incr = IncrementalValueMonitor( self )
 		
 		self._doc = doc
 		self._relativeLocation = relativeLocation
+		self.__appState = appState
 		
 		
 		
@@ -83,6 +92,11 @@ class AppDocument (object):
 	
 	def hasUnsavedData(self):
 		return self._doc.hasUnsavedData()
+
+
+	@property
+	def appState(self):
+		return self.__appState
 		
 	
 

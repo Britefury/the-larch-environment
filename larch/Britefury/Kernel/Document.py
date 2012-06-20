@@ -124,7 +124,15 @@ class Document (ChangeHistoryListener):
 		self._documentModules = {}
 		self._world.unregisterImportedModules( modulesToRemove )
 		return modulesToRemove
-	
+
+
+	def shutdown(self):
+		print 'Document.shutdown: WARNING (TODO): commands have not been uninstalled'
+		self.unloadAllImportedModules()
+
+	def close(self):
+		self.shutdown()
+
 	
 	
 	def newSubject(self, enclosingSubject, location, importName, title):
@@ -152,8 +160,28 @@ class Document (ChangeHistoryListener):
 				self._unsavedDataListener( self )
 		self._saveTime = datetime.now()
 
-		
-		
+
+	def reload(self):
+		# Shut down
+		self.shutdown()
+
+		# Reload
+		if self._filename is None:
+			raise ValueError, 'Cannot reload document - no filename'
+		f = open( self._filename, 'rU' )
+		documentRoot = IsolationPickle.load( f )
+		f.close()
+
+		# New contents
+		self._contents = documentRoot
+
+		# New change history
+		self._changeHistory = ChangeHistory()
+		self._changeHistory.track( self._contents )
+		self._changeHistory.setChangeHistoryListener( self )
+
+
+
 	def _setFilename(self, filename):
 		self._filename = filename
 		head, documentName = os.path.split( filename )
