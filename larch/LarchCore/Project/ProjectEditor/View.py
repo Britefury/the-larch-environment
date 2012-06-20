@@ -286,6 +286,20 @@ class ProjectView (MethodDispatchView):
 			DocumentManagement.promptSaveDocumentAs( fragment.getSubjectContext()['world'], control.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn, document.getFilename() )
 
 
+		def _onReload(control, buttonEvent):
+			if document.hasFilename():
+				document.save()
+				document.reload()
+				project.reset()
+			else:
+				def handleSaveDocumentAsFn(filename):
+					document.saveAs( filename )
+					document.reload()
+					project.reset()
+
+				DocumentManagement.promptSaveDocumentAs( fragment.getSubjectContext()['world'], control.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn )
+
+
 		def _onExport(control, event):
 			component = control.getElement().getRootElement().getComponent()
 			openDialog = JFileChooser()
@@ -355,10 +369,11 @@ class ProjectView (MethodDispatchView):
 
 		# Controls for 'save' and 'save as'
 		saveExportHeader = SectionHeading1( 'Save/export' )
-		saveButton = Button.buttonWithLabel( 'SAVE', _onSave )
-		saveAsButton = Button.buttonWithLabel( 'SAVE AS', _onSaveAs )
+		saveButton = Button.buttonWithLabel( 'Save', _onSave )
+		saveAsButton = Button.buttonWithLabel( 'Save as', _onSaveAs )
+		reloadButton = Button.buttonWithLabel( 'Save and reload', _onReload )
 		exportButton = Button.buttonWithLabel( 'Export', _onExport )
-		saveBox = Row( [ saveButton.padX( 10.0 ), Spacer( 30.0, 0.0 ), saveAsButton.padX( 10.0 ), Spacer( 50.0, 0.0 ), exportButton.padX( 10.0 ) ] ).alignHLeft()
+		saveBox = Row( [ saveButton.padX( 10.0 ), Spacer( 30.0, 0.0 ), saveAsButton.padX( 10.0 ), Spacer( 30.0, 0.0 ), reloadButton.padX( 10.0 ), Spacer( 50.0, 0.0 ), exportButton.padX( 10.0 ) ] ).alignHLeft()
 		saveExportSection = Section( saveExportHeader, saveBox )
 
 

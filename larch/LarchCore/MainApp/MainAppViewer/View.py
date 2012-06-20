@@ -177,13 +177,13 @@ class AppView (MethodDispatchView):
 		
 		title = TitleBar( 'The Larch Environment' )
 		
-		newLink = Hyperlink( 'NEW', _onNewDoc )
-		openLink = Hyperlink( 'OPEN', _onOpenDoc )
+		newLink = Hyperlink( 'New', _onNewDoc )
+		openLink = Hyperlink( 'Open', _onOpenDoc )
 		openDocumentsBox = _contentsList( [ newLink, openLink ], openDocViews, 'Documents' )
 		openDocumentsBox = openDocumentsBox.withNonLocalDropDest( DataFlavor.javaFileListFlavor, _onFileListDrop )
 		
 		
-		newConsoleLink = Hyperlink( 'NEW', _onNewConsole )
+		newConsoleLink = Hyperlink( 'New', _onNewConsole )
 		consolesBox = _contentsList( [ newConsoleLink ], consoles, 'Python consoles' )
 		
 		
@@ -219,17 +219,39 @@ class AppView (MethodDispatchView):
 			
 			DocumentManagement.promptSaveDocumentAs( world, element.getRootElement().getComponent(), handleSaveDocumentAsFn, document.getFilename() )
 
-			
+
+		def _onClose(link, event):
+			element = link.getElement()
+			world = fragment.getSubjectContext()['world']
+			document = node.getDocument()
+
+			def _performClose():
+				document.close()
+				node.appState.closeDocument( document )
+
+
+			if document.hasUnsavedData():
+				response = JOptionPane.showOptionDialog( element.rootElement.component,
+									 'You have not saved your work. Close document anyway?', 'Unsaved data', JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, None, [ 'Close document', 'Cancel' ], 'Cancel' )
+				if response == JOptionPane.YES_OPTION:
+					_performClose()
+				else:
+					return
+			else:
+				_performClose()
+
+
 		name = node.getName()
 		relLocation = node.getRelativeLocation()
 			
 		
 		location = fragment.getSubjectContext()['location'] + '.documents.' + relLocation
 		docLink = Hyperlink( name, location ).padX( 0.0, _appDocRightPadding )
-		saveLink = Hyperlink( 'SAVE', _onSave )
-		saveAsLink = Hyperlink( 'SAVE AS', _onSaveAs )
-	
-		return GridRow( [ docLink, saveLink, saveAsLink ] )
+		saveLink = Hyperlink( 'Save', _onSave )
+		saveAsLink = Hyperlink( 'Save as', _onSaveAs )
+		closeLink = Hyperlink( 'Close', _onClose )
+
+		return GridRow( [ docLink, saveLink, saveAsLink, closeLink ] )
 
 
 
