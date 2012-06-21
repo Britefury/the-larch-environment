@@ -100,8 +100,6 @@ public class TextArea extends ControlPres
 		@Override
 		public Pres textToPres(String text)
 		{
-			ArrayList<Pres> p = new ArrayList<Pres>();
-			
 			if ( completePattern == null )
 			{
 				StringBuilder r = new StringBuilder();
@@ -119,45 +117,60 @@ public class TextArea extends ControlPres
 			}
 			
 			
-			Matcher m = completePattern.matcher( text );
-			
-			int pos = 0;
-			while ( pos < text.length() )
+			if ( text.length() == 0 )
 			{
-				if ( m.find( pos ) )
+				return new Text( text );
+			}
+			else
+			{
+				ArrayList<Pres> p = new ArrayList<Pres>();
+				Matcher m = completePattern.matcher( text );
+				
+				int pos = 0;
+				while ( pos < text.length() )
 				{
-					int start = m.start(), end = m.end();
-					if ( start > pos )
+					if ( m.find( pos ) )
 					{
-						p.add( new Text( text.substring( pos, start ) ) );
-					}
-					// Determine which pattern was matched
-					String seq = text.substring( start, end );
-					boolean patternFound = false;
-					for (int i = 0; i < patterns.size(); i++)
-					{
-						if ( patterns.get( i ).matcher( seq ).matches() )
+						int start = m.start(), end = m.end();
+						if ( start > pos )
 						{
-							p.add( functions.get( i ).textToPres( seq ) );
-							patternFound = true;
-							break;
+							p.add( new Text( text.substring( pos, start ) ) );
 						}
+						// Determine which pattern was matched
+						String seq = text.substring( start, end );
+						boolean patternFound = false;
+						for (int i = 0; i < patterns.size(); i++)
+						{
+							if ( patterns.get( i ).matcher( seq ).matches() )
+							{
+								p.add( functions.get( i ).textToPres( seq ) );
+								patternFound = true;
+								break;
+							}
+						}
+						if ( !patternFound )
+						{
+							throw new RuntimeException( "This shouldn't have happened; could not identify which pattern matched '" + seq + "'" );
+						}
+						pos = end;
 					}
-					if ( !patternFound )
+					else
 					{
-						throw new RuntimeException( "This shouldn't have happened; could not identify which pattern matched '" + seq + "'" );
+						// No match - finish
+						p.add( new Text( text.substring( pos ) ) );
+						break;
 					}
-					pos = end;
+				}
+				
+				if ( p.size() == 1 )
+				{
+					return p.get( 0 );
 				}
 				else
 				{
-					// No match - finish
-					p.add( new Text( text.substring( pos ) ) );
-					break;
+					return new Span( p.toArray( new Pres[] {} ) );
 				}
 			}
-			
-			return new Span( p.toArray( new Pres[] {} ) );
 		}
 		
 	}

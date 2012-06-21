@@ -8,6 +8,7 @@
 import re
 
 from java.awt import Color
+from java.util.regex import Pattern
 
 from Britefury.Util.Lerp import lerp, lerpColour
 
@@ -251,7 +252,7 @@ def unparsedElements(components):
 
 _non_escaped_string_re = re.compile( r'(\\(?:[abnfrt\\' + '\'\"' + r']|(?:x[0-9a-fA-F]{2})|(?:u[0-9a-fA-F]{4})|(?:U[0-9a-fA-F]{8})))' )
 
-def stringLiteral(format, quotation, value, raw):
+def stringLiteral(format, quotation, value, isUnicode, raw):
 	boxContents = []
 
 	if format is not None  and  format != '':
@@ -282,12 +283,19 @@ def stringLiteral(format, quotation, value, raw):
 	return Row( boxContents )
 
 
-def multilineStringLiteral(valueLiveFunction, formatLive, isRaw, editFn):
+_string_escape_re = Pattern.compile( r'\\(?:[abnfrt\\' + '\'\"' + r']|(?:x[0-9a-fA-F]{2})|(?:u[0-9a-fA-F]{4})|(?:U[0-9a-fA-F]{8}))' )
+
+_stringTextPresFn = TextArea.RegexPresTable()
+_stringTextPresFn.addPattern( _string_escape_re, lambda text: ApplyStyleSheetFromAttribute( PythonEditorStyle.stringLiteralEscapeStyle, Border( Text( text ) ) ) )
+
+
+def multilineStringLiteral(valueLiveFunction, isUnicode, raw, editFn):
 	class _Listener (TextArea.TextAreaListener):
 		def onTextChanged(self, area):
 			editFn( area.getDisplayedText() )
 
-	t = TextArea( valueLiveFunction, _Listener() )
+
+	t = TextArea( valueLiveFunction, _Listener(), _stringTextPresFn   if not raw   else None )
 
 	return t
 

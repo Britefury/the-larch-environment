@@ -743,7 +743,7 @@ class Python2View (MethodDispatchView):
 
 		quote = "'"   if quotation == 'single'   else   '"'
 
-		return stringLiteral( fmt, quote, value, format.endswith( 'regex' ) )
+		return stringLiteral( fmt, quote, value, format.startswith( 'unicode' ), format.endswith( 'regex' ) )
 
 
 
@@ -751,6 +751,17 @@ class Python2View (MethodDispatchView):
 	@SpecialFormExpression
 	def MultilineStringLiteral(self, fragment, inheritedState, model, format):
 		fragment.disableAutoRefresh()
+
+		def _onRaw(checkbox, value):
+			if not value:
+				model['format'] = format.replace( '-regex', '' ).replace( 'regex', '' )
+			else:
+				model['format'] = ( format + '-regex' )   if len( format ) > 0   else 'regex'
+			fragment.queueRefresh()
+
+		def _contentMenuInteractor(element, menu):
+			menu.add( Checkbox.checkboxWithLabel( 'Raw', format.endswith( 'regex' ), _onRaw ) )
+			return True
 
 		@LiveFunction
 		def _val():
@@ -764,23 +775,13 @@ class Python2View (MethodDispatchView):
 				fragment.queueRefresh()
 				return ''
 
-		@LiveFunction
-		def _format():
-			f = model['format']
-			if f.startswith( 'unicode' ):
-				return 'unicode'
-			elif f.startswith( 'bytes' ):
-				return 'bytes'
-			else:
-				return 'ascii'
 
-		@LiveFunction
-		def _isRaw():
-			return model['format'].endswith( 'regex' )
 
 		def _onEdit(text):
 			model['value'] = text
-		return multilineStringLiteral( _val, _format, _isRaw, _onEdit )
+		p = multilineStringLiteral( _val, format.startswith( 'unicode' ), format.endswith( 'regex' ), _onEdit )
+		p = p.withContextMenuInteractor( _contentMenuInteractor )
+		return p
 
 
 	# Integer literal

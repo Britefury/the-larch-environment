@@ -12,6 +12,7 @@ import BritefuryJ.Graphics.AbstractBorder;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
 import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.Live.LiveInterface;
 import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
@@ -26,13 +27,20 @@ import BritefuryJ.StyleSheet.StyleValues;
 
 public class Checkbox extends ControlPres
 {
+	public static interface CheckboxListener
+	{
+		public void onCheckbox(CheckboxControl checkbox, boolean state);
+	}
+	
+	
 	public static class CheckboxControl extends Control implements IncrementalMonitorListener
 	{
 		private LSElement element, box, check;
-		private LiveValue state;
+		private LiveInterface state;
+		private CheckboxListener listener;
 
 		
-		protected CheckboxControl(PresentationContext ctx, StyleValues style, LSElement element, LSElement box, LSElement check, LiveValue state, Paint checkForeground)
+		protected CheckboxControl(PresentationContext ctx, StyleValues style, LSElement element, LSElement box, LSElement check, LiveInterface state, CheckboxListener listener, Paint checkForeground)
 		{
 			super( ctx, style );
 			
@@ -43,6 +51,7 @@ public class Checkbox extends ControlPres
 			check.addPainter( new CheckboxHelper.CheckboxCheckPainter( checkForeground, this ) );
 			this.state = state;
 			this.state.addListener( this );
+			this.listener = listener;
 			element.setFixedValue( state );
 		}
 		
@@ -60,17 +69,15 @@ public class Checkbox extends ControlPres
 			return (Boolean)state.getStaticValue();
 		}
 		
-		public void setState(boolean state)
-		{
-			this.state.setLiteralValue( state );
-		}
-
 		
 		
-		public void toggle()
+		protected void toggle()
 		{
 			boolean value = (Boolean)state.getStaticValue();
-			state.setLiteralValue( !value );
+			if ( listener != null )
+			{
+				listener.onCheckbox( this, !value );
+			}
 		}
 
 
@@ -89,28 +96,74 @@ public class Checkbox extends ControlPres
 
 	
 	
-	private Pres child;
-	private LiveValue state;
+	private static class CommitListener implements CheckboxListener
+	{
+		private LiveValue value;
+		private CheckboxListener listener;
+		
+		public CommitListener(LiveValue value, CheckboxListener listener)
+		{
+			this.value = value;
+			this.listener = listener;
+		}
+		
+		@Override
+		public void onCheckbox(CheckboxControl checkbox, boolean state)
+		{
+			if ( listener != null )
+			{
+				listener.onCheckbox( checkbox, state );
+			}
+			value.setLiteralValue( state );
+		}
+	}
+	
 
 	
-	public Checkbox(Object child, LiveValue state)
+	private Pres child;
+	private LiveSource valueSource;
+	private CheckboxListener listener;
+	
+	
+	private Checkbox(Object child, LiveSource valueSource, CheckboxListener listener)
 	{
 		this.child = coerce( child );
-		this.state = state;
+		this.valueSource = valueSource;
+		this.listener = listener;
 	}
+
 	
-	public Checkbox(Object child, boolean state)
+	public Checkbox(Object child, boolean initialState, CheckboxListener listener)
 	{
-		this( child, new LiveValue( state ) );
+		LiveValue value = new LiveValue( initialState );
+		
+		this.child = coerce( child );
+		this.valueSource = new LiveSourceRef( value );
+		this.listener = new CommitListener( value, listener );
 	}
 	
+	public Checkbox(Object child, LiveInterface value, CheckboxListener listener)
+	{
+		this( child, new LiveSourceRef( value ), listener );
+	}
+	
+	public Checkbox(Object child, LiveValue value)
+	{
+		this( child, new LiveSourceRef( value ), new CommitListener( value, null ) );
+	}
+	
+	
+	public static Checkbox checkboxWithLabel(String labelText, boolean state, CheckboxListener listener)
+	{
+		return new Checkbox( new Label( labelText ), state, listener );
+	}
+	
+	public static Checkbox checkboxWithLabel(String labelText, LiveInterface state, CheckboxListener listener)
+	{
+		return new Checkbox( new Label( labelText ), state, listener );
+	}
 	
 	public static Checkbox checkboxWithLabel(String labelText, LiveValue state)
-	{
-		return new Checkbox( new Label( labelText ), state );
-	}
-	
-	public static Checkbox checkboxWithLabel(String labelText, boolean state)
 	{
 		return new Checkbox( new Label( labelText ), state );
 	}
@@ -120,6 +173,8 @@ public class Checkbox extends ControlPres
 	@Override
 	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
+		final LiveInterface value = valueSource.getLive();
+
 		StyleSheet checkStyle = StyleSheet.style( Primitive.border.as( style.get( Controls.checkboxCheckBorder, AbstractBorder.class ) ) );
 		StyleSheet checkboxStyle = Controls.checkboxStyle.get( style );
 		
@@ -136,7 +191,7 @@ public class Checkbox extends ControlPres
 		
 		Pres bin = new Bin( rowElement );
 		LSElement element = bin.present( ctx, style );
-		element.setFixedValue( state.getStaticValue() );
-		return new CheckboxControl( ctx, style, element, rowElement, checkElement, state, checkForeground );
+		element.setFixedValue( value.getStaticValue() );
+		return new CheckboxControl( ctx, style, element, rowElement, checkElement, value, listener, checkForeground );
 	}
 }
