@@ -431,11 +431,13 @@ public class SequentialRichStringVisitor extends AbstractRichStringVisitor
 		}
 	}
 
+	@Override
 	protected void inOrderVisitPartialContentLeafEditable(RichStringBuilder builder, LSContentLeafEditable e, int startIndex, int endIndex)
 	{
 		builder.appendTextValue( e.getTextRepresentation().substring( startIndex, endIndex ) );
 	}
 	
+	@Override
 	public boolean shouldVisitChildrenOfElement(LSElement e, boolean completeVisit)
 	{
 		if ( completeVisit )

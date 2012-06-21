@@ -8,6 +8,8 @@ package BritefuryJ.Controls;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Incremental.IncrementalMonitor;
@@ -37,10 +39,11 @@ import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Blank;
 import BritefuryJ.Pres.Primitive.Border;
 import BritefuryJ.Pres.Primitive.Column;
+import BritefuryJ.Pres.Primitive.Paragraph;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Region;
-import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Pres.Primitive.Segment;
+import BritefuryJ.Pres.Primitive.Span;
 import BritefuryJ.Pres.Primitive.Text;
 import BritefuryJ.Pres.Primitive.Whitespace;
 import BritefuryJ.Projection.Perspective;
@@ -66,6 +69,98 @@ public class TextArea extends ControlPres
 	}
 	
 	protected static Perspective textAreaPerspective = new Perspective( new TextAreaViewFragmentFn() );
+	
+	
+	
+	public static interface TextToPresFn
+	{
+		Pres textToPres(String text);
+	}
+	
+	
+	
+	public static class RegexPresTable implements TextToPresFn
+	{
+		private ArrayList<Pattern> patterns = new ArrayList<Pattern>();
+		private ArrayList<TextToPresFn> functions = new ArrayList<TextToPresFn>();
+		private Pattern completePattern = null;
+		
+		public RegexPresTable()
+		{
+		}
+		
+		
+		public void addPattern(Pattern pat, TextToPresFn function)
+		{
+			patterns.add( pat );
+			functions.add( function );
+		}
+		
+		
+		@Override
+		public Pres textToPres(String text)
+		{
+			ArrayList<Pres> p = new ArrayList<Pres>();
+			
+			if ( completePattern == null )
+			{
+				StringBuilder r = new StringBuilder();
+				boolean first = true;
+				for (Pattern pat: patterns)
+				{
+					if ( !first )
+					{
+						r.append( "|" );
+					}
+					r.append( "(" ).append( pat.pattern() ).append( ")" );
+					first = false;
+				}
+				completePattern = Pattern.compile( r.toString() ); 
+			}
+			
+			
+			Matcher m = completePattern.matcher( text );
+			
+			int pos = 0;
+			while ( pos < text.length() )
+			{
+				if ( m.find( pos ) )
+				{
+					int start = m.start(), end = m.end();
+					if ( start > pos )
+					{
+						p.add( new Text( text.substring( pos, start ) ) );
+					}
+					// Determine which pattern was matched
+					String seq = text.substring( start, end );
+					boolean patternFound = false;
+					for (int i = 0; i < patterns.size(); i++)
+					{
+						if ( patterns.get( i ).matcher( seq ).matches() )
+						{
+							p.add( functions.get( i ).textToPres( seq ) );
+							patternFound = true;
+							break;
+						}
+					}
+					if ( !patternFound )
+					{
+						throw new RuntimeException( "This shouldn't have happened; could not identify which pattern matched '" + seq + "'" );
+					}
+					pos = end;
+				}
+				else
+				{
+					// No match - finish
+					p.add( new Text( text.substring( pos ) ) );
+					break;
+				}
+			}
+			
+			return new Span( p.toArray( new Pres[] {} ) );
+		}
+		
+	}
 
 	
 	
@@ -275,11 +370,19 @@ public class TextArea extends ControlPres
 				{
 					listeners = PresentationStateListenerList.addListener( listeners, fragment );
 					
-					Pres textPres = new Text( text );
+					Pres textPres;
+					if ( textToPres != null )
+					{
+						textPres = textToPres.textToPres( text );
+					}
+					else
+					{
+						textPres = new Text( text );
+					}
 					Pres seg = new Segment( false, false, textPres );
 					Pres newline = new Whitespace( "\n" );
 					
-					return new Row( new Object[] { seg, newline } ).withTreeEventListener( textLineTreeEventListener );
+					return new Paragraph( new Object[] { seg, newline } ).withTreeEventListener( textLineTreeEventListener );
 				}
 			}
 			
@@ -391,11 +494,12 @@ public class TextArea extends ControlPres
 		private LSBorder element;
 		private TextAreaBox box;
 		private LiveInterface value;
+		private TextToPresFn textToPres;
 		private TextAreaListener listener;
 		
 		
 		
-		protected TextAreaControl(PresentationContext ctx, StyleValues style, LSBorder element, TextAreaListener listener, LiveInterface value)
+		protected TextAreaControl(PresentationContext ctx, StyleValues style, LSBorder element, TextToPresFn textToPres, TextAreaListener listener, LiveInterface value)
 		{
 			super( ctx, style );
 			
@@ -403,6 +507,7 @@ public class TextArea extends ControlPres
 			this.value.addListener( this );
 			
 			this.element = element;
+			this.textToPres = textToPres;
 			this.listener = listener;
 		
 			element.setValueFunction( new ValueFn() );
@@ -520,27 +625,44 @@ public class TextArea extends ControlPres
 	
 	private LiveSource valueSource;
 	private TextAreaListener listener;
+	private TextToPresFn textToPres;
 	
 	
-	private TextArea(LiveSource valueSource, TextAreaListener listener)
+	private TextArea(LiveSource valueSource, TextAreaListener listener, TextToPresFn textToPres)
 	{
 		this.valueSource = valueSource;
 		this.listener = listener;
+		this.textToPres = textToPres;
 	}
 
 	public TextArea(String initialText, TextAreaListener listener)
 	{
-		this( new LiveSourceValue( initialText ), listener );
+		this( new LiveSourceValue( initialText ), listener, null );
+	}
+	
+	public TextArea(String initialText, TextAreaListener listener, TextToPresFn textToPres)
+	{
+		this( new LiveSourceValue( initialText ), listener, textToPres );
 	}
 	
 	public TextArea(LiveInterface value, TextAreaListener listener)
 	{
-		this( new LiveSourceRef( value ), listener );
+		this( new LiveSourceRef( value ), listener, null );
+	}
+	
+	public TextArea(LiveInterface value, TextAreaListener listener, TextToPresFn textToPres)
+	{
+		this( new LiveSourceRef( value ), listener, textToPres );
 	}
 	
 	public TextArea(LiveValue value)
 	{
-		this( new LiveSourceRef( value ), new CommitListener( value ) );
+		this( new LiveSourceRef( value ), new CommitListener( value ), null );
+	}
+	
+	public TextArea(LiveValue value, TextToPresFn textToPres)
+	{
+		this( new LiveSourceRef( value ), new CommitListener( value ), textToPres );
 	}
 	
 
@@ -559,12 +681,17 @@ public class TextArea extends ControlPres
 		Pres elementPres = new Border( new Blank() );
 		LSBorder element = (LSBorder)elementPres.present( ctx, textAreaStyle );
 		
-		return new TextAreaControl( ctx, style.withAttr( Primitive.hAlign, HAlignment.PACK ), element, listener, value );
+		return new TextAreaControl( ctx, style.withAttr( Primitive.hAlign, HAlignment.PACK ), element, textToPres, listener, value );
 	}
 	
 	
 	public static TextArea textAreaCommitOnChange(LiveValue value)
 	{
-		return new TextArea( new LiveSourceRef( value ), new ChangeListener( value ) );
+		return new TextArea( new LiveSourceRef( value ), new ChangeListener( value ), null );
+	}
+	
+	public static TextArea textAreaCommitOnChange(LiveValue value, TextToPresFn textToPres)
+	{
+		return new TextArea( new LiveSourceRef( value ), new ChangeListener( value ), textToPres );
 	}
 }
