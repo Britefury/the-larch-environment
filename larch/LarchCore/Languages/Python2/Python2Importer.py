@@ -171,9 +171,14 @@ class _DecoratorImporter (_Importer):
 	def Name(self, node):
 		return Schema.Decorator( name=node.id, args=None )
 
+	def Attribute(self, node):
+		target = _decorator( node.value )
+		return Schema.Decorator( name=target['name'] + '.' + node.attr, args=target['args'] )
+
 	def Call(self, node):
+		target = _decorator( node.func )
 		_starArg = lambda name, x:   [ [ name, _expr( x ) ] ]   if x is not None   else   []
-		return Schema.Decorator( name=node.func.id, args=[ _expr( x )   for x in node.args ]  +  [ _expr( x )   for x in node.keywords ]  +  _starArg( 'argList', node.starargs )  +  _starArg( 'kwArgList', node.kwargs ) )
+		return Schema.Decorator( name=target['name'], args=[ _expr( x )   for x in node.args ]  +  [ _expr( x )   for x in node.keywords ]  +  _starArg( 'argList', node.starargs )  +  _starArg( 'kwArgList', node.kwargs ) )
 
 	def keyword(self, node):
 		return Schema.CallKWArg( name=node.arg, value=_expr( node.value ) )
@@ -1412,12 +1417,22 @@ def f(a,b=q,*c,**d):
 @p
 def f():
 	x"""
-		src4 = \
+		src4 =\
+"""
+@p.x.y.z
+def f():
+	x"""
+		src5 = \
 """
 @p(h)
 def f():
 	x"""
-		src5 = \
+		src6 =\
+"""
+@p.x.y.z(h)
+def f():
+	x"""
+		src7 = \
 """
 @p(h)
 @q(j)
@@ -1428,8 +1443,10 @@ def f():
 														  Schema.DefaultValueParam( param=Schema.SimpleParam( name='b' ), defaultValue=Schema.Load( name='q' ) ), Schema.ParamList( name='c' ),
 														  Schema.KWParamList( name='d' ) ], suite=[ Schema.ExprStmt( expr=Schema.Load( name='x' ) ) ] ) ] )
 		self._compStmtTest( src3, [ Schema.BlankLine(), Schema.DefStmt( decorators=[ Schema.Decorator( name='p', args=None ) ], name='f', params=[], suite=[ Schema.ExprStmt( expr=Schema.Load( name='x' ) ) ] ) ] )
-		self._compStmtTest( src4, [ Schema.BlankLine(), Schema.DefStmt( decorators=[ Schema.Decorator( name='p', args=[ Schema.Load( name='h' ) ] ) ], name='f', params=[], suite=[ Schema.ExprStmt( expr=Schema.Load( name='x' ) ) ] ) ] )
-		self._compStmtTest( src5, [ Schema.BlankLine(), Schema.DefStmt( decorators=[ Schema.Decorator( name='p', args=[ Schema.Load( name='h' ) ] ), Schema.Decorator( name='q', args=[ Schema.Load( name='j' ) ] ) ], name='f', params=[], suite=[ Schema.ExprStmt( expr=Schema.Load( name='x' ) ) ] ) ] )
+		self._compStmtTest( src4, [ Schema.BlankLine(), Schema.DefStmt( decorators=[ Schema.Decorator( name='p.x.y.z', args=None ) ], name='f', params=[], suite=[ Schema.ExprStmt( expr=Schema.Load( name='x' ) ) ] ) ] )
+		self._compStmtTest( src5, [ Schema.BlankLine(), Schema.DefStmt( decorators=[ Schema.Decorator( name='p', args=[ Schema.Load( name='h' ) ] ) ], name='f', params=[], suite=[ Schema.ExprStmt( expr=Schema.Load( name='x' ) ) ] ) ] )
+		self._compStmtTest( src6, [ Schema.BlankLine(), Schema.DefStmt( decorators=[ Schema.Decorator( name='p.x.y.z', args=[ Schema.Load( name='h' ) ] ) ], name='f', params=[], suite=[ Schema.ExprStmt( expr=Schema.Load( name='x' ) ) ] ) ] )
+		self._compStmtTest( src7, [ Schema.BlankLine(), Schema.DefStmt( decorators=[ Schema.Decorator( name='p', args=[ Schema.Load( name='h' ) ] ), Schema.Decorator( name='q', args=[ Schema.Load( name='j' ) ] ) ], name='f', params=[], suite=[ Schema.ExprStmt( expr=Schema.Load( name='x' ) ) ] ) ] )
 
 		
 	def testClass(self):
