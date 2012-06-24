@@ -177,13 +177,13 @@ class AppView (MethodDispatchView):
 		
 		title = TitleBar( 'The Larch Environment' )
 		
-		newLink = Hyperlink( 'New', _onNewDoc )
-		openLink = Hyperlink( 'Open', _onOpenDoc )
+		newLink = Hyperlink( 'NEW', _onNewDoc )
+		openLink = Hyperlink( 'OPEN', _onOpenDoc )
 		openDocumentsBox = _contentsList( [ newLink, openLink ], openDocViews, 'Documents' )
 		openDocumentsBox = openDocumentsBox.withNonLocalDropDest( DataFlavor.javaFileListFlavor, _onFileListDrop )
 		
 		
-		newConsoleLink = Hyperlink( 'New', _onNewConsole )
+		newConsoleLink = Hyperlink( 'NEW', _onNewConsole )
 		consolesBox = _contentsList( [ newConsoleLink ], consoles, 'Python consoles' )
 		
 		
