@@ -589,7 +589,7 @@ public class Primitive
 	{
 		return style.useAttr( hAlign ).useAttr( vAlign ).useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
 				.useAttr( tableColumnSpacing ).useAttr( tableColumnExpand ).useAttr( tableRowSpacing ).useAttr( tableRowExpand )
-				.useAttr( tableCellBoundaryWidth ).useAttr( tableCellBoundaryPaint ).useAttr( tableBorder );
+				.useAttr( tableBackgroundPainter ).useAttr( tableCellBoundaryWidth ).useAttr( tableCellBoundaryPaint ).useAttr( tableBorder );
 	}
 	
 	

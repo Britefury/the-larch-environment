@@ -93,6 +93,16 @@ public class ClipboardCopier
 		return memo.copy( x );
 	}
 	
+	public Object __call__(Object x)
+	{
+		return copy( x );
+	}
+	
+	public Object __call__(Object x, ClipboardCopierMemo memo)
+	{
+		return memo.copy( x );
+	}
+	
 	protected Object createCopy(Object x, ClipboardCopierMemo memo)
 	{
 		if ( x == null )

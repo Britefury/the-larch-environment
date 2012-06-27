@@ -380,6 +380,34 @@ public class Image extends Pres
 		}
 	}
 
+	public static Image systemImage(String filename, double width)
+	{
+		URL u = Image.class.getResource( "/images/" + filename );
+		
+		if ( u != null )
+		{
+			return new Image( u, null, width );
+		}
+		else
+		{
+			return new Image( "images/" + filename, null, width );
+		}
+	}
+
+	public static Image systemImage(String filename, double width, double height)
+	{
+		URL u = Image.class.getResource( "/images/" + filename );
+		
+		if ( u != null )
+		{
+			return new Image( u, null, width, height );
+		}
+		else
+		{
+			return new Image( "images/" + filename, null, width, height );
+		}
+	}
+
 
 	
 	public static Image svgFromSource(final String image, final double imageWidth, final double imageHeight)
