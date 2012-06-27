@@ -383,20 +383,27 @@ public class LayoutNodeFlowGrid extends ArrangedSequenceLayoutNode
 		refreshSubtree();
 		int numRows = rowReqBoxes.length;
 		
-		if ( row == 0 )
+		if ( numRows == 0 )
 		{
-			return rowAllocBoxes[0].getAllocPositionInParentSpaceY();
-		}
-		else if ( row == numRows )
-		{
-			LAllocBox bottom = rowAllocBoxes[row-1];
-			return bottom.getAllocPositionInParentSpaceY() + bottom.getAllocHeight();
+			return 0.0;
 		}
 		else
 		{
-			double halfRowSpacing = getRowSpacing() * 0.5;
-			LAllocBox bottom = rowAllocBoxes[row-1];
-			return bottom.getAllocPositionInParentSpaceY() + bottom.getAllocHeight()  +  halfRowSpacing;
+			if ( row == 0 )
+			{
+				return rowAllocBoxes[0].getAllocPositionInParentSpaceY();
+			}
+			else if ( row == numRows )
+			{
+				LAllocBox bottom = rowAllocBoxes[row-1];
+				return bottom.getAllocPositionInParentSpaceY() + bottom.getAllocHeight();
+			}
+			else
+			{
+				double halfRowSpacing = getRowSpacing() * 0.5;
+				LAllocBox bottom = rowAllocBoxes[row-1];
+				return bottom.getAllocPositionInParentSpaceY() + bottom.getAllocHeight()  +  halfRowSpacing;
+			}
 		}
 	}
 	
