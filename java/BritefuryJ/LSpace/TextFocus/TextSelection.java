@@ -9,11 +9,12 @@ package BritefuryJ.LSpace.TextFocus;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 
+import BritefuryJ.LSpace.ElementTreeVisitor;
 import BritefuryJ.LSpace.LSContainer;
+import BritefuryJ.LSpace.LSContentLeaf;
 import BritefuryJ.LSpace.LSContentLeafEditable;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSRegion;
-import BritefuryJ.LSpace.ElementTreeVisitor;
 import BritefuryJ.LSpace.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.LSpace.Focus.Selection;
 import BritefuryJ.LSpace.Focus.Target;
@@ -88,6 +89,23 @@ public class TextSelection extends Selection implements MarkerListener
 		
 		marker0.addMarkerListener( this );
 		marker1.addMarkerListener( this );
+	}
+	
+	
+	public TextSelection tightened()
+	{
+		Marker start = getStartMarker();
+		Marker end = getEndMarker();
+		if ( start != null  &&  end != null )
+		{
+			start = tightenForward( start );
+			end = tightenBackward( end );
+			return new TextSelection( rootElement, start, end );
+		}
+		else
+		{
+			return null;
+		}
 	}
 	
 	
@@ -272,5 +290,50 @@ public class TextSelection extends Selection implements MarkerListener
 			caret.makeCurrentTarget();
 		}
 		return super.deleteSelectionInRegion( target, clipboardHandler );
+	}
+	
+	
+	private static Marker tightenForward(Marker marker)
+	{
+		LSContentLeafEditable leaf = marker.getElement();
+		
+		if ( marker.isAtEndOf( leaf ) )
+		{
+			LSContentLeaf right = leaf.getContentLeafToRight();
+
+			while ( right != null  &&  ( !(right instanceof LSContentLeafEditable)  ||  right.getTextRepresentationLength() == 0 ) )
+			{
+				right = right.getContentLeafToRight();
+			}
+
+			if ( right != null )
+			{
+				LSContentLeafEditable editableRight = (LSContentLeafEditable)right;
+				return Marker.atStartOfLeaf( editableRight );
+			}
+		}
+		return marker;
+	}
+	
+	private static Marker tightenBackward(Marker marker)
+	{
+		LSContentLeafEditable leaf = marker.getElement();
+		
+		if ( marker.isAtStartOf( leaf ) )
+		{
+			LSContentLeaf left = leaf.getContentLeafToLeft();
+
+			while ( left != null  &&  ( !(left instanceof LSContentLeafEditable)  ||  left.getTextRepresentationLength() == 0 ) )
+			{
+				left = left.getContentLeafToLeft();
+			}
+
+			if ( left != null )
+			{
+				LSContentLeafEditable editableLeft = (LSContentLeafEditable)left;
+				return Marker.atEndOfLeaf( editableLeft );
+			}
+		}
+		return marker;
 	}
 }

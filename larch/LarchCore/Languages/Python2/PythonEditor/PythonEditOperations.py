@@ -422,12 +422,14 @@ def _getSelectedNode(selection, modelTestFn):
 		None
 	"""
 	if isinstance( selection, TextSelection ):
-		commonRoot = selection.getCommonRoot()
-		if commonRoot is not None:
-			fragment = commonRoot.getFragmentContext()
-			model = fragment.model
-			if modelTestFn( model ):
-				return model
+		selection = selection.tightened()
+		if selection is not None:
+			commonRoot = selection.getCommonRoot()
+			if commonRoot is not None:
+				fragment = commonRoot.getFragmentContext()
+				model = fragment.model
+				if modelTestFn( model ):
+					return model
 	return None
 
 
@@ -470,17 +472,19 @@ def _findSelectedNode(selection, modelTestFn):
 		None
 	"""
 	if isinstance( selection, TextSelection ):
-		commonRoot = selection.getCommonRoot()
-		if commonRoot is not None:
-			fragment = commonRoot.getFragmentContext()
-		
-			while fragment is not None:
-				model = fragment.model
-				if modelTestFn( model ):
-					return model
-				if isTopLevel( model ):
-					return False
-				fragment = fragment.getParent()
+		selection = selection.tightened()
+		if selection is not None:
+			commonRoot = selection.getCommonRoot()
+			if commonRoot is not None:
+				fragment = commonRoot.getFragmentContext()
+
+				while fragment is not None:
+					model = fragment.model
+					if modelTestFn( model ):
+						return model
+					if isTopLevel( model ):
+						return False
+					fragment = fragment.getParent()
 	return None
 
 
