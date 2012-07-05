@@ -6,6 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
 from copy import deepcopy
+import os
 
 from BritefuryJ.ChangeHistory import Trackable
 from BritefuryJ.Incremental import IncrementalValueMonitor
@@ -62,7 +63,7 @@ class ProjectPackage (ProjectContainer):
 			f.write( '' )
 			f.close()
 
-		self.exportContents( mypath )
+		self.exportContents( myPath )
 
 
 
