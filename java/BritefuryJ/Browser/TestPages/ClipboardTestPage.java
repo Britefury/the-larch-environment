@@ -65,7 +65,7 @@ public class ClipboardTestPage extends TestPage
 	
 	protected Pres makeDest()
 	{
-		return new Proxy( placeHolderStyle.applyTo( new Bin( new Text( " " ).pad( 8.0, 8.0 ) ) ) );
+		return new Proxy( placeHolderStyle.applyTo( new Bin( new Text( "Place caret here" ).pad( 8.0, 8.0 ) ) ) );
 	}
 	
 	protected Pres makeDescription()
@@ -214,7 +214,7 @@ public class ClipboardTestPage extends TestPage
 		};
 		
 		
-		Pres title = new Heading5( "Text element (displays description of pasted content):" );
+		Pres title = new Heading5( "Text element (displays description of pasted content below):" );
 		Pres borderedReceiver = StyleSheet.style( Primitive.border.as( new SolidBorder( 2.0, 2.0, new Color( 0.3f, 0.3f, 0.3f ), null ) ) ).applyTo( receiverPres );
 		return new Column( new Pres[] { title, borderedReceiver } );
 	}

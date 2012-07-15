@@ -33,7 +33,7 @@ public class ViewportTestPage extends TestPage
 	
 	protected String getDescription()
 	{
-		return "The viewport element allows zooming and panning of its contents."; 
+		return "The viewport element allows zooming and panning of its contents. ALT+left drag to pan, ALT+right drag or ALT+scroll wheel to zoom."; 
 	}
 
 	

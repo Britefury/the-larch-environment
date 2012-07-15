@@ -19,7 +19,6 @@ import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Proxy;
-import BritefuryJ.Pres.Primitive.Text;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.RichText.Heading2;
 import BritefuryJ.Pres.RichText.NormalText;
@@ -92,7 +91,7 @@ public class CommandConsoleTestPage extends TestPage
 	private static Pres colouredText(StyleSheet style)
 	{
 		return style.withValues( Primitive.editable.as( false ) ).applyTo(
-				new NormalText( "Change the colour of this text, using the buttons below." ) );
+				new NormalText( "Change the colour of this text, using the command console." ) );
 	}
 	
 	protected Pres createContents()
@@ -104,9 +103,10 @@ public class CommandConsoleTestPage extends TestPage
 		Command blueCmd = new Command( "&B&lue", new CommandContentChanger( colouredTextProxyRef, colouredText( blueText ) ) );
 		Command failCmd = new Command( "&Fail", new CommandFailAction() );
 		CommandSet cmds = new CommandSet( "test.TestCommandSet", Arrays.asList( blackCmd, redCmd, greenCmd, blueCmd, failCmd ) );
-		Pres cmdText = new Text( "Place the caret within this text, and use the command console. 'bk', 're', 'gr', 'bl' and 'f' are the commands available." ).withCommands( cmds );
-		Pres colourBox = new Column( new Pres[] { colouredTextProxyRef, cmdText } );
+		Pres cmdText = new NormalText( "Place the caret within this text, and invoke the command console by pressing ESC. " + 
+					"Type one of the following commands and hit enter to execute: 'bk', 're', 'gr', 'bl' and 'f'." );
+		Pres colourBox = new Column( new Pres[] { colouredTextProxyRef, cmdText } ).withCommands( cmds );
 		
-		return new Body( new Pres[] { new Heading2( "Action button" ), colourBox } );
+		return new Body( new Pres[] { new Heading2( "Commands" ), colourBox } );
 	}
 }
