@@ -15,6 +15,7 @@ import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Pres.Primitive.SpaceBin;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.RichText.Heading2;
+import BritefuryJ.Pres.RichText.NormalText;
 import BritefuryJ.StyleSheet.StyleSheet;
 
 public class ObjectDropBoxTestPage extends TestPage
@@ -44,6 +45,10 @@ public class ObjectDropBoxTestPage extends TestPage
 		Pres dropLine = StyleSheet.style( Primitive.rowSpacing.as( 20.0 ) ).applyTo( new Row( new Object[] { new Label( "Object: " ),
 			    new SpaceBin( 100.0, -1.0, objectDrop.alignHExpand() ), value } ).padX( 5.0 ) );
 		
-		return new Body( new Pres[] { new Heading2( "Object drop box" ), dropLine } );
+		Pres instructions = new NormalText( "The object drop box receives object drops. To initiate a drop, ALT+SHIFT+left drag from (almost) anywhere within Larch to acquire " +
+				"the data model that is displayed on a particular part of a Larch window. Drop the object here to take a look. Alternatively, you can ALT+SHIFT+right click to " +
+				"inspect an object." );
+		
+		return new Body( new Pres[] { new Heading2( "Object drop box" ), instructions, dropLine } );
 	}
 }
