@@ -82,6 +82,12 @@ class WindowManager (object):
 		if len( self._openWindows ) == 0:
 			if self.onCloseLastWindow is not None:
 				self.onCloseLastWindow( self )
+			try:
+				onCloseAppFn = self._appState.onCloseApp
+			except AttributeError:
+				pass
+			else:
+				onCloseAppFn()
 	
 	
 
