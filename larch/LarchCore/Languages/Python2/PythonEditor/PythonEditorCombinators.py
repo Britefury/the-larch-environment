@@ -109,7 +109,7 @@ class PythonEditorStyle (object):
 
 
 	solidHighlightRounding = InheritedAttributeNonNull( pythonEditor, 'solidHighlightRounding', float, 3.0 )
-	outlineHighlightThickness = InheritedAttributeNonNull( pythonEditor, 'outlineHighlightThickness', float, 2.0 )
+	outlineHighlightThickness = InheritedAttributeNonNull( pythonEditor, 'outlineHighlightThickness', float, 1.5 )
 	outlineHighlightInset = InheritedAttributeNonNull( pythonEditor, 'outlineHighlightInset', float, 2.0 )
 	outlineHighlightRounding = InheritedAttributeNonNull( pythonEditor, 'outlineHighlightRounding', float, 5.0 )
 
