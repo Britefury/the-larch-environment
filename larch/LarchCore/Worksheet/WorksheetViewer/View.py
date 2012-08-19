@@ -28,6 +28,7 @@ from BritefuryJ.Shortcut import Shortcut
 from BritefuryJ.AttributeTable import *
 
 from BritefuryJ.LSpace import *
+from BritefuryJ.LSpace.Input import Modifier
 from BritefuryJ.Graphics import *
 from BritefuryJ.Browser import Location
 from BritefuryJ.StyleSheet import StyleSheet
@@ -217,7 +218,7 @@ def _refreshWorksheet(subject, pageController):
 	subject._modelView.refreshResults()
 
 
-_refreshCommand = Command( CommandName( '&Refresh worksheet' ), _refreshWorksheet, Shortcut( KeyEvent.VK_F5, 0 ) )
+_refreshCommand = Command( CommandName( '&Refresh worksheet' ), _refreshWorksheet, Shortcut( KeyEvent.VK_ENTER, Modifier.CTRL ) )
 _worksheetViewerCommands = CommandSet( 'LarchCore.Worksheet.Viewer', [ _refreshCommand ] )
 
 
