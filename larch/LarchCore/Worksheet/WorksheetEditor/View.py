@@ -416,7 +416,7 @@ def _refreshWorksheet(subject, pageController):
 	subject._modelView.refreshResults()
 
 
-_refreshCommand = Command( CommandName( '&Refresh worksheet' ), _refreshWorksheet, Shortcut( KeyEvent.VK_F5, 0 ) )
+_refreshCommand = Command( CommandName( '&Refresh worksheet' ), _refreshWorksheet, Shortcut( KeyEvent.VK_ENTER, Modifier.CTRL ) )
 _worksheetEditorCommands = CommandSet( 'LarchCore.Worksheet.Editor', [ _refreshCommand ] )
 
 
