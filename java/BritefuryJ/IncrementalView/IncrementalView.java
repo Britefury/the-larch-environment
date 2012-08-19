@@ -500,12 +500,12 @@ public class IncrementalView
 			double deltaT = ( t2 - t1 )  *  1.0e-9;
 			ProfileMeasurement m = new ProfileMeasurement( deltaT, getModelViewMappingTime(), getPresBuildTime(), getPresToElementsTime(), getHandleContentChangeTime(), getModifyPresTreeTime() );
 			profile.addMeasurement( m );
-			System.out.println( "IncrementalView: REFRESH TIME = " + deltaT );
-			System.out.println( "IncrementalView: PROFILE -- view: " + getModelViewMappingTime() +
-					",  pres build: " + getPresBuildTime() +
-					",  pres realise: " + getPresToElementsTime() +
-					",  handle content change: " + getHandleContentChangeTime() +
-					",  commit fragment element: " + getModifyPresTreeTime() );
+//			System.out.println( "IncrementalView: REFRESH TIME = " + deltaT );
+//			System.out.println( "IncrementalView: PROFILE -- view: " + getModelViewMappingTime() +
+//					",  pres build: " + getPresBuildTime() +
+//					",  pres realise: " + getPresToElementsTime() +
+//					",  handle content change: " + getHandleContentChangeTime() +
+//					",  commit fragment element: " + getModifyPresTreeTime() );
 		}
 		
 		if ( ENABLE_DISPLAY_TREESIZES )
