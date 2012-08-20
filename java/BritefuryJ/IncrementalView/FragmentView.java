@@ -23,6 +23,7 @@ import BritefuryJ.LSpace.FragmentContext;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSFragment;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
+import BritefuryJ.LSpace.Input.DndHandler;
 import BritefuryJ.LSpace.Input.Modifier;
 import BritefuryJ.LSpace.Input.ObjectDndHandler;
 import BritefuryJ.LSpace.Interactor.PushElementInteractor;
@@ -125,7 +126,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	};
 	
 
-	private static final ObjectDndHandler.DragSource fragmentDragSource = new ObjectDndHandler.DragSource( FragmentData.class, ObjectDndHandler.ASPECT_DOC_NODE, fragmentDragSourceFn );
+	private static final ObjectDndHandler.DragSource fragmentDragSource = new ObjectDndHandler.DragSource( FragmentData.class, DndHandler.ASPECT_DOC_NODE, fragmentDragSourceFn );
 	
 	
 	
