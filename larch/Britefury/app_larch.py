@@ -30,11 +30,28 @@ def start_larch():
 	world.enableImportHooks()
 
 	if len( sys.argv ) > 1:
-		filename = sys.argv[1]
-		document = Document.readFile( world, filename )
-		outerSubject = WorldDefaultOuterSubject( world )
-		subject = document.newSubject( outerSubject, Location( 'main' ), None, filename )
-		world.setRootSubject( subject )
+		if sys.argv[1] == '-app':
+			if len( sys.argv ) < 3:
+				print 'Usage:'
+				print '\t{0} -app <app_name>'
+				sys.exit()
+			# Custom app
+			importName = sys.argv[2]
+			appModule = __import__( importName )
+
+			components = importName.split( '.' )
+			for comp in components[1:]:
+				appModule = getattr( appModule, comp )
+
+			appState = appModule.newAppState()
+			world.setRootSubject( appModule.newAppStateSubject( world, appState ) )
+		else:
+			# Load a document
+			filename = sys.argv[1]
+			document = Document.readFile( world, filename )
+			outerSubject = WorldDefaultOuterSubject( world )
+			subject = document.newSubject( outerSubject, Location( 'main' ), None, filename )
+			world.setRootSubject( subject )
 	else:
 		appState = MainApp.newAppState()
 		world.setRootSubject( MainApp.newAppStateSubject( world, appState ) )

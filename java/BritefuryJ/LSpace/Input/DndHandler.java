@@ -6,12 +6,19 @@
 //##************************
 package BritefuryJ.LSpace.Input;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.datatransfer.Transferable;
+import java.awt.geom.AffineTransform;
 
 import javax.swing.TransferHandler;
 
+import BritefuryJ.Graphics.FilledOutlinePainter;
+import BritefuryJ.LSpace.LSContentLeafEditable;
 import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Marker.Marker;
+import BritefuryJ.Math.Xform2;
 
 public abstract class DndHandler
 {
@@ -24,6 +31,8 @@ public abstract class DndHandler
 	public final static int ASPECT_NONE = 0;
 	public final static int ASPECT_NORMAL = 0x1;
 	public final static int ASPECT_DOC_NODE = 0x2;
+	public static final Color dndHighlightPaint = new Color( 1.0f, 0.5f, 0.0f );
+	public static final FilledOutlinePainter dndHighlightPainter = new FilledOutlinePainter( new Color( 1.0f, 0.8f, 0.0f, 0.2f ), new Color( 1.0f, 0.5f, 0.0f, 0.5f ) );
 	
 	
 	public static interface PotentialDrop
@@ -34,6 +43,26 @@ public abstract class DndHandler
 
 	
 	
+	public static void drawCaretDndHighlight(Graphics2D graphics, LSElement dndTargetElement, Marker marker)
+	{
+		if ( marker != null  &&  marker.isValid() )
+		{
+			LSContentLeafEditable leaf = marker.getElement();
+			
+			AffineTransform prevX = graphics.getTransform();
+			Paint prevP = graphics.getPaint();
+			
+			Xform2 x = dndTargetElement.getRootToLocalXform();
+			x.apply( graphics );
+			graphics.setPaint( dndHighlightPaint );
+			
+			leaf.drawCaret( graphics, marker );
+			
+			graphics.setPaint( prevP );
+			graphics.setTransform( prevX );
+		}
+	}
+
 	public abstract boolean isSource(LSElement sourceElement);
 
 	public int getSourceRequestedAction(LSElement sourceElement, PointerInterface pointer, int button)
