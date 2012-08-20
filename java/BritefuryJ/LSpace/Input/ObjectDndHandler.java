@@ -6,9 +6,7 @@
 //##************************
 package BritefuryJ.LSpace.Input;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Paint;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -18,14 +16,10 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import BritefuryJ.Graphics.FilledOutlinePainter;
 import BritefuryJ.LSpace.ElementPreview;
-import BritefuryJ.LSpace.LSContentLeafEditable;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Clipboard.LocalDataFlavor;
-import BritefuryJ.LSpace.Marker.Marker;
 import BritefuryJ.Math.Point2;
-import BritefuryJ.Math.Xform2;
 import BritefuryJ.Util.HashUtils;
 
 
@@ -57,11 +51,6 @@ public class ObjectDndHandler extends DndHandler
 	}
 
 	
-	
-	public static final Color dndHighlightPaint = new Color( 1.0f, 0.5f, 0.0f );
-	public static final FilledOutlinePainter dndHighlightPainter = new FilledOutlinePainter( new Color( 1.0f, 0.8f, 0.0f, 0.2f ), new Color( 1.0f, 0.5f, 0.0f, 0.5f ) );
-	
-
 	
 	private static class DndPin
 	{
@@ -911,27 +900,5 @@ public class ObjectDndHandler extends DndHandler
 	
 	
 	
-	public static void drawCaretDndHighlight(Graphics2D graphics, LSElement dndTargetElement, Marker marker)
-	{
-		if ( marker != null  &&  marker.isValid() )
-		{
-			LSContentLeafEditable leaf = marker.getElement();
-			
-			AffineTransform prevX = graphics.getTransform();
-			Paint prevP = graphics.getPaint();
-			
-			Xform2 x = dndTargetElement.getRootToLocalXform();
-			x.apply( graphics );
-			graphics.setPaint( dndHighlightPaint );
-			
-			leaf.drawCaret( graphics, marker );
-			
-			graphics.setPaint( prevP );
-			graphics.setTransform( prevX );
-		}
-	}
-
-
-
 	public static final ObjectDndHandler instance = new ObjectDndHandler();
 }

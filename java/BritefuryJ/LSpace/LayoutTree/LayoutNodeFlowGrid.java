@@ -127,11 +127,14 @@ public class LayoutNodeFlowGrid extends ArrangedSequenceLayoutNode
 			}
 			else
 			{
+				// rangeEnd is the end of the range, we need
+				int rangeLast = rangeEnd - 1;
+				
 				int numColumns = columnBounds.getNumColumns();
 				int startRow = rangeStart / numColumns;
 				int startCol = rangeStart % numColumns;
-				int endRow = rangeEnd / numColumns;
-				int endCol = rangeEnd % numColumns;
+				int endRow = rangeLast / numColumns;
+				int endCol = rangeLast % numColumns;
 				
 				double lowerX, upperX, lowerY, upperY;
 				if ( startRow == endRow )
