@@ -233,7 +233,7 @@ class LiterateSuite (object):
 					renameButton ] ).withDragSource( _dragSource )
 	
 
-		dropDown = self._dropDownStyle( DropDownExpander( header, suitePres, self._expanded ) )
+		dropDown = self._dropDownStyle( DropDownExpander( header, suitePres, self._expanded, None ) )
 
 		return ObjectBorder( dropDown ).withContextMenuInteractor( _literateExpressionMenu )
 
