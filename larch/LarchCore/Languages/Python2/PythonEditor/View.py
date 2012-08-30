@@ -1287,7 +1287,9 @@ class Python2View (MethodDispatchView):
 		value = embeddedValue.getValue()
 		valueView = ApplyPerspective( EditPerspective.instance, value )
 
-		view = embeddedObjectLiteral( valueView )
+		hideFrame = getattr( value, '__embed_hide_frame__', False )
+
+		view = embeddedObjectLiteral( valueView, hideFrame )
 		return view.withContextMenuInteractor( _embeddedObjectLiteralContextMenuFactory ).withTreeEventListener( _EmbeddedObjectExprTreeEventListener.instance )
 
 
