@@ -7,6 +7,8 @@
 ##-*************************
 from copy import copy
 
+from javax.swing import JOptionPane
+
 from BritefuryJ.Browser import Location
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
@@ -54,6 +56,16 @@ class AppState (object):
 			if doc.hasUnsavedData():
 				return True
 		return False
+
+
+	def onCloseRequest(self, windowManager, window):
+		if self.hasUnsavedData():
+			response = JOptionPane.showOptionDialog( window.getFrame(),
+				'You have not saved your work. Close anyway?', 'Unsaved data', JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, None, [ 'Close', 'Cancel' ], 'Cancel' )
+			return response == JOptionPane.YES_OPTION
+		else:
+			return True
+
 
 
 
