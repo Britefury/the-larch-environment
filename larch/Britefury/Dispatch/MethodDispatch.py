@@ -56,12 +56,12 @@ M
 	
 	
 To dispatch, call:
-	objectMethodDispatch( dispatchInstance, node, args ) -> result_of_method_invocation
+	methodDispatch( dispatchInstance, node, args ) -> result_of_method_invocation
 		dispatchInstance - the object that is an instance of a dispatch class
 		node - the node to use as the dispatch 'key'
 		args - additional arguments to be supplied to the method from @dispatchInstance that is invoked
 
-	objectMethodDispatchAndGetName( dispatchInstance, node, args ) -> (result_of_method_invocation, method_name)
+	methodDispatchAndGetName( dispatchInstance, node, args ) -> (result_of_method_invocation, method_name)
 		dispatchInstance - the object that is an instance of a dispatch class
 		node - the node to use as the dispatch 'key'
 		args - additional arguments to be supplied to the method from @dispatchInstance that is invoked

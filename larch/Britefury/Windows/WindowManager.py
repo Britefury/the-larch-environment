@@ -52,6 +52,15 @@ class WindowManager (object):
 	def setCloseLastWindowListener(self, listener):
 		self.onCloseLastWindow = listener
 
+
+
+	def close(self):
+		for window in self._openWindows:
+			window.close()
+		self._openWindows = set()
+
+		self.__windowClosed()
+
 		
 	def _createNewWindow(self, location):
 		newWindow = Window( self, self._createCommandConsole, location )
@@ -62,23 +71,27 @@ class WindowManager (object):
 		
 	def _onWindowCloseRequest(self, window):
 		if len( self._openWindows ) == 1:
+			# Only one window open
+
+			# Invoke the application state's onCloseRequest method to determine if closing
+			# is allowed
 			try:
-				hasUnsavedDataFn = self._appState.hasUnsavedData
+				onCloseRequestFn = self._appState.onCloseRequest
 			except AttributeError:
 				pass
 			else:
-				if hasUnsavedDataFn():
-					# Dialog here
-					response = JOptionPane.showOptionDialog( window.getFrame(),
-						                                 'You have not saved your work. Close anyway?', 'Unsaved data', JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, None, [ 'Close', 'Cancel' ], 'Cancel' )
-					if response == JOptionPane.YES_OPTION:
-						pass
-					else:
-						return
-				
+				if not onCloseRequestFn( self, window ):
+					# Request denied: don't close
+					return
+
 		window.close()
 		self._openWindows.remove( window )
-		
+
+		self.__windowClosed()
+
+	
+
+	def __windowClosed(self):
 		if len( self._openWindows ) == 0:
 			if self.onCloseLastWindow is not None:
 				self.onCloseLastWindow( self )
@@ -87,11 +100,7 @@ class WindowManager (object):
 			except AttributeError:
 				pass
 			else:
-				onCloseAppFn()
-	
-	
-
-	
+				onCloseAppFn( self )
 
 	
 
