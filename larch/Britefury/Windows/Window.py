@@ -247,6 +247,15 @@ class Window (object):
 	def setCloseRequestListener(self, listener):
 		self.onCloseRequest = listener
 
+
+
+	@property
+	def tabbedBrowser(self):
+		return self._browser
+
+	@property
+	def currentBrowser(self):
+		return self._browser.getCurrentBrowser()
 		
 		
 		
