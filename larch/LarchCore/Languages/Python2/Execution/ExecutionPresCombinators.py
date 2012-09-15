@@ -22,14 +22,14 @@ class ExecutionStyle (object):
 	pythonExecution = AttributeNamespace( 'pythonExecution' )
 	
 	labelStyle = InheritedAttributeNonNull( pythonExecution, 'labelStyle', StyleSheet,
-	                                          StyleSheet.style( Primitive.fontSize( 10 ), Primitive.foreground( Color.BLACK ) ) )
+	                                          StyleSheet.style( Primitive.fontSize( 10 ) ) )
 	
 	stdOutStyle = InheritedAttributeNonNull( pythonExecution, 'stdOutStyle', StyleSheet,
-	                                          StyleSheet.style( Primitive.border( SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.0, 0.8, 0.0 ), Color.WHITE ) ), Primitive.foreground( Color( 0.0, 0.5, 0.0 ) ) ) )
+	                                          StyleSheet.style( Primitive.border( SolidBorder( 1.0, 3.0, 7.0, 7.0, Color( 0.5, 1.0, 0.5 ), Color( 0.9, 1.0, 0.9 ) ) ), Primitive.foreground( Color( 0.0, 0.5, 0.0 ) ) ) )
 	stdErrStyle = InheritedAttributeNonNull( pythonExecution, 'stdErrStyle', StyleSheet,
-	                                          StyleSheet.style( Primitive.border( SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 1.0, 0.5, 0.0 ), Color.WHITE ) ), Primitive.foreground( Color( 0.75, 0.375, 0.0 ) ) ) )
+	                                          StyleSheet.style( Primitive.border( SolidBorder( 1.0, 3.0, 7.0, 7.0, Color( 1.0, 0.75, 0.5 ), Color( 1.0, 0.95, 0.9 ) ) ), Primitive.foreground( Color( 0.75, 0.375, 0.0 ) ) ) )
 	exceptionBorderStyle = InheritedAttributeNonNull( pythonExecution, 'exceptionBorderStyle', StyleSheet,
-	                                          StyleSheet.style( Primitive.border( SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.8, 0.0, 0.0 ), Color( 1.0, 0.9, 0.9 ) ) ) ) )
+	                                          StyleSheet.style( Primitive.border( SolidBorder( 1.0, 3.0, 7.0, 7.0, Color( 0.8, 0.0, 0.0 ), Color( 1.0, 0.9, 0.9 ) ) ) ) )
 	resultBorderStyle = InheritedAttributeNonNull( pythonExecution, 'resultBorderStyle', StyleSheet,
 	                                          StyleSheet.style( Primitive.border( SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.0, 0.0, 0.8 ), Color.WHITE ) ) ) )
 
@@ -45,6 +45,8 @@ class ExecutionStyle (object):
 
 
 def _textLines(text, textStyleAttribute):
+	if text.endswith('\n'):
+		text = text[:-1]
 	return ApplyStyleSheetFromAttribute( textStyleAttribute, Column( [ StaticText( line )   for line in text.split( '\n' ) ] ) )
 
 def _richStringItem(item, textStyleAttribute, bUseDefaultPerspectiveForResult):
@@ -59,14 +61,14 @@ def _richStringItem(item, textStyleAttribute, bUseDefaultPerspectiveForResult):
 def _richStringLines(labelText, richString, textStyleAttribute, bUseDefaultPerspectiveForResult):
 	label = ApplyStyleSheetFromAttribute( ExecutionStyle.labelStyle, StaticText( labelText ) )
 	lines = [ _richStringItem( item, textStyleAttribute, bUseDefaultPerspectiveForResult )   for item in richString.getItems() ]
-	return Column( [ label, Column( lines ).padX( 5.0, 0.0 ) ] )
+	return Overlay( [ Column( lines ).alignHExpand(), label.alignHRight().alignVTop() ] )
 
 
 def execStdout(richString, bUseDefaultPerspectiveForResult):
-	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdOutStyle, Border( _richStringLines( 'STDOUT:', richString, ExecutionStyle.stdOutStyle, bUseDefaultPerspectiveForResult ).alignHExpand() ).alignHExpand() )
+	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdOutStyle, Border( _richStringLines( 'STDOUT', richString, ExecutionStyle.stdOutStyle, bUseDefaultPerspectiveForResult ).alignHExpand() ).alignHExpand() )
 
 def execStderr(richString, bUseDefaultPerspectiveForResult):
-	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdErrStyle, Border( _richStringLines( 'STDERR:', richString, ExecutionStyle.stdErrStyle, bUseDefaultPerspectiveForResult ).alignHExpand() ).alignHExpand() )
+	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdErrStyle, Border( _richStringLines( 'STDERR', richString, ExecutionStyle.stdErrStyle, bUseDefaultPerspectiveForResult ).alignHExpand() ).alignHExpand() )
 	
 def execException(exceptionView):
 	label = ApplyStyleSheetFromAttribute( ExecutionStyle.labelStyle, StaticText( 'EXCEPTION:' ) )
@@ -76,12 +78,15 @@ def execResult(resultView):
 	return ApplyStyleSheetFromAttribute( ExecutionStyle.resultBorderStyle, Border( Bin( Paragraph( [ resultView ] ) ) ).alignHExpand() )
 
 
-def executionResultBox(stdoutStream, stderrStream, exception, resultInTuple, bUseDefaultPerspecitveForException, bUseDefaultPerspectiveForResult):
+def executionResultBox(streams, exception, resultInTuple, bUseDefaultPerspecitveForException, bUseDefaultPerspectiveForResult):
 	boxContents = []
-	if stderrStream is not None:
-		boxContents.append( execStderr( stderrStream, bUseDefaultPerspectiveForResult ) )
-	if stdoutStream is not None:
-		boxContents.append( execStdout( stdoutStream, bUseDefaultPerspectiveForResult ) )
+	for stream in streams:
+		if stream.name == 'out':
+			boxContents.append( execStdout( stream.richString, bUseDefaultPerspectiveForResult ) )
+		elif stream.name == 'err':
+			boxContents.append( execStderr( stream.richString, bUseDefaultPerspectiveForResult ) )
+		else:
+			raise ValueError, 'Unreckognised stream \'{0}\''.format( stream.name )
 	if exception is not None:
 		exceptionView = InnerFragment( exception ).alignHPack()
 		if bUseDefaultPerspecitveForException:
@@ -99,8 +104,8 @@ def executionResultBox(stdoutStream, stderrStream, exception, resultInTuple, bUs
 		return None
 
 
-def minimalExecutionResultBox(stdoutStream, stderrStream, exception, resultInTuple, bUseDefaultPerspecitveForException, bUseDefaultPerspectiveForResult):
-	if stdoutStream is None  and  stderrStream is None  and  exception is None:
+def minimalExecutionResultBox(streams, exception, resultInTuple, bUseDefaultPerspecitveForException, bUseDefaultPerspectiveForResult):
+	if len( streams ) == 0  and  exception is None:
 		if resultInTuple is None:
 			return None
 		else:
@@ -110,15 +115,18 @@ def minimalExecutionResultBox(stdoutStream, stderrStream, exception, resultInTup
 			return Paragraph( [ resultView ] ).alignHExpand()
 	else:
 		boxContents = []
-		if stderrStream is not None:
-			boxContents.append( execStderr( stderrStream, bUseDefaultPerspectiveForResult ) )
+		for stream in streams:
+			if stream.name == 'out':
+				boxContents.append( execStdout( stream.richString, bUseDefaultPerspectiveForResult ) )
+			elif stream.name == 'err':
+				boxContents.append( execStderr( stream.richString, bUseDefaultPerspectiveForResult ) )
+			else:
+				raise ValueError, 'Unreckognised stream \'{0}\''.format( stream.name )
 		if exception is not None:
 			exceptionView = InnerFragment( exception )
 			if bUseDefaultPerspecitveForException:
 				exceptionView = ApplyPerspective.defaultPerspective( exceptionView )
 			boxContents.append( execException( exceptionView ) )
-		if stdoutStream is not None:
-			boxContents.append( execStdout( stdoutStream, bUseDefaultPerspectiveForResult ) )
 		if resultInTuple is not None:
 			resultView = InnerFragment( resultInTuple[0] ).alignHPack()
 			if bUseDefaultPerspectiveForResult:
