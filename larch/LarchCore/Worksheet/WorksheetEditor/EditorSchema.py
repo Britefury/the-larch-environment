@@ -11,6 +11,8 @@ from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from BritefuryJ.Pres import InnerFragment
 
+from BritefuryJ.Browser import Location
+
 
 from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, methodDispatch
 
@@ -46,7 +48,11 @@ class _Projection (object):
 	@DMObjectNodeDispatchMethod( Schema.TextSpan )
 	def textSpan(self, worksheet, node):
 		return TextSpanEditor( worksheet, node )
-	
+
+	@DMObjectNodeDispatchMethod( Schema.Link )
+	def link(self, worksheet, node):
+		return LinkEditor( worksheet, node )
+
 	@DMObjectNodeDispatchMethod( Schema.PythonCode )
 	def pythonCode(self, worksheet, node):
 		return PythonCodeEditor( worksheet, node )
@@ -164,6 +170,10 @@ class ParagraphEditor (AbstractViewSchema.ParagraphAbstractView):
 	def setStyle(self, style):
 		self._model['style'] = style
 		self._editorModel.setStyleAttrs( { 'style' : style } )
+
+
+	def __clipboard_copy__(self, memo):
+		return ParagraphEditor( None, memo.copy( self._model ) )
 		
 		
 	@staticmethod
@@ -201,6 +211,10 @@ class TextSpanEditor (AbstractViewSchema.TextSpanAbstractView):
 		self._model['styleAttrs'] = modelAttrs
 		self._editorModel.setStyleAttrs( styleAttrs )
 
+
+	def __clipboard_copy__(self, memo):
+		return TextSpanEditor( None, memo.copy( self._model ) )
+
 		
 	@staticmethod
 	def newTextSpan(contents, styleMap):
@@ -211,13 +225,76 @@ class TextSpanEditor (AbstractViewSchema.TextSpanAbstractView):
 	@staticmethod
 	def newTextSpanModel(text, styleAttrs):
 		return Schema.TextSpan( text=text, styleAttrs=styleAttrs )
+
+
+
+class LinkEditor (AbstractViewSchema.LinkAbstractView):
+	def __init__(self, worksheet, model):
+		super( LinkEditor, self ).__init__( worksheet, model )
+		self._editorModel = WSEditor.RichTextEditor.WorksheetRichTextEditor.instance.editorModelInlineEmbed( self )
+
+
+	@property
+	def text(self):
+		return self._model['text']
+
+	@text.setter
+	def text(self, value):
+		self._model['text'] = value
+
+
+	def setAbsoluteLocation(self, docLocation, location):
+		self._model['location'], self._model['absolute'] = self._modelLocationAndAbsoluteFlag( docLocation, location )
+
+
+	def copy(self, worksheet=None):
+		model = Schema.Link( text=self._model['text'], location=self._model['location'], absolute=self._model['absolute'] )
+		return LinkEditor( worksheet, model )
+
+
+	def __clipboard_copy__(self, memo):
+		return LinkEditor( None, memo.copy( self._model ) )
+
+
+	@staticmethod
+	def newLinkForModel(model):
+		return LinkEditor( None, model )
+
+	@staticmethod
+	def newHomeLink(text):
+		return LinkEditor( None, LinkEditor.newHomeLinkModel( text ) )
+
+	@staticmethod
+	def newHomeLinkModel(text):
+		return Schema.Link( text=text, location='', absolute='1' )
+
+	@staticmethod
+	def newLink(docLocation, text, location):
+		m = LinkEditor.newLinkModel( docLocation, text, location )
+		return LinkEditor( None, m )
+
+	@staticmethod
+	def newLinkModel(docLocation, text, location):
+		loc, absolute = LinkEditor._modelLocationAndAbsoluteFlag( docLocation, location )
+		return Schema.Link( text=text, location=loc, absolute=absolute )
+
+
+	@staticmethod
+	def _modelLocationAndAbsoluteFlag(docLocation, location):
+		relative = location.relativeTo( docLocation )
+		if relative is not None:
+			return str( relative ), None
+		else:
+			return str( location ), '1'
+
+
 		
 		
 		
 class PythonCodeEditor (AbstractViewSchema.PythonCodeAbstractView):
 	def __init__(self, worksheet, model):
 		super( PythonCodeEditor, self ).__init__( worksheet, model )
-		self._editorModel = WSEditor.RichTextEditor.WorksheetRichTextEditor.instance.editorModelParagraphEmbed( model )
+		self._editorModel = WSEditor.RichTextEditor.WorksheetRichTextEditor.instance.editorModelParagraphEmbed( self )
 
 		
 	def setCode(self, code):
@@ -231,6 +308,14 @@ class PythonCodeEditor (AbstractViewSchema.PythonCodeAbstractView):
 		except KeyError:
 			raise ValueError, 'invalid style'
 		self._model['style'] = name
+
+
+	def copy(self, worksheet=None):
+		return PythonCodeEditor( worksheet, self._model )
+
+
+	def __clipboard_copy__(self, memo):
+		return PythonCodeEditor( None, memo.copy( self._model ) )
 
 
 	@staticmethod
@@ -247,7 +332,15 @@ class PythonCodeEditor (AbstractViewSchema.PythonCodeAbstractView):
 class InlineEmbeddedObjectEditor (AbstractViewSchema.InlineEmbeddedObjectAbstractView):
 	def __init__(self, worksheet, model):
 		super( InlineEmbeddedObjectEditor, self ).__init__( worksheet, model )
-		self._editorModel = WSEditor.RichTextEditor.WorksheetRichTextEditor.instance.editorModelInlineEmbed( model )
+		self._editorModel = WSEditor.RichTextEditor.WorksheetRichTextEditor.instance.editorModelInlineEmbed( self )
+
+
+	def copy(self, worksheet=None):
+		return self.newInlineEmbeddedObject( self.value )
+
+
+	def __clipboard_copy__(self, memo):
+		return InlineEmbeddedObjectEditor( None, memo.copy( self._model ) )
 
 
 	@staticmethod
@@ -266,7 +359,15 @@ class InlineEmbeddedObjectEditor (AbstractViewSchema.InlineEmbeddedObjectAbstrac
 class ParagraphEmbeddedObjectEditor (AbstractViewSchema.ParagraphEmbeddedObjectAbstractView):
 	def __init__(self, worksheet, model):
 		super( ParagraphEmbeddedObjectEditor, self ).__init__( worksheet, model )
-		self._editorModel = WSEditor.RichTextEditor.WorksheetRichTextEditor.instance.editorModelParagraphEmbed( model )
+		self._editorModel = WSEditor.RichTextEditor.WorksheetRichTextEditor.instance.editorModelParagraphEmbed( self )
+
+
+	def copy(self, worksheet=None):
+		return self.newParagraphEmbeddedObject( self.value )
+
+
+	def __clipboard_copy__(self, memo):
+		return ParagraphEmbeddedObjectEditor( None, memo.copy( self._model ) )
 
 
 	@staticmethod

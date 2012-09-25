@@ -41,7 +41,11 @@ class _Projection (object):
 	@DMObjectNodeDispatchMethod( Schema.TextSpan )
 	def textSpan(self, worksheet, node):
 		return TextSpanView( worksheet, node )
-	
+
+	@DMObjectNodeDispatchMethod( Schema.Link )
+	def link(self, worksheet, node):
+		return LinkView( worksheet, node )
+
 	@DMObjectNodeDispatchMethod( Schema.PythonCode )
 	def pythonCode(self, worksheet, node):
 		return PythonCodeView( worksheet, node )
@@ -72,6 +76,11 @@ class ParagraphView (AbstractViewSchema.ParagraphAbstractView):
 		
 		
 class TextSpanView (AbstractViewSchema.TextSpanAbstractView):
+	pass
+
+
+
+class LinkView (AbstractViewSchema.LinkAbstractView):
 	pass
 
 		

@@ -463,6 +463,14 @@ public abstract class RichTextEditor extends SequentialEditor
 	
 	
 	
+	public void insertInlineEmbedAtCaret(Caret caret, MakeInlineEmbedValueFn makeInlineEmbedValue)
+	{
+		if ( caret.isValid()  &&  caret.isEditable() )
+		{
+			insertInlineEmbedAtMarker( caret.getMarker(), makeInlineEmbedValue );
+		}
+	}
+	
 	public void insertInlineEmbedAtMarker(Marker marker, MakeInlineEmbedValueFn makeInlineEmbedValue)
 	{
 		if ( marker.isValid()  &&  marker.getElement().isEditable() )

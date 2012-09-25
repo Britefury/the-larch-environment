@@ -89,6 +89,32 @@ public class Location implements Presentable
 	}
 	
 	
+	public Location relativeTo(Location x)
+	{
+		if ( locationString.equals( x.locationString ) )
+		{
+			return new Location( "" );
+		}
+		else
+		{
+			String prefix = x.locationString + ".";
+			if ( locationString.startsWith( prefix ) )
+			{
+				return new Location( locationString.substring( prefix.length() ) );
+			}
+			else
+			{
+				return null;
+			}
+		}
+	}
+	
+	public boolean isWithin(Location x)
+	{
+		return locationString.equals( x.locationString )  ||  locationString.startsWith( x.locationString + "." );
+	}
+	
+	
 	public String toString()
 	{
 		return "Location(" + locationString + ")";
