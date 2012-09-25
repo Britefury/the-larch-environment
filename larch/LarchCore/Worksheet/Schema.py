@@ -24,6 +24,8 @@ Text = schema.newClass( 'Text', WorksheetNode, [ 'text' ] )
 Paragraph = schema.newClass( 'Paragraph', Text, [ 'style' ] )
 TextSpan = schema.newClass( 'TextSpan', Text, [ 'styleAttrs' ] )
 
+Link = schema.newClass( 'Link', WorksheetNode, [ 'text', 'location', 'absolute' ] )
+
 StyleAttr = schema.newClass( 'StyleAttr', WorksheetNode, [ 'name', 'value' ] )
 
 

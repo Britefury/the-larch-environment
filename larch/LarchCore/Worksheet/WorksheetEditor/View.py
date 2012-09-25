@@ -78,7 +78,7 @@ def _onDrop_embeddedObject(element, pos, data, action):
 		def _onDropInline(control):
 			def _makeInline():
 				model = data.getModel()
-				return EditorSchema.InlineEmbeddedObjectEditor.newInlineEmbeddedObjectModel( model )
+				return EditorSchema.InlineEmbeddedObjectEditor.newInlineEmbeddedObject( model )
 			WorksheetRichTextEditor.instance.insertInlineEmbedAtMarker( marker, _makeInline )
 
 		def _onDropParagraph(control):
@@ -113,7 +113,7 @@ def _applyParagraphShortcuts(p):
 	def insertCodeAction(element):
 		marker = Marker.atEndOf( element, True )
 		def _makeParagraph():
-			return EditorSchema.PythonCodeEditor.newPythonCode()
+			return EditorSchema.PythonCodeEditor.newPythonCodeModel()
 		WorksheetRichTextEditor.instance.insertParagraphAtMarker( marker, _makeParagraph )
 
 
@@ -190,6 +190,21 @@ def _worksheetContextMenuFactory(element, menu):
 	menu.add( Section( SectionHeading2( 'Text style' ), styles ).alignHExpand() )
 
 
+	def _onLink(link, event):
+		def _makeLink():
+			return EditorSchema.LinkEditor.newHomeLink( 'Link' )
+
+		caret = rootElement.getCaret()
+		if caret.isValid():
+			WorksheetRichTextEditor.instance.insertInlineEmbedAtCaret( caret, _makeLink )
+
+
+	insertLink = Hyperlink( 'Hyperlink', _onLink )
+	insert = ControlsRow( [ insertLink ] )
+	menu.add( Section( SectionHeading2( 'Insert' ), insert ).alignHExpand() )
+
+
+
 	def _onPythonCode(link, event):
 		def _makePythonCode():
 			return EditorSchema.PythonCodeEditor.newPythonCode()
@@ -212,7 +227,6 @@ def _worksheetContextMenuFactory(element, menu):
 	worksheetControls = ControlsRow( [ refreshButton.alignHPack() ] )
 	menu.add( Section( SectionHeading2( 'Worksheet' ), worksheetControls ).alignHExpand() )
 	return True
-
 
 
 
@@ -304,6 +318,48 @@ class WorksheetEditor (MethodDispatchView):
 		return p
 
 
+	@ObjectDispatchMethod( EditorSchema.LinkEditor )
+	def Link(self, fragment, inheritedState, node):
+		docLocation = fragment.getSubjectContext()['docLocation']
+
+		def _linkContextMenuFactory(element, menu):
+			def _onRemove(control, event):
+				WorksheetRichTextEditor.instance.deleteInlineEmbedContainingElement( element )
+
+
+			class _TextListener (TextEntry.TextEntryListener):
+				def onAccept(self, textEntry, text):
+					node.text = text
+
+
+			class _LocationListener (TextEntry.TextEntryListener):
+				def onAccept(self, textEntry, text):
+					node.setAbsoluteLocation( docLocation, Location( text ) )
+
+
+			textEntry = TextEntry( node.text, _TextListener() )
+
+			absLoc = node.getAbsoluteLocation( docLocation )
+
+			locationEntry = TextEntry( absLoc.getLocationString(), _LocationListener() )
+
+			link = Hyperlink( 'Go to location...', absLoc )
+
+			onRemove = Button.buttonWithLabel( 'Remove', _onRemove )
+
+			menu.add( Section( SectionHeading3( 'Text:' ), textEntry ) )
+			menu.add( Section( SectionHeading3( 'Location:' ), Column( [ locationEntry, link ] ) ) )
+			menu.add( Spacer( 0.0, 20.0 ) )
+			menu.add( onRemove )
+			return True
+
+
+		p = _linkStyle.applyTo( Label( node.text ) )
+		p = p.withContextMenuInteractor( _linkContextMenuFactory )
+		p = WorksheetRichTextEditor.instance.editableInlineEmbed( node, p )
+		return p
+
+
 	@ObjectDispatchMethod( EditorSchema.BlankParagraphEditor )
 	def BlankParagraph(self, fragment, inheritedState, node):
 		style = node.getStyle()
@@ -384,7 +440,7 @@ class WorksheetEditor (MethodDispatchView):
 
 	@ObjectDispatchMethod( EditorSchema.InlineEmbeddedObjectEditor )
 	def InlineEmbeddedObject(self, fragment, inheritedState, node):
-		value = node.getValue()
+		value = node.value
 		valueView = _editableStyle.applyTo( ApplyPerspective( EditPerspective.instance, value ) )
 
 		hideFrame = getattr( value, '__embed_hide_frame__', False )
@@ -398,7 +454,7 @@ class WorksheetEditor (MethodDispatchView):
 
 	@ObjectDispatchMethod( EditorSchema.ParagraphEmbeddedObjectEditor )
 	def ParagraphEmbeddedObject(self, fragment, inheritedState, node):
-		value = node.getValue()
+		value = node.value
 		valueView = _editableStyle.applyTo( ApplyPerspective( EditPerspective.instance, value ) )
 
 		hideFrame = getattr( value, '__embed_hide_frame__', False )
@@ -409,6 +465,8 @@ class WorksheetEditor (MethodDispatchView):
 		return p
 
 
+
+_linkStyle = StyleSheet.style( Primitive.foreground( Color.BLUE ), Primitive.hoverBackground( FilledOutlinePainter( Color( 0.9, 0.9, 0.9 ), Color( 0.5, 0.5, 0.5 ) ) ) )
 
 
 
