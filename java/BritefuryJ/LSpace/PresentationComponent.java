@@ -109,6 +109,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			
 			// Create a presentation component for the popup contents, and add them
 			popupComponent = new PresentationComponent( this );
+			popupComponent.setPageController( parentComponent.getPageController() );
 			popupComponent.getRootElement().setChild( popupContents.layoutWrap( HAlignment.EXPAND, VAlignment.EXPAND ) );
 			
 			popupWindow.add( popupComponent );
@@ -604,6 +605,11 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	public void setPageController(PageController pageController)
 	{
 		rootElement.setPageController( pageController );
+	}
+	
+	public PageController getPageController()
+	{
+		return rootElement.getPageController();
 	}
 	
 

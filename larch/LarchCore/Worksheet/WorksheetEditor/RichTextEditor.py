@@ -32,16 +32,32 @@ class WorksheetRichTextEditor (RichTextEditor):
 
 
 	def buildInlineEmbed(self, value):
-		return EditorSchema.InlineEmbeddedObjectEditor.newInlineEmbeddedObject( value['embeddedValue'].getValue() )
+#		assert isinstance( value, DMObject )
+#		if value.isInstanceOf( Schema.Link ):
+#			return EditorSchema.LinkEditor.newLinkForModel( value )
+#		elif value.isInstanceOf( Schema.InlineEmbeddedObject ):
+#			return EditorSchema.InlineEmbeddedObjectEditor.newInlineEmbeddedObject( value['embeddedValue'].getValue() )
+#		else:
+#			raise TypeError, 'Unknown inline embed type {0}'.format( value.getDMClass().getName() )
+		assert not isinstance( value, DMObject )
+		if isinstance( value, EditorSchema.LinkEditor )  or  isinstance( value, EditorSchema.InlineEmbeddedObjectEditor ):
+			return value.copy()
+		else:
+			raise TypeError, 'Unknown inline embed proxy type {0}'.format( type( value ) )
 
 	def buildParagraphEmbed(self, value):
-		assert isinstance( value, DMObject )
-		if value.isInstanceOf( Schema.PythonCode ):
-			return EditorSchema.PythonCodeEditor( None, value )
-		elif value.isInstanceOf( Schema.ParagraphEmbeddedObject ):
-			return EditorSchema.ParagraphEmbeddedObjectEditor( None, value )
+#		assert isinstance( value, DMObject )
+#		if value.isInstanceOf( Schema.PythonCode ):
+#			return EditorSchema.PythonCodeEditor( None, value )
+#		elif value.isInstanceOf( Schema.ParagraphEmbeddedObject ):
+#			return EditorSchema.ParagraphEmbeddedObjectEditor( None, value )
+#		else:
+#			raise TypeError, 'cannot create paragraph embed for %s'  %  value.getDMClass().getName()
+		assert not isinstance( value, DMObject )
+		if isinstance( value, EditorSchema.PythonCodeEditor )  or  isinstance( value, EditorSchema.ParagraphEmbeddedObjectEditor ):
+			return value.copy()
 		else:
-			raise TypeError, 'cannot create paragraph embed for %s'  %  value.getDMClass().getName()
+			raise TypeError, 'Unknown paragraph embed proxy type {0}'.format( type( value ) )
 
 
 	def buildParagraph(self, contents, styleAttrs):

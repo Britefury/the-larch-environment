@@ -126,6 +126,13 @@ class WorksheetViewer (MethodDispatchView):
 		return styleSheet.applyTo( RichSpan( text ) )
 
 
+
+	@ObjectDispatchMethod( ViewSchema.LinkView )
+	def Link(self, fragment, inheritedState, node):
+		docLocation = fragment.getSubjectContext()['docLocation']
+		return Hyperlink( node.text, node.getAbsoluteLocation( docLocation ) )
+
+
 	
 	@ObjectDispatchMethod( ViewSchema.PythonCodeView )
 	def PythonCode(self, fragment, inheritedState, node):
@@ -165,7 +172,7 @@ class WorksheetViewer (MethodDispatchView):
 
 	@ObjectDispatchMethod( ViewSchema.InlineEmbeddedObjectView )
 	def InlineEmbeddedObject(self, fragment, inheritedState, node):
-		value = node.getValue()
+		value = node.value
 		valueView = _editableStyle.applyTo( ApplyPerspective( None, value ) )
 		return valueView
 
@@ -173,7 +180,7 @@ class WorksheetViewer (MethodDispatchView):
 
 	@ObjectDispatchMethod( ViewSchema.ParagraphEmbeddedObjectView )
 	def ParagraphEmbeddedObject(self, fragment, inheritedState, node):
-		value = node.getValue()
+		value = node.value
 		valueView = _editableStyle.applyTo( ApplyPerspective( None, value ) )
 
 		hideFrame = getattr( value, '__embed_hide_frame__', False )
