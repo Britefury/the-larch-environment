@@ -12,6 +12,8 @@ import imp
 from BritefuryJ.Incremental import IncrementalValueMonitor
 from BritefuryJ.Live import LiveFunction
 
+from BritefuryJ.Browser import Location
+
 from BritefuryJ.Pres import InnerFragment
 from BritefuryJ.Pres.Primitive import Primitive
 from BritefuryJ.StyleSheet import StyleSheet
@@ -188,6 +190,28 @@ class TextSpanAbstractView (_TextAbstractView):
 
 
 
+class LinkAbstractView (NodeAbstractView):
+	def __init__(self, worksheet, model):
+		super( LinkAbstractView, self ).__init__( worksheet, model )
+
+
+	@property
+	def text(self):
+		return self._model['text']
+
+
+	def getAbsoluteLocation(self, docLocation):
+		loc = self._model['location']
+		if self._model['absolute'] is not None:
+			return Location( loc )
+		else:
+			if loc == '':
+				return docLocation
+			else:
+				return docLocation.join( loc )
+
+
+
 	
 class PythonCodeAbstractView (NodeAbstractView):
 	STYLE_MINIMAL_RESULT = 0
@@ -276,7 +300,8 @@ class InlineEmbeddedObjectAbstractView (NodeAbstractView):
 		self._result = None
 
 
-	def getValue(self):
+	@property
+	def value(self):
 		return self._model['embeddedValue'].getValue()
 
 
@@ -293,7 +318,8 @@ class ParagraphEmbeddedObjectAbstractView (NodeAbstractView):
 		self._result = None
 
 
-	def getValue(self):
+	@property
+	def value(self):
 		return self._model['embeddedValue'].getValue()
 
 
