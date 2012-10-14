@@ -27,6 +27,8 @@ from BritefuryJ.LSpace import *
 from BritefuryJ.Browser import *
 from BritefuryJ.LSpace.StyleParams import *
 
+from BritefuryJ.Pres.Help import *
+
 
 from BritefuryJ.Projection import Subject
 
@@ -173,12 +175,29 @@ class Window (object):
 
 		
 		
+		# HELP MENU
+
+		helpMenu = JMenu( 'Help' )
+
+		helpToggleTooltipHighlightsItem = JMenuItem( 'Toggle tooltip highlights' )
+		toggleTooltipHighlightsAction = _action( 'Toggle tooltip highlights', self._onToggleTooltipHighlights )
+		helpToggleTooltipHighlightsItem.setActionCommand( toggleTooltipHighlightsAction.getValue( Action.NAME ) )
+		helpToggleTooltipHighlightsItem.addActionListener( toggleTooltipHighlightsAction )
+		helpToggleTooltipHighlightsItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_F2, 0 ) )
+		helpMenu.add( helpToggleTooltipHighlightsItem )
+
+		helpMenu.add( _action( 'Show all tip boxes', self._onShowAllTipBoxes ) )
+
+
+		# MENU BAR
+
 		menuBar = JMenuBar()
 		menuBar.add( editMenu )
 		menuBar.add( viewMenu )
+		menuBar.add( helpMenu )
 
-		
-		
+
+
 		# MAIN PANEL
 		
 		windowPanel = JPanel()
@@ -322,6 +341,13 @@ class Window (object):
 
 
 
-	
+	def _onToggleTooltipHighlights(self):
+		AttachTooltip.toggleHighlights()
+
+
+	def _onShowAllTipBoxes(self):
+		TipBox.resetTipHiddenStates()
+
+
 
 

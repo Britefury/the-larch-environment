@@ -41,6 +41,7 @@ from BritefuryJ.Pres.RichText import *
 from BritefuryJ.Pres.ContextMenu import *
 from BritefuryJ.Pres.ObjectPres import *
 from BritefuryJ.Pres.UI import *
+from BritefuryJ.Pres.Help import *
 
 from BritefuryJ.EditPerspective import EditPerspective
 
@@ -63,6 +64,8 @@ _editableStyle = StyleSheet.style( Primitive.editable( True ) )
 
 _pythonCodeBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) ) )
 _pythonCodeBox = BorderWithHeaderBar( SolidBorder( 1.5, 4.0, 10.0, 10.0, Color( 0.4, 0.4, 0.5 ), None ), Color( 0.825, 0.825, 0.875 ) )
+
+_worksheetMargin = 10.0
 
 
 
@@ -264,8 +267,13 @@ class WorksheetEditor (MethodDispatchView):
 		viewLink = Hyperlink( 'Switch to user mode', viewLocation )
 		linkHeader = SplitLinkHeaderBar( [ viewLink ], [ homeLink ] )
 
-		
-		w = Page( [ linkHeader, bodyView ] )
+
+		tip = TipBox( 'Type to add text to the worksheet.\nRight click to access the context menu, from which styles can be applied and code can be added.\n' + \
+			'To re-execute all code within the worksheet, press Control-Enter',
+			      'larchcore.worksheet.edit.howto' )
+
+
+		w = Page( [ linkHeader, bodyView, tip ] )
 		w = w.withContextMenuInteractor( _worksheetContextMenuFactory )
 		w = w.withDropDest( _embeddedObject_dropDest )
 		w = w.withCommands( worksheetCommands )
@@ -277,7 +285,7 @@ class WorksheetEditor (MethodDispatchView):
 	def Body(self, fragment, inheritedState, node):
 		contentViews = list( InnerFragment.map( node.getContents() ) )
 
-		b = Body( contentViews )
+		b = Body( contentViews ).padX( _worksheetMargin )
 		b = WorksheetRichTextEditor.instance.editableBlock( node, b )
 		return b
 	

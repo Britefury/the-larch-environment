@@ -7,7 +7,7 @@
 ##-*************************
 from BritefuryJ.GraphViz import GraphViz
 
-from Britefury.Config import PathsConfigPage, GraphVizConfigPage, FontConfigPage
+from Britefury.Config import PathsConfigPage, GraphVizConfigPage, FontConfigPage, TipBoxConfig
 
 
 _shutdownListeners = []
@@ -16,6 +16,7 @@ def appInit():
 	PathsConfigPage.initPathsConfig()
 	GraphVizConfigPage.initGraphVizConfig()
 	FontConfigPage.initFontConfig()
+	TipBoxConfig.initTipboxConfig()
 
 
 def appShutdown():
@@ -23,6 +24,7 @@ def appShutdown():
 	GraphVizConfigPage.saveGraphVizConfig()
 	GraphViz.shutdown()
 	FontConfigPage.saveFontConfig()
+	TipBoxConfig.saveTipboxConfig()
 
 	for l in _shutdownListeners:
 		l()

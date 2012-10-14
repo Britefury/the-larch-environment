@@ -37,6 +37,7 @@ from BritefuryJ.Pres import *
 from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.Pres.RichText import *
 from BritefuryJ.Pres.UI import *
+from BritefuryJ.Pres.Help import *
 
 from BritefuryJ.Projection import Perspective, Subject
 
@@ -181,14 +182,20 @@ class AppView (MethodDispatchView):
 		openLink = Hyperlink( 'OPEN', _onOpenDoc )
 		openDocumentsBox = _contentsList( [ newLink, openLink ], openDocViews, 'Documents' )
 		openDocumentsBox = openDocumentsBox.withNonLocalDropDest( DataFlavor.javaFileListFlavor, _onFileListDrop )
+		openDocumentsBox = AttachTooltip( openDocumentsBox, 'Click NEW to create a new document. To open, click OPEN, or drag files from a file explorer application.', False )
 		
 		
 		newConsoleLink = Hyperlink( 'NEW', _onNewConsole )
 		consolesBox = _contentsList( [ newConsoleLink ], consoles, 'Python consoles' )
+
+
+		tip = TipBox( 'You can highlight items that have help types by pressing F2. Hover the pointer over them to display the tips. ' + \
+			      'Some items have tips that will not appear unless highlighting is enabled.',
+			      'larchcore.mainapp.tooltiphighlights' )
 		
 		
 		head = Head( [ linkHeader, title ] )
-		body = Body( [ openDocumentsBox.pad( 0.0, 10.0 ).alignHLeft(), consolesBox.pad( 0.0, 10.0 ).alignHLeft() ] )
+		body = Body( [ openDocumentsBox.pad( 0.0, 10.0 ).alignHLeft(), consolesBox.pad( 0.0, 10.0 ).alignHLeft(), tip ] )
 		return StyleSheet.style( Primitive.editable( False ) ).applyTo( Page( [ head, body ] ) )
 
 

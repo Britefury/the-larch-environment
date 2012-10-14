@@ -43,6 +43,7 @@ from BritefuryJ.Pres import *
 from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.Pres.RichText import *
 from BritefuryJ.Pres.UI import *
+from BritefuryJ.Pres.Help import *
 from BritefuryJ.Util.Jython import JythonException
 
 from BritefuryJ.Projection import Perspective
@@ -372,7 +373,9 @@ class ProjectView (MethodDispatchView):
 		saveButton = Button.buttonWithLabel( 'Save', _onSave )
 		saveAsButton = Button.buttonWithLabel( 'Save as', _onSaveAs )
 		reloadButton = Button.buttonWithLabel( 'Save and reload', _onReload )
+		reloadButton = AttachTooltip( reloadButton, 'Saves and reloads the project from scratch\nCauses all embedded objects to be re-created.' )
 		exportButton = Button.buttonWithLabel( 'Export', _onExport )
+		exportButton = AttachTooltip( exportButton, 'Exports project contents to text files where possible.' )
 		saveBox = Row( [ saveButton.padX( 10.0 ), Spacer( 30.0, 0.0 ), saveAsButton.padX( 10.0 ), Spacer( 30.0, 0.0 ), reloadButton.padX( 10.0 ), Spacer( 50.0, 0.0 ), exportButton.padX( 10.0 ) ] ).alignHLeft()
 		saveExportSection = Section( saveExportHeader, saveBox )
 
@@ -390,6 +393,8 @@ class ProjectView (MethodDispatchView):
 			pythonPackageNameBox = Row( [ pythonPackageNamePrompt, pythonPackageNameLabel, Spacer( 25.0, 0.0 ), comment ] )
 		else:
 			pythonPackageNameBox = Row( [ pythonPackageNamePrompt, pythonPackageNameLabel ] )
+		pythonPackageNameBox = AttachTooltip( pythonPackageNameBox, 'The root python package name is the name under which the contents of the project can be imported using import statements within the project.\n' + \
+			'If this is not set, pages from this project cannot be imported.', False )
 		
 		
 		# Clear imported modules
@@ -402,6 +407,7 @@ class ProjectView (MethodDispatchView):
 			BubblePopup.popupInBubbleAdjacentTo( report, button.getElement(), Anchor.BOTTOM, True, True )
 		resetPrompt = Label( 'Reset (unload project modules): ' )
 		resetButton = Button.buttonWithLabel( 'Reset', _onReset )
+		resetButton = AttachTooltip( resetButton, 'Unloads all modules that were imported from this project from the Python module cache.' )
 		reset = Row( [ resetPrompt, resetButton ] )
 
 
@@ -417,6 +423,8 @@ class ProjectView (MethodDispatchView):
 		nameBox = _itemHoverHighlightStyle.applyTo( nameElement.alignVCentre() )
 		nameBox = nameBox.withContextMenuInteractor( _projectIndexContextMenuFactory )
 		nameBox = nameBox.withDropDest( _projectIndexDropDest )
+		nameBox = AttachTooltip( nameBox, 'Right click to access context menu, from which new pages and packages can be created.\n' + \
+			'A page called index at the root will appear instead of the project page. A page called __startup__ will be executed at start time.', False )
 
 		itemsBox = Column( items ).alignHExpand()
 
@@ -426,10 +434,15 @@ class ProjectView (MethodDispatchView):
 		indexSection = Section( indexHeader, contentsView )
 
 
+		tip = TipBox( 'Larch projects act like Python programs. Packages act as directories/packages and pages act as Python source files. Pages can import code from one another as if they are modules.\n' + \
+			'If a page called index is present in the root of the project, then it will appear instead of the project page. To access the project page, add \'.___project___\' (3 underscores) to the address of the project.\n' +\
+			'If a page called __startup__ (2 underscores) is present at the root, code within it will be executed before all other pages. This can be used for registering editor extensions.',
+			      'larchcore.worksheet.worksheeteditor')
+
 
 		# The page
 		head = Head( [ linkHeader, title ] )
-		body = Column( [ saveExportSection, projectSection, indexSection ] ).alignHPack()
+		body = Body( [ saveExportSection, projectSection, indexSection, tip ] ).alignHPack()
 
 		return StyleSheet.style( Primitive.editable( False ) ).applyTo( Page( [ head, body ] ) )
 
@@ -488,6 +501,7 @@ class ProjectView (MethodDispatchView):
 
 		nameBox = nameBox.withContextMenuInteractor( _packageContextMenuFactory )
 		nameBox = nameBox.withDragSource( _dragSource )
+		nameBox = AttachTooltip( nameBox, 'Right click to access context menu.', False )
 
 		nameLive = LiveValue( nameBox )
 
@@ -530,6 +544,7 @@ class ProjectView (MethodDispatchView):
 		nameBox = _itemHoverHighlightStyle.applyTo( Row( [ link ] ) )
 		nameBox = nameBox.withDragSource( _dragSource )
 		nameBox = nameBox.withDropDest( _pageDropDest )
+		nameBox = AttachTooltip( nameBox, 'Click to enter page.\nRight click to access context menu.', False )
 
 		nameLive = LiveValue( nameBox )
 
