@@ -17,57 +17,134 @@ from LarchCore.Languages.Python2 import CodeGenerator
 from LarchCore.Languages.Python2.Execution import ExecutionPresCombinators
 
 
-class _OutputStream (object):
-	def __init__(self):
-		self._builder = None
+class RichStream (object):
+	def __init__(self, name):
+		self.name = name
+		self.__builder = None
 		
 	def write(self, text):
 		if not ( isinstance( text, str )  or  isinstance( text, unicode ) ):
 			raise TypeError, 'argument 1 must be string, not %s' % type( text )
-		if self._builder is None:
-			self._builder = RichStringBuilder()
 		self._builder.appendTextValue( text )
-	
-	def display(self, value):
-		if self._builder is None:
-			self._builder = RichStringBuilder()
-		self._builder.appendStructuralValue( value )
-		
-		
-	def getRichString(self):
-		return self._builder.richString()   if self._builder is not None   else None
 
+	def display(self, value):
+		self._builder.appendStructuralValue( value )
+
+
+	@property
+	def _builder(self):
+		if self.__builder is None:
+			self.__builder = RichStringBuilder()
+		return self.__builder
 		
-		
+
+	@property
+	def richString(self):
+		return self.__builder.richString()   if self.__builder is not None   else None
+
+
+
+class MultiplexedRichStream (object):
+	class _SingleStream (object):
+		def __init__(self, multiplexedStream, name):
+			self.name = name
+			self.__multi = multiplexedStream
+			self.__stream = RichStream( name )
+
+		def write(self, text):
+			self.__stream.write( text )
+			self.__multi._write( self.name, text )
+
+		def display(self, value):
+			self.__stream.display( value )
+			self.__multi._display( self.name, value )
+
+		@property
+		def richString(self):
+			return self.__stream.richString
+
+
+	def __init__(self, streamNames):
+		self.__streamsByName = { name : self._SingleStream( self, name )   for name in streamNames }
+		self.__multiplexed = []
+
+
+	def __getattr__(self, item):
+		try:
+			return self.__streamsByName[item]
+		except KeyError:
+			raise AttributeError, 'No stream named {0}'.format( item )
+
+
+	def __iter__(self):
+		return iter( self.__multiplexed )
+
+	def __getitem__(self, item):
+		return self.__multiplexed[item]
+
+	def __len__(self):
+		return len( self.__multiplexed )
+
+
+	def suppressStream(self, name):
+		result = MultiplexedRichStream([])
+		for n, stream in self.__streamsByName.items():
+			if n != name:
+				result.__streamsByName[n] = stream
+		for s in self.__multiplexed:
+			if s.name != name:
+				result.__multiplexed.append( s )
+		return result
+
+
+
+	def _write(self, streamName, text):
+		stream = self.__multiplexedForName(streamName)
+		stream.write( text )
+
+
+	def _display(self, streamName, value):
+		stream = self.__multiplexedForName(streamName)
+		stream.display( value )
+
+
+	def __multiplexedForName(self, name):
+		if len( self.__multiplexed ) > 0:
+			top = self.__multiplexed[-1]
+			if top.name == name:
+				return top
+		stream = RichStream( name )
+		self.__multiplexed.append( stream )
+		return stream
+
+
+
+
 class ExecutionResult (object):
-	def __init__(self, stdout, stderr, caughtException, result=None):
+	def __init__(self, streams, caughtException, result=None):
 		super( ExecutionResult, self ).__init__()
-		self._stdout = stdout
-		self._stderr = stderr
+		self._streams = streams
 		self._caughtException = caughtException
 		self._result = result
 
 
 	def suppressStdOut(self):
-		return ExecutionResult( None, self._stderr, self._caughtException, self._result )
+		return ExecutionResult( self._streams.suppressStream( 'out' ), self._caughtException, self._result )
 
 	def suppressStdErr(self):
-		return ExecutionResult( self._stdout, None, self._caughtException, self._result )
+		return ExecutionResult( self._streams.suppressStream( 'err' ), self._caughtException, self._result )
 
 	def suppressCaughtException(self):
-		return ExecutionResult( self._stdout, self._stderr, None, self._result )
+		return ExecutionResult( self._streams, None, self._result )
 
 	def suppressResult(self):
-		return ExecutionResult( self._stdout, self._stderr, self._caughtException, None )
+		return ExecutionResult( self._streams, self._caughtException, None )
 
 		
 		
-	def getStdOutStream(self):
-		return self._stdout
+	def getStreams(self):
+		return self._streams
 	
-	def getStdErrStream(self):
-		return self._stderr
-
 	def getCaughtException(self):
 		return self._caughtException
 	
@@ -76,17 +153,16 @@ class ExecutionResult (object):
 
 
 	def view(self, bUseDefaultPerspecitveForException=True, bUseDefaultPerspectiveForResult=True):
-		return ExecutionPresCombinators.executionResultBox( self._stdout, self._stderr, self._caughtException, self._result, bUseDefaultPerspecitveForException, bUseDefaultPerspectiveForResult )
+		return ExecutionPresCombinators.executionResultBox( self._streams, self._caughtException, self._result, bUseDefaultPerspecitveForException, bUseDefaultPerspectiveForResult )
 
 
 	def minimalView(self, bUseDefaultPerspecitveForException=True, bUseDefaultPerspectiveForResult=True):
-		return ExecutionPresCombinators.minimalExecutionResultBox( self._stdout, self._stderr, self._caughtException, self._result, bUseDefaultPerspecitveForException, bUseDefaultPerspectiveForResult )
+		return ExecutionPresCombinators.minimalExecutionResultBox( self._streams, self._caughtException, self._result, bUseDefaultPerspecitveForException, bUseDefaultPerspectiveForResult )
 
 
 
 def getResultOfExecutionWithinModule(pythonCode, module, bEvaluate):
-	stdout = _OutputStream()
-	stderr = _OutputStream()
+	std = MultiplexedRichStream( [ 'out', 'err' ] )
 
 	evalCode = execCode = None
 	caughtException = None
@@ -104,10 +180,10 @@ def getResultOfExecutionWithinModule(pythonCode, module, bEvaluate):
 
 	if execCode is not None  or  evalCode is not None:
 		savedStdout, savedStderr = sys.stdout, sys.stderr
-		sys.stdout = stdout
-		sys.stderr = stderr
-		setattr( module, 'display', stdout.display )
-		setattr( module, 'displayerr', stderr.display )
+		sys.stdout = std.out
+		sys.stderr = std.err
+		setattr( module, 'display', std.out.display )
+		setattr( module, 'displayerr', std.err.display )
 
 		def _exec():
 			exec execCode in module.__dict__
@@ -124,13 +200,11 @@ def getResultOfExecutionWithinModule(pythonCode, module, bEvaluate):
 			caughtException = JythonException.getCurrentException()
 
 		sys.stdout, sys.stderr = savedStdout, savedStderr
-
-	return ExecutionResult( stdout.getRichString(), stderr.getRichString(), caughtException, result )
+	return ExecutionResult( std, caughtException, result )
 
 
 def getResultOfExecutionInScopeWithinModule(pythonCode, globals, locals, module, bEvaluate):
-	stdout = _OutputStream()
-	stderr = _OutputStream()
+	std = MultiplexedRichStream( [ 'out', 'err' ] )
 
 	evalCode = execCode = None
 	caughtException = None
@@ -153,10 +227,10 @@ def getResultOfExecutionInScopeWithinModule(pythonCode, globals, locals, module,
 
 	if execCode is not None  or  evalCode is not None:
 		savedStdout, savedStderr = sys.stdout, sys.stderr
-		sys.stdout = stdout
-		sys.stderr = stderr
-		setattr( module, 'display', stdout.display )
-		setattr( module, 'displayerr', stderr.display )
+		sys.stdout = std.out
+		sys.stderr = std.err
+		setattr( module, 'display', std.out.display )
+		setattr( module, 'displayerr', std.err.display )
 
 		def _exec():
 			exec execCode in globals, locals
@@ -174,7 +248,7 @@ def getResultOfExecutionInScopeWithinModule(pythonCode, globals, locals, module,
 
 		sys.stdout, sys.stderr = savedStdout, savedStderr
 
-	return ExecutionResult( stdout.getRichString(), stderr.getRichString(), caughtException, result )
+	return ExecutionResult( std, caughtException, result )
 
 
 
