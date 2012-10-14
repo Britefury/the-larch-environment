@@ -341,7 +341,7 @@ public class TextEntry extends ControlPres
 				String failMessage = getValidationMessage( t );
 				if ( failMessage != null )
 				{
-					Tooltip tooltip = new Tooltip( failMessage, 5.0 );
+					TimedTip tooltip = new TimedTip( failMessage, 5.0 );
 					tooltip.popup( outerElement, Anchor.TOP_LEFT, Anchor.BOTTOM_LEFT, ctx, style );
 				}
 				return;

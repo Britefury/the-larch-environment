@@ -16,9 +16,9 @@ import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleSheet;
 
 
-public class Tooltip extends TimedPopup
+public class TimedTip extends TimedPopup
 {
-	public Tooltip(String text, double timeout)
+	public TimedTip(String text, double timeout)
 	{
 		super( createChild( text ), timeout, false );
 	}

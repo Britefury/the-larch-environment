@@ -32,6 +32,8 @@ import BritefuryJ.StyleSheet.StyleValues;
 
 public class BubblePopup
 {
+	private static final double ARROW_OVERLAP_THRESHOLD = 1.0;
+	
 	private enum ArrowEdge
 	{
 		TOP,
@@ -65,7 +67,7 @@ public class BubblePopup
 		}
 		
 		
-		protected abstract ArrowLocation computeArrowLocation(LSElement element);
+		protected abstract ArrowLocation computeArrowLocation(LSElement popupElement);
 		
 		
 		@Override
@@ -252,24 +254,28 @@ public class BubblePopup
 		
 		
 		@Override
-		protected ArrowLocation computeArrowLocation(LSElement element)
+		protected ArrowLocation computeArrowLocation(LSElement popupElement)
 		{
-			AABox2 popupAABoxScreen = element.getAABoxRelativeToScreen();
+			AABox2 popupAABoxScreen = popupElement.getVisibleBoxRelativeToScreen();
 
 			ArrowEdge arrowEdge;
 			Point2 arrowPos;
 			
 			if ( targetElement != null  &&  targetElement.isRealised() )
 			{
-				AABox2 targetAABoxScreen = targetElement.getAABoxRelativeToScreen();
+				AABox2 targetAABoxScreen = targetElement.getVisibleBoxRelativeToScreen();
 				AABox2 intersection = popupAABoxScreen.intersection( targetAABoxScreen );
 				Vector2 intersectionSz = intersection.getSize();
 				double minOverlap = Math.min( intersectionSz.x, intersectionSz.y );
-				if ( minOverlap > 1.0 )
+				if ( minOverlap > ARROW_OVERLAP_THRESHOLD )
 				{
 					// More than one pixel overlap - don't draw an arrow
 					arrowEdge = null;
 					arrowPos = null;
+					System.out.println("BubblePopup.ElementBubblePainter.computeArrowLocation: Hiding arrow; targetBox="+targetAABoxScreen);
+					System.out.println("BubblePopup.ElementBubblePainter.computeArrowLocation: Hiding arrow; targetSz="+targetElement.getActualSize());
+					System.out.println("BubblePopup.ElementBubblePainter.computeArrowLocation: Hiding arrow; popupBox ="+popupAABoxScreen);
+					System.out.println("BubblePopup.ElementBubblePainter.computeArrowLocation: Hiding arrow; intersect="+intersection);
 				}
 				else
 				{
@@ -333,9 +339,9 @@ public class BubblePopup
 		
 		
 		@Override
-		protected ArrowLocation computeArrowLocation(LSElement element)
+		protected ArrowLocation computeArrowLocation(LSElement popupElement)
 		{
-			AABox2 popupAABoxScreen = element.getAABoxRelativeToScreen();
+			AABox2 popupAABoxScreen = popupElement.getAABoxRelativeToScreen();
 
 			ArrowEdge arrowEdge = null;
 			Point2 arrowPos = null;

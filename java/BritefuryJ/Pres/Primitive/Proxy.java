@@ -17,6 +17,11 @@ public class Proxy extends Pres
 	private Pres child;
 	
 	
+	public Proxy()
+	{
+		this.child = null;
+	}
+	
 	public Proxy(Object child)
 	{
 		this.child = coerce( child );
@@ -27,7 +32,7 @@ public class Proxy extends Pres
 	@Override
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		LSElement childElement = child.present( ctx, style );
+		LSElement childElement = child != null  ?  child.present( ctx, style )  :  null;
 		return new LSProxy( childElement );
 	}
 }

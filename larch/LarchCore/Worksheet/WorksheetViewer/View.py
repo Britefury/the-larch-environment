@@ -39,6 +39,7 @@ from BritefuryJ.Pres.RichText import *
 from BritefuryJ.Pres.ContextMenu import *
 from BritefuryJ.Pres.ObjectPres import *
 from BritefuryJ.Pres.UI import *
+from BritefuryJ.Pres.Help import *
 
 from BritefuryJ.Projection import Perspective, Subject
 
@@ -53,6 +54,8 @@ from LarchCore.Worksheet.WorksheetEditor.View import WorksheetEditorSubject
 
 
 _editableStyle = StyleSheet.style( Primitive.editable( True ) )
+
+_worksheetMargin = 10.0
 
 _pythonCodeBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) ) )
 _pythonCodeEditorBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.5, 4.0, 10.0, 10.0, Color( 0.4, 0.4, 0.5 ), None ) ) )
@@ -82,8 +85,11 @@ class WorksheetViewer (MethodDispatchView):
 		homeLink = Hyperlink( 'HOME PAGE', Location( '' ) )
 		editLink = Hyperlink( 'Switch to developer mode', editLocation )
 		linkHeader = SplitLinkHeaderBar( [ editLink ], [ homeLink ] )
-		
-		w = Page( [ linkHeader, bodyView ] )
+
+		tip = TipBox( 'To edit this worksheet, or add content, click Developer mode at the top left',
+			      'larchcore.worksheet.view.toedit' )
+
+		w = Page( [ linkHeader, bodyView, tip ] )
 		w = w.withContextMenuInteractor( _worksheetContextMenuFactory )
 		return StyleSheet.style( Primitive.editable( False ) ).applyTo( w )
 
@@ -91,7 +97,7 @@ class WorksheetViewer (MethodDispatchView):
 	@ObjectDispatchMethod( ViewSchema.BodyView )
 	def Body(self, fragment, inheritedState, node):
 		contentViews = InnerFragment.map( [ c    for c in node.getContents()   if c.isVisible() ] )
-		return Body( contentViews )
+		return Body( contentViews ).padX( _worksheetMargin )
 	
 	
 	@ObjectDispatchMethod( ViewSchema.ParagraphView )

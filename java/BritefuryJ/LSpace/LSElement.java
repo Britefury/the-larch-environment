@@ -621,6 +621,22 @@ abstract public class LSElement implements Presentable
 		return getLocalAABox();
 	}
 	
+	public AABox2 getVisibleBoxRelativeToAncestor(LSElement ancestor)
+	{
+		Xform2 toElementXform = getLocalToAncestorXform( ancestor );
+		return toElementXform.transform( getVisibleBoxInLocalSpace() );
+	}
+	
+	public AABox2 getVisibleBoxRelativeToRoot()
+	{
+		return getVisibleBoxRelativeToAncestor( rootElement );
+	}
+	
+	public AABox2 getVisibleBoxRelativeToScreen()
+	{
+		Point screenRoot = rootElement.getComponent().getLocationOnScreen();
+		return getVisibleBoxRelativeToAncestor( rootElement ).offset( new Vector2( screenRoot.x, screenRoot.y ) );
+	}
 	
 
 	public double getAllocWidth()
