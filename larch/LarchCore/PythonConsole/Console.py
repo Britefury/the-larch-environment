@@ -51,7 +51,6 @@ from LarchCore.Languages.Python2.Execution import Execution
 
 
 
-
 _executeShortcut = Shortcut( KeyEvent.VK_ENTER, Modifier.CTRL )
 _executeNoEvalShortcut = Shortcut( KeyEvent.VK_ENTER, Modifier.CTRL | Modifier.SHIFT )
 _historyPreviousShortcut = Shortcut( KeyEvent.VK_UP, Modifier.ALT )
@@ -65,9 +64,11 @@ _bannerBorder = SolidBorder( 2.0, 5.0, 8.0, 8.0, Color( 0.3, 0.5, 0.3 ), Color( 
 
 _labelStyle = StyleSheet.style( Primitive.fontSize( 10 ) )
 
-_blockStyle = StyleSheet.style( Primitive.columnSpacing( 2.0 ), Primitive.border( SolidBorder( 1.0, 5.0, 15.0, 15.0, Color( 0.6, 0.6, 0.6 ), Color( 0.9, 0.9, 0.9 ) ) ) )
+#_blockStyle = StyleSheet.style( Primitive.columnSpacing( 2.0 ), Primitive.border( SolidBorder( 1.0, 5.0, 15.0, 15.0, Color( 0.25, 0.25, 0.25 ), Color( 0.8, 0.8, 0.8 ) ) ) )
+_blockStyle = StyleSheet.style( Primitive.columnSpacing( 3.0 ), Primitive.border( SolidBorder( 1.0, 3.0, 13.0, 13.0, Color( 0.6, 0.6, 0.6 ), Color( 0.9, 0.9, 0.9 ) ) ) )
+_blockOutputStyle = StyleSheet.style( Primitive.columnSpacing( 2.0 ) )
 
-_pythonModuleBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), Color.WHITE ) ) )
+_pythonModuleBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.5, 5.0, 10.0, 10.0, Color( 0.65, 0.65, 0.65 ), Color.WHITE ) ) )
 _dropPromptStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.0, 0.8, 0.0 ), None ) ) )
 
 _varAssignVarNameStyle = StyleSheet.style( Primitive.fontItalic( True ), Primitive.foreground( Color( 0.0, 0.0, 0.5 ) ) )
@@ -78,7 +79,8 @@ _varAssignDocModelKindStyle = StyleSheet.style( Primitive.foreground( Color( 0.4
 _varAssignMsgStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.125, 0.0 ) ) )
 
 _consoleBlockListStyle = StyleSheet.style( Primitive.columnSpacing( 5.0 ) )
-_consoleStyle = StyleSheet.style( Primitive.columnSpacing( 8.0 ) )
+_consoleStyle = StyleSheet.style( Primitive.columnSpacing( 9.0 ) )
+
 
 
 _objectKindJava = _varAssignJavaKindStyle( Label( 'Java object' ) )
@@ -265,7 +267,7 @@ class Console (object):
 			element.ensureVisible()
 		m = m.withCustomElementAction( _ensureCurrentModuleVisible )
 
-		dropPromptLive = LiveValue( Blank() )
+		dropPromptLive = LiveValue( Span( [] ) )
 		dropPromptView = dropPromptLive
 
 		consoleColumnContents = [ banner.alignVRefY() ]   if self._showBanner   else []
@@ -305,24 +307,27 @@ class ConsoleBlock (object):
 
 		caughtException = executionResult.getCaughtException()
 		result = executionResult.getResult()
-		stdoutStream = executionResult.getStdOutStream()
-		stderrStream = executionResult.getStdErrStream()
+		streams = executionResult.getStreams()
 
 		moduleView = StyleSheet.style( Primitive.editable( False ) ).applyTo( Python2.python2EditorPerspective.applyTo( InnerFragment( pythonModule ) ) )
 		caughtExceptionView = ApplyPerspective.defaultPerspective( InnerFragment( caughtException ) )   if caughtException is not None   else None
 		resultView = ApplyPerspective.defaultPerspective( InnerFragment( result[0] ) )   if result is not None   else None
 
-		blockContents = [ _pythonModuleBorderStyle.applyTo( Border( moduleView.alignHExpand() ).alignHExpand() ) ]
-		if stderrStream is not None:
-			blockContents.append( execStderr( stderrStream, True ) )
-		if stdoutStream is not None:
-			blockContents.append( execStdout( stdoutStream, True ) )
+		code = _pythonModuleBorderStyle.applyTo( Border( moduleView.alignHExpand() ).alignHExpand() )
+		outputContents = []
+		for stream in streams:
+			if stream.name == 'out':
+				outputContents.append( execStdout( stream.richString, True ) )
+			elif stream.name == 'err':
+				outputContents.append( execStderr( stream.richString, True ) )
+			else:
+				raise ValueError, 'Unreckognised stream \'{0}\''.format( stream.name )
 		if caughtExceptionView is not None:
-			blockContents.append( execException( caughtExceptionView ) )
+			outputContents.append( execException( caughtExceptionView ) )
 		if resultView is not None:
-			blockContents.append( execResult( resultView ) )
-		blockColumn = Column( blockContents ).alignHExpand()
-		return _blockStyle.applyTo( Border( blockColumn ).alignHExpand() )
+			outputContents.append( execResult( resultView ) )
+		outputColumn = _blockOutputStyle.applyTo( Column( outputContents ).alignHExpand() )
+		return _blockStyle.applyTo( Border( Column( [ code, outputColumn ] ) ) ).alignHExpand()
 
 
 
