@@ -15,8 +15,14 @@ import BritefuryJ.LSpace.TextFocus.TextSelection;
 import BritefuryJ.Util.RichString.RichString;
 import BritefuryJ.Util.RichString.RichStringBuilder;
 
-public abstract class SequentialRichStringEditor extends SequentialEditor
+public class SequentialRichStringEditor extends SequentialEditor
 {
+	public SequentialRichStringEditor(String editorName)
+	{
+		super( editorName );
+	}
+	
+	
 	//
 	//
 	// OVERRIDE THESE AS NECESSARY

@@ -30,20 +30,12 @@ def isTopLevelFragment(fragment):
 
 
 class VisualRegexSyntaxRecognizingEditor (SyntaxRecognizingEditor):
-	def __init__(self):
-		super( VisualRegexSyntaxRecognizingEditor, self ).__init__()
-
-
-	def getName(self):
-		return 'VREEdit'
-
-
 	def isClipboardEditLevelFragmentView(self, fragment):
 		return isTopLevelFragment( fragment )
 
 
 
 
-VisualRegexSyntaxRecognizingEditor.instance = VisualRegexSyntaxRecognizingEditor()
+VisualRegexSyntaxRecognizingEditor.instance = VisualRegexSyntaxRecognizingEditor( 'VREEdit' )
 
 

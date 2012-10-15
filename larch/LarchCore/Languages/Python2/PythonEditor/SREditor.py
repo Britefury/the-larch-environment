@@ -50,14 +50,6 @@ class DedentPythonSelectionTreeEvent (SelectionEditTreeEvent):
 		
 		
 class PythonSyntaxRecognizingEditor (SyntaxRecognizingEditor):
-	def __init__(self):
-		super( PythonSyntaxRecognizingEditor, self ).__init__()
-		
-		
-	def getName(self):
-		return 'Py25Edit'
-	
-	
 	def isEditEvent(self, event):
 		return isinstance( event, PythonIndentationTreeEvent )
 	
@@ -223,6 +215,6 @@ class PythonSyntaxRecognizingEditor (SyntaxRecognizingEditor):
 	
 	
 	
-PythonSyntaxRecognizingEditor.instance = PythonSyntaxRecognizingEditor()
+PythonSyntaxRecognizingEditor.instance = PythonSyntaxRecognizingEditor( 'Py2Edit' )
 
 
