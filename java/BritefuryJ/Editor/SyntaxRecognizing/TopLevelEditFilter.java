@@ -13,12 +13,6 @@ import BritefuryJ.LSpace.TextEditEvent;
 
 public abstract class TopLevelEditFilter extends SREditFilter
 {
-	protected boolean canCatchEditEvent(EditEvent event)
-	{
-		return false;
-	}
-	
-	
 	protected void handleTopLevelEdit(LSElement element, LSElement sourceElement, EditEvent event)
 	{
 	}
@@ -28,7 +22,7 @@ public abstract class TopLevelEditFilter extends SREditFilter
 	protected HandleEditResult handleEdit(LSElement element, LSElement sourceElement, EditEvent event)
 	{
 		handleTopLevelEdit( element, sourceElement, event );
-		if ( event instanceof TextEditEvent  ||  event instanceof SelectionEditTreeEvent  ||  canCatchEditEvent( event ) )
+		if ( event instanceof TextEditEvent  ||  event instanceof SelectionEditTreeEvent  ||  getSequentialEditor().isEditEvent( event ) )
 		{
 			return HandleEditResult.HANDLED;
 		}

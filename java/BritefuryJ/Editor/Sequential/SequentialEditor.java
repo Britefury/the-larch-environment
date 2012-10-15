@@ -8,9 +8,9 @@ package BritefuryJ.Editor.Sequential;
 
 import BritefuryJ.Editor.Sequential.EditFilter.HandleEditResult;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.LSpace.EditEvent;
 import BritefuryJ.LSpace.LSContentLeaf;
 import BritefuryJ.LSpace.LSElement;
-import BritefuryJ.LSpace.EditEvent;
 import BritefuryJ.LSpace.LSRegion;
 import BritefuryJ.LSpace.SequentialRichStringVisitor;
 import BritefuryJ.LSpace.TextEditEvent;
@@ -237,9 +237,9 @@ public abstract class SequentialEditor
 	}
 	
 	
-
 	
-	protected boolean isEditEvent(EditEvent event)
+
+	public boolean isEditEvent(EditEvent event)
 	{
 		return false;
 	}
