@@ -21,7 +21,7 @@ import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Util.HashUtils;
 import BritefuryJ.Util.RichString.RichString;
 
-public abstract class SyntaxRecognizingEditor extends SequentialRichStringEditor
+public class SyntaxRecognizingEditor extends SequentialRichStringEditor
 {
 	public static enum EditMode
 	{
@@ -250,9 +250,9 @@ public abstract class SyntaxRecognizingEditor extends SequentialRichStringEditor
 	private TopLevelNodeEditFilter cachedTopLevel = new TopLevelNodeEditFilter();
 	
 	
-	public SyntaxRecognizingEditor()
+	public SyntaxRecognizingEditor(String editorName)
 	{
-		super();
+		super( editorName );
 	}
 	
 	

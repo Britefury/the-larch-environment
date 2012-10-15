@@ -250,8 +250,10 @@ public abstract class RichTextEditor extends SequentialEditor
 	private RichStringEditFilter textEditListener, paraEditListener, blockEditListener;
 	
 	
-	public RichTextEditor()
+	public RichTextEditor(String editorName)
 	{
+		super( editorName );
+		
 		HandleRichStringFn onTextEdit = new HandleRichStringFn()
 		{
 			@Override

@@ -168,17 +168,22 @@ public abstract class SequentialEditor
 	protected ClearStructuralValueListener clearListener = new ClearStructuralValueListener();
 	protected static ClearNeighbouringStructuralValueListener clearNeighbourListener = new ClearNeighbouringStructuralValueListener();
 	protected SequentialClipboardHandler clipboardHandler;
+	protected String editorName;
 	
 	
 	
-	public SequentialEditor()
+	public SequentialEditor(String editorName)
 	{
 		this.clipboardHandler = new SequentialClipboardHandler( this );
+		this.editorName = editorName;
 	}
 	
 	
 	
-	public abstract String getName();
+	public String getName()
+	{
+		return editorName;
+	}
 	
 	
 	

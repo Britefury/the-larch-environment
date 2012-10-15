@@ -19,10 +19,6 @@ from LarchCore.Worksheet import Schema
 
 
 class WorksheetRichTextEditor (RichTextEditor):
-	def getName(self):
-		return 'WsEdit'
-
-
 	def setModelContents(self, model, contents):
 		model.setContents( contents )
 
@@ -81,5 +77,5 @@ class WorksheetRichTextEditor (RichTextEditor):
 
 
 
-WorksheetRichTextEditor.instance = WorksheetRichTextEditor()
+WorksheetRichTextEditor.instance = WorksheetRichTextEditor( 'WsEdit' )
 
