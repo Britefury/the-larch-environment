@@ -202,13 +202,13 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	};
 	
 	
-	private SequentialEditor sequentialEditor;
+	private SequentialController sequentialEditor;
 	
 	
 	
 	
 	
-	public SequentialClipboardHandler(SequentialEditor sequentialEditor)
+	public SequentialClipboardHandler(SequentialController sequentialEditor)
 	{
 		this.sequentialEditor = sequentialEditor;
 		
@@ -219,7 +219,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	
 	
 	
-	protected SequentialEditor getSequentialEditor()
+	protected SequentialController getSequentialEditor()
 	{
 		return sequentialEditor;
 	}

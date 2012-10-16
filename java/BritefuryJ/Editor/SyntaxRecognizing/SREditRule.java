@@ -20,7 +20,7 @@ public class SREditRule extends SRAbstractEditRule
 	private List<TreeEventListener> editListeners;
 	
 	
-	public SREditRule(SyntaxRecognizingEditor editor, PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners)
+	public SREditRule(SyntaxRecognizingController editor, PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners)
 	{
 		super( editor, precedenceHandler );
 		this.editListeners = new ArrayList<TreeEventListener>();
@@ -31,10 +31,10 @@ public class SREditRule extends SRAbstractEditRule
 	protected Pres buildFragment(Pres view, Object model, SimpleAttributeTable inheritedState)
 	{
 		Object editModeObj = inheritedState.getOptional( "__SREditor_edit" );
-		SyntaxRecognizingEditor.EditMode editMode = editModeObj instanceof SyntaxRecognizingEditor.EditMode  ?
-				(SyntaxRecognizingEditor.EditMode)editModeObj  :  SyntaxRecognizingEditor.EditMode.EDIT;
+		SyntaxRecognizingController.EditMode editMode = editModeObj instanceof SyntaxRecognizingController.EditMode  ?
+				(SyntaxRecognizingController.EditMode)editModeObj  :  SyntaxRecognizingController.EditMode.EDIT;
 		
-		if ( editMode == SyntaxRecognizingEditor.EditMode.EDIT )
+		if ( editMode == SyntaxRecognizingController.EditMode.EDIT )
 		{
 			view = new EditableSequentialItem( editor, editListeners, view );
 		}

@@ -8,7 +8,7 @@ package BritefuryJ.Editor.Sequential.Item;
 
 import java.util.List;
 
-import BritefuryJ.Editor.Sequential.SequentialEditor;
+import BritefuryJ.Editor.Sequential.SequentialController;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.TreeEventListener;
 import BritefuryJ.Pres.Pres;
@@ -17,13 +17,13 @@ import BritefuryJ.StyleSheet.StyleValues;
 
 public class SoftStructuralItem extends Pres
 {
-	private SequentialEditor editor;
+	private SequentialController editor;
 	private TreeEventListener editListeners[];
 	private Object model;
 	private Pres child;
 	
 	
-	public SoftStructuralItem(SequentialEditor editor, Object model, Object child)
+	public SoftStructuralItem(SequentialController editor, Object model, Object child)
 	{
 		this.editor = editor;
 		this.editListeners = new TreeEventListener[] {};
@@ -31,7 +31,7 @@ public class SoftStructuralItem extends Pres
 		this.model = model;
 	}
 
-	public SoftStructuralItem(SequentialEditor editor, TreeEventListener editListener, Object model, Object child)
+	public SoftStructuralItem(SequentialController editor, TreeEventListener editListener, Object model, Object child)
 	{
 		this.editor = editor;
 		this.editListeners = new TreeEventListener[] { editListener };
@@ -39,7 +39,7 @@ public class SoftStructuralItem extends Pres
 		this.model = model;
 	}
 
-	public SoftStructuralItem(SequentialEditor editor, List<TreeEventListener> editListeners, Object model, Object child)
+	public SoftStructuralItem(SequentialController editor, List<TreeEventListener> editListeners, Object model, Object child)
 	{
 		this.editor = editor;
 		this.editListeners = editListeners.toArray( new TreeEventListener[editListeners.size()] );
@@ -54,7 +54,7 @@ public class SoftStructuralItem extends Pres
 		LSElement element = child.present( ctx, style );
 		if ( editor.isClearNeighbouringStructuresEnabled() )
 		{
-			element.addTreeEventListener( SequentialEditor.getClearNeighbouringStructuralValueListener() );
+			element.addTreeEventListener( SequentialController.getClearNeighbouringStructuralValueListener() );
 		}
 		element.setFixedValue( model );
 		element.addTreeEventListener( editor.getClearStructuralValueListener() );

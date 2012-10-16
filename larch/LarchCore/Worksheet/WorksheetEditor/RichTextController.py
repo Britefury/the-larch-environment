@@ -9,7 +9,7 @@ from copy import copy, deepcopy
 
 from BritefuryJ.DocModel import DMObject
 
-from BritefuryJ.Editor.RichText import RichTextEditor
+from BritefuryJ.Editor.RichText import RichTextController
 
 from Britefury.Util.Abstract import abstractmethod
 
@@ -18,7 +18,7 @@ from LarchCore.Worksheet import AbstractViewSchema
 from LarchCore.Worksheet import Schema
 
 
-class WorksheetRichTextEditor (RichTextEditor):
+class WorksheetRichTextController (RichTextController):
 	def setModelContents(self, model, contents):
 		model.setContents( contents )
 
@@ -77,5 +77,5 @@ class WorksheetRichTextEditor (RichTextEditor):
 
 
 
-WorksheetRichTextEditor.instance = WorksheetRichTextEditor( 'WsEdit' )
+WorksheetRichTextController.instance = WorksheetRichTextController( 'WsEdit' )
 

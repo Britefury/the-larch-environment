@@ -11,10 +11,10 @@ import BritefuryJ.Pres.Pres;
 
 public abstract class AbstractEditRule
 {
-	protected SequentialEditor editor;
+	protected SequentialController editor;
 	
 	
-	public AbstractEditRule(SequentialEditor editor)
+	public AbstractEditRule(SequentialController editor)
 	{
 		this.editor = editor;
 	}

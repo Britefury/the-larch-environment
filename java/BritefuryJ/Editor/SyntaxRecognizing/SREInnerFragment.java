@@ -14,18 +14,18 @@ import BritefuryJ.Pres.InnerFragment;
 
 public class SREInnerFragment extends InnerFragment
 {
-	public SREInnerFragment(Object model, int containerPrecedence, SyntaxRecognizingEditor.EditMode editMode)
+	public SREInnerFragment(Object model, int containerPrecedence, SyntaxRecognizingController.EditMode editMode)
 	{
 		super( model, SimpleAttributeTable.instance.withAttr( "outerPrecedence", containerPrecedence ).withAttr( "__SREditor_edit", editMode ) );
 	}
 
 	public SREInnerFragment(Object model, int containerPrecedence)
 	{
-		this( model, containerPrecedence, SyntaxRecognizingEditor.EditMode.DISPLAY );
+		this( model, containerPrecedence, SyntaxRecognizingController.EditMode.DISPLAY );
 	}
 
 	
-	public static SREInnerFragment[] map(Object models[], int containerPrecedence, SyntaxRecognizingEditor.EditMode editMode)
+	public static SREInnerFragment[] map(Object models[], int containerPrecedence, SyntaxRecognizingController.EditMode editMode)
 	{
 		SREInnerFragment fragments[] = new SREInnerFragment[models.length];
 		for (int i = 0; i < models.length; i++)
@@ -35,7 +35,7 @@ public class SREInnerFragment extends InnerFragment
 		return fragments;
 	}
 
-	public static List<SREInnerFragment> map(List<Object> models, int containerPrecedence, SyntaxRecognizingEditor.EditMode editMode)
+	public static List<SREInnerFragment> map(List<Object> models, int containerPrecedence, SyntaxRecognizingController.EditMode editMode)
 	{
 		ArrayList<SREInnerFragment> fragments = new ArrayList<SREInnerFragment>();
 		fragments.ensureCapacity( models.size() );
@@ -49,11 +49,11 @@ public class SREInnerFragment extends InnerFragment
 
 	public static SREInnerFragment[] map(Object models[], int containerPrecedence)
 	{
-		return map( models, containerPrecedence, SyntaxRecognizingEditor.EditMode.DISPLAY );
+		return map( models, containerPrecedence, SyntaxRecognizingController.EditMode.DISPLAY );
 	}
 
 	public static List<SREInnerFragment> map(List<Object> models, int containerPrecedence)
 	{
-		return map( models, containerPrecedence, SyntaxRecognizingEditor.EditMode.DISPLAY );
+		return map( models, containerPrecedence, SyntaxRecognizingController.EditMode.DISPLAY );
 	}
 }

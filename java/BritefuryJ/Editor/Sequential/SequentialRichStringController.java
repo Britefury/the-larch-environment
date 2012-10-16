@@ -15,9 +15,9 @@ import BritefuryJ.LSpace.TextFocus.TextSelection;
 import BritefuryJ.Util.RichString.RichString;
 import BritefuryJ.Util.RichString.RichStringBuilder;
 
-public class SequentialRichStringEditor extends SequentialEditor
+public class SequentialRichStringController extends SequentialController
 {
-	public SequentialRichStringEditor(String editorName)
+	public SequentialRichStringController(String editorName)
 	{
 		super( editorName );
 	}

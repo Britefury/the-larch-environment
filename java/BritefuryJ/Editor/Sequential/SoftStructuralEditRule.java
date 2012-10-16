@@ -19,7 +19,7 @@ public class SoftStructuralEditRule extends AbstractEditRule
 	private List<TreeEventListener> editListeners;
 	
 	
-	public SoftStructuralEditRule(SequentialEditor editor, List<TreeEventListener> editListeners)
+	public SoftStructuralEditRule(SequentialController editor, List<TreeEventListener> editListeners)
 	{
 		super( editor );
 		this.editListeners = new ArrayList<TreeEventListener>();

@@ -17,7 +17,7 @@ from BritefuryJ.Util.RichString import RichStringBuilder
 from BritefuryJ.Editor.Sequential import SequentialClipboardHandler, SelectionEditTreeEvent
 
 
-from BritefuryJ.Editor.SyntaxRecognizing import SyntaxRecognizingEditor
+from BritefuryJ.Editor.SyntaxRecognizing import SyntaxRecognizingController
 
 from LarchCore.Languages.Python2 import Schema
 
@@ -49,7 +49,7 @@ class DedentPythonSelectionTreeEvent (SelectionEditTreeEvent):
 		
 		
 		
-class PythonSyntaxRecognizingEditor (SyntaxRecognizingEditor):
+class PythonSyntaxRecognizingController (SyntaxRecognizingController):
 	def isEditEvent(self, event):
 		return isinstance( event, PythonIndentationTreeEvent )
 	
@@ -127,7 +127,7 @@ class PythonSyntaxRecognizingEditor (SyntaxRecognizingEditor):
 		visitor.setElementSuffix( element, Schema.Dedent() )
 		bSuccess = element.postTreeEventToParent( event )
 		if not bSuccess:
-			print 'PythonSyntaxRecognizingEditor._indentLine(): INDENT LINE FAILED'
+			print 'PythonSyntaxRecognizingController._indentLine(): INDENT LINE FAILED'
 			
 	
 	
@@ -142,9 +142,9 @@ class PythonSyntaxRecognizingEditor (SyntaxRecognizingEditor):
 			visitor.setElementSuffix( element, Schema.Indent() )
 			bSuccess = element.postTreeEventToParent( event )
 			if not bSuccess:
-				print 'PythonSyntaxRecognizingEditor._dedentLine(): DEDENT LINE FAILED'
+				print 'PythonSyntaxRecognizingController._dedentLine(): DEDENT LINE FAILED'
 		else:
-			print 'PythonSyntaxRecognizingEditor._dedentLine(): Attempted to dedent line in top-level module'
+			print 'PythonSyntaxRecognizingController._dedentLine(): Attempted to dedent line in top-level module'
 			
 				
 				
@@ -176,7 +176,7 @@ class PythonSyntaxRecognizingEditor (SyntaxRecognizingEditor):
 		
 		bSuccess = root.getFragmentContentElement().postTreeEvent( event )
 		if not bSuccess:
-			print 'PythonSyntaxRecognizingEditor._indentSelection(): INDENT SELECTION FAILED'
+			print 'PythonSyntaxRecognizingController._indentSelection(): INDENT SELECTION FAILED'
 			
 				
 	
@@ -211,10 +211,10 @@ class PythonSyntaxRecognizingEditor (SyntaxRecognizingEditor):
 		
 		bSuccess = rootElement.postTreeEvent( event )
 		if not bSuccess:
-			print 'PythonSyntaxRecognizingEditor._dedentSelection(): DEDENT SELECTION FAILED'
+			print 'PythonSyntaxRecognizingController._dedentSelection(): DEDENT SELECTION FAILED'
 	
 	
 	
-PythonSyntaxRecognizingEditor.instance = PythonSyntaxRecognizingEditor( 'Py2Edit' )
+PythonSyntaxRecognizingController.instance = PythonSyntaxRecognizingController( 'Py2Edit' )
 
 

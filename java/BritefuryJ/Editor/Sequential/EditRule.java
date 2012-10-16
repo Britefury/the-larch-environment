@@ -19,7 +19,7 @@ public class EditRule extends AbstractEditRule
 	private List<TreeEventListener> editListeners;
 	
 	
-	public EditRule(SequentialEditor editor, List<TreeEventListener> editListeners)
+	public EditRule(SequentialController editor, List<TreeEventListener> editListeners)
 	{
 		super( editor );
 		this.editListeners = new ArrayList<TreeEventListener>();

@@ -17,7 +17,7 @@ from BritefuryJ.LSpace import *
 from BritefuryJ.Editor.Sequential import SequentialClipboardHandler, SelectionEditTreeEvent
 
 
-from BritefuryJ.Editor.SyntaxRecognizing import SyntaxRecognizingEditor
+from BritefuryJ.Editor.SyntaxRecognizing import SyntaxRecognizingController
 
 from LarchTools.PythonTools.VisualRegex import Schema
 
@@ -29,13 +29,13 @@ def isTopLevelFragment(fragment):
 	return isinstance( model, DMNode )  and  model.isInstanceOf( Schema.PythonRegEx )
 
 
-class VisualRegexSyntaxRecognizingEditor (SyntaxRecognizingEditor):
+class VisualRegexSyntaxRecognizingController (SyntaxRecognizingController):
 	def isClipboardEditLevelFragmentView(self, fragment):
 		return isTopLevelFragment( fragment )
 
 
 
 
-VisualRegexSyntaxRecognizingEditor.instance = VisualRegexSyntaxRecognizingEditor( 'VREEdit' )
+VisualRegexSyntaxRecognizingController.instance = VisualRegexSyntaxRecognizingController( 'VREEdit' )
 
 

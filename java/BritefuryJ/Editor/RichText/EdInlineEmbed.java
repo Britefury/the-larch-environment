@@ -25,7 +25,7 @@ public class EdInlineEmbed extends EdEmbed
 
 
 	@Override
-	protected Object buildModel(RichTextEditor editor)
+	protected Object buildModel(RichTextController editor)
 	{
 		return editor.buildInlineEmbed( value );
 	}

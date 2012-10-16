@@ -20,7 +20,7 @@ public class SRSoftStructuralEditRule extends SRAbstractEditRule
 	private List<TreeEventListener> editListeners;
 	
 	
-	public SRSoftStructuralEditRule(SyntaxRecognizingEditor editor, PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners)
+	public SRSoftStructuralEditRule(SyntaxRecognizingController editor, PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners)
 	{
 		super( editor, precedenceHandler );
 		this.editListeners = new ArrayList<TreeEventListener>();
