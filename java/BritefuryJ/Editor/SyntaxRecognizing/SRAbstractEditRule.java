@@ -7,18 +7,18 @@
 package BritefuryJ.Editor.SyntaxRecognizing;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.Editor.Sequential.AbstractEditRule;
 import BritefuryJ.Editor.SyntaxRecognizing.Precedence.PrecedenceHandler;
 import BritefuryJ.Pres.Pres;
 
-public abstract class SRAbstractEditRule
+public abstract class SRAbstractEditRule extends AbstractEditRule
 {
-	protected SyntaxRecognizingEditor editor;
 	private PrecedenceHandler precedenceHandler;
 	
 	
 	public SRAbstractEditRule(SyntaxRecognizingEditor editor, PrecedenceHandler precedenceHandler)
 	{
-		this.editor = editor;
+		super( editor );
 		this.precedenceHandler = precedenceHandler;
 	}
 	

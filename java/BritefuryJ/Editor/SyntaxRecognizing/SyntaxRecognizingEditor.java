@@ -329,7 +329,7 @@ public class SyntaxRecognizingEditor extends SequentialRichStringEditor
 		return new SREditRule( this, precedenceHandler, editListeners );
 	}
 	
-	public SREditRule editRule( List<TreeEventListener> editListeners)
+	public SREditRule editRule(List<TreeEventListener> editListeners)
 	{
 		return new SREditRule( this, null, editListeners );
 	}
