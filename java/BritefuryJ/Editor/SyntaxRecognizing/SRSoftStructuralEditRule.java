@@ -20,9 +20,9 @@ public class SRSoftStructuralEditRule extends SRAbstractEditRule
 	private List<TreeEventListener> editListeners;
 	
 	
-	public SRSoftStructuralEditRule(SyntaxRecognizingController editor, PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners)
+	public SRSoftStructuralEditRule(SyntaxRecognizingController controller, PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners)
 	{
-		super( editor, precedenceHandler );
+		super( controller, precedenceHandler );
 		this.editListeners = new ArrayList<TreeEventListener>();
 		this.editListeners.addAll( editListeners );
 	}
@@ -30,6 +30,6 @@ public class SRSoftStructuralEditRule extends SRAbstractEditRule
 	
 	protected Pres buildFragment(Pres view, Object model, SimpleAttributeTable inheritedState)
 	{
-		return new SoftStructuralItem( editor, editListeners, model, view );
+		return new SoftStructuralItem( controller, editListeners, model, view );
 	}
 }

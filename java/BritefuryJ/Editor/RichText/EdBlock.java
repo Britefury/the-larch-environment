@@ -26,13 +26,13 @@ public class EdBlock extends EdNode
 	}
 	
 	
-	public void setModelContents(RichTextController editor, List<Object> xs)
+	public void setModelContents(RichTextController controller, List<Object> xs)
 	{
 		ArrayList<EdNode> ed = new ArrayList<EdNode>();
 		ed.ensureCapacity( xs.size() );
 		for (Object x: xs)
 		{
-			ed.add( editor.modelToEditorModel( x ) );
+			ed.add( controller.modelToEditorModel( x ) );
 		}
 		this.contents.clear();
 		this.contents.addAll( ed );

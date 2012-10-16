@@ -34,13 +34,13 @@ public class SequentialClipboardHandler extends ClipboardHandler
 		@Override
 		protected DataFlavor getDataFlavor()
 		{
-			return dataFlavorForClass( sequentialEditor.getSelectionBufferType() );
+			return dataFlavorForClass( sequentialController.getSelectionBufferType() );
 		}
 
 		@Override
 		protected Object export(Object selectionContents)
 		{
-			return sequentialEditor.createSelectionBuffer( selectionContents );
+			return sequentialController.createSelectionBuffer( selectionContents );
 		}
 		
 	};
@@ -57,13 +57,13 @@ public class SequentialClipboardHandler extends ClipboardHandler
 		@Override
 		protected Object export(Object selectionContents)
 		{
-			return sequentialEditor.sequentialToTextForExport( selectionContents );
+			return sequentialController.sequentialToTextForExport( selectionContents );
 		}
 
 		@Override
 		protected boolean canExport(Object selectionContents)
 		{
-			return sequentialEditor.canConvertSequentialToTextForExport( selectionContents );
+			return sequentialController.canConvertSequentialToTextForExport( selectionContents );
 		}
 	};
 
@@ -102,14 +102,14 @@ public class SequentialClipboardHandler extends ClipboardHandler
 		@Override
 		protected boolean canImportFlavor(DataFlavor flavor)
 		{
-			return flavor.equals( dataFlavorForClass( sequentialEditor.getSelectionBufferType() ) );
+			return flavor.equals( dataFlavorForClass( sequentialController.getSelectionBufferType() ) );
 		}
 
 		@Override
 		protected boolean importCheckedData(Caret caret, Selection selection, Object data)
 		{
 			SequentialBuffer buffer = (SequentialBuffer)data;
-			if ( !sequentialEditor.canImportFromSequentialEditor( buffer.clipboardHandler.sequentialEditor ) )
+			if ( !sequentialController.canImportFromSequentialEditor( buffer.clipboardHandler.sequentialController ) )
 			{
 				return false;
 			}
@@ -131,7 +131,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 		{
 			if ( data instanceof String )
 			{
-				return paste( caret, selection, sequentialEditor.textToSequentialForImport( ((String)data) ) );
+				return paste( caret, selection, sequentialController.textToSequentialForImport( ((String)data) ) );
 			}
 			return false;
 		}
@@ -159,7 +159,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 		{
 			if ( target instanceof Caret )
 			{
-				Object sequentialReplacement = sequentialEditor.textToSequentialForImport( replacement );
+				Object sequentialReplacement = sequentialController.textToSequentialForImport( replacement );
 				replaceSelection( selection, (Caret)target, sequentialReplacement );
 				return true;
 			}
@@ -202,15 +202,15 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	};
 	
 	
-	private SequentialController sequentialEditor;
+	private SequentialController sequentialController;
 	
 	
 	
 	
 	
-	public SequentialClipboardHandler(SequentialController sequentialEditor)
+	public SequentialClipboardHandler(SequentialController sequentialController)
 	{
-		this.sequentialEditor = sequentialEditor;
+		this.sequentialController = sequentialController;
 		
 		addExporter( exporter );
 		addImporter( importer );
@@ -221,7 +221,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	
 	protected SequentialController getSequentialEditor()
 	{
-		return sequentialEditor;
+		return sequentialController;
 	}
 	
 	
@@ -235,7 +235,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	
 	private boolean isEditLevelFragmentView(FragmentView fragment)
 	{
-		return sequentialEditor.isClipboardEditLevelFragmentView( fragment );
+		return sequentialController.isClipboardEditLevelFragmentView( fragment );
 	}
 	
 	
@@ -244,7 +244,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	{
 		LSElement root = selection.getCommonRoot();
 		FragmentView fragment = FragmentView.getEnclosingFragment( root, editLevelFragmentFilter );
-		return sequentialEditor.getSequentialContentInSelection( fragment, fragment.getFragmentContentElement(), selection );
+		return sequentialController.getSequentialContentInSelection( fragment, fragment.getFragmentContentElement(), selection );
 	}
 
 	private void replaceSelection(Selection selection, Caret caret, Object replacement)
@@ -280,10 +280,10 @@ public class SequentialClipboardHandler extends ClipboardHandler
 				if ( replacement != null )
 				{
 					// Splice the content before the selection, the inserted content, and the content after the selection
-					Object spliced = sequentialEditor.spliceForInsertion( editRootFragment, editRootFragmentElement, startMarker, endMarker, replacement );
+					Object spliced = sequentialController.spliceForInsertion( editRootFragment, editRootFragmentElement, startMarker, endMarker, replacement );
 					
 					// Create the event
-					SelectionEditTreeEvent event = sequentialEditor.createSelectionEditTreeEvent( editRootFragmentElement );
+					SelectionEditTreeEvent event = sequentialController.createSelectionEditTreeEvent( editRootFragmentElement );
 					// Store the spliced content in the structural value of the root element
 					event.getRichStringVisitor().setElementFixedValue( editRootFragmentElement, spliced );
 					// Take a copy of the end marker
@@ -298,10 +298,10 @@ public class SequentialClipboardHandler extends ClipboardHandler
 				else
 				{
 					// Splice the content around the selection
-					Object spliced = sequentialEditor.spliceForDeletion( editRootFragment, editRootFragmentElement, startMarker, endMarker );
+					Object spliced = sequentialController.spliceForDeletion( editRootFragment, editRootFragmentElement, startMarker, endMarker );
 	
 					// Create the event
-					SelectionEditTreeEvent event = sequentialEditor.createSelectionEditTreeEvent( editRootFragmentElement );
+					SelectionEditTreeEvent event = sequentialController.createSelectionEditTreeEvent( editRootFragmentElement );
 					// Store the joined rich string in the structural value of the root element
 					event.getRichStringVisitor().setElementFixedValue( editRootFragmentElement, spliced );
 					// Take a copy of the end marker
@@ -328,10 +328,10 @@ public class SequentialClipboardHandler extends ClipboardHandler
 			LSElement insertionPointElement = insertionPointFragment.getFragmentContentElement();
 			
 			// Splice the content before the insertion point, the inserted content, and the content after the insertion point
-			Object spliced = sequentialEditor.spliceForInsertion( insertionPointFragment, insertionPointElement, caretMarker, caretMarker, data );
+			Object spliced = sequentialController.spliceForInsertion( insertionPointFragment, insertionPointElement, caretMarker, caretMarker, data );
 			
 			// Store the spliced content in the structural value of the root element
-			SelectionEditTreeEvent event = sequentialEditor.createSelectionEditTreeEvent( insertionPointElement );
+			SelectionEditTreeEvent event = sequentialController.createSelectionEditTreeEvent( insertionPointElement );
 			event.getRichStringVisitor().setElementFixedValue( insertionPointElement, spliced );
 			// Move the caret to the start of the next item, to ensure that it is placed *after* the inserted content, once the insertion is done.
 			caret.moveToStartOfNextItem();

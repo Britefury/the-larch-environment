@@ -24,17 +24,17 @@ public abstract class EditFilter implements TreeEventListener
 	}
 	
 	
-	protected abstract SequentialController getSequentialEditor();
+	protected abstract SequentialController getSequentialController();
 	
 	
 	protected boolean isSelectionEditEvent(EditEvent event)
 	{
-		return getSequentialEditor().isSelectionEditEvent( event );
+		return getSequentialController().isSelectionEditEvent( event );
 	}
 	
 	protected boolean isEditEvent(EditEvent event)
 	{
-		return getSequentialEditor().isEditEvent( event );
+		return getSequentialController().isEditEvent( event );
 	}
 	
 	

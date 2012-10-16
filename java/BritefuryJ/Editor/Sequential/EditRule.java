@@ -19,9 +19,9 @@ public class EditRule extends AbstractEditRule
 	private List<TreeEventListener> editListeners;
 	
 	
-	public EditRule(SequentialController editor, List<TreeEventListener> editListeners)
+	public EditRule(SequentialController controller, List<TreeEventListener> editListeners)
 	{
-		super( editor );
+		super( controller );
 		this.editListeners = new ArrayList<TreeEventListener>();
 		this.editListeners.addAll( editListeners );
 	}
@@ -29,6 +29,6 @@ public class EditRule extends AbstractEditRule
 	
 	public Pres applyToFragment(Pres view, Object model, SimpleAttributeTable inheritedState)
 	{
-		return new EditableSequentialItem( editor, editListeners, view );
+		return new EditableSequentialItem( controller, editListeners, view );
 	}
 }

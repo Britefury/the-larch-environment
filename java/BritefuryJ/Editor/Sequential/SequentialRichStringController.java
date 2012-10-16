@@ -17,9 +17,9 @@ import BritefuryJ.Util.RichString.RichStringBuilder;
 
 public class SequentialRichStringController extends SequentialController
 {
-	public SequentialRichStringController(String editorName)
+	public SequentialRichStringController(String controllerName)
 	{
-		super( editorName );
+		super( controllerName );
 	}
 	
 	

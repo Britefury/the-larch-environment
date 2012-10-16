@@ -44,7 +44,7 @@ public abstract class EdNode implements Presentable, ClipboardCopyable
 	}
 	
 	
-	protected abstract Object buildModel(RichTextController editor);
+	protected abstract Object buildModel(RichTextController controller);
 	
 	
 	protected boolean isParagraph()

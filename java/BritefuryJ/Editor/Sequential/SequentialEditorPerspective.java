@@ -11,8 +11,8 @@ import BritefuryJ.Projection.Perspective;
 
 public class SequentialEditorPerspective extends Perspective
 {
-	public SequentialEditorPerspective(ViewFragmentFunction fragmentViewFn, SequentialController sequentialEditor)
+	public SequentialEditorPerspective(ViewFragmentFunction fragmentViewFn, SequentialController sequentialController)
 	{
-		super( fragmentViewFn, sequentialEditor.getClipboardHandler() );
+		super( fragmentViewFn, sequentialController.getClipboardHandler() );
 	}
 }

@@ -34,7 +34,7 @@ public abstract class ParsingEditFilter extends SRRichStringEditFilter
 
 	protected boolean isValueEmpty(LSElement element, FragmentView fragment, Object model, RichString value)
 	{
-		return getSyntaxRecognizingEditor().isValueEmpty( value );
+		return getSyntaxRecognizingController().isValueEmpty( value );
 	}
 	
 	protected boolean isValueValid(LSElement element, FragmentView fragment, Object model, RichString value)
@@ -74,7 +74,7 @@ public abstract class ParsingEditFilter extends SRRichStringEditFilter
 				Log log = fragment.getView().getLog();
 				if ( log.isRecording() )
 				{
-					log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " - deleted" ).vItem( "editedRichStr", value ) );
+					log.log( new LogEntry( getSequentialController().getName() ).hItem( "description", logName + " - deleted" ).vItem( "editedRichStr", value ) );
 				}
 			}
 			return handleEmptyValue( element, fragment, event, model );
@@ -90,7 +90,7 @@ public abstract class ParsingEditFilter extends SRRichStringEditFilter
 					Log log = fragment.getView().getLog();
 					if ( log.isRecording() )
 					{
-						log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " - parse succeeded" ).vItem( "editedRichStr", value ).hItem( "parser", parser ).vItem( "parsed", parsed[0] ) );
+						log.log( new LogEntry( getSequentialController().getName() ).hItem( "description", logName + " - parse succeeded" ).vItem( "editedRichStr", value ).hItem( "parser", parser ).vItem( "parsed", parsed[0] ) );
 					}
 				}
 				return handleParseSuccess( element, sourceElement, fragment, event, model, value, parsed[0] );
@@ -102,7 +102,7 @@ public abstract class ParsingEditFilter extends SRRichStringEditFilter
 					Log log = fragment.getView().getLog();
 					if ( log.isRecording() )
 					{
-						log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " - parse failed" ).vItem( "editedRichStr", value ).hItem( "parser", parser ) );
+						log.log( new LogEntry( getSequentialController().getName() ).hItem( "description", logName + " - parse failed" ).vItem( "editedRichStr", value ).hItem( "parser", parser ) );
 					}
 				}
 				return handleParseFailure( element, sourceElement, fragment, event, model, value );

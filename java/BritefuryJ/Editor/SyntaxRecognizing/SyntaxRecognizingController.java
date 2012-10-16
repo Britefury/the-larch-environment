@@ -53,7 +53,7 @@ public class SyntaxRecognizingController extends SequentialRichStringController
 		
 		
 		@Override
-		protected SyntaxRecognizingController getSyntaxRecognizingEditor()
+		protected SyntaxRecognizingController getSyntaxRecognizingController()
 		{
 			return SyntaxRecognizingController.this;
 		}
@@ -131,7 +131,7 @@ public class SyntaxRecognizingController extends SequentialRichStringController
 		
 		
 		@Override
-		protected SyntaxRecognizingController getSyntaxRecognizingEditor()
+		protected SyntaxRecognizingController getSyntaxRecognizingController()
 		{
 			return SyntaxRecognizingController.this;
 		}
@@ -173,7 +173,7 @@ public class SyntaxRecognizingController extends SequentialRichStringController
 		
 		
 		@Override
-		protected SyntaxRecognizingController getSyntaxRecognizingEditor()
+		protected SyntaxRecognizingController getSyntaxRecognizingController()
 		{
 			return SyntaxRecognizingController.this;
 		}
@@ -230,7 +230,7 @@ public class SyntaxRecognizingController extends SequentialRichStringController
 		
 		
 		@Override
-		protected SyntaxRecognizingController getSyntaxRecognizingEditor()
+		protected SyntaxRecognizingController getSyntaxRecognizingController()
 		{
 			return SyntaxRecognizingController.this;
 		}
@@ -250,9 +250,9 @@ public class SyntaxRecognizingController extends SequentialRichStringController
 	private TopLevelNodeEditFilter cachedTopLevel = new TopLevelNodeEditFilter();
 	
 	
-	public SyntaxRecognizingController(String editorName)
+	public SyntaxRecognizingController(String controllerName)
 	{
-		super( editorName );
+		super( controllerName );
 	}
 	
 	

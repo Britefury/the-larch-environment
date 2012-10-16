@@ -25,9 +25,9 @@ public class EdParagraphEmbed extends EdEmbed
 
 
 	@Override
-	protected Object buildModel(RichTextController editor)
+	protected Object buildModel(RichTextController controller)
 	{
-		return editor.buildParagraphEmbed( value );
+		return controller.buildParagraphEmbed( value );
 	}
 
 

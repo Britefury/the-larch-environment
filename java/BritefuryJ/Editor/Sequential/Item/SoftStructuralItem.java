@@ -17,31 +17,31 @@ import BritefuryJ.StyleSheet.StyleValues;
 
 public class SoftStructuralItem extends Pres
 {
-	private SequentialController editor;
+	private SequentialController controller;
 	private TreeEventListener editListeners[];
 	private Object model;
 	private Pres child;
 	
 	
-	public SoftStructuralItem(SequentialController editor, Object model, Object child)
+	public SoftStructuralItem(SequentialController controller, Object model, Object child)
 	{
-		this.editor = editor;
+		this.controller = controller;
 		this.editListeners = new TreeEventListener[] {};
 		this.child = coerceNonNull( child );
 		this.model = model;
 	}
 
-	public SoftStructuralItem(SequentialController editor, TreeEventListener editListener, Object model, Object child)
+	public SoftStructuralItem(SequentialController controller, TreeEventListener editListener, Object model, Object child)
 	{
-		this.editor = editor;
+		this.controller = controller;
 		this.editListeners = new TreeEventListener[] { editListener };
 		this.child = coerceNonNull( child );
 		this.model = model;
 	}
 
-	public SoftStructuralItem(SequentialController editor, List<TreeEventListener> editListeners, Object model, Object child)
+	public SoftStructuralItem(SequentialController controller, List<TreeEventListener> editListeners, Object model, Object child)
 	{
-		this.editor = editor;
+		this.controller = controller;
 		this.editListeners = editListeners.toArray( new TreeEventListener[editListeners.size()] );
 		this.model = model;
 		this.child = coerceNonNull( child );
@@ -52,12 +52,12 @@ public class SoftStructuralItem extends Pres
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		LSElement element = child.present( ctx, style );
-		if ( editor.isClearNeighbouringStructuresEnabled() )
+		if ( controller.isClearNeighbouringStructuresEnabled() )
 		{
 			element.addTreeEventListener( SequentialController.getClearNeighbouringStructuralValueListener() );
 		}
 		element.setFixedValue( model );
-		element.addTreeEventListener( editor.getClearStructuralValueListener() );
+		element.addTreeEventListener( controller.getClearStructuralValueListener() );
 		for (TreeEventListener listener: editListeners)
 		{
 			element.addTreeEventListener( listener );
