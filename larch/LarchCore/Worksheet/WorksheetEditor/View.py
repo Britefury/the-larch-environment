@@ -362,7 +362,7 @@ class WorksheetEditor (MethodDispatchView):
 			return True
 
 
-		p = _linkStyle.applyTo( Label( node.text ) )
+		p = _linkStyle.applyTo( ApplyStyleSheetFromAttribute( Controls.hyperlinkAttrs, Label( node.text ) ) )
 		p = p.withContextMenuInteractor( _linkContextMenuFactory )
 		p = WorksheetRichTextEditor.instance.editableInlineEmbed( node, p )
 		return p
@@ -474,7 +474,7 @@ class WorksheetEditor (MethodDispatchView):
 
 
 
-_linkStyle = StyleSheet.style( Primitive.foreground( Color.BLUE ), Primitive.hoverBackground( FilledOutlinePainter( Color( 0.9, 0.9, 0.9 ), Color( 0.5, 0.5, 0.5 ) ) ) )
+_linkStyle = StyleSheet.style( Primitive.hoverBackground( FilledOutlinePainter( Color( 0.9, 0.9, 0.9 ), Color( 0.5, 0.5, 0.5 ) ) ), Primitive.hoverForeground( None ), Primitive.cursor( None ) )
 
 
 
