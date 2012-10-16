@@ -30,7 +30,7 @@ public abstract class UnparsedEditFilter extends SRRichStringEditFilter
 	protected boolean isValueEmpty(LSElement element, LSElement sourceElement, FragmentView fragment,
 			EditEvent event, Object model, RichString value)
 	{
-		return getSyntaxRecognizingEditor().isValueEmpty( value );
+		return getSyntaxRecognizingController().isValueEmpty( value );
 	}
 	
 	protected boolean shouldApplyToInnerFragment(LSElement element, LSElement sourceElement, FragmentView fragment,
@@ -75,7 +75,7 @@ public abstract class UnparsedEditFilter extends SRRichStringEditFilter
 					Log log = fragment.getView().getLog();
 					if ( log.isRecording() )
 					{
-						log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " (unparsed) - apply to model" ).vItem( "editedRichStr", value ) );
+						log.log( new LogEntry( getSequentialController().getName() ).hItem( "description", logName + " (unparsed) - apply to model" ).vItem( "editedRichStr", value ) );
 					}
 				}
 				return handleUnparsed( element, sourceElement, fragment, event, model, value );
@@ -95,7 +95,7 @@ public abstract class UnparsedEditFilter extends SRRichStringEditFilter
 						Log log = fragment.getView().getLog();
 						if ( log.isRecording() )
 						{
-							log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " (unparsed) - sub-model deleted" ).vItem( "editedRichStr", value ) );
+							log.log( new LogEntry( getSequentialController().getName() ).hItem( "description", logName + " (unparsed) - sub-model deleted" ).vItem( "editedRichStr", value ) );
 						}
 					}
 					return handleUnparsed( element, sourceElement, fragment, event, model, value );
@@ -107,7 +107,7 @@ public abstract class UnparsedEditFilter extends SRRichStringEditFilter
 					Log log = fragment.getView().getLog();
 					if ( log.isRecording() )
 					{
-						log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " (unparsed) - apply to sub-model" ).vItem( "editedRichStr", sourceValue ) );
+						log.log( new LogEntry( getSequentialController().getName() ).hItem( "description", logName + " (unparsed) - apply to sub-model" ).vItem( "editedRichStr", sourceValue ) );
 					}
 				}
 				return handleInnerUnparsed( sourceFragmentElement, sourceElement, sourceFragment, event, sourceModel, sourceValue );
@@ -120,7 +120,7 @@ public abstract class UnparsedEditFilter extends SRRichStringEditFilter
 				Log log = fragment.getView().getLog();
 				if ( log.isRecording() )
 				{
-					log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " (unparsed) - invalid" ).vItem( "editedRichStr", value ) );
+					log.log( new LogEntry( getSequentialController().getName() ).hItem( "description", logName + " (unparsed) - invalid" ).vItem( "editedRichStr", value ) );
 				}
 			}
 			

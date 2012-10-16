@@ -28,9 +28,9 @@ public abstract class EdAbstractText extends EdNode
 	}
 	
 	
-	public void setModelContents(RichTextController editor, List<Object> modelContents)
+	public void setModelContents(RichTextController controller, List<Object> modelContents)
 	{
-		List<Object> editorModelContents = editor.convertModelListToEditorModelList( modelContents );
+		List<Object> editorModelContents = controller.convertModelListToEditorModelList( modelContents );
 		this.contents.clear();
 		this.contents.addAll( editorModelContents );
 	}

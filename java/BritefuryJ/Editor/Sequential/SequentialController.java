@@ -125,7 +125,7 @@ public abstract class SequentialController
 		
 
 		@Override
-		protected SequentialController getSequentialEditor()
+		protected SequentialController getSequentialController()
 		{
 			return SequentialController.this;
 		}
@@ -152,7 +152,7 @@ public abstract class SequentialController
 		
 
 		@Override
-		protected SequentialController getSequentialEditor()
+		protected SequentialController getSequentialController()
 		{
 			return SequentialController.this;
 		}
@@ -170,21 +170,21 @@ public abstract class SequentialController
 	protected ClearStructuralValueListener clearListener = new ClearStructuralValueListener();
 	protected static ClearNeighbouringStructuralValueListener clearNeighbourListener = new ClearNeighbouringStructuralValueListener();
 	protected SequentialClipboardHandler clipboardHandler;
-	protected String editorName;
+	protected String controllerName;
 	
 	
 	
 	public SequentialController(String editorName)
 	{
 		this.clipboardHandler = new SequentialClipboardHandler( this );
-		this.editorName = editorName;
+		this.controllerName = editorName;
 	}
 	
 	
 	
 	public String getName()
 	{
-		return editorName;
+		return controllerName;
 	}
 	
 	

@@ -100,9 +100,9 @@ public class EdParagraph extends EdAbstractText
 
 
 	@Override
-	protected Object buildModel(RichTextController accessor)
+	protected Object buildModel(RichTextController controller)
 	{
-		return accessor.buildParagraph( accessor.editorModelListToModelList( contents ), styleAttrs );
+		return controller.buildParagraph( controller.editorModelListToModelList( contents ), styleAttrs );
 	}
 
 

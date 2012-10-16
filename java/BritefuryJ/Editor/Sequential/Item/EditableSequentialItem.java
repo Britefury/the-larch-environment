@@ -17,21 +17,21 @@ import BritefuryJ.StyleSheet.StyleValues;
 
 public class EditableSequentialItem extends Pres
 {
-	private SequentialController editor;
+	private SequentialController controller;
 	private TreeEventListener editListeners[];
 	private Pres child;
 	
 	
-	public EditableSequentialItem(SequentialController editor, TreeEventListener editListener, Object child)
+	public EditableSequentialItem(SequentialController controller, TreeEventListener editListener, Object child)
 	{
-		this.editor = editor;
+		this.controller = controller;
 		this.editListeners = new TreeEventListener[] { editListener };
 		this.child = coerceNonNull( child );
 	}
 
-	public EditableSequentialItem(SequentialController editor, List<TreeEventListener> editListeners, Object child)
+	public EditableSequentialItem(SequentialController controller, List<TreeEventListener> editListeners, Object child)
 	{
-		this.editor = editor;
+		this.controller = controller;
 		this.editListeners = editListeners.toArray( new TreeEventListener[editListeners.size()] );
 		this.child = coerceNonNull( child );
 	}
@@ -41,7 +41,7 @@ public class EditableSequentialItem extends Pres
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		LSElement element = child.present( ctx, style );
-		if ( editor.isClearNeighbouringStructuresEnabled() )
+		if ( controller.isClearNeighbouringStructuresEnabled() )
 		{
 			element.addTreeEventListener( SequentialController.getClearNeighbouringStructuralValueListener() );
 		}

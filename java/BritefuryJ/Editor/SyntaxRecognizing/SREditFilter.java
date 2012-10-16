@@ -11,12 +11,12 @@ import BritefuryJ.Editor.Sequential.SequentialController;
 
 public abstract class SREditFilter extends EditFilter
 {
-	protected abstract SyntaxRecognizingController getSyntaxRecognizingEditor();
+	protected abstract SyntaxRecognizingController getSyntaxRecognizingController();
 	
 	
 	@Override
-	protected SequentialController getSequentialEditor()
+	protected SequentialController getSequentialController()
 	{
-		return getSyntaxRecognizingEditor();
+		return getSyntaxRecognizingController();
 	}
 }

@@ -19,9 +19,9 @@ public class SoftStructuralEditRule extends AbstractEditRule
 	private List<TreeEventListener> editListeners;
 	
 	
-	public SoftStructuralEditRule(SequentialController editor, List<TreeEventListener> editListeners)
+	public SoftStructuralEditRule(SequentialController controller, List<TreeEventListener> editListeners)
 	{
-		super( editor );
+		super( controller );
 		this.editListeners = new ArrayList<TreeEventListener>();
 		this.editListeners.addAll( editListeners );
 	}
@@ -29,6 +29,6 @@ public class SoftStructuralEditRule extends AbstractEditRule
 	
 	public Pres applyToFragment(Pres view, Object model, SimpleAttributeTable inheritedState)
 	{
-		return new SoftStructuralItem( editor, editListeners, model, view );
+		return new SoftStructuralItem( controller, editListeners, model, view );
 	}
 }

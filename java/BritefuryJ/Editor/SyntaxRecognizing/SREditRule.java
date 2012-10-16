@@ -20,9 +20,9 @@ public class SREditRule extends SRAbstractEditRule
 	private List<TreeEventListener> editListeners;
 	
 	
-	public SREditRule(SyntaxRecognizingController editor, PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners)
+	public SREditRule(SyntaxRecognizingController controller, PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners)
 	{
-		super( editor, precedenceHandler );
+		super( controller, precedenceHandler );
 		this.editListeners = new ArrayList<TreeEventListener>();
 		this.editListeners.addAll( editListeners );
 	}
@@ -36,7 +36,7 @@ public class SREditRule extends SRAbstractEditRule
 		
 		if ( editMode == SyntaxRecognizingController.EditMode.EDIT )
 		{
-			view = new EditableSequentialItem( editor, editListeners, view );
+			view = new EditableSequentialItem( controller, editListeners, view );
 		}
 		
 		return view;

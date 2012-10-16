@@ -22,7 +22,7 @@ public abstract class TopLevelEditFilter extends SREditFilter
 	protected HandleEditResult handleEdit(LSElement element, LSElement sourceElement, EditEvent event)
 	{
 		handleTopLevelEdit( element, sourceElement, event );
-		if ( event instanceof TextEditEvent  ||  event instanceof SelectionEditTreeEvent  ||  getSequentialEditor().isEditEvent( event ) )
+		if ( event instanceof TextEditEvent  ||  event instanceof SelectionEditTreeEvent  ||  getSequentialController().isEditEvent( event ) )
 		{
 			return HandleEditResult.HANDLED;
 		}

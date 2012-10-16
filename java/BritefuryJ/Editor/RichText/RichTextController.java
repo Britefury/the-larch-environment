@@ -46,12 +46,12 @@ public abstract class RichTextController extends SequentialController
 		protected ArrayList<Object> prefix = new ArrayList<Object>();
 		protected ArrayList<Object> contents = new ArrayList<Object>();
 		protected ArrayList<Object> suffix = new ArrayList<Object>();
-		protected RichTextController editor;
+		protected RichTextController controller;
 		
 		
-		public Visitor(RichTextController editor)
+		public Visitor(RichTextController controller)
 		{
-			this.editor = editor;
+			this.controller = controller;
 		}
 
 
@@ -62,7 +62,7 @@ public abstract class RichTextController extends SequentialController
 			{
 				Object model = e.getFixedValue();
 				
-				Object prefix = editor.modelToPrefixTag( model );
+				Object prefix = controller.modelToPrefixTag( model );
 				if ( prefix != null )
 				{
 					contents.add( prefix );
@@ -70,8 +70,8 @@ public abstract class RichTextController extends SequentialController
 				
 				if ( !complete )
 				{
-					Object regionStart = editor.modelToRegionStartTag( model );
-					Object regionEnd = editor.modelToRegionEndTag( model );
+					Object regionStart = controller.modelToRegionStartTag( model );
+					Object regionEnd = controller.modelToRegionEndTag( model );
 					
 					if ( regionStart != null )
 					{
@@ -113,8 +113,8 @@ public abstract class RichTextController extends SequentialController
 				
 				if ( !complete )
 				{
-					Object start = editor.modelToRegionStartTag( model );
-					Object end = editor.modelToRegionEndTag( model );
+					Object start = controller.modelToRegionStartTag( model );
+					Object end = controller.modelToRegionEndTag( model );
 					
 					if ( start != null )
 					{
@@ -126,7 +126,7 @@ public abstract class RichTextController extends SequentialController
 					}
 				}
 
-				Object suffix = editor.modelToSuffixTag( model );
+				Object suffix = controller.modelToSuffixTag( model );
 				if ( suffix != null )
 				{
 					contents.add( suffix );
@@ -165,36 +165,36 @@ public abstract class RichTextController extends SequentialController
 	
 	private static class TagsVisitor extends Visitor
 	{
-		public TagsVisitor(RichTextController editor)
+		public TagsVisitor(RichTextController controller)
 		{
-			super( editor );
+			super( controller );
 		}
 
 		@Override
 		protected void completelyVisitStructralValue(Object value)
 		{
-			editor.modelToTags( contents, value );
+			controller.modelToTags( contents, value );
 		}
 	}
 	
 	
 	private static class NodeVisitor extends Visitor
 	{
-		public NodeVisitor(RichTextController editor)
+		public NodeVisitor(RichTextController controller)
 		{
-			super( editor );
+			super( controller );
 		}
 
 		@Override
 		protected void completelyVisitStructralValue(Object value)
 		{
-			if ( editor.isStyleSpan( value ) )
+			if ( controller.isStyleSpan( value ) )
 			{
-				editor.modelToTags( contents, value );
+				controller.modelToTags( contents, value );
 			}
 			else
 			{
-				contents.add( editor.modelToEditorModel( value ) );
+				contents.add( controller.modelToEditorModel( value ) );
 			}
 		}
 	}
@@ -231,17 +231,17 @@ public abstract class RichTextController extends SequentialController
 	//
 	
 	
-	protected static class RichTextEditorPropertyKey
+	protected static class RichTextControllerPropertyKey
 	{
 	}
 	
 	// Instance variables, so that each rich text editor has its own set of keys, so that two different editors cannot interfere with one another
-	protected final RichTextEditorPropertyKey inlineEmbedPropertyKey = new RichTextEditorPropertyKey();
-	protected final RichTextEditorPropertyKey spanPropertyKey = new RichTextEditorPropertyKey();
-	protected final RichTextEditorPropertyKey paragraphPropertyKey = new RichTextEditorPropertyKey();
-	protected final RichTextEditorPropertyKey paragraphEmbedPropertyKey = new RichTextEditorPropertyKey();
-	protected final RichTextEditorPropertyKey blockPropertyKey = new RichTextEditorPropertyKey();
-	protected final RichTextEditorPropertyKey blockItemPropertyKey = new RichTextEditorPropertyKey();
+	protected final RichTextControllerPropertyKey inlineEmbedPropertyKey = new RichTextControllerPropertyKey();
+	protected final RichTextControllerPropertyKey spanPropertyKey = new RichTextControllerPropertyKey();
+	protected final RichTextControllerPropertyKey paragraphPropertyKey = new RichTextControllerPropertyKey();
+	protected final RichTextControllerPropertyKey paragraphEmbedPropertyKey = new RichTextControllerPropertyKey();
+	protected final RichTextControllerPropertyKey blockPropertyKey = new RichTextControllerPropertyKey();
+	protected final RichTextControllerPropertyKey blockItemPropertyKey = new RichTextControllerPropertyKey();
 	
 	
 	
@@ -250,9 +250,9 @@ public abstract class RichTextController extends SequentialController
 	private RichStringEditFilter textEditListener, paraEditListener, blockEditListener;
 	
 	
-	public RichTextController(String editorName)
+	public RichTextController(String controllerName)
 	{
-		super( editorName );
+		super( controllerName );
 		
 		HandleRichStringFn onTextEdit = new HandleRichStringFn()
 		{

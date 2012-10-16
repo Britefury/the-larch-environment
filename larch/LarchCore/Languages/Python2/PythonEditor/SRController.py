@@ -38,12 +38,12 @@ class PythonDedentTreeEvent (PythonIndentationTreeEvent):
 	pass
 
 class IndentPythonSelectionTreeEvent (SelectionEditTreeEvent):
-	def __init__(self, sequentialEditor, sourceElement):
-		super( IndentPythonSelectionTreeEvent, self ).__init__( sequentialEditor, sourceElement )
+	def __init__(self, sequentialController, sourceElement):
+		super( IndentPythonSelectionTreeEvent, self ).__init__( sequentialController, sourceElement )
 
 class DedentPythonSelectionTreeEvent (SelectionEditTreeEvent):
-	def __init__(self, sequentialEditor, sourceElement):
-		super( DedentPythonSelectionTreeEvent, self ).__init__( sequentialEditor, sourceElement )
+	def __init__(self, sequentialController, sourceElement):
+		super( DedentPythonSelectionTreeEvent, self ).__init__( sequentialController, sourceElement )
 
 		
 		
