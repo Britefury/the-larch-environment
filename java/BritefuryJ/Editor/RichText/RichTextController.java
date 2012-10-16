@@ -18,7 +18,7 @@ import BritefuryJ.Editor.Sequential.EditFilter;
 import BritefuryJ.Editor.Sequential.EditFilter.HandleEditResult;
 import BritefuryJ.Editor.Sequential.RichStringEditFilter;
 import BritefuryJ.Editor.Sequential.SelectionEditTreeEvent;
-import BritefuryJ.Editor.Sequential.SequentialEditor;
+import BritefuryJ.Editor.Sequential.SequentialController;
 import BritefuryJ.Editor.Sequential.Item.SoftStructuralItem;
 import BritefuryJ.Editor.Sequential.Item.StructuralItem;
 import BritefuryJ.IncrementalView.FragmentView;
@@ -39,17 +39,17 @@ import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.Util.RichString.RichString;
 import BritefuryJ.Util.RichString.RichStringBuilder;
 
-public abstract class RichTextEditor extends SequentialEditor
+public abstract class RichTextController extends SequentialController
 {
 	private static abstract class Visitor extends ElementTreeVisitor
 	{
 		protected ArrayList<Object> prefix = new ArrayList<Object>();
 		protected ArrayList<Object> contents = new ArrayList<Object>();
 		protected ArrayList<Object> suffix = new ArrayList<Object>();
-		protected RichTextEditor editor;
+		protected RichTextController editor;
 		
 		
-		public Visitor(RichTextEditor editor)
+		public Visitor(RichTextController editor)
 		{
 			this.editor = editor;
 		}
@@ -165,7 +165,7 @@ public abstract class RichTextEditor extends SequentialEditor
 	
 	private static class TagsVisitor extends Visitor
 	{
-		public TagsVisitor(RichTextEditor editor)
+		public TagsVisitor(RichTextController editor)
 		{
 			super( editor );
 		}
@@ -180,7 +180,7 @@ public abstract class RichTextEditor extends SequentialEditor
 	
 	private static class NodeVisitor extends Visitor
 	{
-		public NodeVisitor(RichTextEditor editor)
+		public NodeVisitor(RichTextController editor)
 		{
 			super( editor );
 		}
@@ -250,7 +250,7 @@ public abstract class RichTextEditor extends SequentialEditor
 	private RichStringEditFilter textEditListener, paraEditListener, blockEditListener;
 	
 	
-	public RichTextEditor(String editorName)
+	public RichTextController(String editorName)
 	{
 		super( editorName );
 		

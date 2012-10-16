@@ -56,7 +56,7 @@ from LarchCore.Languages.Python2 import Python2
 
 from LarchCore.Worksheet.WorksheetCommands import worksheetCommands
 from LarchCore.Worksheet.WorksheetEditor import EditorSchema
-from LarchCore.Worksheet.WorksheetEditor.RichTextEditor import WorksheetRichTextEditor
+from LarchCore.Worksheet.WorksheetEditor.RichTextController import WorksheetRichTextController
 
 
 
@@ -82,13 +82,13 @@ def _onDrop_embeddedObject(element, pos, data, action):
 			def _makeInline():
 				model = data.getModel()
 				return EditorSchema.InlineEmbeddedObjectEditor.newInlineEmbeddedObject( model )
-			WorksheetRichTextEditor.instance.insertInlineEmbedAtMarker( marker, _makeInline )
+			WorksheetRichTextController.instance.insertInlineEmbedAtMarker( marker, _makeInline )
 
 		def _onDropParagraph(control):
 			def _makeParagraph():
 				model = data.getModel()
 				return EditorSchema.ParagraphEmbeddedObjectEditor.newParagraphEmbeddedObject( model )
-			WorksheetRichTextEditor.instance.insertParagraphAtMarker( marker, _makeParagraph )
+			WorksheetRichTextController.instance.insertParagraphAtMarker( marker, _makeParagraph )
 
 		menu = VPopupMenu( [ MenuItem.menuItemWithLabel( 'Inline', _onDropInline ),
 		                     MenuItem.menuItemWithLabel( 'As paragraph', _onDropParagraph ) ] )
@@ -117,7 +117,7 @@ def _applyParagraphShortcuts(p):
 		marker = Marker.atEndOf( element, True )
 		def _makeParagraph():
 			return EditorSchema.PythonCodeEditor.newPythonCodeModel()
-		WorksheetRichTextEditor.instance.insertParagraphAtMarker( marker, _makeParagraph )
+		WorksheetRichTextController.instance.insertParagraphAtMarker( marker, _makeParagraph )
 
 
 	p = p.withShortcut( Shortcut( KeyEvent.VK_N, Modifier.ALT ), paraStyleAction( 'normal' ) )
@@ -152,7 +152,7 @@ def _worksheetContextMenuFactory(element, menu):
 		def _onLink(link, event):
 			caret = rootElement.getCaret()
 			if caret.isValid():
-				WorksheetRichTextEditor.instance.modifyParagraphAtMarker( caret.getMarker(), _modifyParagraph )
+				WorksheetRichTextController.instance.modifyParagraphAtMarker( caret.getMarker(), _modifyParagraph )
 		return _onLink
 	
 	normalParaStyle = Hyperlink( 'Normal', makeParaStyleFn( 'normal' ) )
@@ -179,7 +179,7 @@ def _worksheetContextMenuFactory(element, menu):
 			selection = rootElement.getSelection()
 			if isinstance( selection, TextSelection ):
 				if selection.getRegion() == region:
-					WorksheetRichTextEditor.instance.applyStyleToSelection( selection, computeStyleValues )
+					WorksheetRichTextController.instance.applyStyleToSelection( selection, computeStyleValues )
 
 
 		return onButton
@@ -199,7 +199,7 @@ def _worksheetContextMenuFactory(element, menu):
 
 		caret = rootElement.getCaret()
 		if caret.isValid():
-			WorksheetRichTextEditor.instance.insertInlineEmbedAtCaret( caret, _makeLink )
+			WorksheetRichTextController.instance.insertInlineEmbedAtCaret( caret, _makeLink )
 
 
 	insertLink = Hyperlink( 'Hyperlink', _onLink )
@@ -214,7 +214,7 @@ def _worksheetContextMenuFactory(element, menu):
 		
 		caret = rootElement.getCaret()
 		if caret.isValid():
-			WorksheetRichTextEditor.instance.insertParagraphAtCaret( caret, _makePythonCode )
+			WorksheetRichTextController.instance.insertParagraphAtCaret( caret, _makePythonCode )
 
 	newCode = Hyperlink( 'Python code', _onPythonCode )
 	codeControls = ControlsRow( [ newCode ] )
@@ -235,7 +235,7 @@ def _worksheetContextMenuFactory(element, menu):
 
 def _inlineEmbeddedObjectContextMenuFactory(element, menu):
 	def _onDelete(control):
-		WorksheetRichTextEditor.instance.deleteInlineEmbedContainingElement( element )
+		WorksheetRichTextController.instance.deleteInlineEmbedContainingElement( element )
 
 	deleteItem = MenuItem.menuItemWithLabel( 'Delete embedded object', _onDelete )
 
@@ -245,7 +245,7 @@ def _inlineEmbeddedObjectContextMenuFactory(element, menu):
 
 def _paragraphEmbeddedObjectContextMenuFactory(element, menu):
 	def _onDelete(control):
-		WorksheetRichTextEditor.instance.deleteParagraphContainingElement( element )
+		WorksheetRichTextController.instance.deleteParagraphContainingElement( element )
 
 	deleteItem = MenuItem.menuItemWithLabel( 'Delete embedded object paragraph', _onDelete )
 
@@ -277,7 +277,7 @@ class WorksheetEditor (MethodDispatchView):
 		w = w.withContextMenuInteractor( _worksheetContextMenuFactory )
 		w = w.withDropDest( _embeddedObject_dropDest )
 		w = w.withCommands( worksheetCommands )
-		w = WorksheetRichTextEditor.instance.region( w )
+		w = WorksheetRichTextController.instance.region( w )
 		return w
 	
 	
@@ -286,7 +286,7 @@ class WorksheetEditor (MethodDispatchView):
 		contentViews = list( InnerFragment.map( node.getContents() ) )
 
 		b = Body( contentViews ).padX( _worksheetMargin )
-		b = WorksheetRichTextEditor.instance.editableBlock( node, b )
+		b = WorksheetRichTextController.instance.editableBlock( node, b )
 		return b
 	
 	
@@ -312,7 +312,7 @@ class WorksheetEditor (MethodDispatchView):
 			p = TitleBar( text )
 		else:
 			p = NormalText( text )
-		p = WorksheetRichTextEditor.instance.editableParagraph( node, p )
+		p = WorksheetRichTextController.instance.editableParagraph( node, p )
 		p = _applyParagraphShortcuts( p )
 		return p
 	
@@ -322,7 +322,7 @@ class WorksheetEditor (MethodDispatchView):
 		text = node.getText()
 		styleSheet = node.getStyleSheet()
 		p = styleSheet.applyTo( RichSpan( text ) )
-		p = WorksheetRichTextEditor.instance.editableSpan( node, p )
+		p = WorksheetRichTextController.instance.editableSpan( node, p )
 		return p
 
 
@@ -332,7 +332,7 @@ class WorksheetEditor (MethodDispatchView):
 
 		def _linkContextMenuFactory(element, menu):
 			def _onRemove(control, event):
-				WorksheetRichTextEditor.instance.deleteInlineEmbedContainingElement( element )
+				WorksheetRichTextController.instance.deleteInlineEmbedContainingElement( element )
 
 
 			class _TextListener (TextEntry.TextEntryListener):
@@ -364,7 +364,7 @@ class WorksheetEditor (MethodDispatchView):
 
 		p = _linkStyle.applyTo( ApplyStyleSheetFromAttribute( Controls.hyperlinkAttrs, Label( node.text ) ) )
 		p = p.withContextMenuInteractor( _linkContextMenuFactory )
-		p = WorksheetRichTextEditor.instance.editableInlineEmbed( node, p )
+		p = WorksheetRichTextController.instance.editableInlineEmbed( node, p )
 		return p
 
 
@@ -389,7 +389,7 @@ class WorksheetEditor (MethodDispatchView):
 			p = TitleBar( '' )
 		else:
 			p = NormalText( '' )
-		p = WorksheetRichTextEditor.instance.editableParagraph( node, p )
+		p = WorksheetRichTextController.instance.editableParagraph( node, p )
 		p = _applyParagraphShortcuts( p )
 		return p
 
@@ -411,7 +411,7 @@ class WorksheetEditor (MethodDispatchView):
 			node.setStyle( style )
 			
 		def _onDeleteButton(button, event):
-			WorksheetRichTextEditor.instance.deleteParagraphContainingElement( button.getElement() )
+			WorksheetRichTextController.instance.deleteParagraphContainingElement( button.getElement() )
 
 		codeView = Python2.python2EditorPerspective.applyTo( InnerFragment( node.getCode() ) )
 		
@@ -442,7 +442,7 @@ class WorksheetEditor (MethodDispatchView):
 
 		p = _pythonCodeBox.surround( headerBox.padY( 0.0, 3.0 ), box.padY( 5.0, 0.0 ) )
 
-		p = WorksheetRichTextEditor.instance.editableParagraphEmbed( node, p )
+		p = WorksheetRichTextController.instance.editableParagraphEmbed( node, p )
 		return p.alignHExpand()
 
 
@@ -455,7 +455,7 @@ class WorksheetEditor (MethodDispatchView):
 		p = ObjectBorder( valueView )   if not hideFrame   else valueView
 
 		p = p.withContextMenuInteractor( _inlineEmbeddedObjectContextMenuFactory )
-		p = WorksheetRichTextEditor.instance.editableInlineEmbed( node, p )
+		p = WorksheetRichTextController.instance.editableInlineEmbed( node, p )
 		return p
 
 
@@ -469,7 +469,7 @@ class WorksheetEditor (MethodDispatchView):
 		p = ObjectBorder( valueView )   if not hideFrame   else valueView
 
 		p = p.withContextMenuInteractor( _paragraphEmbeddedObjectContextMenuFactory )
-		p = WorksheetRichTextEditor.instance.editableParagraphEmbed( node, p )
+		p = WorksheetRichTextController.instance.editableParagraphEmbed( node, p )
 		return p
 
 
@@ -487,7 +487,7 @@ _worksheetEditorCommands = CommandSet( 'LarchCore.Worksheet.Editor', [ _refreshC
 
 
 _view = WorksheetEditor()
-perspective2 = SequentialEditorPerspective( _view.fragmentViewFunction, WorksheetRichTextEditor.instance )
+perspective2 = SequentialEditorPerspective( _view.fragmentViewFunction, WorksheetRichTextController.instance )
 
 
 class WorksheetEditorSubject (Subject):

@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Editor.Sequential.Item;
 
-import BritefuryJ.Editor.Sequential.SequentialEditor;
+import BritefuryJ.Editor.Sequential.SequentialController;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
@@ -14,12 +14,12 @@ import BritefuryJ.StyleSheet.StyleValues;
 
 public class StructuralItem extends Pres
 {
-	private SequentialEditor editor;
+	private SequentialController editor;
 	private Object model;
 	private Pres child;
 	
 	
-	public StructuralItem(SequentialEditor editor, Object model, Object child)
+	public StructuralItem(SequentialController editor, Object model, Object child)
 	{
 		this.editor = editor;
 		this.model = model;
@@ -33,7 +33,7 @@ public class StructuralItem extends Pres
 		LSElement element = child.present( ctx, style );
 		if ( editor.isClearNeighbouringStructuresEnabled() )
 		{
-			element.addTreeEventListener( SequentialEditor.getClearNeighbouringStructuralValueListener() );
+			element.addTreeEventListener( SequentialController.getClearNeighbouringStructuralValueListener() );
 		}
 		element.setFixedValue( model );
 		return element;

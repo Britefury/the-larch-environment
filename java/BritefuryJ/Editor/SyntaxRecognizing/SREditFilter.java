@@ -7,15 +7,15 @@
 package BritefuryJ.Editor.SyntaxRecognizing;
 
 import BritefuryJ.Editor.Sequential.EditFilter;
-import BritefuryJ.Editor.Sequential.SequentialEditor;
+import BritefuryJ.Editor.Sequential.SequentialController;
 
 public abstract class SREditFilter extends EditFilter
 {
-	protected abstract SyntaxRecognizingEditor getSyntaxRecognizingEditor();
+	protected abstract SyntaxRecognizingController getSyntaxRecognizingEditor();
 	
 	
 	@Override
-	protected SequentialEditor getSequentialEditor()
+	protected SequentialController getSequentialEditor()
 	{
 		return getSyntaxRecognizingEditor();
 	}

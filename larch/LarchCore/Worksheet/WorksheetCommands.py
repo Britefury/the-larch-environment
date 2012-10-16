@@ -9,13 +9,13 @@ from BritefuryJ.Command import CommandSet, CommandSetRegistry
 
 from BritefuryJ.LSpace.TextFocus import TextSelection
 
-from LarchCore.Worksheet.WorksheetEditor.RichTextEditor import WorksheetRichTextEditor
+from LarchCore.Worksheet.WorksheetEditor.RichTextController import WorksheetRichTextController
 from LarchCore.Worksheet.WorksheetEditor import EditorSchema
 
 
 def _isValidInsertPoint(marker):
-	editor = WorksheetRichTextEditor.getEditorForElement( marker.element )
-	return editor is WorksheetRichTextEditor.instance
+	editor = WorksheetRichTextController.getEditorForElement( marker.element )
+	return editor is WorksheetRichTextController.instance
 
 
 def InlineEmbeddedObjectAtCaretAction(valueAtCaretFactory):
@@ -33,7 +33,7 @@ def InlineEmbeddedObjectAtCaretAction(valueAtCaretFactory):
 			if value is not None:
 				def _makeInline():
 					return EditorSchema.InlineEmbeddedObjectEditor.newInlineEmbeddedObjectModel( value )
-				WorksheetRichTextEditor.instance.insertInlineEmbedAtMarker( caret.marker, _makeInline )
+				WorksheetRichTextController.instance.insertInlineEmbedAtMarker( caret.marker, _makeInline )
 				return True
 
 		return False
@@ -56,7 +56,7 @@ def ParagraphEmbeddedObjectAtCaretAction(valueAtCaretFactory):
 			if value is not None:
 				def _makeParagraph():
 					return EditorSchema.ParagraphEmbeddedObjectEditor.newParagraphEmbeddedObject( value )
-				WorksheetRichTextEditor.instance.insertParagraphAtMarker( caret.marker, _makeParagraph )
+				WorksheetRichTextController.instance.insertParagraphAtMarker( caret.marker, _makeParagraph )
 				return True
 
 		return False

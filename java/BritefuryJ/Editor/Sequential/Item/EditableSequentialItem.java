@@ -8,7 +8,7 @@ package BritefuryJ.Editor.Sequential.Item;
 
 import java.util.List;
 
-import BritefuryJ.Editor.Sequential.SequentialEditor;
+import BritefuryJ.Editor.Sequential.SequentialController;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.TreeEventListener;
 import BritefuryJ.Pres.Pres;
@@ -17,19 +17,19 @@ import BritefuryJ.StyleSheet.StyleValues;
 
 public class EditableSequentialItem extends Pres
 {
-	private SequentialEditor editor;
+	private SequentialController editor;
 	private TreeEventListener editListeners[];
 	private Pres child;
 	
 	
-	public EditableSequentialItem(SequentialEditor editor, TreeEventListener editListener, Object child)
+	public EditableSequentialItem(SequentialController editor, TreeEventListener editListener, Object child)
 	{
 		this.editor = editor;
 		this.editListeners = new TreeEventListener[] { editListener };
 		this.child = coerceNonNull( child );
 	}
 
-	public EditableSequentialItem(SequentialEditor editor, List<TreeEventListener> editListeners, Object child)
+	public EditableSequentialItem(SequentialController editor, List<TreeEventListener> editListeners, Object child)
 	{
 		this.editor = editor;
 		this.editListeners = editListeners.toArray( new TreeEventListener[editListeners.size()] );
@@ -43,7 +43,7 @@ public class EditableSequentialItem extends Pres
 		LSElement element = child.present( ctx, style );
 		if ( editor.isClearNeighbouringStructuresEnabled() )
 		{
-			element.addTreeEventListener( SequentialEditor.getClearNeighbouringStructuralValueListener() );
+			element.addTreeEventListener( SequentialController.getClearNeighbouringStructuralValueListener() );
 		}
 		for (TreeEventListener listener: editListeners)
 		{

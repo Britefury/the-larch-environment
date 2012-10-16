@@ -26,7 +26,7 @@ public class EdBlock extends EdNode
 	}
 	
 	
-	public void setModelContents(RichTextEditor editor, List<Object> xs)
+	public void setModelContents(RichTextController editor, List<Object> xs)
 	{
 		ArrayList<EdNode> ed = new ArrayList<EdNode>();
 		ed.ensureCapacity( xs.size() );
@@ -50,7 +50,7 @@ public class EdBlock extends EdNode
 	
 	
 	@Override
-	protected Object buildModel(RichTextEditor editor)
+	protected Object buildModel(RichTextController editor)
 	{
 		throw new RuntimeException( "Cannot build model for an EdBlock" );
 	}

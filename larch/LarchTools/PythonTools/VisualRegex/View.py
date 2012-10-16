@@ -46,7 +46,7 @@ from BritefuryJ.Editor.Sequential.EditFilter import HandleEditResult
 from BritefuryJ.Editor.Sequential.Item import *
 from BritefuryJ.Editor.SyntaxRecognizing.Precedence import PrecedenceHandler
 from BritefuryJ.Editor.SyntaxRecognizing import SREInnerFragment, ParsingEditFilter
-from BritefuryJ.Editor.SyntaxRecognizing.SyntaxRecognizingEditor import EditMode
+from BritefuryJ.Editor.SyntaxRecognizing.SyntaxRecognizingController import EditMode
 
 from BritefuryJ.ModelAccess.DocModel import *
 
@@ -54,7 +54,7 @@ from BritefuryJ.ModelAccess.DocModel import *
 
 from LarchTools.PythonTools.VisualRegex import Schema
 from LarchTools.PythonTools.VisualRegex.Parser import VisualRegexGrammar
-from LarchTools.PythonTools.VisualRegex.SREditor import VisualRegexSyntaxRecognizingEditor
+from LarchTools.PythonTools.VisualRegex.SRController import VisualRegexSyntaxRecognizingController
 
 
 PRECEDENCE_NONE = -1
@@ -306,7 +306,7 @@ class VREView (MethodDispatchView):
 		super( VREView, self ).__init__()
 		self._parser = grammar
 
-		editor = VisualRegexSyntaxRecognizingEditor.instance
+		editor = VisualRegexSyntaxRecognizingController.instance
 
 		self._expr = editor.parsingEditFilter( 'Expression', grammar.regex(), vreReplaceNode )
 		self._exprOuterValid = editor.parsingEditFilter( 'Expression-outer-valid', grammar.regex(), _commitExprOuterValid, _commitExprOuterEmpty )
@@ -345,7 +345,7 @@ class VREView (MethodDispatchView):
 			elif isinstance( x, DMObjectInterface ):
 				view = SREInnerFragment( x, PRECEDENCE_CONTAINER_UNPARSED, EditMode.DISPLAY )
 				#<NO_TREE_EVENT_LISTENER>
-				view = StructuralItem( VisualRegexSyntaxRecognizingEditor.instance, x, view )
+				view = StructuralItem( VisualRegexSyntaxRecognizingController.instance, x, view )
 				return view
 			else:
 				raise TypeError, 'UNPARSED should contain a list of only strings or nodes, not a %s'  %  ( type( x ), )
@@ -521,4 +521,4 @@ class VREView (MethodDispatchView):
 
 _parser = VisualRegexGrammar()
 _view = VREView( _parser )
-perspective = SequentialEditorPerspective( _view.fragmentViewFunction, VisualRegexSyntaxRecognizingEditor.instance )
+perspective = SequentialEditorPerspective( _view.fragmentViewFunction, VisualRegexSyntaxRecognizingController.instance )

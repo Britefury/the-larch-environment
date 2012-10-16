@@ -11,18 +11,18 @@ import BritefuryJ.LSpace.EditEvent;
 
 public class SelectionEditTreeEvent extends EditEvent
 {
-	protected SequentialEditor sequentialEditor;
+	protected SequentialController sequentialEditor;
 	protected LSElement sourceElement;
 	
 	
-	protected SelectionEditTreeEvent(SequentialEditor sequentialEditor, LSElement sourceElement)
+	protected SelectionEditTreeEvent(SequentialController sequentialEditor, LSElement sourceElement)
 	{
 		this.sequentialEditor = sequentialEditor;
 		this.sourceElement = sourceElement;
 	}
 	
 	
-	public SequentialEditor getSequentialEditor()
+	public SequentialController getSequentialEditor()
 	{
 		return sequentialEditor;
 	}

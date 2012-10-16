@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.WeakHashMap;
 import java.util.regex.Pattern;
 
-import BritefuryJ.Editor.Sequential.SequentialRichStringEditor;
+import BritefuryJ.Editor.Sequential.SequentialRichStringController;
 import BritefuryJ.Editor.SyntaxRecognizing.Precedence.PrecedenceHandler;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.LSpace.EditEvent;
@@ -21,7 +21,7 @@ import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Util.HashUtils;
 import BritefuryJ.Util.RichString.RichString;
 
-public class SyntaxRecognizingEditor extends SequentialRichStringEditor
+public class SyntaxRecognizingController extends SequentialRichStringController
 {
 	public static enum EditMode
 	{
@@ -53,9 +53,9 @@ public class SyntaxRecognizingEditor extends SequentialRichStringEditor
 		
 		
 		@Override
-		protected SyntaxRecognizingEditor getSyntaxRecognizingEditor()
+		protected SyntaxRecognizingController getSyntaxRecognizingEditor()
 		{
-			return SyntaxRecognizingEditor.this;
+			return SyntaxRecognizingController.this;
 		}
 		
 		@Override
@@ -131,9 +131,9 @@ public class SyntaxRecognizingEditor extends SequentialRichStringEditor
 		
 		
 		@Override
-		protected SyntaxRecognizingEditor getSyntaxRecognizingEditor()
+		protected SyntaxRecognizingController getSyntaxRecognizingEditor()
 		{
-			return SyntaxRecognizingEditor.this;
+			return SyntaxRecognizingController.this;
 		}
 		
 		@Override
@@ -173,9 +173,9 @@ public class SyntaxRecognizingEditor extends SequentialRichStringEditor
 		
 		
 		@Override
-		protected SyntaxRecognizingEditor getSyntaxRecognizingEditor()
+		protected SyntaxRecognizingController getSyntaxRecognizingEditor()
 		{
-			return SyntaxRecognizingEditor.this;
+			return SyntaxRecognizingController.this;
 		}
 		
 		@Override
@@ -230,9 +230,9 @@ public class SyntaxRecognizingEditor extends SequentialRichStringEditor
 		
 		
 		@Override
-		protected SyntaxRecognizingEditor getSyntaxRecognizingEditor()
+		protected SyntaxRecognizingController getSyntaxRecognizingEditor()
 		{
-			return SyntaxRecognizingEditor.this;
+			return SyntaxRecognizingController.this;
 		}
 	}
 
@@ -250,7 +250,7 @@ public class SyntaxRecognizingEditor extends SequentialRichStringEditor
 	private TopLevelNodeEditFilter cachedTopLevel = new TopLevelNodeEditFilter();
 	
 	
-	public SyntaxRecognizingEditor(String editorName)
+	public SyntaxRecognizingController(String editorName)
 	{
 		super( editorName );
 	}

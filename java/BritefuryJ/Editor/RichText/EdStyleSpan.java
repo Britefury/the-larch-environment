@@ -98,7 +98,7 @@ public class EdStyleSpan extends EdAbstractText
 
 
 	@Override
-	protected Object buildModel(RichTextEditor editor)
+	protected Object buildModel(RichTextController editor)
 	{
 		return editor.buildSpan( editor.editorModelListToModelList( contents ), styleAttrs );
 	}

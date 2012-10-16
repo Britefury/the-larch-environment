@@ -22,7 +22,7 @@ import BritefuryJ.LSpace.TextFocus.TextSelection;
 import BritefuryJ.Pres.Primitive.Region;
 import BritefuryJ.Util.RichString.RichString;
 
-public abstract class SequentialEditor
+public abstract class SequentialController
 {
 	public static interface HandleEditEventFn
 	{
@@ -125,9 +125,9 @@ public abstract class SequentialEditor
 		
 
 		@Override
-		protected SequentialEditor getSequentialEditor()
+		protected SequentialController getSequentialEditor()
 		{
-			return SequentialEditor.this;
+			return SequentialController.this;
 		}
 
 		@Override
@@ -152,9 +152,9 @@ public abstract class SequentialEditor
 		
 
 		@Override
-		protected SequentialEditor getSequentialEditor()
+		protected SequentialController getSequentialEditor()
 		{
-			return SequentialEditor.this;
+			return SequentialController.this;
 		}
 
 		@Override
@@ -174,7 +174,7 @@ public abstract class SequentialEditor
 	
 	
 	
-	public SequentialEditor(String editorName)
+	public SequentialController(String editorName)
 	{
 		this.clipboardHandler = new SequentialClipboardHandler( this );
 		this.editorName = editorName;
@@ -220,7 +220,7 @@ public abstract class SequentialEditor
 	
 	
 	
-	public static SequentialEditor getEditorForElement(LSElement element)
+	public static SequentialController getEditorForElement(LSElement element)
 	{
 		SequentialClipboardHandler clipboardHandler = (SequentialClipboardHandler)element.getRegion().getClipboardHandler();
 		return clipboardHandler.getSequentialEditor();
@@ -298,7 +298,7 @@ public abstract class SequentialEditor
 		return SequentialBuffer.class;
 	}
 	
-	public boolean canImportFromSequentialEditor(SequentialEditor editor)
+	public boolean canImportFromSequentialEditor(SequentialController editor)
 	{
 		return editor == this;
 	}

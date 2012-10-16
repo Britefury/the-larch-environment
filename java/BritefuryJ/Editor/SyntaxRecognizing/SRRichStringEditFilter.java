@@ -6,16 +6,16 @@
 //##************************
 package BritefuryJ.Editor.SyntaxRecognizing;
 
-import BritefuryJ.Editor.Sequential.SequentialEditor;
+import BritefuryJ.Editor.Sequential.SequentialController;
 import BritefuryJ.Editor.Sequential.RichStringEditFilter;
 
 public abstract class SRRichStringEditFilter extends RichStringEditFilter
 {
-	protected abstract SyntaxRecognizingEditor getSyntaxRecognizingEditor();
+	protected abstract SyntaxRecognizingController getSyntaxRecognizingEditor();
 	
 	
 	@Override
-	protected SequentialEditor getSequentialEditor()
+	protected SequentialController getSequentialEditor()
 	{
 		return getSyntaxRecognizingEditor();
 	}

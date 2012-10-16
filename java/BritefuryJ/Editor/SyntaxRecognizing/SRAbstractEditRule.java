@@ -16,7 +16,7 @@ public abstract class SRAbstractEditRule extends AbstractEditRule
 	private PrecedenceHandler precedenceHandler;
 	
 	
-	public SRAbstractEditRule(SyntaxRecognizingEditor editor, PrecedenceHandler precedenceHandler)
+	public SRAbstractEditRule(SyntaxRecognizingController editor, PrecedenceHandler precedenceHandler)
 	{
 		super( editor );
 		this.precedenceHandler = precedenceHandler;

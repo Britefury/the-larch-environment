@@ -40,7 +40,7 @@ from BritefuryJ.Editor.Sequential import SequentialEditorPerspective
 from BritefuryJ.Editor.Sequential.Item import *
 from BritefuryJ.Editor.SyntaxRecognizing.Precedence import PrecedenceHandler
 from BritefuryJ.Editor.SyntaxRecognizing import SREInnerFragment
-from BritefuryJ.Editor.SyntaxRecognizing.SyntaxRecognizingEditor import EditMode
+from BritefuryJ.Editor.SyntaxRecognizing.SyntaxRecognizingController import EditMode
 
 from BritefuryJ.Live import LiveFunction
 
@@ -53,7 +53,7 @@ from LarchCore.Languages.Python2 import PythonCommands
 
 from LarchCore.Languages.Python2.PythonEditor.Parser import Python2Grammar
 from LarchCore.Languages.Python2.PythonEditor.PythonEditOperations import *
-from LarchCore.Languages.Python2.PythonEditor.SREditor import *
+from LarchCore.Languages.Python2.PythonEditor.SRController import *
 from LarchCore.Languages.Python2.PythonEditor.Keywords import *
 from LarchCore.Languages.Python2.PythonEditor.Precedence import *
 from LarchCore.Languages.Python2.PythonEditor.PythonEditorCombinators import *
@@ -70,14 +70,14 @@ def _onIndent(element):
 	fragment = element.getFragmentContext()
 	node = fragment.getModel()
 
-	editor = PythonSyntaxRecognizingEditor.getEditorForElement( element )
+	editor = PythonSyntaxRecognizingController.getEditorForElement( element )
 	editor.indent( element, fragment, node )
 
 def _onDedent(element):
 	fragment = element.getFragmentContext()
 	node = fragment.getModel()
 
-	editor = PythonSyntaxRecognizingEditor.getEditorForElement( element )
+	editor = PythonSyntaxRecognizingController.getEditorForElement( element )
 	editor.dedent( element, fragment, node )
 
 
@@ -176,7 +176,7 @@ def compoundStatementEditor(pythonView, inheritedState, model, compoundBlocks):
 			raise TypeError, 'Compound block should be of the form (headerNode, headerContents, suite)  or  (headerNode, headerContents, suite, headerContainerFn)'
 
 		headerStatementLine = statementLine( headerContents )
-		headerStatementLine = SoftStructuralItem( PythonSyntaxRecognizingEditor.instance, headerNode, headerStatementLine )
+		headerStatementLine = SoftStructuralItem( PythonSyntaxRecognizingController.instance, headerNode, headerStatementLine )
 		headerStatementLine = _applyIndentationShortcuts( headerStatementLine )
 
 		if headerContainerFn is not None:
@@ -185,14 +185,14 @@ def compoundStatementEditor(pythonView, inheritedState, model, compoundBlocks):
 
 
 		if suite is not None:
-			indent = StructuralItem( PythonSyntaxRecognizingEditor.instance, Schema.Indent(), indentElement() )
+			indent = StructuralItem( PythonSyntaxRecognizingController.instance, Schema.Indent(), indentElement() )
 
 			lineViews = SREInnerFragment.map( suite, PRECEDENCE_NONE, EditMode.EDIT )
 
-			dedent = StructuralItem( PythonSyntaxRecognizingEditor.instance, Schema.Dedent(), dedentElement() )
+			dedent = StructuralItem( PythonSyntaxRecognizingController.instance, Schema.Dedent(), dedentElement() )
 
 			suiteElement = indentedBlock( indent, lineViews, dedent )
-			suiteElement = SoftStructuralItem( PythonSyntaxRecognizingEditor.instance, pythonView._makeCompoundSuiteEditFilter( suite ), Schema.IndentedBlock( suite=suite ), suiteElement )
+			suiteElement = SoftStructuralItem( PythonSyntaxRecognizingController.instance, pythonView._makeCompoundSuiteEditFilter( suite ), Schema.IndentedBlock( suite=suite ), suiteElement )
 
 			statementContents.extend( [ headerStatementLine.alignHExpand(), suiteElement.alignHExpand() ] )
 		else:
@@ -561,7 +561,7 @@ def SpecialFormExpression(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
 		v = v.withContextMenuInteractor( _specialFormExprContextMenuFactory )
-		return StructuralItem( PythonSyntaxRecognizingEditor.instance, model, v )
+		return StructuralItem( PythonSyntaxRecognizingController.instance, model, v )
 	return redecorateDispatchMethod( method, _m )
 
 
@@ -569,7 +569,7 @@ def SpecialFormExpression(method):
 def SpecialFormStatement(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
-		v = StructuralItem( PythonSyntaxRecognizingEditor.instance, model, v )
+		v = StructuralItem( PythonSyntaxRecognizingController.instance, model, v )
 		v = specialFormStatementLine( v )
 		v = self._specialFormStatementEditRule.applyToFragment( v, model, inheritedState )
 		v = _applyIndentationShortcuts( v )
@@ -581,7 +581,7 @@ def SpecialFormStatement(method):
 def EmbeddedObjectExpression(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
-		return StructuralItem( PythonSyntaxRecognizingEditor.instance, model, v )
+		return StructuralItem( PythonSyntaxRecognizingController.instance, model, v )
 	return redecorateDispatchMethod( method, _m )
 
 
@@ -591,7 +591,7 @@ class Python2View (MethodDispatchView):
 		super( Python2View, self ).__init__()
 		self._parser = grammar
 		
-		editor = PythonSyntaxRecognizingEditor.instance
+		editor = PythonSyntaxRecognizingController.instance
 		
 		self._expr = editor.parsingEditFilter( 'Expression', grammar.expression(), pyReplaceNode )
 		self._stmt = editor.parsingEditFilter( 'Statement', grammar.simpleSingleLineStatementValid(), pyReplaceNode )
@@ -615,10 +615,10 @@ class Python2View (MethodDispatchView):
 
 		
 	def _makeSuiteEditFilter(self, suite):
-		return PythonSyntaxRecognizingEditor.instance.parsingEditFilter( 'Suite', self._parser.suite(), _makeSuiteCommitFn( suite ) )
+		return PythonSyntaxRecognizingController.instance.parsingEditFilter( 'Suite', self._parser.suite(), _makeSuiteCommitFn( suite ) )
 
 	def _makeCompoundSuiteEditFilter(self, suite):
-		return PythonSyntaxRecognizingEditor.instance.parsingEditFilter( 'Suite', self._parser.compoundSuite(), _makeSuiteCommitFn( suite ) )
+		return PythonSyntaxRecognizingController.instance.parsingEditFilter( 'Suite', self._parser.compoundSuite(), _makeSuiteCommitFn( suite ) )
 
 		
 		
@@ -637,7 +637,7 @@ class Python2View (MethodDispatchView):
 		s = s.withCommands( PythonCommands.pythonTargetCommands )
 		s = s.withCommands( PythonCommands.pythonCommands )
 		s = ApplyStyleSheetFromAttribute( PythonEditorStyle.paragraphIndentationStyle, s )
-		s = SoftStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._makeSuiteEditFilter( suite ), self._topLevel ], suite, s )
+		s = SoftStructuralItem( PythonSyntaxRecognizingController.instance, [ self._makeSuiteEditFilter( suite ), self._topLevel ], suite, s )
 		return s
 
 
@@ -655,7 +655,7 @@ class Python2View (MethodDispatchView):
 		s = s.withCommands( PythonCommands.pythonTargetCommands )
 		s = s.withCommands( PythonCommands.pythonCommands )
 		s = ApplyStyleSheetFromAttribute( PythonEditorStyle.paragraphIndentationStyle, s )
-		s = SoftStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._makeSuiteEditFilter( suite ), self._topLevel ], suite, s )
+		s = SoftStructuralItem( PythonSyntaxRecognizingController.instance, [ self._makeSuiteEditFilter( suite ), self._topLevel ], suite, s )
 		return s
 
 
@@ -714,7 +714,7 @@ class Python2View (MethodDispatchView):
 			elif isinstance( x, DMObjectInterface ):
 				view = SREInnerFragment( x, PRECEDENCE_CONTAINER_UNPARSED, EditMode.DISPLAY )
 				#<NO_TREE_EVENT_LISTENER>
-				view = StructuralItem( PythonSyntaxRecognizingEditor.instance, x, view )
+				view = StructuralItem( PythonSyntaxRecognizingController.instance, x, view )
 				return view
 			else:
 				raise TypeError, 'UNPARSED should contain a list of only strings or nodes, not a %s'  %  ( type( x ), )
@@ -1236,7 +1236,7 @@ class Python2View (MethodDispatchView):
 			raise TypeError, 'Value of \'quote\' should be a DMObject'
 
 
-		return quote( valueView, title, PythonSyntaxRecognizingEditor.instance )
+		return quote( valueView, title, PythonSyntaxRecognizingController.instance )
 
 
 
@@ -1250,7 +1250,7 @@ class Python2View (MethodDispatchView):
 			raise TypeError, 'Value of \'unquote\' should be a DMObject'
 
 
-		return unquote( valueView, 'UNQUOTE', PythonSyntaxRecognizingEditor.instance )
+		return unquote( valueView, 'UNQUOTE', PythonSyntaxRecognizingController.instance )
 
 
 
@@ -1686,15 +1686,15 @@ class Python2View (MethodDispatchView):
 	# Indented block
 	@DMObjectNodeDispatchMethod( Schema.IndentedBlock )
 	def IndentedBlock(self, fragment, inheritedState, model, suite):
-		indent = StructuralItem( PythonSyntaxRecognizingEditor.instance, Schema.Indent(), indentElement() )
+		indent = StructuralItem( PythonSyntaxRecognizingController.instance, Schema.Indent(), indentElement() )
 
 		lineViews = SREInnerFragment.map( suite, PRECEDENCE_NONE, EditMode.EDIT )
 
-		dedent = StructuralItem( PythonSyntaxRecognizingEditor.instance, Schema.Dedent(), dedentElement() )
+		dedent = StructuralItem( PythonSyntaxRecognizingController.instance, Schema.Dedent(), dedentElement() )
 
 		suiteElement = badIndentedBlock( indent, lineViews, dedent )
-		suiteElement = SoftStructuralItem( PythonSyntaxRecognizingEditor.instance,
-		                                       PythonSyntaxRecognizingEditor.instance.parsingEditFilter( 'Suite', self._parser.compoundSuite(), _makeSuiteCommitFn( suite ) ),
+		suiteElement = SoftStructuralItem( PythonSyntaxRecognizingController.instance,
+		                                       PythonSyntaxRecognizingController.instance.parsingEditFilter( 'Suite', self._parser.compoundSuite(), _makeSuiteCommitFn( suite ) ),
 		                                       model, suiteElement )
 
 		return suiteElement
@@ -1809,7 +1809,7 @@ class Python2View (MethodDispatchView):
 
 _parser = Python2Grammar()
 _view = Python2View( _parser )
-perspective = SequentialEditorPerspective( _view.fragmentViewFunction, PythonSyntaxRecognizingEditor.instance )
+perspective = SequentialEditorPerspective( _view.fragmentViewFunction, PythonSyntaxRecognizingController.instance )
 
 
 
