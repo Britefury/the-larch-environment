@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.Editor.Sequential;
 
+import java.util.List;
+
 import BritefuryJ.Editor.Sequential.EditFilter.HandleEditResult;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.LSpace.EditEvent;
@@ -236,6 +238,17 @@ public abstract class SequentialEditor
 		return new _FnRichStringEditFilter( handleRichStringFn );
 	}
 	
+	
+	
+	public AbstractEditRule editRule(List<TreeEventListener> editListeners)
+	{
+		return new EditRule( this, editListeners );
+	}
+	
+	public AbstractEditRule softStructuralEditRule(List<TreeEventListener> editListeners)
+	{
+		return new SoftStructuralEditRule( this, editListeners );
+	}
 	
 	
 
