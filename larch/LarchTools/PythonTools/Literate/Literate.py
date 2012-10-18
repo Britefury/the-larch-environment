@@ -38,7 +38,7 @@ def _dragSourceCreateSourceData(element, aspect):
 	return FragmentData( l._new_reference(), element )
 
 
-_dragSource = ObjectDndHandler.DragSource( FragmentData, ObjectDndHandler.ASPECT_NORMAL, _dragSourceCreateSourceData )
+_dragSource = ObjectDndHandler.DragSource( FragmentData, _dragSourceCreateSourceData )
 
 
 
