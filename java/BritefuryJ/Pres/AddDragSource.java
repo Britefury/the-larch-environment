@@ -27,9 +27,14 @@ public class AddDragSource extends Pres
 		this( child, new ObjectDndHandler.DragSource( dataType, sourceAspects, sourceDataFn, exportDoneFn ) );
 	}
 	
-	public AddDragSource(Pres child, Class<?> dataType, int sourceAspects, ObjectDndHandler.SourceDataFn sourceDataFn)
+	public AddDragSource(Pres child, Class<?> dataType, ObjectDndHandler.SourceDataFn sourceDataFn, ObjectDndHandler.ExportDoneFn exportDoneFn)
 	{
-		this( child, new ObjectDndHandler.DragSource( dataType, sourceAspects, sourceDataFn ) );
+		this( child, new ObjectDndHandler.DragSource( dataType, sourceDataFn, exportDoneFn ) );
+	}
+	
+	public AddDragSource(Pres child, Class<?> dataType, ObjectDndHandler.SourceDataFn sourceDataFn)
+	{
+		this( child, new ObjectDndHandler.DragSource( dataType, sourceDataFn ) );
 	}
 	
 	
