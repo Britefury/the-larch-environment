@@ -20,7 +20,6 @@ import BritefuryJ.LSpace.FragmentContext;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.PresentationComponent;
 import BritefuryJ.LSpace.TreeEventListener;
-import BritefuryJ.LSpace.Input.DndHandler;
 import BritefuryJ.LSpace.Input.ObjectDndHandler;
 import BritefuryJ.LSpace.Interactor.AbstractElementInteractor;
 import BritefuryJ.LSpace.Interactor.ContextMenuElementInteractor;
@@ -216,12 +215,12 @@ public abstract class Pres
 	
 	public AddDragSource withDragSource(Class<?> dataType, ObjectDndHandler.SourceDataFn sourceDataFn, ObjectDndHandler.ExportDoneFn exportDoneFn)
 	{
-		return new AddDragSource( this, dataType, DndHandler.ASPECT_NORMAL, sourceDataFn, exportDoneFn );
+		return new AddDragSource( this, dataType, sourceDataFn, exportDoneFn );
 	}
 	
 	public AddDragSource withDragSource(Class<?> dataType, ObjectDndHandler.SourceDataFn sourceDataFn)
 	{
-		return new AddDragSource( this, dataType, DndHandler.ASPECT_NORMAL, sourceDataFn );
+		return new AddDragSource( this, dataType, sourceDataFn );
 	}
 	
 	

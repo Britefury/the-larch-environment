@@ -126,7 +126,8 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	};
 	
 
-	private static final ObjectDndHandler.DragSource fragmentDragSource = new ObjectDndHandler.DragSource( FragmentData.class, DndHandler.ASPECT_DOC_NODE, fragmentDragSourceFn );
+	private static final ObjectDndHandler.DragSource fragmentDragSource = new ObjectDndHandler.DragSource( FragmentData.class, DndHandler.ASPECT_DOC_NODE,
+			fragmentDragSourceFn, null );
 	
 	
 	
