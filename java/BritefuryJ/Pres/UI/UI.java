@@ -9,6 +9,7 @@ package BritefuryJ.Pres.UI;
 import java.awt.Color;
 
 import BritefuryJ.AttributeTable.AttributeNamespace;
+import BritefuryJ.AttributeTable.AttributeNonNull;
 import BritefuryJ.AttributeTable.InheritedAttributeNonNull;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleSheet;
@@ -41,6 +42,9 @@ public class UI
 	public static final InheritedAttributeNonNull titleTextAttrs = new InheritedAttributeNonNull( uiNamespace, "titleTextAttrs", StyleSheet.class,
 			    StyleSheet.style( Primitive.fontSize.as( 40 ), Primitive.foreground.as( titleColour ) ) );
 
+	public static final InheritedAttributeNonNull notesTextAttrs = new InheritedAttributeNonNull( uiNamespace, "notesTextAttrs", StyleSheet.class,
+			    StyleSheet.style( Primitive.fontSize.as( 11 ), Primitive.foreground.as( new Color( 0.3f, 0.3f, 0.3f ) ) ) );
+
 	public static final InheritedAttributeNonNull h1TextAttrs = new InheritedAttributeNonNull( uiNamespace, "h1TextAttrs", StyleSheet.class,
 			    StyleSheet.style( Primitive.fontSize.as( 22 ), Primitive.foreground.as( h1Colour ) ) );
 	public static final InheritedAttributeNonNull h2TextAttrs = new InheritedAttributeNonNull( uiNamespace, "h2TextAttrs", StyleSheet.class,
@@ -49,9 +53,18 @@ public class UI
 		    StyleSheet.style( Primitive.fontSize.as( 14 ), Primitive.foreground.as( h3Colour) ) );
 	
 	
-	public static final InheritedAttributeNonNull sectionColumnStyle = new InheritedAttributeNonNull( uiNamespace, "sectionColumnStyle", StyleSheet.class,
+	public static final AttributeNonNull sectionColumnStyle = new AttributeNonNull( uiNamespace, "sectionColumnStyle", StyleSheet.class,
 			StyleSheet.style( Primitive.columnSpacing.as( 5.0 ) ) );
-	public static final InheritedAttributeNonNull sectionPadding = new InheritedAttributeNonNull( uiNamespace, "sectionPadding", Double.class, 10.0 );
+	public static final AttributeNonNull sectionPadding = new AttributeNonNull( uiNamespace, "sectionPadding", Double.class, 10.0 );
+	
+	
+	public static final AttributeNonNull formTitleSpacing = new AttributeNonNull( uiNamespace, "formTitleSpacing", Double.class, 10.0 );
+	public static final AttributeNonNull formNotesSpacing = new AttributeNonNull( uiNamespace, "formNotesSpacing", Double.class, 5.0 );
+	public static final AttributeNonNull formTableStyle = new AttributeNonNull( uiNamespace, "formTableStyle", StyleSheet.class,
+			StyleSheet.style( Primitive.tableRowSpacing.as( 10.0 ), Primitive.tableColumnSpacing.as( 20.0 ) ) );
+	public static final AttributeNonNull formHPadding = new AttributeNonNull( uiNamespace, "formHPadding", Double.class, 10.0 );
+	public static final AttributeNonNull formVPadding = new AttributeNonNull( uiNamespace, "formVPadding", Double.class, 5.0 );
+	
 
 
 
@@ -112,5 +125,24 @@ public class UI
 	public static StyleValues useH3TextAttrs(StyleValues style)
 	{
 		return style.useAttr( uiTextAttrs ).useAttr( h3TextAttrs );
+	}
+
+	
+
+	public static StyleSheet notesTextStyle(StyleValues style)
+	{
+		return style.get( uiTextAttrs, StyleSheet.class ).withAttrs( style.get( notesTextAttrs, StyleSheet.class ) );
+	}
+
+	
+	
+	public static StyleValues useFormAttrs(StyleValues style)
+	{
+		return style.useAttr( formTitleSpacing ).useAttr( formTableStyle ).useAttr( formHPadding ).useAttr( formVPadding );
+	}
+	
+	public static StyleValues useFormSectionAttrs(StyleValues style)
+	{
+		return style.useAttr( formNotesSpacing );
 	}
 }
