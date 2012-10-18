@@ -14,7 +14,6 @@ import BritefuryJ.Graphics.FillPainter;
 import BritefuryJ.Graphics.SolidBorder;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSProxy;
-import BritefuryJ.LSpace.Input.DndHandler;
 import BritefuryJ.LSpace.Input.ObjectDndHandler;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Pres.ElementRef;
@@ -73,7 +72,7 @@ public class DndTestPage extends TestPage
 			}
 		};
 		
-		return source.withDragSource( Pres.class, DndHandler.ASPECT_NORMAL, sourceDataFn );
+		return source.withDragSource( Pres.class, sourceDataFn );
 	}
 
 	protected Pres makeTextSource(final String text)

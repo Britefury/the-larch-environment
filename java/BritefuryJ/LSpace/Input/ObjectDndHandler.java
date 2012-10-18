@@ -73,9 +73,14 @@ public class ObjectDndHandler extends DndHandler
 			this.exportDoneFn = exportDoneFn;
 		}
 
-		public DragSource(Class<?> dataType, int sourceAspects, SourceDataFn sourceDataFn)
+		public DragSource(Class<?> dataType, SourceDataFn sourceDataFn, ExportDoneFn exportDoneFn)
 		{
-			this( dataType, sourceAspects, sourceDataFn, null );
+			this( dataType, ASPECT_NORMAL, sourceDataFn, exportDoneFn );
+		}
+
+		public DragSource(Class<?> dataType, SourceDataFn sourceDataFn)
+		{
+			this( dataType, ASPECT_NORMAL, sourceDataFn, null );
 		}
 		
 		

@@ -103,7 +103,7 @@ def _dragSourceCreateSourceData(element, aspect):
 	return ProjectDrag( _getModelOfPackageOrPageNameElement( element ) )
 
 
-_dragSource = ObjectDndHandler.DragSource( ProjectDrag, ObjectDndHandler.ASPECT_NORMAL, _dragSourceCreateSourceData )
+_dragSource = ObjectDndHandler.DragSource( ProjectDrag, _dragSourceCreateSourceData )
 
 
 
