@@ -70,6 +70,7 @@ public class LSRGrid extends LSContainerSequence implements TableElement
 	}
 	
 	
+	@Override
 	public boolean hasChildAt(int x, int y)
 	{
 		LayoutNodeRGrid gridLayout = (LayoutNodeRGrid)getLayoutNode();
@@ -91,6 +92,31 @@ public class LSRGrid extends LSContainerSequence implements TableElement
 		}
 		
 		return false;
+	}
+	
+	@Override
+	public LSElement getChildAt(int x, int y)
+	{
+		LayoutNodeRGrid gridLayout = (LayoutNodeRGrid)getLayoutNode();
+		
+		List<LSElement> rows = gridLayout.getLeaves();
+		if ( y < rows.size() )
+		{
+			LSElement rowElem = rows.get( y );
+			if ( rowElem instanceof LSGridRow )
+			{
+				LSGridRow row = (LSGridRow)rowElem;
+				LayoutNodeGridRow rowLayout = (LayoutNodeGridRow)row.getLayoutNode();
+				List<LSElement> rowLeaves = rowLayout.getLeaves();
+				return x < rowLeaves.size()  ?  rowLayout.getLeaves().get( x )  :  null;
+			}
+			else
+			{
+				return x == 0  ?  rowElem  :  null;
+			}
+		}
+		
+		return null;
 	}
 	
 	public int getChildColSpan(int x, int y)
@@ -121,6 +147,7 @@ public class LSRGrid extends LSContainerSequence implements TableElement
 		return hasChildAt( x, y )  ?  1  :  -1;
 	}
 	
+	@Override
 	public int[] getPositionOfChildCoveringCell(int x, int y)
 	{
 		LayoutNodeRGrid gridLayout = (LayoutNodeRGrid)getLayoutNode();
@@ -142,6 +169,12 @@ public class LSRGrid extends LSContainerSequence implements TableElement
 		}
 		
 		return null;
+	}
+
+	@Override
+	public LSElement getChildCoveringCell(int x, int y)
+	{
+		return getChildAt( x, y );
 	}
 
 	public int[] getCellPositionUnder(Point2 localPos)

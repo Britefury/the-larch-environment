@@ -36,6 +36,7 @@ public abstract class AbstractTableEditorInstance <ModelType>
 				TableElement table = (TableElement)element;
 				int pos[] = table.getCellPositionUnder( p );
 				pos = table.getPositionOfChildCoveringCell( pos[0], pos[1] );
+				LSElement cellElem = table.getChildAt( pos[0], pos[1] );
 				
 				int tx = elementXToTableX( pos[0] );
 				int ty = elementYToTableY( pos[1] );
@@ -44,10 +45,14 @@ public abstract class AbstractTableEditorInstance <ModelType>
 				int targetY = Math.max( ty, 0 );
 				
 				Target target = elem.getRootElement().getTarget();
-				if ( target instanceof TableTarget )
+				if ( target.getElement().isInSubtreeRootedAt( cellElem ) )
+				{
+					return null;
+				}
+				else if ( target instanceof TableTarget )
 				{
 					TableTarget tableTarget = (TableTarget)target;
-					if ( targetX == tableTarget.x  &&  targetY == tableTarget.y )
+					if ( table == tableTarget.table  &&  targetX == tableTarget.x  &&  targetY == tableTarget.y )
 					{
 						return null;
 					}

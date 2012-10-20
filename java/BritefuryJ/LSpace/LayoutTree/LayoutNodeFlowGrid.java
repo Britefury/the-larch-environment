@@ -285,6 +285,21 @@ public class LayoutNodeFlowGrid extends ArrangedSequenceLayoutNode
 		}
 	}
 
+	public LSElement getChildAt(int x, int y)
+	{
+		refreshSubtree();
+		if ( columnBounds != null )
+		{
+			int numColumns = columnBounds.getNumColumns();
+			int index = y * numColumns + x;
+			return index < leaves.length  ?  leaves[y * numColumns + x]  : null;
+		}
+		else
+		{
+			return null;
+		}
+	}
+
 
 	public int[] getPositionOfChildCoveringCell(int x, int y)
 	{
@@ -298,6 +313,11 @@ public class LayoutNodeFlowGrid extends ArrangedSequenceLayoutNode
 			}
 		}
 		return null;
+	}
+
+	public LSElement getChildCoveringCell(int x, int y)
+	{
+		return getChildAt( x, y );
 	}
 
 
