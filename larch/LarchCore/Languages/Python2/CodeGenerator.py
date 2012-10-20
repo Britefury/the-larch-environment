@@ -240,7 +240,7 @@ class Python2CodeGenerator (object):
 	
 	@DMObjectNodeDispatchMethod( Schema.ListTarget )
 	def ListTarget(self, node, targets):
-		return '[ '  +  ', '.join( [ self( i, PRECEDENCE_CONTAINER_ELEMENT )   for i in targets ] )  +  ' ]'
+		return '['  +  ', '.join( [ self( i, PRECEDENCE_CONTAINER_ELEMENT )   for i in targets ] )  +  ']'
 	
 	
 
@@ -261,7 +261,7 @@ class Python2CodeGenerator (object):
 	# List literal
 	@DMObjectNodeDispatchMethod( Schema.ListLiteral )
 	def ListLiteral(self, node, values):
-		return '[ '  +  ', '.join( [ self( i, PRECEDENCE_CONTAINER_ELEMENT )   for i in values ] )  +  ' ]'
+		return '['  +  ', '.join( [ self( i, PRECEDENCE_CONTAINER_ELEMENT )   for i in values ] )  +  ']'
 	
 	
 	
@@ -276,11 +276,11 @@ class Python2CodeGenerator (object):
 	
 	@DMObjectNodeDispatchMethod( Schema.ListComp )
 	def ListComp(self, node, resultExpr, comprehensionItems):
-		return '[ ' + self( resultExpr, PRECEDENCE_CONTAINER_ELEMENT ) + '   ' + '   '.join( [ self( x, PRECEDENCE_CONTAINER_ELEMENT )   for x in comprehensionItems ] )  +  ' ]'
+		return '[' + self( resultExpr, PRECEDENCE_CONTAINER_ELEMENT ) + '   ' + '   '.join( [ self( x, PRECEDENCE_CONTAINER_ELEMENT )   for x in comprehensionItems ] )  +  ']'
 	
 	@DMObjectNodeDispatchMethod( Schema.GeneratorExpr )
 	def GeneratorExpr(self, node, resultExpr, comprehensionItems):
-		return '( ' + self( resultExpr, PRECEDENCE_CONTAINER_ELEMENT ) + '   ' + '   '.join( [ self( c, PRECEDENCE_CONTAINER_ELEMENT )   for c in comprehensionItems ] )  +  ' )'
+		return '(' + self( resultExpr, PRECEDENCE_CONTAINER_ELEMENT ) + '   ' + '   '.join( [ self( c, PRECEDENCE_CONTAINER_ELEMENT )   for c in comprehensionItems ] )  +  ')'
 	
 	
 	
@@ -291,22 +291,22 @@ class Python2CodeGenerator (object):
 	
 	@DMObjectNodeDispatchMethod( Schema.DictLiteral )
 	def DictLiteral(self, node, values):
-		return '{ '  +  ', '.join( [ self( i, PRECEDENCE_CONTAINER_ELEMENT )   for i in values ] )  +  ' }'
+		return '{'  +  ', '.join( [ self( i, PRECEDENCE_CONTAINER_ELEMENT )   for i in values ] )  +  '}'
 
 	@DMObjectNodeDispatchMethod( Schema.DictComp )
 	def DictComp(self, node, resultExpr, comprehensionItems):
-		return '{ ' + self( resultExpr, PRECEDENCE_CONTAINER_ELEMENT ) + '   ' + '   '.join( [ self( x, PRECEDENCE_CONTAINER_ELEMENT )   for x in comprehensionItems ] )  +  ' }'
+		return '{' + self( resultExpr, PRECEDENCE_CONTAINER_ELEMENT ) + '   ' + '   '.join( [ self( x, PRECEDENCE_CONTAINER_ELEMENT )   for x in comprehensionItems ] )  +  '}'
 
 
 
 	# Set literal
 	@DMObjectNodeDispatchMethod( Schema.SetLiteral )
 	def SetLiteral(self, node, values):
-		return '{ '  +  ', '.join( [ self( i, PRECEDENCE_CONTAINER_ELEMENT )   for i in values ] )  +  ' }'
+		return '{'  +  ', '.join( [ self( i, PRECEDENCE_CONTAINER_ELEMENT )   for i in values ] )  +  '}'
 
 	@DMObjectNodeDispatchMethod( Schema.SetComp )
 	def SetComp(self, node, resultExpr, comprehensionItems):
-		return '{ ' + self( resultExpr, PRECEDENCE_CONTAINER_ELEMENT ) + '   ' + '   '.join( [ self( x, PRECEDENCE_CONTAINER_ELEMENT )   for x in comprehensionItems ] )  +  ' }'
+		return '{' + self( resultExpr, PRECEDENCE_CONTAINER_ELEMENT ) + '   ' + '   '.join( [ self( x, PRECEDENCE_CONTAINER_ELEMENT )   for x in comprehensionItems ] )  +  '}'
 
 
 
@@ -374,7 +374,7 @@ class Python2CodeGenerator (object):
 	
 	@DMObjectNodeDispatchMethod( Schema.Call )
 	def Call(self, node, target, args):
-		return self( target, PRECEDENCE_CONTAINER_CALLTARGET ) + '( ' + ', '.join( [ self( a, PRECEDENCE_CONTAINER_CALLARG )   for a in args ] ) + ' )'
+		return self( target, PRECEDENCE_CONTAINER_CALLTARGET ) + '(' + ', '.join( [ self( a, PRECEDENCE_CONTAINER_CALLARG )   for a in args ] ) + ')'
 	
 	
 	
@@ -818,7 +818,7 @@ class Python2CodeGenerator (object):
 	def Decorator(self, node, name, args):
 		text = '@' + name
 		if args is not None:
-			text += '( ' + ', '.join( [ self( a, PRECEDENCE_STMT )   for a in args ] ) + ' )'
+			text += '(' + ', '.join( [ self( a, PRECEDENCE_STMT )   for a in args ] ) + ')'
 		return Line( text, node )
 	
 	
@@ -983,7 +983,7 @@ class Python2ModuleCodeGenerator (Python2CodeGenerator):
 						args.append( ( field.getName(), self._quotedNode( value ) ) )
 				return astMapExpr + '(' + ', '.join( [ '%s=%s' % ( k,v )   for k,v in args ] ) + ')'
 		elif isinstance( node, DMList ):
-			return _runtime_DMList_Name + '( [' + ', '.join( [ self._quotedNode( v )   for v in node ] ) + '] )'
+			return _runtime_DMList_Name + '([' + ', '.join( [ self._quotedNode( v )   for v in node ] ) + '])'
 		elif isinstance( node, DMEmbeddedObject )  or  isinstance( node, DMEmbeddedIsolatedObject ):
 			return self._embeddedValueSrc( deepcopy( node ) )
 		else:
@@ -1051,7 +1051,7 @@ class Python2ModuleCodeGenerator (Python2CodeGenerator):
 		else:
 			evalFnSource = self._embeddedValueSrc( evalFn )
 			selfSource = self._embeddedValueSrc( self )
-			return evalFnSource + '( globals(), locals(), ' + selfSource + ' )'
+			return evalFnSource + '(globals(), locals(), ' + selfSource + ')'
 		
 		
 		# Use the object as a value
@@ -1095,7 +1095,7 @@ class Python2ModuleCodeGenerator (Python2CodeGenerator):
 		else:
 			execFnSource = self._embeddedValueSrc( execFn )
 			selfSource = self._embeddedValueSrc( self )
-			return Line( execFnSource + '( globals(), locals(), ' + selfSource + ' )',  node )
+			return Line( execFnSource + '(globals(), locals(), ' + selfSource + ')',  node )
 
 			
 		# Try to use the __py_localnames__ and __py_localvalues__ method pair
@@ -1108,7 +1108,7 @@ class Python2ModuleCodeGenerator (Python2CodeGenerator):
 			# Get the attribute name list
 			names = attrNamesFn()
 			selfSource = self._embeddedValueSrc( self )
-			valuesCallSource = self._embeddedValueSrc( attrValuesFn ) + '( globals(), locals(), ' + selfSource + ' )'
+			valuesCallSource = self._embeddedValueSrc( attrValuesFn ) + '(globals(), locals(), ' + selfSource + ')'
 			if isinstance( names, str )  or  isinstance( names, unicode ):
 				return Line( names + ' = ' + valuesCallSource,   node )
 			else:
@@ -1284,11 +1284,11 @@ class TestCase_Python2CodeGenerator (unittest.TestCase):
 		self._testSX( '(py TupleTarget targets=[])', '()' )
 		self._testSX( '(py TupleTarget targets=[(py SingleTarget name=a)])', '(a,)' )
 		self._testSX( '(py TupleTarget targets=[(py SingleTarget name=a) (py SingleTarget name=b) (py SingleTarget name=c)])', '(a, b, c)' )
-		self._testSX( '(py ListTarget targets=[(py SingleTarget name=a) (py TupleTarget targets=[(py SingleTarget name=a) (py SingleTarget name=b) (py SingleTarget name=c)])])', '[ a, (a, b, c) ]' )
+		self._testSX( '(py ListTarget targets=[(py SingleTarget name=a) (py TupleTarget targets=[(py SingleTarget name=a) (py SingleTarget name=b) (py SingleTarget name=c)])])', '[a, (a, b, c)]' )
 		
 		
 	def test_ListTarget(self):
-		self._testSX( '(py ListTarget targets=[(py SingleTarget name=a) (py SingleTarget name=b) (py SingleTarget name=c)])', '[ a, b, c ]' )
+		self._testSX( '(py ListTarget targets=[(py SingleTarget name=a) (py SingleTarget name=b) (py SingleTarget name=c)])', '[a, b, c]' )
 		
 		
 	def test_Load(self):
@@ -1299,11 +1299,11 @@ class TestCase_Python2CodeGenerator (unittest.TestCase):
 		self._testSX( '(py TupleLiteral values=[])', '()' )
 		self._testSX( '(py TupleLiteral values=[(py Load name=a)])', '(a,)' )
 		self._testSX( '(py TupleLiteral values=[(py Load name=a) (py Load name=b) (py Load name=c)])', '(a, b, c)' )
-		self._testSX( '(py ListLiteral values=[(py Load name=a) (py TupleLiteral values=[(py Load name=a) (py Load name=b) (py Load name=c)])])', '[ a, (a, b, c) ]' )
+		self._testSX( '(py ListLiteral values=[(py Load name=a) (py TupleLiteral values=[(py Load name=a) (py Load name=b) (py Load name=c)])])', '[a, (a, b, c)]' )
 		
 		
 	def test_ListLiteral(self):
-		self._testSX( '(py ListLiteral values=[(py Load name=a) (py Load name=b) (py Load name=c)])', '[ a, b, c ]' )
+		self._testSX( '(py ListLiteral values=[(py Load name=a) (py Load name=b) (py Load name=c)])', '[a, b, c]' )
 		
 		
 	def test_ComprehensionFor(self):
@@ -1315,11 +1315,11 @@ class TestCase_Python2CodeGenerator (unittest.TestCase):
 		
 		
 	def test_ListComp(self):
-		self._testSX( '(py ListComp resultExpr=(py Load name=a) comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs)) (py ComprehensionIf condition=(py Load name=a))])', '[ a   for a in xs   if a ]' )
+		self._testSX( '(py ListComp resultExpr=(py Load name=a) comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs)) (py ComprehensionIf condition=(py Load name=a))])', '[a   for a in xs   if a]' )
 		
 		
 	def test_GeneratorExpr(self):
-		self._testSX( '(py GeneratorExpr resultExpr=(py Load name=a) comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs)) (py ComprehensionIf condition=(py Load name=a))])', '( a   for a in xs   if a )' )
+		self._testSX( '(py GeneratorExpr resultExpr=(py Load name=a) comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs)) (py ComprehensionIf condition=(py Load name=a))])', '(a   for a in xs   if a)' )
 		
 		
 	def test_DictKeyValuePair(self):
@@ -1327,20 +1327,20 @@ class TestCase_Python2CodeGenerator (unittest.TestCase):
 		
 		
 	def test_DictLiteral(self):
-		self._testSX( '(py DictLiteral values=[(py DictKeyValuePair key=(py Load name=a) value=(py Load name=b)) (py DictKeyValuePair key=(py Load name=c) value=(py Load name=d))])', '{ a:b, c:d }' )
+		self._testSX( '(py DictLiteral values=[(py DictKeyValuePair key=(py Load name=a) value=(py Load name=b)) (py DictKeyValuePair key=(py Load name=c) value=(py Load name=d))])', '{a:b, c:d}' )
 
 
 	def test_DictComp(self):
 		self._testSX( '(py DictComp resultExpr=(py DictKeyValuePair key=(py Load name=a) value=(py Load name=b)) '+\
-		              'comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs)) (py ComprehensionIf condition=(py Load name=a))])', '{ a:b   for a in xs   if a }' )
+		              'comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs)) (py ComprehensionIf condition=(py Load name=a))])', '{a:b   for a in xs   if a}' )
 
 
 	def test_SetLiteral(self):
-		self._testSX( '(py SetLiteral values=[(py Load name=a) (py Load name=c)])', '{ a, c }' )
+		self._testSX( '(py SetLiteral values=[(py Load name=a) (py Load name=c)])', '{a, c}' )
 
 
 	def test_SetComp(self):
-		self._testSX( '(py SetComp resultExpr=(py Load name=a) comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs)) (py ComprehensionIf condition=(py Load name=a))])', '{ a   for a in xs   if a }' )
+		self._testSX( '(py SetComp resultExpr=(py Load name=a) comprehensionItems=[(py ComprehensionFor target=(py SingleTarget name=a) source=(py Load name=xs)) (py ComprehensionIf condition=(py Load name=a))])', '{a   for a in xs   if a}' )
 
 
 	def test_YieldExpr(self):
@@ -1384,7 +1384,7 @@ class TestCase_Python2CodeGenerator (unittest.TestCase):
 		
 		
 	def test_call(self):
-		self._testSX( '(py Call target=(py Load name=x) args=[(py Load name=a) (py Load name=b) (py CallKWArg name=c value=(py Load name=d)) (py CallKWArg name=e value=(py Load name=f)) (py CallArgList value=(py Load name=g)) (py CallKWArgList value=(py Load name=h))])', 'x( a, b, c=d, e=f, *g, **h )' )
+		self._testSX( '(py Call target=(py Load name=x) args=[(py Load name=a) (py Load name=b) (py CallKWArg name=c value=(py Load name=d)) (py CallKWArg name=e value=(py Load name=f)) (py CallArgList value=(py Load name=g)) (py CallKWArgList value=(py Load name=h))])', 'x(a, b, c=d, e=f, *g, **h)' )
 		
 		
 	def test_operators(self):
@@ -1578,7 +1578,7 @@ class TestCase_Python2CodeGenerator (unittest.TestCase):
 
 	def test_decorator(self):
 		self._testSX( '(py Decorator name=myDeco args=`null`)', '@myDeco' )
-		self._testSX( '(py Decorator name=myDeco args=[(py Load name=a) (py Load name=b)])', '@myDeco( a, b )' )
+		self._testSX( '(py Decorator name=myDeco args=[(py Load name=a) (py Load name=b)])', '@myDeco(a, b)' )
 
 		
 	def test_defStmt(self):
@@ -1589,7 +1589,7 @@ class TestCase_Python2CodeGenerator (unittest.TestCase):
 			      '@myDeco\ndef myFunc(a, b=c, *d, **e):\n\tb\n' )
 		self._testSX( '(py DefStmt decorators=[(py Decorator name=myDeco args=`null`) (py Decorator name=myDeco args=[(py Load name=a) (py Load name=b)])] '+\
 			      'name=myFunc params=[(py SimpleParam name=a) (py DefaultValueParam param=(py SimpleParam name=b) defaultValue=(py Load name=c)) (py ParamList name=d) '+\
-			      '(py KWParamList name=e)] suite=[(py ExprStmt expr=(py Load name=b))])', '@myDeco\n@myDeco( a, b )\ndef myFunc(a, b=c, *d, **e):\n\tb\n' )
+			      '(py KWParamList name=e)] suite=[(py ExprStmt expr=(py Load name=b))])', '@myDeco\n@myDeco(a, b)\ndef myFunc(a, b=c, *d, **e):\n\tb\n' )
 
 
 	def test_classStmt(self):
