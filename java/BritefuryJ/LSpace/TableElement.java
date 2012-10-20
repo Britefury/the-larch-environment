@@ -15,9 +15,11 @@ public interface TableElement
 	public int getNumRows();
 	
 	public boolean hasChildAt(int x, int y);
+	public LSElement getChildAt(int x, int y);
 	public int getChildColSpan(int x, int y);
 	public int getChildRowSpan(int x, int y);
 	public int[] getPositionOfChildCoveringCell(int x, int y);
+	public LSElement getChildCoveringCell(int x, int y);
 	public int[] getCellPositionUnder(Point2 localPos);
 	
 	public double getColumnBoundaryX(int column);

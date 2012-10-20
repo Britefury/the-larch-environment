@@ -459,13 +459,14 @@ public class LSTable extends LSContainerNonOverlayed implements TableElement
 		return numRows;
 	}
 	
-	
-	public LSElement get(int x, int y)
+	@Override
+	public LSElement getChildAt(int x, int y)
 	{
 		TableChildEntry childEntry = getChildEntry( x, y );
 		return childEntry != null  ?  childEntry.child  :  null;
 	}
 	
+	@Override
 	public boolean hasChildAt(int x, int y)
 	{
 		TableChildEntry childEntry = getChildEntry( x, y );
@@ -502,7 +503,7 @@ public class LSTable extends LSContainerNonOverlayed implements TableElement
 		}
 		int x = index.__getitem__( 0 ).asInt();
 		int y = index.__getitem__( 1 ).asInt();
-		return get( x, y );
+		return getChildAt( x, y );
 	}
 	
 	
@@ -787,12 +788,20 @@ public class LSTable extends LSContainerNonOverlayed implements TableElement
 		return childEntry != null  ?  childEntry.rowSpan  :  -1;
 	}
 	
+	@Override
 	public int[] getPositionOfChildCoveringCell(int x, int y)
 	{
 		LayoutNodeTable layout = (LayoutNodeTable)getLayoutNode();
 		return layout.getPositionOfChildCoveringCell( x, y );
 	}
 
+	@Override
+	public LSElement getChildCoveringCell(int x, int y)
+	{
+		LayoutNodeTable layout = (LayoutNodeTable)getLayoutNode();
+		return layout.getChildCoveringCell( x, y );
+	}
+	
 	public int[] getCellPositionUnder(Point2 localPos)
 	{
 		LayoutNodeTable layout = (LayoutNodeTable)getLayoutNode();

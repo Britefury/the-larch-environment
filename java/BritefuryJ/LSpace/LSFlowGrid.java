@@ -96,6 +96,12 @@ public class LSFlowGrid extends LSContainerSequence implements TableElement
 	{
 		return ((LayoutNodeFlowGrid)layoutNode).hasChildAt( x, y );
 	}
+	
+	@Override
+	public LSElement getChildAt(int x, int y)
+	{
+		return ((LayoutNodeFlowGrid)layoutNode).getChildAt( x, y );
+	}
 
 	@Override
 	public int getChildColSpan(int x, int y)
@@ -113,6 +119,12 @@ public class LSFlowGrid extends LSContainerSequence implements TableElement
 	public int[] getPositionOfChildCoveringCell(int x, int y)
 	{
 		return ((LayoutNodeFlowGrid)layoutNode).getPositionOfChildCoveringCell( x, y );
+	}
+
+	@Override
+	public LSElement getChildCoveringCell(int x, int y)
+	{
+		return ((LayoutNodeFlowGrid)layoutNode).getChildCoveringCell( x, y );
 	}
 
 	@Override

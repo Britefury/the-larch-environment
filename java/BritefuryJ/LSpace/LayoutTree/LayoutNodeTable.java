@@ -202,18 +202,18 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 		return x <= ( packing.x + packing.colSpan )  &&  y <= ( packing.y + packing.rowSpan );
 	}
 	
-	private LSElement getChildCoveringCell(int x, int y)
+	public LSElement getChildCoveringCell(int x, int y)
 	{
 		LSTable table = (LSTable)element;
 		int pos[] = getPositionOfChildCoveringCell( x, y );
-		return pos != null  ?  table.get( pos[0], pos[1] )  :  null;
+		return pos != null  ?  table.getChildAt( pos[0], pos[1] )  :  null;
 	}
 
 	public int[] getPositionOfChildCoveringCell(int x, int y)
 	{
 		LSTable table = (LSTable)element;
 
-		LSElement child = table.get( x, y );
+		LSElement child = table.getChildAt( x, y );
 		
 		if ( child != null )
 		{
@@ -233,7 +233,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 						int searchY = y - i;
 						if ( searchY >= 0 )
 						{
-							child = table.get( colX, searchY );
+							child = table.getChildAt( colX, searchY );
 							if ( child != null  &&  doesChildCoverCell( child, x, y ) )
 							{
 								return new int[] { colX, searchY };
@@ -251,7 +251,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 						int searchX = x - i;
 						if ( searchX >= 0 )
 						{
-							child = table.get( searchX, rowY );
+							child = table.getChildAt( searchX, rowY );
 							if ( child != null  &&  doesChildCoverCell( child, x, y ) )
 							{
 								return new int[] { searchX, rowY };
@@ -263,7 +263,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 				// Cell above and to left
 				if ( radius <= x  &&  radius <= y )
 				{
-					child = table.get( x - radius, y - radius );
+					child = table.getChildAt( x - radius, y - radius );
 					if ( child != null  &&  doesChildCoverCell( child, x, y ) )
 					{
 						return new int[] { x - radius, y - radius };
