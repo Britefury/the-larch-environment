@@ -6,7 +6,10 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
 import sys
+import jarray
 
+from java.lang import String, Thread
+from java.util.jar import JarInputStream
 from javax.swing import UIManager
 
 from BritefuryJ.DocModel import DMIOReader, DMNode
@@ -14,7 +17,7 @@ from BritefuryJ.Browser import Location
 
 from Britefury.Kernel.World import World, WorldDefaultOuterSubject
 from Britefury.Kernel.Document import Document
-from Britefury import app
+from Britefury import app, app_startup, app_in_jar
 
 from Britefury.Windows.WindowManager import WindowManager
 
@@ -22,9 +25,38 @@ from LarchCore.MainApp import MainApp
 
 
 
+world = None
+
+
 def start_larch():
+	global world
+
 	UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() )
 	app.appInit()
+
+
+
+	jarCustomLarchApp = []
+	jarCustomPythonApp = [ False ]
+
+
+	# Register a JAR entry handler so that we can pick up custom apps
+	def _handle_larch_app(name, reader):
+		inputStream = reader()
+		jarCustomLarchApp.append( inputStream )
+
+	def _handle_python_app(name, reader):
+		jarCustomPythonApp[0] = True
+
+	app_in_jar.registerJarEntryHandler( lambda name: name == 'mainapp/app.larch', _handle_larch_app )
+	app_in_jar.registerJarEntryHandler( lambda name: name == 'mainapp/app.py'  or  name == 'mainapp.app$py.class', _handle_python_app )
+
+
+
+	# If Larch was started from a JAR, scan it
+	if app_in_jar.startedFromJar():
+		app_in_jar.scanLarchJar()
+
 
 	world = World()
 	world.enableImportHooks()
@@ -53,8 +85,21 @@ def start_larch():
 			subject = document.newSubject( outerSubject, Location( 'main' ), None, filename )
 			world.setRootSubject( subject )
 	else:
-		appState = MainApp.newAppState()
-		world.setRootSubject( MainApp.newAppStateSubject( world, appState ) )
+		foundAppInJar = False
+
+		if len( jarCustomLarchApp ) > 0:
+			inputStream = jarCustomLarchApp[0]
+			document = Document.readFromInputStream( world, inputStream, 'app' )
+			outerSubject = WorldDefaultOuterSubject( world )
+			subject = document.newSubject( outerSubject, Location( 'main' ), None, 'app' )
+			world.setRootSubject( subject )
+		elif jarCustomPythonApp[0]:
+			from mainapp import app as appModule
+			appState = appModule.newAppState()
+			world.setRootSubject( appModule.newAppStateSubject( world, appState ) )
+		else:
+			appState = MainApp.newAppState()
+			world.setRootSubject( MainApp.newAppStateSubject( world, appState ) )
 
 
 

@@ -234,8 +234,7 @@ class Window (object):
 			
 
 		self._frame = JFrame( 'Larch' )
-		self._frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE )
-		
+
 		self._frame.setJMenuBar( menuBar )
 
 		self._frame.add( windowPanel )

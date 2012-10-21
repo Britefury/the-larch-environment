@@ -6,14 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2012.
 ##-*************************
 import sys
-
-
-_larchJarURL = None
-
-
-def getLarchJarURL():
-	return _larchJarURL
-
+import app_in_jar
 
 
 def appStartupFromFileSystem(larchJavaClassPath):
@@ -21,7 +14,6 @@ def appStartupFromFileSystem(larchJavaClassPath):
 
 
 def appStartupFromJar(larchJarURL):
-	global _larchJarURL
 	sys.packageManager.addJarToPackages( larchJarURL )
-	_larchJarURL = larchJarURL
+	app_in_jar.setLarchJarURL(larchJarURL)
 

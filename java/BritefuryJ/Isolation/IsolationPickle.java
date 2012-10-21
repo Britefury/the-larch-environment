@@ -6,7 +6,11 @@
 //##************************
 package BritefuryJ.Isolation;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import org.python.core.Py;
+import org.python.core.PyFile;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 import org.python.core.imp;
@@ -59,5 +63,17 @@ public class IsolationPickle
 	{
 		StringIO stream = cStringIO.StringIO( s );
 		return load( stream );		
+	}
+
+	public static void dumpToOutputStream(PyObject obj, OutputStream stream)
+	{
+		dump( obj, new PyFile( stream ) );
+	}
+	
+	public static PyObject loadFromInputStream(InputStream stream)
+	{
+		String name = "<Java InputStream '" +stream + "' as file>";
+		PyFile f = new PyFile( stream, name, "rU", -1, true );
+		return load( f );		
 	}
 }
