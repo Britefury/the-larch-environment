@@ -1063,7 +1063,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 			words.add( javaKeywordStyle.applyTo( new Label( "Throws" ) ) );
 			words.add( space );
 			Object exceptions[] = new Object[exceptionTypes.length];
-			for (int i = 0; i < params.length; i++)
+			for (int i = 0; i < exceptionTypes.length; i++)
 			{
 				exceptions[i] = PrimitivePresenter.presentJavaClassName( exceptionTypes[i], typeNameStyle );
 			}

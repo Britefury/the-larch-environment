@@ -7,12 +7,27 @@
 ##-*************************
 import os
 import sys
-from java.util.zip import ZipInputStream
-
-from java.net import URLConnection
 
 from Britefury.Config.PathsConfigPage import getPathsConfig
-from Britefury import app_startup
+from Britefury import app_in_jar
+
+
+
+_jarPluginNames = []
+
+
+def _testJarEntryName(name):
+	return name.endswith( '/larchplugin$py.class' )  or  name.endswith( '/larchplugin.py' )
+
+def _handleJarEntry(name, reader_fn):
+	lastSlash = name.rfind( '/' )
+	pluginName = name[:lastSlash]
+	pluginName = '.'.join( pluginName.split( '/' ) )
+	if pluginName not in _jarPluginNames:
+		_jarPluginNames.append( pluginName )
+
+
+app_in_jar.registerJarEntryHandler(_testJarEntryName, _handleJarEntry)
 
 
 
@@ -43,38 +58,22 @@ def _getUserPluginRootPaths():
 
 	
 
-def _loadPluginsFromJar(plugins, jarURL):
-	conn = jarURL.openConnection()
-	stream = conn.getInputStream()
-	zip = ZipInputStream( stream )
+def _loadPlugin(plugins, pluginName):
+	importName = pluginName + '.larchplugin'
+	mod = __import__( importName )
+	components = importName.split( '.' )
+	for comp in components[1:]:
+		mod = getattr( mod, comp )
 
-	pluginNames = []
-	entry = zip.getNextEntry()
-	while entry is not None:
-		name = entry.getName()
-		if name.endswith( '/larchplugin$py.class' )  or  name.endswith( '/larchplugin.py' ):
-			lastSlash = name.rfind( '/' )
-			pluginName = name[:lastSlash]
-			pluginName = '.'.join( pluginName.split( '/' ) )
-			if pluginName not in pluginNames:
-				pluginNames.append( pluginName )
+	initPluginFn = getattr( mod, 'initPlugin' )
 
-		entry = zip.getNextEntry()
-
-	for pluginName in pluginNames:
-		importName = pluginName + '.larchplugin'
-		mod = __import__( importName )
-		components = importName.split( '.' )
-		for comp in components[1:]:
-			mod = getattr( mod, comp )
-
-		print mod.__name__
-
-		initPluginFn = getattr( mod, 'initPlugin' )
-
-		plugins.append( Plugin( pluginName, initPluginFn ) )
+	plugins.append( Plugin( pluginName, initPluginFn ) )
 
 
+
+def _loadPluginsFromJar(plugins):
+	for pluginName in _jarPluginNames:
+		_loadPlugin(plugins, pluginName)
 
 
 
@@ -85,18 +84,10 @@ def _loadPluginsInDir(plugins, pluginDir, isLocal):
 				pathComponents = _splitPath( dirpath )
 				if isLocal:
 					del pathComponents[0]
-				pathComponents.append( 'larchplugin' )
-				importName = '.'.join( pathComponents )
-				
-				mod = __import__( importName )
-				components = importName.split( '.' )
-				for comp in components[1:]:
-					mod = getattr( mod, comp )
-					
-				initPluginFn = getattr( mod, 'initPlugin' )
+				pluginName = '.'.join( pathComponents )
 
-				plugins.append( Plugin( importName, initPluginFn ) )
-				
+				_loadPlugin(plugins, pluginName)
+
 				break
 
 				
@@ -118,9 +109,8 @@ class Plugin (object):
 		
 		plugins = []
 
-		larchJarURL = app_startup.getLarchJarURL()
-		if larchJarURL is not None:
-			_loadPluginsFromJar( plugins, larchJarURL )
+		if app_in_jar.startedFromJar():
+			_loadPluginsFromJar( plugins )
 		else:
 			for pluginDir in _localPluginDirectories:
 				_loadPluginsInDir( plugins, os.path.join( 'larch', pluginDir ), True )

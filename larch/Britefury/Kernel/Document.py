@@ -203,10 +203,19 @@ class Document (ChangeHistoryListener):
 				return document
 			except IOError:
 				return None
-				
-		
-			
-			
+
+
+	@staticmethod
+	def readFromInputStream(world, stream, documentName):
+		documentRoot = IsolationPickle.loadFromInputStream( stream )
+
+		document = Document( world, documentRoot )
+		document._docName = documentName
+		return document
+
+
+
+
 	def onChangeHistoryChanged(self, history):
 		if not self._bHasUnsavedData:
 			self._bHasUnsavedData = True
