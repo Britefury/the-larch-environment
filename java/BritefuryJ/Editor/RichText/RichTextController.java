@@ -254,7 +254,7 @@ public abstract class RichTextController extends SequentialController
 	{
 		super( controllerName );
 		
-		HandleRichStringFn onTextEdit = new HandleRichStringFn()
+		RichStringEditFilterFn onTextEdit = new RichStringEditFilterFn()
 		{
 			@Override
 			public EditFilter.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
@@ -273,7 +273,7 @@ public abstract class RichTextController extends SequentialController
 		};
 
 		
-		HandleRichStringFn onParagraphEdit = new HandleRichStringFn()
+		RichStringEditFilterFn onParagraphEdit = new RichStringEditFilterFn()
 		{
 			@Override
 			public EditFilter.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
@@ -297,7 +297,7 @@ public abstract class RichTextController extends SequentialController
 		};
 
 		
-		HandleRichStringFn onBlockEdit = new HandleRichStringFn()
+		RichStringEditFilterFn onBlockEdit = new RichStringEditFilterFn()
 		{
 			@Override
 			public EditFilter.HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)

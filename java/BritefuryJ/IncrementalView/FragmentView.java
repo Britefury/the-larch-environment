@@ -352,6 +352,11 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 		return getFragmentFactory().perspective;
 	}
 	
+	public SimpleAttributeTable getInheritedState()
+	{
+		return getFragmentFactory().inheritedState;
+	}
+	
 	public PresentationContext createPresentationContext()
 	{
 		IncrementalView.FragmentFactory f = getFragmentFactory();
