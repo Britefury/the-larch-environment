@@ -24,14 +24,20 @@ import BritefuryJ.Util.RichString.RichString;
 
 public abstract class SequentialController
 {
-	public static interface HandleEditEventFn
+	public static interface EditFilterFn
 	{
 		EditFilter.HandleEditResult handleEditEvent(LSElement element, LSElement sourceElement, EditEvent event);
 	}
 	
-	public static interface HandleRichStringFn
+	public static interface RichStringEditFilterFn
 	{
 		HandleEditResult handleValue(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value);
+	}
+	
+	
+	public static interface RichStringCommitFilterFn
+	{
+		boolean handleValue(Object model, RichString value);
 	}
 	
 	
@@ -115,12 +121,12 @@ public abstract class SequentialController
 	
 	protected class _FnEditFilter extends EditFilter
 	{
-		private HandleEditEventFn handleEditEventFn;
+		private EditFilterFn filterFn;
 		
 		
-		protected _FnEditFilter(HandleEditEventFn handleEditEventFn)
+		protected _FnEditFilter(EditFilterFn filterFn)
 		{
-			this.handleEditEventFn = handleEditEventFn;
+			this.filterFn = filterFn;
 		}
 		
 
@@ -133,7 +139,7 @@ public abstract class SequentialController
 		@Override
 		protected HandleEditResult handleEdit(LSElement element, LSElement sourceElement, EditEvent event)
 		{
-			return handleEditEventFn.handleEditEvent( element, sourceElement, event );
+			return filterFn.handleEditEvent( element, sourceElement, event );
 		}
 	}
 	
@@ -142,12 +148,12 @@ public abstract class SequentialController
 	
 	protected class _FnRichStringEditFilter extends RichStringEditFilter
 	{
-		private HandleRichStringFn handleRichStringFn;
+		private RichStringEditFilterFn filterFn;
 		
 		
-		protected _FnRichStringEditFilter(HandleRichStringFn handleRichStringFn)
+		protected _FnRichStringEditFilter(RichStringEditFilterFn filterFn)
 		{
-			this.handleRichStringFn = handleRichStringFn;
+			this.filterFn = filterFn;
 		}
 		
 
@@ -160,7 +166,33 @@ public abstract class SequentialController
 		@Override
 		protected HandleEditResult handleRichStringEdit(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
 		{
-			return handleRichStringFn.handleValue( element, sourceElement, fragment, event, model, value );
+			return filterFn.handleValue( element, sourceElement, fragment, event, model, value );
+		}
+	}
+	
+	
+	
+	protected class _FnRichStringCommitFilter extends RichStringEditFilter
+	{
+		private RichStringCommitFilterFn commitFn;
+		
+		
+		protected _FnRichStringCommitFilter(RichStringCommitFilterFn commitFn)
+		{
+			this.commitFn = commitFn;
+		}
+		
+
+		@Override
+		protected SequentialController getSequentialController()
+		{
+			return SequentialController.this;
+		}
+
+		@Override
+		protected HandleEditResult handleRichStringEdit(LSElement element, LSElement sourceElement, FragmentView fragment, EditEvent event, Object model, RichString value)
+		{
+			return commitFn.handleValue( model, value )  ?  HandleEditResult.HANDLED  :  HandleEditResult.NOT_HANDLED;
 		}
 	}
 	
@@ -228,14 +260,19 @@ public abstract class SequentialController
 	
 	
 	
-	public EditFilter editFilter(HandleEditEventFn handleEditEventFn)
+	public EditFilter editFilter(EditFilterFn handleEditEventFn)
 	{
 		return new _FnEditFilter( handleEditEventFn );
 	}
 	
-	public RichStringEditFilter richStringEditFilter(HandleRichStringFn handleRichStringFn)
+	public RichStringEditFilter richStringEditFilter(RichStringEditFilterFn handleRichStringFn)
 	{
 		return new _FnRichStringEditFilter( handleRichStringFn );
+	}
+	
+	public RichStringEditFilter richStringCommitFilter(RichStringCommitFilterFn commitFn)
+	{
+		return new _FnRichStringCommitFilter( commitFn );
 	}
 	
 	

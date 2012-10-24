@@ -45,7 +45,7 @@ from BritefuryJ.Editor.Sequential import SequentialEditorPerspective
 from BritefuryJ.Editor.Sequential.EditFilter import HandleEditResult
 from BritefuryJ.Editor.Sequential.Item import *
 from BritefuryJ.Editor.SyntaxRecognizing.Precedence import PrecedenceHandler
-from BritefuryJ.Editor.SyntaxRecognizing import SREInnerFragment, ParsingEditFilter
+from BritefuryJ.Editor.SyntaxRecognizing import SREInnerFragment
 from BritefuryJ.Editor.SyntaxRecognizing.SyntaxRecognizingController import EditMode
 
 from BritefuryJ.ModelAccess.DocModel import *
