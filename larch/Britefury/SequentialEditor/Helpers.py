@@ -9,78 +9,8 @@ from Britefury.Dispatch.MethodDispatch import redecorateDispatchMethod
 
 
 
-def _cache(controller, key, valueFn):
-	try:
-		tbl = controller.___seq_editor_cache___
-	except AttributeError:
-		tbl = {}
-		controller.___seq_editor_cache___ = tbl
-	try:
-		return tbl[key]
-	except KeyError:
-		value = valueFn()
-		tbl[key] = value
-		return value
 
-
-
-class _SeqEditorDescriptor (object):
-	def __set__(self, obj, value):
-		raise TypeError
-
-	def __delete__(self, obj):
-		raise TypeError
-
-
-
-class RichStringFilterDeclaration (_SeqEditorDescriptor):
-	def __init__(self):
-		self.__method = None
-
-
-	def commitMethod(self, method):
-		self.__method = method
-
-
-	def _filterForInstance(self, controller):
-		return _cache( controller, self, lambda: controller.richStringCommitFilter( lambda model, value: self.__method( controller, model, value ) ) )
-
-	def __get__(self, obj, type):
-		if obj is None:
-			return self
-		else:
-			if self.__method is not None:
-				raise ValueError, 'Commit method of RichStringFilterDeclaration \'{0}\' not set'.format( type( obj ).__name__ )
-			return self._filterForInstance( obj )
-
-
-
-class _AbstractEditRuleDeclaration (_SeqEditorDescriptor):
-	def __init__(self, filterDeclarations):
-		self.__filterDeclarations = filterDeclarations
-
-	def _filters(self, controller):
-		return  [ f._filterForInstance( controller )   for f in self.__filterDeclarations ]
-
-
-class EditRuleDeclaration (_AbstractEditRuleDeclaration):
-	def __get__(self, obj, type):
-		if obj is None:
-			return self
-		else:
-			return _cache( obj, self, lambda: _WrappedEditRule( obj.editRule( self._filters( obj ) ) ) )
-
-
-class SoftStructuralEditRuleDeclaration (_AbstractEditRuleDeclaration):
-	def __get__(self, obj, type):
-		if obj is None:
-			return self
-		else:
-			return _cache( obj, self, lambda: _WrappedEditRule( obj.softStructuralEditRule( self._filters( obj ) ) ) )
-
-
-
-class _WrappedEditRule (object):
+class BoundEditRuleDecorator (object):
 	def __init__(self, rule):
 		self.__rule = rule
 		self.applyToFragment = rule.applyToFragment
@@ -100,3 +30,17 @@ class _WrappedEditRule (object):
 		return _m
 
 
+
+
+
+class EditRuleDecorator (object):
+	def __init__(self, ruleFn):
+		self.__ruleFn = ruleFn
+
+
+	def __get__(self, obj, type):
+		if obj is None:
+			return self
+		else:
+			rule = self.__ruleFn( obj )
+			return BoundEditRuleDecorator( rule )
