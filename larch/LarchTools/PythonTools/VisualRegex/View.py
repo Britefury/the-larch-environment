@@ -240,7 +240,7 @@ def _editTopLevelNode(char):
 
 
 
-_editor = VisualRegexSyntaxRecognizingController.instance
+_controller = VisualRegexSyntaxRecognizingController.instance
 
 
 class VREView (MethodDispatchView):
@@ -252,7 +252,7 @@ class VREView (MethodDispatchView):
 
 
 	@DMObjectNodeDispatchMethod( Schema.PythonRegEx )
-	@_editor.expressionTopLevel
+	@_controller.expressionTopLevel
 	def PythonRegEx(self, fragment, inheritedState, model, expr):
 		exprView =_editTopLevelNode( expr )
 		seg = Segment( exprView )
@@ -261,7 +261,7 @@ class VREView (MethodDispatchView):
 
 
 	@DMObjectNodeDispatchMethod( Schema.UNPARSED )
-	@_editor.unparsed
+	@_controller.unparsed
 	def UNPARSED(self, fragment, inheritedState, model, value):
 		def _viewItem(x):
 			if x is model:
@@ -282,64 +282,64 @@ class VREView (MethodDispatchView):
 
 
 	@DMObjectNodeDispatchMethod( Schema.EscapedChar )
-	@_editor.expression
+	@_controller.expression
 	def EscapedChar(self, fragment, inheritedState, model, char):
 		return escapedChar( char )
 
 
 	@DMObjectNodeDispatchMethod( Schema.PythonEscapedChar )
-	@_editor.expression
+	@_controller.expression
 	def PythonEscapedChar(self, fragment, inheritedState, model, char):
 		return pythonEscapedChar( char )
 
 
 	@DMObjectNodeDispatchMethod( Schema.LiteralChar )
-	@_editor.expression
+	@_controller.expression
 	def LiteralChar(self, fragment, inheritedState, model, char):
 		return literalChar( char )
 
 
 
 	@DMObjectNodeDispatchMethod( Schema.AnyChar )
-	@_editor.expression
+	@_controller.expression
 	def AnyChar(self, fragment, inheritedState, model):
 		return anyChar()
 
 
 	@DMObjectNodeDispatchMethod( Schema.StartOfLine )
-	@_editor.expression
+	@_controller.expression
 	def StartOfLine(self, fragment, inheritedState, model):
 		return startOfLine()
 
 
 	@DMObjectNodeDispatchMethod( Schema.EndOfLine )
-	@_editor.expression
+	@_controller.expression
 	def EndOfLine(self, fragment, inheritedState, model):
 		return endOfLine()
 
 
 
 	@DMObjectNodeDispatchMethod( Schema.CharClass )
-	@_editor.expression
+	@_controller.expression
 	def CharClass(self, fragment, inheritedState, model, cls):
 		return charClass( cls )
 
 
 
 	@DMObjectNodeDispatchMethod( Schema.CharSetChar )
-	@_editor.expression
+	@_controller.expression
 	def CharSetChar(self, fragment, inheritedState, model, char):
 		return charSetChar( _displayNode( char ) )
 
 
 	@DMObjectNodeDispatchMethod( Schema.CharSetRange )
-	@_editor.expression
+	@_controller.expression
 	def CharSetRange(self, fragment, inheritedState, model, min, max):
 		return charSetRange( _displayNode( min ), _displayNode( max ) )
 
 
 	@DMObjectNodeDispatchMethod( Schema.CharSet )
-	@_editor.expression
+	@_controller.expression
 	def CharSet(self, fragment, inheritedState, model, invert, items):
 		itemViews = [ _displayNode( item )   for item in items ]
 		return charSet( invert is not None, itemViews )
@@ -347,35 +347,35 @@ class VREView (MethodDispatchView):
 
 
 	@DMObjectNodeDispatchMethod( Schema.Group )
-	@_editor.expression
+	@_controller.expression
 	def Group(self, fragment, inheritedState, model, subexp, capturing):
 		subexpView = _displayNode( subexp )
 		return group( subexpView, capturing is not None )
 
 
 	@DMObjectNodeDispatchMethod( Schema.DefineNamedGroup )
-	@_editor.expression
+	@_controller.expression
 	def DefineNamedGroup(self, fragment, inheritedState, model, subexp, name):
 		subexpView = _displayNode( subexp )
 		return defineNamedGroup( subexpView, name )
 
 
 	@DMObjectNodeDispatchMethod( Schema.MatchNamedGroup )
-	@_editor.expression
+	@_controller.expression
 	def MatchNamedGroup(self, fragment, inheritedState, model, name):
 		return matchNamedGroup( name )
 
 
 
 	@DMObjectNodeDispatchMethod( Schema.Lookahead )
-	@_editor.expression
+	@_controller.expression
 	def Lookahead(self, fragment, inheritedState, model, subexp, positive):
 		subexpView = _displayNode( subexp )
 		return lookahead( subexpView, positive is not None )
 
 
 	@DMObjectNodeDispatchMethod( Schema.Lookbehind )
-	@_editor.expression
+	@_controller.expression
 	def Lookbehind(self, fragment, inheritedState, model, subexp, positive):
 		subexpView = _displayNode( subexp )
 		return lookbehind( subexpView, positive is not None )
@@ -383,47 +383,47 @@ class VREView (MethodDispatchView):
 
 
 	@DMObjectNodeDispatchMethod( Schema.SetFlags )
-	@_editor.expression
+	@_controller.expression
 	def SetFlags(self, fragment, inheritedState, model, flags):
 		return setFlags( flags )
 
 	@DMObjectNodeDispatchMethod( Schema.Comment )
-	@_editor.expression
+	@_controller.expression
 	def Comment(self, fragment, inheritedState, model, text):
 		return comment( text )
 
 
 
 	@DMObjectNodeDispatchMethod( Schema.Repeat )
-	@_editor.expression
+	@_controller.expression
 	def Repeat(self, fragment, inheritedState, model, subexp, repetitions):
 		subexpView = _displayNode( subexp )
 		return repeat( subexpView, repetitions )
 
 
 	@DMObjectNodeDispatchMethod( Schema.ZeroOrMore )
-	@_editor.expression
+	@_controller.expression
 	def ZeroOrMore(self, fragment, inheritedState, model, subexp, greedy):
 		subexpView = _displayNode( subexp )
 		return zeroOrMore( subexpView, greedy is not None )
 
 
 	@DMObjectNodeDispatchMethod( Schema.OneOrMore )
-	@_editor.expression
+	@_controller.expression
 	def OneOrMore(self, fragment, inheritedState, model, subexp, greedy):
 		subexpView = _displayNode( subexp )
 		return oneOrMore( subexpView, greedy is not None )
 
 
 	@DMObjectNodeDispatchMethod( Schema.Optional )
-	@_editor.expression
+	@_controller.expression
 	def Optional(self, fragment, inheritedState, model, subexp, greedy):
 		subexpView = _displayNode( subexp )
 		return optional( subexpView, greedy is not None )
 
 
 	@DMObjectNodeDispatchMethod( Schema.RepeatRange )
-	@_editor.expression
+	@_controller.expression
 	def RepeatRange(self, fragment, inheritedState, model, subexp, min, max, greedy):
 		subexpView = _displayNode( subexp )
 		return repeatRange( subexpView, min, max, greedy is not None )
@@ -431,14 +431,14 @@ class VREView (MethodDispatchView):
 
 
 	@DMObjectNodeDispatchMethod( Schema.Sequence )
-	@_editor.expression
+	@_controller.expression
 	def Sequence(self, fragment, inheritedState, model, subexps):
 		subexpViews = [ _displayNode( subexp )   for subexp in subexps ]
 		return sequence( subexpViews )
 
 
 	@DMObjectNodeDispatchMethod( Schema.Choice )
-	@_editor.expression
+	@_controller.expression
 	def Choice(self, fragment, inheritedState, model, subexps):
 		subexpViews = [ _displayNode( subexp )   for subexp in subexps ]
 		return choice( subexpViews )
@@ -448,4 +448,4 @@ class VREView (MethodDispatchView):
 
 _parser = VisualRegexGrammar()
 _view = VREView( _parser )
-perspective = SequentialEditorPerspective( _view.fragmentViewFunction, VisualRegexSyntaxRecognizingController.instance )
+perspective = SequentialEditorPerspective( _view.fragmentViewFunction, _controller )
