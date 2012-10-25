@@ -38,13 +38,10 @@ from BritefuryJ.IncrementalView import FragmentView, FragmentData
 
 from BritefuryJ.Editor.Sequential import SequentialEditorPerspective
 from BritefuryJ.Editor.Sequential.Item import *
-from BritefuryJ.Editor.SyntaxRecognizing.Precedence import PrecedenceHandler
 from BritefuryJ.Editor.SyntaxRecognizing import SREInnerFragment
 from BritefuryJ.Editor.SyntaxRecognizing.SyntaxRecognizingController import EditMode
 
 from BritefuryJ.Live import LiveFunction
-
-from BritefuryJ.ModelAccess.DocModel import *
 
 
 from LarchCore.Languages.Python2 import Schema
@@ -54,6 +51,7 @@ from LarchCore.Languages.Python2 import PythonCommands
 from LarchCore.Languages.Python2.PythonEditor.Parser import Python2Grammar
 from LarchCore.Languages.Python2.PythonEditor.PythonEditOperations import *
 from LarchCore.Languages.Python2.PythonEditor.SRController import *
+from LarchCore.Languages.Python2.PythonEditor.SRController import _makeSuiteCommitFn
 from LarchCore.Languages.Python2.PythonEditor.Keywords import *
 from LarchCore.Languages.Python2.PythonEditor.Precedence import *
 from LarchCore.Languages.Python2.PythonEditor.PythonEditorCombinators import *
@@ -86,78 +84,12 @@ def _applyIndentationShortcuts(p):
 
 
 
-_pythonPrecedenceHandler = PrecedenceHandler( ClassAttributeReader( parensRequired ), ObjectFieldReader( 'parens' ).stringToInteger( -1 ), ClassAttributeReader( nodePrecedence ), openParen, closeParen )
-
-
 
 def computeBinOpViewPrecedenceValues(precedence, bRightAssociative):
 	if bRightAssociative:
 		return precedence - 1, precedence
 	else:
 		return precedence, precedence - 1
-
-
-
-def _makeSuiteCommitFn(suite):
-	def _commit(model, parsed):
-		modifySuiteMinimisingChanges( suite, parsed )
-	return _commit
-
-def _isValidUnparsedStatementValue(value):
-	# Unparsed statement is only valid if there is ONE newline, and it is at the end
-	i = value.indexOf( '\n' )
-	return i != -1   and   i == len( value ) - 1
-
-def _commitUnparsedStatment(model, value):
-	withoutNewline = value[:-1]
-	unparsed = Schema.UnparsedStmt( value=Schema.UNPARSED( value=withoutNewline.getItemValues() ) )
-	# In some cases, we will be replacing @model with an UNPARSED node that contains a reference to @model.
-	# Since pyReplaceNode calls model.become(), this causes severe problems, due to circular references.
-	# The call to deepcopy eliminates this possibility.
-	pyReplaceNode( model, deepcopy( unparsed ) )
-
-def _commitInnerUnparsed(model, value):
-	unparsed = Schema.UNPARSED( value=value.getItemValues() )
-	# In some cases, we will be replacing @model with an UNPARSED node that contains a reference to @model.
-	# Since pyReplaceNode calls model.become(), this causes severe problems, due to circular references.
-	# The call to deepcopy eliminates this possibility.
-	pyReplaceNode( model, deepcopy( unparsed ) )
-
-
-
-def _isValidExprOrTargetOuterUnparsed(value):
-	return '\n' not in value
-
-
-def _commitExprOuterValid(model, parsed):
-	expr = model['expr']
-	if parsed != expr:
-		model['expr'] = parsed
-
-def _commitExprOuterEmpty(model, parsed):
-	model['expr'] = Schema.UNPARSED( value=[ '' ] )
-
-def _commitExprOuterUnparsed(model, value):
-	values = value.getItemValues()
-	if values == []:
-		values = [ '' ]
-	model['expr'] = Schema.UNPARSED( value=values )
-
-
-def _commitTargetOuterValid(model, parsed):
-	expr = model['target']
-	if parsed != expr:
-		model['target'] = parsed
-
-def _commitTargetOuterEmpty(model, parsed):
-	model['target'] = Schema.UNPARSED( value=[ '' ] )
-
-def _commitTargetOuterUnparsed(model, value):
-	values = value.getItemValues()
-	if values == []:
-		values = [ '' ]
-	model['target'] = Schema.UNPARSED( value=values )
-
 
 
 
@@ -192,7 +124,9 @@ def compoundStatementEditor(pythonView, inheritedState, model, compoundBlocks):
 			dedent = StructuralItem( PythonSyntaxRecognizingController.instance, Schema.Dedent(), dedentElement() )
 
 			suiteElement = indentedBlock( indent, lineViews, dedent )
-			suiteElement = SoftStructuralItem( PythonSyntaxRecognizingController.instance, pythonView._makeCompoundSuiteEditFilter( suite ), Schema.IndentedBlock( suite=suite ), suiteElement )
+			suiteElement = SoftStructuralItem( PythonSyntaxRecognizingController.instance,
+							   PythonSyntaxRecognizingController.instance._makeCompoundSuiteEditFilter( suite ),
+							   Schema.IndentedBlock( suite=suite ), suiteElement )
 
 			statementContents.extend( [ headerStatementLine.alignHExpand(), suiteElement.alignHExpand() ] )
 		else:
@@ -202,19 +136,19 @@ def compoundStatementEditor(pythonView, inheritedState, model, compoundBlocks):
 
 
 
-def spanPrefixOpView(grammar, inheritedState, model, x, op):
+def spanPrefixOpView(model, x, op):
 	xView = SREInnerFragment( x, nodePrecedence[model], EditMode.DISPLAY )
 	return spanPrefixOp( xView, op )
 
 
-def spanBinOpView(grammar, inheritedState, model, x, y, op):
+def spanBinOpView(model, x, y, op):
 	xPrec, yPrec = computeBinOpViewPrecedenceValues( nodePrecedence[model], rightAssociative[model] )
 	xView = SREInnerFragment( x, xPrec, EditMode.DISPLAY )
 	yView = SREInnerFragment( y, yPrec, EditMode.DISPLAY )
 	return spanBinOp( xView, yView, op )
 
 
-def spanCmpOpView(grammar, inheritedState, model, op, y):
+def spanCmpOpView(model, op, y):
 	yView = SREInnerFragment( y, nodePrecedence[model], EditMode.DISPLAY )
 	return spanCmpOp( op, yView )
 
@@ -471,15 +405,15 @@ def _pythonTargetContextMenuFactory(element, menu):
 def Unparsed(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
-		return self._unparsedEditRule.applyToFragment( v, model, inheritedState )
+		return PythonSyntaxRecognizingController.instance._unparsedEditRule.applyToFragment( v, model, inheritedState )
 	return redecorateDispatchMethod( method, _m )
-		
+
 
 
 def UnparsedStatement(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
-		v = self._unparsedStatementEditRule.applyToFragment( statementLine( v ), model, inheritedState )
+		v = PythonSyntaxRecognizingController.instance._unparsedStatementEditRule.applyToFragment( statementLine( v ), model, inheritedState )
 		v = _applyIndentationShortcuts( v )
 		return v
 	return redecorateDispatchMethod( method, _m )
@@ -489,7 +423,7 @@ def UnparsedStatement(method):
 def TargetTopLevel(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
-		return self._targetTopLevelEditRule.applyToFragment( v, model, inheritedState )
+		return PythonSyntaxRecognizingController.instance._targetTopLevelEditRule.applyToFragment( v, model, inheritedState )
 	return redecorateDispatchMethod( method, _m )
 
 
@@ -497,7 +431,7 @@ def TargetTopLevel(method):
 def Expression(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
-		return self._expressionEditRule.applyToFragment( v, model, inheritedState )
+		return PythonSyntaxRecognizingController.instance._expressionEditRule.applyToFragment( v, model, inheritedState )
 	return redecorateDispatchMethod( method, _m )
 
 
@@ -505,7 +439,7 @@ def Expression(method):
 def StructuralExpression(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
-		return self._structuralExpressionEditRule.applyToFragment( v, model, inheritedState )
+		return PythonSyntaxRecognizingController.instance._structuralExpressionEditRule.applyToFragment( v, model, inheritedState )
 	return redecorateDispatchMethod( method, _m )
 
 
@@ -513,7 +447,7 @@ def StructuralExpression(method):
 def ExpressionTopLevel(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
-		return self._expressionTopLevelEditRule.applyToFragment( v, model, inheritedState )
+		return PythonSyntaxRecognizingController.instance._expressionTopLevelEditRule.applyToFragment( v, model, inheritedState )
 	return redecorateDispatchMethod( method, _m )
 
 
@@ -521,7 +455,7 @@ def ExpressionTopLevel(method):
 def Statement(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
-		v = self._statementEditRule.applyToFragment( statementLine( v ), model, inheritedState )
+		v = PythonSyntaxRecognizingController.instance._statementEditRule.applyToFragment( statementLine( v ), model, inheritedState )
 		v = _applyIndentationShortcuts( v )
 		return v
 	return redecorateDispatchMethod( method, _m )
@@ -532,13 +466,13 @@ def CompoundStatementHeader(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
 		if isinstance( v, tuple ):
-			e = self._compoundStatementHeaderEditRule.applyToFragment( statementLine( v[0] ), model, inheritedState )
+			e = PythonSyntaxRecognizingController.instance._compoundStatementHeaderEditRule.applyToFragment( statementLine( v[0] ), model, inheritedState )
 			e = _applyIndentationShortcuts( e )
 			for f in v[1:]:
 				e = f( e )
 			return e
 		else:
-			v = self._compoundStatementHeaderEditRule.applyToFragment( statementLine( v ), model, inheritedState )
+			v = PythonSyntaxRecognizingController.instance._compoundStatementHeaderEditRule.applyToFragment( statementLine( v ), model, inheritedState )
 			v = _applyIndentationShortcuts( v )
 			return v
 	return redecorateDispatchMethod( method, _m )
@@ -571,7 +505,7 @@ def SpecialFormStatement(method):
 		v = method(self, fragment, inheritedState, model, *args )
 		v = StructuralItem( PythonSyntaxRecognizingController.instance, model, v )
 		v = specialFormStatementLine( v )
-		v = self._specialFormStatementEditRule.applyToFragment( v, model, inheritedState )
+		v = PythonSyntaxRecognizingController.instance._specialFormStatementEditRule.applyToFragment( v, model, inheritedState )
 		v = _applyIndentationShortcuts( v )
 		return v
 	return redecorateDispatchMethod( method, _m )
@@ -587,41 +521,10 @@ def EmbeddedObjectExpression(method):
 
 
 class Python2View (MethodDispatchView):
-	def __init__(self, grammar):
+	def __init__(self):
 		super( Python2View, self ).__init__()
-		self._parser = grammar
-		
-		editor = PythonSyntaxRecognizingController.instance
-		
-		self._expr = editor.parsingEditFilter( 'Expression', grammar.expression(), pyReplaceNode )
-		self._stmt = editor.parsingEditFilter( 'Statement', grammar.simpleSingleLineStatementValid(), pyReplaceNode )
-		self._compHdr = editor.partialParsingEditFilter( 'Compound header', grammar.compoundStmtHeader() )
-		self._stmtUnparsed = editor.unparsedEditFilter( 'Unparsed statement', _isValidUnparsedStatementValue, _commitUnparsedStatment, _commitInnerUnparsed )
-		self._topLevel = editor.topLevelEditFilter()
-		self._exprOuterValid = editor.parsingEditFilter( 'Expression-outer-valid', grammar.tupleOrExpression(), _commitExprOuterValid, _commitExprOuterEmpty )
-		self._exprOuterInvalid = editor.unparsedEditFilter( 'Expression-outer-invalid', _isValidExprOrTargetOuterUnparsed, _commitExprOuterUnparsed )
-		self._targetOuterValid = editor.parsingEditFilter( 'Target-outer-valid', grammar.targetListOrTargetItem(), _commitTargetOuterValid, _commitTargetOuterEmpty )
-		self._targetOuterInvalid = editor.unparsedEditFilter( 'Target-outer-invalid', _isValidExprOrTargetOuterUnparsed, _commitTargetOuterUnparsed )
 
-		self._expressionEditRule = editor.editRule( _pythonPrecedenceHandler, [ self._expr ] )
-		self._structuralExpressionEditRule = editor.softStructuralEditRule( _pythonPrecedenceHandler, [ self._expr ] )
-		self._unparsedEditRule = editor.editRule( [ self._expr ] )
-		self._statementEditRule = editor.softStructuralEditRule( [ self._stmt, self._compHdr, self._stmtUnparsed ] )
-		self._unparsedStatementEditRule = editor.editRule( [ self._stmt, self._compHdr, self._stmtUnparsed ] )
-		self._compoundStatementHeaderEditRule = editor.softStructuralEditRule( [ self._compHdr, self._stmtUnparsed ] )
-		self._specialFormStatementEditRule = editor.softStructuralEditRule( [ self._stmt, self._compHdr, self._stmtUnparsed ] )
-		self._targetTopLevelEditRule = editor.softStructuralEditRule( _pythonPrecedenceHandler, [ self._targetOuterValid, self._targetOuterInvalid, self._topLevel ] )
-		self._expressionTopLevelEditRule = editor.softStructuralEditRule( _pythonPrecedenceHandler, [ self._exprOuterValid, self._exprOuterInvalid, self._topLevel ] )
 
-		
-	def _makeSuiteEditFilter(self, suite):
-		return PythonSyntaxRecognizingController.instance.parsingEditFilter( 'Suite', self._parser.suite(), _makeSuiteCommitFn( suite ) )
-
-	def _makeCompoundSuiteEditFilter(self, suite):
-		return PythonSyntaxRecognizingController.instance.parsingEditFilter( 'Suite', self._parser.compoundSuite(), _makeSuiteCommitFn( suite ) )
-
-		
-		
 		
 	# OUTER NODES
 	@DMObjectNodeDispatchMethod( Schema.PythonModule )
@@ -637,7 +540,8 @@ class Python2View (MethodDispatchView):
 		s = s.withCommands( PythonCommands.pythonTargetCommands )
 		s = s.withCommands( PythonCommands.pythonCommands )
 		s = ApplyStyleSheetFromAttribute( PythonEditorStyle.paragraphIndentationStyle, s )
-		s = SoftStructuralItem( PythonSyntaxRecognizingController.instance, [ self._makeSuiteEditFilter( suite ), self._topLevel ], suite, s )
+		s = SoftStructuralItem( PythonSyntaxRecognizingController.instance, [ PythonSyntaxRecognizingController.instance._makeSuiteEditFilter( suite ),
+										      PythonSyntaxRecognizingController.instance._topLevel ], suite, s )
 		return s
 
 
@@ -655,7 +559,8 @@ class Python2View (MethodDispatchView):
 		s = s.withCommands( PythonCommands.pythonTargetCommands )
 		s = s.withCommands( PythonCommands.pythonCommands )
 		s = ApplyStyleSheetFromAttribute( PythonEditorStyle.paragraphIndentationStyle, s )
-		s = SoftStructuralItem( PythonSyntaxRecognizingController.instance, [ self._makeSuiteEditFilter( suite ), self._topLevel ], suite, s )
+		s = SoftStructuralItem( PythonSyntaxRecognizingController.instance, [ PythonSyntaxRecognizingController.instance._makeSuiteEditFilter( suite ),
+										      PythonSyntaxRecognizingController.instance._topLevel ], suite, s )
 		return s
 
 
@@ -1029,23 +934,23 @@ class Python2View (MethodDispatchView):
 	@DMObjectNodeDispatchMethod( Schema.Invert )
 	@Expression
 	def Invert(self, fragment, inheritedState, model, x):
-		return spanPrefixOpView( self._parser, inheritedState, model, x, '~' )
+		return spanPrefixOpView( model, x, '~' )
 
 	@DMObjectNodeDispatchMethod( Schema.Negate )
 	@Expression
 	def Negate(self, fragment, inheritedState, model, x):
-		return spanPrefixOpView( self._parser, inheritedState, model, x, '-' )
+		return spanPrefixOpView( model, x, '-' )
 
 	@DMObjectNodeDispatchMethod( Schema.Pos )
 	@Expression
 	def Pos(self, fragment, inheritedState, model, x):
-		return spanPrefixOpView( self._parser, inheritedState, model, x, '+' )
+		return spanPrefixOpView( model, x, '+' )
 
 
 	@DMObjectNodeDispatchMethod( Schema.Mul )
 	@Expression
 	def Mul(self, fragment, inheritedState, model, x, y):
-		return spanBinOpView( self._parser, inheritedState, model, x, y, '*' )
+		return spanBinOpView( model, x, y, '*' )
 
 	@DMObjectNodeDispatchMethod( Schema.Div )
 	@StructuralExpression
@@ -1058,45 +963,45 @@ class Python2View (MethodDispatchView):
 	@DMObjectNodeDispatchMethod( Schema.Mod )
 	@Expression
 	def Mod(self, fragment, inheritedState, model, x, y):
-		return spanBinOpView( self._parser, inheritedState, model, x, y, '%' )
+		return spanBinOpView( model, x, y, '%' )
 
 
 	@DMObjectNodeDispatchMethod( Schema.Add )
 	@Expression
 	def Add(self, fragment, inheritedState, model, x, y):
-		return spanBinOpView( self._parser, inheritedState, model, x, y, '+' )
+		return spanBinOpView( model, x, y, '+' )
 
 	@DMObjectNodeDispatchMethod( Schema.Sub )
 	@Expression
 	def Sub(self, fragment, inheritedState, model, x, y):
-		return spanBinOpView( self._parser, inheritedState, model, x, y, '-' )
+		return spanBinOpView( model, x, y, '-' )
 
 
 	@DMObjectNodeDispatchMethod( Schema.LShift )
 	@Expression
 	def LShift(self, fragment, inheritedState, model, x, y):
-		return spanBinOpView( self._parser, inheritedState, model, x, y, '<<' )
+		return spanBinOpView( model, x, y, '<<' )
 
 	@DMObjectNodeDispatchMethod( Schema.RShift )
 	@Expression
 	def RShift(self, fragment, inheritedState, model, x, y):
-		return spanBinOpView( self._parser, inheritedState, model, x, y, '>>' )
+		return spanBinOpView( model, x, y, '>>' )
 
 
 	@DMObjectNodeDispatchMethod( Schema.BitAnd )
 	@Expression
 	def BitAnd(self, fragment, inheritedState, model, x, y):
-		return spanBinOpView( self._parser, inheritedState, model, x, y, '&' )
+		return spanBinOpView( model, x, y, '&' )
 
 	@DMObjectNodeDispatchMethod( Schema.BitXor )
 	@Expression
 	def BitXor(self, fragment, inheritedState, model, x, y):
-		return spanBinOpView( self._parser, inheritedState, model, x, y, '^' )
+		return spanBinOpView( model, x, y, '^' )
 
 	@DMObjectNodeDispatchMethod( Schema.BitOr )
 	@Expression
 	def BitOr(self, fragment, inheritedState, model, x, y):
-		return spanBinOpView( self._parser, inheritedState, model, x, y, '|' )
+		return spanBinOpView( model, x, y, '|' )
 
 
 	@DMObjectNodeDispatchMethod( Schema.Cmp )
@@ -1108,57 +1013,57 @@ class Python2View (MethodDispatchView):
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpLte )
 	def CmpOpLte(self, fragment, inheritedState, model, y):
-		return spanCmpOpView( self._parser, inheritedState, model, '<=', y )
+		return spanCmpOpView( model, '<=', y )
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpLt )
 	def CmpOpLt(self, fragment, inheritedState, model, y):
-		return spanCmpOpView( self._parser, inheritedState, model, '<', y )
+		return spanCmpOpView( model, '<', y )
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpGte )
 	def CmpOpGte(self, fragment, inheritedState, model, y):
-		return spanCmpOpView( self._parser, inheritedState, model, '>=', y )
+		return spanCmpOpView( model, '>=', y )
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpGt )
 	def CmpOpGt(self, fragment, inheritedState, model, y):
-		return spanCmpOpView( self._parser, inheritedState, model, '>', y )
+		return spanCmpOpView( model, '>', y )
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpEq )
 	def CmpOpEq(self, fragment, inheritedState, model, y):
-		return spanCmpOpView( self._parser, inheritedState, model, '==', y )
+		return spanCmpOpView( model, '==', y )
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpNeq )
 	def CmpOpNeq(self, fragment, inheritedState, model, y):
-		return spanCmpOpView( self._parser, inheritedState, model, '!=', y )
+		return spanCmpOpView( model, '!=', y )
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpIsNot )
 	def CmpOpIsNot(self, fragment, inheritedState, model, y):
-		return spanCmpOpView( self._parser, inheritedState, model, 'is not', y )
+		return spanCmpOpView( model, 'is not', y )
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpIs )
 	def CmpOpIs(self, fragment, inheritedState, model, y):
-		return spanCmpOpView( self._parser, inheritedState, model, 'is', y )
+		return spanCmpOpView( model, 'is', y )
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpNotIn )
 	def CmpOpNotIn(self, fragment, inheritedState, model, y):
-		return spanCmpOpView( self._parser, inheritedState, model, 'not in', y )
+		return spanCmpOpView( model, 'not in', y )
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpIn )
 	def CmpOpIn(self, fragment, inheritedState, model, y):
-		return spanCmpOpView( self._parser, inheritedState, model, 'in', y )
+		return spanCmpOpView( model, 'in', y )
 
 
 
 	@DMObjectNodeDispatchMethod( Schema.NotTest )
 	def NotTest(self, fragment, inheritedState, model, x):
-		return spanPrefixOpView( self._parser, inheritedState, model, x, 'not ' )
+		return spanPrefixOpView( model, x, 'not ' )
 
 	@DMObjectNodeDispatchMethod( Schema.AndTest )
 	def AndTest(self, fragment, inheritedState, model, x, y):
-		return spanBinOpView( self._parser, inheritedState, model, x, y, 'and' )
+		return spanBinOpView( model, x, y, 'and' )
 
 	@DMObjectNodeDispatchMethod( Schema.OrTest )
 	def OrTest(self, fragment, inheritedState, model, x, y):
-		return spanBinOpView( self._parser, inheritedState, model, x, y, 'or' )
+		return spanBinOpView( model, x, y, 'or' )
 
 
 
@@ -1694,7 +1599,7 @@ class Python2View (MethodDispatchView):
 
 		suiteElement = badIndentedBlock( indent, lineViews, dedent )
 		suiteElement = SoftStructuralItem( PythonSyntaxRecognizingController.instance,
-		                                       PythonSyntaxRecognizingController.instance.parsingEditFilter( 'Suite', self._parser.compoundSuite(), _makeSuiteCommitFn( suite ) ),
+		                                       PythonSyntaxRecognizingController.instance.parsingEditFilter( 'Suite', _parser.compoundSuite(), _makeSuiteCommitFn( suite ) ),
 		                                       model, suiteElement )
 
 		return suiteElement
@@ -1807,8 +1712,8 @@ class Python2View (MethodDispatchView):
 
 
 
-_parser = Python2Grammar()
-_view = Python2View( _parser )
+_parser = PythonSyntaxRecognizingController.instance._grammar
+_view = Python2View()
 perspective = SequentialEditorPerspective( _view.fragmentViewFunction, PythonSyntaxRecognizingController.instance )
 
 

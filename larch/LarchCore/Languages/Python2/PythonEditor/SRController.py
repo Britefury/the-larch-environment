@@ -16,16 +16,31 @@ from BritefuryJ.Util.RichString import RichStringBuilder
 
 from BritefuryJ.Editor.Sequential import SequentialClipboardHandler, SelectionEditTreeEvent
 
-
+from BritefuryJ.Editor.SyntaxRecognizing.Precedence import PrecedenceHandler
 from BritefuryJ.Editor.SyntaxRecognizing import SyntaxRecognizingController
+
+from BritefuryJ.ModelAccess.DocModel import ClassAttributeReader, ObjectFieldReader
+
+
+
+from Britefury.SequentialEditor.Helpers import *
+
 
 from LarchCore.Languages.Python2 import Schema
 
 from LarchCore.Languages.Python2.PythonEditor.Precedence import *
 from LarchCore.Languages.Python2.PythonEditor.PythonEditOperations import *
+from LarchCore.Languages.Python2.PythonEditor.PythonEditorCombinators import openParen, closeParen
+from LarchCore.Languages.Python2.PythonEditor import Parser
 
 
 
+
+#
+#
+# Python edit events
+#
+#
 
 
 class PythonIndentationTreeEvent (EditEvent):
@@ -45,11 +60,139 @@ class DedentPythonSelectionTreeEvent (SelectionEditTreeEvent):
 	def __init__(self, sequentialController, sourceElement):
 		super( DedentPythonSelectionTreeEvent, self ).__init__( sequentialController, sourceElement )
 
-		
-		
-		
+
+
+
+
+#
+#
+# Commit functions
+#
+#
+
+def _isValidUnparsedStatementValue(value):
+	# Unparsed statement is only valid if there is ONE newline, and it is at the end
+	i = value.indexOf( '\n' )
+	return i != -1   and   i == len( value ) - 1
+
+def _commitUnparsedStatment(model, value):
+	withoutNewline = value[:-1]
+	unparsed = Schema.UnparsedStmt( value=Schema.UNPARSED( value=withoutNewline.getItemValues() ) )
+	# In some cases, we will be replacing @model with an UNPARSED node that contains a reference to @model.
+	# Since pyReplaceNode calls model.become(), this causes severe problems, due to circular references.
+	# The call to deepcopy eliminates this possibility.
+	pyReplaceNode( model, deepcopy( unparsed ) )
+
+def _commitInnerUnparsed(model, value):
+	unparsed = Schema.UNPARSED( value=value.getItemValues() )
+	# In some cases, we will be replacing @model with an UNPARSED node that contains a reference to @model.
+	# Since pyReplaceNode calls model.become(), this causes severe problems, due to circular references.
+	# The call to deepcopy eliminates this possibility.
+	pyReplaceNode( model, deepcopy( unparsed ) )
+
+
+
+
+def _isValidExprOrTargetOuterUnparsed(value):
+	return '\n' not in value
+
+
+def _commitExprOuterValid(model, parsed):
+	expr = model['expr']
+	if parsed != expr:
+		model['expr'] = parsed
+
+def _commitExprOuterEmpty(model, parsed):
+	model['expr'] = Schema.UNPARSED( value=[ '' ] )
+
+def _commitExprOuterUnparsed(model, value):
+	values = value.getItemValues()
+	if values == []:
+		values = [ '' ]
+	model['expr'] = Schema.UNPARSED( value=values )
+
+
+def _commitTargetOuterValid(model, parsed):
+	expr = model['target']
+	if parsed != expr:
+		model['target'] = parsed
+
+def _commitTargetOuterEmpty(model, parsed):
+	model['target'] = Schema.UNPARSED( value=[ '' ] )
+
+def _commitTargetOuterUnparsed(model, value):
+	values = value.getItemValues()
+	if values == []:
+		values = [ '' ]
+	model['target'] = Schema.UNPARSED( value=values )
+
+
+
+def _makeSuiteCommitFn(suite):
+	def _commit(model, parsed):
+		modifySuiteMinimisingChanges( suite, parsed )
+	return _commit
+
+
+
+
+
+#
+# Precedence handler
+#
+
+_pythonPrecedenceHandler = PrecedenceHandler( ClassAttributeReader( parensRequired ), ObjectFieldReader( 'parens' ).stringToInteger( -1 ), ClassAttributeReader( nodePrecedence ), openParen, closeParen )
+
+
+
+
 		
 class PythonSyntaxRecognizingController (SyntaxRecognizingController):
+	def __init__(self, name='Py2Edit'):
+		super( PythonSyntaxRecognizingController, self ).__init__( name )
+
+		self._grammar = Parser.Python2Grammar()
+
+
+		self._expr = self.parsingEditFilter( 'Expression', self._grammar.expression(), pyReplaceNode )
+		self._stmt = self.parsingEditFilter( 'Statement', self._grammar.simpleSingleLineStatementValid(), pyReplaceNode )
+		self._compHdr = self.partialParsingEditFilter( 'Compound header', self._grammar.compoundStmtHeader() )
+		self._stmtUnparsed = self.unparsedEditFilter( 'Unparsed statement', _isValidUnparsedStatementValue, _commitUnparsedStatment, _commitInnerUnparsed )
+		self._topLevel = self.topLevelEditFilter()
+		self._exprOuterValid = self.parsingEditFilter( 'Expression-outer-valid', self._grammar.tupleOrExpression(), _commitExprOuterValid, _commitExprOuterEmpty )
+		self._exprOuterInvalid = self.unparsedEditFilter( 'Expression-outer-invalid', _isValidExprOrTargetOuterUnparsed, _commitExprOuterUnparsed )
+		self._targetOuterValid = self.parsingEditFilter( 'Target-outer-valid', self._grammar.targetListOrTargetItem(), _commitTargetOuterValid, _commitTargetOuterEmpty )
+		self._targetOuterInvalid = self.unparsedEditFilter( 'Target-outer-invalid', _isValidExprOrTargetOuterUnparsed, _commitTargetOuterUnparsed )
+
+		self._expressionEditRule = self.editRule( _pythonPrecedenceHandler, [ self._expr ] )
+		self._structuralExpressionEditRule = self.softStructuralEditRule( _pythonPrecedenceHandler, [ self._expr ] )
+		self._unparsedEditRule = self.editRule( [ self._expr ] )
+		self._statementEditRule = self.softStructuralEditRule( [ self._stmt, self._compHdr, self._stmtUnparsed ] )
+		self._unparsedStatementEditRule = self.editRule( [ self._stmt, self._compHdr, self._stmtUnparsed ] )
+		self._compoundStatementHeaderEditRule = self.softStructuralEditRule( [ self._compHdr, self._stmtUnparsed ] )
+		self._specialFormStatementEditRule = self.softStructuralEditRule( [ self._stmt, self._compHdr, self._stmtUnparsed ] )
+		self._targetTopLevelEditRule = self.softStructuralEditRule( _pythonPrecedenceHandler, [ self._targetOuterValid, self._targetOuterInvalid, self._topLevel ] )
+		self._expressionTopLevelEditRule = self.softStructuralEditRule( _pythonPrecedenceHandler, [ self._exprOuterValid, self._exprOuterInvalid, self._topLevel ] )
+
+
+
+
+
+	def _makeSuiteEditFilter(self, suite):
+		return self.parsingEditFilter( 'Suite', self._grammar.suite(), _makeSuiteCommitFn( suite ) )
+
+	def _makeCompoundSuiteEditFilter(self, suite):
+		return self.parsingEditFilter( 'Suite', self._grammar.compoundSuite(), _makeSuiteCommitFn( suite ) )
+
+
+
+
+
+
+
+
+
+
 	def isEditEvent(self, event):
 		return isinstance( event, PythonIndentationTreeEvent )
 	
