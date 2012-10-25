@@ -33,43 +33,50 @@ class _SeqEditorDescriptor (object):
 
 
 
-class RichStringCommitFilterMethod (_SeqEditorDescriptor):
-	def __init__(self, method):
+class RichStringFilterDeclaration (_SeqEditorDescriptor):
+	def __init__(self):
+		self.__method = None
+
+
+	def commitMethod(self, method):
 		self.__method = method
 
-	def _filterForInstance(self, obj):
-		return _cache( obj, self, lambda : obj.richStringCommitFilter( lambda model, value: self.__method( obj, model, value ) ) )
+
+	def _filterForInstance(self, controller):
+		return _cache( controller, self, lambda: controller.richStringCommitFilter( lambda model, value: self.__method( controller, model, value ) ) )
 
 	def __get__(self, obj, type):
 		if obj is None:
 			return self
 		else:
+			if self.__method is not None:
+				raise ValueError, 'Commit method of RichStringFilterDeclaration \'{0}\' not set'.format( type( obj ).__name__ )
 			return self._filterForInstance( obj )
 
 
 
-class _AbstractEditRuleFromFilters (_SeqEditorDescriptor):
-	def __init__(self, filterDescriptors):
-		self.__filterDescriptors = filterDescriptors
+class _AbstractEditRuleDeclaration (_SeqEditorDescriptor):
+	def __init__(self, filterDeclarations):
+		self.__filterDeclarations = filterDeclarations
 
-	def _filters(self, obj):
-		return  [f._filterForInstance( obj )   for f in self.__filterDescriptors ]
+	def _filters(self, controller):
+		return  [ f._filterForInstance( controller )   for f in self.__filterDeclarations ]
 
 
-class EditRuleFromFilters (_AbstractEditRuleFromFilters):
+class EditRuleDeclaration (_AbstractEditRuleDeclaration):
 	def __get__(self, obj, type):
 		if obj is None:
 			return self
 		else:
-			return _cache( obj, self, lambda : _WrappedEditRule( obj.editRule( self._filters( obj ) ) ) )
+			return _cache( obj, self, lambda: _WrappedEditRule( obj.editRule( self._filters( obj ) ) ) )
 
 
-class SoftStructuralEditRuleFromFilter (_AbstractEditRuleFromFilters):
+class SoftStructuralEditRuleDeclaration (_AbstractEditRuleDeclaration):
 	def __get__(self, obj, type):
 		if obj is None:
 			return self
 		else:
-			return _cache( obj, self, lambda : _WrappedEditRule( obj.softStructuralEditRule( self._filters( obj ) ) ) )
+			return _cache( obj, self, lambda: _WrappedEditRule( obj.softStructuralEditRule( self._filters( obj ) ) ) )
 
 
 
@@ -77,6 +84,12 @@ class _WrappedEditRule (object):
 	def __init__(self, rule):
 		self.__rule = rule
 		self.applyToFragment = rule.applyToFragment
+
+
+	@property
+	def rule(self):
+		return self.__rule
+
 
 	def __call__(self, method):
 		def _m(*args):
