@@ -3,13 +3,13 @@
     <!--this file was created by Eclipse Runnable JAR Export Wizard-->
     <!--ANT 1.7 is required                                        -->
     <property name="larch.version" value="UNVERSIONED"/>
+	<property name="jython.path" value="/jython2.7a2_s/jython.jar"/>
 
 	<target name="standalone_jar">
         <jar destfile="./larch-standalone-${larch.version}.jar">
             <manifest>
                 <attribute name="Main-Class" value="Main.Main"/>
                 <attribute name="Class-Path" value="."/>
-				<attribute name="Built-By" value="${user.name}" />
 				<section name="Build-Info">
 					<attribute name="version" value="${larch.version}" />
 				</section>
@@ -21,7 +21,7 @@
 				<exclude name="visualtests"/>
 			</fileset>
             <fileset dir="./larch"/>
-            <zipfileset excludes="META-INF/*.SF" src="C:/jython2.7a2_s/jython.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${jython.path}"/>
             <zipfileset excludes="META-INF/*.SF" src="./extlibs/jericho-html-3.2.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="./extlibs/svgSalamander.jar"/>
         </jar>
