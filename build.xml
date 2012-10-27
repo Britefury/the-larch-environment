@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="standalone_jar" name="Create Runnable Jar for Project Larch">
+<project default="standalone_jar" name="Build larch distributable files">
     <!--this file was created by Eclipse Runnable JAR Export Wizard-->
     <!--ANT 1.7 is required                                        -->
-    <target name="standalone_jar">
-        <jar destfile="./larch-standalone.jar">
+    <property name="larch.version" value="UNVERSIONED"/>
+
+	<target name="standalone_jar">
+        <jar destfile="./larch-standalone-${larch.version}.jar">
             <manifest>
                 <attribute name="Main-Class" value="Main.Main"/>
                 <attribute name="Class-Path" value="."/>
+				<attribute name="Built-By" value="${user.name}" />
+				<section name="Build-Info">
+					<attribute name="version" value="${larch.version}" />
+				</section>
             </manifest>
             <fileset dir="./bin">
 				<exclude name="tests/**/*"/>
