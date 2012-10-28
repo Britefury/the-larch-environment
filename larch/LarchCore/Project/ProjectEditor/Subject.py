@@ -22,6 +22,7 @@ from BritefuryJ.Pres.Pres import *
 from BritefuryJ.Pres.Primitive import *
 
 from LarchCore.MainApp import DocumentManagement
+from LarchCore.MainApp import AppLocationPath
 
 from LarchCore.Project.ProjectPage import ProjectPage
 from LarchCore.Project.ProjectPackage import ProjectPackage
@@ -151,6 +152,7 @@ class _RootSubject (Subject):
 	def getSubjectContext(self):
 		return self.enclosingSubject.getSubjectContext().withAttrs( document=self._document, docLocation=self._location, location=self._location )
 
+
 	def getChangeHistory(self):
 		return self._document.getChangeHistory()
 	
@@ -180,8 +182,18 @@ class ProjectSubject (_RootSubject):
 		self._packageFinder = PackageFinder( self, model, location )
 		self._rootFinder = RootFinder( self, model.pythonPackageName )
 		self._rootSubject = _RootSubject( document, model, enclosingSubject, location, importName, title )
-		
-		
+
+
+
+	def getSubjectContext(self):
+		t = super( ProjectSubject, self ).getSubjectContext()
+		index = self._model.contentsMap.get( 'index' )
+		if index is not None  and  isinstance( index, ProjectPage ):
+			location = self._location + '.___project___'
+		else:
+			location = self._location
+		return AppLocationPath.addLocationPathEntry( t, 'Project', location )
+
 
 	def redirect(self):
 		index = self._model.contentsMap.get( 'index' )

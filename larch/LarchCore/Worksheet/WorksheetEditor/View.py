@@ -54,6 +54,8 @@ from BritefuryJ.Editor.Sequential.Item import *
 
 from LarchCore.Languages.Python2 import Python2
 
+from LarchCore.MainApp import AppLocationPath
+
 from LarchCore.Worksheet.WorksheetCommands import worksheetCommands
 from LarchCore.Worksheet.WorksheetEditor import EditorSchema
 from LarchCore.Worksheet.WorksheetEditor.RichTextController import WorksheetRichTextController
@@ -265,7 +267,7 @@ class WorksheetEditor (MethodDispatchView):
 		
 		homeLink = Hyperlink( 'HOME PAGE', Location( '' ) )
 		viewLink = Hyperlink( 'Switch to user mode', viewLocation )
-		linkHeader = SplitLinkHeaderBar( [ viewLink ], [ homeLink ] )
+		linkHeader = AppLocationPath.appLinkheaderBar( fragment.getSubjectContext(), [ viewLink ] )
 
 
 		tip = TipBox( 'Type to add text to the worksheet.\nRight click to access the context menu, from which styles can be applied and code can be added.\n' + \

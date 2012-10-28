@@ -50,6 +50,7 @@ from BritefuryJ.Projection import Perspective
 
 
 from LarchCore.MainApp import DocumentManagement
+from LarchCore.MainApp import AppLocationPath
 
 from LarchCore.Project.ProjectRoot import ProjectRoot
 from LarchCore.Project.ProjectPackage import ProjectPackage
@@ -361,8 +362,7 @@ class ProjectView (MethodDispatchView):
 		inheritedState = inheritedState.withAttrs( location=location )
 
 		# Link to home page, in link header bar
-		homeLink = Hyperlink( 'HOME PAGE', Location( '' ) )
-		linkHeader = LinkHeaderBar( [ homeLink ] )
+		linkHeader = AppLocationPath.appLinkheaderBar( fragment.getSubjectContext(), [] )
 
 		# Title
 		title = TitleBar( document.getDocumentName() )
