@@ -11,9 +11,15 @@ from BritefuryJ.Browser import Location
 
 from BritefuryJ.Projection import Subject
 
+from BritefuryJ.DefaultPerspective import DefaultPerspective
+
+from BritefuryJ.Pres.Primitive import Column
+
+from LarchCore.MainApp import AppLocationPath
+
 from LarchCore.Languages.Python2 import Schema
 from LarchCore.Languages.Python2.CodeGenerator import compileForModuleExecution
-from LarchCore.Languages.Python2.PythonEditor.View import perspective
+from LarchCore.Languages.Python2.PythonEditor.View import perspective as python2Perspective
 
 
 def _getSuiteStmtByName(suite, name):
@@ -39,7 +45,7 @@ class _MemberSubject (Subject):
 		return self._model
 	
 	def getPerspective(self):
-		return perspective
+		return python2Perspective
 	
 	def getTitle(self):
 		return self._pythonSubject.getTitle() + ' [' + self._name + ']'
@@ -81,9 +87,19 @@ class _Python2ModuleLoader (object):
 		code = compileForModuleExecution( mod, self._model, fullname )
 		exec code in mod.__dict__
 		return mod
-	
-	
-	
+
+
+
+class _Python2Page (object):
+	def __init__(self, model):
+		self._model = model
+
+	def __present__(self, fragment, inherited_state):
+		linkHeader = AppLocationPath.appLinkheaderBar( fragment.getSubjectContext(), [] )
+		pyView = python2Perspective.applyTo( self._model )
+		return Column( [ linkHeader.padY( 0.0, 5.0 ).alignVRefY(), pyView.alignVRefYExpand() ] )
+
+
 class Python2Subject (Subject):
 	def __init__(self, document, model, enclosingSubject, location, importName, title):
 		super( Python2Subject, self ).__init__( enclosingSubject )
@@ -93,19 +109,21 @@ class Python2Subject (Subject):
 		self._location = location
 		self._importName = importName
 		self._title = title
+		self._page = _Python2Page( model )
 
 
 	def getFocus(self):
-		return self._model
+		return self._page
 	
 	def getPerspective(self):
-		return perspective
+		return DefaultPerspective.instance
 	
 	def getTitle(self):
 		return self._title + ' [Py25]'
 	
 	def getSubjectContext(self):
-		return self.enclosingSubject.getSubjectContext().withAttrs( location=self._location )
+		t = self.enclosingSubject.getSubjectContext().withAttrs( location=self._location )
+		return AppLocationPath.addLocationPathEntry( t, 'Python 2.x', self._location )
 
 	def getChangeHistory(self):
 		return self._document.getChangeHistory()
