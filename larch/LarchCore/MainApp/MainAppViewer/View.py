@@ -43,6 +43,8 @@ from BritefuryJ.Projection import Perspective, Subject
 
 from LarchCore.MainApp import Application
 from LarchCore.MainApp import DocumentManagement
+from LarchCore.MainApp import AppLocationPath
+
 
 from LarchCore.PythonConsole import Console
 
@@ -174,8 +176,8 @@ class AppView (MethodDispatchView):
 		
 		systemLink = Hyperlink( 'TEST PAGES', Location( 'tests' ) )
 		configurationLink = Hyperlink( 'CONFIGURATION PAGE', Location( 'config' ) )
-		linkHeader = LinkHeaderBar( [ configurationLink, systemLink ] )
-		
+		linkHeader = AppLocationPath.appLinkheaderBar( fragment.getSubjectContext(), [ configurationLink, systemLink ] )
+
 		title = TitleBar( 'The Larch Environment' )
 		
 		newLink = Hyperlink( 'NEW', _onNewDoc )

@@ -17,6 +17,7 @@ from Britefury.Kernel.Document import Document
 from LarchCore.PythonConsole import Console
 
 from LarchCore.MainApp.MainAppViewer.View import perspective
+from LarchCore.MainApp import AppLocationPath
 
 
 
@@ -69,8 +70,9 @@ class MainAppSubject (Subject):
 		return 'Larch'
 	
 	def getSubjectContext(self):
-		return SimpleAttributeTable.instance.withAttrs( world=self._world, document=None, docLocation=None, location=self._rootLocation )
-	
+		t = SimpleAttributeTable.instance.withAttrs( world=self._world, document=None, docLocation=None, location=self._rootLocation )
+		return AppLocationPath.addLocationPathEntry( t, 'Home', self._rootLocation )
+
 	
 	def loadDocument(self, filename):
 		document = Document.readFile( self._world, filename )

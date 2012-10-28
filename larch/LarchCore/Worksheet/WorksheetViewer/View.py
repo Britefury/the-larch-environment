@@ -47,6 +47,8 @@ from BritefuryJ.Projection import Perspective, Subject
 from LarchCore.Languages.Python2 import Python2
 from LarchCore.Languages.Python2.CodeGenerator import compileForModuleExecution
 
+from LarchCore.MainApp import AppLocationPath
+
 from LarchCore.Worksheet import Schema
 from LarchCore.Worksheet.WorksheetViewer import ViewSchema
 from LarchCore.Worksheet.WorksheetEditor.View import WorksheetEditorSubject
@@ -82,9 +84,8 @@ class WorksheetViewer (MethodDispatchView):
 		
 		editLocation = fragment.getSubjectContext()['editLocation']
 
-		homeLink = Hyperlink( 'HOME PAGE', Location( '' ) )
 		editLink = Hyperlink( 'Switch to developer mode', editLocation )
-		linkHeader = SplitLinkHeaderBar( [ editLink ], [ homeLink ] )
+		linkHeader = AppLocationPath.appLinkheaderBar( fragment.getSubjectContext(), [ editLink ] )
 
 		tip = TipBox( 'To edit this worksheet, or add content, click Developer mode at the top left',
 			      'larchcore.worksheet.view.toedit' )
@@ -268,8 +269,9 @@ class WorksheetViewerSubject (Subject):
 		return self._title + ' [Ws-User]'
 	
 	def getSubjectContext(self):
-		return self.enclosingSubject.getSubjectContext().withAttrs( location=self._location, editLocation=self._editLocation, viewLocation=self._location )
-	
+		t = self.enclosingSubject.getSubjectContext().withAttrs( location=self._location, editLocation=self._editLocation, viewLocation=self._location )
+		return AppLocationPath.addLocationPathEntry( t, 'Worksheet', self._location )
+
 	def getChangeHistory(self):
 		return self._document.getChangeHistory()
 
