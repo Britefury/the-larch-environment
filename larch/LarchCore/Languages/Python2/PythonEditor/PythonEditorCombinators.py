@@ -295,7 +295,9 @@ def multilineStringLiteral(valueLiveFunction, isUnicode, raw, editFn):
 			editFn( area.getDisplayedText() )
 
 
-	t = TextArea( valueLiveFunction, _Listener(), _stringTextPresFn   if not raw   else None )
+	t = TextArea( valueLiveFunction, _Listener() )
+	if not raw:
+		t = t.withTextToPresFunction( _stringTextPresFn )
 
 	return t
 

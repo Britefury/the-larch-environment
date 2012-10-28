@@ -1724,7 +1724,7 @@ perspective = SequentialEditorPerspective( _view.fragmentViewFunction, PythonSyn
 def _newMultilineString(caret):
 	return Schema.MultilineStringLiteral( value='', format='ascii' )
 
-_multilineStringCommand = Command( '&Mult-line &string', _newMultilineString )
+_multilineStringCommand = Command( '&Multi-line &string', _newMultilineString )
 
 
 @PythonCommands.SpecialFormExprAtCaretAction

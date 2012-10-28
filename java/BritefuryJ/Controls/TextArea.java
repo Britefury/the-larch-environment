@@ -381,6 +381,8 @@ public class TextArea extends ControlPres
 				@Override
 				public Pres textAreaPresent(FragmentView fragment, SimpleAttributeTable inheritedState)
 				{
+					fragment.disableInspector();
+					
 					listeners = PresentationStateListenerList.addListener( listeners, fragment );
 					
 					Pres textPres;
@@ -418,6 +420,8 @@ public class TextArea extends ControlPres
 			@Override
 			public Pres textAreaPresent(FragmentView fragment, SimpleAttributeTable inheritedState)
 			{
+				fragment.disableInspector();
+				
 				listeners = PresentationStateListenerList.addListener( listeners, fragment );
 				
 				Pres textBox = new Column( lines.toArray() ).alignHPack();
@@ -653,19 +657,9 @@ public class TextArea extends ControlPres
 		this( new LiveSourceValue( initialText ), listener, null );
 	}
 	
-	public TextArea(String initialText, TextAreaListener listener, TextToPresFn textToPres)
-	{
-		this( new LiveSourceValue( initialText ), listener, textToPres );
-	}
-	
 	public TextArea(LiveInterface value, TextAreaListener listener)
 	{
 		this( new LiveSourceRef( value ), listener, null );
-	}
-	
-	public TextArea(LiveInterface value, TextAreaListener listener, TextToPresFn textToPres)
-	{
-		this( new LiveSourceRef( value ), listener, textToPres );
 	}
 	
 	public TextArea(LiveValue value)
@@ -673,9 +667,10 @@ public class TextArea extends ControlPres
 		this( new LiveSourceRef( value ), new CommitListener( value ), null );
 	}
 	
-	public TextArea(LiveValue value, TextToPresFn textToPres)
+	
+	public TextArea withTextToPresFunction(TextToPresFn textToPres)
 	{
-		this( new LiveSourceRef( value ), new CommitListener( value ), textToPres );
+		return new TextArea( valueSource, listener, textToPres );
 	}
 	
 

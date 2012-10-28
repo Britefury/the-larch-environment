@@ -206,7 +206,7 @@ public class TextAreaTestPage extends TestPage
 		TextArea.RegexPresTable t = new TextArea.RegexPresTable();
 		t.addPattern( Pattern.compile( "\\\\\\\\" ), highlighter );
 		t.addPattern( Pattern.compile( "\\\\n" ), highlighter );
-		TextArea area = new TextArea( testString, listener, t );
+		TextArea area = new TextArea( testString, listener ).withTextToPresFunction( t );
 		
 		Pres resultBox = StyleSheet.style( Primitive.columnSpacing.as( 5.0 ) ).applyTo( new Column( new Object[] { new Heading6( "Text:" ), listener.getResultArea(),
 				new Heading6( "Event:" ), listener.getEventArea() } ) );
