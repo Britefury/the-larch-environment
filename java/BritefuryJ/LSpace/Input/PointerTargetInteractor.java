@@ -54,7 +54,7 @@ public class PointerTargetInteractor
 				Stack<LSElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
 				Stack<PointerButtonEvent> events = Pointer.eventStack( event, elements );
 				
-				while ( !elements.isEmpty() )
+				while ( !elements.isEmpty()  &&  !bHandled )
 				{
 					LSElement element = elements.peek();
 					PointerButtonEvent elementSpaceEvent = events.peek();
@@ -74,6 +74,7 @@ public class PointerTargetInteractor
 									targetDragElementRootToLocalXform = Pointer.rootToLocalTransform( elements );
 									targetDragInteractor = pressInt;
 									bHandled = true;
+									break;
 								}
 							}
 						}
