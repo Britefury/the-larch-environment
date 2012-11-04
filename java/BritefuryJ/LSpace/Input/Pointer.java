@@ -34,7 +34,8 @@ public class Pointer extends PointerInterface
 	}
 	
 	
-	private static final int TARGET_CLICK_INTERACTOR_PRIORITY = -2000;
+	private static final int TARGET_CLICK_INTERACTOR_PRIORITY = -3000;
+	private static final int SCROLL_INTERACTOR_PRIORITY = -2000;
 	private static final int NAVIGATION_INTERACTOR_PRIORITY = -1000;
 	private static final int CONTEXTMENU_INTERACTOR_PRIORITY = -500;
 	private static final int DND_INTERACTOR_PRIORITY = -400;
@@ -72,6 +73,7 @@ public class Pointer extends PointerInterface
 
 		
 		interactors.add( TARGET_CLICK_INTERACTOR_PRIORITY, targetInteractor.clickInteractor );
+		interactors.add( SCROLL_INTERACTOR_PRIORITY, new PointerScrollInteractor() );
 		interactors.add( NAVIGATION_INTERACTOR_PRIORITY, new PointerNavigationInteractor() );
 		interactors.add( CONTEXTMENU_INTERACTOR_PRIORITY, new PointerContextMenuInteractor() );
 		interactors.add( DND_INTERACTOR_PRIORITY, new PointerDndInteractor( rootElement, dndController ) );

@@ -37,59 +37,67 @@ public class CommandName extends CommandMnemonic
 		return cmdBorder.surround( completePres );
 	}
 
-	public Pres autocompleteVisual(String text)
+	public Pres autocompleteVisual(String autocompleteText)
 	{
-		String name = getName();
-		int start = name.toLowerCase().indexOf( text );
-		int end = start + text.length();
+		String name = getName().toLowerCase();
+		int highlighStart;
+		if ( name.startsWith( autocompleteText ) )
+		{
+			highlighStart = 0;
+		}
+		else
+		{
+			highlighStart = name.indexOf( " " + autocompleteText ) + 1;
+		}
+		int highlightEnd = highlighStart + autocompleteText.length();
 		
 		ArrayList<Pres> elements = new ArrayList<Pres>();
 		int pos = 0;
 		for (int x: getCharIndices())
 		{
-			addSegment( elements, name, pos, x, start, end );
+			addSegment( elements, name, pos, x, highlighStart, highlightEnd );
 			
-			addElement( elements, name, x, x + 1, ( x >= start  &&  x < end )  ?  autocompleteHighlightMnemonicStyle  :  autocompleteMnemonicStyle );
+			addElement( elements, name, x, x + 1, ( x >= highlighStart  &&  x < highlightEnd )  ?  autocompleteHighlightMnemonicStyle  :  autocompleteMnemonicStyle );
 			pos = x + 1;
 		}
-		addSegment( elements, name, pos, name.length(), start, end );
+		addSegment( elements, name, pos, name.length(), highlighStart, highlightEnd );
 		
-		/*Pres before = autocompleteStyle.applyTo( new Label( name.substring( 0, index ) ) );
-		Pres highlight = autocompleteHighlightStyle.applyTo( new Label( name.substring( index, end ) ) );
-		Pres after = autocompleteStyle.applyTo( new Label( name.substring( end ) ) );*/
-		Pres auto = new Row( elements.toArray( new Pres[0] ) );
-		return auto;
+		return new Row( elements.toArray( new Pres[0] ) );
 	}
 	
-	private void addSegment(List<Pres> elements, String name, int pos, int x, int start, int end)
+	private void addSegment(List<Pres> elements, String name, int segStart, int segEnd, int highlightStart, int highlightEnd)
 	{
-		if ( pos < x )
+		if ( segStart < segEnd )
 		{
-			if ( start >= pos  &&  start < x )
+			// The length of the segment is > 0
+			
+			if ( highlightEnd <= segStart )
 			{
-				if ( start > pos )
-				{
-					addElement( elements, name, pos, start, autocompleteStyle );
-				}
-				addElement( elements, name, start, x, autocompleteHighlightStyle );
+				// Highlight before segment; no overlap
+				addElement( elements, name, segStart, segEnd, autocompleteStyle );
 			}
-			else if ( end >= pos  &&  end < x )
+			else if ( highlightStart >= segEnd )
 			{
-				if ( end > pos )
-				{
-					addElement( elements, name, pos, end, autocompleteHighlightStyle );
-				}
-				addElement( elements, name, end, x, autocompleteStyle );
+				// Highlight after segment; no overlap
+				addElement( elements, name, segStart, segEnd, autocompleteStyle );
 			}
 			else
 			{
-				if ( pos > start  &&  pos < end )
+				// There is some overlap
+				
+				if ( highlightStart > segStart )
 				{
-					addElement( elements, name, pos, x, autocompleteHighlightStyle );
+					// There is some non-highlighted text before the highlight region start
+					addElement( elements, name, segStart, highlightStart, autocompleteStyle );
 				}
-				else
+				
+				// Highlighted text
+				addElement( elements, name, highlightStart, Math.min( segEnd, highlightEnd ), autocompleteHighlightStyle );
+				
+				if ( highlightEnd < segEnd )
 				{
-					addElement( elements, name, pos, x, autocompleteStyle );
+					// There is some non-highlighted text after the highlight region end
+					addElement( elements, name, highlightEnd, segEnd, autocompleteStyle );
 				}
 			}
 		}
