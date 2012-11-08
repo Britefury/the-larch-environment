@@ -9,8 +9,6 @@ import os
 
 from BritefuryJ.Isolation import IsolationPickle
 
-from Britefury.Config import Configuration
-
 
 _userConfigDirName = '.larch'
 

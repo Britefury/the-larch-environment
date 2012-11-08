@@ -9,7 +9,7 @@ from LarchCore.Worksheet.WorksheetViewer.View import perspective as worksheetVie
 from LarchCore.Worksheet import Schema
 from LarchCore.Worksheet.TextExporter import WorksheetTextExporter
 
-from LarchCore.Project.PageData import PageData, registerPageFactory, registerPageImporter
+from LarchCore.Project.PageData import PageData, registerPageFactory
 
 
 

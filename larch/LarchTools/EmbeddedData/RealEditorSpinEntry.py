@@ -5,8 +5,6 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
-__author__ = 'Geoff'
-
 from BritefuryJ.Parser.Utils import Tokens
 from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.Controls import RealSpinEntry, TextEntry

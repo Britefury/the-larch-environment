@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2010.
 ##-*************************
-from BritefuryJ.Pres.Primitive import *
+from BritefuryJ.Pres.Primitive import Label
 
 from Britefury.Config.ConfigurationPage import ConfigurationPage
 

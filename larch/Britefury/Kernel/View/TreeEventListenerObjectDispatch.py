@@ -7,7 +7,7 @@
 ##-*************************
 from BritefuryJ.LSpace import TreeEventListener
 from BritefuryJ.Dispatch import DispatchError
-from Britefury.Dispatch.MethodDispatch import methodDispatch, methodDispatchAndGetName, ObjectDispatchMethod
+from Britefury.Dispatch.MethodDispatch import methodDispatch
 
 
 		

@@ -29,10 +29,6 @@ from BritefuryJ.LSpace.Input import Modifier
 
 from BritefuryJ.Live import *
 
-from BritefuryJ.GraphViz import GraphViz, Configuration as GraphVizConfiguration
-
-from Britefury.Util.Abstract import abstractmethod
-
 from Britefury.Config.UserConfig import loadUserConfig, saveUserConfig
 from Britefury.Config import Configuration
 from Britefury.Config.ConfigurationPage import ConfigurationPage

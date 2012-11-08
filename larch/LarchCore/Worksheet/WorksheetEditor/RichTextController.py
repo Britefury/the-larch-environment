@@ -5,17 +5,12 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
-from copy import copy, deepcopy
-
 from BritefuryJ.DocModel import DMObject
 
 from BritefuryJ.Editor.RichText import RichTextController
 
-from Britefury.Util.Abstract import abstractmethod
-
 from LarchCore.Worksheet.WorksheetEditor import EditorSchema
 from LarchCore.Worksheet import AbstractViewSchema
-from LarchCore.Worksheet import Schema
 
 
 class WorksheetRichTextController (RichTextController):

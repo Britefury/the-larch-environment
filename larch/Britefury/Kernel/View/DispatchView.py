@@ -8,7 +8,6 @@
 from BritefuryJ.IncrementalView import ViewFragmentFunction
 
 from BritefuryJ.Dispatch import PyMethodDispatchViewFragmentFunction
-from Britefury.Dispatch.MethodDispatch import ObjectDispatchMethod, DMObjectNodeDispatchMethod
 
 
 

@@ -26,7 +26,7 @@ from LarchCore.MainApp import AppLocationPath
 
 from LarchCore.Project.ProjectPage import ProjectPage
 from LarchCore.Project.ProjectPackage import ProjectPackage
-from LarchCore.Project.ProjectEditor.View import perspective
+from LarchCore.Project.ProjectEditor import View
 from LarchCore.Project.ProjectEditor.ModuleFinder import RootFinder, PackageFinder
 
 
@@ -144,7 +144,7 @@ class _RootSubject (Subject):
 		return self._model
 
 	def getPerspective(self):
-		return perspective
+		return View.perspective
 
 	def getTitle(self):
 		return self._title + ' [Prj]'

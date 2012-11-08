@@ -5,11 +5,6 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
-import sys
-import os
-
-from datetime import datetime
-
 from java.lang import Runnable
 from javax.swing import AbstractAction, Action, TransferHandler, KeyStroke, BoxLayout, BorderFactory
 from javax.swing import JComponent, JFrame, JMenuItem, JMenu, JMenuBar, JMenuItem, JPopupMenu, JOptionPane, JFileChooser, JOptionPane, JTextField, JLabel, JPanel
@@ -32,12 +27,6 @@ from BritefuryJ.Pres.Help import *
 
 from BritefuryJ.Projection import Subject
 
-
-from Britefury.Util.Abstract import abstractmethod
-
-
-from Britefury.Kernel.World import World
-from Britefury.Kernel.Document import Document
 
 
 

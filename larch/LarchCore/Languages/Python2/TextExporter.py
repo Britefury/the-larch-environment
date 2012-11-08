@@ -5,11 +5,9 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2012.
 ##-*************************
-from copy import deepcopy
-
 from BritefuryJ.DocModel import DMObject, DMList, DMEmbeddedObject, DMEmbeddedIsolatedObject
 
-from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, methodDispatch
+from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod
 
 from LarchCore.Languages.Python2 import CodeGenerator
 from LarchCore.Languages.Python2 import Schema
