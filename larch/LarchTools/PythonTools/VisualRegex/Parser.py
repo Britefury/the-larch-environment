@@ -5,11 +5,6 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
-import re
-import string
-
-from copy import deepcopy
-
 from BritefuryJ.DocModel import DMObject, DMNode
 
 from BritefuryJ.Parser import Literal, Keyword, RegEx, Word, SeparatedList, ObjectNode

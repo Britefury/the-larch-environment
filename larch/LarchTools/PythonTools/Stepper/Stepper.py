@@ -5,8 +5,6 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
-__author__ = 'Geoff'
-
 from copy import deepcopy
 import imp
 
@@ -28,7 +26,6 @@ from BritefuryJ.Live import LiveValue
 
 from LarchCore.Languages.Python2.PythonCommands import pythonCommandSet, WrapSelectedStatementRangeInEmbeddedObjectAction, EmbeddedStatementAtCaretAction, chainActions
 from LarchCore.Languages.Python2.Embedded import EmbeddedPython2Suite
-from LarchCore.Languages.Python2.Execution import Execution
 
 
 

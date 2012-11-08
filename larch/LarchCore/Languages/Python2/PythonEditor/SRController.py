@@ -23,8 +23,6 @@ from BritefuryJ.ModelAccess.DocModel import ClassAttributeReader, ObjectFieldRea
 
 
 
-from Britefury.SequentialEditor.Helpers import *
-
 
 from LarchCore.Languages.Python2 import Schema
 

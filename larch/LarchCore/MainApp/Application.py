@@ -14,7 +14,6 @@ from BritefuryJ.Browser import Location
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from LarchCore.PythonConsole import Console
-from LarchCore.MainApp import FragmentInspector
 
 
 

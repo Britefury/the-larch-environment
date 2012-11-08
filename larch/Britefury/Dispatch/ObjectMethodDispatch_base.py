@@ -5,8 +5,6 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-import copy
-
 from BritefuryJ.Dispatch import ObjectDispatchPyMethodInvoker
 
 from BritefuryJ.Util import PolymorphicMap

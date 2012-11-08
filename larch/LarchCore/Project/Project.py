@@ -11,8 +11,10 @@ from BritefuryJ.Incremental import IncrementalValueMonitor
 from Britefury.Kernel.Document import Document
 from Britefury.Kernel.World import DocumentFactory
 
-from LarchCore.Project.ProjectEditor.View import perspective as projectEditorPerspective
-from LarchCore.Project.ProjectEditor.Subject import ProjectSubject
+# Fix cyclic imports:
+import LarchCore.Project.ProjectEditor.View
+import LarchCore.Project.ProjectEditor.Subject
+
 from LarchCore.Project.ProjectRoot import ProjectRoot
 
 

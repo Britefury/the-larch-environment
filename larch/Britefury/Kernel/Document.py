@@ -9,8 +9,6 @@ import os
 import sys
 import imp
 
-#import cPickle
-
 from datetime import datetime
 
 from BritefuryJ.ChangeHistory import ChangeHistory, ChangeHistoryListener
@@ -18,8 +16,6 @@ from BritefuryJ.ChangeHistory import ChangeHistory, ChangeHistoryListener
 from BritefuryJ.Isolation import IsolationPickle
 
 from Britefury import LoadBuiltins
-
-from Britefury.Kernel.World import World
 
 
 

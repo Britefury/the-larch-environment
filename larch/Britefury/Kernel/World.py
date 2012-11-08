@@ -9,7 +9,6 @@ import sys
 
 from Britefury.Kernel.Plugin import Plugin
 from Britefury.Config import Configuration
-from Britefury.Config.PathsConfigPage import getPathsConfig
 
 from BritefuryJ.AttributeTable import SimpleAttributeTable
 from BritefuryJ.Browser import Location
