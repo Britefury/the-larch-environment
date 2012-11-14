@@ -97,79 +97,79 @@ class _TrackedListWrapper (object):
 		return self._ls.count( x )
 	
 	def __setitem__(self, index, x):
-		ch = self._prop._getChangeHistory( self._instance )
+		ch = self._prop._getChangeHistory_( self._instance )
 		if isinstance( index, int )  or  isinstance( index, long ):
 			oldX = self._ls[index]
 			self._ls[index] = x
-			onTrackedListSetItem( ch, self, index, oldX, x, 'Tracked list \'%s\' set item' % self._prop._attrName )
+			onTrackedListSetItem( ch, self, index, oldX, x, 'Tracked list \'%s\' set item' % self._prop.__name__ )
 		else:
 			oldContents = self._ls[:]
 			self._ls[index] = x
 			newContents = self._ls[:]
-			onTrackedListSetContents( ch, self, oldContents, newContents, 'Tracked list \'%s\' set item' % self._prop._attrName )
-		self._prop._onChange( self._instance )
+			onTrackedListSetContents( ch, self, oldContents, newContents, 'Tracked list \'%s\' set item' % self._prop.__name__ )
+		self._prop._onChange_( self._instance )
 	
 	def __delitem__(self, index):
-		ch = self._prop._getChangeHistory( self._instance )
+		ch = self._prop._getChangeHistory_( self._instance )
 		oldContents = self._ls[:]
 		del self._ls[index]
 		newContents = self._ls[:]
-		onTrackedListSetContents( ch, self, oldContents, newContents, 'Tracked list \'%s\' del item' % self._prop._attrName )
-		self._prop._onChange( self._instance )
+		onTrackedListSetContents( ch, self, oldContents, newContents, 'Tracked list \'%s\' del item' % self._prop.__name__ )
+		self._prop._onChange_( self._instance )
 		
 	def append(self, x):
-		ch = self._prop._getChangeHistory( self._instance )
+		ch = self._prop._getChangeHistory_( self._instance )
 		self._ls.append( x )
-		onTrackedListAppend( ch, self, x, 'Tracked list \'%s\' append' % self._prop._attrName )
-		self._prop._onChange( self._instance )
+		onTrackedListAppend( ch, self, x, 'Tracked list \'%s\' append' % self._prop.__name__ )
+		self._prop._onChange_( self._instance )
 
 	def extend(self, xs):
-		ch = self._prop._getChangeHistory( self._instance )
+		ch = self._prop._getChangeHistory_( self._instance )
 		self._ls.extend( xs )
-		onTrackedListExtend( ch, self, xs, 'Tracked list \'%s\' extend' % self._prop._attrName )
-		self._prop._onChange( self._instance )
+		onTrackedListExtend( ch, self, xs, 'Tracked list \'%s\' extend' % self._prop.__name__ )
+		self._prop._onChange_( self._instance )
 	
 	def insert(self, i, x):
-		ch = self._prop._getChangeHistory( self._instance )
+		ch = self._prop._getChangeHistory_( self._instance )
 		self._ls.insert( i, x )
-		onTrackedListInsert( ch, self, i, x, 'Tracked list \'%s\' insert' % self._prop._attrName )
-		self._prop._onChange( self._instance )
+		onTrackedListInsert( ch, self, i, x, 'Tracked list \'%s\' insert' % self._prop.__name__ )
+		self._prop._onChange_( self._instance )
 
 	def pop(self):
-		ch = self._prop._getChangeHistory( self._instance )
+		ch = self._prop._getChangeHistory_( self._instance )
 		x = self._ls.pop()
-		onTrackedListPop( ch, self, x, 'Tracked list \'%s\' pop' % self._prop._attrName )
-		self._prop._onChange( self._instance )
+		onTrackedListPop( ch, self, x, 'Tracked list \'%s\' pop' % self._prop.__name__ )
+		self._prop._onChange_( self._instance )
 		return x
 		
 	def remove(self, x):
-		ch = self._prop._getChangeHistory( self._instance )
+		ch = self._prop._getChangeHistory_( self._instance )
 		i = self._ls.index( x )
 		xFromList = self._ls[i]
 		del self._ls[i]
-		onTrackedListRemove( ch, self, i, xFromList, 'Tracked list \'%s\' remove' % self._prop._attrName )
-		self._prop._onChange( self._instance )
+		onTrackedListRemove( ch, self, i, xFromList, 'Tracked list \'%s\' remove' % self._prop.__name__ )
+		self._prop._onChange_( self._instance )
 		
 	def reverse(self):
-		ch = self._prop._getChangeHistory( self._instance )
+		ch = self._prop._getChangeHistory_( self._instance )
 		self._ls.reverse()
-		onTrackedListReverse( ch, self, 'Tracked list \'%s\' reverse' % self._prop._attrName )
-		self._prop._onChange( self._instance )
+		onTrackedListReverse( ch, self, 'Tracked list \'%s\' reverse' % self._prop.__name__ )
+		self._prop._onChange_( self._instance )
 	
 	def sort(self, cmp=None, key=None, reverse=None):
-		ch = self._prop._getChangeHistory( self._instance )
+		ch = self._prop._getChangeHistory_( self._instance )
 		oldContents = self._ls[:]
 		self._ls.sort( cmp, key, reverse )
 		newContents = self._ls[:]
-		onTrackedListSetContents( ch, self, oldContents, newContents, 'Tracked list \'%s\' sort' % self._prop._attrName )
-		self._prop._onChange( self._instance )
+		onTrackedListSetContents( ch, self, oldContents, newContents, 'Tracked list \'%s\' sort' % self._prop.__name__ )
+		self._prop._onChange_( self._instance )
 	
 	def _setContents(self, xs):
-		ch = self._prop._getChangeHistory( self._instance )
+		ch = self._prop._getChangeHistory_( self._instance )
 		oldContents = self._ls[:]
 		self._ls[:] = xs
-		onTrackedListSetContents( ch, self, oldContents, xs, 'Tracked list \'%s\' set contents' % self._prop._attrName )
-		self._prop._onChange( self._instance )
+		onTrackedListSetContents( ch, self, oldContents, xs, 'Tracked list \'%s\' set contents' % self._prop.__name__ )
+		self._prop._onChange_( self._instance )
 	
 	
 	def __get_trackable_contents__(self):
@@ -178,31 +178,70 @@ class _TrackedListWrapper (object):
 
 
 class TrackedListProperty (object):
-	def __init__(self, attrName, changeHistoryAttrName='__change_history__', onChangeMethod=None):
-		self._attrName = intern( attrName )
-		self._changeHistoryAttrName = intern( changeHistoryAttrName )
-		self._onChangeMethod = onChangeMethod
-	
-		
+	def __init__(self, getter, changeHistoryAttrNameOrGetter='__change_history__', onChangeMethod=None):
+		self.__name__ = getter.__name__
+
+		self.__getter = getter
+		self.__setter = None
+
+		if changeHistoryAttrNameOrGetter is None:
+			self.__changeHistoryGetter = lambda instance: getattr( instance, '__change_history__' )
+		elif isinstance( changeHistoryAttrNameOrGetter, str )  or  isinstance( changeHistoryAttrNameOrGetter, unicode ):
+			self.__changeHistoryGetter = lambda instance: getattr( instance, changeHistoryAttrNameOrGetter )
+		else:
+			self.__changeHistoryGetter = changeHistoryAttrNameOrGetter
+
+		self.__onChangeMethod = onChangeMethod
+
+
+	# Setter function
+	def setter(self, setter):
+		self.__setter = setter
+
+
+	# Change history attribute name
+	changeHistoryAttrName = property( None )
+
+	@changeHistoryAttrName.setter
+	def changeHistoryAttrName(self, name):
+		self.__changeHistoryGetter = lambda instance: getattr( instance, name )
+
+
+	# Change history getter
+	def changeHistoryGetter(self, changeHistoryGetter):
+		self.__changeHistoryGetter = changeHistoryGetter
+		return changeHistoryGetter
+
+
+	# Change notification method
+	def changeNotificationMethod(self, method):
+		self.__onChangeMethod = method
+		return self
+
+
 	def __get__(self, instance, owner):
 		if instance is None:
 			return self
 		else:
-			return _TrackedListWrapper( instance, self, getattr( instance, self._attrName ) )
+			return _TrackedListWrapper( instance, self, self.__getter( instance ) )
 	
 	def __set__(self, instance, value):
-		setattr( instance, self._attrName, value )
-	
-	def __delete__(self, instance):
-		delattr( instance, self._attrName )
-	
-	
-	def _getChangeHistory(self, instance):
-		return getattr( instance, self._changeHistoryAttrName )
+		if self.__setter is not None:
+			self.__setter( instance, value )
+		else:
+			raise TypeError, 'TrackedListProperty named \'{0}\' is read-only'.format(self.__name__)
 
-	def _onChange(self, instance):
-		if self._onChangeMethod is not None:
-			self._onChangeMethod( instance )
+	def __delete__(self, instance):
+		raise TypeError, 'TrackedListProperty named \'{0}\' cannot be deleted'.format(self.__name__)
+
+
+
+	def _getChangeHistory_(self, instance):
+		return self.__changeHistoryGetter( instance )
+
+	def _onChange_(self, instance):
+		if self.__onChangeMethod is not None:
+			self.__onChangeMethod( instance )
 
 	
 	

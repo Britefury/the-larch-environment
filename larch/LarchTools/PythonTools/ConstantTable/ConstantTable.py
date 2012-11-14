@@ -149,8 +149,11 @@ class ConstantTable (object):
 	def __present__(self, fragment, inheritedState):
 		return _tableEditor.editTable( self )
 
-	
-	_definitions = TrackedListProperty( '_definitions_' )
+
+	@TrackedListProperty
+	def _definitions(self):
+		return self._definitions_
+
 
 
 
