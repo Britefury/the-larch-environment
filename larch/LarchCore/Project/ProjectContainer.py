@@ -88,14 +88,7 @@ class ProjectContainer (ProjectNode):
 		self._contents.remove( x )
 		
 		
-	def _onContentsChange(self):
-		for x in self._prevContents:
-			x._parent = None
-		for x in self._contents_:
-			x._parent = self
-		self._prevContents = self._contents_[:]
-		self._incr.onChanged()
-		
+
 		
 	def getContentsMap(self):
 		return self._contentsMapLive.getValue()
@@ -114,8 +107,19 @@ class ProjectContainer (ProjectNode):
 		
 	contentsMap = property( getContentsMap )
 
-	
-	_contents = TrackedListProperty( '_contents_', onChangeMethod=_onContentsChange )
-	
+
+	@TrackedListProperty
+	def _contents(self):
+		return self._contents_
+
+	@_contents.changeNotificationMethod
+	def _contents_changed(self):
+		for x in self._prevContents:
+			x._parent = None
+		for x in self._contents_:
+			x._parent = self
+		self._prevContents = self._contents_[:]
+		self._incr.onChanged()
+
 	
 	

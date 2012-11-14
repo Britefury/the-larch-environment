@@ -270,8 +270,8 @@ class WorksheetEditor (MethodDispatchView):
 		linkHeader = AppLocationPath.appLinkheaderBar( fragment.getSubjectContext(), [ viewLink ] )
 
 
-		tip = TipBox( 'Type to add text to the worksheet.\nRight click to access the context menu, from which styles can be applied and code can be added.\n' + \
-			'To re-execute all code within the worksheet, press Control-Enter',
+		tip = TipBox( 'Type to add text to the worksheet.\nRight click to access the context menu, from which styles can be applied.\n' + \
+			      'Code can also be added from the context menu. To re-execute all code within the worksheet, press Control-Enter',
 			      'larchcore.worksheet.edit.howto' )
 
 

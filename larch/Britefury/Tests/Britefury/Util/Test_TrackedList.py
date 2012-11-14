@@ -16,7 +16,7 @@ import random
 
 
 
-class Value (object):
+class _Value (object):
 	def __init__(self, x):
 		self.__change_history__ = None
 		self.x = x
@@ -31,7 +31,7 @@ class Value (object):
 		
 		
 	def __eq__(self, x):
-		return isinstance( x, Value )  and  self.x == x.x
+		return isinstance( x, _Value )  and  self.x == x.x
 	
 	def __str__(self):
 		return 'Value( %s )'  %  str( self.x )
@@ -43,7 +43,7 @@ class Value (object):
 		return cmp( self.x, x.x )
 
 
-class Sequence (object):
+class _Sequence (object):
 	def __init__(self):
 		self.__change_history__ = None
 		self._xs_ = []
@@ -53,14 +53,16 @@ class Sequence (object):
 		return self.xs.__get_trackable_contents__()
 	
 	
-	xs = TrackedListProperty( '_xs_' )
+	@TrackedListProperty
+	def xs(self):
+		return self._xs_
 
 
 
 class Test_TrackedList (unittest.TestCase):
 	def setUp(self):
 		self.history = ChangeHistory()
-		self.s = Sequence()
+		self.s = _Sequence()
 		self.history.track( self.s )
 	
 	def tearDown(self):
@@ -72,18 +74,18 @@ class Test_TrackedList (unittest.TestCase):
 	def test_setitem(self):
 		self.assertEqual( self.s.xs[:], [] )
 		
-		_two = Value( -2 )
+		_two = _Value( -2 )
 		self.s.xs.append( _two )
 		self.assertEqual( self.s.xs[:], [ _two ] )
 		self.assertTrue( _two.isTracked() )
 		
-		_one = Value( -1 )
+		_one = _Value( -1 )
 		self.s.xs[0] = _one
 		self.assertEqual( self.s.xs[:], [ _one ] )
 		self.assertFalse( _two.isTracked() )
 		self.assertTrue( _one.isTracked() )
 		
-		_rng = [ Value( x )   for x in xrange( 0, 5 ) ]
+		_rng = [ _Value( x )   for x in xrange( 0, 5 ) ]
 		self.s.xs[1:] = _rng
 		self.assertEqual( self.s.xs[:], [ _one ] + _rng )
 		self.assertFalse( _two.isTracked() )
@@ -127,7 +129,7 @@ class Test_TrackedList (unittest.TestCase):
 	def test_delitem(self):
 		self.assertEqual( self.s.xs[:], [] )
 		
-		_rng = [ Value( x )   for x in xrange( 0, 5 ) ]
+		_rng = [ _Value( x )   for x in xrange( 0, 5 ) ]
 		self.s.xs[:] = _rng
 		self.assertEqual( self.s.xs[:], _rng )
 		self.assertEqual( [ x.isTracked() for x in _rng ],  [ True, True, True, True, True ] )
@@ -167,24 +169,24 @@ class Test_TrackedList (unittest.TestCase):
 	def test_append(self):
 		self.assertEqual( self.s.xs[:], [] )
 		
-		v = Value( 2 )
+		v = _Value( 2 )
 		self.s.xs.append( v )
 		self.assertTrue( v.isTracked() )
 		
-		self.assertEqual( self.s.xs[:], [ Value( 2 ) ] )
+		self.assertEqual( self.s.xs[:], [ _Value( 2 ) ] )
 		
 		self.history.undo()
 		self.assertEqual( self.s.xs[:], [] )
 		self.assertFalse( v.isTracked() )
 
 		self.history.redo()
-		self.assertEqual( self.s.xs[:], [ Value( 2 ) ] )
+		self.assertEqual( self.s.xs[:], [ _Value( 2 ) ] )
 		self.assertTrue( v.isTracked() )
 			
 			
 		
 	def test_extend(self):
-		_rng = [ Value( x )   for x in xrange( 0, 5 ) ]
+		_rng = [ _Value( x )   for x in xrange( 0, 5 ) ]
 		self.assertEqual( self.s.xs[:], [] )
 		self.assertEqual( [ x.isTracked() for x in _rng ],  [ False, False, False, False, False ] )
 		
@@ -203,8 +205,8 @@ class Test_TrackedList (unittest.TestCase):
 	
 
 	def test_insert(self):
-		v = Value( 20 )
-		_rng = [ Value( x )   for x in xrange( 0, 5 ) ]
+		v = _Value( 20 )
+		_rng = [ _Value( x )   for x in xrange( 0, 5 ) ]
 
 		self.s.xs[:] = _rng
 		self.assertEqual( self.s.xs[:], _rng )
@@ -229,7 +231,7 @@ class Test_TrackedList (unittest.TestCase):
 	
 
 	def test_pop(self):
-		_rng = [ Value( x )   for x in xrange( 0, 5 ) ]
+		_rng = [ _Value( x )   for x in xrange( 0, 5 ) ]
 
 		self.s.xs[:] = _rng
 		self.assertEqual( self.s.xs[:], _rng )
@@ -251,13 +253,13 @@ class Test_TrackedList (unittest.TestCase):
 	
 
 	def test_remove(self):
-		_rng = [ Value( x )   for x in xrange( 0, 5 ) ]
+		_rng = [ _Value( x )   for x in xrange( 0, 5 ) ]
 
 		self.s.xs[:] = _rng
 		self.assertEqual( self.s.xs[:], _rng )
 		self.assertEqual( [ x.isTracked() for x in _rng ],  [ True, True, True, True, True ] )
 
-		self.s.xs.remove( Value( 2 ) )
+		self.s.xs.remove( _Value( 2 ) )
 		self.assertEqual( self.s.xs[:], _rng[:2] + _rng[3:] )
 		self.assertEqual( [ x.isTracked() for x in _rng ],  [ True, True, False, True, True ] )
 		
@@ -272,7 +274,7 @@ class Test_TrackedList (unittest.TestCase):
 	
 
 	def test_reverse(self):
-		_rng = [ Value( x )   for x in xrange( 0, 5 ) ]
+		_rng = [ _Value( x )   for x in xrange( 0, 5 ) ]
 		_rev = _rng[:]
 		_rev.reverse()
 
@@ -295,7 +297,7 @@ class Test_TrackedList (unittest.TestCase):
 	
 
 	def test_sort(self):
-		_rng = [ Value( x )   for x in xrange( 0, 5 ) ]
+		_rng = [ _Value( x )   for x in xrange( 0, 5 ) ]
 		
 		_shuf = _rng[:]
 		r = random.Random( 12345 )

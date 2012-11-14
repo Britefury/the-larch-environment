@@ -87,7 +87,7 @@ class WorksheetViewer (MethodDispatchView):
 		editLink = Hyperlink( 'Switch to developer mode', editLocation )
 		linkHeader = AppLocationPath.appLinkheaderBar( fragment.getSubjectContext(), [ editLink ] )
 
-		tip = TipBox( 'To edit this worksheet, or add content, click Developer mode at the top left',
+		tip = TipBox( 'To edit this worksheet, or add content, click Developer mode at the top right',
 			      'larchcore.worksheet.view.toedit' )
 
 		w = Page( [ linkHeader, bodyView, tip ] )
