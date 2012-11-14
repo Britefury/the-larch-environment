@@ -175,6 +175,7 @@ public class Checkbox extends ControlPres
 	{
 		final LiveInterface value = valueSource.getLive();
 
+		double checkboxPadding = style.get( Controls.checkboxPadding, Double.class );
 		StyleSheet checkStyle = StyleSheet.style( Primitive.border.as( style.get( Controls.checkboxCheckBorder, AbstractBorder.class ) ) );
 		StyleSheet checkboxStyle = Controls.checkboxStyle.get( style );
 		
@@ -186,7 +187,8 @@ public class Checkbox extends ControlPres
 		Pres checkBorder = checkStyle.applyTo( new Border( checkElement ) );
 		
 		Pres childElement = presentAsCombinator( ctx, Controls.useCheckboxAttrs( style ), child );
-		Pres row = checkboxStyle.applyTo( new Row( new Pres[] { checkBorder.alignHPack().alignVCentre(), childElement.alignVCentre() } ) );
+		Pres row = checkboxStyle.applyTo( new Row( new Pres[] { checkBorder.pad( checkboxPadding, checkboxPadding ).alignHPack(),
+				childElement } ) ).alignVCentre();
 		LSElement rowElement = row.present( ctx, style);
 		
 		Pres bin = new Bin( rowElement );

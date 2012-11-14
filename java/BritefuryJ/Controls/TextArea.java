@@ -635,7 +635,11 @@ public class TextArea extends ControlPres
 		@Override
 		public void onTextChanged(TextAreaControl textArea)
 		{
-			value.setLiteralValue( textArea.getDisplayedText() );
+			String text = textArea.getDisplayedText();
+			if ( !text.equals( value.getStaticValue() ) )
+			{
+				value.setLiteralValue( text );
+			}
 		}
 	}
 	

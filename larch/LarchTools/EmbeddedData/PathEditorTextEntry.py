@@ -51,7 +51,7 @@ class _PathEditorTextEntry (Editor):
 					if filename is not None:
 						self._model.liveValue.setLiteralValue( filename )
 		openButton = Button.buttonWithLabel( '...', _onOpen )
-		return Row( [ openButton, Spacer( 3.0, 0.0 ), EditableLabel.regexValidated( self._model.liveValue, _notSetStyle( Label( '<none>' ) ), _filenamePattern, 'Please enter a valid filename' ) ] )
+		return Row( [ openButton, Spacer( 3.0, 0.0 ), EditableLabel( self._model.liveValue, _notSetStyle( Label( '<none>' ) ) ).regexValidated( _filenamePattern, 'Please enter a valid filename' ) ] )
 
 
 

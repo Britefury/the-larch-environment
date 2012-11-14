@@ -58,10 +58,10 @@ class IntEditorSpinEntry (Editor):
 						setattr( self, attrName, int( textEntry.getDisplayedText() ) )
 						self._incr.onChanged()
 			return _Listener()
-		min = [ Label( 'Min' ), TextEntry.regexValidated( str( self._min ), _listener( '_min' ), Tokens.decimalIntegerPattern, 'Please enter an integer value' ) ]
-		max = [ Label( 'Max' ), TextEntry.regexValidated( str( self._max ), _listener( '_max' ), Tokens.decimalIntegerPattern, 'Please enter an integer value' ) ]
-		step = [ Label( 'Step' ), TextEntry.regexValidated( str( self._step ), _listener( '_step' ), Tokens.decimalIntegerPattern, 'Please enter an integer value' ) ]
-		page = [ Label( 'Page' ), TextEntry.regexValidated( str( self._page ), _listener( '_page' ), Tokens.decimalIntegerPattern, 'Please enter an integer value' ) ]
+		min = [ Label( 'Min' ), TextEntry( str( self._min ), _listener( '_min' ) ).regexValidated( Tokens.decimalIntegerPattern, 'Please enter an integer value' ) ]
+		max = [ Label( 'Max' ), TextEntry( str( self._max ), _listener( '_max' ) ).regexValidated( Tokens.decimalIntegerPattern, 'Please enter an integer value' ) ]
+		step = [ Label( 'Step' ), TextEntry( str( self._step ), _listener( '_step' ) ).regexValidated( Tokens.decimalIntegerPattern, 'Please enter an integer value' ) ]
+		page = [ Label( 'Page' ), TextEntry( str( self._page ), _listener( '_page' ) ).regexValidated( Tokens.decimalIntegerPattern, 'Please enter an integer value' ) ]
 		return Table( [ min, max, step, page ] )
 
 
