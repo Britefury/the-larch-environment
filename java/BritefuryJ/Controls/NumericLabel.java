@@ -119,7 +119,7 @@ public abstract class NumericLabel extends ControlPres
 					
 					if ( showEntry )
 					{
-						TextEntry entry = TextEntry.regexValidated( text, entryListener, getValidationPattern(), getValidationFailMessage() );
+						TextEntry entry = new TextEntry( text, entryListener ).regexValidated( getValidationPattern(), getValidationFailMessage() );
 						entry.grabCaretOnRealise();
 						return entry;
 					}

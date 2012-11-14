@@ -9,6 +9,7 @@ package BritefuryJ.Controls;
 import java.util.regex.Pattern;
 
 import BritefuryJ.Controls.TextEntry.TextEntryControl;
+import BritefuryJ.Controls.TextEntry.TextEntryValidator;
 import BritefuryJ.DefaultPerspective.DefaultPerspective;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
@@ -129,7 +130,7 @@ public class EditableLabel extends ControlPres
 		
 		private void showTextEntry()
 		{
-			TextEntry entry = TextEntry.validated( value, entryListener, validator );
+			TextEntry entry = new TextEntry( value, entryListener ).validated( validator );
 			entry.grabCaretOnRealise();
 			display.setLiteralValue( entry );
 			
@@ -187,54 +188,34 @@ public class EditableLabel extends ControlPres
 		this.validator = validator;
 	}
 	
-	
-	
 	public EditableLabel(String initialText, Object notSet, EditableLabelListener listener)
 	{
 		this( new LiveSourceValue( initialText ), notSet, listener, null );
 	}
-	
-	public static EditableLabel validated(String initialText, Object notSet, EditableLabelListener listener, TextEntry.TextEntryValidator validator)
-	{
-		return new EditableLabel( new LiveSourceValue( initialText ), notSet, listener, validator );
-	}
-	
-	public static EditableLabel regexValidated(String initialText, Object notSet, EditableLabelListener listener, Pattern validatorRegex, String validationFailMessage)
-	{
-		return new EditableLabel( new LiveSourceValue( initialText ), notSet, listener, new TextEntry.RegexTextEntryValidator( validatorRegex, validationFailMessage ) );
-	}
-	
 	
 	public EditableLabel(LiveInterface value, Object notSet, EditableLabelListener listener)
 	{
 		this( new LiveSourceRef( value ), notSet, listener, null );
 	}
 	
-	public static EditableLabel validated(LiveInterface value, Object notSet, EditableLabelListener listener, TextEntry.TextEntryValidator validator)
-	{
-		return new EditableLabel( new LiveSourceRef( value ), notSet, listener, validator );
-	}
-	
-	public static EditableLabel regexValidated(LiveInterface value, Object notSet, EditableLabelListener listener, Pattern validatorRegex, String validationFailMessage)
-	{
-		return new EditableLabel( new LiveSourceRef( value ), notSet, listener, new TextEntry.RegexTextEntryValidator( validatorRegex, validationFailMessage ) );
-	}
-	
-	
 	public EditableLabel(LiveValue value, Object notSet)
 	{
 		this( new LiveSourceRef( value ), notSet, new CommitListener( value ), null );
 	}
 	
-	public static EditableLabel validated(LiveValue value, Object notSet, TextEntry.TextEntryValidator validator)
+	
+	
+	public EditableLabel validated(TextEntryValidator v)
 	{
-		return new EditableLabel( new LiveSourceRef( value ), notSet, new CommitListener( value ), validator );
+		return new EditableLabel( valueSource, notSet, listener, v );
 	}
 	
-	public static EditableLabel regexValidated(LiveValue value, Object notSet, Pattern validatorRegex, String validationFailMessage)
+	public EditableLabel regexValidated(Pattern validatorRegex, String validationFailMessage)
 	{
-		return new EditableLabel( new LiveSourceRef( value ), notSet, new CommitListener( value ), new TextEntry.RegexTextEntryValidator( validatorRegex, validationFailMessage ) );
+		return validated( new TextEntry.RegexTextEntryValidator( validatorRegex, validationFailMessage ) );
 	}
+	
+	
 	
 	
 	@Override

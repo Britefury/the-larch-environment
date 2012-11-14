@@ -18,7 +18,6 @@ import BritefuryJ.AttributeTable.InheritedAttribute;
 import BritefuryJ.AttributeTable.InheritedAttributeNonNull;
 import BritefuryJ.Graphics.AbstractBorder;
 import BritefuryJ.Graphics.FillPainter;
-import BritefuryJ.Graphics.FilledBorder;
 import BritefuryJ.Graphics.FilledOutlinePainter;
 import BritefuryJ.Graphics.OutlinePainter;
 import BritefuryJ.Graphics.Painter;
@@ -45,12 +44,13 @@ public class Controls
 			    StyleSheet.style( Primitive.editable.as( false ), Primitive.foreground.as( new Color( 0, 111, 128 ) ), Primitive.hoverForeground.as( new Color( 0.0f, 0.5f, 0.0f ) ), Primitive.cursor.as( new Cursor( Cursor.HAND_CURSOR ) ) ) );
 
 	public static final InheritedAttributeNonNull checkboxHoverBackground = new InheritedAttributeNonNull( controlsNamespace, "checkboxHoverBackground", Painter.class,
-			new OutlinePainter( new Color( 0.5f, 0.625f, 0.75f ) ) );
+			new FilledOutlinePainter( new Color( 0.6f, 0.6f, 0.75f  ), new Color( 0.95f, 0.95f, 0.975f  ) ) );
 	public static final InheritedAttributeNonNull checkboxCheckBorder = new InheritedAttributeNonNull( controlsNamespace, "checkboxCheckBorder", AbstractBorder.class,
-			new FilledBorder( 3.0, 3.0, 3.0, 3.0, 5.0, 5.0, new Color( 0.75f, 0.75f, 0.75f ) ) );
-	public static final InheritedAttributeNonNull checkboxCheckForeground = new InheritedAttributeNonNull( controlsNamespace, "checkboxCheckForeground", Paint.class, new Color( 0.0f, 0.2f, 0.4f ) );
-	public static final InheritedAttributeNonNull checkboxCheckSize = new InheritedAttributeNonNull( controlsNamespace, "checkboxCheckSize", Double.class, 10.0 );
-	public static final InheritedAttributeNonNull checkboxSpacing = new InheritedAttributeNonNull( controlsNamespace, "checkboxSpacing", Double.class, 8.0 );
+			new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.6f, 0.6f, 0.75f ), new Color( 0.8f, 0.8f, 0.9f  ) ) );
+	public static final InheritedAttributeNonNull checkboxCheckForeground = new InheritedAttributeNonNull( controlsNamespace, "checkboxCheckForeground", Paint.class, new Color( 0.4f, 0.4f, 0.5f ) );
+	public static final InheritedAttributeNonNull checkboxCheckSize = new InheritedAttributeNonNull( controlsNamespace, "checkboxCheckSize", Double.class, 8.0 );
+	public static final InheritedAttributeNonNull checkboxSpacing = new InheritedAttributeNonNull( controlsNamespace, "checkboxSpacing", Double.class, 5.0 );
+	public static final InheritedAttributeNonNull checkboxPadding = new InheritedAttributeNonNull( controlsNamespace, "checkboxPadding", Double.class, 1.0 );
 
 	
 	public static final InheritedAttributeNonNull optionMenuBorder = new InheritedAttributeNonNull( controlsNamespace, "optionMenuBorder", AbstractBorder.class,
@@ -204,7 +204,7 @@ public class Controls
 
 	public static StyleValues useCheckboxAttrs(StyleValues style)
 	{
-		return style.useAttr( checkboxHoverBackground ).useAttr( checkboxCheckBorder ).useAttr( checkboxCheckForeground ).useAttr( checkboxCheckSize ).useAttr( checkboxSpacing );
+		return style.useAttr( checkboxHoverBackground ).useAttr( checkboxCheckBorder ).useAttr( checkboxCheckForeground ).useAttr( checkboxCheckSize ).useAttr( checkboxSpacing ).useAttr( checkboxPadding );
 	}
 	
 	

@@ -18,6 +18,7 @@ import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Paragraph;
 import BritefuryJ.Pres.Primitive.Row;
+import BritefuryJ.Pres.Primitive.Spacer;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.RichText.Heading2;
 
@@ -94,7 +95,7 @@ public class TextEntryTestPage extends TestPage
 			Pres entry;
 			if ( validationRegex != null )
 			{
-				entry = TextEntry.regexValidated( value, listener, validationRegex, validationFailMsg );
+				entry = new TextEntry( value, listener ).regexValidated( validationRegex, validationFailMsg );
 			}
 			else
 			{
@@ -118,7 +119,10 @@ public class TextEntryTestPage extends TestPage
 		Pres identifierLine = new Paragraph( new Object[] { new Label( "Identifier: "), identifier } );
 		Pres integerLine = new Paragraph( new Object[] { new Label( "Integer: "), integer } );
 		
-		Pres entriesBox = new Column( new Object[] { hello, world, identifierLine, integerLine } );
+		LiveValue live = new LiveValue( "Its alive..." );
+		Pres liveLine = new Paragraph( new Object[] { new Label( "Live: "), TextEntry.textEntryCommitOnChange( live ), new Spacer( 10.0, 0.0 ), live } );
+		
+		Pres entriesBox = new Column( new Object[] { hello, world, identifierLine, integerLine, liveLine } );
 		
 		return new Body( new Pres[] { new Heading2( "Text entries" ), entriesBox } );
 	}

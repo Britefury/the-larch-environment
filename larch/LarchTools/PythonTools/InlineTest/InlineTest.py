@@ -291,7 +291,7 @@ class StandardInlineTest (AbstractInlineTest):
 
 		title = SectionHeading2( 'Unit tests' )
 
-		nameEntry = _nameBorder.surround( EditableLabel.regexValidated( self._name, _notSet, Tokens.identifierPattern, 'Please enter a valid identifier' ) )
+		nameEntry = _nameBorder.surround( EditableLabel( self._name, _notSet ).regexValidated( Tokens.identifierPattern, 'Please enter a valid identifier' ) )
 
 		header = Row( [ title, Spacer( 25.0, 0.0 ), nameEntry ] )
 

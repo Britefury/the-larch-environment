@@ -379,7 +379,7 @@ class MonitoredExpression (object):
 			self._incr.onChanged()
 
 
-		namePres = EditableLabel.regexValidated( self._name, self._nameNotSetStyle( Label( '<not set>' ) ), _setName, Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*' ), 'Please enter a valid identifier' )
+		namePres = EditableLabel( self._name, self._nameNotSetStyle( Label( '<not set>' ) ), _setName ).regexValidated( Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*' ), 'Please enter a valid identifier' )
 
 		exprPres = self._expr
 

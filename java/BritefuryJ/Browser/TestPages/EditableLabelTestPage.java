@@ -45,8 +45,8 @@ public class EditableLabelTestPage extends TestPage
 		Pres notSet = notSetStyle.applyTo( new Label( "<not set>" ) );
 		EditableLabel hello = new EditableLabel( new LiveValue( "Hello" ), notSet );
 		EditableLabel world = new EditableLabel( new LiveValue( "World" ), notSet );
-		EditableLabel identifier = EditableLabel.regexValidated( new LiveValue( "abc" ), notSet, Pattern.compile( "[a-zA-Z_][a-zA-Z0-9_]*" ), "Please enter a valid identifier.\n(alphabetic or underscore, followed by alphanumeric or underscore)" );
-		EditableLabel integer = EditableLabel.regexValidated( new LiveValue( "123" ), notSet, Pattern.compile( "[0-9]+" ), "Please enter a valid integer." );
+		EditableLabel identifier = new EditableLabel( new LiveValue( "abc" ), notSet ).regexValidated( Pattern.compile( "[a-zA-Z_][a-zA-Z0-9_]*" ), "Please enter a valid identifier.\n(alphabetic or underscore, followed by alphanumeric or underscore)" );
+		EditableLabel integer = new EditableLabel( new LiveValue( "123" ), notSet ).regexValidated( Pattern.compile( "[0-9]+" ), "Please enter a valid integer." );
 		
 		Pres identifierLine = new Paragraph( new Pres[] { new Label( "Identifier: "), identifier } );
 		Pres integerLine = new Paragraph( new Pres[] { new Label( "Integer: "), integer } );

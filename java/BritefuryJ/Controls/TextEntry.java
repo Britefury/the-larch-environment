@@ -15,8 +15,8 @@ import BritefuryJ.LSpace.Anchor;
 import BritefuryJ.LSpace.LSBorder;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSRegion;
-import BritefuryJ.LSpace.LSText;
 import BritefuryJ.LSpace.LSRootElement;
+import BritefuryJ.LSpace.LSText;
 import BritefuryJ.LSpace.TextEditEventInsert;
 import BritefuryJ.LSpace.TextEditEventRemove;
 import BritefuryJ.LSpace.TextEditEventReplace;
@@ -67,6 +67,31 @@ public class TextEntry extends ControlPres
 		{
 		}
 	}
+	
+	
+	private static class ChangeListener extends TextEntryListener
+	{
+		private LiveValue value;
+		
+		public ChangeListener(LiveValue value)
+		{
+			this.value = value;
+		}
+		
+		@Override
+		public void onTextChanged(TextEntryControl textEntry)
+		{
+			if ( !textEntry.bSetTextInProgress )
+			{
+				String text = textEntry.getDisplayedText();
+				if ( !text.equals( value.getStaticValue() ) )
+				{
+					value.setLiteralValue( text );
+				}
+			}
+		}
+	}
+	
 	
 	
 	public static abstract class TextEntryValidator
@@ -238,7 +263,7 @@ public class TextEntry extends ControlPres
 		private TextEntryListener listener;
 		private TextEntryValidator validator;
 		private LiveInterface text;
-		private boolean bGrabCaretOnRealise, bSelectAllOnRealise;
+		private boolean bGrabCaretOnRealise, bSelectAllOnRealise, bSetTextInProgress;
 	
 	
 		
@@ -285,9 +310,11 @@ public class TextEntry extends ControlPres
 			return textElement.getText();
 		}
 		
-		public void setDisplayedText(String x)
+		private void setDisplayedText(String x)
 		{
+			bSetTextInProgress = true;
 			textElement.setText( x );
+			bSetTextInProgress = false;
 			validate( x );
 		}
 		
@@ -436,48 +463,33 @@ public class TextEntry extends ControlPres
 		this( new LiveSourceValue( initialText ), listener, null );
 	}
 	
-	public static TextEntry validated(String initialText, TextEntryListener listener, TextEntryValidator validator)
-	{
-		return new TextEntry( new LiveSourceValue( initialText ), listener, validator );
-	}
-	
-	public static TextEntry regexValidated(String initialText, TextEntryListener listener, Pattern validatorRegex, String validationFailMessage)
-	{
-		return new TextEntry( new LiveSourceValue( initialText ), listener, new RegexTextEntryValidator( validatorRegex, validationFailMessage ) );
-	}
-	
-	
 	public TextEntry(LiveInterface value, TextEntryListener listener)
 	{
 		this( new LiveSourceRef( value ), listener, null );
 	}
-	
-	public static TextEntry validated(LiveInterface value, TextEntryListener listener, TextEntryValidator validator)
-	{
-		return new TextEntry( new LiveSourceRef( value ), listener, validator );
-	}
-	
-	public static TextEntry regexValidated(LiveInterface value, TextEntryListener listener, Pattern validatorRegex, String validationFailMessage)
-	{
-		return new TextEntry( new LiveSourceRef( value ), listener, new RegexTextEntryValidator( validatorRegex, validationFailMessage ) );
-	}
-	
 	
 	public TextEntry(LiveValue value)
 	{
 		this( new LiveSourceRef( value ), new CommitListener( value ), null );
 	}
 	
-	public static TextEntry validated(LiveValue value, TextEntryValidator validator)
+	
+	public static TextEntry textEntryCommitOnChange(LiveValue value)
 	{
-		return new TextEntry( new LiveSourceRef( value ), new CommitListener( value ), validator );
+		return new TextEntry( new LiveSourceRef( value ), new ChangeListener( value ), null );
 	}
 	
-	public static TextEntry regexValidated(LiveValue value, Pattern validatorRegex, String validationFailMessage)
+	
+	
+	public TextEntry validated(TextEntryValidator v)
 	{
-		return new TextEntry( new LiveSourceRef( value ), new CommitListener( value ), new RegexTextEntryValidator( validatorRegex, validationFailMessage ) );
+		return new TextEntry( valueSource, listener, v );
 	}
 	
+	public TextEntry regexValidated(Pattern validatorRegex, String validationFailMessage)
+	{
+		return validated( new RegexTextEntryValidator( validatorRegex, validationFailMessage ) );
+	}
 	
 	
 	public void selectAllOnRealise()

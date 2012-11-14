@@ -100,7 +100,7 @@ _varNameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*' )
 
 
 def _dropPrompt(varNameTextEntryListener):
-	textEntry = TextEntry.regexValidated( 'var', varNameTextEntryListener, _varNameRegex, 'Please enter a valid identifier' )
+	textEntry = TextEntry( 'var', varNameTextEntryListener ).regexValidated( _varNameRegex, 'Please enter a valid identifier' )
 	prompt = Label( 'Place object into a variable named: ' )
 	textEntry.grabCaretOnRealise()
 	textEntry.selectAllOnRealise()
