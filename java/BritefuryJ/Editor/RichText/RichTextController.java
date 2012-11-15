@@ -741,7 +741,7 @@ public abstract class RichTextController extends SequentialController
 		}
 		else
 		{
-			throw new RuntimeException( "Could not filter editor model value: value is not a String, EdNode, List, or data model object - it is a " + x.getClass().getName() );
+			throw new RuntimeException( "Could not filter editor model value: value is not a String, EdNode, List, or data model object - it is " + x.toString() + " (" + x.getClass().getName() + ")" );
 		}
 	}
 
