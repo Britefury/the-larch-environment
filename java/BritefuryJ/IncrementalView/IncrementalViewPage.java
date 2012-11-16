@@ -12,8 +12,6 @@ import java.util.List;
 import BritefuryJ.Browser.BrowserPage;
 import BritefuryJ.Browser.Location;
 import BritefuryJ.ChangeHistory.ChangeHistory;
-import BritefuryJ.ChangeHistory.ChangeHistoryController;
-import BritefuryJ.ChangeHistory.ChangeHistoryListener;
 import BritefuryJ.Command.BoundCommandSet;
 import BritefuryJ.Command.Command;
 import BritefuryJ.Command.Command.CommandAction;
@@ -79,17 +77,9 @@ public class IncrementalViewPage extends BrowserPage
 	}
 
 	
-	public ChangeHistoryController getChangeHistoryController()
+	public ChangeHistory getChangeHistory()
 	{
 		return changeHistory;
-	}
-	
-	public void setChangeHistoryListener(ChangeHistoryListener listener)
-	{
-		if ( changeHistory != null )
-		{
-			changeHistory.setChangeHistoryListener( listener );
-		}
 	}
 
 

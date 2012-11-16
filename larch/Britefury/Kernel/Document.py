@@ -26,7 +26,7 @@ class Document (ChangeHistoryListener):
 		
 		self._changeHistory = ChangeHistory()
 		self._changeHistory.track( self._contents )
-		self._changeHistory.setChangeHistoryListener( self )
+		self._changeHistory.addChangeHistoryListener( self )
 		
 		self._docName = ''
 		self._location = None
@@ -35,9 +35,6 @@ class Document (ChangeHistoryListener):
 		self._filename = None
 		self._saveTime = None
 	
-		self._changeHistoryListener = None
-		self._unsavedDataListener = None
-		
 		self._documentModules = {}
 
 
@@ -81,13 +78,6 @@ class Document (ChangeHistoryListener):
 
 		
 	
-	def setChangeHistoryListener(self, listener):
-		self._changeHistoryListener = listener
-		
-
-	def setUnsavedDataListener(self, listener):
-		self._unsavedDataListener = listener
-		
 	def hasUnsavedData(self):
 		return self._bHasUnsavedData
 	
@@ -152,8 +142,6 @@ class Document (ChangeHistoryListener):
 		f.close()
 		if self._bHasUnsavedData:
 			self._bHasUnsavedData = False
-			if self._unsavedDataListener is not None:
-				self._unsavedDataListener( self )
 		self._saveTime = datetime.now()
 
 
@@ -171,10 +159,12 @@ class Document (ChangeHistoryListener):
 		# New contents
 		self._contents = documentRoot
 
+		self._changeHistory.removeChangeHistoryListener( self )
+
 		# New change history
 		self._changeHistory = ChangeHistory()
 		self._changeHistory.track( self._contents )
-		self._changeHistory.setChangeHistoryListener( self )
+		self._changeHistory.addChangeHistoryListener( self )
 
 
 
@@ -215,10 +205,6 @@ class Document (ChangeHistoryListener):
 	def onChangeHistoryChanged(self, history):
 		if not self._bHasUnsavedData:
 			self._bHasUnsavedData = True
-			if self._unsavedDataListener is not None:
-				self._unsavedDataListener( self )
-		if self._changeHistoryListener is not None:
-			self._changeHistoryListener.onChangeHistoryChanged( history )
 
 
 

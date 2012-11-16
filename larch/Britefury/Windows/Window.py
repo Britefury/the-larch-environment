@@ -88,6 +88,11 @@ class Window (object):
 		class _BrowserListener (TabbedBrowser.TabbedBrowserListener):
 			def createNewBrowserWindow(_self, location):
 				self._createNewWindow( location )
+
+			def onTabbledBrowserChangePage(_self, browser):
+				# This event is triggered before the browser is initialised
+				if hasattr( self, '_browser' ):
+					self._onChangePage()
 				
 				
 		self._browser = TabbedBrowser( self._windowManager._browserContext.getPageLocationResolver(), _BrowserListener(), location, commandConsoleFactory )
@@ -97,10 +102,11 @@ class Window (object):
 		class _ChangeHistoryListener (ChangeHistoryListener):
 			def onChangeHistoryChanged(_self, history):
 				self._onChangeHistoryChanged( history )
-		
-		self._browser.setChangeHistoryListener( _ChangeHistoryListener() )
-		
-		
+
+		self.__prevChangeHistory = None
+		self.__changeHistoryListener = _ChangeHistoryListener()
+
+
 		self.onCloseRequest = None
 		
 		
@@ -265,8 +271,22 @@ class Window (object):
 		return self._browser.getCurrentBrowser()
 		
 		
-		
-		
+
+	def _onChangePage(self):
+		changeHistory = self._browser.getChangeHistory()
+
+		if changeHistory is not self.__prevChangeHistory:
+			if self.__prevChangeHistory is not None:
+				self.__prevChangeHistory.removeChangeHistoryListener( self.__changeHistoryListener )
+
+			if changeHistory is not None:
+				changeHistory.addChangeHistoryListener( self.__changeHistoryListener )
+
+			self.__prevChangeHistory = changeHistory
+
+			self._onChangeHistoryChanged( changeHistory )
+
+
 	def _onChangeHistoryChanged(self, changeHistory):
 		if changeHistory is not None:
 			self._editUndoItem.setEnabled( changeHistory.canUndo() )
@@ -301,14 +321,14 @@ class Window (object):
 	
 	
 	def _onUndo(self):
-		changeHistoryController = self._browser.getChangeHistoryController()
-		if changeHistoryController.canUndo():
-			changeHistoryController.undo()
+		changeHistory = self._browser.getChangeHistory()
+		if changeHistory.canUndo():
+			changeHistory.undo()
 
 	def _onRedo(self):
-		changeHistoryController = self._browser.getChangeHistoryController()
-		if changeHistoryController.canRedo():
-			changeHistoryController.redo()
+		changeHistory = self._browser.getChangeHistory()
+		if changeHistory.canRedo():
+			changeHistory.redo()
 
 
 		
@@ -321,9 +341,9 @@ class Window (object):
 
 
 	def _onShowUndoHistory(self):
-		changeHistoryController = self._browser.getChangeHistoryController()
-		if changeHistoryController is not None:
-			location = self._windowManager._browserContext.getLocationForObject( changeHistoryController )
+		changeHistory = self._browser.getChangeHistory()
+		if changeHistory is not None:
+			location = self._windowManager._browserContext.getLocationForObject( changeHistory )
 			self._browser.openLocationInNewWindow( location )
 
 

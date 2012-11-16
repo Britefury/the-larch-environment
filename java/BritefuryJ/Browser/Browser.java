@@ -27,8 +27,7 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.TransferHandler;
 
-import BritefuryJ.ChangeHistory.ChangeHistoryController;
-import BritefuryJ.ChangeHistory.ChangeHistoryListener;
+import BritefuryJ.ChangeHistory.ChangeHistory;
 import BritefuryJ.Command.AbstractCommandConsole;
 import BritefuryJ.Command.BoundCommandSet;
 import BritefuryJ.Command.Command;
@@ -48,9 +47,9 @@ import BritefuryJ.StyleSheet.StyleValues;
 
 public class Browser
 {
-	protected interface BrowserListener
+	protected static interface BrowserListener
 	{
-		public void onBrowserChangeTitle(Browser browser, String title);
+		public void onBrowserChangePage(Browser browser, BrowserPage page, String title);
 	}
 	
 	
@@ -113,7 +112,6 @@ public class Browser
 	private PageLocationResolver resolver;
 	private BrowserPage page;
 	private BrowserListener listener;
-	private ChangeHistoryListener changeHistoryListener;
 	
 	
 	
@@ -219,24 +217,15 @@ public class Browser
 	
 	
 	
-	public ChangeHistoryController getChangeHistoryController()
+	public ChangeHistory getChangeHistory()
 	{
 		if ( page != null )
 		{
-			return page.getChangeHistoryController();
+			return page.getChangeHistory();
 		}
 		else
 		{
 			return null;
-		}
-	}
-	
-	public void setChangeHistoryListener(ChangeHistoryListener listener)
-	{
-		changeHistoryListener = listener;
-		if ( page != null )
-		{
-			page.setChangeHistoryListener( listener );
 		}
 	}
 	
@@ -327,27 +316,11 @@ public class Browser
 	{
 		if ( p != page )
 		{
-			if ( page != null )
-			{
-				page.setChangeHistoryListener( null );
-			}
-			
 			page = p;
-			
-			if ( page != null  &&  changeHistoryListener != null )
-			{
-				page.setChangeHistoryListener( changeHistoryListener );
-			}
-			
-			if ( changeHistoryListener != null )
-			{
-				changeHistoryListener.onChangeHistoryChanged( getChangeHistoryController() );
-			}
-			
 			
 			if ( listener != null )
 			{
-				listener.onBrowserChangeTitle( this, getTitle() );
+				listener.onBrowserChangePage( this, page, getTitle() );
 			}
 		}
 	}

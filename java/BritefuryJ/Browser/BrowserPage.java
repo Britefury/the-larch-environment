@@ -8,8 +8,7 @@ package BritefuryJ.Browser;
 
 import java.util.List;
 
-import BritefuryJ.ChangeHistory.ChangeHistoryController;
-import BritefuryJ.ChangeHistory.ChangeHistoryListener;
+import BritefuryJ.ChangeHistory.ChangeHistory;
 import BritefuryJ.Command.BoundCommandSet;
 import BritefuryJ.LSpace.PersistentState.PersistentStateStore;
 import BritefuryJ.Pres.Pres;
@@ -19,13 +18,9 @@ public abstract class BrowserPage
 	public abstract String getTitle();
 	public abstract Pres getContentsPres();
 	
-	public ChangeHistoryController getChangeHistoryController()
+	public ChangeHistory getChangeHistory()
 	{
 		return null;
-	}
-	
-	public void setChangeHistoryListener(ChangeHistoryListener listener)
-	{
 	}
 	
 	
