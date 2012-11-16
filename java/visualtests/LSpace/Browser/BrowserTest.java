@@ -154,4 +154,10 @@ public class BrowserTest implements TabbedBrowser.TabbedBrowserListener
 		frame.pack();
 		frame.setVisible(true);
 	}
+
+
+	@Override
+	public void onTabbledBrowserChangePage(TabbedBrowser browser)
+	{
+	}
 }

@@ -29,6 +29,7 @@ import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.StyleSheet.StyleSheet;
+import BritefuryJ.Util.WeakListenerList;
 
 public class ChangeHistory implements ChangeHistoryController, Presentable
 {
@@ -225,7 +226,7 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 	private ArrayList<Entry> past, future;
 	private boolean bCommandsBlocked, bFrozen;
 	private int freezeCount;
-	private ChangeHistoryListener listener;
+	private WeakListenerList<ChangeHistoryListener> listeners = null;
 	private PresentationStateListenerList presStateListeners = null;
 	
 	
@@ -243,15 +244,21 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 		bCommandsBlocked = false;
 		bFrozen = false;
 		freezeCount = 0;
-		listener = null;
 	}
 	
 	
 	
-	public void setChangeHistoryListener(ChangeHistoryListener listener)
+	public void addChangeHistoryListener(ChangeHistoryListener listener)
 	{
-		this.listener = listener;
+		listeners = WeakListenerList.addListener( listeners, listener );
 	}
+	
+	public void removeChangeHistoryListener(ChangeHistoryListener listener)
+	{
+		listeners = WeakListenerList.removeListener( listeners, listener );
+	}
+	
+	
 	
 	
 	public void addChange(Change change)
@@ -277,11 +284,6 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 				}
 			}
 			
-			if ( listener != null )
-			{
-				listener.onChangeHistoryChanged( this );
-			}
-			
 			onModified();
 		}
 	}
@@ -305,11 +307,6 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 			unexecuteEntry( entry );
 			future.add( entry );
 			
-			if ( listener != null )
-			{
-				listener.onChangeHistoryChanged( this );
-			}
-
 			onModified();
 		}
 	}
@@ -329,11 +326,6 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 			executeEntry( entry );
 			past.add( entry );
 			
-			if ( listener != null )
-			{
-				listener.onChangeHistoryChanged( this );
-			}
-
 			onModified();
 		}
 	}
@@ -343,11 +335,6 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 	{
 		past.clear();
 		future.clear();
-		
-		if ( listener != null )
-		{
-			listener.onChangeHistoryChanged( this );
-		}
 		
 		onModified();
 	}
@@ -520,6 +507,14 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 	
 	private void onModified()
 	{
+		if ( listeners != null )
+		{
+			for (ChangeHistoryListener listener: listeners)
+			{
+				listener.onChangeHistoryChanged( this );
+			}
+		}
+		
 		presStateListeners = PresentationStateListenerList.onPresentationStateChanged( presStateListeners, this );
 	}
 	

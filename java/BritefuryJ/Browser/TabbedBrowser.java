@@ -31,14 +31,14 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicButtonUI;
 
-import BritefuryJ.ChangeHistory.ChangeHistoryController;
-import BritefuryJ.ChangeHistory.ChangeHistoryListener;
+import BritefuryJ.ChangeHistory.ChangeHistory;
 import BritefuryJ.Command.CommandConsoleFactory;
 import BritefuryJ.LSpace.PageController;
 
 public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, PageController
 {
 	private static final int MAX_TITLE_LENGTH = 16;
+	
 	
 	private static class TabComponent extends JPanel
 	{
@@ -192,7 +192,9 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	public static interface TabbedBrowserListener
 	{
 		public void createNewBrowserWindow(Location location);
+		public void onTabbledBrowserChangePage(TabbedBrowser browser);
 	}
+	
 	
 	
 	
@@ -204,11 +206,10 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	
 	private PageLocationResolver resolver;
 	
-	TabbedBrowserListener listener;
+	private TabbedBrowserListener listener;
 	
 	private ArrayList<Browser> browsers;
 	private Browser currentBrowser;
-	private ChangeHistoryListener changeHistoryListener;
 	
 	private CommandConsoleFactory commandConsoleFactory;
 	
@@ -243,15 +244,9 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	}
 	
 	
-	public ChangeHistoryController getChangeHistoryController()
+	public ChangeHistory getChangeHistory()
 	{
-		return currentBrowser.getChangeHistoryController();
-	}
-	
-	public void setChangeHistoryListener(ChangeHistoryListener listener)
-	{
-		changeHistoryListener = listener;
-		currentBrowser.setChangeHistoryListener( listener );
+		return currentBrowser.getChangeHistory();
 	}
 	
 
@@ -281,21 +276,11 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	{
 		if ( browser != currentBrowser )
 		{
-			if ( currentBrowser != null )
-			{
-				currentBrowser.setChangeHistoryListener( null );
-			}
-			
 			currentBrowser = browser;
 			
-			if ( currentBrowser != null  &&  changeHistoryListener != null )
+			if ( listener != null )
 			{
-				currentBrowser.setChangeHistoryListener( changeHistoryListener );
-			}
-	
-			if ( changeHistoryListener != null )
-			{
-				changeHistoryListener.onChangeHistoryChanged( getChangeHistoryController() );
+				listener.onTabbledBrowserChangePage( this );
 			}
 		}
 	}
@@ -310,7 +295,7 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	}
 	
 	
-	public void onBrowserChangeTitle(Browser browser, String title)
+	public void onBrowserChangePage(Browser browser, BrowserPage page, String title)
 	{
 		int index = browsers.indexOf( browser );
 		if ( index == -1 )
@@ -322,6 +307,11 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 		tab.setTitle( title );
 		
 		tabs.setToolTipTextAt( index, title );
+		
+		if ( listener != null )
+		{
+			listener.onTabbledBrowserChangePage( this );
+		}
 	}
 
 
