@@ -18,21 +18,9 @@ from BritefuryJ.ChangeHistory import ChangeHistory, ChangeHistoryListener
 
 from BritefuryJ.DocModel import DMIOReader, DMIOWriter, DMNode
 
-from BritefuryJ.LSpace import *
-from BritefuryJ.Browser import *
-from BritefuryJ.LSpace.StyleParams import *
+from BritefuryJ.Browser import TabbedBrowser, Location
 
-from BritefuryJ.Pres.Help import *
-
-
-from BritefuryJ.Projection import Subject
-
-
-
-
-_bProfile = True
-
-
+from BritefuryJ.Pres.Help import AttachTooltip, TipBox
 
 
 
@@ -63,147 +51,124 @@ class _TransferActionListener (ActionListener):
 				
 
 		
-class _ModelSubject (Subject):
-	def __init__(self, focus):
-		super( _ModelSubject, self ).__init__( None )
-		self._focus = focus
-
-		
-	def getFocus(self):
-		return self._focus
-	
-	def getPerspective(self):
-		return None
-	
-	def getTitle(self):
-		return '[model]'
-
-	
-	
-
 class Window (object):
 	def __init__(self, windowManager, commandConsoleFactory, location=Location( '' )):
 		self._windowManager = windowManager
-		
-		class _BrowserListener (TabbedBrowser.TabbedBrowserListener):
-			def createNewBrowserWindow(_self, location):
-				self._createNewWindow( location )
 
-			def onTabbledBrowserChangePage(_self, browser):
-				# This event is triggered before the browser is initialised
-				if hasattr( self, '_browser' ):
-					self._onChangePage()
-				
-				
-		self._browser = TabbedBrowser( self._windowManager._browserContext.getPageLocationResolver(), _BrowserListener(), location, commandConsoleFactory )
-		self._browser.getComponent().setPreferredSize( Dimension( 800, 600 ) )
 
-		
-		class _ChangeHistoryListener (ChangeHistoryListener):
-			def onChangeHistoryChanged(_self, history):
-				self._onChangeHistoryChanged( history )
+
+		def onChangeHistoryChanged(history):
+			self.__refreshChangeHistoryControls( history )
 
 		self.__prevChangeHistory = None
-		self.__changeHistoryListener = _ChangeHistoryListener()
+		self.__changeHistoryListener = onChangeHistoryChanged
 
 
-		self.onCloseRequest = None
-		
-		
-		
+
+		class _BrowserListener (TabbedBrowser.TabbedBrowserListener):
+			def createNewBrowserWindow(_self, location):
+				self._onOpenNewWindow( location )
+
+			def onTabbledBrowserChangePage(_self, browser):
+				self._onChangePage( browser )
+
+
+		self._browser = TabbedBrowser( self._windowManager.browserContext.getPageLocationResolver(), _BrowserListener(), location, commandConsoleFactory )
+		self._browser.getComponent().setPreferredSize( Dimension( 800, 600 ) )
+
+
+
+		self.onCloseRequestListener = None
+
+
+
 		# EDIT MENU
-		
+
 		transferActionListener = _TransferActionListener()
-		
+
 		editMenu = JMenu( 'Edit' )
-		
-		self._editUndoItem = JMenuItem( 'Undo' )
-		undoAction = _action( 'undo', self._onUndo )
-		self._editUndoItem.setActionCommand( undoAction.getValue( Action.NAME ) )
-		self._editUndoItem.addActionListener( undoAction )
-		self._editUndoItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_Z, ActionEvent.CTRL_MASK ) )
-		self._editUndoItem.setMnemonic( KeyEvent.VK_U )
-		editMenu.add( self._editUndoItem )
 
-		self._editRedoItem = JMenuItem( 'Redo' )
-		redoAction = _action( 'redo', self._onRedo )
-		self._editRedoItem.setActionCommand( redoAction.getValue( Action.NAME ) )
-		self._editRedoItem.addActionListener( redoAction )
-		self._editRedoItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_Y, ActionEvent.CTRL_MASK ) )
-		self._editRedoItem.setMnemonic( KeyEvent.VK_R )
-		editMenu.add( self._editRedoItem )
+		self.__editUndoItem = JMenuItem( 'Undo' )
+		undoAction = _action( 'undo', self.__onUndo )
+		self.__editUndoItem.setActionCommand( undoAction.getValue( Action.NAME ) )
+		self.__editUndoItem.addActionListener( undoAction )
+		self.__editUndoItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_Z, ActionEvent.CTRL_MASK ) )
+		self.__editUndoItem.setMnemonic( KeyEvent.VK_U )
+		editMenu.add( self.__editUndoItem )
 
-		
+		self.__editRedoItem = JMenuItem( 'Redo' )
+		redoAction = _action( 'redo', self.__onRedo )
+		self.__editRedoItem.setActionCommand( redoAction.getValue( Action.NAME ) )
+		self.__editRedoItem.addActionListener( redoAction )
+		self.__editRedoItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_Y, ActionEvent.CTRL_MASK ) )
+		self.__editRedoItem.setMnemonic( KeyEvent.VK_R )
+		editMenu.add( self.__editRedoItem )
+
 		editMenu.addSeparator()
-		
+
 		editCutItem = JMenuItem( 'Cut' )
 		editCutItem.setActionCommand( TransferHandler.getCutAction().getValue( Action.NAME ) )
 		editCutItem.addActionListener( transferActionListener )
 		editCutItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_X, ActionEvent.CTRL_MASK ) )
 		editCutItem.setMnemonic( KeyEvent.VK_T )
 		editMenu.add( editCutItem )
-		
+
 		editCopyItem = JMenuItem( 'Copy' )
 		editCopyItem.setActionCommand( TransferHandler.getCopyAction().getValue( Action.NAME ) )
 		editCopyItem.addActionListener( transferActionListener )
 		editCopyItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_C, ActionEvent.CTRL_MASK ) )
 		editCopyItem.setMnemonic( KeyEvent.VK_C )
 		editMenu.add( editCopyItem )
-		
+
 		editPasteItem = JMenuItem( 'Paste' )
 		editPasteItem.setActionCommand( TransferHandler.getPasteAction().getValue( Action.NAME ) )
 		editPasteItem.addActionListener( transferActionListener )
 		editPasteItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_V, ActionEvent.CTRL_MASK ) )
 		editPasteItem.setMnemonic( KeyEvent.VK_P )
 		editMenu.add( editPasteItem )
-		
 
-		
-		
-		# VIEW MENU
-		
-		viewMenu = JMenu( 'View' )
-		viewMenu.add( _action( 'Show element tree explorer', self._onShowElementTreeExplorer ) )
-		self._showUndoHistoryItem = JMenuItem( 'Show undo history' )
-		self._showUndoHistoryItem.addActionListener( _action( 'Show undo history', self._onShowUndoHistory ) )
-		viewMenu.add( self._showUndoHistoryItem )
+		editMenu.addSeparator()
 
-		
-		
+		self.__showUndoHistoryItem = JMenuItem( 'Show undo history' )
+		self.__showUndoHistoryItem.addActionListener( _action( 'Show undo history', self.__onShowUndoHistory ) )
+		editMenu.add( self.__showUndoHistoryItem )
+
+
+
+
 		# HELP MENU
 
 		helpMenu = JMenu( 'Help' )
 
 		helpToggleTooltipHighlightsItem = JMenuItem( 'Toggle tooltip highlights' )
-		toggleTooltipHighlightsAction = _action( 'Toggle tooltip highlights', self._onToggleTooltipHighlights )
+		toggleTooltipHighlightsAction = _action( 'Toggle tooltip highlights', self.__onToggleTooltipHighlights )
 		helpToggleTooltipHighlightsItem.setActionCommand( toggleTooltipHighlightsAction.getValue( Action.NAME ) )
 		helpToggleTooltipHighlightsItem.addActionListener( toggleTooltipHighlightsAction )
 		helpToggleTooltipHighlightsItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_F2, 0 ) )
 		helpMenu.add( helpToggleTooltipHighlightsItem )
 
-		helpMenu.add( _action( 'Show all tip boxes', self._onShowAllTipBoxes ) )
+		helpMenu.add( _action( 'Show all tip boxes', self.__onShowAllTipBoxes ) )
 
 
 		# MENU BAR
 
 		menuBar = JMenuBar()
 		menuBar.add( editMenu )
-		menuBar.add( viewMenu )
 		menuBar.add( helpMenu )
 
 
 
 		# MAIN PANEL
-		
+
 		windowPanel = JPanel()
 		windowPanel.setLayout( BoxLayout( windowPanel, BoxLayout.Y_AXIS ) )
 		windowPanel.add( self._browser.getComponent() )
-		
-		
-		
-		
+
+
+
+
 		# WINDOW
-		
+
 		class _WindowLister (WindowListener):
 			def windowActivated(listenerSelf, event):
 				pass
@@ -212,54 +177,43 @@ class Window (object):
 				pass
 
 			def windowClosing(listenerSelf, event):
-				if self.onCloseRequest is not None:
-					self.onCloseRequest( self )
-			
+				if self.onCloseRequestListener is not None:
+					self.onCloseRequestListener( self )
+
 			def windowDeactivated(listenerSelf, event):
 				pass
-			
+
 			def windowDeiconified(listenerSelf, event):
 				pass
-			
+
 			def windowIconified(listenerSelf, event):
 				pass
-			
+
 			def windowOpened(listenerSelf, event):
 				pass
-			
 
-		self._frame = JFrame( 'Larch' )
 
-		self._frame.setJMenuBar( menuBar )
+		self.__frame = JFrame( 'Larch' )
 
-		self._frame.add( windowPanel )
-		self._frame.addWindowListener( _WindowLister() )
-		self._frame.setDefaultCloseOperation( JFrame.DO_NOTHING_ON_CLOSE )
-		
-		self._frame.pack()
-		
-		
+		self.__frame.setJMenuBar( menuBar )
+
+		self.__frame.add( windowPanel )
+		self.__frame.addWindowListener( _WindowLister() )
+		self.__frame.setDefaultCloseOperation( JFrame.DO_NOTHING_ON_CLOSE )
+
+		self.__frame.pack()
+
+
 		# Cause command history controls to refresh
-		self._onChangeHistoryChanged( None )
-		
-		
-		
+		self.__refreshChangeHistoryControls( None )
 
-	
-	def show(self):
-		self._frame.setVisible( True )
-		
-	def getFrame(self):
-		return self._frame
-	
-	
-	def close(self):
-		self._frame.dispose()
-		
-		
-	def setCloseRequestListener(self, listener):
-		self.onCloseRequest = listener
 
+
+
+
+	@property
+	def frame(self):
+		return self.__frame
 
 
 	@property
@@ -269,11 +223,20 @@ class Window (object):
 	@property
 	def currentBrowser(self):
 		return self._browser.getCurrentBrowser()
-		
-		
 
-	def _onChangePage(self):
-		changeHistory = self._browser.getChangeHistory()
+
+
+	def show(self):
+		self.__frame.setVisible( True )
+
+	def close(self):
+		self.__frame.dispose()
+
+
+
+
+	def _onChangePage(self, browser):
+		changeHistory = browser.getChangeHistory()
 
 		if changeHistory is not self.__prevChangeHistory:
 			if self.__prevChangeHistory is not None:
@@ -284,48 +247,35 @@ class Window (object):
 
 			self.__prevChangeHistory = changeHistory
 
-			self._onChangeHistoryChanged( changeHistory )
+			self.__refreshChangeHistoryControls( changeHistory )
 
 
-	def _onChangeHistoryChanged(self, changeHistory):
+	def __refreshChangeHistoryControls(self, changeHistory):
 		if changeHistory is not None:
-			self._editUndoItem.setEnabled( changeHistory.canUndo() )
-			self._editRedoItem.setEnabled( changeHistory.canRedo() )
-			self._showUndoHistoryItem.setEnabled( True )
+			self.__editUndoItem.setEnabled( changeHistory.canUndo() )
+			self.__editRedoItem.setEnabled( changeHistory.canRedo() )
+			self.__showUndoHistoryItem.setEnabled( True )
 		else:
-			self._editUndoItem.setEnabled( False )
-			self._editRedoItem.setEnabled( False )
-			self._showUndoHistoryItem.setEnabled( False )
+			self.__editUndoItem.setEnabled( False )
+			self.__editRedoItem.setEnabled( False )
+			self.__showUndoHistoryItem.setEnabled( False )
 			
 		
 		
 			
-			
-		
-		
-		
-	
-	def getWorld(self):
-		return self._windowManager.getWorld()
 
 	
-	def getBrowserContext(self):
-		return self._windowManager.getBrowserContext()
-
-	
-	
-	
-	def _createNewWindow(self, location):
+	def _onOpenNewWindow(self, location):
 		self._windowManager._createNewWindow( location )
 	
 	
 	
-	def _onUndo(self):
+	def __onUndo(self):
 		changeHistory = self._browser.getChangeHistory()
 		if changeHistory.canUndo():
 			changeHistory.undo()
 
-	def _onRedo(self):
+	def __onRedo(self):
 		changeHistory = self._browser.getChangeHistory()
 		if changeHistory.canRedo():
 			changeHistory.redo()
@@ -333,27 +283,20 @@ class Window (object):
 
 		
 
-	def _onShowElementTreeExplorer(self):
-		currentTab = self._browser.getCurrentBrowser()
-		treeExplorer = currentTab.getRootElement().treeExplorer()
-		location = self._windowManager._browserContext.getLocationForObject( treeExplorer )
-		self._browser.openLocationInNewWindow( location )
-
-
-	def _onShowUndoHistory(self):
+	def __onShowUndoHistory(self):
 		changeHistory = self._browser.getChangeHistory()
 		if changeHistory is not None:
-			location = self._windowManager._browserContext.getLocationForObject( changeHistory )
+			location = self._windowManager.browserContext.getLocationForObject( changeHistory )
 			self._browser.openLocationInNewWindow( location )
 
 
 
 
-	def _onToggleTooltipHighlights(self):
+	def __onToggleTooltipHighlights(self):
 		AttachTooltip.toggleHighlights()
 
 
-	def _onShowAllTipBoxes(self):
+	def __onShowAllTipBoxes(self):
 		TipBox.resetTipHiddenStates()
 
 

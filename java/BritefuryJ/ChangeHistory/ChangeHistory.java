@@ -29,7 +29,6 @@ import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.StyleSheet.StyleSheet;
-import BritefuryJ.Util.WeakListenerList;
 
 public class ChangeHistory implements ChangeHistoryController, Presentable
 {
@@ -226,7 +225,7 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 	private ArrayList<Entry> past, future;
 	private boolean bCommandsBlocked, bFrozen;
 	private int freezeCount;
-	private WeakListenerList<ChangeHistoryListener> listeners = null;
+	private ArrayList<ChangeHistoryListener> listeners;
 	private PresentationStateListenerList presStateListeners = null;
 	
 	
@@ -244,18 +243,19 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 		bCommandsBlocked = false;
 		bFrozen = false;
 		freezeCount = 0;
+		listeners = new ArrayList<ChangeHistoryListener>();
 	}
 	
 	
 	
 	public void addChangeHistoryListener(ChangeHistoryListener listener)
 	{
-		listeners = WeakListenerList.addListener( listeners, listener );
+		listeners.add( listener );
 	}
 	
 	public void removeChangeHistoryListener(ChangeHistoryListener listener)
 	{
-		listeners = WeakListenerList.removeListener( listeners, listener );
+		listeners.remove( listener );
 	}
 	
 	
@@ -507,12 +507,9 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 	
 	private void onModified()
 	{
-		if ( listeners != null )
+		for (ChangeHistoryListener listener: listeners)
 		{
-			for (ChangeHistoryListener listener: listeners)
-			{
-				listener.onChangeHistoryChanged( this );
-			}
+			listener.onChangeHistoryChanged( this );
 		}
 		
 		presStateListeners = PresentationStateListenerList.onPresentationStateChanged( presStateListeners, this );

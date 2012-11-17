@@ -24,7 +24,7 @@ from Britefury.Kernel.View.TreeEventListenerObjectDispatch import TreeEventListe
 from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, ObjectDispatchMethod, redecorateDispatchMethod
 
 
-from BritefuryJ.DocModel import DMObjectClass, DMObject
+from BritefuryJ.DocModel import DMObjectClass, DMObject, DMObjectInterface
 
 from BritefuryJ.AttributeTable import *
 from BritefuryJ.Controls import *
@@ -47,8 +47,6 @@ from BritefuryJ.Editor.Sequential.Item import StructuralItem
 from BritefuryJ.Editor.SyntaxRecognizing.Precedence import PrecedenceHandler
 from BritefuryJ.Editor.SyntaxRecognizing import SREInnerFragment
 from BritefuryJ.Editor.SyntaxRecognizing.SyntaxRecognizingController import EditMode
-
-from BritefuryJ.ModelAccess.DocModel import DMObjectInterface
 
 
 

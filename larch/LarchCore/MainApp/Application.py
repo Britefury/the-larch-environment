@@ -59,7 +59,7 @@ class AppState (object):
 
 	def onCloseRequest(self, windowManager, window):
 		if self.hasUnsavedData():
-			response = JOptionPane.showOptionDialog( window.getFrame(),
+			response = JOptionPane.showOptionDialog( window.frame,
 				'You have not saved your work. Close anyway?', 'Unsaved data', JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, None, [ 'Close', 'Cancel' ], 'Cancel' )
 			return response == JOptionPane.YES_OPTION
 		else:
