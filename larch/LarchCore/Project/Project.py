@@ -9,7 +9,7 @@ from BritefuryJ.ChangeHistory import Trackable
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from Britefury.Kernel.Document import Document
-from Britefury.Kernel.World import DocumentFactory
+from Britefury.Kernel.World import _DocumentFactory
 
 # Fix cyclic imports:
 import LarchCore.Project.ProjectEditor.View
@@ -28,5 +28,5 @@ def _newProjectDocment(world):
 	return Document( world, newProject() )
 
 
-newDocumentFactory = DocumentFactory( 'Larch Document', _newProjectDocment )
+newDocumentFactory = _DocumentFactory( 'Larch Document', _newProjectDocment )
 

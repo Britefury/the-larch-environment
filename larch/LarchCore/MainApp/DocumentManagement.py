@@ -10,7 +10,7 @@ import os
 from javax.swing import JOptionPane, JFileChooser
 from javax.swing.filechooser import FileNameExtensionFilter
 
-from BritefuryJ.Controls import *
+from BritefuryJ.Controls import MenuItem, VPopupMenu
 
 
 from Britefury.Kernel.Document import Document
@@ -19,14 +19,14 @@ from Britefury.Kernel.Document import Document
 
 # handleNewDocumentFn(document)
 def promptNewDocument(world, element, handleNewDocumentFn):
-	def _make_newDocument(newDocFn):
+	def _make_newDocument(documentFactory):
 		def newDoc(menuItem):
-			doc = newDocFn( world )
+			doc = documentFactory.makeDocument( world )
 			handleNewDocumentFn( doc )
 		return newDoc
 	items = []
 	for newDocumentFactory in world.newDocumentFactories:
-		items.append( MenuItem.menuItemWithLabel( newDocumentFactory.menuLabelText, _make_newDocument( newDocumentFactory.newDocumentFn ) ) )
+		items.append( MenuItem.menuItemWithLabel( newDocumentFactory.menuLabelText, _make_newDocument( newDocumentFactory ) ) )
 	newDocumentMenu = VPopupMenu( items )
 	
 	newDocumentMenu.popupToRightOf( element )
