@@ -8,6 +8,7 @@
 import sys
 
 from Britefury.Kernel.Plugin import Plugin
+from Britefury.Kernel.Document import Document
 from Britefury.Config import Configuration
 
 from BritefuryJ.AttributeTable import SimpleAttributeTable
@@ -16,115 +17,29 @@ from BritefuryJ.Projection import Subject, ProjectiveBrowserContext
 
 
 
-_internalSchemas = {}
-
-
-		
-def _get_attr(x, attrName, default=None):
-	try:
-		return getattr( x, attrName )
-	except AttributeError:
-		return default
-
-
-
 class _WorldBrowserContext (ProjectiveBrowserContext):
 	def __init__(self, world):
 		super( _WorldBrowserContext, self ).__init__( True )
-		self._world = world
+		self.__world = world
 
 
 	def inspectFragment(self, fragment, sourceElement, triggeringEvent):
-		return self._world._inspectFragment( fragment, sourceElement, triggeringEvent )
-
-	
-	
-class World (object):
-	def __init__(self):
-		super( World, self ).__init__()
-		self._plugins = Plugin.loadPlugins()
-		self.newDocumentFactories = []
-		self._rootSubject = None
-		self._importedModuleRegistry = set()
-		self.configuration = Configuration.Configuration()
-		self._fragmentInspector = None
-		self._browserContext = None
-
-		for plugin in self._plugins:
-			plugin.initialise( self )
-
-		self._browserContext = _WorldBrowserContext( self )
-		self._browserContext.registerNamedSubject( 'config', self.configuration.subject )
+		return self.__world._inspectFragment( fragment, sourceElement, triggeringEvent )
 
 
 
+class _WorldImportHooks (object):
+	def __init__(self, world):
+		self.__world = world
 
 
-	def registerNewDocumentFactory(self, plugin, newDocumentFactory):
-		self.newDocumentFactories.append( newDocumentFactory )
-		
-	
-	def setRootSubject(self, appStateSubject):
-		self._rootSubject = appStateSubject
-		if self._browserContext is not None:
-			self._browserContext.registerMainSubject( self._rootSubject )
-
-	def getRootSubject(self):
-		return self._rootSubject
-
-
-
-	def getBrowserContext(self):
-		return self._browserContext
-
-
-
-	def setFragmentInspector(self, inspector):
-		self._fragmentInspector = inspector
-
-
-
-	def _inspectFragment(self, fragment, sourceElement, triggeringEvent):
-		if self._fragmentInspector is not None:
-			return self._fragmentInspector( fragment, sourceElement, triggeringEvent )
-		else:
-			return False
-
-		
-		
-	def registerImportedModule(self, fullname):
-		self._importedModuleRegistry.add( fullname )
-		
-	def unregisterImportedModules(self, moduleNames):
-		self._importedModuleRegistry -= set( moduleNames )
-	
-	
-	def unloadImportedModules(self, moduleFullnames):
-		modules = set( moduleFullnames )
-		modulesToRemove = self._importedModuleRegistry & modules
-		for moduleFullname in modulesToRemove:
-			del sys.modules[moduleFullname]
-		self._importedModuleRegistry -= modulesToRemove
-		return modulesToRemove
-		
-		
-	
-	
-	
-
-
-	def enableImportHooks(self):
-		sys.meta_path.append( self )
-		
-		
-		
 	def find_module(self, fullname, path=None):
 		try:
-			app_find_module = self._rootSubject.import_resolve
+			app_find_module = self.__world._rootSubject.import_resolve
 		except AttributeError:
 			return None
 		names = fullname.split( '.' )
-		finder = self._rootSubject
+		finder = self.__world._rootSubject
 		for name in names:
 			try:
 				resolver = finder.import_resolve
@@ -135,13 +50,142 @@ class World (object):
 				return None
 		return finder
 
-	
-	
-class DocumentFactory (object):
-	def __init__(self, menuLabelText, newDocumentFn):
-		self.menuLabelText = menuLabelText
-		self.newDocumentFn = newDocumentFn
 
+
+
+class _DocumentFactory (object):
+	def __init__(self, menuLabelText, newDocumentContentFn):
+		self.menuLabelText = menuLabelText
+		self.__newDocumentContentFn = newDocumentContentFn
+
+
+	def makeDocument(self, world):
+		content = self.__newDocumentContentFn()
+		return Document( world, content )
+
+
+
+
+
+class World (object):
+	"""
+	The World
+
+	Maintains:
+
+	- loaded plugins
+	- factories for creating new documents (registering and retrieving)
+	- application root subject
+	- list of modules imported via import hooks
+	- configuration
+	- fragment inspector
+
+	The 'newDocumentFactories' attribute contains a list of document factories.
+	The 'configuration' attribute contains the application configuration.
+	"""
+	def __init__(self):
+		super( World, self ).__init__()
+
+		self.__plugins = Plugin.loadPlugins()
+		self.newDocumentFactories = []
+		self._rootSubject = None
+		self.__importedModuleRegistry = set()
+		self.configuration = Configuration.Configuration()
+		self.__fragmentInspector = None
+		self.__browserContext = None
+
+		for plugin in self.__plugins:
+			plugin.initialise( self )
+
+		self.__browserContext = _WorldBrowserContext( self )
+		self.__browserContext.registerNamedSubject( 'config', self.configuration.subject )
+
+		self.__import_hooks = _WorldImportHooks( self )
+
+
+
+
+	@property
+	def rootSubject(self):
+		"""Property to retrieve the root subject"""
+		return self._rootSubject
+
+
+	def setRootSubject(self, appStateSubject):
+		"""Set the root subject"""
+		self._rootSubject = appStateSubject
+		if self.__browserContext is not None:
+			self.__browserContext.registerMainSubject( self._rootSubject )
+
+
+
+	@property
+	def browserContext(self):
+		"""Property to retrieve the browser context"""
+		return self.__browserContext
+
+
+
+	def setFragmentInspector(self, inspector):
+		"""Set the fragment inspector"""
+		self.__fragmentInspector = inspector
+
+
+
+	def _inspectFragment(self, fragment, sourceElement, triggeringEvent):
+		if self.__fragmentInspector is not None:
+			return self.__fragmentInspector( fragment, sourceElement, triggeringEvent )
+		else:
+			return False
+
+
+
+	def documentContentFactory(self, description):
+		"""Register a document content factory
+
+		Use as a decorator:
+
+		@world.documentContentFactory('New something')
+		def newSomethingContent():
+			return SomethingContent()
+		"""
+		def decorate(contentFactoryFn):
+			self.newDocumentFactories.append( _DocumentFactory( description, contentFactoryFn ) )
+			return contentFactoryFn
+		return decorate
+
+
+
+	def registerImportedModule(self, fullname):
+		"""Register a module imported via the import hooks"""
+		self.__importedModuleRegistry.add( fullname )
+		
+	def unregisterImportedModules(self, moduleNames):
+		"""Unregister a set of modules imported via the import hooks"""
+		self.__importedModuleRegistry -= set( moduleNames )
+	
+	
+	def unloadImportedModules(self, moduleFullnames):
+		"""Unload a list of modules
+
+		Only unloads those imported via the import hooks
+		"""
+		modules = set( moduleFullnames )
+		modulesToRemove = self.__importedModuleRegistry & modules
+		for moduleFullname in modulesToRemove:
+			del sys.modules[moduleFullname]
+		self.__importedModuleRegistry -= modulesToRemove
+		return modulesToRemove
+		
+		
+	
+	def enableImportHooks(self):
+		"""Enable the import hooks"""
+		if self.__import_hooks not in sys.meta_path:
+			sys.meta_path.append( self.__import_hooks )
+		
+		
+		
 
 
 
@@ -150,7 +194,7 @@ class DocumentFactory (object):
 class WorldDefaultOuterSubject (Subject):
 	def __init__(self, world):
 		super( WorldDefaultOuterSubject, self ).__init__( None )
-		self._world = world
+		self.__world = world
 
 
 	def getFocus(self):
@@ -163,4 +207,4 @@ class WorldDefaultOuterSubject (Subject):
 		return '<default root subject>'
 
 	def getSubjectContext(self):
-		return SimpleAttributeTable.instance.withAttrs( world=self._world, document=None, docLocation=None, location=Location( '' ) )
+		return SimpleAttributeTable.instance.withAttrs( world=self.__world, document=None, docLocation=None, location=Location( '' ) )

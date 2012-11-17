@@ -18,13 +18,13 @@ from Britefury.Windows.Window import Window
 class WindowManager (object):
 	def __init__(self, world, location=Location( '' )):
 		def createCommandConsole(presentationComponent, browser):
-			return CommandConsole( browser, self.__world.getBrowserContext(), presentationComponent )
+			return CommandConsole( browser, self.__world.browserContext, presentationComponent )
 
 		self.__createCommandConsole = createCommandConsole
 
 		self.__world = world
 		
-		self.__appState = world.getRootSubject().getFocus()
+		self.__appState = world.rootSubject.getFocus()
 
 		self.__rootWindow = Window( self, createCommandConsole, location )
 		self.__rootWindow.onCloseRequestListener = self.__onWindowCloseRequest
@@ -41,7 +41,7 @@ class WindowManager (object):
 
 	@property
 	def browserContext(self):
-		return self.__world.getBrowserContext()
+		return self.__world.browserContext
 
 
 	def showRootWindow(self):

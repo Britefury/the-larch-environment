@@ -10,5 +10,9 @@ from LarchCore.Project import Project
 
 
 def initPlugin(plugin, world):
-	world.registerNewDocumentFactory( plugin, Project.newDocumentFactory )
+
+	@world.documentContentFactory('Larch Project')
+	def newProjectContent():
+		return Project.newProject()
+
 
