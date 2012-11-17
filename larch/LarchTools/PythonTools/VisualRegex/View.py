@@ -28,11 +28,11 @@ from BritefuryJ.DocModel import DMObjectClass, DMObject
 
 from BritefuryJ.AttributeTable import *
 from BritefuryJ.Controls import *
-from BritefuryJ.Graphics import *
+from BritefuryJ.Graphics import SolidBorder, FilledBorder, FillPainter
 from BritefuryJ.LSpace.Interactor import KeyElementInteractor
 
 from BritefuryJ.Pres import ApplyPerspective
-from BritefuryJ.Pres.Primitive import *
+from BritefuryJ.Pres.Primitive import Primitive, Box, Text, Label, HiddenText, Segment, Script, Span, Row, Column, Paragraph, FlowGrid
 
 from BritefuryJ.StyleSheet import StyleSheet
 
@@ -43,12 +43,12 @@ from BritefuryJ.IncrementalView import FragmentView, FragmentData
 
 from BritefuryJ.Editor.Sequential import SequentialEditorPerspective
 from BritefuryJ.Editor.Sequential.EditFilter import HandleEditResult
-from BritefuryJ.Editor.Sequential.Item import *
+from BritefuryJ.Editor.Sequential.Item import StructuralItem
 from BritefuryJ.Editor.SyntaxRecognizing.Precedence import PrecedenceHandler
 from BritefuryJ.Editor.SyntaxRecognizing import SREInnerFragment
 from BritefuryJ.Editor.SyntaxRecognizing.SyntaxRecognizingController import EditMode
 
-from BritefuryJ.ModelAccess.DocModel import *
+from BritefuryJ.ModelAccess.DocModel import DMObjectInterface
 
 
 
@@ -270,7 +270,7 @@ class VREView (MethodDispatchView):
 				view = unparseableText( x )
 				return view
 			elif isinstance( x, DMObjectInterface ):
-				view = SREInnerFragment( x, PRECEDENCE_CONTAINER_UNPARSED, EditMode.DISPLAY )
+				view = SREInnerFragment( x, PRECEDENCE_NONE, EditMode.DISPLAY )
 				#<NO_TREE_EVENT_LISTENER>
 				view = StructuralItem( VisualRegexSyntaxRecognizingController.instance, x, view )
 				return view

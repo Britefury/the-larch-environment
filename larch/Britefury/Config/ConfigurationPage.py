@@ -5,10 +5,10 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
-from BritefuryJ.Controls import *
+from BritefuryJ.Controls import Hyperlink
 
-from BritefuryJ.Pres.Primitive import *
-from BritefuryJ.Pres.RichText import *
+from BritefuryJ.Pres.Primitive import Primitive
+from BritefuryJ.Pres.RichText import SplitLinkHeaderBar, TitleBar, Page, Head, Body
 from BritefuryJ.Browser import Location
 from BritefuryJ.StyleSheet import StyleSheet
 
