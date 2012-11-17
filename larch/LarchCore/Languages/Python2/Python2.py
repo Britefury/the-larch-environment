@@ -11,7 +11,7 @@ from BritefuryJ.DocModel import DMNode
 
 from LarchCore.Languages.Python2 import Schema
 from LarchCore.Languages.Python2.Embedded import _py25NewModule
-from LarchCore.Languages.Python2.Python2Importer import importPy25File
+from LarchCore.Languages.Python2.Python2Importer import importPy2File
 from LarchCore.Languages.Python2.PythonEditor.Subject import Python2Subject
 from LarchCore.Languages.Python2.PythonEditor.View import perspective as python2EditorPerspective
 from LarchCore.Languages.Python2.TextExporter import PythonTextExporter
@@ -53,7 +53,7 @@ class Python2PageData (PageData):
 
 
 def _py25ImportPage(filename):
-	content = importPy25File( filename )
+	content = importPy2File( filename )
 	return Python2PageData( content )
 	
 

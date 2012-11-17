@@ -21,7 +21,7 @@ from Britefury.Windows.WindowManager import WindowManager
 
 from LarchCore.PythonConsole import Console
 
-from LarchCore.Languages.Python2.Python2Importer import importPy25File
+from LarchCore.Languages.Python2.Python2Importer import importPy2File
 
 
 
@@ -44,7 +44,7 @@ def start_lconsole():
 
 		filename = sys.argv[1]
 		if filename.lower().endswith( '.py' ):
-			m = importPy25File( filename )
+			m = importPy2File( filename )
 			console.executeModule( m, True )
 		else:
 			print 'Python script filename must end with .py'

@@ -862,13 +862,13 @@ class _StructureTable (object):
 
 	
 	
-def importPy25Source(source, moduleName, mode):
+def importPy2Source(source, moduleName, mode):
 	tree = compile( source, moduleName, mode, _ast.PyCF_ONLY_AST )
 	structTab = _StructureTable( source )
 	return _module( structTab, tree )
 
 
-def importPy25File(filename):
+def importPy2File(filename):
 	source = open( filename, 'r' ).read()
 	tree = compile( source, filename, 'exec', _ast.PyCF_ONLY_AST )
 	structTab = _StructureTable( source )
@@ -882,7 +882,7 @@ from BritefuryJ.DocModel import DMNode
 
 class ImporterTestCase (unittest.TestCase):
 	def _moduleTest(self, source, expectedResult):
-		result = importPy25Source( source, '<test_module>', 'exec' )
+		result = importPy2Source( source, '<test_module>', 'exec' )
 		result = DMNode.coerce( result )
 		expectedResult = DMNode.coerce( expectedResult )
 		if result != expectedResult:
@@ -894,7 +894,7 @@ class ImporterTestCase (unittest.TestCase):
 		
 		
 	def _exprTest(self, source, expectedResult):
-		result = importPy25Source( source, '<text_expr>', 'exec' )
+		result = importPy2Source( source, '<text_expr>', 'exec' )
 		result = DMNode.coerce( result )
 		expectedResult = DMNode.coerce( expectedResult )
 		result = result['suite'][0]
@@ -908,7 +908,7 @@ class ImporterTestCase (unittest.TestCase):
 		self.assert_( result == expectedResult )
 		
 	def _stmtTest(self, source, expectedResult):
-		result = importPy25Source( source, '<test_stmt>', 'exec' )
+		result = importPy2Source( source, '<test_stmt>', 'exec' )
 		result = DMNode.coerce( result )
 		expectedResult = DMNode.coerce( expectedResult )
 		result = result['suite'][0]
@@ -920,7 +920,7 @@ class ImporterTestCase (unittest.TestCase):
 		self.assert_( result == expectedResult )
 		
 	def _compStmtTest(self, source, expectedResult):
-		result = importPy25Source( source, '<test_stmt>', 'exec' )
+		result = importPy2Source( source, '<test_stmt>', 'exec' )
 		result = DMNode.coerce( result )
 		expectedResult = DMNode.coerce( expectedResult )
 		result = result['suite']
