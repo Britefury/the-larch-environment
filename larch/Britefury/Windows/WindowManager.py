@@ -17,66 +17,61 @@ from Britefury.Windows.Window import Window
 		
 class WindowManager (object):
 	def __init__(self, world, location=Location( '' )):
-		self._world = world
-		
-		
-		self._browserContext = world.getBrowserContext()
+		def createCommandConsole(presentationComponent, browser):
+			return CommandConsole( browser, self.__world.getBrowserContext(), presentationComponent )
 
-		def _createCommandConsole(presentationComponent, browser):
-			return CommandConsole( browser, self.getBrowserContext(), presentationComponent )
+		self.__createCommandConsole = createCommandConsole
+
+		self.__world = world
 		
-		self._createCommandConsole = _createCommandConsole
+		self.__appState = world.getRootSubject().getFocus()
 
-		self._appState = world.getRootSubject().getFocus()
-
-		self._rootWindow = Window( self, self._createCommandConsole, location )
-		self._rootWindow.setCloseRequestListener( self._onWindowCloseRequest )
-		self._openWindows = set( [ self._rootWindow ] )
+		self.__rootWindow = Window( self, createCommandConsole, location )
+		self.__rootWindow.onCloseRequestListener = self.__onWindowCloseRequest
+		self.__openWindows = { self.__rootWindow }
 		
 		self.onCloseLastWindow = None
 		
 
 		
-	def getWorld(self):
-		return self._world
-	
-	
+	@property
+	def world(self):
+		return self.__world
+
+
+	@property
+	def browserContext(self):
+		return self.__world.getBrowserContext()
+
+
 	def showRootWindow(self):
-		self._rootWindow.show()
+		self.__rootWindow.show()
 
 		
-	def getBrowserContext(self):
-		return self._world.getBrowserContext()
-	
-	
-	def setCloseLastWindowListener(self, listener):
-		self.onCloseLastWindow = listener
 
-
-
-	def close(self):
-		for window in self._openWindows:
+	def closeAllWindows(self):
+		for window in self.__openWindows:
 			window.close()
-		self._openWindows = set()
+		self.__openWindows = set()
 
 		self.__windowClosed()
 
 		
 	def _createNewWindow(self, location):
-		newWindow = Window( self, self._createCommandConsole, location )
-		newWindow.setCloseRequestListener( self._onWindowCloseRequest )
+		newWindow = Window( self, self.__createCommandConsole, location )
+		newWindow.onCloseRequestListener = self.__onWindowCloseRequest
 		newWindow.show()
-		self._openWindows.add( newWindow )
-		
-		
-	def _onWindowCloseRequest(self, window):
-		if len( self._openWindows ) == 1:
+		self.__openWindows.add( newWindow )
+
+
+	def __onWindowCloseRequest(self, window):
+		if len( self.__openWindows ) == 1:
 			# Only one window open
 
 			# Invoke the application state's onCloseRequest method to determine if closing
 			# is allowed
 			try:
-				onCloseRequestFn = self._appState.onCloseRequest
+				onCloseRequestFn = self.__appState.onCloseRequest
 			except AttributeError:
 				pass
 			else:
@@ -85,18 +80,18 @@ class WindowManager (object):
 					return
 
 		window.close()
-		self._openWindows.remove( window )
+		self.__openWindows.remove( window )
 
 		self.__windowClosed()
 
 	
 
 	def __windowClosed(self):
-		if len( self._openWindows ) == 0:
+		if len( self.__openWindows ) == 0:
 			if self.onCloseLastWindow is not None:
 				self.onCloseLastWindow( self )
 			try:
-				onCloseAppFn = self._appState.onCloseApp
+				onCloseAppFn = self.__appState.onCloseApp
 			except AttributeError:
 				pass
 			else:

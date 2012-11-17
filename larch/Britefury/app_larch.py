@@ -107,6 +107,6 @@ def start_larch():
 		app.appShutdown()
 
 	wm = WindowManager( world )
-	wm.setCloseLastWindowListener( _onClose )
+	wm.onCloseLastWindow = _onClose
 
 	wm.showRootWindow()
