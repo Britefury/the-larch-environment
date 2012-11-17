@@ -16,13 +16,13 @@ import re
 
 from java.awt import Color
 
-from BritefuryJ.Command import *
+from BritefuryJ.Command import Command
 
 from BritefuryJ.DocModel import DMNode
 
-from BritefuryJ.Graphics import *
+from BritefuryJ.Graphics import SolidBorder
 
-from BritefuryJ.Pres.Primitive import *
+from BritefuryJ.Pres.Primitive import Paragraph, HiddenText
 
 from LarchCore.Languages.Python2.PythonCommands import pythonCommandSet, EmbeddedExpressionAtCaretAction, chainActions
 

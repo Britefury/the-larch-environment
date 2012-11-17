@@ -9,17 +9,14 @@ from copy import deepcopy
 
 from BritefuryJ.DocModel import DMNode
 
-from BritefuryJ.LSpace.Clipboard import *
 from BritefuryJ.LSpace.TextFocus import TextSelection
-from BritefuryJ.LSpace.StyleParams import *
-from BritefuryJ.LSpace import *
 
 from BritefuryJ.Editor.Sequential import SequentialClipboardHandler, SelectionEditTreeEvent
 
 from BritefuryJ.Editor.SyntaxRecognizing import SyntaxRecognizingController
 
 
-from Britefury.SequentialEditor.Helpers import *
+from Britefury.SequentialEditor.Helpers import EditRuleDecorator
 
 
 from LarchTools.PythonTools.VisualRegex import Schema, Parser

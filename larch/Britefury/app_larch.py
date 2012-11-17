@@ -49,7 +49,7 @@ def start_larch():
 		jarCustomPythonApp[0] = True
 
 	app_in_jar.registerJarEntryHandler( lambda name: name == 'mainapp/app.larch', _handle_larch_app )
-	app_in_jar.registerJarEntryHandler( lambda name: name == 'mainapp/app.py'  or  name == 'mainapp.app$py.class', _handle_python_app )
+	app_in_jar.registerJarEntryHandler( lambda name: name == 'mainapp/app.py'  or  name == 'mainapp/app$py.class', _handle_python_app )
 
 
 
