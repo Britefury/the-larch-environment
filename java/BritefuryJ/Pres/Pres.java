@@ -26,7 +26,6 @@ import BritefuryJ.LSpace.Interactor.ContextMenuElementInteractor;
 import BritefuryJ.LSpace.Layout.HAlignment;
 import BritefuryJ.LSpace.Layout.VAlignment;
 import BritefuryJ.Projection.AbstractPerspective;
-import BritefuryJ.Projection.ProjectiveBrowserContext;
 import BritefuryJ.Projection.Subject;
 import BritefuryJ.Shortcut.Shortcut;
 import BritefuryJ.Shortcut.ShortcutElementAction;
@@ -430,8 +429,8 @@ public abstract class Pres
 	{
 		PresentationContext presCtx = PresentationContext.defaultCtx;
 		FragmentContext fragCtx = contextElement.getFragmentContext();
+		IncrementalView parentView = null;
 		Subject enclosingSubject = null;
-		ProjectiveBrowserContext browserContext = null;
 		
 		if ( fragCtx != null )
 		{
@@ -440,17 +439,18 @@ public abstract class Pres
 			{
 				style = fragCtx.getStyleValues();
 			}
-			browserContext = fragCtx.getBrowserContext();
 			
 			if ( fragCtx instanceof FragmentView )
 			{
 				FragmentView fragView = (FragmentView)fragCtx;
-				enclosingSubject = fragView.getView().getSubject();
+				
+				parentView = fragView.getView();
+				enclosingSubject = parentView.getSubject();
 			}
 		}
 		
 		PopupSubject popupSubject = new PopupSubject( enclosingSubject, this, presCtx.getPerspective() );
-		IncrementalView popupView = new IncrementalView( popupSubject, browserContext );
+		IncrementalView popupView = new IncrementalView( popupSubject, parentView );
 		
 		Pres viewPres = popupView.getViewPres();
 		
