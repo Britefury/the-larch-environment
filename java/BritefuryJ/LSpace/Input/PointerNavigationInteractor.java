@@ -24,6 +24,9 @@ import BritefuryJ.Math.Vector2;
 
 public class PointerNavigationInteractor extends AbstractPointerDragInteractor
 {
+	private static final double SCROLL_PAN_RATE = 75.0;
+	
+	
 	private int navigationButton = 0;
 	private AffineTransform navigationDragElementRootToLocalXform = null;
 	private Point2 navigationDragStartPos = new Point2();
@@ -128,7 +131,7 @@ public class PointerNavigationInteractor extends AbstractPointerDragInteractor
 		else
 		{
 			double delta = (double)event.getScrollY();
-			handleNavigationGestureClick( pointer, new PointerNavigationPanEvent( pointer, new Vector2( 0.0, delta * 75.0 ) ) );
+			handleNavigationGestureClick( pointer, new PointerNavigationPanEvent( pointer, new Vector2( 0.0, delta * SCROLL_PAN_RATE ) ) );
 		}
 		
 		return true;
