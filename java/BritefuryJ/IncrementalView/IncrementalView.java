@@ -348,12 +348,12 @@ public class IncrementalView
 	
 	public IncrementalView(Subject subject, IncrementalView parentView, PersistentStateStore persistentState)
 	{
-		this( subject, parentView.browserContext, persistentState );
+		this( subject, parentView != null ? parentView.browserContext : null, persistentState );
 	}
 
 	public IncrementalView(Subject subject, IncrementalView parentView)
 	{
-		this( subject, parentView.browserContext, null );
+		this( subject, parentView != null ? parentView.browserContext : null, null );
 	}
 
 	
