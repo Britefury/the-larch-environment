@@ -18,7 +18,7 @@ from Britefury.Windows.Window import Window
 class WindowManager (object):
 	def __init__(self, world, location=Location( '' )):
 		def createCommandConsole(presentationComponent, browser):
-			return CommandConsole( browser, self.__world.browserContext, presentationComponent )
+			return CommandConsole( browser, presentationComponent )
 
 		self.__createCommandConsole = createCommandConsole
 
@@ -57,8 +57,8 @@ class WindowManager (object):
 		self.__windowClosed()
 
 		
-	def _createNewWindow(self, location):
-		newWindow = Window( self, self.__createCommandConsole, location )
+	def _createNewWindow(self, subject):
+		newWindow = Window( self, self.__createCommandConsole, subject )
 		newWindow.onCloseRequestListener = self.__onWindowCloseRequest
 		newWindow.show()
 		self.__openWindows.add( newWindow )

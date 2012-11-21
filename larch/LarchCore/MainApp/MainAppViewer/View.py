@@ -119,7 +119,7 @@ class AppView (MethodDispatchView):
 				location = fragment.getSubjectContext()['location'] + '.documents.' + appDoc.getRelativeLocation()
 
 				pageController = link.element.rootElement.pageController
-				pageController.openLocation( location, PageController.OpenOperation.OPEN_IN_CURRENT_TAB )
+				pageController.openSubject( location, PageController.OpenOperation.OPEN_IN_CURRENT_TAB )
 
 				
 			element = link.getElement()
@@ -161,7 +161,7 @@ class AppView (MethodDispatchView):
 			location = fragment.getSubjectContext()['location'] + '.consoles.c%d'  %  ( index, )
 
 			pageController = link.element.rootElement.pageController
-			pageController.openLocation( location, PageController.OpenOperation.OPEN_IN_CURRENT_TAB )
+			pageController.openSubject( location, PageController.OpenOperation.OPEN_IN_CURRENT_TAB )
 
 			return True
 		
