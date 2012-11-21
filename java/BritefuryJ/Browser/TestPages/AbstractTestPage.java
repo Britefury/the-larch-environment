@@ -2,21 +2,11 @@
 //##* under the terms of the GNU General Public License version 2 as published by the
 //##* Free Software Foundation. The full text of the GNU General Public License
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
-//##* program. This source code is (C)copyright Geoffrey French 2008.
+//##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.LSpace;
+package BritefuryJ.Browser.TestPages;
 
-import BritefuryJ.Projection.Subject;
-
-
-public interface PageController
+public abstract class AbstractTestPage
 {
-	public enum OpenOperation
-	{
-		OPEN_IN_CURRENT_TAB,
-		OPEN_IN_NEW_TAB,
-		OPEN_IN_NEW_WINDOW
-	}
-	
-	public void openSubject(Subject subject, OpenOperation op);
+	public abstract String getTitle();
 }

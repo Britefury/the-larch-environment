@@ -22,7 +22,7 @@ public class BrowserIncrementalView extends IncrementalView
 	{
 		super( subject, browserContext, persistentState );
 
-		page = new IncrementalViewPage( getViewPres(), subject.getTitle(), browserContext, subject.getChangeHistory(), this, subject );
+		page = new IncrementalViewPage( getViewPres(), this, subject );
 	}
 	
 	
