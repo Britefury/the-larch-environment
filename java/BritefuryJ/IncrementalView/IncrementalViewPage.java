@@ -10,18 +10,17 @@ import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.Browser.BrowserPage;
-import BritefuryJ.Browser.Location;
 import BritefuryJ.ChangeHistory.ChangeHistory;
 import BritefuryJ.Command.BoundCommandSet;
 import BritefuryJ.Command.Command;
 import BritefuryJ.Command.Command.CommandAction;
 import BritefuryJ.Command.CommandSet;
+import BritefuryJ.DefaultPerspective.DefaultPerspective;
 import BritefuryJ.LSpace.PageController;
 import BritefuryJ.LSpace.PersistentState.PersistentStateStore;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Logging.LogView;
 import BritefuryJ.Pres.Pres;
-import BritefuryJ.Projection.ProjectiveBrowserContext;
 import BritefuryJ.Projection.Subject;
 
 public class IncrementalViewPage extends BrowserPage
@@ -31,7 +30,6 @@ public class IncrementalViewPage extends BrowserPage
 	private ChangeHistory changeHistory;
 	private BrowserIncrementalView view;
 	private Subject subject;
-	private ProjectiveBrowserContext browserContext;
 	
 	
 	private static CommandAction pageLogCmdAction = new CommandAction()
@@ -49,14 +47,13 @@ public class IncrementalViewPage extends BrowserPage
 	
 	
 	
-	public IncrementalViewPage(Pres pres, String title, ProjectiveBrowserContext browserContext, ChangeHistory changeHistory, BrowserIncrementalView view, Subject subject)
+	public IncrementalViewPage(Pres pres, BrowserIncrementalView view, Subject subject)
 	{
 		this.pagePres = pres;
-		this.title = title;
-		this.changeHistory = changeHistory;
+		this.title = subject.getTitle();
+		this.changeHistory = subject.getChangeHistory();
 		this.view = view;
 		this.subject = subject;
-		this.browserContext = browserContext;
 	}
 	
 	
@@ -102,7 +99,7 @@ public class IncrementalViewPage extends BrowserPage
 		Log log = getLog();
 		log.startRecording();
 		LogView view = new LogView( log );
-		Location location = browserContext.getLocationForObject( view );
-		pageController.openLocation( location, PageController.OpenOperation.OPEN_IN_NEW_WINDOW );
+		Subject subject = DefaultPerspective.instance.objectSubject( view );
+		pageController.openSubject( subject, PageController.OpenOperation.OPEN_IN_NEW_WINDOW );
 	}
 }

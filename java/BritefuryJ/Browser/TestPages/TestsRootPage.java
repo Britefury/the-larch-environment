@@ -9,9 +9,10 @@ package BritefuryJ.Browser.TestPages;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import BritefuryJ.Browser.BrowserPage;
-import BritefuryJ.Browser.Location;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Controls.Hyperlink;
+import BritefuryJ.DefaultPerspective.Presentable;
+import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Row;
@@ -21,10 +22,37 @@ import BritefuryJ.Pres.RichText.LinkHeaderBar;
 import BritefuryJ.Pres.RichText.Page;
 import BritefuryJ.Pres.RichText.TitleBar;
 import BritefuryJ.Pres.UI.SectionHeading2;
+import BritefuryJ.Projection.Subject;
 
-public class TestsRootPage extends BrowserPage
+public class TestsRootPage extends AbstractTestPage implements Presentable
 {
-	public TestsRootPage()
+	private static class TestSubject extends Subject
+	{
+		AbstractTestPage page;
+		
+		public TestSubject(AbstractTestPage page)
+		{
+			super( null );
+			
+			this.page = page;
+		}
+
+		@Override
+		public Object getFocus()
+		{
+			return page;
+		}
+
+		@Override
+		public String getTitle()
+		{
+			return page.getTitle();
+		}
+	}
+	
+	
+	
+	private TestsRootPage()
 	{
 	}
 	
@@ -37,34 +65,26 @@ public class TestsRootPage extends BrowserPage
 	
 
 	
-	public Pres getContentsPres()
-	{
-		Pres title = new TitleBar( "Tests" );
-		
-		Pres head = new Head( new Pres[] { createLinkHeader( TestsRootPage.LINKHEADER_ROOTPAGE ), title } );
-		
-		return new Page( new Pres[] { head, createTestsContents() } );
-	}
 
 	
-	public static int LINKHEADER_ROOTPAGE = 0x1;
 	public static int LINKHEADER_SYSTEMPAGE = 0x2;
 	
 	public static Pres createLinkHeader(int linkHeaderFlags)
 	{
 		ArrayList<Object> links = new ArrayList<Object>();
 		
-		if ( ( linkHeaderFlags & LINKHEADER_ROOTPAGE )  !=  0 )
-		{
-			links.add( new Hyperlink( "HOME PAGE", new Location( "" ) ) );
-		}
-		
 		if ( ( linkHeaderFlags & LINKHEADER_SYSTEMPAGE )  !=  0 )
 		{
-			links.add( new Hyperlink( "TESTS PAGE", new Location( "tests" ) ) );
+			links.add( new Hyperlink( "TESTS PAGE", subjectFor( TestsRootPage.instance ) ) );
 		}
 		
 		return new LinkHeaderBar( links );
+	}
+	
+	
+	private static Subject subjectFor(AbstractTestPage page)
+	{
+		return new TestSubject( page );
 	}
 	
 	
@@ -119,28 +139,28 @@ public class TestsRootPage extends BrowserPage
 	public static final ViewportTestPage viewport = new ViewportTestPage();
 	
 	private static final Hyperlink primitiveLinks[] = {
-		new Hyperlink( "Alignment", new Location( "tests.alignment" ) ),
-		new Hyperlink( "Border", new Location( "tests.border" ) ),
-		new Hyperlink( "Column", new Location( "tests.column" ) ),
-		new Hyperlink( "Clipboard", new Location( "tests.clipboard" ) ),
-		new Hyperlink( "Drag and drop", new Location( "tests.dnd" ) ),
-		new Hyperlink( "Flow grid", new Location( "tests.flowGrid" ) ),
-		new Hyperlink( "Fraction", new Location( "tests.fraction" ) ),
-		new Hyperlink( "Grid", new Location( "tests.grid" ) ),
-		new Hyperlink( "Image", new Location( "tests.image" ) ),
-		new Hyperlink( "Math root", new Location( "tests.mathRoot" ) ),
-		new Hyperlink( "Non-local drag and drop", new Location( "tests.nonLocalDnd" ) ),
-		new Hyperlink( "Paragraph", new Location( "tests.paragraph" ) ),
-		new Hyperlink( "Paragraph with span", new Location( "tests.paragraphWithSpan" ) ),
-		new Hyperlink( "Proxy and span", new Location( "tests.proxyAndSpan" ) ),
-		new Hyperlink( "Row", new Location( "tests.row" ) ),
-		new Hyperlink( "Script", new Location( "tests.script" ) ),
-		new Hyperlink( "Segment", new Location( "tests.segment" ) ),
-		new Hyperlink( "Sequence view", new Location( "tests.sequenceView" ) ),
-		new Hyperlink( "Shape", new Location( "tests.shape" ) ),
-		new Hyperlink( "Table", new Location( "tests.table" ) ),
-		new Hyperlink( "Text", new Location( "tests.text" ) ),
-		new Hyperlink( "Viewport", new Location( "tests.viewport" ) ),
+		new Hyperlink( "Alignment", subjectFor( alignment ) ),
+		new Hyperlink( "Border", subjectFor( border ) ),
+		new Hyperlink( "Column", subjectFor( column ) ),
+		new Hyperlink( "Clipboard", subjectFor( clipboard ) ),
+		new Hyperlink( "Drag and drop", subjectFor( dnd ) ),
+		new Hyperlink( "Flow grid", subjectFor( flowGrid ) ),
+		new Hyperlink( "Fraction", subjectFor( fraction ) ),
+		new Hyperlink( "Grid", subjectFor( grid ) ),
+		new Hyperlink( "Image", subjectFor( image ) ),
+		new Hyperlink( "Math root", subjectFor( mathRoot ) ),
+		new Hyperlink( "Non-local drag and drop", subjectFor( nonLocalDnd ) ),
+		new Hyperlink( "Paragraph", subjectFor( paragraph ) ),
+		new Hyperlink( "Paragraph with span", subjectFor( paragraphWithSpan ) ),
+		new Hyperlink( "Proxy and span", subjectFor( proxyAndSpan ) ),
+		new Hyperlink( "Row", subjectFor( row ) ),
+		new Hyperlink( "Script", subjectFor( script ) ),
+		new Hyperlink( "Segment", subjectFor( segment ) ),
+		new Hyperlink( "Sequence view", subjectFor( sequenceView ) ),
+		new Hyperlink( "Shape", subjectFor( shape ) ),
+		new Hyperlink( "Table", subjectFor( table ) ),
+		new Hyperlink( "Text", subjectFor( text ) ),
+		new Hyperlink( "Viewport", subjectFor( viewport ) ),
 	};
 
 	
@@ -167,24 +187,39 @@ public class TestsRootPage extends BrowserPage
 	public static final TextEntryTestPage textEntry = new TextEntryTestPage();
 	
 	private static final Hyperlink controlsLinks[] = {
-		new Hyperlink( "Bubble popup", new Location( "tests.bubblePopup" ) ),
-		new Hyperlink( "Button", new Location( "tests.button" ) ),
-		new Hyperlink( "Check box", new Location( "tests.checkbox" ) ),
-		new Hyperlink( "Colour picker", new Location( "tests.colourPicker" ) ),
-		new Hyperlink( "Command console", new Location( "tests.commandConsole" ) ),
-		new Hyperlink( "Editable label", new Location( "tests.editableLabel" ) ),
-		new Hyperlink( "Expander", new Location( "tests.expander" ) ),
-		new Hyperlink( "Hyperlink", new Location( "tests.hyperlink" ) ),
-		new Hyperlink( "Numeric label", new Location( "tests.numLabel" ) ),
-		new Hyperlink( "Object drop box", new Location( "tests.objectDrop" ) ),
-		new Hyperlink( "Option menu", new Location( "tests.optionMenu" ) ),
-		new Hyperlink( "Popup", new Location( "tests.popup" ) ),
-		new Hyperlink( "Scroll bar", new Location( "tests.scrollBar" ) ),
-		new Hyperlink( "Scrolled viewport", new Location( "tests.scrolledViewport" ) ),
-		new Hyperlink( "Slider", new Location( "tests.slider" ) ),
-		new Hyperlink( "Spin entry", new Location( "tests.spinEntry" ) ),
-		new Hyperlink( "Tabbed box", new Location( "tests.tabbedBox" ) ),
-		new Hyperlink( "Text area", new Location( "tests.textArea" ) ),
-		new Hyperlink( "Text entry", new Location( "tests.textEntry" ) ),
+		new Hyperlink( "Bubble popup", subjectFor( bubblePopup ) ),
+		new Hyperlink( "Button", subjectFor( button ) ),
+		new Hyperlink( "Check box", subjectFor( checkbox ) ),
+		new Hyperlink( "Colour picker", subjectFor( colourPicker ) ),
+		new Hyperlink( "Command console", subjectFor( commandConsole ) ),
+		new Hyperlink( "Editable label", subjectFor( editableLabel ) ),
+		new Hyperlink( "Expander", subjectFor( expander ) ),
+		new Hyperlink( "Hyperlink", subjectFor( hyperlink ) ),
+		new Hyperlink( "Numeric label", subjectFor( numLabel ) ),
+		new Hyperlink( "Object drop box", subjectFor( objectDrop ) ),
+		new Hyperlink( "Option menu", subjectFor( optionMenu ) ),
+		new Hyperlink( "Popup", subjectFor( popup ) ),
+		new Hyperlink( "Scroll bar", subjectFor( scrollBar ) ),
+		new Hyperlink( "Scrolled viewport", subjectFor( scrolledViewport ) ),
+		new Hyperlink( "Slider", subjectFor( slider ) ),
+		new Hyperlink( "Spin entry", subjectFor( spinEntry ) ),
+		new Hyperlink( "Tabbed box", subjectFor( tabbedBox ) ),
+		new Hyperlink( "Text area", subjectFor( textArea ) ),
+		new Hyperlink( "Text entry", subjectFor( textEntry ) ),
 	};
+	
+
+	@Override
+	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
+	{
+		Pres title = new TitleBar( "Tests" );
+		
+		Pres head = new Head( new Pres[] { createLinkHeader( 0 ), title } );
+		
+		return new Page( new Pres[] { head, createTestsContents() } );
+	}
+
+
+	
+	public static final TestsRootPage instance = new TestsRootPage();
 }
