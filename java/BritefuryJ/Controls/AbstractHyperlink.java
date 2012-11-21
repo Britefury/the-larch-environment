@@ -6,10 +6,6 @@
 //##************************
 package BritefuryJ.Controls;
 
-import java.util.regex.Matcher;
-
-import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.Browser.Location;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.PageController;
 import BritefuryJ.LSpace.Event.AbstractPointerButtonEvent;
@@ -19,6 +15,7 @@ import BritefuryJ.LSpace.Interactor.ClickElementInteractor;
 import BritefuryJ.LSpace.Interactor.ContextMenuElementInteractor;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
+import BritefuryJ.Projection.Subject;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
 
@@ -33,12 +30,12 @@ public abstract class AbstractHyperlink extends ControlPres
 	
 	protected static class LinkTargetListener implements LinkListener
 	{
-		private Location targetLocation;
+		private Subject targetSubject;
 		
 		
-		public LinkTargetListener(Location targetLocation)
+		public LinkTargetListener(Subject targetSubject)
 		{
-			this.targetLocation = targetLocation;
+			this.targetSubject = targetSubject;
 		}
 		
 		public void onLinkClicked(AbstractHyperlinkControl link, PointerButtonClickedEvent buttonEvent)
@@ -48,18 +45,18 @@ public abstract class AbstractHyperlink extends ControlPres
 			{
 				if ( buttonEvent.getButton() == 1  ||  buttonEvent.getButton() == 2 )
 				{
-					pageController.openLocation( targetLocation, PageController.OpenOperation.OPEN_IN_NEW_WINDOW );
+					pageController.openSubject( targetSubject, PageController.OpenOperation.OPEN_IN_NEW_WINDOW );
 				}
 			}
 			else
 			{
 				if ( buttonEvent.getButton() == 1 )
 				{
-					pageController.openLocation( targetLocation, PageController.OpenOperation.OPEN_IN_CURRENT_TAB );
+					pageController.openSubject( targetSubject, PageController.OpenOperation.OPEN_IN_CURRENT_TAB );
 				}
 				else if ( buttonEvent.getButton() == 2 )
 				{
-					pageController.openLocation( targetLocation, PageController.OpenOperation.OPEN_IN_NEW_TAB );
+					pageController.openSubject( targetSubject, PageController.OpenOperation.OPEN_IN_NEW_TAB );
 				}
 			}
 		}
@@ -69,12 +66,12 @@ public abstract class AbstractHyperlink extends ControlPres
 	
 	protected static class LinkContextMenuFactory implements ContextMenuElementInteractor
 	{
-		private LinkTargetListener listener;
+		private Subject targetSubject;
 		
 		
-		public LinkContextMenuFactory(LinkTargetListener listener)
+		public LinkContextMenuFactory(Subject targetSubject)
 		{
-			this.listener = listener;
+			this.targetSubject = targetSubject;
 		}
 		
 		
@@ -88,7 +85,7 @@ public abstract class AbstractHyperlink extends ControlPres
 				@Override
 				public void onMenuItemClicked(MenuItem.MenuItemControl menuItem)
 				{
-					pageController.openLocation( listener.targetLocation, PageController.OpenOperation.OPEN_IN_NEW_TAB );
+					pageController.openSubject( targetSubject, PageController.OpenOperation.OPEN_IN_NEW_TAB );
 				}
 			};
 
@@ -97,7 +94,7 @@ public abstract class AbstractHyperlink extends ControlPres
 				@Override
 				public void onMenuItemClicked(MenuItem.MenuItemControl menuItem)
 				{
-					pageController.openLocation( listener.targetLocation, PageController.OpenOperation.OPEN_IN_NEW_WINDOW );
+					pageController.openSubject( targetSubject, PageController.OpenOperation.OPEN_IN_NEW_WINDOW );
 				}
 			};
 			
@@ -109,69 +106,6 @@ public abstract class AbstractHyperlink extends ControlPres
 		}
 	}
 
-	
-	protected static interface LocationFn
-	{
-		public Location apply(Location location);
-	}
-
-	
-	protected static interface LinkListenerFactory
-	{
-		public LinkListener createLinkListener(LocationFn locFn);
-		public ContextMenuElementInteractor createContextMenuInteractor(LinkListener listener);
-	}
-
-	
-	
-	protected static class FixedLinkListenerFactory implements LinkListenerFactory
-	{
-		private LinkListener linkListener;
-		
-		
-		public FixedLinkListenerFactory(LinkListener linkListener)
-		{
-			this.linkListener = linkListener; 
-		}
-		
-		
-		public LinkListener createLinkListener(LocationFn locFn)
-		{
-			return linkListener;
-		}
-		
-		public ContextMenuElementInteractor createContextMenuInteractor(LinkListener listener)
-		{
-			return null;
-		}
-	}
-
-	
-	
-	protected static class LocationLinkListenerFactory implements LinkListenerFactory
-	{
-		private Location location;
-		
-		
-		public LocationLinkListenerFactory(Location location)
-		{
-			this.location = location; 
-		}
-		
-		
-		public LinkListener createLinkListener(LocationFn locFn)
-		{
-			return new LinkTargetListener( locFn.apply( location ) );
-		}
-		
-		public ContextMenuElementInteractor createContextMenuInteractor(LinkListener listener)
-		{
-			return new LinkContextMenuFactory( (LinkTargetListener)listener );
-		}
-	}
-
-	
-	
 	
 	public static abstract class AbstractHyperlinkControl extends Control
 	{
@@ -229,62 +163,23 @@ public abstract class AbstractHyperlink extends ControlPres
 	
 	
 	
-	protected LinkListenerFactory listenerFactory;
+	protected LinkListener listener;
+	protected LinkContextMenuFactory contextMenuInteractor;
 	private Pres contents;
 	
 	
 	
-	public AbstractHyperlink(Object contents, LinkListenerFactory listenerFactory)
+	public AbstractHyperlink(Object contents, LinkListener listener)
 	{
-		this.listenerFactory = listenerFactory;
+		this.listener = listener;
 		this.contents = Pres.coerce( contents );
 	}
 
-
-
-	protected LocationFn createLocationFn(PresentationContext ctx)
+	public AbstractHyperlink(Object contents, Subject targetSubject)
 	{
-		final SimpleAttributeTable subjectContext = ctx.getSubjectContext();
-		LocationFn locFn = new LocationFn()
-		{
-			@Override
-			public Location apply(Location location)
-			{
-				if ( subjectContext != null )
-				{
-					String loc = location.getLocationString();
-					Matcher m;
-					
-					m = Location.locationVarPattern.matcher( loc );
-					while ( m.find( 0 ) )
-					{
-						String varName = loc.substring( m.start()+1, m.end() );
-						
-						Object value = subjectContext.getOptional( varName );
-						String valueLoc = "None";
-						
-						if ( value instanceof String )
-						{
-							valueLoc = (String)value;
-						}
-						else if ( value instanceof Location )
-						{
-							valueLoc = ((Location)value).getLocationString();
-						}
-						
-						loc = loc.replace( "$" + varName, valueLoc );
-						m = Location.locationVarPattern.matcher( loc );
-					}
-					
-					return new Location( loc );
-				}
-				else
-				{
-					return location;
-				}
-			}
-		};
-		return locFn;
+		this.listener = new LinkTargetListener( targetSubject );
+		this.contextMenuInteractor = new LinkContextMenuFactory( targetSubject );
+		this.contents = Pres.coerce( contents );
 	}
 
 
@@ -295,11 +190,6 @@ public abstract class AbstractHyperlink extends ControlPres
 		StyleSheet hyperlinkStyle = style.get( Controls.hyperlinkAttrs, StyleSheet.class );
 		Pres contentsPres = hyperlinkStyle.applyTo( contents );
 		boolean bClosePopupOnActivate = hyperlinkStyle.get( Controls.bClosePopupOnActivate, Boolean.class );
-		
-		LocationFn locFn = createLocationFn( ctx );
-		
-		LinkListener listener = listenerFactory.createLinkListener( locFn );
-		ContextMenuElementInteractor contextMenuInteractor = listenerFactory.createContextMenuInteractor( listener );
 		
 		LSElement contentsElement = contentsPres.present( ctx, style );
 		if ( contextMenuInteractor != null )

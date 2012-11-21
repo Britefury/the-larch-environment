@@ -27,6 +27,7 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.TransferHandler;
 
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.ChangeHistory.ChangeHistory;
 import BritefuryJ.Command.AbstractCommandConsole;
 import BritefuryJ.Command.BoundCommandSet;
@@ -35,6 +36,9 @@ import BritefuryJ.Command.CommandBar;
 import BritefuryJ.Command.CommandConsoleFactory;
 import BritefuryJ.Command.CommandSet;
 import BritefuryJ.Controls.ScrolledViewport;
+import BritefuryJ.DefaultPerspective.Presentable;
+import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.IncrementalView.IncrementalView;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.PageController;
 import BritefuryJ.LSpace.PresentationComponent;
@@ -43,14 +47,74 @@ import BritefuryJ.LSpace.PersistentState.PersistentStateStore;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Blank;
+import BritefuryJ.Pres.Primitive.Label;
+import BritefuryJ.Pres.Primitive.Primitive;
+import BritefuryJ.Pres.RichText.Body;
+import BritefuryJ.Pres.RichText.Page;
+import BritefuryJ.Projection.ProjectiveBrowserContext;
+import BritefuryJ.Projection.Subject;
+import BritefuryJ.Projection.SubjectPath;
+import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class Browser
 {
 	protected static interface BrowserListener
 	{
-		public void onBrowserChangePage(Browser browser, BrowserPage page, String title);
+		public void onBrowserChangePage(Browser browser, Subject subject, String title);
 	}
+	
+	
+	
+	private static class ResolveError implements Presentable
+	{
+		private Throwable exception;
+		
+		public ResolveError(Throwable exception)
+		{
+			this.exception = exception;
+		}
+		
+		
+		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
+		{
+			StyleSheet titleStyle = StyleSheet.style( Primitive.fontSize.as( 24 ) );
+			
+			Pres errorTitle = titleStyle.applyTo( new Label( "Could not resolve" ) );
+			Pres exc = Pres.coerceNonNull( exception );
+			Pres body = new Body( new Pres[] { errorTitle.alignHCentre(), exc.alignHCentre() } );
+			return new Page( new Pres[] { body } );
+		}
+	}
+	
+	
+	private class ResolveErrorSubject extends Subject
+	{
+		ResolveError error;
+		
+		public ResolveErrorSubject(Throwable exception)
+		{
+			super( null );
+			
+			error = new ResolveError( exception );
+		}
+
+		@Override
+		public Object getFocus()
+		{
+			return error;
+		}
+
+		@Override
+		public String getTitle()
+		{
+			return "Resolve error";
+		}
+	}
+	
+	
+	
+	
 	
 	
 	private static final String COMMAND_BACK = "back";
@@ -62,7 +126,8 @@ public class Browser
 	{
 		public void commandAction(Object context, PageController pageController)
 		{
-			pageController.openLocation( new Location( "" ), PageController.OpenOperation.OPEN_IN_NEW_TAB );
+			Browser browser = (Browser)context;
+			pageController.openSubject( browser.rootSubject, PageController.OpenOperation.OPEN_IN_NEW_TAB );
 		}
 	};
 	
@@ -70,7 +135,8 @@ public class Browser
 	{
 		public void commandAction(Object context, PageController pageController)
 		{
-			pageController.openLocation( new Location( "" ), PageController.OpenOperation.OPEN_IN_NEW_WINDOW );
+			Browser browser = (Browser)context;
+			pageController.openSubject( browser.rootSubject, PageController.OpenOperation.OPEN_IN_NEW_WINDOW );
 		}
 	};
 	
@@ -109,17 +175,18 @@ public class Browser
 	private ScrolledViewport.ScrolledViewportControl viewport;
 	private BrowserHistory history;
 	
-	private PageLocationResolver resolver;
-	private BrowserPage page;
+	private Subject rootSubject, subject;
+	private IncrementalView view;
 	private BrowserListener listener;
 	
 	
 	
 	
-	public Browser(PageLocationResolver resolver, Location location, PageController pageController, CommandConsoleFactory commandConsoleFactory)
+	public Browser(Subject rootSubject, Subject subject, PageController pageController, CommandConsoleFactory commandConsoleFactory)
 	{
-		this.resolver = resolver;
-		history = new BrowserHistory( location );
+		this.rootSubject = rootSubject;
+		this.subject = subject;
+		history = new BrowserHistory( subject );
 		
 		viewport = makeViewport( new Blank(), history.getCurrentState().getViewportState() );
 		
@@ -139,7 +206,7 @@ public class Browser
 		initialiseToolbar(toolbar);
 		
 		
-		locationField = new JTextField( location.getLocationString() );
+		locationField = new JTextField( "<TODO: replace>" );
 		locationField.setMaximumSize( new Dimension( locationField.getMaximumSize().width, locationField.getMinimumSize().height ) );
 		locationField.setBorder( BorderFactory.createLineBorder( Color.black, 1 ) );
 		locationField.setDragEnabled( true );
@@ -148,7 +215,6 @@ public class Browser
 		{
 			public void actionPerformed(ActionEvent event)
 			{
-				onLocationField( locationField.getText() );
 			}
 		};
 		
@@ -186,7 +252,7 @@ public class Browser
 	
 	public String getTitle()
 	{
-		return page.getTitle();
+		return subject.getTitle();
 	}
 	
 	public LSElement getRootElement()
@@ -196,15 +262,15 @@ public class Browser
 	
 	
 	
-	public Location getLocation()
+	public Subject getSubject()
 	{
-		return history.getCurrentState().getLocation();
+		return subject;
 	}
 	
-	public void goToLocation(Location location)
+	public void goToSubject(Subject subject)
 	{
-		locationField.setText( location.getLocationString() );
-		setLocation( location );
+		locationField.setText( "<TODO: replace (goToPath)>" );
+		setSubject( subject );
 	}
 	
 	
@@ -219,9 +285,9 @@ public class Browser
 	
 	public ChangeHistory getChangeHistory()
 	{
-		if ( page != null )
+		if ( subject != null )
 		{
-			return page.getChangeHistory();
+			return subject.getChangeHistory();
 		}
 		else
 		{
@@ -231,11 +297,11 @@ public class Browser
 	
 
 	
-	public void reset(Location location)
+	public void reset(Subject subject)
 	{
-		history.visit( location );
+		history.visit( subject );
 		history.clear();
-		locationField.setText( location.getLocationString() );
+		locationField.setText( "<TODO: replace (reset)>" );
 		viewportReset();
 		resolve();
 	}
@@ -263,8 +329,7 @@ public class Browser
 		{
 			onPreHistoryChange();
 			history.back();
-			Location location = history.getCurrentState().getLocation();
-			locationField.setText( location.getLocationString() );
+			locationField.setText( "<TODO: replace (back)>" );
 			resolve();
 		}
 	}
@@ -275,8 +340,7 @@ public class Browser
 		{
 			onPreHistoryChange();
 			history.forward();
-			Location location = history.getCurrentState().getLocation();
-			locationField.setText( location.getLocationString() );
+			locationField.setText( "<TODO: replace (forward)>" );
 			resolve();
 		}
 	}
@@ -299,50 +363,52 @@ public class Browser
 	private void resolve()
 	{
 		// Get the location to resolve
-		Location location = history.getCurrentState().getLocation();
+		SubjectPath path = history.getCurrentState().getSubjectPath();
 		
 		PersistentStateStore stateStore = history.getCurrentState().getPagePersistentState();
-		BrowserPage p = resolver.resolveLocationAsPage( location, stateStore );
+		
+		Subject s;
+		
+		try
+		{
+			s = path.followFrom( rootSubject );
+		}
+		catch (Throwable t)
+		{
+			s = new ResolveErrorSubject( t );
+		}
+		
+		
+		view = new IncrementalView( s, (ProjectiveBrowserContext)null, stateStore );
 
-		viewport = makeViewport( p.getContentsPres(), history.getCurrentState().getViewportState() );
-		commandBar.pageChanged( p );
+		viewport = makeViewport( view.getViewPres(), history.getCurrentState().getViewportState() );
+		commandBar.pageChanged( s );
 		presComponent.getRootElement().setChild( viewport.getElement() );
 		
-		// Set the page
-		setPage( p );
-	}
-	
-	private void setPage(BrowserPage p)
-	{
-		if ( p != page )
+		// Set the subject
+		if ( s != subject )
 		{
-			page = p;
+			subject = s;
 			
 			if ( listener != null )
 			{
-				listener.onBrowserChangePage( this, page, getTitle() );
+				listener.onBrowserChangePage( this, s, getTitle() );
 			}
 		}
 	}
 	
 	
-	private void setLocation(Location location)
+	private void setSubject(Subject subject)
 	{
 		onPreHistoryChange();
-		history.visit( location );
+		history.visit( subject );
 		resolve();
-	}
-	
-	
-	private void onLocationField(String location)
-	{
-		setLocation( new Location( location ) );
 	}
 	
 	
 	private void onPreHistoryChange()
 	{
-		PersistentStateStore store = page.storePersistentState();
+		PersistentStateStore store = view.storePersistentState();
 		history.getCurrentState().setPagePersistentState( store );
 	}
 	

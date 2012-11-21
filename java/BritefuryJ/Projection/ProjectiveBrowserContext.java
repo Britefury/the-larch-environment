@@ -19,7 +19,6 @@ import org.python.core.__builtin__;
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Browser.BrowserPage;
 import BritefuryJ.Browser.Location;
-import BritefuryJ.Browser.PageLocationResolver;
 import BritefuryJ.Browser.TestPages.TestsRootPage;
 import BritefuryJ.DefaultPerspective.DefaultPerspective;
 import BritefuryJ.DefaultPerspective.DefaultPerspectiveSubject;
@@ -95,16 +94,6 @@ public class ProjectiveBrowserContext
 	
 	
 	
-	private class ProjectiveBrowserContextLocationResolver implements PageLocationResolver
-	{
-		public BrowserPage resolveLocationAsPage(Location location, PersistentStateStore persistentState)
-		{
-			return ProjectiveBrowserContext.this.resolveLocationAsPage( location, persistentState );
-		}
-	}
-	
-	
-	private ProjectiveBrowserContextLocationResolver pageLocationResolver = new ProjectiveBrowserContextLocationResolver();
 	private ObjectPresentationLocationResolver objPresLocationResolver = new ObjectPresentationLocationResolver();
 	
 	private HashMap<String, PyObject> resolverLocals = new HashMap<String, PyObject>();
@@ -119,7 +108,7 @@ public class ProjectiveBrowserContext
 		
 		if ( bWithTestPages )
 		{
-			resolverLocals.put( "tests", Py.java2py( new TestsRootPage() ) );
+			//resolverLocals.put( "tests", Py.java2py( new TestsRootPage() ) );
 		}
 		resolverLocals.put( "objects", Py.java2py( objPresLocationResolver ) );
 		
@@ -158,11 +147,6 @@ public class ProjectiveBrowserContext
 		resolverLocals.put( name, subject );
 	}
 	
-	
-	public PageLocationResolver getPageLocationResolver()
-	{
-		return pageLocationResolver;
-	}
 	
 	
 	public DefaultPerspectiveSubject defaultSubject(Object focus)

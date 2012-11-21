@@ -8,6 +8,8 @@ package BritefuryJ.Browser;
 
 import java.util.Stack;
 
+import BritefuryJ.Projection.Subject;
+
 class BrowserHistory
 {
 	private Stack<BrowserState> past, future;
@@ -15,11 +17,11 @@ class BrowserHistory
 	
 	
 	
-	public BrowserHistory(Location location)
+	public BrowserHistory(Subject subject)
 	{
 		past = new Stack<BrowserState>();
 		future = new Stack<BrowserState>();
-		currentState = new BrowserState( location );
+		currentState = new BrowserState( subject.path() );
 	}
 	
 	
@@ -29,10 +31,10 @@ class BrowserHistory
 	}
 	
 	
-	public void visit(Location location)
+	public void visit(Subject subject)
 	{
 		past.push( currentState );
-		currentState = new BrowserState( location );
+		currentState = new BrowserState( subject.path() );
 		future.clear();
 	}
 	
