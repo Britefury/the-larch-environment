@@ -9,7 +9,6 @@ from BritefuryJ.Controls import Hyperlink
 
 from BritefuryJ.Pres.Primitive import Primitive
 from BritefuryJ.Pres.RichText import SplitLinkHeaderBar, TitleBar, Page, Head, Body
-from BritefuryJ.Browser import Location
 from BritefuryJ.StyleSheet import StyleSheet
 
 from BritefuryJ.Projection import Subject
@@ -69,10 +68,9 @@ class ConfigurationPage (object):
 
 
 	def __present__(self, fragment, inheritedState):
-		homeLink = Hyperlink( 'HOME PAGE', Location( '' ) )
-		configLink = Hyperlink( 'CONFIGURATION PAGE', Location( 'config' ) )
-		systemLink = Hyperlink( 'SYSTEM PAGE', Location( 'system' ) )
-		linkHeader = SplitLinkHeaderBar( [ homeLink ], [ configLink, systemLink ] )
+		homeLink = Hyperlink( 'HOME PAGE', fragment.subject.rootSubject )
+		configLink = Hyperlink( 'CONFIGURATION PAGE', fragment.subect.configSubject )
+		linkHeader = SplitLinkHeaderBar( [ homeLink ], [ configLink ] )
 		
 		title = TitleBar( self.getTitleText() )
 

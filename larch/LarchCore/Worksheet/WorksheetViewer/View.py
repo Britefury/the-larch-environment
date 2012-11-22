@@ -19,6 +19,7 @@ from javax.swing import JPopupMenu, JOptionPane, JFileChooser
 from javax.swing.filechooser import FileNameExtensionFilter
 
 from Britefury.Dispatch.MethodDispatch import ObjectDispatchMethod
+from Britefury.Kernel import AppLocationPath
 
 from Britefury.Kernel.View.DispatchView import MethodDispatchView
 
@@ -30,7 +31,6 @@ from BritefuryJ.AttributeTable import *
 from BritefuryJ.LSpace import *
 from BritefuryJ.LSpace.Input import Modifier
 from BritefuryJ.Graphics import *
-from BritefuryJ.Browser import Location
 from BritefuryJ.StyleSheet import StyleSheet
 from BritefuryJ.Controls import *
 from BritefuryJ.Pres import *
@@ -46,8 +46,6 @@ from BritefuryJ.Projection import Perspective, Subject
 
 from LarchCore.Languages.Python2 import Python2
 from LarchCore.Languages.Python2.CodeGenerator import compileForModuleExecution
-
-from LarchCore.MainApp import AppLocationPath
 
 from LarchCore.Worksheet import Schema
 from LarchCore.Worksheet.WorksheetViewer import ViewSchema
@@ -239,7 +237,6 @@ _worksheetViewerCommands = CommandSet( 'LarchCore.Worksheet.Viewer', [ _refreshC
 class WorksheetViewerSubject (Subject):
 	def __init__(self, document, model, enclosingSubject, location, importName, title):
 		super( WorksheetViewerSubject, self ).__init__( enclosingSubject )
-		assert isinstance( location, Location )
 		self._document = document
 		self._model = model
 		# Defer the creation of the model view - it involves executing all the code in the worksheet which can take some time

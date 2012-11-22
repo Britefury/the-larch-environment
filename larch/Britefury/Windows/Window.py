@@ -20,7 +20,7 @@ from BritefuryJ.DefaultPerspective import DefaultPerspective
 
 from BritefuryJ.DocModel import DMIOReader, DMIOWriter, DMNode
 
-from BritefuryJ.Browser import TabbedBrowser, Location
+from BritefuryJ.Browser import TabbedBrowser
 
 from BritefuryJ.Pres.Help import AttachTooltip, TipBox
 
@@ -75,7 +75,11 @@ class Window (object):
 				self._onChangePage( browser )
 
 
-		self._browser = TabbedBrowser( self._windowManager.world.rootSubject, subject, _BrowserListener(), commandConsoleFactory )
+		def inspectFragment(fragment, sourceElement, triggeringEvent):
+			return self._windowManager.world.inspectFragment( fragment, sourceElement, triggeringEvent )
+
+
+		self._browser = TabbedBrowser( self._windowManager.world.rootSubject, subject, inspectFragment, _BrowserListener(), commandConsoleFactory )
 		self._browser.getComponent().setPreferredSize( Dimension( 800, 600 ) )
 
 

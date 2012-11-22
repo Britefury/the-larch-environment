@@ -4,9 +4,12 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.Browser;
+package BritefuryJ.IncrementalView;
 
-public interface HasPageTitle
+import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.Event.PointerButtonEvent;
+
+public interface FragmentInspector
 {
-	public String getPageTitle();
+	public boolean inspectFragment(FragmentView fragment, LSElement sourceElement, PointerButtonEvent triggeringEvent);
 }

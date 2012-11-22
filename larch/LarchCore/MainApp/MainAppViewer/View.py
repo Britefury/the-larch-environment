@@ -18,6 +18,7 @@ from javax.swing import JPopupMenu, JOptionPane, JFileChooser
 from javax.swing.filechooser import FileNameExtensionFilter
 
 from Britefury.Dispatch.MethodDispatch import ObjectDispatchMethod
+from Britefury.Kernel import AppLocationPath
 
 from Britefury.Kernel.View.DispatchView import MethodDispatchView
 from Britefury.Kernel.Document import Document
@@ -26,7 +27,6 @@ from Britefury.Kernel.Document import Document
 from BritefuryJ.AttributeTable import *
 
 from BritefuryJ.StyleSheet import *
-from BritefuryJ.Browser import Location
 from BritefuryJ.LSpace import PageController
 from BritefuryJ.Graphics import *
 
@@ -41,9 +41,6 @@ from BritefuryJ.Projection import Perspective, Subject
 
 from LarchCore.MainApp import Application
 from LarchCore.MainApp import DocumentManagement
-from LarchCore.MainApp import AppLocationPath
-
-
 
 
 _appDocRightPadding = 30.0
@@ -114,7 +111,7 @@ class AppView (MethodDispatchView):
 				name = _newDocumentName( openDocuments )
 				document.setDocumentName( name )
 				
-				appDoc = node.registerOpenDocument( document, fragment.getSubjectContext()['location'] + '.documents' )
+				appDoc = node.registerOpenDocument( document )
 
 				location = fragment.getSubjectContext()['location'] + '.documents.' + appDoc.getRelativeLocation()
 
@@ -132,7 +129,7 @@ class AppView (MethodDispatchView):
 			
 		def _onOpenDoc(link, event):
 			def handleOpenedDocumentFn(fullPath, document):
-				appDoc = node.registerOpenDocument( document, fragment.getSubjectContext()['location'] + '.documents' )
+				appDoc = node.registerOpenDocument( document )
 
 				
 			element = link.getElement()
@@ -148,7 +145,7 @@ class AppView (MethodDispatchView):
 				filename = str( filename )
 				
 				document = Document.readFile( world, filename )
-				node.registerOpenDocument( document, fragment.getSubjectContext()['location'] + '.documents' )
+				node.registerOpenDocument( document )
 			return True
 
 		
@@ -171,7 +168,7 @@ class AppView (MethodDispatchView):
 		consoles = InnerFragment.map( node.getConsoles(), state.withAttrs( location='' ) )
 		
 		systemLink = Hyperlink( 'TEST PAGES', Location( 'tests' ) )
-		configurationLink = Hyperlink( 'CONFIGURATION PAGE', Location( 'config' ) )
+		configurationLink = Hyperlink( 'CONFIGURATION PAGE', fragment.subject.world.configuration.subject )
 		linkHeader = AppLocationPath.appLinkheaderBar( fragment.getSubjectContext(), [ configurationLink, systemLink ] )
 
 		title = TitleBar( 'The Larch Environment' )

@@ -22,6 +22,7 @@ from javax.swing.filechooser import FileNameExtensionFilter
 from java.util.regex import Pattern
 
 from Britefury.Dispatch.MethodDispatch import ObjectDispatchMethod
+from Britefury.Kernel import AppLocationPath
 
 from Britefury.Kernel.View.DispatchView import MethodDispatchView
 
@@ -32,7 +33,6 @@ from BritefuryJ.AttributeTable import *
 
 from BritefuryJ.DefaultPerspective import DefaultPerspective
 
-from BritefuryJ.Browser import Location
 from BritefuryJ.Graphics import *
 from BritefuryJ.StyleSheet import StyleSheet
 from BritefuryJ.LSpace import Anchor
@@ -50,7 +50,6 @@ from BritefuryJ.Projection import Perspective
 
 
 from LarchCore.MainApp import DocumentManagement
-from LarchCore.MainApp import AppLocationPath
 
 from LarchCore.Project.ProjectRoot import ProjectRoot
 from LarchCore.Project.ProjectPackage import ProjectPackage

@@ -7,8 +7,6 @@
 ##-*************************
 from java.awt.event import KeyEvent
 
-from BritefuryJ.Browser import Location
-
 from BritefuryJ.DefaultPerspective import DefaultPerspective
 
 from BritefuryJ.Projection import Subject
@@ -20,9 +18,9 @@ from BritefuryJ.Shortcut import Shortcut
 from BritefuryJ.Controls import Hyperlink
 from BritefuryJ.Pres.Pres import *
 from BritefuryJ.Pres.Primitive import *
+from Britefury.Kernel import AppLocationPath
 
 from LarchCore.MainApp import DocumentManagement
-from LarchCore.MainApp import AppLocationPath
 
 from LarchCore.Project.ProjectPage import ProjectPage
 from LarchCore.Project.ProjectPackage import ProjectPackage
@@ -89,7 +87,6 @@ class _PackageSubject (object):
 
 class _IndexPage (object):
 	def __init__(self, model, perspective, projectPageLoc):
-		assert isinstance( projectPageLoc, Location )
 		self._model = model
 		self._perspective = perspective
 		self._projectPageLoc = projectPageLoc
@@ -102,7 +99,6 @@ class _IndexPage (object):
 class _ProjectIndexSubject (Subject):
 	def __init__(self, indexSubject, enclosingSubject, projectLoc):
 		super( _ProjectIndexSubject, self ).__init__( enclosingSubject )
-		assert isinstance( projectLoc, Location )
 		self._indexSubject = indexSubject
 		self._page = _IndexPage( indexSubject.getFocus(), indexSubject.getPerspective(), projectLoc )
 	
@@ -132,7 +128,6 @@ class _ProjectIndexSubject (Subject):
 class _RootSubject (Subject):
 	def __init__(self, document, model, enclosingSubject, location, importName, title):
 		super( _RootSubject, self ).__init__( enclosingSubject )
-		assert isinstance( location, Location )
 		self._document = document
 		self._model = model
 		self._location = location
@@ -178,7 +173,6 @@ class _RootSubject (Subject):
 class ProjectSubject (_RootSubject):
 	def __init__(self, document, model, enclosingSubject, location, importName, title):
 		super( ProjectSubject, self ).__init__( document, model, enclosingSubject, location, importName, title )
-		assert isinstance( location, Location )
 		self._packageFinder = PackageFinder( self, model, location )
 		self._rootFinder = RootFinder( self, model.pythonPackageName )
 		self._rootSubject = _RootSubject( document, model, enclosingSubject, location, importName, title )

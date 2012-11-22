@@ -116,7 +116,7 @@ public class BrowserTest implements TabbedBrowser.TabbedBrowserListener
 		
 		
 		
-		final TabbedBrowser browser = new TabbedBrowser( rootSubject, subject, this, fac );
+		final TabbedBrowser browser = new TabbedBrowser( rootSubject, subject, null, this, fac );
 
 		
 		

@@ -37,6 +37,7 @@ import BritefuryJ.Command.CommandConsoleFactory;
 import BritefuryJ.Command.CommandSet;
 import BritefuryJ.Controls.ScrolledViewport;
 import BritefuryJ.DefaultPerspective.Presentable;
+import BritefuryJ.IncrementalView.FragmentInspector;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.IncrementalView.IncrementalView;
 import BritefuryJ.LSpace.LSElement;
@@ -51,7 +52,6 @@ import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.RichText.Page;
-import BritefuryJ.Projection.ProjectiveBrowserContext;
 import BritefuryJ.Projection.Subject;
 import BritefuryJ.Projection.SubjectPath;
 import BritefuryJ.StyleSheet.StyleSheet;
@@ -176,16 +176,18 @@ public class Browser
 	private BrowserHistory history;
 	
 	private Subject rootSubject, subject;
+	private FragmentInspector inspector;
 	private IncrementalView view;
 	private BrowserListener listener;
 	
 	
 	
 	
-	public Browser(Subject rootSubject, Subject subject, PageController pageController, CommandConsoleFactory commandConsoleFactory)
+	public Browser(Subject rootSubject, Subject subject, FragmentInspector inspector, PageController pageController, CommandConsoleFactory commandConsoleFactory)
 	{
 		this.rootSubject = rootSubject;
 		this.subject = subject;
+		this.inspector = inspector;
 		history = new BrowserHistory( subject );
 		
 		viewport = makeViewport( new Blank(), history.getCurrentState().getViewportState() );
@@ -363,23 +365,26 @@ public class Browser
 	private void resolve()
 	{
 		// Get the location to resolve
-		SubjectPath path = history.getCurrentState().getSubjectPath();
+		BrowserState state = history.getCurrentState();
+		Subject s = history.getCurrentSubject();
 		
-		PersistentStateStore stateStore = history.getCurrentState().getPagePersistentState();
+		PersistentStateStore stateStore = state.getPagePersistentState();
 		
-		Subject s;
-		
-		try
+		if ( s == null )
 		{
-			s = path.followFrom( rootSubject );
-		}
-		catch (Throwable t)
-		{
-			s = new ResolveErrorSubject( t );
+			SubjectPath path = state.getSubjectPath();
+			try
+			{
+				s = path.followFrom( rootSubject );
+			}
+			catch (Throwable t)
+			{
+				s = new ResolveErrorSubject( t );
+			}
 		}
 		
 		
-		view = new IncrementalView( s, (ProjectiveBrowserContext)null, stateStore );
+		view = new IncrementalView( s, inspector, stateStore );
 
 		viewport = makeViewport( view.getViewPres(), history.getCurrentState().getViewportState() );
 		commandBar.pageChanged( s );

@@ -12,7 +12,7 @@ from javax.swing import UIManager
 
 from BritefuryJ.DocModel import DMIOReader, DMNode
 
-from Britefury.Kernel.World import World, WorldDefaultOuterSubject
+from Britefury.Kernel.World import World
 from Britefury.Kernel.Document import Document
 from Britefury import app
 
@@ -32,8 +32,7 @@ def start_lconsole():
 	world = World()
 	world.enableImportHooks()
 	console = Console.Console( 'Console' )
-	outerSubject = WorldDefaultOuterSubject( world )
-	world.setRootSubject( Console.ConsoleSubject( console, outerSubject ) )
+	world.setRootSubject( Console.ConsoleSubject( console, world.worldSubject ) )
 
 
 	if len( sys.argv ) > 1:

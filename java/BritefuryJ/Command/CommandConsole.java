@@ -113,11 +113,6 @@ public class CommandConsole extends AbstractCommandConsole
 			return "Command console";
 		}
 
-		public SimpleAttributeTable getSubjectContext()
-		{
-			return SimpleAttributeTable.instance;
-		}
-		
 		public ChangeHistory getChangeHistory()
 		{
 			return null;
