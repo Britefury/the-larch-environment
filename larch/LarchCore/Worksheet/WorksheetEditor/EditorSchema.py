@@ -11,8 +11,6 @@ from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from BritefuryJ.Pres import InnerFragment
 
-from BritefuryJ.Browser import Location
-
 
 from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, methodDispatch
 

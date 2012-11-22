@@ -14,6 +14,7 @@ import java.util.List
 from javax.swing import AbstractAction
 from javax.swing import JPopupMenu, JOptionPane, JFileChooser
 from javax.swing.filechooser import FileNameExtensionFilter
+from Britefury.Kernel import AppLocationPath
 
 from Britefury.Kernel.View.DispatchView import MethodDispatchView
 from Britefury.Dispatch.MethodDispatch import ObjectDispatchMethod
@@ -24,14 +25,13 @@ from BritefuryJ.Shortcut import Shortcut
 from BritefuryJ.AttributeTable import *
 
 from BritefuryJ.Projection import Perspective, Subject
-from BritefuryJ.Pres import InnerFragment, LocationAsInnerFragment
+from BritefuryJ.Pres import InnerFragment
 
 
 from BritefuryJ.Controls import *
 from BritefuryJ.LSpace import *
 from BritefuryJ.Graphics import *
 from BritefuryJ.LSpace.Input import ObjectDndHandler, Modifier
-from BritefuryJ.Browser import Location
 from BritefuryJ.LSpace.TextFocus import TextSelection
 from BritefuryJ.LSpace.Marker import Marker
 from BritefuryJ.StyleSheet import StyleSheet
@@ -53,8 +53,6 @@ from BritefuryJ.Editor.Sequential import SequentialEditorPerspective
 from BritefuryJ.Editor.Sequential.Item import *
 
 from LarchCore.Languages.Python2 import Python2
-
-from LarchCore.MainApp import AppLocationPath
 
 from LarchCore.Worksheet.WorksheetCommands import worksheetCommands
 from LarchCore.Worksheet.WorksheetEditor import EditorSchema

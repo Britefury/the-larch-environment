@@ -8,7 +8,11 @@ package BritefuryJ.Projection;
 
 import java.util.List;
 
-import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import org.python.core.Py;
+import org.python.core.PyObject;
+import org.python.core.PyString;
+import org.python.core.__builtin__;
+
 import BritefuryJ.ChangeHistory.ChangeHistory;
 import BritefuryJ.Command.BoundCommandSet;
 
@@ -72,19 +76,6 @@ public abstract class Subject
 	public abstract String getTitle();
 
 	
-	public SimpleAttributeTable getSubjectContext()
-	{
-		if ( enclosingSubject != null )
-		{
-			return enclosingSubject.getSubjectContext();
-		}
-		else
-		{
-			return SimpleAttributeTable.instance;
-		}
-	}
-	
-	
 	public ChangeHistory getChangeHistory()
 	{
 		if ( enclosingSubject != null )
@@ -108,9 +99,16 @@ public abstract class Subject
 	
 	
 	
-	public Subject redirect()
+	public PyObject __getattr__(PyString key)
 	{
-		return null;
+		if ( enclosingSubject != null )
+		{
+			return __builtin__.getattr( Py.java2py( enclosingSubject ), key );
+		}
+		else
+		{
+			throw Py.AttributeError( "Object of class '" + Py.java2py( this ).getType().getName() + "' has no attribute '" + key.asString() + "'" );
+		}
 	}
 	
 	

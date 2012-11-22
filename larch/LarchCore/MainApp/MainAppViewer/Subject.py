@@ -7,16 +7,13 @@
 ##-*************************
 from BritefuryJ.AttributeTable import SimpleAttributeTable
 
-from BritefuryJ.Browser import Location
-
 from BritefuryJ.Projection import Subject
+from Britefury.Kernel import AppLocationPath
 from Britefury.Kernel.Document import Document
 
 from LarchCore.PythonConsole import Console
 
 from LarchCore.MainApp.MainAppViewer.View import perspective
-from LarchCore.MainApp import AppLocationPath
-
 
 
 class _ConsoleListSubject (object):
@@ -48,16 +45,19 @@ class _DocumentListSubject (object):
 		
 
 class MainAppSubject (Subject):
-	def __init__(self, appState, world, rootLocation):
-		super( MainAppSubject, self ).__init__( None )
-		assert isinstance( rootLocation, Location )
+	def __init__(self, appState, world):
+		super( MainAppSubject, self ).__init__( world.worldSubject )
 		self._appState = appState
 		self._world = world
-		self._rootLocation = rootLocation
 		self.consoles = _ConsoleListSubject( self._appState, self )
 		self.documents = _DocumentListSubject( self._appState, self )
 
-		
+
+	@property
+	def appLocationPath(self):
+		return self.enclosingSubject.appLocationPath.withPathEntry( 'Home', self )
+
+
 	def getFocus(self):
 		return self._appState
 	
@@ -67,15 +67,11 @@ class MainAppSubject (Subject):
 	def getTitle(self):
 		return 'Larch'
 	
-	def getSubjectContext(self):
-		t = SimpleAttributeTable.instance.withAttrs( world=self._world, document=None, docLocation=None, location=self._rootLocation )
-		return AppLocationPath.addLocationPathEntry( t, 'Home', self._rootLocation )
 
-	
 	def loadDocument(self, filename):
 		document = Document.readFile( self._world, filename )
 		if document is not None:
-			self._appState.registerOpenDocument( document, self._rootLocation + '.documents' )
+			self._appState.registerOpenDocument( document )
 			return document
 		return None
 		

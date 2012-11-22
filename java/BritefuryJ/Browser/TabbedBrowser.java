@@ -33,6 +33,7 @@ import javax.swing.plaf.basic.BasicButtonUI;
 
 import BritefuryJ.ChangeHistory.ChangeHistory;
 import BritefuryJ.Command.CommandConsoleFactory;
+import BritefuryJ.IncrementalView.FragmentInspector;
 import BritefuryJ.LSpace.PageController;
 import BritefuryJ.Projection.Subject;
 
@@ -207,6 +208,8 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	
 	private Subject rootSubject;
 	
+	private FragmentInspector inspector;
+	
 	private TabbedBrowserListener listener;
 	
 	private ArrayList<Browser> browsers;
@@ -216,9 +219,10 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	
 	
 	
-	public TabbedBrowser(Subject rootSubject, Subject subject, TabbedBrowserListener listener, CommandConsoleFactory commandConsoleFactory)
+	public TabbedBrowser(Subject rootSubject, Subject subject, FragmentInspector inspector, TabbedBrowserListener listener, CommandConsoleFactory commandConsoleFactory)
 	{
 		this.rootSubject = rootSubject;
+		this.inspector = inspector;
 		this.listener = listener;
 		this.commandConsoleFactory = commandConsoleFactory;
 		
@@ -290,7 +294,7 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	
 	private Browser createBrowser(Subject subject)
 	{
-		Browser browser = new Browser( rootSubject, subject, this, commandConsoleFactory );
+		Browser browser = new Browser( rootSubject, subject, inspector, this, commandConsoleFactory );
 		browser.setListener( this );
 		return browser;
 	}

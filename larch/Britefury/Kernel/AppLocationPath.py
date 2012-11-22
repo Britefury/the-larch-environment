@@ -7,8 +7,6 @@
 ##-*************************
 from java.awt import Color
 
-from BritefuryJ.Browser import Location
-
 from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.Pres.RichText import *
 from BritefuryJ.Controls import *
@@ -18,12 +16,12 @@ from BritefuryJ.DefaultPerspective import DefaultPerspective
 
 
 class _LocationPathEntry (object):
-	def __init__(self, name, location):
+	def __init__(self, name, subject):
 		self.__name = name
-		self.__location = location
+		self.__subject = subject
 
 	def __present__(self, fragment, inheritedState):
-		return Hyperlink( self.__name, self.__location )
+		return Hyperlink( self.__name, self.__subject )
 
 _arrowStyle = StyleSheet.style( Primitive.shapePainter( FilledOutlinePainter( Color( 0.5, 0.5, 0.5, 0.2 ), Color( 0.5, 0.5, 0.5, 0.8 ) ) )  )
 _arrow = _arrowStyle.applyTo( Arrow( Arrow.Direction.RIGHT, 12.0 ) ).padX( 7.0 ).alignVCentre()
@@ -34,8 +32,8 @@ class LocationPath (object):
 		self.__entries = entries
 
 
-	def withPathEntry(self, name, location):
-		return LocationPath( self.__entries + [ _LocationPathEntry( name, location ) ] )
+	def withPathEntry(self, name, subject):
+		return LocationPath( self.__entries + [ _LocationPathEntry( name, subject ) ] )
 
 	def __present__(self, fragment, inheritedState):
 		contents = []
@@ -49,14 +47,6 @@ class LocationPath (object):
 
 
 _ATTR_NAME = '__app_location_path__'
-
-
-def addLocationPathEntry(subjectContext, name, location):
-	try:
-		path = subjectContext[_ATTR_NAME]
-	except KeyError:
-		path = LocationPath( [] )
-	return subjectContext.withAttr( _ATTR_NAME, path.withPathEntry( name, location ) )
 
 
 def appLinkheaderBar(subjectContext, rightContents=[]):
