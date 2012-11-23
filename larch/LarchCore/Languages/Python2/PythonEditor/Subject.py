@@ -41,7 +41,7 @@ class _Python2Page (object):
 		self._model = model
 
 	def __present__(self, fragment, inherited_state):
-		linkHeader = AppLocationPath.appLinkheaderBar( fragment.getSubjectContext(), [] )
+		linkHeader = AppLocationPath.appLinkheaderBar( fragment.subject, [] )
 		pyView = python2Perspective.applyTo( self._model )
 		return Column( [ linkHeader.padY( 0.0, 5.0 ).alignVRefY(), pyView.alignVRefYExpand() ] )
 

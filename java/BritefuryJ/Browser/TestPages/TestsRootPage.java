@@ -222,4 +222,5 @@ public class TestsRootPage extends AbstractTestPage implements Presentable
 
 	
 	public static final TestsRootPage instance = new TestsRootPage();
+	public static final Subject instanceSubject = subjectFor( instance );
 }

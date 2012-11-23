@@ -106,7 +106,10 @@ class AppConsole (object):
 		
 		self._index = index
 		self._console = Console.Console( '<console%d>'  %  ( index, ) )
-		
+
+
+	def subject(self, enclosingSubject):
+		return Console.ConsoleSubject( self._console, enclosingSubject )
 		
 		
 	def getIndex(self):

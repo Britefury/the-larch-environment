@@ -19,8 +19,8 @@ _staticStyle = StyleSheet.style( Primitive.editable( False ) )
 
 class Configuration (object):
 	class _ConfigurationSubject (Subject):
-		def __init__(self, config):
-			super( Configuration._ConfigurationSubject, self ).__init__( None )
+		def __init__(self, enclosingSubject, config):
+			super( Configuration._ConfigurationSubject, self ).__init__( enclosingSubject )
 			self._config = config
 	
 		@property
@@ -38,11 +38,14 @@ class Configuration (object):
 	
 	def __init__(self, world):
 		self._pages = []
-		self.subject = self._ConfigurationSubject( self )
 		self.__world = world
 
 		for page in _systemConfigPages:
 			self.registerConfigurationPage( page )
+
+
+	def subject(self, enclosingSubject):
+		return self._ConfigurationSubject( enclosingSubject, self )
 
 
 	def __present__(self, fragment, inheritedState):
@@ -53,11 +56,11 @@ class Configuration (object):
 		
 		head = Head( [ linkHeader, title ] )
 		
-		pageItemCmp = lambda itemA, itemB: cmp( itemA[1].getLinkText(), itemB[1].getLinkText() )
+		pageItemCmp = lambda itemA, itemB: cmp( itemA.getLinkText(), itemB.getLinkText() )
 		pages = self._pages[:]
 		pages.sort( pageItemCmp )
 		
-		links = [ Hyperlink( page.getLinkText(), page.getSubject() )   for page in pages ]
+		links = [ Hyperlink( page.getLinkText(), page.subject( fragment.subject ) )   for page in pages ]
 		body = Body( [ Column( links ) ] )
 		
 		return _staticStyle.applyTo( Page( [ head, body ] ) )

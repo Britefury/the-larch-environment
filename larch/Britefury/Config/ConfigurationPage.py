@@ -22,8 +22,8 @@ _staticStyle = StyleSheet.style( Primitive.editable( False ) )
 
 class ConfigurationPage (object):
 	class _ConfigPageSubject (Subject):
-		def __init__(self, page):
-			super( ConfigurationPage._ConfigPageSubject, self ).__init__( None )
+		def __init__(self, enclosingSubject, page):
+			super( ConfigurationPage._ConfigPageSubject, self ).__init__( enclosingSubject )
 			self._page = page
 		
 		def getFocus(self):
@@ -34,19 +34,19 @@ class ConfigurationPage (object):
 		
 	
 	def __init__(self):
-		self._subject = self._ConfigPageSubject( self )
-		
+		pass
+
 		
 	def __getstate__(self):
 		return {}
 	
 	def __setstate__(self, state):
-		self._subject = self._ConfigPageSubject( self )
+		pass
+
 		
 		
-		
-	def getSubject(self):
-		return self._subject
+	def subject(self, enclosingSubject):
+		return self._ConfigPageSubject( enclosingSubject, self )
 		
 		
 	@abstractmethod
@@ -69,7 +69,7 @@ class ConfigurationPage (object):
 
 	def __present__(self, fragment, inheritedState):
 		homeLink = Hyperlink( 'HOME PAGE', fragment.subject.rootSubject )
-		configLink = Hyperlink( 'CONFIGURATION PAGE', fragment.subect.configSubject )
+		configLink = Hyperlink( 'CONFIGURATION PAGE', fragment.subject.configSubject )
 		linkHeader = SplitLinkHeaderBar( [ homeLink ], [ configLink ] )
 		
 		title = TitleBar( self.getTitleText() )
