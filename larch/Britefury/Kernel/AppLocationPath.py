@@ -46,11 +46,11 @@ class LocationPath (object):
 		return Paragraph( contents )
 
 
-_ATTR_NAME = '__app_location_path__'
-
-
-def appLinkheaderBar(subjectContext, rightContents=[]):
-	path = subjectContext.get( _ATTR_NAME )
+def appLinkheaderBar(subject, rightContents=[]):
+	try:
+		path = subject.appLocationPath
+	except AttributeError:
+		path = None
 	left = []
 	if path is not None:
 		left.append( DefaultPerspective.instance.applyTo( path ) )

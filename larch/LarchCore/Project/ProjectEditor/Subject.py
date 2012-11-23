@@ -38,7 +38,7 @@ def _save(subject, pageController):
 		def handleSaveDocumentAsFn(filename):
 			document.saveAs( filename )
 
-		DocumentManagement.promptSaveDocumentAs( subject.getSubjectContext()['world'], None, handleSaveDocumentAsFn )
+		DocumentManagement.promptSaveDocumentAs( subject.world, None, handleSaveDocumentAsFn )
 
 
 def _saveAs(subject, pageController):
@@ -46,7 +46,7 @@ def _saveAs(subject, pageController):
 	def handleSaveDocumentAsFn(filename):
 		document.saveAs( filename )
 
-	DocumentManagement.promptSaveDocumentAs( subject.getSubjectContext()['world'], None, handleSaveDocumentAsFn, document.getFilename() )
+	DocumentManagement.promptSaveDocumentAs( subject.world, None, handleSaveDocumentAsFn, document.getFilename() )
 
 
 def _reset(subject, pageController):
@@ -112,9 +112,6 @@ class _ProjectIndexSubject (Subject):
 	def getTitle(self):
 		return self._indexSubject.getTitle()
 
-	def getSubjectContext(self):
-		return self._indexSubject.getSubjectContext()
-
 	def getChangeHistory(self):
 		return self._indexSubject.getChangeHistory()
 
@@ -132,6 +129,11 @@ class _RootSubject (Subject):
 		self._model = model
 		self._location = location
 		self._title = title
+
+
+	@property
+	def document(self):
+		return self._document
 		
 		
 
@@ -143,9 +145,6 @@ class _RootSubject (Subject):
 
 	def getTitle(self):
 		return self._title + ' [Prj]'
-
-	def getSubjectContext(self):
-		return self.enclosingSubject.getSubjectContext().withAttrs( document=self._document, docLocation=self._location, location=self._location )
 
 
 	def getChangeHistory(self):
@@ -171,11 +170,11 @@ class _RootSubject (Subject):
 
 
 class ProjectSubject (_RootSubject):
-	def __init__(self, document, model, enclosingSubject, location, importName, title):
-		super( ProjectSubject, self ).__init__( document, model, enclosingSubject, location, importName, title )
-		self._packageFinder = PackageFinder( self, model, location )
+	def __init__(self, document, model, enclosingSubject, importName, title):
+		super( ProjectSubject, self ).__init__( document, model, enclosingSubject, importName, title )
+		self._packageFinder = PackageFinder( self, model )
 		self._rootFinder = RootFinder( self, model.pythonPackageName )
-		self._rootSubject = _RootSubject( document, model, enclosingSubject, location, importName, title )
+		self._rootSubject = _RootSubject( document, model, enclosingSubject, importName, title )
 
 
 
