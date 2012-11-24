@@ -22,7 +22,6 @@ from javax.swing.filechooser import FileNameExtensionFilter
 from java.util.regex import Pattern
 
 from Britefury.Dispatch.MethodDispatch import ObjectDispatchMethod
-from Britefury.Kernel import AppLocationPath
 
 from Britefury.Kernel.View.DispatchView import MethodDispatchView
 
@@ -342,9 +341,6 @@ class ProjectView (MethodDispatchView):
 		world = fragment.subject.world
 
 
-		# Link to home page, in link header bar
-		linkHeader = AppLocationPath.appLinkheaderBar( fragment.subject, [] )
-
 		# Title
 		title = TitleBar( document.getDocumentName() )
 
@@ -420,7 +416,7 @@ class ProjectView (MethodDispatchView):
 
 
 		# The page
-		head = Head( [ linkHeader, title ] )
+		head = Head( [ title ] )
 		body = Body( [ saveExportSection, projectSection, indexSection, tip ] ).alignHPack()
 
 		return StyleSheet.style( Primitive.editable( False ) ).applyTo( Page( [ head, body ] ) )

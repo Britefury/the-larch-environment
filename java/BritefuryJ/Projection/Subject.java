@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.Projection;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.python.core.Py;
@@ -115,5 +116,37 @@ public abstract class Subject
 	public SubjectPath path()
 	{
 		return path;
+	}
+	
+	
+	public String getTrailLinkText()
+	{
+		return null;
+	}
+	
+	public SubjectTrailLink getTrailLink()
+	{
+		String text = getTrailLinkText();
+		return text != null  ?  new SubjectTrailLink( text, this )  :  null;
+	}
+	
+	public List<SubjectTrailLink> getTrail()
+	{
+		ArrayList<SubjectTrailLink> trail = new ArrayList<SubjectTrailLink>();
+		buildTrail( trail );
+		return trail;
+	}
+	
+	private void buildTrail(List<SubjectTrailLink> trail)
+	{
+		if ( enclosingSubject != null )
+		{
+			enclosingSubject.buildTrail( trail );
+		}
+		SubjectTrailLink link = getTrailLink();
+		if ( link != null )
+		{
+			trail.add( link );
+		}
 	}
 }

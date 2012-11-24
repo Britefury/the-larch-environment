@@ -9,7 +9,6 @@ import sys
 
 from Britefury.Kernel.Plugin import Plugin
 from Britefury.Kernel.Document import Document
-from Britefury.Kernel.AppLocationPath import LocationPath
 from Britefury.Config import Configuration
 
 from BritefuryJ.AttributeTable import SimpleAttributeTable
@@ -58,7 +57,6 @@ class _WorldSubject (Subject):
 	def __init__(self, world):
 		super( _WorldSubject, self ).__init__( None )
 		self.__world = world
-		self.__locationPath = LocationPath( [] )
 
 
 	@property
@@ -68,10 +66,6 @@ class _WorldSubject (Subject):
 	@property
 	def rootSubject(self):
 		return self.__world.rootSubject
-
-	@property
-	def appLocationPath(self):
-		return self.__locationPath
 
 
 	def getFocus(self):

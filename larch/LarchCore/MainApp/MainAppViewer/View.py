@@ -18,7 +18,6 @@ from javax.swing import JPopupMenu, JOptionPane, JFileChooser
 from javax.swing.filechooser import FileNameExtensionFilter
 
 from Britefury.Dispatch.MethodDispatch import ObjectDispatchMethod
-from Britefury.Kernel import AppLocationPath
 
 from Britefury.Kernel.View.DispatchView import MethodDispatchView
 from Britefury.Kernel.Document import Document
@@ -161,7 +160,7 @@ class AppView (MethodDispatchView):
 
 		systemLink = Hyperlink( 'TEST PAGES', TestsRootPage.instanceSubject )
 		configurationLink = Hyperlink( 'CONFIGURATION PAGE', fragment.subject.world.configuration.subject( fragment.subject ) )
-		linkHeader = AppLocationPath.appLinkheaderBar( fragment.subject, [ configurationLink, systemLink ] )
+		linkHeader = LinkHeaderBar( [ configurationLink, systemLink ])
 
 		title = TitleBar( 'The Larch Environment' )
 		

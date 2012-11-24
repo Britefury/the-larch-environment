@@ -81,9 +81,8 @@ class ProjectSubject (Subject):
 		return self
 
 
-	@property
-	def appLocationPath(self):
-		return self.enclosingSubject.appLocationPath.withPathEntry( 'Project', self )
+	def getTrailLinkText(self):
+		return 'Project'
 
 
 	def getFocus(self):

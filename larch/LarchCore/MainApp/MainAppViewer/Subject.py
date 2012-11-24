@@ -7,11 +7,8 @@
 ##-*************************
 from BritefuryJ.AttributeTable import SimpleAttributeTable
 
-from BritefuryJ.Projection import Subject
-from Britefury.Kernel import AppLocationPath
+from BritefuryJ.Projection import Subject, SubjectTrailLink
 from Britefury.Kernel.Document import Document
-
-from LarchCore.PythonConsole import Console
 
 from LarchCore.MainApp.MainAppViewer.View import perspective
 
@@ -23,9 +20,8 @@ class MainAppSubject (Subject):
 		self._world = world
 
 
-	@property
-	def appLocationPath(self):
-		return self.enclosingSubject.appLocationPath.withPathEntry( 'Home', self )
+	def getTrailLinkText(self):
+		return 'Home'
 
 
 	def getFocus(self):
