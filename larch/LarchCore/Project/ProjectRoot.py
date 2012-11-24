@@ -12,7 +12,7 @@ from BritefuryJ.ChangeHistory import Trackable
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from LarchCore.Project.ProjectContainer import ProjectContainer
-from LarchCore.Project import ProjectEditor
+from LarchCore.Project import ProjectEditor, ProjectPage
 
 
 
@@ -47,7 +47,13 @@ class ProjectRoot (ProjectContainer):
 	
 	
 	def __new_subject__(self, document, enclosingSubject, importName, title):
-		return ProjectEditor.Subject.ProjectSubject( document, self, enclosingSubject, importName, title )
+		"""Used to create the subject that displays the project as a page"""
+		projectSubject = ProjectEditor.Subject.ProjectSubject( document, self, enclosingSubject, importName, title )
+		if 'index' in self.contentsMap:
+			index = self.contentsMap['index']
+			if isinstance( index, ProjectPage.ProjectPage ):
+				return document.newModelSubject( index.data, projectSubject, index.importName, index.name )
+		return projectSubject
 
 		
 	def getPythonPackageName(self):
