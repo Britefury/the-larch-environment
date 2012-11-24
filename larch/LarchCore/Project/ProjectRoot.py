@@ -22,8 +22,13 @@ class ProjectRoot (ProjectContainer):
 		super( ProjectRoot, self ).__init__( contents )
 		self._pythonPackageName = packageName
 		self._startupExecuted = False
-	
-	
+
+
+	@property
+	def importName(self):
+		return self._pythonPackageName   if self._pythonPackageName is not None   else ''
+
+
 	def __getstate__(self):
 		state = super( ProjectRoot, self ).__getstate__()
 		state['pythonPackageName'] = self._pythonPackageName

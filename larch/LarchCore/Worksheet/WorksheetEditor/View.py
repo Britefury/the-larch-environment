@@ -261,11 +261,9 @@ class WorksheetEditor (MethodDispatchView):
 	def Worksheet(self, fragment, inheritedState, node):
 		bodyView = InnerFragment( node.getBody() )
 		
-		viewLocation = fragment.getSubjectContext()['viewLocation']
-		
-		homeLink = Hyperlink( 'HOME PAGE', Location( '' ) )
-		viewLink = Hyperlink( 'Switch to user mode', viewLocation )
-		linkHeader = AppLocationPath.appLinkheaderBar( fragment.getSubjectContext(), [ viewLink ] )
+		homeLink = Hyperlink( 'HOME PAGE', fragment.subject.rootSubject )
+		viewLink = Hyperlink( 'Switch to user mode', fragment.subject.viewSubject )
+		linkHeader = AppLocationPath.appLinkheaderBar( fragment.subject, [ viewLink ] )
 
 
 		tip = TipBox( 'Type to add text to the worksheet.\nRight click to access the context menu, from which styles can be applied.\n' + \
@@ -328,7 +326,7 @@ class WorksheetEditor (MethodDispatchView):
 
 	@ObjectDispatchMethod( EditorSchema.LinkEditor )
 	def Link(self, fragment, inheritedState, node):
-		docLocation = fragment.getSubjectContext()['docLocation']
+		docSubject = fragment.documentSubject
 
 		def _linkContextMenuFactory(element, menu):
 			def _onRemove(control, event):
@@ -340,23 +338,23 @@ class WorksheetEditor (MethodDispatchView):
 					node.text = text
 
 
-			class _LocationListener (TextEntry.TextEntryListener):
+			class _TargetListener (TextEntry.TextEntryListener):
 				def onAccept(self, textEntry, text):
-					node.setAbsoluteLocation( docLocation, Location( text ) )
+					raise NotImplementedError
 
 
 			textEntry = TextEntry( node.text, _TextListener() )
 
-			absLoc = node.getAbsoluteLocation( docLocation )
+			subject = node.getSubject( docSubject )
 
-			locationEntry = TextEntry( absLoc.getLocationString(), _LocationListener() )
+			targetEntry = TextEntry( '<<TODO: replace this>>', _TargetListener() )
 
-			link = Hyperlink( 'Go to location...', absLoc )
+			link = Hyperlink( 'Go to target...', subject )
 
 			onRemove = Button.buttonWithLabel( 'Remove', _onRemove )
 
 			menu.add( Section( SectionHeading3( 'Text:' ), textEntry ) )
-			menu.add( Section( SectionHeading3( 'Location:' ), Column( [ locationEntry, link ] ) ) )
+			menu.add( Section( SectionHeading3( 'Target:' ), Column( [ targetEntry, link ] ) ) )
 			menu.add( Spacer( 0.0, 20.0 ) )
 			menu.add( onRemove )
 			return True
@@ -491,14 +489,12 @@ perspective2 = SequentialEditorPerspective( _view.fragmentViewFunction, Workshee
 
 
 class WorksheetEditorSubject (Subject):
-	def __init__(self, document, model, enclosingSubject, location, importName, title):
+	def __init__(self, document, model, enclosingSubject, importName, title):
 		super( WorksheetEditorSubject, self ).__init__( enclosingSubject )
-		assert isinstance( location, Location )
 		self._document = document
 		self._model = model
 		# Defer the creation of the model view - it involves executing all the code in the worksheet which can take some time
 		self._modelView = None
-		self._location = location
 		self._importName = importName
 		self._title = title
 
@@ -517,9 +513,6 @@ class WorksheetEditorSubject (Subject):
 	
 	def getTitle(self):
 		return self._title + ' [Ws-Devel]'
-	
-	def getSubjectContext(self):
-		return self.enclosingSubject.getSubjectContext().withAttrs( location=self._location )
 	
 	def getChangeHistory(self):
 		return self._document.getChangeHistory()

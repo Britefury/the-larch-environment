@@ -67,23 +67,6 @@ class Window (object):
 
 
 
-		class _BrowserListener (TabbedBrowser.TabbedBrowserListener):
-			def createNewBrowserWindow(_self, subject):
-				self._onOpenNewWindow( subject )
-
-			def onTabbledBrowserChangePage(_self, browser):
-				self._onChangePage( browser )
-
-
-		def inspectFragment(fragment, sourceElement, triggeringEvent):
-			return self._windowManager.world.inspectFragment( fragment, sourceElement, triggeringEvent )
-
-
-		self._browser = TabbedBrowser( self._windowManager.world.rootSubject, subject, inspectFragment, _BrowserListener(), commandConsoleFactory )
-		self._browser.getComponent().setPreferredSize( Dimension( 800, 600 ) )
-
-
-
 		self.onCloseRequestListener = None
 
 
@@ -161,6 +144,29 @@ class Window (object):
 		menuBar = JMenuBar()
 		menuBar.add( editMenu )
 		menuBar.add( helpMenu )
+
+
+
+
+		# BROWSER
+
+		# Initialise here, as the browser listener may invoke methods upon the browser's creation
+		class _BrowserListener (TabbedBrowser.TabbedBrowserListener):
+			def createNewBrowserWindow(_self, subject):
+				self._onOpenNewWindow( subject )
+
+			def onTabbledBrowserChangePage(_self, browser):
+				self._onChangePage( browser )
+
+
+		def inspectFragment(fragment, sourceElement, triggeringEvent):
+			return self._windowManager.world.inspectFragment( fragment, sourceElement, triggeringEvent )
+
+
+		self._browser = TabbedBrowser( self._windowManager.world.rootSubject, subject, inspectFragment, _BrowserListener(), commandConsoleFactory )
+		self._browser.getComponent().setPreferredSize( Dimension( 800, 600 ) )
+
+
 
 
 

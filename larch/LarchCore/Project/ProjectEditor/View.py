@@ -59,19 +59,6 @@ from LarchCore.Project import PageData
 
 
 
-def _ProjectViewState(location):
-	return ( location, )
-
-
-
-
-def _joinLocation(a, *xs):
-	for x in xs:
-		a = a + '.' + x
-	return a
-
-
-
 class ProjectDrag (Object):
 	def __init__(self, source):
 		self.source = source
@@ -277,14 +264,14 @@ class ProjectView (MethodDispatchView):
 				def handleSaveDocumentAsFn(filename):
 					document.saveAs( filename )
 
-				DocumentManagement.promptSaveDocumentAs( fragment.getSubjectContext()['world'], control.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn )
+				DocumentManagement.promptSaveDocumentAs( world, control.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn )
 
 
 		def _onSaveAs(control, buttonEvent):
 			def handleSaveDocumentAsFn(filename):
 				document.saveAs( filename )
 
-			DocumentManagement.promptSaveDocumentAs( fragment.getSubjectContext()['world'], control.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn, document.getFilename() )
+			DocumentManagement.promptSaveDocumentAs( world, control.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn, document.getFilename() )
 
 
 		def _onReload(control, buttonEvent):
@@ -298,7 +285,7 @@ class ProjectView (MethodDispatchView):
 					document.reload()
 					project.reset()
 
-				DocumentManagement.promptSaveDocumentAs( fragment.getSubjectContext()['world'], control.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn )
+				DocumentManagement.promptSaveDocumentAs( world, control.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn )
 
 
 		def _onExport(control, event):
@@ -351,17 +338,12 @@ class ProjectView (MethodDispatchView):
 
 
 		# Get some initial variables
-		subjectContext = fragment.getSubjectContext()
-		document = subjectContext['document']
-		location = subjectContext['location']
-		world = subjectContext['world']
+		document = fragment.subject.document
+		world = fragment.subject.world
 
-
-		# Set location attribute of inheritedState
-		inheritedState = inheritedState.withAttrs( location=location )
 
 		# Link to home page, in link header bar
-		linkHeader = AppLocationPath.appLinkheaderBar( fragment.getSubjectContext(), [] )
+		linkHeader = AppLocationPath.appLinkheaderBar( fragment.subject, [] )
 
 		# Title
 		title = TitleBar( document.getDocumentName() )
@@ -416,8 +398,6 @@ class ProjectView (MethodDispatchView):
 		# Project index
 		indexHeader = SectionHeading1( 'Index' )
 
-		items = InnerFragment.map( project[:], inheritedState )
-
 		nameElement = _projectIndexNameStyle.applyTo( Label( 'Project root' ) )
 		nameBox = _itemHoverHighlightStyle.applyTo( nameElement.alignVCentre() )
 		nameBox = nameBox.withContextMenuInteractor( _projectIndexContextMenuFactory )
@@ -425,7 +405,7 @@ class ProjectView (MethodDispatchView):
 		nameBox = AttachTooltip( nameBox, 'Right click to access context menu, from which new pages and packages can be created.\n' + \
 			'A page called index at the root will appear instead of the project page. A page called __startup__ will be executed at start time.', False )
 
-		itemsBox = Column( items ).alignHExpand()
+		itemsBox = Column( project[:] ).alignHExpand()
 
 		contentsView = Column( [ nameBox.alignHExpand(), itemsBox.padX( _packageContentsIndentation, 0.0 ).alignHExpand() ] )
 
@@ -482,13 +462,6 @@ class ProjectView (MethodDispatchView):
 			menu.add( MenuItem.menuItemWithLabel( 'Delete', _onDelete ) )
 			return True
 
-		location = inheritedState['location']
-		packageLocation = _joinLocation( location, package.name )
-
-		items = InnerFragment.map( package[:], inheritedState.withAttrs( location=packageLocation ) )
-
-		world = fragment.getSubjectContext()['world']
-
 		nameElement = _packageNameStyle.applyTo( StaticText( package.name ) )
 		nameBox = _itemHoverHighlightStyle.applyTo( Row( [ _packageIcon.padX( 5.0 ).alignHPack().alignVCentre(), nameElement.alignVCentre() ] ) )
 
@@ -504,7 +477,7 @@ class ProjectView (MethodDispatchView):
 
 		nameLive = LiveValue( nameBox )
 
-		itemsBox = Column( items )
+		itemsBox = Column( package[:] )
 
 		return Column( [ nameLive, itemsBox.padX( _packageContentsIndentation, 0.0 ).alignHExpand() ] )
 
@@ -535,10 +508,10 @@ class ProjectView (MethodDispatchView):
 			return True
 
 
-		location = inheritedState['location']
-		pageLocation = _joinLocation( location, page.name )
+		document = fragment.subject.document
+		pageSubject = document.newModelSubject( page.data, fragment.subject, page.importName, page.name )
 
-		link = Hyperlink( page.name, pageLocation )
+		link = Hyperlink( page.name, pageSubject )
 		link = link.withContextMenuInteractor( _pageContextMenuFactory )
 		nameBox = _itemHoverHighlightStyle.applyTo( Row( [ link ] ) )
 		nameBox = nameBox.withDragSource( _dragSource )
