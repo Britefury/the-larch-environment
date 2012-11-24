@@ -19,7 +19,6 @@ from javax.swing import JPopupMenu, JOptionPane, JFileChooser
 from javax.swing.filechooser import FileNameExtensionFilter
 
 from Britefury.Dispatch.MethodDispatch import ObjectDispatchMethod
-from Britefury.Kernel import AppLocationPath
 
 from Britefury.Kernel.View.DispatchView import MethodDispatchView
 
@@ -83,7 +82,7 @@ class WorksheetViewer (MethodDispatchView):
 		editSubject = fragment.subject.editSubject
 		
 		editLink = Hyperlink( 'Switch to developer mode', editSubject )
-		linkHeader = AppLocationPath.appLinkheaderBar( fragment.subject, [ editLink ] )
+		linkHeader = LinkHeaderBar( [ editLink ] )
 
 		tip = TipBox( 'To edit this worksheet, or add content, click Developer mode at the top right',
 			      'larchcore.worksheet.view.toedit' )
@@ -256,7 +255,11 @@ class WorksheetViewerSubject (Subject):
 		if self._modelView is None:
 			self._modelView = ViewSchema.WorksheetView( None, self._model, self._importName )
 		return self._modelView
-		
+
+
+	def getTrailLinkText(self):
+		return 'Worksheet'
+
 
 	def getFocus(self):
 		return self._getModelView()

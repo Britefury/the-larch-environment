@@ -14,7 +14,6 @@ import java.util.List
 from javax.swing import AbstractAction
 from javax.swing import JPopupMenu, JOptionPane, JFileChooser
 from javax.swing.filechooser import FileNameExtensionFilter
-from Britefury.Kernel import AppLocationPath
 
 from Britefury.Kernel.View.DispatchView import MethodDispatchView
 from Britefury.Dispatch.MethodDispatch import ObjectDispatchMethod
@@ -263,7 +262,7 @@ class WorksheetEditor (MethodDispatchView):
 		
 		homeLink = Hyperlink( 'HOME PAGE', fragment.subject.rootSubject )
 		viewLink = Hyperlink( 'Switch to user mode', fragment.subject.viewSubject )
-		linkHeader = AppLocationPath.appLinkheaderBar( fragment.subject, [ viewLink ] )
+		linkHeader = LinkHeaderBar( [ viewLink ] )
 
 
 		tip = TipBox( 'Type to add text to the worksheet.\nRight click to access the context menu, from which styles can be applied.\n' + \
@@ -503,8 +502,12 @@ class WorksheetEditorSubject (Subject):
 		if self._modelView is None:
 			self._modelView = EditorSchema.WorksheetEditor( None, self._model, self._importName )
 		return self._modelView
-		
-	
+
+
+	def getTrailLinkText(self):
+		return 'Edit worksheet'
+
+
 	def getFocus(self):
 		return self._getModelView()
 	

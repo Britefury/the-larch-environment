@@ -18,13 +18,14 @@ import java.util.List;
 
 import javax.swing.Action;
 import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.JSeparator;
 import javax.swing.JToolBar;
+import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
@@ -167,7 +168,7 @@ public class Browser
 	private static CommandSet commands = new CommandSet( "Larch.Browser", Arrays.asList( new Command[] { cmdNewTab, cmdNewWindow, cmdViewportOneToOne, cmdViewportReset } ) );
 
 
-	private JTextField locationField;
+	private BrowserTrail trail;
 	private JPanel panel;
 
 	private PresentationComponent presComponent;
@@ -207,21 +208,12 @@ public class Browser
 		toolbar.setRollover(true);
 		initialiseToolbar(toolbar);
 		
+		toolbar.add( Box.createHorizontalStrut( 10 ) );
 		
-		locationField = new JTextField( "<TODO: replace>" );
-		locationField.setMaximumSize( new Dimension( locationField.getMaximumSize().width, locationField.getMinimumSize().height ) );
-		locationField.setBorder( BorderFactory.createLineBorder( Color.black, 1 ) );
-		locationField.setDragEnabled( true );
-		
-		ActionListener locationActionListener = new ActionListener()
-		{
-			public void actionPerformed(ActionEvent event)
-			{
-			}
-		};
-		
-		locationField.addActionListener( locationActionListener );
-		toolbar.add(locationField);
+		trail = new BrowserTrail();
+		trail.setPageController( pageController );
+		trail.setMaximumSize( new Dimension( Integer.MAX_VALUE, Integer.MAX_VALUE ) );
+		toolbar.add( trail );
 		
 		
 		JPanel header = new JPanel( new BorderLayout() );
@@ -271,7 +263,6 @@ public class Browser
 	
 	public void goToSubject(Subject subject)
 	{
-		locationField.setText( "<TODO: replace (goToPath)>" );
 		setSubject( subject );
 	}
 	
@@ -303,7 +294,6 @@ public class Browser
 	{
 		history.visit( subject );
 		history.clear();
-		locationField.setText( "<TODO: replace (reset)>" );
 		viewportReset();
 		resolve();
 	}
@@ -331,7 +321,6 @@ public class Browser
 		{
 			onPreHistoryChange();
 			history.back();
-			locationField.setText( "<TODO: replace (back)>" );
 			resolve();
 		}
 	}
@@ -342,7 +331,6 @@ public class Browser
 		{
 			onPreHistoryChange();
 			history.forward();
-			locationField.setText( "<TODO: replace (forward)>" );
 			resolve();
 		}
 	}
@@ -390,6 +378,8 @@ public class Browser
 		commandBar.pageChanged( s );
 		presComponent.getRootElement().setChild( viewport.getElement() );
 		
+		trail.setTrail( s.getTrail() );
+
 		// Set the subject
 		if ( s != subject )
 		{
