@@ -198,15 +198,9 @@ class LinkAbstractView (NodeAbstractView):
 		return self._model['text']
 
 
-	def getAbsoluteLocation(self, docLocation):
-		loc = self._model['location']
-		if self._model['absolute'] is not None:
-			return Location( loc )
-		else:
-			if loc == '':
-				return docLocation
-			else:
-				return docLocation.join( loc )
+	def getSubject(self, docSubject):
+		raise NotImplementedError
+
 
 
 
