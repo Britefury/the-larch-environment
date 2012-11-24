@@ -276,13 +276,3 @@ class WorksheetViewerSubject (Subject):
 
 	def createModuleLoader(self, document):
 		return _WorksheetModuleLoader( self._model, document )
-
-
-	def redirect(self):
-		module = self._getModelView().getModule()
-		try:
-			subjectFactory = module.__subject__
-		except AttributeError:
-			return None
-		else:
-			return subjectFactory( self._document, module, self )

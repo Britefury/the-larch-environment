@@ -18,12 +18,9 @@ from BritefuryJ.Shortcut import Shortcut
 from BritefuryJ.Controls import Hyperlink
 from BritefuryJ.Pres.Pres import *
 from BritefuryJ.Pres.Primitive import *
-from Britefury.Kernel import AppLocationPath
 
 from LarchCore.MainApp import DocumentManagement
 
-from LarchCore.Project.ProjectPage import ProjectPage
-from LarchCore.Project.ProjectPackage import ProjectPackage
 from LarchCore.Project.ProjectEditor import View
 from LarchCore.Project.ProjectEditor.ModuleFinder import RootFinder, PackageFinder
 
