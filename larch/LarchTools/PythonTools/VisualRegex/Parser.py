@@ -25,12 +25,12 @@ class VisualRegexGrammar (Grammar):
 
 	@Rule
 	def pythonEscapedChar(self):
-		return ( Literal( '\\' ) + RegEx( '[abnfrt]|(x[0-9a-fA-F]{2})|(u[0-9a-fA-F]{4})|(U[0-9a-fA-F]{8})' ) ).action( lambda input, begin, end, x, bindings: Schema.PythonEscapedChar( char=x[1] ) )
+		return ( Literal( '\\' ) + RegEx( '[abnfrt]|(x[0-9a-fA-F]{2})|(u[0-9a-fA-F]{4})|(U[0-9a-fA-F]{8})|([0-3][0-7]{2})' ) ).action( lambda input, begin, end, x, bindings: Schema.PythonEscapedChar( char=x[1] ) )
 
 
 	@Rule
 	def escapedRegexChar(self):
-		return ( Literal( '\\' ) + RegEx( '.' ) ).action( lambda input, begin, end, x, bindings: Schema.EscapedChar( char=x[1] ) )
+		return ( Literal( '\\' ) + RegEx( '[^0-9]' ) ).action( lambda input, begin, end, x, bindings: Schema.EscapedChar( char=x[1] ) )
 
 
 	@Rule
@@ -118,6 +118,10 @@ class VisualRegexGrammar (Grammar):
 		return ( Literal( '(?P=' ) + Tokens.identifier + Literal( ')' ) ).action( lambda input, begin, end, x, bindings: Schema.MatchNamedGroup( name=x[1] ) )
 
 	@Rule
+	def matchNumberedGroup(self):
+		return ( Literal( '\\' ) + RegEx( r'0|[1-9][0-9]*' ) ).action( lambda input, begin, end, x, bindings: Schema.MatchNumberedGroup( number=x[1] ) )
+
+	@Rule
 	def lookahead(self):
 		return ( Literal( '(?=' ) + self.choice() + Literal( ')' ) ).action( lambda input, begin, end, x, bindings: Schema.Lookahead( subexp=x[1], positive='1' ) )
 
@@ -145,8 +149,8 @@ class VisualRegexGrammar (Grammar):
 
 	@Rule
 	def item(self):
-		return self.setFlags() | self.nonCapturingGroup() | self.defineNamedGroup() | self.matchNamedGroup() | self.comment() | \
-		       self.lookahead() | self.negativeLookahead() | self.lookbehind() | self.negativeLookbehind() | self.group() | self.character()
+		return self.setFlags() | self.nonCapturingGroup() | self.defineNamedGroup() | self.matchNamedGroup()  | self.comment() | \
+		       self.lookahead() | self.negativeLookahead() | self.lookbehind() | self.negativeLookbehind() | self.group() | self.character() | self.matchNumberedGroup()
 
 
 
