@@ -18,8 +18,13 @@ class ProjectNode (object):
 		self._incr = IncrementalValueMonitor()
 		self.__change_history__ = None
 		self._parent = None
-	
-	
+
+
+	@property
+	def importName(self):
+		raise NotImplementedError, 'abstract'
+
+
 	def __getstate__(self):
 		return {}
 	
@@ -31,7 +36,6 @@ class ProjectNode (object):
 	
 	def getParent(self):
 		return self._parent
-
 
 
 	@abstractmethod
