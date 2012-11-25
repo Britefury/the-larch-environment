@@ -9,7 +9,6 @@ from BritefuryJ.Controls import Hyperlink
 
 from BritefuryJ.Pres.Primitive import Primitive, Column
 from BritefuryJ.Pres.RichText import SplitLinkHeaderBar, TitleBar, Page, Head, Body
-from BritefuryJ.Browser import Location
 from BritefuryJ.StyleSheet import StyleSheet
 
 from BritefuryJ.Projection import Subject
@@ -20,59 +19,56 @@ _staticStyle = StyleSheet.style( Primitive.editable( False ) )
 
 class Configuration (object):
 	class _ConfigurationSubject (Subject):
-		def __init__(self, config):
-			super( Configuration._ConfigurationSubject, self ).__init__( None )
+		def __init__(self, enclosingSubject, config):
+			super( Configuration._ConfigurationSubject, self ).__init__( enclosingSubject )
 			self._config = config
 	
-	
+		@property
+		def configSubject(self):
+			return self
+
+
 		def getFocus(self):
 			return self._config
 	
 		def getTitle(self):
 			return 'Configuration'
-		
-		
-		def __resolve__(self, name):
-			return self._config._pagesByName[name].getSubject()
 
 
 	
-	def __init__(self):
-		self._pagesByName = {}
-		self.subject = self._ConfigurationSubject( self )
-		
+	def __init__(self, world):
+		self._pages = []
+		self.__world = world
+
 		for page in _systemConfigPages:
 			self.registerConfigurationPage( page )
-	
-	
+
+
+	def subject(self, enclosingSubject):
+		return self._ConfigurationSubject( enclosingSubject, self )
+
+
 	def __present__(self, fragment, inheritedState):
-		homeLink = Hyperlink( 'HOME PAGE', Location( '' ) )
-		systemLink = Hyperlink( 'SYSTEM PAGE', Location( 'system' ) )
-		linkHeader = SplitLinkHeaderBar( [ homeLink ], [ systemLink ] ).alignHExpand()
+		homeLink = Hyperlink( 'HOME PAGE', self.__world.rootSubject )
+		linkHeader = SplitLinkHeaderBar( [ homeLink ], [] ).alignHExpand()
 		
 		title = TitleBar( 'Configuration' )
 		
 		head = Head( [ linkHeader, title ] )
 		
-		pageItemCmp = lambda itemA, itemB: cmp( itemA[1].getLinkText(), itemB[1].getLinkText() )
-		items = list( self._pagesByName.items() )
-		items.sort( pageItemCmp )
+		pageItemCmp = lambda itemA, itemB: cmp( itemA.getLinkText(), itemB.getLinkText() )
+		pages = self._pages[:]
+		pages.sort( pageItemCmp )
 		
-		links = [ Hyperlink( page.getLinkText(), Location( 'config.%s'  %  ( name, ) ) )   for name, page in items ]
+		links = [ Hyperlink( page.getLinkText(), page.subject( fragment.subject ) )   for page in pages ]
 		body = Body( [ Column( links ) ] )
 		
 		return _staticStyle.applyTo( Page( [ head, body ] ) )
 	
 	
-	def getConfigurationLocation(self):
-		return self._configLocation
-	
-	
 	def registerConfigurationPage(self, page):
-		index = len( self._pagesByName )
-		name = 'p%d'  %  index
-		self._pagesByName[name] = page
-		
+		self._pages.append( page )
+
 
 
 

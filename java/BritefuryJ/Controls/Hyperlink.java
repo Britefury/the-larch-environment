@@ -7,12 +7,12 @@
 package BritefuryJ.Controls;
 
 
-import BritefuryJ.Browser.Location;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSText;
 import BritefuryJ.LSpace.Interactor.ContextMenuElementInteractor;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Text;
+import BritefuryJ.Projection.Subject;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class Hyperlink extends AbstractHyperlink
@@ -44,12 +44,12 @@ public class Hyperlink extends AbstractHyperlink
 	
 	public Hyperlink(String text, LinkListener listener)
 	{
-		super( new Text( text ), new FixedLinkListenerFactory( listener ) );
+		super( new Text( text ), listener );
 	}
 	
-	public Hyperlink(String text, Location targetLocation)
+	public Hyperlink(String text, Subject targetSubject)
 	{
-		super( new Text( text ), new LocationLinkListenerFactory( targetLocation ) );
+		super( new Text( text ), targetSubject );
 	}
 	
 	
