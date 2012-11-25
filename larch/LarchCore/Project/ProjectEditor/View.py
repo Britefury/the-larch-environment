@@ -410,7 +410,7 @@ class ProjectView (MethodDispatchView):
 
 
 		tip = TipBox( 'Larch projects act like Python programs. Packages act as directories/packages and pages act as Python source files. Pages can import code from one another as if they are modules.\n' + \
-			'If a page called index is present in the root of the project, then it will appear instead of the project page. To access the project page, add \'.___project___\' (3 underscores) to the address of the project.\n' +\
+			'If a page called index is present in the root of the project, then it will appear instead of the project page.\n' +\
 			'If a page called __startup__ (2 underscores) is present at the root, code within it will be executed before all other pages. This can be used for registering editor extensions.',
 			      'larchcore.worksheet.worksheeteditor')
 

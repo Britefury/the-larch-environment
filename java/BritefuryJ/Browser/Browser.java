@@ -23,9 +23,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
 import javax.swing.JToolBar;
-import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
