@@ -19,6 +19,10 @@ import BritefuryJ.Command.BoundCommandSet;
 
 public abstract class Subject
 {
+	//
+	// Absolute path entry
+	//
+	
 	private static class AbsoluteSubjectPathEntry implements SubjectPathEntry
 	{
 		private Subject subject;
@@ -46,6 +50,7 @@ public abstract class Subject
 	private SubjectPath path;
 	
 	
+	
 	public Subject(Subject enclosingSubject, SubjectPath path)
 	{
 		this.enclosingSubject = enclosingSubject;
@@ -59,7 +64,12 @@ public abstract class Subject
 	}
 	
 	
-	
+	// Basics:
+	// - enclosing subject
+	// - focus (override this)
+	// - perspective (override this if perspective other than the default perspective is needed)
+	// - title (override this)
+	// - change history (override this if change history available)
 	public Subject getEnclosingSubject()
 	{
 		return enclosingSubject;
@@ -90,6 +100,9 @@ public abstract class Subject
 	}
 	
 	
+	
+	//
+	// Command list - override to add commands. Call super method.
 	public void buildBoundCommandSetList(List<BoundCommandSet> boundCommandSets)
 	{
 		if ( enclosingSubject != null )
@@ -99,7 +112,9 @@ public abstract class Subject
 	}
 	
 	
-	
+	//
+	// Fall back on attributes from enclosing subject if attribute not found
+	//
 	public PyObject __getattr__(PyString key)
 	{
 		if ( enclosingSubject != null )
@@ -113,23 +128,34 @@ public abstract class Subject
 	}
 	
 	
+	//
+	// Get the path
+	//
+	
 	public SubjectPath path()
 	{
 		return path;
 	}
 	
 	
+	//
+	// Trail - for the browser trail
+	//
+	
+	// Link text
 	public String getTrailLinkText()
 	{
 		return null;
 	}
 	
+	// Return a link
 	public SubjectTrailLink getTrailLink()
 	{
 		String text = getTrailLinkText();
 		return text != null  ?  new SubjectTrailLink( text, this )  :  null;
 	}
 	
+	// Get the trail
 	public List<SubjectTrailLink> getTrail()
 	{
 		ArrayList<SubjectTrailLink> trail = new ArrayList<SubjectTrailLink>();

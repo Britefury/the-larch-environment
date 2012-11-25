@@ -23,6 +23,7 @@ import BritefuryJ.LSpace.Util.Range;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Arrow;
+import BritefuryJ.Pres.Primitive.Blank;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Projection.SubjectTrailLink;
@@ -51,19 +52,28 @@ class BrowserTrail extends PresentationComponent
 	
 	void setTrail(List<SubjectTrailLink> trail)
 	{
-		Pres rowContents[] = new Pres[trail.size() * 2 - 1];
-		boolean bFirst = true;
-		int i = 0;
-		for (SubjectTrailLink link: trail)
+		Pres trailPres;
+		
+		if ( trail.size() > 0 )
 		{
-			if ( !bFirst )
+			Pres rowContents[] = new Pres[trail.size() * 2 - 1];
+			boolean bFirst = true;
+			int i = 0;
+			for (SubjectTrailLink link: trail)
 			{
-				rowContents[i++] = arrow;
+				if ( !bFirst )
+				{
+					rowContents[i++] = arrow;
+				}
+				rowContents[i++] = link.hyperlink();
+				bFirst = false;
 			}
-			rowContents[i++] = link.hyperlink();
-			bFirst = false;
+			trailPres = new Row( rowContents ).alignHPack();
 		}
-		Pres trailPres = new Row( rowContents ).alignHPack(); 
+		else
+		{
+			trailPres = new Blank();
+		}
 		LSElement elem = trailPres.present( PresentationContext.defaultCtx, StyleValues.getRootStyle().alignVExpand() );
 		viewport.setChild( elem );
 	}
