@@ -90,7 +90,8 @@ class ProjectContainer (ProjectNode):
 		
 
 		
-	def getContentsMap(self):
+	@property
+	def contentsMap(self):
 		return self._contentsMapLive.getValue()
 
 
@@ -105,9 +106,6 @@ class ProjectContainer (ProjectNode):
 		return self._contents.__get_trackable_contents__()
 	
 		
-	contentsMap = property( getContentsMap )
-
-
 	@TrackedListProperty
 	def _contents(self):
 		return self._contents_

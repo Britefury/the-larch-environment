@@ -8,9 +8,9 @@ package BritefuryJ.Command;
 
 import java.awt.Color;
 
-import BritefuryJ.Browser.Location;
 import BritefuryJ.Graphics.SolidBorder;
 import BritefuryJ.LSpace.PageController;
+import BritefuryJ.Projection.Subject;
 import BritefuryJ.Shortcut.Shortcut;
 
 public class Command
@@ -23,9 +23,9 @@ public class Command
 	
 	private static class HyperlinkAction implements CommandAction
 	{
-		private Location target;
+		private Subject target;
 		
-		public HyperlinkAction(Location target)
+		public HyperlinkAction(Subject target)
 		{
 			this.target = target;
 		}
@@ -34,7 +34,7 @@ public class Command
 		@Override
 		public void commandAction(Object context, PageController pageController)
 		{
-			pageController.openLocation( target, PageController.OpenOperation.OPEN_IN_CURRENT_TAB );
+			pageController.openSubject( target, PageController.OpenOperation.OPEN_IN_CURRENT_TAB );
 		}
 	}
 	
@@ -71,28 +71,28 @@ public class Command
 	
 	
 
-	public Command(CommandName name, Location targetLocation, Shortcut shortcut)
+	public Command(CommandName name, Subject targetSubject, Shortcut shortcut)
 	{
 		this.name = name;
-		this.action = new HyperlinkAction( targetLocation );
+		this.action = new HyperlinkAction( targetSubject );
 		this.shortcut = shortcut;
 	}
 	
-	public Command(String annotatedName, Location targetLocation, Shortcut shortcut)
+	public Command(String annotatedName, Subject targetSubject, Shortcut shortcut)
 	{
-		this( new CommandName( annotatedName ), targetLocation, shortcut );
+		this( new CommandName( annotatedName ), targetSubject, shortcut );
 	}
 	
 	
-	public Command(CommandName name, Location targetLocation)
+	public Command(CommandName name, Subject targetSubject)
 	{
 		this.name = name;
-		this.action = new HyperlinkAction( targetLocation );
+		this.action = new HyperlinkAction( targetSubject );
 	}
 	
-	public Command(String annotatedName, Location targetLocation)
+	public Command(String annotatedName, Subject targetSubject)
 	{
-		this( new CommandName( annotatedName ), targetLocation );
+		this( new CommandName( annotatedName ), targetSubject );
 	}
 	
 	
