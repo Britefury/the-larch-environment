@@ -9,6 +9,7 @@ package BritefuryJ.Controls;
 import java.awt.event.KeyEvent;
 import java.util.regex.Pattern;
 
+import BritefuryJ.Graphics.AbstractBorder;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
 import BritefuryJ.LSpace.Anchor;
@@ -81,12 +82,15 @@ public class TextEntry extends ControlPres
 		@Override
 		public void onTextChanged(TextEntryControl textEntry)
 		{
-			if ( !textEntry.bSetTextInProgress )
+			if ( !textEntry.setTextInProgress )
 			{
-				String text = textEntry.getDisplayedText();
-				if ( !text.equals( value.getStaticValue() ) )
+				if ( textEntry.isDisplayedTextValid() )
 				{
-					value.setLiteralValue( text );
+					String text = textEntry.getDisplayedText();
+					if ( !text.equals( value.getStaticValue() ) )
+					{
+						value.setLiteralValue( text );
+					}
 				}
 			}
 		}
@@ -168,16 +172,16 @@ public class TextEntry extends ControlPres
 			
 			public void elementRealised(LSElement element)
 			{
-				if ( bGrabCaretOnRealise )
+				if ( grabCaretOnRealise )
 				{
 					grabCaret();
-					bGrabCaretOnRealise = false;
+					grabCaretOnRealise = false;
 				}
 
-				if ( bSelectAllOnRealise )
+				if ( selectAllOnRealise )
 				{
 					selectAll();
-					bSelectAllOnRealise = false;
+					selectAllOnRealise = false;
 				}
 			}
 
@@ -194,6 +198,7 @@ public class TextEntry extends ControlPres
 				if ( event instanceof TextEditEventInsert )
 				{
 					TextEditEventInsert insert = (TextEditEventInsert)event;
+					notifyChanged();
 					if ( listener != null )
 					{
 						listener.onTextInserted( TextEntryControl.this, insert.getPosition(), insert.getTextInserted() );
@@ -205,6 +210,7 @@ public class TextEntry extends ControlPres
 				else if ( event instanceof TextEditEventRemove )
 				{
 					TextEditEventRemove remove = (TextEditEventRemove)event;
+					notifyChanged();
 					if ( listener != null )
 					{
 						listener.onTextRemoved( TextEntryControl.this, remove.getPosition(), remove.getLength() );
@@ -216,6 +222,7 @@ public class TextEntry extends ControlPres
 				else if ( event instanceof TextEditEventReplace )
 				{
 					TextEditEventReplace replace = (TextEditEventReplace)event;
+					notifyChanged();
 					if ( listener != null )
 					{
 						listener.onTextReplaced( TextEntryControl.this, replace.getPosition(), replace.getLength(), replace.getReplacement() );
@@ -259,16 +266,18 @@ public class TextEntry extends ControlPres
 		
 		private LSBorder outerElement;
 		private LSText textElement;
-		private BritefuryJ.Graphics.AbstractBorder validBorder, invalidBorder;
+		private BritefuryJ.Graphics.AbstractBorder validBorder, invalidBorder, changedBorder;
 		private TextEntryListener listener;
 		private TextEntryValidator validator;
 		private LiveInterface text;
-		private boolean bGrabCaretOnRealise, bSelectAllOnRealise, bSetTextInProgress;
+		private boolean grabCaretOnRealise, selectAllOnRealise, setTextInProgress, changed, textIsValid;
 	
 	
 		
-		protected TextEntryControl(PresentationContext ctx, StyleValues style, LiveInterface text, LSBorder outerElement, LSRegion region, LSText textElement, TextEntryListener listener, TextEntryValidator validator,
-				BritefuryJ.Graphics.AbstractBorder validBorder, BritefuryJ.Graphics.AbstractBorder invalidBorder)
+		protected TextEntryControl(PresentationContext ctx, StyleValues style, LiveInterface text,
+				LSBorder outerElement, LSRegion region, LSText textElement,
+				TextEntryListener listener, TextEntryValidator validator,
+				BritefuryJ.Graphics.AbstractBorder validBorder, BritefuryJ.Graphics.AbstractBorder invalidBorder, BritefuryJ.Graphics.AbstractBorder changedBorder)
 		{
 			super( ctx, style );
 			
@@ -282,6 +291,7 @@ public class TextEntry extends ControlPres
 			
 			this.validBorder = validBorder;
 			this.invalidBorder = invalidBorder;
+			this.changedBorder = changedBorder;
 	
 			this.textElement.addElementInteractor( new TextEntryInteractor() );
 			this.textElement.addTreeEventListener( new TextEntryTreeEventListener() );
@@ -291,6 +301,8 @@ public class TextEntry extends ControlPres
 			region.setClipboardHandler( new TextEntryClipboardHandler() );
 			
 			requestRefresh();
+			
+			changed = false;
 		}
 		
 		
@@ -312,16 +324,16 @@ public class TextEntry extends ControlPres
 		
 		private void setDisplayedText(String x)
 		{
-			bSetTextInProgress = true;
+			setTextInProgress = true;
 			textElement.setText( x );
-			bSetTextInProgress = false;
+			setTextInProgress = false;
 			validate( x );
 		}
 		
 		
 		public boolean isDisplayedTextValid()
 		{
-			return validate( getDisplayedText() );
+			return textIsValid;
 		}
 		
 		
@@ -340,7 +352,7 @@ public class TextEntry extends ControlPres
 		
 		public void selectAllOnRealise()
 		{
-			bSelectAllOnRealise = true;
+			selectAllOnRealise = true;
 		}
 		
 		
@@ -351,7 +363,7 @@ public class TextEntry extends ControlPres
 		
 		public void grabCaretOnRealise()
 		{
-			bGrabCaretOnRealise = true;
+			grabCaretOnRealise = true;
 		}
 		
 		public void ungrabCaret()
@@ -363,7 +375,8 @@ public class TextEntry extends ControlPres
 		public void accept()
 		{
 			String t = getDisplayedText();
-			if ( !validate( t ) )
+			validate( t );
+			if ( !textIsValid )
 			{
 				String failMessage = getValidationMessage( t );
 				if ( failMessage != null )
@@ -373,7 +386,10 @@ public class TextEntry extends ControlPres
 				}
 				return;
 			}
+			
 			ungrabCaret();
+			changed = false;
+			updateBorder();
 			listener.onAccept( this, t );
 		}
 	
@@ -384,11 +400,10 @@ public class TextEntry extends ControlPres
 		}
 		
 		
-		private boolean validate(String t)
+		private void validate(String t)
 		{
-			boolean bValid = validator == null || validator.validateText( this, t );
-			outerElement.setBorder( bValid  ?  validBorder  :  invalidBorder );
-			return bValid;
+			textIsValid = validator == null || validator.validateText( this, t );
+			updateBorder();
 		}
 		
 		private String getValidationMessage(String t)
@@ -401,6 +416,25 @@ public class TextEntry extends ControlPres
 			{
 				return null;
 			}
+		}
+		
+		
+		private void notifyChanged()
+		{
+			boolean stateChanged = changed == false;
+			changed = true;
+			if ( stateChanged )
+			{
+				updateBorder();
+			}
+		}
+		
+		
+		private void updateBorder()
+		{
+			AbstractBorder c = changedBorder != null  ?  changedBorder  :  validBorder;
+			AbstractBorder b = changed  ?  c  :  validBorder;
+			outerElement.setBorder( textIsValid  ?  b  :  invalidBorder );
 		}
 
 
@@ -420,6 +454,8 @@ public class TextEntry extends ControlPres
 					String t = (String)text.getValue();
 					t = t != null  ?  t  :  "";
 					setDisplayedText( t );
+					changed = false;
+					updateBorder();
 				}
 			};
 			outerElement.queueImmediateEvent( refresh );
@@ -510,6 +546,7 @@ public class TextEntry extends ControlPres
 
 		BritefuryJ.Graphics.AbstractBorder validBorder = style.get( Controls.textEntryBorder, BritefuryJ.Graphics.AbstractBorder.class ); 
 		BritefuryJ.Graphics.AbstractBorder invalidBorder = style.get( Controls.textEntryInvalidBorder, BritefuryJ.Graphics.AbstractBorder.class );
+		BritefuryJ.Graphics.AbstractBorder changedBorder = style.get( Controls.textEntryChangedBorder, BritefuryJ.Graphics.AbstractBorder.class );
 		
 		LiveInterface value = valueSource.getLive();
 		LSText textElement = (LSText)new Text( "" ).present( ctx, style );
@@ -519,7 +556,8 @@ public class TextEntry extends ControlPres
 		Pres outer = new Border( regionElement ).alignVRefY();
 		LSBorder outerElement = (LSBorder)outer.present( ctx, style );
 		
-		TextEntryControl control = new TextEntryControl( ctx, style, value, outerElement, regionElement, textElement, listener, validator, validBorder, invalidBorder );
+		TextEntryControl control = new TextEntryControl( ctx, style, value, outerElement, regionElement, textElement, listener, validator,
+				validBorder, invalidBorder, changedBorder );
 		if ( bSelectAllOnRealise )
 		{
 			control.selectAllOnRealise();
