@@ -56,7 +56,7 @@ public class Controls
 	public static final InheritedAttributeNonNull optionMenuBorder = new InheritedAttributeNonNull( controlsNamespace, "optionMenuBorder", AbstractBorder.class,
 			new SolidBorder( 1.5, 2.0, 8.0, 8.0, new Color( 0.7f, 0.7f, 0.7f ), new Color( 0.925f, 0.925f, 0.925f  ), new Color( 0.6f, 0.6f, 0.6f ), new Color( 0.875f, 0.875f, 0.875f ) ) );
 	public static final InheritedAttributeNonNull optionMenuContentsSpacing = new InheritedAttributeNonNull( controlsNamespace, "optionMenuContentsSpacing", Double.class, 5.0 );
-	public static final InheritedAttributeNonNull optionMenuArrowSize = new InheritedAttributeNonNull( controlsNamespace, "optionMenuArrowSize", Double.class, 16.0 );
+	public static final InheritedAttributeNonNull optionMenuArrowSize = new InheritedAttributeNonNull( controlsNamespace, "optionMenuArrowSize", Double.class, 14.0 );
 	public static final InheritedAttributeNonNull optionMenuArrowPainter = new InheritedAttributeNonNull( controlsNamespace, "optionMenuArrowPainter", Painter.class,
 			 new FilledOutlinePainter( new Color( 0.775f, 0.775f, 0.85f ), new Color( 0.525f, 0.525f, 0.6f ), new BasicStroke( 1.0f ) ) );
 
@@ -107,7 +107,7 @@ public class Controls
 			    StyleSheet.style( Primitive.foreground.as( new Color( 0.0f, 0.3f, 0.5f ) ), Primitive.cursor.as( new Cursor( Cursor.E_RESIZE_CURSOR ) )  ) );
 		
 		
-	public static final InheritedAttributeNonNull spinEntryArrowSize = new InheritedAttributeNonNull( controlsNamespace, "spinEntryArrowSize", Double.class, 16.0 );
+	public static final InheritedAttributeNonNull spinEntryArrowSize = new InheritedAttributeNonNull( controlsNamespace, "spinEntryArrowSize", Double.class, 14.0 );
 	public static final InheritedAttributeNonNull spinEntryArrowAttrs = new InheritedAttributeNonNull( controlsNamespace, "spinEntryArrowAttrs", StyleSheet.class,
 		    StyleSheet.style( Primitive.columnSpacing.as( 2.0 ),
 				    Primitive.shapePainter.as( new FilledOutlinePainter( new Color( 0.85f, 0.85f, 0.85f ), new Color( 0.6f, 0.6f, 0.6f ), new BasicStroke( 1.0f ) ) ),
