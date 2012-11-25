@@ -100,6 +100,11 @@ class VisualRegexCodeGenerator (object):
 		return '(?P=' + name + ')'
 
 
+	@DMObjectNodeDispatchMethod( Schema.MatchNumberedGroup )
+	def MatchNumberedGroup(self, model, number):
+		return '\\' + number
+
+
 	@DMObjectNodeDispatchMethod( Schema.Lookahead )
 	def Lookahead(self, model, subexp, positive):
 		return '(' + ( '?=' if positive is not None   else '?!' ) + self( subexp ) + ')'

@@ -43,6 +43,7 @@ CharSetRange = schema.newClass( 'CharSetRange', Node, [ 'min', 'max' ] )
 
 Group = schema.newClass( 'Group', Node, [ 'subexp', 'capturing' ] )
 DefineNamedGroup = schema.newClass( 'DefineNamedGroup', Node, [ 'subexp', 'name' ] )
+MatchNumberedGroup = schema.newClass( 'MatchNumberedGroup', Node, [ 'number' ] )
 MatchNamedGroup = schema.newClass( 'MatchNamedGroup', Node, [ 'name' ] )
 
 Look = schema.newClass( 'Look', Node, [ 'subexp', 'positive' ] )

@@ -76,6 +76,7 @@ _charClassBorder = SolidBorder( 1.0, 1.0, 4.0, 4.0, Color( 0.6, 0.65, 0.7 ), Col
 #_charClassBorder = SolidBorder( 1.0, 2.0, 4.0, 4.0, Color( 0.0, 0.25, 0.5 ), Color( 0.8, 0.9, 1.0 ) )
 
 _groupNameStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.65, 0.0 ) ) )
+_groupNumberStyle = StyleSheet.style( Primitive.foreground( Color( 0.1, 0.45, 0.1 ) ) )
 _commentStyle = StyleSheet.style( Primitive.foreground( Color( 0.3, 0.3, 0.3 ) ) )
 _flagsStyle = StyleSheet.style( Primitive.foreground( Color( 1.0, 0.5, 0.0 ) ) )
 
@@ -175,6 +176,10 @@ def matchNamedGroup(name):
 	groupName = Row( [ _controlCharStyle( Text( 'P=' ) ), _groupNameStyle( Text( name ) ) ] )
 	nameBlock = Script.scriptRSub(  _controlCharStyle( Text( '?' ) ), groupName )
 	return _groupBorder.surround( Row( [ _controlCharStyle( Text( '(' ) ), nameBlock, _controlCharStyle( Text( ')' ) ) ] ) )
+
+def matchNumberedGroup(number):
+	groupNumber = _groupNumberStyle( Text( number ) )
+	return _groupBorder.surround( Row( [ _controlCharStyle( Text( '\\' ) ), groupNumber ] ) )
 
 def lookahead(subexp, positive):
 	posNegIndicator = _controlCharStyle( Text( '=' ) )   if positive   else _invertControlCharStyle( Text( '!' ) )
@@ -362,6 +367,13 @@ class VREView (MethodDispatchView):
 	@_controller.expression
 	def MatchNamedGroup(self, fragment, inheritedState, model, name):
 		return matchNamedGroup( name )
+
+
+
+	@DMObjectNodeDispatchMethod( Schema.MatchNumberedGroup )
+	@_controller.expression
+	def MatchNumberedGroup(self, fragment, inheritedState, model, number):
+		return matchNumberedGroup( number )
 
 
 
