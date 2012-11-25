@@ -12,7 +12,7 @@ from BritefuryJ.ChangeHistory import Trackable
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from LarchCore.Project.ProjectContainer import ProjectContainer
-from LarchCore.Project import ProjectEditor
+from LarchCore.Project import ProjectEditor, ProjectPage
 
 
 
@@ -22,8 +22,13 @@ class ProjectRoot (ProjectContainer):
 		super( ProjectRoot, self ).__init__( contents )
 		self._pythonPackageName = packageName
 		self._startupExecuted = False
-	
-	
+
+
+	@property
+	def importName(self):
+		return self._pythonPackageName   if self._pythonPackageName is not None   else ''
+
+
 	def __getstate__(self):
 		state = super( ProjectRoot, self ).__getstate__()
 		state['pythonPackageName'] = self._pythonPackageName
@@ -41,8 +46,14 @@ class ProjectRoot (ProjectContainer):
 		return ProjectRoot( self._pythonPackageName, [ deepcopy( x, memo )   for x in self ] )
 	
 	
-	def __new_subject__(self, document, enclosingSubject, location, importName, title):
-		return ProjectEditor.Subject.ProjectSubject( document, self, enclosingSubject, location, importName, title )
+	def __new_subject__(self, document, enclosingSubject, importName, title):
+		"""Used to create the subject that displays the project as a page"""
+		projectSubject = ProjectEditor.Subject.ProjectSubject( document, self, enclosingSubject, importName, title )
+		if 'index' in self.contentsMap:
+			index = self.contentsMap['index']
+			if isinstance( index, ProjectPage.ProjectPage ):
+				return document.newModelSubject( index.data, projectSubject, index.importName, index.name )
+		return projectSubject
 
 		
 	def getPythonPackageName(self):

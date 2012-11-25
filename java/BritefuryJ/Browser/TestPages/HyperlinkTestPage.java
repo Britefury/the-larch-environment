@@ -8,15 +8,19 @@ package BritefuryJ.Browser.TestPages;
 
 import java.awt.Color;
 
-import BritefuryJ.Browser.Location;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Controls.AbstractHyperlink;
 import BritefuryJ.Controls.Hyperlink;
+import BritefuryJ.DefaultPerspective.DefaultPerspective;
+import BritefuryJ.DefaultPerspective.Presentable;
+import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSProxy;
 import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
 import BritefuryJ.Pres.ElementRef;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Column;
+import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Proxy;
 import BritefuryJ.Pres.Primitive.Row;
@@ -68,12 +72,25 @@ public class HyperlinkTestPage extends TestPage
 
 	
 
-	private static StyleSheet styleSheet = StyleSheet.instance;
-	private static StyleSheet blackText = styleSheet.withValues( Primitive.foreground.as( Color.black ) );
-	private static StyleSheet redText = styleSheet.withValues( Primitive.foreground.as( Color.red ) );
-	private static StyleSheet greenText = styleSheet.withValues( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.0f ) ) );
+	private static StyleSheet blackText = StyleSheet.style( Primitive.foreground.as( Color.black ) );
+	private static StyleSheet redText = StyleSheet.style( Primitive.foreground.as( Color.red ) );
+	private static StyleSheet greenText = StyleSheet.style( Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.0f ) ) );
+	private static StyleSheet largeText = StyleSheet.style( Primitive.fontSize.as( 24 ) );
+	
 
 
+	private static class TargetObject implements Presentable
+	{
+		@Override
+		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
+		{
+			return largeText.applyTo( new Label( "The target object as a page" ) );
+		}
+	}
+	
+	
+	private TargetObject targetObject = new TargetObject();
+	
 	
 	
 	private static Pres colouredText(StyleSheet style)
@@ -88,10 +105,10 @@ public class HyperlinkTestPage extends TestPage
 		AbstractHyperlink blackLink = new Hyperlink( "Black", new LinkContentChanger( colouredTextProxyRef, colouredText( blackText ) ) );
 		AbstractHyperlink redLink = new Hyperlink( "Red", new LinkContentChanger( colouredTextProxyRef, colouredText( redText ) ) );
 		AbstractHyperlink greenLink = new Hyperlink( "Green", new LinkContentChanger( colouredTextProxyRef, colouredText( greenText ) ) );
-		Pres colourLinks = styleSheet.withValues( Primitive.rowSpacing.as( 20.0 ) ).applyTo( new Row( new Pres[] { blackLink, redLink, greenLink } ) ).padX( 5.0 );
+		Pres colourLinks = StyleSheet.style( Primitive.rowSpacing.as( 20.0 ) ).applyTo( new Row( new Pres[] { blackLink, redLink, greenLink } ) ).padX( 5.0 );
 		Pres colourBox = new Column( new Pres[] { colouredTextProxyRef, colourLinks } );
 		
-		AbstractHyperlink locationLink = new Hyperlink( "To home page", new Location( "" ) );
+		AbstractHyperlink locationLink = new Hyperlink( "To home page", DefaultPerspective.instance.objectSubject( targetObject ) );
 		
 		return new Body( new Object[] { new Heading2( "Action hyperlinks" ), colourBox, new Heading2( "Location hyperlinks" ), locationLink } );
 	}

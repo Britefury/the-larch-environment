@@ -28,7 +28,6 @@ from BritefuryJ.AttributeTable import *
 from BritefuryJ.Controls import TextEntry
 from BritefuryJ.StyleSheet import *
 from BritefuryJ.Graphics import *
-from BritefuryJ.Browser import Location
 from BritefuryJ.LSpace.Input import ObjectDndHandler, Modifier
 from BritefuryJ.Shortcut import Shortcut
 
@@ -384,9 +383,6 @@ class ConsoleSubject (Subject):
 
 	def getTitle(self):
 		return 'Python console'
-
-	def getSubjectContext(self):
-		return self.enclosingSubject.getSubjectContext()   if self.enclosingSubject is not None   else SimpleAttributeTable.instance
 
 	def getChangeHistory(self):
 		return None
