@@ -695,11 +695,11 @@ class Python2View (MethodDispatchView):
 	def IntLiteral(self, fragment, inheritedState, model, format, numType, value):
 		boxContents = []
 
-		if format == 'hex':
+		if format == 'hex' and not value.startswith('0x'):
 			valueString = '0x' + value
-		elif format == 'bin':
+		elif format == 'bin' and not value.startswith('0b'):
 			valueString = '0b' + value
-		elif format == 'oct':
+		elif format == 'oct' and not value.startswith('0o'):
 			valueString = '0o' + value
 		else:
 			valueString = value

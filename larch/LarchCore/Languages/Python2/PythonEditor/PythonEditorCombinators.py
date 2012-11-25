@@ -961,14 +961,9 @@ def decoStmtHeader(name, args, bArgsTrailingSeparator):
 
 	elements = [ _at, nameView ]
 	if args is not None:
-		elements.append( _openParen )
-		if len( args ) > 0:
-			for a in args[:-1]:
-				elements.extend( [ a, _comma, _space ] )
-			elements.append( args[-1] )
-			if bArgsTrailingSeparator:
-				elements.extend( [ _comma, _space ] )
-		elements.append( _closeParen )
+		argsSeq = SpanSequenceView( args, _openParen, _closeParen, _comma, _space, TrailingSeparator.ALWAYS   if bArgsTrailingSeparator   else TrailingSeparator.NEVER )
+		argsView = ApplyStyleSheetFromAttribute( PythonEditorStyle.sequenceStyle, argsSeq )
+		elements.append( argsView )
 	return Span( elements )
 
 
@@ -977,13 +972,9 @@ def defStmtHeader(name, params, bParamsTrailingSeparator):
 
 	elements = [ _keyword( 'def' ),  _space,  nameView,  _openParen ]
 	if len( params ) > 0:
-		paramElems = []
-		for p in params[:-1]:
-			paramElems.extend( [ p,  _comma,  _space ] )
-		paramElems.append( params[-1] )
-		if bParamsTrailingSeparator:
-			paramElems.extend( [ _comma,  _space ] )
-		elements.append( ParagraphIndentMatchSpan( paramElems ) )
+		paramsSeq = SpanSequenceView( params, None, None, _comma, _space, TrailingSeparator.ALWAYS   if bParamsTrailingSeparator   else TrailingSeparator.NEVER )
+		paramsView = ApplyStyleSheetFromAttribute( PythonEditorStyle.sequenceStyle, paramsSeq )
+		elements.append( paramsView )
 
 	elements.extend( [ _closeParen,  _colon ] )
 	return Span( elements )
