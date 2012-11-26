@@ -65,19 +65,6 @@ class Window (object):
 
 
 
-		class _BrowserListener (TabbedBrowser.TabbedBrowserListener):
-			def createNewBrowserWindow(_self, location):
-				self._onOpenNewWindow( location )
-
-			def onTabbledBrowserChangePage(_self, browser):
-				self._onChangePage( browser )
-
-
-		self._browser = TabbedBrowser( self._windowManager.browserContext.getPageLocationResolver(), _BrowserListener(), location, commandConsoleFactory )
-		self._browser.getComponent().setPreferredSize( Dimension( 800, 600 ) )
-
-
-
 		self.onCloseRequestListener = None
 
 
@@ -155,6 +142,21 @@ class Window (object):
 		menuBar = JMenuBar()
 		menuBar.add( editMenu )
 		menuBar.add( helpMenu )
+
+
+
+
+		# Create browser after creating menus, as the listener is invoked on construction, which make use them
+		class _BrowserListener (TabbedBrowser.TabbedBrowserListener):
+			def createNewBrowserWindow(_self, location):
+				self._onOpenNewWindow( location )
+
+			def onTabbledBrowserChangePage(_self, browser):
+				self._onChangePage( browser )
+
+
+		self._browser = TabbedBrowser( self._windowManager.browserContext.getPageLocationResolver(), _BrowserListener(), location, commandConsoleFactory )
+		self._browser.getComponent().setPreferredSize( Dimension( 800, 600 ) )
 
 
 
