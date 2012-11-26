@@ -41,7 +41,6 @@ import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Region;
 import BritefuryJ.Pres.Primitive.StaticText;
 import BritefuryJ.Projection.AbstractPerspective;
-import BritefuryJ.Projection.ProjectiveBrowserContext;
 import BritefuryJ.Projection.Subject;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -115,22 +114,20 @@ public class IncrementalView
 	protected static class FragmentFactory
 	{
 		protected AbstractPerspective perspective;
-		protected SimpleAttributeTable subjectContext;
 		protected StyleValues style;
 		protected SimpleAttributeTable inheritedState;
 		protected int hash;
 		
-		public FragmentFactory(IncrementalView view, AbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
+		public FragmentFactory(IncrementalView view, AbstractPerspective perspective, StyleValues style, SimpleAttributeTable inheritedState)
 		{
 			if ( style == null )
 			{
 				throw new RuntimeException( "style == null" );
 			}
 			this.perspective = perspective;
-			this.subjectContext = subjectContext;
 			this.style = style;
 			this.inheritedState = inheritedState;
-			hash = HashUtils.nHash( new int[] { System.identityHashCode( perspective ), style.hashCode(), inheritedState.hashCode(), subjectContext.hashCode() } );
+			hash = HashUtils.nHash( new int[] { System.identityHashCode( perspective ), style.hashCode(), inheritedState.hashCode() } );
 		}
 
 
@@ -151,7 +148,7 @@ public class IncrementalView
 			if ( x instanceof FragmentFactory )
 			{
 				FragmentFactory fx = (FragmentFactory)x;
-				return perspective == fx.perspective  &&  style.equals( fx.style )  &&  inheritedState == fx.inheritedState  &&  subjectContext == fx.subjectContext;
+				return perspective == fx.perspective  &&  style.equals( fx.style )  &&  inheritedState == fx.inheritedState;
 			}
 			else
 			{
@@ -247,7 +244,7 @@ public class IncrementalView
 		@Override
 		public LSElement present(PresentationContext ctx, StyleValues style)
 		{
-			FragmentFactory fragmentFactory = getUniqueFragmentFactory( rootPerspective, subjectContext, style, SimpleAttributeTable.instance );
+			FragmentFactory fragmentFactory = getUniqueFragmentFactory( rootPerspective, style, SimpleAttributeTable.instance );
 			setRootFragmentFactory( fragmentFactory );
 			
 			refresh();
@@ -264,8 +261,7 @@ public class IncrementalView
 	
 	
 	private Subject subject;
-	private ProjectiveBrowserContext browserContext;
-	private SimpleAttributeTable subjectContext;
+	private FragmentInspector inspector;
 	private AbstractPerspective rootPerspective;
 	protected Object modelRootNode;
 
@@ -305,10 +301,10 @@ public class IncrementalView
 	
 	
 	
-	public IncrementalView(Subject subject, ProjectiveBrowserContext browserContext, PersistentStateStore persistentState)
+	public IncrementalView(Subject subject, FragmentInspector inspector, PersistentStateStore persistentState)
 	{
 		this.subject = subject;
-		this.browserContext = browserContext;
+		this.inspector = inspector;
 
 		this.modelRootNode = subject.getFocus();
 		
@@ -318,7 +314,6 @@ public class IncrementalView
 			this.rootPerspective = DefaultPerspective.instance;
 		}
 
-		this.subjectContext = subject.getSubjectContext();
 		this.changeHistory = subject.getChangeHistory();
 		
 	
@@ -341,19 +336,19 @@ public class IncrementalView
 	}
 	
 	
-	public IncrementalView(Subject subject, ProjectiveBrowserContext browserContext)
+	public IncrementalView(Subject subject, FragmentInspector inspector)
 	{
-		this( subject, browserContext, null );
+		this( subject, inspector, null );
 	}
 	
 	public IncrementalView(Subject subject, IncrementalView parentView, PersistentStateStore persistentState)
 	{
-		this( subject, parentView != null ? parentView.browserContext : null, persistentState );
+		this( subject, parentView != null ? parentView.inspector : null, persistentState );
 	}
 
 	public IncrementalView(Subject subject, IncrementalView parentView)
 	{
-		this( subject, parentView != null ? parentView.browserContext : null, null );
+		this( subject, parentView != null ? parentView.inspector : null, null );
 	}
 
 	
@@ -400,11 +395,6 @@ public class IncrementalView
 	//
 	// Contexts, logs, etc
 	//
-	
-	public ProjectiveBrowserContext getBrowserContext()
-	{
-		return browserContext;
-	}
 	
 	public ChangeHistory getChangeHistory()
 	{
@@ -653,9 +643,9 @@ public class IncrementalView
 		}
 	}
 	
-	protected FragmentFactory getUniqueFragmentFactory(AbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
+	protected FragmentFactory getUniqueFragmentFactory(AbstractPerspective perspective, StyleValues style, SimpleAttributeTable inheritedState)
 	{
-		FragmentFactory factory = new FragmentFactory( this, perspective, subjectContext, style, inheritedState );
+		FragmentFactory factory = new FragmentFactory( this, perspective, style, inheritedState );
 		
 		FragmentFactory uniqueFactory = uniqueFragmentFactories.get( factory );
 		
@@ -729,7 +719,7 @@ public class IncrementalView
 	
 	protected boolean inspectFragment(FragmentView fragment, LSElement sourceElement, PointerButtonEvent triggeringEvent)
 	{
-		return browserContext.inspectFragment( fragment, sourceElement, triggeringEvent );
+		return inspector.inspectFragment( fragment, sourceElement, triggeringEvent );
 	}
 	
 	

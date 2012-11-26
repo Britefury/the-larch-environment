@@ -12,19 +12,7 @@ from Britefury.Kernel.Document import Document
 from Britefury.Config import Configuration
 
 from BritefuryJ.AttributeTable import SimpleAttributeTable
-from BritefuryJ.Browser import Location
-from BritefuryJ.Projection import Subject, ProjectiveBrowserContext
-
-
-
-class _WorldBrowserContext (ProjectiveBrowserContext):
-	def __init__(self, world):
-		super( _WorldBrowserContext, self ).__init__( True )
-		self.__world = world
-
-
-	def inspectFragment(self, fragment, sourceElement, triggeringEvent):
-		return self.__world._inspectFragment( fragment, sourceElement, triggeringEvent )
+from BritefuryJ.Projection import Subject
 
 
 
@@ -65,6 +53,31 @@ class _DocumentFactory (object):
 
 
 
+class _WorldSubject (Subject):
+	def __init__(self, world):
+		super( _WorldSubject, self ).__init__( None )
+		self.__world = world
+
+
+	@property
+	def world(self):
+		return self.__world
+
+	@property
+	def rootSubject(self):
+		return self.__world.rootSubject
+
+
+	def getFocus(self):
+		return None
+
+	def getPerspective(self):
+		return None
+
+	def getTitle(self):
+		return '<world subject>'
+
+
 
 
 class World (object):
@@ -90,19 +103,21 @@ class World (object):
 		self.newDocumentFactories = []
 		self._rootSubject = None
 		self.__importedModuleRegistry = set()
-		self.configuration = Configuration.Configuration()
+		self.configuration = Configuration.Configuration( self )
 		self.__fragmentInspector = None
-		self.__browserContext = None
 
 		for plugin in self.__plugins:
 			plugin.initialise( self )
 
-		self.__browserContext = _WorldBrowserContext( self )
-		self.__browserContext.registerNamedSubject( 'config', self.configuration.subject )
-
 		self.__import_hooks = _WorldImportHooks( self )
 
+		self.__worldOuterSubject = _WorldSubject( self )
 
+
+
+	@property
+	def worldSubject(self):
+		return self.__worldOuterSubject
 
 
 	@property
@@ -114,15 +129,6 @@ class World (object):
 	def setRootSubject(self, appStateSubject):
 		"""Set the root subject"""
 		self._rootSubject = appStateSubject
-		if self.__browserContext is not None:
-			self.__browserContext.registerMainSubject( self._rootSubject )
-
-
-
-	@property
-	def browserContext(self):
-		"""Property to retrieve the browser context"""
-		return self.__browserContext
 
 
 
@@ -132,7 +138,7 @@ class World (object):
 
 
 
-	def _inspectFragment(self, fragment, sourceElement, triggeringEvent):
+	def inspectFragment(self, fragment, sourceElement, triggeringEvent):
 		if self.__fragmentInspector is not None:
 			return self.__fragmentInspector( fragment, sourceElement, triggeringEvent )
 		else:
@@ -191,20 +197,3 @@ class World (object):
 
 
 
-class WorldDefaultOuterSubject (Subject):
-	def __init__(self, world):
-		super( WorldDefaultOuterSubject, self ).__init__( None )
-		self.__world = world
-
-
-	def getFocus(self):
-		return None
-
-	def getPerspective(self):
-		return None
-
-	def getTitle(self):
-		return '<default root subject>'
-
-	def getSubjectContext(self):
-		return SimpleAttributeTable.instance.withAttrs( world=self.__world, document=None, docLocation=None, location=Location( '' ) )
