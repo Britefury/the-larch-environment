@@ -29,8 +29,8 @@ class Document (ChangeHistoryListener):
 		self._changeHistory.addChangeHistoryListener( self )
 		
 		self._docName = ''
-		self._location = None
-		
+		self._subject = None
+
 		self._bHasUnsavedData = True
 		self._filename = None
 		self._saveTime = None
@@ -62,16 +62,6 @@ class Document (ChangeHistoryListener):
 	def setDocumentName(self, name):
 		self._docName = name
 		
-		
-	def setLocation(self, location):
-		self._location = location
-	
-	def getLocation(self):
-		return self._location
-	
-	def relativeToAbsoluteLocation(self, relativeLocation):
-		return self._location + relativeLocation
-	
 		
 	def getChangeHistory(self):
 		return self._changeHistory
@@ -121,11 +111,11 @@ class Document (ChangeHistoryListener):
 
 	
 	
-	def newSubject(self, enclosingSubject, location, importName, title):
-		return self.newModelSubject( self._contents, enclosingSubject, location, importName, title )
+	def newSubject(self, enclosingSubject, importName, title):
+		return self.newModelSubject( self._contents, enclosingSubject, importName, title )
 
-	def newModelSubject(self, model, enclosingSubject, location, importName, title):
-		return model.__new_subject__( self, enclosingSubject, location, importName, title )
+	def newModelSubject(self, model, enclosingSubject, importName, title):
+		return model.__new_subject__( self, enclosingSubject, importName, title )
 
 		
 	
