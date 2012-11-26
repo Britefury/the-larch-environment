@@ -34,8 +34,14 @@ class VisualRegexGrammar (Grammar):
 
 
 	@Rule
+	def newLine(self):
+		return Literal( '\n' ).action( lambda input, begin, end, x, bindings: Schema.PythonEscapedChar( char='n' ) )
+
+
+	@Rule
 	def escapedChar(self):
-		return self.pythonEscapedChar() | self.escapedRegexChar()
+		return self.pythonEscapedChar() | self.escapedRegexChar() | self.newLine()
+
 
 
 	# Literal Character - escaped or not escaped
