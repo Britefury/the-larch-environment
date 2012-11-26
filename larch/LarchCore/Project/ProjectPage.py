@@ -21,8 +21,13 @@ class ProjectPage (ProjectNode):
 		super( ProjectPage, self ).__init__()
 		self._name = name
 		self._data = data
-	
-	
+
+
+	@property
+	def importName(self):
+		return self._parent.importName + '.' + self._name
+
+
 	def __getstate__(self):
 		state = super( ProjectPage, self ).__getstate__()
 		state['name'] = self._name
