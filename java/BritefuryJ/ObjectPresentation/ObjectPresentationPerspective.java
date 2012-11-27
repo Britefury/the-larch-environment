@@ -8,6 +8,7 @@ package BritefuryJ.ObjectPresentation;
 
 import org.python.core.Py;
 import org.python.core.PyException;
+import org.python.core.PyMethod;
 import org.python.core.PyObject;
 import org.python.core.PyString;
 import org.python.core.PyType;
@@ -88,10 +89,24 @@ public abstract class ObjectPresentationPerspective extends AbstractPerspective
 			
 			if ( presentMethod != null  &&  presentMethod.isCallable() )
 			{
-				result = Py.tojava( presentMethod.__call__( Py.java2py( fragment ), Py.java2py( inheritedState ) ),  Pres.class );
-				if ( result != null )
+				// If @presentMethod is an unbound method, we cannot invoke it, since we do not have
+				// an instance
+				if ( presentMethod instanceof PyMethod )
 				{
-					typeName = pyX.getType().getName();
+					PyMethod m = (PyMethod)presentMethod;
+					if ( m.im_self == Py.None  ||  m.im_self == null )
+					{
+						presentMethod = null;
+					}
+				}
+				
+				if ( presentMethod != null )
+				{
+					result = Py.tojava( presentMethod.__call__( Py.java2py( fragment ), Py.java2py( inheritedState ) ),  Pres.class );
+					if ( result != null )
+					{
+						typeName = pyX.getType().getName();
+					}
 				}
 			}
 			
