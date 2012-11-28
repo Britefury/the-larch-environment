@@ -18,10 +18,53 @@ import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Projection.AbstractPerspective;
+import BritefuryJ.Projection.Subject;
 import BritefuryJ.Util.PolymorphicMap;
 
 public abstract class ObjectPresentationPerspective extends AbstractPerspective
 {
+	private class ObjectPresentationSubject extends Subject
+	{
+		private Object focus;
+		private String title;
+		
+		
+		public ObjectPresentationSubject(Object focus, String title)
+		{
+			super( null );
+			this.focus = focus;
+			this.title = title;
+		}
+		
+		public ObjectPresentationSubject(Object focus)
+		{
+			super( null );
+			this.focus = focus;
+			this.title = focus != null  ?  focus.getClass().getName()  :  "<null>";
+		}
+		
+
+		@Override
+		public Object getFocus()
+		{
+			return focus;
+		}
+		
+		@Override
+		public AbstractPerspective getPerspective()
+		{
+			return ObjectPresentationPerspective.this;
+		}
+
+		@Override
+		public String getTitle()
+		{
+			return title;
+		}
+	}
+	
+	
+	
 	private PyString pythonPresentMethodName;
 	private PolymorphicMap<Object> objectPresenters = new PolymorphicMap<Object>();
 	protected AbstractPerspective fallbackPerspective;
@@ -36,6 +79,18 @@ public abstract class ObjectPresentationPerspective extends AbstractPerspective
 	public ObjectPresentationPerspective(String pythonMethodName)
 	{
 		this( pythonMethodName, null );
+	}
+	
+	
+	
+	public Subject objectSubject(Object o)
+	{
+		return new ObjectPresentationSubject( o );
+	}
+
+	public Subject objectSubject(Object o, String title)
+	{
+		return new ObjectPresentationSubject( o, title );
 	}
 
 	

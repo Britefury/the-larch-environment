@@ -10,15 +10,13 @@ from BritefuryJ.AttributeTable import SimpleAttributeTable
 
 from BritefuryJ.Command import CommandConsole
 
-from BritefuryJ.Browser import Location
-
 from Britefury.Windows.Window import Window
 
 		
 class WindowManager (object):
-	def __init__(self, world, location=Location( '' )):
+	def __init__(self, world):
 		def createCommandConsole(presentationComponent, browser):
-			return CommandConsole( browser, self.__world.browserContext, presentationComponent )
+			return CommandConsole( browser, presentationComponent )
 
 		self.__createCommandConsole = createCommandConsole
 
@@ -26,7 +24,7 @@ class WindowManager (object):
 		
 		self.__appState = world.rootSubject.getFocus()
 
-		self.__rootWindow = Window( self, createCommandConsole, location )
+		self.__rootWindow = Window( self, createCommandConsole, world.rootSubject )
 		self.__rootWindow.onCloseRequestListener = self.__onWindowCloseRequest
 		self.__openWindows = { self.__rootWindow }
 		
@@ -37,11 +35,6 @@ class WindowManager (object):
 	@property
 	def world(self):
 		return self.__world
-
-
-	@property
-	def browserContext(self):
-		return self.__world.browserContext
 
 
 	def showRootWindow(self):
@@ -57,8 +50,8 @@ class WindowManager (object):
 		self.__windowClosed()
 
 		
-	def _createNewWindow(self, location):
-		newWindow = Window( self, self.__createCommandConsole, location )
+	def _createNewWindow(self, subject):
+		newWindow = Window( self, self.__createCommandConsole, subject )
 		newWindow.onCloseRequestListener = self.__onWindowCloseRequest
 		newWindow.show()
 		self.__openWindows.add( newWindow )
