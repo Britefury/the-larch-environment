@@ -215,10 +215,10 @@ class EmbeddedPython2Executable (EmbeddedPython2):
 
 
 	def getResultOfExecutionInScopeWithinModule(self, module, globals, locals):
-		return Execution.getResultOfExecutionWithinModule( self.model, globals, locals, module, False )
+		return Execution.getResultOfExecutionInScopeWithinModule( self.model, globals, locals, module, False )
 
 	def getResultOfExecutionAndEvaluationInScopeWithinModule(self, module, globals, locals):
-		return Execution.getResultOfExecutionWithinModule( self.model, globals, locals, module, True )
+		return Execution.getResultOfExecutionInScopeWithinModule( self.model, globals, locals, module, True )
 
 
 	def executeWithinModule(self, module):
