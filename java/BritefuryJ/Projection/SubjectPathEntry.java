@@ -4,9 +4,11 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.Browser;
+package BritefuryJ.Projection;
 
-public interface HasPageTitle
+public interface SubjectPathEntry
 {
-	public String getPageTitle();
+	public Subject follow(Subject outerSubject);
+	
+	public boolean canPersist();
 }

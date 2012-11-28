@@ -33,7 +33,9 @@ import javax.swing.plaf.basic.BasicButtonUI;
 
 import BritefuryJ.ChangeHistory.ChangeHistory;
 import BritefuryJ.Command.CommandConsoleFactory;
+import BritefuryJ.IncrementalView.FragmentInspector;
 import BritefuryJ.LSpace.PageController;
+import BritefuryJ.Projection.Subject;
 
 public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, PageController
 {
@@ -191,7 +193,7 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	
 	public static interface TabbedBrowserListener
 	{
-		public void createNewBrowserWindow(Location location);
+		public void createNewBrowserWindow(Subject subject);
 		public void onTabbledBrowserChangePage(TabbedBrowser browser);
 	}
 	
@@ -204,7 +206,9 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	
 	private JTabbedPane tabs;
 	
-	private PageLocationResolver resolver;
+	private Subject rootSubject;
+	
+	private FragmentInspector inspector;
 	
 	private TabbedBrowserListener listener;
 	
@@ -215,9 +219,10 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	
 	
 	
-	public TabbedBrowser(PageLocationResolver resolver, TabbedBrowserListener listener, Location location, CommandConsoleFactory commandConsoleFactory)
+	public TabbedBrowser(Subject rootSubject, Subject subject, FragmentInspector inspector, TabbedBrowserListener listener, CommandConsoleFactory commandConsoleFactory)
 	{
-		this.resolver = resolver;
+		this.rootSubject = rootSubject;
+		this.inspector = inspector;
 		this.listener = listener;
 		this.commandConsoleFactory = commandConsoleFactory;
 		
@@ -226,7 +231,7 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 		tabs = new JTabbedPane();
 		tabs.addChangeListener( this );
 		
-		Browser browser = addNewBrowser( location );
+		Browser browser = addNewBrowser( subject );
 		setCurrentBrowser( browser );
 	}
 	
@@ -251,11 +256,11 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	
 
 	
-	public void reset(Location location)
+	public void reset(Subject subject)
 	{
 		browsers.clear();
 		browsers.add( currentBrowser );
-		currentBrowser.reset( location );
+		currentBrowser.reset( subject );
 		currentBrowser.viewportReset();
 	}
 	
@@ -287,15 +292,15 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	
 	
 	
-	private Browser createBrowser(Location location)
+	private Browser createBrowser(Subject subject)
 	{
-		Browser browser = new Browser( resolver, location, this, commandConsoleFactory );
+		Browser browser = new Browser( rootSubject, subject, inspector, this, commandConsoleFactory );
 		browser.setListener( this );
 		return browser;
 	}
 	
 	
-	public void onBrowserChangePage(Browser browser, BrowserPage page, String title)
+	public void onBrowserChangePage(Browser browser, Subject subject, String title)
 	{
 		int index = browsers.indexOf( browser );
 		if ( index == -1 )
@@ -329,56 +334,57 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 
 
 
-	public Location getCurrentBrowserLocation()
+	public Subject getCurrentBrowserSubject()
 	{
-		return currentBrowser.getLocation();
+		return currentBrowser.getSubject();
 	}
 	
-	public void openLocation(Location location, OpenOperation op)
+	@Override
+	public void openSubject(Subject subject, OpenOperation op)
 	{
 		if ( op == PageController.OpenOperation.OPEN_IN_CURRENT_TAB )
 		{
-			openLocationInCurrentTab( location );
+			openSubjectInCurrentTab( subject );
 		}
 		else if ( op == PageController.OpenOperation.OPEN_IN_NEW_TAB )
 		{
-			openLocationInNewTab( location );
+			openSubjectInNewTab( subject );
 		}
 		else if ( op == PageController.OpenOperation.OPEN_IN_NEW_WINDOW )
 		{
-			openLocationInNewWindow( location );
+			openSubjectInNewWindow( subject );
 		}
 	}
 	
-	public void openLocationInCurrentTab(Location location)
+	public void openSubjectInCurrentTab(Subject subject)
 	{
-		currentBrowser.goToLocation( location );
+		currentBrowser.goToSubject( subject );
 	}
 	
-	public void openLocationInNewTab(Location location)
+	public void openSubjectInNewTab(Subject subject)
 	{
-		addNewBrowser( location );
+		addNewBrowser( subject );
 	}
 	
-	public void openLocationInNewWindow(Location location)
+	public void openSubjectInNewWindow(Subject subject)
 	{
 		if ( listener != null )
 		{
-			listener.createNewBrowserWindow( location );
+			listener.createNewBrowserWindow( subject );
 		}
 		else
 		{
-			openLocationInNewTab( location );
+			openSubjectInNewTab( subject );
 		}
 	}
 	
 	
 	
-	private Browser addNewBrowser(Location location)
+	private Browser addNewBrowser(Subject subject)
 	{
 		int index = browsers.size();
 
-		Browser browser = createBrowser( location );
+		Browser browser = createBrowser( subject );
 		browsers.add( browser );
 		
 		String title = browser.getTitle();
