@@ -17,13 +17,14 @@ import org.python.core.__builtin__;
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Projection.TransientSubject;
 import BritefuryJ.Projection.AbstractPerspective;
 import BritefuryJ.Projection.Subject;
 import BritefuryJ.Util.PolymorphicMap;
 
 public abstract class ObjectPresentationPerspective extends AbstractPerspective
 {
-	private class ObjectPresentationSubject extends Subject
+	private class ObjectPresentationSubject extends TransientSubject
 	{
 		private Object focus;
 		private String title;

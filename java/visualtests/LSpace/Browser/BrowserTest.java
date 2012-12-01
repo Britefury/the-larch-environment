@@ -43,6 +43,7 @@ import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.RichText.Head;
 import BritefuryJ.Pres.RichText.Page;
 import BritefuryJ.Pres.RichText.TitleBar;
+import BritefuryJ.Projection.TransientSubject;
 import BritefuryJ.Projection.Subject;
 import BritefuryJ.StyleSheet.StyleSheet;
 
@@ -86,8 +87,33 @@ public class BrowserTest implements TabbedBrowser.TabbedBrowserListener
 	
 	
 	
+	private static class RootSubject extends TransientSubject
+	{
+		private Object focus;
+		
+		public RootSubject(Object focus)
+		{
+			super( null );
+			this.focus = focus;
+		}
+
+		@Override
+		public Object getFocus()
+		{
+			return focus;
+		}
+
+		@Override
+		public String getTitle()
+		{
+			return "root";
+		}
+	}
+	
+	
+	
 	private static DefaultRootPage root = new DefaultRootPage();
-	private static Subject rootSubject = DefaultPerspective.instance.objectSubject( root );
+	private static Subject rootSubject = new RootSubject( root );
 
 	
 	public static void main(final String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException

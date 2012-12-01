@@ -36,7 +36,7 @@ class ProjectContainer (ProjectNode):
 		self._contentsMapLive = LiveFunction( self._computeContentsMap )
 
 		for x in self._contents_:
-			x._parent = self
+			x._setParent( self )
 		
 	
 	def _computeContentsMap(self):
@@ -104,18 +104,36 @@ class ProjectContainer (ProjectNode):
 
 	def __get_trackable_contents__(self):
 		return self._contents.__get_trackable_contents__()
-	
-		
+
+
+
+	def _registerRoot(self, root):
+		super( ProjectContainer, self )._registerRoot( root )
+		for x in self._contents_:
+			x._registerRoot( root )
+
+	def _unregisterRoot(self, root):
+		super( ProjectContainer, self )._unregisterRoot( root )
+		for x in self._contents_:
+			x._unregisterRoot( root )
+
+
+
+
 	@TrackedListProperty
 	def _contents(self):
 		return self._contents_
 
 	@_contents.changeNotificationMethod
 	def _contents_changed(self):
-		for x in self._prevContents:
-			x._parent = None
-		for x in self._contents_:
-			x._parent = self
+		prev = set(self._prevContents)
+		cur = set(self._contents_)
+		added = cur - prev
+		removed = prev - cur
+		for x in removed:
+			x._clearParent()
+		for x in added:
+			x._setParent( self )
 		self._prevContents = self._contents_[:]
 		self._incr.onChanged()
 

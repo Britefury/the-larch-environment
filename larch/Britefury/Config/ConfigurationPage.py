@@ -11,7 +11,7 @@ from BritefuryJ.Pres.Primitive import Primitive
 from BritefuryJ.Pres.RichText import SplitLinkHeaderBar, TitleBar, Page, Head, Body
 from BritefuryJ.StyleSheet import StyleSheet
 
-from BritefuryJ.Projection import Subject
+from BritefuryJ.Projection import TransientSubject
 
 from Britefury.Util.Abstract import abstractmethod
 
@@ -21,7 +21,7 @@ _staticStyle = StyleSheet.style( Primitive.editable( False ) )
 
 
 class ConfigurationPage (object):
-	class _ConfigPageSubject (Subject):
+	class _ConfigPageSubject (TransientSubject):
 		def __init__(self, enclosingSubject, page):
 			super( ConfigurationPage._ConfigPageSubject, self ).__init__( enclosingSubject )
 			self._page = page

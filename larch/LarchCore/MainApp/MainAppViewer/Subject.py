@@ -7,13 +7,13 @@
 ##-*************************
 from BritefuryJ.AttributeTable import SimpleAttributeTable
 
-from BritefuryJ.Projection import Subject, SubjectTrailLink
+from BritefuryJ.Projection import TransientSubject, SubjectTrailLink
 from Britefury.Kernel.Document import Document
 
 from LarchCore.MainApp.MainAppViewer.View import perspective
 
 
-class MainAppSubject (Subject):
+class MainAppSubject (TransientSubject):
 	def __init__(self, appState, world):
 		super( MainAppSubject, self ).__init__( world.worldSubject )
 		self._appState = appState

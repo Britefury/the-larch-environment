@@ -11,14 +11,14 @@ from BritefuryJ.Pres.Primitive import Primitive, Column
 from BritefuryJ.Pres.RichText import SplitLinkHeaderBar, TitleBar, Page, Head, Body
 from BritefuryJ.StyleSheet import StyleSheet
 
-from BritefuryJ.Projection import Subject
+from BritefuryJ.Projection import TransientSubject
 
 
 _staticStyle = StyleSheet.style( Primitive.editable( False ) )
 
 
 class Configuration (object):
-	class _ConfigurationSubject (Subject):
+	class _ConfigurationSubject (TransientSubject):
 		def __init__(self, enclosingSubject, config):
 			super( Configuration._ConfigurationSubject, self ).__init__( enclosingSubject )
 			self._config = config

@@ -51,7 +51,7 @@ class PageData (object):
 
 
 	@abstractmethod
-	def __new_subject__(self, document, enclosingSubject, importName, title):
+	def __new_subject__(self, document, enclosingSubject, path, importName, title):
 		pass
 
 	

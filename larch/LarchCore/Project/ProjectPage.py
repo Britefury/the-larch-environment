@@ -19,25 +19,28 @@ from LarchCore.Project.ProjectNode import ProjectNode
 class ProjectPage (ProjectNode):
 	def __init__(self, name='', data=None):
 		super( ProjectPage, self ).__init__()
+		self._id = None
 		self._name = name
 		self._data = data
 
 
 	@property
 	def importName(self):
-		return self._parent.importName + '.' + self._name
+		return self.parent.importName + '.' + self._name
 
 
 	def __getstate__(self):
 		state = super( ProjectPage, self ).__getstate__()
 		state['name'] = self._name
 		state['data'] = self._data
+		state['id'] = self._id
 		return state
 	
 	def __setstate__(self, state):
 		super( ProjectPage, self ).__setstate__( state )
 		self._name = state['name']
 		self._data = state['data']
+		self._id = state.get( 'id' )
 	
 	def __copy__(self):
 		return ProjectPage( self._name, self._data )
@@ -73,10 +76,22 @@ class ProjectPage (ProjectNode):
 
 
 
+	def _registerRoot(self, root):
+		root._registerNode( self )
+
+	def _unregisterRoot(self, root):
+		root._unregisterNode( self )
+
+
+
 	def __get_trackable_contents__(self):
 		return [ self.data ]
 
-	
-	
+
+	@property
+	def nodeId(self):
+		return self._id
+
+
 	name = property( getName, setName )
 	data = property( getData )

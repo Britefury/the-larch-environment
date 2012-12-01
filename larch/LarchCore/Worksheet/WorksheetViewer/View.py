@@ -40,7 +40,7 @@ from BritefuryJ.Pres.ObjectPres import *
 from BritefuryJ.Pres.UI import *
 from BritefuryJ.Pres.Help import *
 
-from BritefuryJ.Projection import Perspective, Subject
+from BritefuryJ.Projection import Perspective, Subject, SubjectPathEntry
 
 
 from LarchCore.Languages.Python2 import Python2
@@ -233,9 +233,21 @@ _refreshCommand = Command( CommandName( '&Refresh worksheet' ), _refreshWorkshee
 _worksheetViewerCommands = CommandSet( 'LarchCore.Worksheet.Viewer', [ _refreshCommand ] )
 
 
+
+class _WorksheetEditorPathEntry (SubjectPathEntry):
+	def follow(self, outerSubject):
+		return outerSubject.editSubject
+
+	def canPersist(self):
+		return True
+
+
+_WorksheetEditorPathEntry.instance = _WorksheetEditorPathEntry()
+
+
 class WorksheetViewerSubject (Subject):
-	def __init__(self, document, model, enclosingSubject, importName, title):
-		super( WorksheetViewerSubject, self ).__init__( enclosingSubject )
+	def __init__(self, document, model, enclosingSubject, path, importName, title):
+		super( WorksheetViewerSubject, self ).__init__( enclosingSubject, path )
 		self._document = document
 		self._model = model
 		# Defer the creation of the model view - it involves executing all the code in the worksheet which can take some time
@@ -243,7 +255,7 @@ class WorksheetViewerSubject (Subject):
 		self._importName = importName
 		self._title = title
 		
-		self.editSubject = WorksheetEditorSubject( document, model, self, self._importName, title )
+		self.editSubject = WorksheetEditorSubject( document, model, self, path.followedBy( _WorksheetEditorPathEntry.instance ), self._importName, title )
 
 
 	@property
@@ -258,7 +270,7 @@ class WorksheetViewerSubject (Subject):
 
 
 	def getTrailLinkText(self):
-		return 'Worksheet'
+		return self._title + '[Ws]'
 
 
 	def getFocus(self):
@@ -268,7 +280,7 @@ class WorksheetViewerSubject (Subject):
 		return perspective
 	
 	def getTitle(self):
-		return self._title + ' [Ws-User]'
+		return self._title + ' [Ws]'
 	
 	def getChangeHistory(self):
 		return self._document.getChangeHistory()

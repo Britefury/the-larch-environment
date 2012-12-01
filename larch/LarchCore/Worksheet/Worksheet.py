@@ -26,8 +26,8 @@ class WorksheetPageData (PageData):
 		exporter = WorksheetTextExporter( filename )
 		return exporter( self.contents )
 
-	def __new_subject__(self, document, enclosingSubject, importName, title):
-		return WorksheetViewerSubject( document, self.contents, enclosingSubject, importName, title )
+	def __new_subject__(self, document, enclosingSubject, path, importName, title):
+		return WorksheetViewerSubject( document, self.contents, enclosingSubject, path, importName, title )
 
 	
 registerPageFactory( 'Worksheet', WorksheetPageData, 'Worksheet' )

@@ -44,7 +44,7 @@ class PackageFinder (object):
 
 			if isinstance( model, ProjectPage ):
 				# We have found a page: get its subject
-				pageSubject = self._projectSubject._document.newModelSubject( model.data, self._projectSubject, fullname, name )
+				pageSubject = self._projectSubject._pageSubject( model )
 				# Now, check if it has a 'createModuleLoader' method - if it has, then we can use it. Otherwise, we can't
 				try:
 					createModuleLoader = pageSubject.createModuleLoader
@@ -74,7 +74,7 @@ class PackageFinder (object):
 
 		if initPage is not None and isinstance( initPage, ProjectPage ):
 			# We have found a page called '__init__' - get its subject
-			pageSubject = self._projectSubject._document.newModelSubject( initPage.data, self._projectSubject, fullname + '.__init__', '__init__' )
+			pageSubject = self._projectSubject._pageSubject( initPage )
 			# Now, check if it has a 'createModuleLoader' method - if it has, then we can use it. Otherwise, use the default
 			try:
 				createModuleLoader = pageSubject.createModuleLoader

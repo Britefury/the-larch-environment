@@ -9,7 +9,7 @@ from java.awt.event import KeyEvent
 
 from BritefuryJ.DefaultPerspective import DefaultPerspective
 
-from BritefuryJ.Projection import Subject
+from BritefuryJ.Projection import Subject, SubjectPath, SubjectPathEntry
 
 from BritefuryJ.LSpace.Input import Modifier
 from BritefuryJ.Command import CommandName, Command, CommandSet
@@ -63,8 +63,8 @@ _projectCommands = CommandSet( 'LarchCore.Project', [ _saveCommand, _saveAsComma
 
 
 class ProjectSubject (Subject):
-	def __init__(self, document, model, enclosingSubject, importName, title):
-		super( ProjectSubject, self ).__init__( enclosingSubject )
+	def __init__(self, document, model, enclosingSubject, path, importName, title):
+		super( ProjectSubject, self ).__init__( enclosingSubject, path )
 		self._document = document
 		self._model = model
 		self._title = title
@@ -107,8 +107,23 @@ class ProjectSubject (Subject):
 		return self._rootFinder.import_resolve( name, fullname, path )
 
 
+	def _pageSubject(self, page):
+		pathEntry = _PageSubjectPathEntry( page )
+		relativePath = SubjectPath( pathEntry )
+		return relativePath.followFrom( self )
 
 
+
+class _PageSubjectPathEntry (SubjectPathEntry):
+	def __init__(self, page):
+		self.__nodeId = page.nodeId
+
+
+	def follow(self, outerSubject):
+		rootNode = outerSubject._model
+		page = rootNode.getNodeById( self.__nodeId )
+		document = outerSubject._document
+		return document.newModelSubject( page.data, outerSubject, outerSubject.path().followedBy( self ), page.importName, page.getName() )
 
 
 

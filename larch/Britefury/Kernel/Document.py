@@ -15,6 +15,8 @@ from BritefuryJ.ChangeHistory import ChangeHistory, ChangeHistoryListener
 
 from BritefuryJ.Isolation import IsolationPickle
 
+from BritefuryJ.Projection import SubjectPath, SubjectPathEntry
+
 from Britefury import LoadBuiltins
 
 
@@ -112,10 +114,11 @@ class Document (ChangeHistoryListener):
 	
 	
 	def newSubject(self, enclosingSubject, importName, title):
-		return self.newModelSubject( self._contents, enclosingSubject, importName, title )
+		path = SubjectPath( _DocumentPathEntry( self, importName, title ) )
+		return self.newModelSubject( self._contents, enclosingSubject, path, importName, title )
 
-	def newModelSubject(self, model, enclosingSubject, importName, title):
-		return model.__new_subject__( self, enclosingSubject, importName, title )
+	def newModelSubject(self, model, enclosingSubject, path, importName, title):
+		return model.__new_subject__( self, enclosingSubject, path, importName, title )
 
 		
 	
@@ -196,6 +199,22 @@ class Document (ChangeHistoryListener):
 		if not self._bHasUnsavedData:
 			self._bHasUnsavedData = True
 
+
+
+
+class _DocumentPathEntry (SubjectPathEntry):
+	def __init__(self, document, importName, title):
+		self.__document = document
+		self.__importName = importName
+		self.__title = title
+
+
+	def follow(self, outerSubject):
+		return self.__document.newModelSubject( self.__document._contents, outerSubject, SubjectPath( self ), self.__importName, self.__title)
+
+
+	def canPersist(self):
+		return False
 
 
 			
