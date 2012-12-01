@@ -7,14 +7,12 @@
 ##-*************************
 from copy import deepcopy
 
-from BritefuryJ.LSpace.Clipboard import *
 from BritefuryJ.LSpace.TextFocus import TextSelection
-from BritefuryJ.LSpace.StyleParams import *
-from BritefuryJ.LSpace import *
+from BritefuryJ.LSpace import EditEvent
 
 from BritefuryJ.Util.RichString import RichStringBuilder
 
-from BritefuryJ.Editor.Sequential import SequentialClipboardHandler, SelectionEditTreeEvent
+from BritefuryJ.Editor.Sequential import SelectionEditTreeEvent
 
 from BritefuryJ.Editor.SyntaxRecognizing.Precedence import PrecedenceHandler
 from BritefuryJ.Editor.SyntaxRecognizing import SyntaxRecognizingController
@@ -26,8 +24,9 @@ from BritefuryJ.ModelAccess.DocModel import ClassAttributeReader, ObjectFieldRea
 
 from LarchCore.Languages.Python2 import Schema
 
-from LarchCore.Languages.Python2.PythonEditor.Precedence import *
-from LarchCore.Languages.Python2.PythonEditor.PythonEditOperations import *
+from LarchCore.Languages.Python2.PythonEditor.Precedence import parensRequired, nodePrecedence
+from LarchCore.Languages.Python2.PythonEditor.PythonEditOperations import pyReplaceNode, modifySuiteMinimisingChanges, isStmtFragment, isTopLevelFragment, \
+	joinRichStringsForInsertion, joinRichStringsAroundDeletionPoint, getStatementContextFromElement, isTopLevel, getStatementContextPathsFromCommonRoot
 from LarchCore.Languages.Python2.PythonEditor.PythonEditorCombinators import openParen, closeParen
 from LarchCore.Languages.Python2.PythonEditor import Parser
 

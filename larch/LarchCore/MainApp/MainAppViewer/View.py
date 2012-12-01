@@ -37,7 +37,7 @@ from BritefuryJ.Pres.RichText import *
 from BritefuryJ.Pres.UI import *
 from BritefuryJ.Pres.Help import *
 
-from BritefuryJ.Projection import Perspective, Subject
+from BritefuryJ.Projection import Perspective
 
 from LarchCore.MainApp import Application
 from LarchCore.MainApp import DocumentManagement
