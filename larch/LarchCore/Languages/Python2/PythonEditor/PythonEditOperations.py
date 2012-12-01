@@ -8,19 +8,12 @@
 import copy
 
 
-from java.lang import Object
-from java.io import IOException
-from java.util import List
-from java.awt.event import KeyEvent
-from java.awt.datatransfer import UnsupportedFlavorException, DataFlavor, StringSelection, Transferable
-
-from BritefuryJ.DocModel import DMList, DMObject, DMObjectInterface, DMNode
+from BritefuryJ.DocModel import DMList, DMObjectInterface
 
 
 
-from BritefuryJ.LSpace.StyleParams import *
 from BritefuryJ.LSpace.TextFocus import TextSelection
-from BritefuryJ.LSpace import *
+from BritefuryJ.LSpace import TextEditEvent, LSContentLeafEditable
 
 from BritefuryJ.Util.RichString import RichStringBuilder, RichString
 

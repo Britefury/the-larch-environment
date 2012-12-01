@@ -38,7 +38,7 @@ from BritefuryJ.StyleSheet import StyleSheet
 
 from BritefuryJ.EditPerspective import EditPerspective
 
-from BritefuryJ.Projection import Perspective, Subject
+from BritefuryJ.Projection import Perspective
 from BritefuryJ.IncrementalView import FragmentView, FragmentData
 
 from BritefuryJ.Editor.Sequential import SequentialEditorPerspective

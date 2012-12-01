@@ -5,20 +5,17 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
-from javax.swing import JOptionPane, JFileChooser
-from javax.swing.filechooser import FileNameExtensionFilter
+from javax.swing import JFileChooser
 
 import os
-import sys
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from BritefuryJ.Controls import Hyperlink
 
-from BritefuryJ.Pres import *
-from BritefuryJ.Pres.Primitive import *
-from BritefuryJ.Pres.RichText import *
-from BritefuryJ.StyleSheet import *
+from BritefuryJ.Pres.Primitive import Primitive, Label, Column
+from BritefuryJ.Pres.RichText import Heading3, Body
+from BritefuryJ.StyleSheet import StyleSheet
 
 from Britefury.Config import Configuration
 from Britefury.Config.UserConfig import loadUserConfig, saveUserConfig
