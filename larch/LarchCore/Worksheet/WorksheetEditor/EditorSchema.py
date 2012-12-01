@@ -11,8 +11,6 @@ from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from BritefuryJ.Pres import InnerFragment
 
-from BritefuryJ.Browser import Location
-
 
 from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, methodDispatch
 
@@ -243,8 +241,8 @@ class LinkEditor (AbstractViewSchema.LinkAbstractView):
 		self._model['text'] = value
 
 
-	def setAbsoluteLocation(self, docLocation, location):
-		self._model['location'], self._model['absolute'] = self._modelLocationAndAbsoluteFlag( docLocation, location )
+	def setSubject(self, docSubject, subject):
+		raise NotImplementedError
 
 
 	def copy(self, worksheet=None):
