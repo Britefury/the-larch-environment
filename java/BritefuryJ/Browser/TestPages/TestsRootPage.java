@@ -22,11 +22,12 @@ import BritefuryJ.Pres.RichText.LinkHeaderBar;
 import BritefuryJ.Pres.RichText.Page;
 import BritefuryJ.Pres.RichText.TitleBar;
 import BritefuryJ.Pres.UI.SectionHeading2;
+import BritefuryJ.Projection.TransientSubject;
 import BritefuryJ.Projection.Subject;
 
 public class TestsRootPage extends AbstractTestPage implements Presentable
 {
-	private static class TestSubject extends Subject
+	private static class TestSubject extends TransientSubject
 	{
 		AbstractTestPage page;
 		

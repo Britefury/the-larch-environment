@@ -39,6 +39,7 @@ import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Pres.Primitive.Spacer;
 import BritefuryJ.Pres.Primitive.Text;
 import BritefuryJ.Pres.UI.BubblePopup;
+import BritefuryJ.Projection.TransientSubject;
 import BritefuryJ.Projection.AbstractPerspective;
 import BritefuryJ.Projection.Subject;
 import BritefuryJ.Shortcut.Shortcut;
@@ -90,7 +91,7 @@ public class CommandConsole extends AbstractCommandConsole
 	}
 	
 	
-	private class CommandConsoleSubject extends Subject
+	private class CommandConsoleSubject extends TransientSubject
 	{
 		public CommandConsoleSubject()
 		{

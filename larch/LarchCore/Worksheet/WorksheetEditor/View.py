@@ -488,8 +488,8 @@ perspective2 = SequentialEditorPerspective( _view.fragmentViewFunction, Workshee
 
 
 class WorksheetEditorSubject (Subject):
-	def __init__(self, document, model, enclosingSubject, importName, title):
-		super( WorksheetEditorSubject, self ).__init__( enclosingSubject )
+	def __init__(self, document, model, enclosingSubject, path, importName, title):
+		super( WorksheetEditorSubject, self ).__init__( enclosingSubject, path )
 		self._document = document
 		self._model = model
 		# Defer the creation of the model view - it involves executing all the code in the worksheet which can take some time
@@ -505,7 +505,7 @@ class WorksheetEditorSubject (Subject):
 
 
 	def getTrailLinkText(self):
-		return 'Edit worksheet'
+		return 'Edit'
 
 
 	def getFocus(self):
@@ -515,7 +515,7 @@ class WorksheetEditorSubject (Subject):
 		return perspective2
 	
 	def getTitle(self):
-		return self._title + ' [Ws-Devel]'
+		return self._title + ' [WsEdit]'
 	
 	def getChangeHistory(self):
 		return self._document.getChangeHistory()

@@ -51,6 +51,7 @@ import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.RichText.Page;
+import BritefuryJ.Projection.TransientSubject;
 import BritefuryJ.Projection.Subject;
 import BritefuryJ.Projection.SubjectPath;
 import BritefuryJ.StyleSheet.StyleSheet;
@@ -87,7 +88,7 @@ public class Browser
 	}
 	
 	
-	private class ResolveErrorSubject extends Subject
+	private class ResolveErrorSubject extends TransientSubject
 	{
 		ResolveError error;
 		
@@ -232,7 +233,7 @@ public class Browser
 			presComponent.getRootElement().getKeyboard().addInteractor( commandConsole.getShortcutKeyboardInteractor() );
 		}
 		
-		resolve();
+		setSubjectAsPage( subject );
 	}
 	
 	
@@ -261,7 +262,9 @@ public class Browser
 	
 	public void goToSubject(Subject subject)
 	{
-		setSubject( subject );
+		onPreHistoryChange();
+		history.visit( subject );
+		setSubjectAsPage( subject );
 	}
 	
 	
@@ -293,7 +296,7 @@ public class Browser
 		history.visit( subject );
 		history.clear();
 		viewportReset();
-		resolve();
+		setSubjectAsPage( subject );
 	}
 	
 	
@@ -319,7 +322,7 @@ public class Browser
 		{
 			onPreHistoryChange();
 			history.back();
-			resolve();
+			resolvePath();
 		}
 	}
 	
@@ -329,13 +332,13 @@ public class Browser
 		{
 			onPreHistoryChange();
 			history.forward();
-			resolve();
+			resolvePath();
 		}
 	}
 	
 	protected void reload()
 	{
-		resolve();
+		resolvePath();
 	}
 
 	
@@ -348,27 +351,29 @@ public class Browser
 	}
 	
 
-	private void resolve()
+	
+	private void resolvePath()
 	{
-		// Get the location to resolve
+		// Get the path to resolve
 		BrowserState state = history.getCurrentState();
-		Subject s = history.getCurrentSubject();
-		
-		PersistentStateStore stateStore = state.getPagePersistentState();
-		
-		if ( s == null )
+		SubjectPath path = state.getSubjectPath();
+		Subject s;
+		try
 		{
-			SubjectPath path = state.getSubjectPath();
-			try
-			{
-				s = path.followFrom( rootSubject );
-			}
-			catch (Throwable t)
-			{
-				s = new ResolveErrorSubject( t );
-			}
+			s = path.followFrom( rootSubject );
+		}
+		catch (Throwable t)
+		{
+			s = new ResolveErrorSubject( t );
 		}
 		
+		setSubjectAsPage( s );
+	}
+	
+	private void setSubjectAsPage(Subject s)
+	{
+		BrowserState state = history.getCurrentState();
+		PersistentStateStore stateStore = state.getPagePersistentState();
 		
 		view = new IncrementalView( s, inspector, stateStore );
 
@@ -388,14 +393,6 @@ public class Browser
 				listener.onBrowserChangePage( this, s, getTitle() );
 			}
 		}
-	}
-	
-	
-	private void setSubject(Subject subject)
-	{
-		onPreHistoryChange();
-		history.visit( subject );
-		resolve();
 	}
 	
 	

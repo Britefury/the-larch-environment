@@ -504,8 +504,7 @@ class ProjectView (MethodDispatchView):
 			return True
 
 
-		document = fragment.subject.document
-		pageSubject = document.newModelSubject( page.data, fragment.subject, page.importName, page.name )
+		pageSubject = fragment.subject._pageSubject( page )
 
 		link = Hyperlink( page.name, pageSubject )
 		link = link.withContextMenuInteractor( _pageContextMenuFactory )

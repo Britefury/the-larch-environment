@@ -13,7 +13,6 @@ import BritefuryJ.Projection.Subject;
 class BrowserHistory
 {
 	private Stack<BrowserState> past, future;
-	private Subject currentSubject;
 	private BrowserState currentState;
 	
 	
@@ -22,7 +21,6 @@ class BrowserHistory
 	{
 		past = new Stack<BrowserState>();
 		future = new Stack<BrowserState>();
-		currentSubject = subject;
 		currentState = new BrowserState( subject.path() );
 	}
 	
@@ -32,16 +30,10 @@ class BrowserHistory
 		return currentState;
 	}
 	
-	public Subject getCurrentSubject()
-	{
-		return currentSubject;
-	}
-	
 	
 	public void visit(Subject subject)
 	{
 		past.push( currentState );
-		currentSubject = subject;
 		currentState = new BrowserState( subject.path() );
 		future.clear();
 	}
@@ -57,7 +49,6 @@ class BrowserHistory
 		if ( past.size() > 0 )
 		{
 			future.push( currentState );
-			currentSubject = null;
 			currentState = past.pop();
 		}
 	}
@@ -73,7 +64,6 @@ class BrowserHistory
 		if ( future.size() > 0 )
 		{
 			past.push( currentState );
-			currentSubject = null;
 			currentState = future.pop();
 		}
 	}

@@ -12,7 +12,7 @@ from Britefury.Kernel.Document import Document
 from Britefury.Config import Configuration
 
 from BritefuryJ.AttributeTable import SimpleAttributeTable
-from BritefuryJ.Projection import Subject
+from BritefuryJ.Projection import TransientSubject
 
 
 
@@ -53,7 +53,7 @@ class _DocumentFactory (object):
 
 
 
-class _WorldSubject (Subject):
+class _WorldSubject (TransientSubject):
 	def __init__(self, world):
 		super( _WorldSubject, self ).__init__( None )
 		self.__world = world

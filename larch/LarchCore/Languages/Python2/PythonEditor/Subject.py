@@ -43,8 +43,8 @@ class _Python2Page (object):
 
 
 class Python2Subject (Subject):
-	def __init__(self, document, model, enclosingSubject, importName, title):
-		super( Python2Subject, self ).__init__( enclosingSubject )
+	def __init__(self, document, model, enclosingSubject, path, importName, title):
+		super( Python2Subject, self ).__init__( enclosingSubject, path )
 		self._document = document
 		self._model = model
 		self._importName = importName

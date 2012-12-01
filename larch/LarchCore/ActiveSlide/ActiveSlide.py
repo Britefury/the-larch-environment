@@ -18,7 +18,7 @@ from BritefuryJ.LSpace.Interactor import *
 from BritefuryJ.LSpace.Input import Modifier
 
 
-from BritefuryJ.Projection import Subject
+from BritefuryJ.Projection import TransientSubject
 
 
 
@@ -107,7 +107,7 @@ class SlideShow (object):
 	
 
 		
-class _SlideSubject (Subject):
+class _SlideSubject (TransientSubject):
 	def __init__(self, slideShowSubject, slide, index):
 		self._slideShowSubject = slideShowSubject
 		self._slide = slide

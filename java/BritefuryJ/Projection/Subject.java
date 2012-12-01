@@ -19,33 +19,6 @@ import BritefuryJ.Command.BoundCommandSet;
 
 public abstract class Subject
 {
-	//
-	// Absolute path entry
-	//
-	
-	private static class AbsoluteSubjectPathEntry implements SubjectPathEntry
-	{
-		private Subject subject;
-		
-		public AbsoluteSubjectPathEntry(Subject subject)
-		{
-			this.subject = subject;
-		}
-		
-		@Override
-		public Subject follow(Subject outerSubject)
-		{
-			return subject;
-		}
-
-		@Override
-		public boolean canPersist()
-		{
-			return false;
-		}
-	}
-	
-	
 	private Subject enclosingSubject;
 	private SubjectPath path;
 	
@@ -55,12 +28,6 @@ public abstract class Subject
 	{
 		this.enclosingSubject = enclosingSubject;
 		this.path = path;
-	}
-	
-	public Subject(Subject enclosingSubject)
-	{
-		this.enclosingSubject = enclosingSubject;
-		this.path = new SubjectPath( new AbsoluteSubjectPathEntry( this ) );
 	}
 	
 	

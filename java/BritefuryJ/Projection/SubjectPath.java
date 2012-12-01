@@ -42,11 +42,6 @@ public class SubjectPath
 	}
 	
 	
-	public SubjectPath __add__(SubjectPathEntry entry)
-	{
-		return followedBy( entry );
-	}
-	
 	public SubjectPath __add__(SubjectPath path)
 	{
 		return followedBy( path );
