@@ -20,7 +20,12 @@ class ProjectPackage (ProjectContainer):
 	def __init__(self, name='', contents=None):
 		super( ProjectPackage, self ).__init__( contents )
 		self._name = name
-		
+
+
+	@property
+	def importName(self):
+		return self.parent.importName + '.' + self._name
+
 
 	def __getstate__(self):
 		state = super( ProjectPackage, self ).__getstate__()

@@ -32,7 +32,6 @@ from BritefuryJ.AttributeTable import *
 
 from BritefuryJ.DefaultPerspective import DefaultPerspective
 
-from BritefuryJ.Browser import Location
 from BritefuryJ.Graphics import *
 from BritefuryJ.StyleSheet import StyleSheet
 from BritefuryJ.LSpace import Anchor
@@ -50,26 +49,12 @@ from BritefuryJ.Projection import Perspective
 
 
 from LarchCore.MainApp import DocumentManagement
-from LarchCore.MainApp import AppLocationPath
 
 from LarchCore.Project.ProjectRoot import ProjectRoot
 from LarchCore.Project.ProjectPackage import ProjectPackage
 from LarchCore.Project.ProjectPage import ProjectPage
 from LarchCore.Project.ProjectNode import ProjectNode
 from LarchCore.Project import PageData
-
-
-
-def _ProjectViewState(location):
-	return ( location, )
-
-
-
-
-def _joinLocation(a, *xs):
-	for x in xs:
-		a = a + '.' + x
-	return a
 
 
 
@@ -278,14 +263,14 @@ class ProjectView (MethodDispatchView):
 				def handleSaveDocumentAsFn(filename):
 					document.saveAs( filename )
 
-				DocumentManagement.promptSaveDocumentAs( fragment.getSubjectContext()['world'], control.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn )
+				DocumentManagement.promptSaveDocumentAs( world, control.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn )
 
 
 		def _onSaveAs(control, buttonEvent):
 			def handleSaveDocumentAsFn(filename):
 				document.saveAs( filename )
 
-			DocumentManagement.promptSaveDocumentAs( fragment.getSubjectContext()['world'], control.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn, document.getFilename() )
+			DocumentManagement.promptSaveDocumentAs( world, control.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn, document.getFilename() )
 
 
 		def _onReload(control, buttonEvent):
@@ -299,7 +284,7 @@ class ProjectView (MethodDispatchView):
 					document.reload()
 					project.reset()
 
-				DocumentManagement.promptSaveDocumentAs( fragment.getSubjectContext()['world'], control.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn )
+				DocumentManagement.promptSaveDocumentAs( world, control.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn )
 
 
 		def _onExport(control, event):
@@ -352,17 +337,9 @@ class ProjectView (MethodDispatchView):
 
 
 		# Get some initial variables
-		subjectContext = fragment.getSubjectContext()
-		document = subjectContext['document']
-		location = subjectContext['location']
-		world = subjectContext['world']
+		document = fragment.subject.document
+		world = fragment.subject.world
 
-
-		# Set location attribute of inheritedState
-		inheritedState = inheritedState.withAttrs( location=location )
-
-		# Link to home page, in link header bar
-		linkHeader = AppLocationPath.appLinkheaderBar( fragment.getSubjectContext(), [] )
 
 		# Title
 		title = TitleBar( document.getDocumentName() )
@@ -417,8 +394,6 @@ class ProjectView (MethodDispatchView):
 		# Project index
 		indexHeader = SectionHeading1( 'Index' )
 
-		items = InnerFragment.map( project[:], inheritedState )
-
 		nameElement = _projectIndexNameStyle.applyTo( Label( 'Project root' ) )
 		nameBox = _itemHoverHighlightStyle.applyTo( nameElement.alignVCentre() )
 		nameBox = nameBox.withContextMenuInteractor( _projectIndexContextMenuFactory )
@@ -426,7 +401,7 @@ class ProjectView (MethodDispatchView):
 		nameBox = AttachTooltip( nameBox, 'Right click to access context menu, from which new pages and packages can be created.\n' + \
 			'A page called index at the root will appear instead of the project page. A page called __startup__ will be executed at start time.', False )
 
-		itemsBox = Column( items ).alignHExpand()
+		itemsBox = Column( project[:] ).alignHExpand()
 
 		contentsView = Column( [ nameBox.alignHExpand(), itemsBox.padX( _packageContentsIndentation, 0.0 ).alignHExpand() ] )
 
@@ -435,13 +410,13 @@ class ProjectView (MethodDispatchView):
 
 
 		tip = TipBox( 'Larch projects act like Python programs. Packages act as directories/packages and pages act as Python source files. Pages can import code from one another as if they are modules.\n' + \
-			'If a page called index is present in the root of the project, then it will appear instead of the project page. To access the project page, add \'.___project___\' (3 underscores) to the address of the project.\n' +\
+			'If a page called index is present in the root of the project, then it will appear instead of the project page.\n' +\
 			'If a page called __startup__ (2 underscores) is present at the root, code within it will be executed before all other pages. This can be used for registering editor extensions.',
 			      'larchcore.worksheet.worksheeteditor')
 
 
 		# The page
-		head = Head( [ linkHeader, title ] )
+		head = Head( [ title ] )
 		body = Body( [ saveExportSection, projectSection, indexSection, tip ] ).alignHPack()
 
 		return StyleSheet.style( Primitive.editable( False ) ).applyTo( Page( [ head, body ] ) )
@@ -483,13 +458,6 @@ class ProjectView (MethodDispatchView):
 			menu.add( MenuItem.menuItemWithLabel( 'Delete', _onDelete ) )
 			return True
 
-		location = inheritedState['location']
-		packageLocation = _joinLocation( location, package.name )
-
-		items = InnerFragment.map( package[:], inheritedState.withAttrs( location=packageLocation ) )
-
-		world = fragment.getSubjectContext()['world']
-
 		nameElement = _packageNameStyle.applyTo( StaticText( package.name ) )
 		nameBox = _itemHoverHighlightStyle.applyTo( Row( [ _packageIcon.padX( 5.0 ).alignHPack().alignVCentre(), nameElement.alignVCentre() ] ) )
 
@@ -505,7 +473,7 @@ class ProjectView (MethodDispatchView):
 
 		nameLive = LiveValue( nameBox )
 
-		itemsBox = Column( items )
+		itemsBox = Column( package[:] )
 
 		return Column( [ nameLive, itemsBox.padX( _packageContentsIndentation, 0.0 ).alignHExpand() ] )
 
@@ -536,10 +504,9 @@ class ProjectView (MethodDispatchView):
 			return True
 
 
-		location = inheritedState['location']
-		pageLocation = _joinLocation( location, page.name )
+		pageSubject = fragment.subject._pageSubject( page )
 
-		link = Hyperlink( page.name, pageLocation )
+		link = Hyperlink( page.name, pageSubject )
 		link = link.withContextMenuInteractor( _pageContextMenuFactory )
 		nameBox = _itemHoverHighlightStyle.applyTo( Row( [ link ] ) )
 		nameBox = nameBox.withDragSource( _dragSource )

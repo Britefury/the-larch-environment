@@ -28,7 +28,6 @@ from BritefuryJ.AttributeTable import *
 from BritefuryJ.Controls import TextEntry
 from BritefuryJ.StyleSheet import *
 from BritefuryJ.Graphics import *
-from BritefuryJ.Browser import Location
 from BritefuryJ.LSpace.Input import ObjectDndHandler, Modifier
 from BritefuryJ.Shortcut import Shortcut
 
@@ -38,7 +37,7 @@ from BritefuryJ.Pres import InnerFragment, ApplyPerspective
 from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.Pres.RichText import *
 
-from BritefuryJ.Projection import Perspective, Subject
+from BritefuryJ.Projection import Perspective, TransientSubject
 from BritefuryJ.IncrementalView import FragmentView, FragmentData
 
 from BritefuryJ.Util import TypeUtils
@@ -370,7 +369,7 @@ class ConsoleVarAssignment (object):
 
 
 
-class ConsoleSubject (Subject):
+class ConsoleSubject (TransientSubject):
 	def __init__(self, console, enclosingSubject):
 		super( ConsoleSubject, self ).__init__( enclosingSubject )
 		self._console = console
@@ -384,9 +383,6 @@ class ConsoleSubject (Subject):
 
 	def getTitle(self):
 		return 'Python console'
-
-	def getSubjectContext(self):
-		return self.enclosingSubject.getSubjectContext()   if self.enclosingSubject is not None   else SimpleAttributeTable.instance
 
 	def getChangeHistory(self):
 		return None
