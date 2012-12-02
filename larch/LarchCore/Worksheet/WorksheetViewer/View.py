@@ -69,15 +69,20 @@ class WorksheetViewer (MethodDispatchView):
 	def Worksheet(self, fragment, inheritedState, node):
 		bodyView = Pres.coerce( node.getBody() )
 
-		editSubject = fragment.subject.editSubject
-		
-		editLink = Hyperlink( 'Switch to developer mode', editSubject )
-		linkHeader = LinkHeaderBar( [ editLink ] )
+		try:
+			editSubject = fragment.subject.editSubject
+		except AttributeError:
+			pageContents = []
+		else:
+			editLink = Hyperlink( 'Switch to developer mode', editSubject )
+			linkHeader = LinkHeaderBar( [ editLink ] )
+			pageContents = [ linkHeader ]
+
 
 		tip = TipBox( 'To edit this worksheet, or add content, click Developer mode at the top right',
 			      'larchcore.worksheet.view.toedit' )
 
-		w = Page( [ linkHeader, bodyView, tip ] )
+		w = Page( pageContents + [ bodyView, tip ] )
 		w = w.withContextMenuInteractor( _worksheetContextMenuFactory )
 		return StyleSheet.style( Primitive.editable( False ) ).applyTo( w )
 

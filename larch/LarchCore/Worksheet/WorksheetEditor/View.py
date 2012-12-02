@@ -246,9 +246,14 @@ class WorksheetEditor (MethodDispatchView):
 	def Worksheet(self, fragment, inheritedState, node):
 		bodyView = Pres.coerce( node.getBody() )
 		
-		homeLink = Hyperlink( 'HOME PAGE', fragment.subject.rootSubject )
-		viewLink = Hyperlink( 'Switch to user mode', fragment.subject.viewSubject )
-		linkHeader = LinkHeaderBar( [ viewLink ] )
+		try:
+			viewSubject = fragment.subject.viewSubject
+		except AttributeError:
+			pageContents = []
+		else:
+			viewLink = Hyperlink( 'Switch to user mode', viewSubject )
+			linkHeader = LinkHeaderBar( [ viewLink ] )
+			pageContents = [ linkHeader ]
 
 
 		tip = TipBox( 'Type to add text to the worksheet.\nRight click to access the context menu, from which styles can be applied.\n' + \
@@ -256,7 +261,7 @@ class WorksheetEditor (MethodDispatchView):
 			      'larchcore.worksheet.edit.howto' )
 
 
-		w = Page( [ linkHeader, bodyView, tip ] )
+		w = Page( pageContents + [ bodyView, tip ] )
 		w = w.withContextMenuInteractor( _worksheetContextMenuFactory )
 		w = w.withDropDest( _embeddedObject_dropDest )
 		w = w.withCommands( worksheetCommands )
