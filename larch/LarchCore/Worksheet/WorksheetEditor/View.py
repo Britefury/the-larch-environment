@@ -244,8 +244,6 @@ def _paragraphEmbeddedObjectContextMenuFactory(element, menu):
 class WorksheetEditor (MethodDispatchView):
 	@ObjectDispatchMethod( EditorSchema.WorksheetEditor )
 	def Worksheet(self, fragment, inheritedState, node):
-		bodyView = Pres.coerce( node.getBody() )
-		
 		try:
 			viewSubject = fragment.subject.viewSubject
 		except AttributeError:
@@ -262,6 +260,7 @@ class WorksheetEditor (MethodDispatchView):
 
 
 		w = Page( pageContents + [ bodyView, tip ] )
+		w = Page( [ linkHeader, node.getBody(), tip ] )
 		w = w.withContextMenuInteractor( _worksheetContextMenuFactory )
 		w = w.withDropDest( _embeddedObject_dropDest )
 		w = w.withCommands( worksheetCommands )
@@ -271,9 +270,7 @@ class WorksheetEditor (MethodDispatchView):
 	
 	@ObjectDispatchMethod( EditorSchema.BodyEditor )
 	def Body(self, fragment, inheritedState, node):
-		contentViews = list( Pres.mapCoerce( node.getContents() ) )
-
-		b = Body( contentViews ).padX( _worksheetMargin )
+		b = Body( node.getContents() ).padX( _worksheetMargin )
 		b = WorksheetRichTextController.instance.editableBlock( node, b )
 		return b
 	
@@ -391,6 +388,7 @@ class WorksheetEditor (MethodDispatchView):
 		        EditorSchema.PythonCodeEditor.STYLE_CODE,
 		        EditorSchema.PythonCodeEditor.STYLE_EDITABLE_CODE_AND_RESULT,
 		        EditorSchema.PythonCodeEditor.STYLE_EDITABLE_CODE,
+			EditorSchema.PythonCodeEditor.STYLE_ERRORS,
 		        EditorSchema.PythonCodeEditor.STYLE_HIDDEN ]
 
 		
@@ -401,7 +399,7 @@ class WorksheetEditor (MethodDispatchView):
 		def _onDeleteButton(button, event):
 			WorksheetRichTextController.instance.deleteParagraphContainingElement( button.getElement() )
 
-		codeView = Python2.python2EditorPerspective.applyTo( Pres.coerce( node.getCode() ) )
+		codeView = Python2.python2EditorPerspective.applyTo( node.getCode() )
 		
 		executionResultView = None
 		executionResult = node.getResult()
@@ -411,7 +409,7 @@ class WorksheetEditor (MethodDispatchView):
 			executionResultView = executionResult.view()
 			
 			
-		optionTexts = [ 'Minimal result', 'Result', 'Code with result', 'Code', 'Editable code with result', 'Editable code', 'Hidden' ]
+		optionTexts = [ 'Minimal result', 'Result', 'Code with result', 'Code', 'Editable code with result', 'Editable code', 'Errors only', 'Hidden' ]
 		optionChoices = [ StaticText( text )   for text in optionTexts ]
 		styleOptionMenu = OptionMenu( optionChoices, choiceValues.index( node.getStyle() ), _onStyleOptionMenu )
 		
