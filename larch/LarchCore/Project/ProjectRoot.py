@@ -37,10 +37,13 @@ class ProjectRoot (ProjectContainer):
 		return state
 	
 	def __setstate__(self, state):
+		# Need to initialise the ID table before loading contents
+		self.__idToNode = {}
+		self.__idCounter = 0
 		super( ProjectRoot, self ).__setstate__( state )
 		self._pythonPackageName = state['pythonPackageName']
 		self._startupExecuted = False
-	
+
 	def __copy__(self):
 		return ProjectRoot( self._pythonPackageName, self[:] )
 	
@@ -122,6 +125,7 @@ class ProjectRoot (ProjectContainer):
 		if nodeId is None  or  nodeId in self.__idToNode:
 			# Either, no node ID or node ID already in use
 			# Create a new one
+			self.__idCounter = max( self.__idCounter, len( self.__idToNode) )
 			nodeId = self.__idCounter
 			self.__idCounter += 1
 			node._id = nodeId
