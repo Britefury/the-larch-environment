@@ -12,13 +12,13 @@ from java.awt import Color
 
 from BritefuryJ.Command import Command, CommandSet
 
-from BritefuryJ.Graphics import *
+from BritefuryJ.Graphics import SolidBorder, FillPainter
 
-from BritefuryJ.Controls import *
+from BritefuryJ.Controls import Button
 
 from BritefuryJ.Pres import Pres
-from BritefuryJ.Pres.Primitive import *
-from BritefuryJ.StyleSheet import *
+from BritefuryJ.Pres.Primitive import Primitive, Label, Arrow, Spacer, Box, Row, Column
+from BritefuryJ.StyleSheet import StyleSheet
 
 from BritefuryJ.Util.Coroutine import Coroutine
 

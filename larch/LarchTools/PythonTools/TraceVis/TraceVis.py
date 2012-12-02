@@ -11,23 +11,23 @@ from java.util.regex import Pattern
 
 from copy import deepcopy
 
-from BritefuryJ.Command import *
+from BritefuryJ.Command import Command, CommandSet
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
 from BritefuryJ.Live import LiveValue
 
-from BritefuryJ.Controls import *
+from BritefuryJ.Controls import MenuItem, TabbedBox, EditableLabel
 
-from BritefuryJ.LSpace.Interactor import *
-from BritefuryJ.Graphics import *
+from BritefuryJ.LSpace.Interactor import PushElementInteractor
+from BritefuryJ.Graphics import FilledOutlinePainter
 
-from BritefuryJ.Pres import *
-from BritefuryJ.Pres.Primitive import *
-from BritefuryJ.Pres.ObjectPres import *
+from BritefuryJ.Pres import Pres
+from BritefuryJ.Pres.Primitive import Primitive, Label, Blank, Box, Spacer, Row, Column
+from BritefuryJ.Pres.ObjectPres import VerticalField, ObjectBorder, ObjectBox
 
-from BritefuryJ.Editor.Table.Generic import *
+from BritefuryJ.Editor.Table.Generic import GenericTableEditor, GenericTableModel
 
-from BritefuryJ.StyleSheet import *
+from BritefuryJ.StyleSheet import StyleSheet
 
 from LarchCore.Languages.Python2.PythonCommands import pythonCommandSet, EmbeddedExpressionAtCaretAction, WrapSelectionInEmbeddedExpressionAction,\
 	WrapSelectedStatementRangeInEmbeddedObjectAction, chainActions
