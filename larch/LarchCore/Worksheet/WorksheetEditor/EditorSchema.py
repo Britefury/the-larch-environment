@@ -9,8 +9,6 @@ from BritefuryJ.DocModel import DMObject, DMNode
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
-from BritefuryJ.Pres import InnerFragment
-
 from BritefuryJ.Browser import Location
 
 

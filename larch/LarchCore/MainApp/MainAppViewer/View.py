@@ -29,9 +29,9 @@ from BritefuryJ.LSpace import PageController
 from BritefuryJ.Graphics import FilledBorder
 
 from BritefuryJ.Controls import Hyperlink
-from BritefuryJ.Pres import InnerFragment
+from BritefuryJ.Pres import Pres
 from BritefuryJ.Pres.Primitive import Primitive, Border, Row, Column, RGrid, GridRow
-from BritefuryJ.Pres.RichText import TitleBar, HSeparator, Head, Body, Page
+from BritefuryJ.Pres.RichText import TitleBar, HSeparator, Head, Body, Page, LinkHeaderBar
 from BritefuryJ.Pres.UI import Section, SectionHeading1
 from BritefuryJ.Pres.Help import AttachTooltip, TipBox
 

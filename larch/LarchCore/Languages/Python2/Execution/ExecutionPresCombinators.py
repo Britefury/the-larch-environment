@@ -10,7 +10,7 @@ from java.awt import Color
 from BritefuryJ.AttributeTable import AttributeNamespace, InheritedAttributeNonNull, PyDerivedValueTable
 from BritefuryJ.StyleSheet import StyleSheet
 from BritefuryJ.Graphics import SolidBorder
-from BritefuryJ.Pres import ApplyStyleSheetFromAttribute, InnerFragment, ApplyPerspective
+from BritefuryJ.Pres import ApplyStyleSheetFromAttribute, Pres, ApplyPerspective
 from BritefuryJ.Pres.Primitive import Primitive, Label, StaticText, Column, Overlay, Bin, Border, Paragraph
 
 
@@ -49,7 +49,7 @@ def _textLines(text, textStyleAttribute):
 
 def _richStringItem(item, textStyleAttribute, bUseDefaultPerspectiveForResult):
 	if item.isStructural():
-		resultView = InnerFragment( item.getValue() )
+		resultView = Pres.coerce( item.getValue() )
 		if bUseDefaultPerspectiveForResult:
 			resultView = ApplyPerspective.defaultPerspective( resultView )
 		return resultView
@@ -86,12 +86,12 @@ def executionResultBox(streams, exception, resultInTuple, bUseDefaultPerspecitve
 		else:
 			raise ValueError, 'Unreckognised stream \'{0}\''.format( stream.name )
 	if exception is not None:
-		exceptionView = InnerFragment( exception ).alignHPack()
+		exceptionView = Pres.coerce( exception ).alignHPack()
 		if bUseDefaultPerspecitveForException:
 			exceptionView = ApplyPerspective.defaultPerspective( exceptionView )
 		boxContents.append( execException( exceptionView ) )
 	if resultInTuple is not None:
-		resultView = InnerFragment( resultInTuple[0] ).alignHPack()
+		resultView = Pres.coerce( resultInTuple[0] ).alignHPack()
 		if bUseDefaultPerspectiveForResult:
 			resultView = ApplyPerspective.defaultPerspective( resultView )
 		boxContents.append( execResult( resultView ) )
@@ -107,7 +107,7 @@ def minimalExecutionResultBox(streams, exception, resultInTuple, bUseDefaultPers
 		if resultInTuple is None:
 			return None
 		else:
-			resultView = InnerFragment( resultInTuple[0] ).alignHPack()
+			resultView = Pres.coerce( resultInTuple[0] ).alignHPack()
 			if bUseDefaultPerspectiveForResult:
 				resultView = ApplyPerspective.defaultPerspective( resultView )
 			return Paragraph( [ resultView ] ).alignHExpand()
@@ -121,12 +121,12 @@ def minimalExecutionResultBox(streams, exception, resultInTuple, bUseDefaultPers
 			else:
 				raise ValueError, 'Unreckognised stream \'{0}\''.format( stream.name )
 		if exception is not None:
-			exceptionView = InnerFragment( exception )
+			exceptionView = Pres.coerce( exception )
 			if bUseDefaultPerspecitveForException:
 				exceptionView = ApplyPerspective.defaultPerspective( exceptionView )
 			boxContents.append( execException( exceptionView ) )
 		if resultInTuple is not None:
-			resultView = InnerFragment( resultInTuple[0] ).alignHPack()
+			resultView = Pres.coerce( resultInTuple[0] ).alignHPack()
 			if bUseDefaultPerspectiveForResult:
 				resultView = ApplyPerspective.defaultPerspective( resultView )
 			boxContents.append( execResult( resultView ) )
