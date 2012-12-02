@@ -110,9 +110,9 @@ class FontConfiguration (object):
 	def __setstate__(self, state):
 		self._generic = LiveValue( state.get( 'generic', 'SansSerif' ) )
 		self._normal = LiveValue( state.get( 'normal', 'SansSerif' ) )
-		self._heading = LiveValue( state.get( 'standard', 'Serif' ) )
-		self._title = LiveValue( state.get( 'standard', 'Serif' ) )
-		self._uiHeading = LiveValue( state.get( 'standard', 'SansSerif' ) )
+		self._heading = LiveValue( state.get( 'heading', 'Serif' ) )
+		self._title = LiveValue( state.get( 'title', 'Serif' ) )
+		self._uiHeading = LiveValue( state.get( 'uiHeading', 'SansSerif' ) )
 
 
 	def copyFrom(self, config):
