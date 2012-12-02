@@ -36,7 +36,6 @@ from BritefuryJ.LSpace import Anchor
 from BritefuryJ.LSpace.Input import ObjectDndHandler
 from BritefuryJ.LSpace.Interactor import ClickElementInteractor
 from BritefuryJ.Controls import Controls, EditableLabel, MenuItem, Button, TextEntry, Hyperlink
-from BritefuryJ.Pres import InnerFragment
 from BritefuryJ.Pres.Primitive import Primitive, Label, StaticText, Image, Spacer, Bin, Row, Column
 from BritefuryJ.Pres.RichText import TitleBar, Body, Head, Page, HSeparator
 from BritefuryJ.Pres.UI import BubblePopup, SectionHeading1, SectionHeading2, Section
