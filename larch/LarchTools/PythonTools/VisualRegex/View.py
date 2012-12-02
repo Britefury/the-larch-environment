@@ -7,27 +7,19 @@
 ##-*************************
 import math
 
-from copy import deepcopy
-
 from java.lang import Throwable
-
-from java.awt.event import KeyEvent
-
-from java.awt import Color
-
 from java.util import List
+from java.awt import Color
+from java.awt.event import KeyEvent
 
 from BritefuryJ.Parser import ParserExpression
 
 from Britefury.Kernel.View.DispatchView import MethodDispatchView
-from Britefury.Kernel.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch
-from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, ObjectDispatchMethod, redecorateDispatchMethod
+from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod
 
 
 from BritefuryJ.DocModel import DMObjectClass, DMObject, DMObjectInterface
 
-from BritefuryJ.AttributeTable import *
-from BritefuryJ.Controls import *
 from BritefuryJ.Graphics import SolidBorder, FilledBorder, FillPainter
 from BritefuryJ.LSpace.Interactor import KeyElementInteractor
 

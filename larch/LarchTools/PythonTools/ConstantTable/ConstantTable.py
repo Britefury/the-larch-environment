@@ -7,15 +7,9 @@
 ##-*************************
 from copy import deepcopy
 
-from BritefuryJ.Command import *
+from BritefuryJ.Command import Command
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
-
-from BritefuryJ.Controls import *
-
-from BritefuryJ.Pres import *
-from BritefuryJ.Pres.Primitive import *
-from BritefuryJ.Pres.ObjectPres import *
 
 from BritefuryJ.Editor.Table.ObjectList import AttributeColumn, ObjectListTableEditor
 

@@ -11,13 +11,6 @@ from java.awt import Color
 
 from java.awt.event import KeyEvent
 
-from java.util.regex import Pattern
-import java.util.List
-
-from javax.swing import AbstractAction
-from javax.swing import JPopupMenu, JOptionPane, JFileChooser
-from javax.swing.filechooser import FileNameExtensionFilter
-
 from Britefury.Dispatch.MethodDispatch import ObjectDispatchMethod
 
 from Britefury.Kernel.View.DispatchView import MethodDispatchView
@@ -25,21 +18,18 @@ from Britefury.Kernel.View.DispatchView import MethodDispatchView
 from BritefuryJ.Command import CommandName, Command, CommandSet
 from BritefuryJ.Shortcut import Shortcut
 
-from BritefuryJ.AttributeTable import *
-
-from BritefuryJ.LSpace import *
 from BritefuryJ.LSpace.Input import Modifier
-from BritefuryJ.Graphics import *
+from BritefuryJ.Graphics import SolidBorder
 from BritefuryJ.Browser import Location
 from BritefuryJ.StyleSheet import StyleSheet
-from BritefuryJ.Controls import *
-from BritefuryJ.Pres import *
-from BritefuryJ.Pres.Primitive import *
-from BritefuryJ.Pres.RichText import *
-from BritefuryJ.Pres.ContextMenu import *
-from BritefuryJ.Pres.ObjectPres import *
-from BritefuryJ.Pres.UI import *
-from BritefuryJ.Pres.Help import *
+from BritefuryJ.Controls import Button, Hyperlink
+from BritefuryJ.Pres import Pres, ApplyPerspective
+from BritefuryJ.Pres.Primitive import Primitive, Blank, Border, Column
+from BritefuryJ.Pres.RichText import TitleBar, Heading1, Heading2, Heading3, Heading4, Heading4, Heading5, Heading6, NormalText, RichSpan, Page, Body
+from BritefuryJ.Pres.ContextMenu import ControlsRow
+from BritefuryJ.Pres.ObjectPres import ObjectBorder
+from BritefuryJ.Pres.UI import Section, SectionHeading2
+from BritefuryJ.Pres.Help import TipBox
 
 from BritefuryJ.Projection import Perspective, Subject
 
@@ -80,7 +70,7 @@ def _worksheetContextMenuFactory(element, menu):
 class WorksheetViewer (MethodDispatchView):
 	@ObjectDispatchMethod( ViewSchema.WorksheetView )
 	def Worksheet(self, fragment, inheritedState, node):
-		bodyView = InnerFragment( node.getBody() )
+		bodyView = Pres.coerce( node.getBody() )
 		
 		editLocation = fragment.getSubjectContext()['editLocation']
 
@@ -97,7 +87,7 @@ class WorksheetViewer (MethodDispatchView):
 
 	@ObjectDispatchMethod( ViewSchema.BodyView )
 	def Body(self, fragment, inheritedState, node):
-		contentViews = InnerFragment.map( [ c    for c in node.getContents()   if c.isVisible() ] )
+		contentViews = Pres.mapCoerce( [ c    for c in node.getContents()   if c.isVisible() ] )
 		return Body( contentViews ).padX( _worksheetMargin )
 	
 	
@@ -145,7 +135,7 @@ class WorksheetViewer (MethodDispatchView):
 	def PythonCode(self, fragment, inheritedState, node):
 		if node.isVisible():
 			if node.isCodeVisible():
-				codeView = Python2.python2EditorPerspective.applyTo( InnerFragment( node.getCode() ) )
+				codeView = Python2.python2EditorPerspective.applyTo( Pres.coerce( node.getCode() ) )
 				if node.isCodeEditable():
 					codeView = StyleSheet.style( Primitive.editable( True ) ).applyTo( codeView )
 			else:

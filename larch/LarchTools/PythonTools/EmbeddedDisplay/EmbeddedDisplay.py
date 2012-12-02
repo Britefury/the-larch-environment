@@ -5,29 +5,16 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
-from java.awt import Color
-
-from java.util.regex import Pattern
-
 from copy import deepcopy
 
-from BritefuryJ.Command import *
+from BritefuryJ.Command import Command
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
-from BritefuryJ.Live import LiveValue
 
-from BritefuryJ.Controls import *
+from BritefuryJ.Controls import MenuItem
 
-from BritefuryJ.LSpace.Interactor import *
-from BritefuryJ.Graphics import *
-
-from BritefuryJ.Pres import *
-from BritefuryJ.Pres.Primitive import *
-from BritefuryJ.Pres.ObjectPres import *
-
-from BritefuryJ.Editor.Table.Generic import *
-
-from BritefuryJ.StyleSheet import *
+from BritefuryJ.Pres.Primitive import Column, Paragraph
+from BritefuryJ.Pres.ObjectPres import ObjectBox
 
 from LarchCore.Languages.Python2.PythonCommands import pythonCommandSet, EmbeddedExpressionAtCaretAction, WrapSelectionInEmbeddedExpressionAction, chainActions
 from LarchCore.Languages.Python2.Embedded import EmbeddedPython2Expr
