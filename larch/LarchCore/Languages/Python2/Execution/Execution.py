@@ -97,6 +97,12 @@ class MultiplexedRichStream (object):
 		return result
 
 
+	def hasContentFor(self, name):
+		for s in self.__multiplexed:
+			if s.name == name:
+				return True
+		return False
+
 
 	def _write(self, streamName, text):
 		stream = self.__multiplexedForName(streamName)
@@ -140,6 +146,9 @@ class ExecutionResult (object):
 	def suppressResult(self):
 		return ExecutionResult( self._streams, self._caughtException, None )
 
+	def errorsOnly(self):
+		return ExecutionResult( self._streams.suppressStream( 'out' ), self._caughtException, None )
+
 		
 		
 	def getStreams(self):
@@ -150,6 +159,10 @@ class ExecutionResult (object):
 	
 	def getResult(self):
 		return self._result
+
+
+	def hasErrors(self):
+		return self._caughtException is not None  or  self._streams.hasContentFor( 'err' )
 
 
 	def view(self, bUseDefaultPerspecitveForException=True, bUseDefaultPerspectiveForResult=True):
