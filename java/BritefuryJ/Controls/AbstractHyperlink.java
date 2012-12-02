@@ -7,10 +7,13 @@
 package BritefuryJ.Controls;
 
 import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSElement.PropertyValue;
 import BritefuryJ.LSpace.PageController;
 import BritefuryJ.LSpace.Event.AbstractPointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
 import BritefuryJ.LSpace.Input.Modifier;
+import BritefuryJ.LSpace.Input.ObjectDndHandler;
+import BritefuryJ.LSpace.Input.ObjectDndHandler.SourceDataFn;
 import BritefuryJ.LSpace.Interactor.ClickElementInteractor;
 import BritefuryJ.LSpace.Interactor.ContextMenuElementInteractor;
 import BritefuryJ.Pres.Pres;
@@ -21,6 +24,12 @@ import BritefuryJ.StyleSheet.StyleValues;
 
 public abstract class AbstractHyperlink extends ControlPres
 {
+	private static class TargetKey
+	{
+		private static final TargetKey instance = new TargetKey();
+	}
+	
+	
 	public interface LinkListener
 	{
 		public void onLinkClicked(AbstractHyperlinkControl link, PointerButtonClickedEvent event);
@@ -107,6 +116,20 @@ public abstract class AbstractHyperlink extends ControlPres
 	}
 
 	
+	private static final SourceDataFn sourceDataFn = new ObjectDndHandler.SourceDataFn()
+	{
+		@Override
+		public Object createSourceData(LSElement sourceElement, int aspect)
+		{
+			PropertyValue value = sourceElement.getProperty( TargetKey.instance );
+			return value.getValue();
+		}
+	};
+	
+	private static final ObjectDndHandler.DragSource dndSource = new ObjectDndHandler.DragSource( Subject.class, sourceDataFn );
+
+	
+	
 	public static abstract class AbstractHyperlinkControl extends Control
 	{
 		private class LinkInteractor implements ClickElementInteractor
@@ -165,6 +188,7 @@ public abstract class AbstractHyperlink extends ControlPres
 	
 	protected LinkListener listener;
 	protected LinkContextMenuFactory contextMenuInteractor;
+	private Subject targetSubject;
 	private Pres contents;
 	
 	
@@ -179,6 +203,7 @@ public abstract class AbstractHyperlink extends ControlPres
 	{
 		this.listener = new LinkTargetListener( targetSubject );
 		this.contextMenuInteractor = new LinkContextMenuFactory( targetSubject );
+		this.targetSubject = targetSubject;
 		this.contents = Pres.coerce( contents );
 	}
 
@@ -192,12 +217,20 @@ public abstract class AbstractHyperlink extends ControlPres
 		boolean bClosePopupOnActivate = hyperlinkStyle.get( Controls.bClosePopupOnActivate, Boolean.class );
 		
 		LSElement contentsElement = contentsPres.present( ctx, style );
+		Control ctl = createHyperlinkControl( ctx, style, contentsElement, bClosePopupOnActivate, listener, contextMenuInteractor );
+		LSElement controlElement = ctl.getElement();
+
 		if ( contextMenuInteractor != null )
 		{
-			contentsElement.addContextMenuInteractor( contextMenuInteractor );
+			controlElement.addContextMenuInteractor( contextMenuInteractor );
+		}
+		if ( targetSubject != null )
+		{
+			controlElement.addDragSource( dndSource );
+			controlElement.setProperty( TargetKey.instance, targetSubject );
 		}
 
-		return createHyperlinkControl( ctx, style, contentsElement, bClosePopupOnActivate, listener, contextMenuInteractor );
+		return ctl;
 	}
 
 
