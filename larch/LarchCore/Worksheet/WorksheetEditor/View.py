@@ -15,7 +15,7 @@ from BritefuryJ.Command import CommandName, Command, CommandSet
 from BritefuryJ.Shortcut import Shortcut
 
 from BritefuryJ.Projection import Perspective, Subject
-from BritefuryJ.Pres import InnerFragment, LocationAsInnerFragment
+from BritefuryJ.Pres import Pres, LocationAsInnerFragment
 
 
 from BritefuryJ.Controls import Controls, MenuItem, VPopupMenu, Hyperlink, Button, TextEntry, OptionMenu
@@ -27,7 +27,7 @@ from BritefuryJ.LSpace.Marker import Marker
 from BritefuryJ.StyleSheet import StyleSheet
 from BritefuryJ.Pres import ApplyStyleSheetFromAttribute, ApplyPerspective
 from BritefuryJ.Pres.Primitive import Primitive, Label, StaticText, Spacer, Image, Bin, Border, SpaceBin, Row, Column
-from BritefuryJ.Pres.RichText import TitleBar, Heading1, Heading2, Heading3, Heading4, Heading4, Heading5, Heading6, NormalText, RichSpan, Page, Body
+from BritefuryJ.Pres.RichText import TitleBar, Heading1, Heading2, Heading3, Heading4, Heading4, Heading5, Heading6, NormalText, RichSpan, Page, Body, LinkHeaderBar
 from BritefuryJ.Pres.ContextMenu import ControlsRow
 from BritefuryJ.Pres.ObjectPres import ObjectBorder
 from BritefuryJ.Pres.UI import Section, SectionHeading2, SectionHeading3
@@ -248,7 +248,7 @@ def _paragraphEmbeddedObjectContextMenuFactory(element, menu):
 class WorksheetEditor (MethodDispatchView):
 	@ObjectDispatchMethod( EditorSchema.WorksheetEditor )
 	def Worksheet(self, fragment, inheritedState, node):
-		bodyView = InnerFragment( node.getBody() )
+		bodyView = Pres.coerce( node.getBody() )
 		
 		viewLocation = fragment.getSubjectContext()['viewLocation']
 		
@@ -272,7 +272,7 @@ class WorksheetEditor (MethodDispatchView):
 	
 	@ObjectDispatchMethod( EditorSchema.BodyEditor )
 	def Body(self, fragment, inheritedState, node):
-		contentViews = list( InnerFragment.map( node.getContents() ) )
+		contentViews = list( Pres.mapCoerce( node.getContents() ) )
 
 		b = Body( contentViews ).padX( _worksheetMargin )
 		b = WorksheetRichTextController.instance.editableBlock( node, b )
@@ -402,7 +402,7 @@ class WorksheetEditor (MethodDispatchView):
 		def _onDeleteButton(button, event):
 			WorksheetRichTextController.instance.deleteParagraphContainingElement( button.getElement() )
 
-		codeView = Python2.python2EditorPerspective.applyTo( InnerFragment( node.getCode() ) )
+		codeView = Python2.python2EditorPerspective.applyTo( Pres.coerce( node.getCode() ) )
 		
 		executionResultView = None
 		executionResult = node.getResult()

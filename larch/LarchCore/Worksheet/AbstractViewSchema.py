@@ -12,9 +12,9 @@ import imp
 from BritefuryJ.Incremental import IncrementalValueMonitor
 from BritefuryJ.Live import LiveFunction
 
+from BritefuryJ.Pres import Pres
 from BritefuryJ.Browser import Location
 
-from BritefuryJ.Pres import InnerFragment
 from BritefuryJ.Pres.Primitive import Primitive
 from BritefuryJ.StyleSheet import StyleSheet
 
@@ -39,7 +39,7 @@ class NodeAbstractView (object):
 		return True
 	
 	def __present__(self, fragment, inheritedState):
-		return InnerFragment( self._model )
+		return Pres.coerce( self._model )
 	
 	def _viewOf(self, model):
 		return self._worksheet._viewOf( model )
