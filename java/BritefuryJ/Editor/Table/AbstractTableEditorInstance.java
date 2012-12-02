@@ -45,7 +45,11 @@ public abstract class AbstractTableEditorInstance <ModelType>
 				int targetY = Math.max( ty, 0 );
 				
 				Target target = elem.getRootElement().getTarget();
-				if ( target.getElement().isInSubtreeRootedAt( cellElem ) )
+				if ( target == null  ||  !target.isValid() )
+				{
+					return null;
+				}
+				else if ( target.getElement().isInSubtreeRootedAt( cellElem ) )
 				{
 					return null;
 				}

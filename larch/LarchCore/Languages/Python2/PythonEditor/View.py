@@ -6,10 +6,10 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 from java.lang import Throwable
-
 from java.awt.event import KeyEvent
-
 from java.util import List
+
+from copy import deepcopy
 
 from BritefuryJ.Parser import ParserExpression
 
@@ -18,17 +18,18 @@ from Britefury.Kernel.View.TreeEventListenerObjectDispatch import TreeEventListe
 from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, ObjectDispatchMethod, redecorateDispatchMethod
 
 
-from BritefuryJ.DocModel import DMObjectClass
+from BritefuryJ.DocModel import DMObjectClass, DMNode, DMObjectInterface, DMObject
 
 from BritefuryJ.Command import Command
 from BritefuryJ.Shortcut import Shortcut
 
-from BritefuryJ.AttributeTable import *
-from BritefuryJ.Controls import *
+from BritefuryJ.Controls import MenuItem, VPopupMenu, Checkbox
 from BritefuryJ.LSpace.Interactor import KeyElementInteractor
 from BritefuryJ.LSpace.Input import ObjectDndHandler, Modifier
 
-from BritefuryJ.Pres import ApplyPerspective
+from BritefuryJ.LSpace.Marker import Marker
+
+from BritefuryJ.Pres import ApplyPerspective, Pres, ApplyStyleSheetFromAttribute, LazyPres
 from BritefuryJ.Pres.Primitive import Paragraph, Segment
 
 from BritefuryJ.EditPerspective import EditPerspective
@@ -37,7 +38,7 @@ from BritefuryJ.Projection import Perspective
 from BritefuryJ.IncrementalView import FragmentView, FragmentData
 
 from BritefuryJ.Editor.Sequential import SequentialEditorPerspective
-from BritefuryJ.Editor.Sequential.Item import *
+from BritefuryJ.Editor.Sequential.Item import SoftStructuralItem, StructuralItem
 from BritefuryJ.Editor.SyntaxRecognizing import SREInnerFragment
 from BritefuryJ.Editor.SyntaxRecognizing.SyntaxRecognizingController import EditMode
 
@@ -48,15 +49,11 @@ from LarchCore.Languages.Python2 import Schema
 from LarchCore.Languages.Python2 import PythonCommands
 
 
-from LarchCore.Languages.Python2.PythonEditor.Parser import Python2Grammar
 from LarchCore.Languages.Python2.PythonEditor.PythonEditOperations import *
-from LarchCore.Languages.Python2.PythonEditor.SRController import *
-from LarchCore.Languages.Python2.PythonEditor.SRController import _makeSuiteCommitFn
-from LarchCore.Languages.Python2.PythonEditor.Keywords import *
+from LarchCore.Languages.Python2.PythonEditor.SRController import PythonSyntaxRecognizingController, _makeSuiteCommitFn
 from LarchCore.Languages.Python2.PythonEditor.Precedence import *
 from LarchCore.Languages.Python2.PythonEditor.PythonEditorCombinators import *
 
-from BritefuryJ.LSpace.Marker import Marker
 
 
 
@@ -224,7 +221,7 @@ _embeddedObject_dropDest = ObjectDndHandler.DropDest( FragmentData, None, _highl
 
 
 
-def _displayExceptionAtPointer(e):
+def _displayExceptionAtPointer(e, element):
 	ApplyPerspective( None, Pres.coerce( e ) ).popupAtMousePosition( element, True, True )
 
 
@@ -234,7 +231,7 @@ def _convertEmbeddedObjectExprToLiteral(model):
 	pyReplaceNode( model, replacement )
 
 
-def _convertEmbeddedObjectLiteralToExpression(model):
+def _convertEmbeddedObjectLiteralToExpression(model, element):
 	isolated = model['embeddedValue']
 	value = isolated.getValue()
 
@@ -246,7 +243,7 @@ def _convertEmbeddedObjectLiteralToExpression(model):
 			raise ValueError, 'Cannot convert embedded object literal expression to statement'
 		pyReplaceNode( model, replacement )
 	except Exception, e:
-		_displayExceptionAtPointer( e )
+		_displayExceptionAtPointer( e, element )
 
 
 def _convertEmbeddedObjectStmtToLiteral(model):
@@ -316,7 +313,7 @@ def _embeddedObjectLiteralContextMenuFactory(element, menu):
 	model = fragment.getModel()
 
 	def _asExpression(item):
-		_convertEmbeddedObjectLiteralToExpression( model )
+		_convertEmbeddedObjectLiteralToExpression( model, element )
 
 	def _onDelete(item):
 		_removeEmbeddedObjectExpr( model )

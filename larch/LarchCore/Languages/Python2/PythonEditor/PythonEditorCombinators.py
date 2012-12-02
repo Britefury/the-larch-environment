@@ -12,16 +12,16 @@ from java.util.regex import Pattern
 
 from Britefury.Util.Lerp import lerp, lerpColour
 
-from BritefuryJ.AttributeTable import *
-from BritefuryJ.Controls import *
-from BritefuryJ.StyleSheet import *
-from BritefuryJ.Graphics import *
+from BritefuryJ.AttributeTable import AttributeNamespace, InheritedAttributeNonNull, PyDerivedValueTable
+from BritefuryJ.StyleSheet import StyleSheet
+from BritefuryJ.Graphics import AbstractBorder, SolidBorder, FilledBorder, Painter, FillPainter, FilledOutlinePainter
 from BritefuryJ.Live import LiveFunction
-from BritefuryJ.Controls import *
-from BritefuryJ.Pres import *
-from BritefuryJ.Pres.Primitive import *
-from BritefuryJ.Pres.RichText import *
-from BritefuryJ.Pres.Sequence import *
+from BritefuryJ.Controls import TextArea, DropDownExpander
+from BritefuryJ.Pres import ApplyStyleSheetFromAttribute, PyPresCombinatorFn
+from BritefuryJ.Pres.Primitive import Primitive, Blank, Label, Text, Whitespace, LineBreak, Box, Border, Segment, Fraction, Script, Span, Row, Column, Paragraph, LineBreakCostSpan, ParagraphIndentMatchSpan
+from BritefuryJ.Pres.Sequence import Sequence, SpanSequenceView, TrailingSeparator
+
+from BritefuryJ.Editor.SyntaxRecognizing.Precedence import PrecedenceBrackets
 
 
 

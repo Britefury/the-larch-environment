@@ -16,7 +16,7 @@ from javax.swing.filechooser import FileNameExtensionFilter
 
 from BritefuryJ.DocModel import DMNode
 
-from BritefuryJ.Controls import *
+from BritefuryJ.Controls import MenuItem, VPopupMenu
 from BritefuryJ.ChangeHistory import Trackable
 
 from Britefury.Util.Abstract import abstractmethod

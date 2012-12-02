@@ -11,33 +11,30 @@ from java.awt import Color
 
 from copy import deepcopy
 
-from BritefuryJ.Command import *
+from BritefuryJ.Command import Command
 
-from BritefuryJ.Incremental import IncrementalValueMonitor
 from BritefuryJ.Live import TrackedLiveValue, LiveValue
 
-from BritefuryJ.Controls import *
+from BritefuryJ.Controls import Button, EditableLabel
 
-from BritefuryJ.Graphics import *
+from BritefuryJ.Graphics import SolidBorder
 
-from BritefuryJ.Pres import *
-from BritefuryJ.Pres.Primitive import *
-from BritefuryJ.Pres.RichText import *
-from BritefuryJ.Pres.UI import *
-from BritefuryJ.Pres.ObjectPres import *
+from BritefuryJ.Pres import Pres
+from BritefuryJ.Pres.Primitive import Primitive, Label, Blank, Spacer, Row, Column
+from BritefuryJ.Pres.UI import SectionHeading2
 
 from BritefuryJ.Parser.Utils import Tokens
 
-from BritefuryJ.Editor.Table.ObjectList import *
+from BritefuryJ.Editor.Table.ObjectList import AttributeColumn, ObjectListTableEditor
 
-from BritefuryJ.StyleSheet import *
+from BritefuryJ.StyleSheet import StyleSheet
 
 from Britefury.Util.LiveList import LiveList
 from Britefury.Util.UniqueNameTable import UniqueNameTable
 from BritefuryJ.Util.Jython import JythonException
 
-from LarchCore.Languages.Python2.PythonCommands import pythonCommandSet, EmbeddedStatementAtCaretAction, WrapSelectedStatementRangeInEmbeddedObjectAction, chainActions
-from LarchCore.Languages.Python2.Embedded import EmbeddedPython2Expr, EmbeddedPython2Suite
+from LarchCore.Languages.Python2.PythonCommands import EmbeddedStatementAtCaretAction, chainActions
+from LarchCore.Languages.Python2.Embedded import EmbeddedPython2Suite
 from LarchCore.Languages.Python2 import Schema
 
 from LarchTools.PythonTools.InlineTest.InlineTest import AbstractInlineTest, inlineTestCommandSet

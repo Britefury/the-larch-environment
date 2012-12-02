@@ -11,8 +11,7 @@ from BritefuryJ.LSpace import Anchor
 from BritefuryJ.LSpace.Input import Modifier
 from BritefuryJ.LSpace.Interactor import ContextMenuElementInteractor
 
-from BritefuryJ.Pres.RichText import *
-from BritefuryJ.Pres.UI import *
+from BritefuryJ.Pres.UI import Section, SectionHeading2
 
 
 class Editor (object):

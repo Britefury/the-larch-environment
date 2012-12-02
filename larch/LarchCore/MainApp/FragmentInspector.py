@@ -7,14 +7,14 @@
 ##-*************************
 from java.awt import Color
 
-from BritefuryJ.Graphics import *
+from BritefuryJ.Graphics import SolidBorder, FilledOutlinePainter
 from BritefuryJ.LSpace import Anchor, ElementPainter, PageController
 from BritefuryJ.LSpace.Interactor import HoverElementInteractor, PushElementInteractor
 from BritefuryJ.Pres import LazyPres, Pres
-from BritefuryJ.Pres.Primitive import *
-from BritefuryJ.Pres.UI import *
-from BritefuryJ.StyleSheet import *
-from BritefuryJ.Controls import *
+from BritefuryJ.Pres.Primitive import Primitive, Label, Spacer, LineBreak, SpaceBin, Column, Paragraph
+from BritefuryJ.Pres.UI import Section, SectionHeading1, BubblePopup
+from BritefuryJ.StyleSheet import StyleSheet
+from BritefuryJ.Controls import TabbedBox
 from BritefuryJ.Util import TypeUtils
 
 from BritefuryJ.ObjectPresentation import PresentationStateListenerList

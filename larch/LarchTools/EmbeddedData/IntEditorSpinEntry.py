@@ -8,7 +8,7 @@
 from java.util.regex import Pattern
 
 from BritefuryJ.Parser.Utils import Tokens
-from BritefuryJ.Pres.Primitive import *
+from BritefuryJ.Pres.Primitive import Label, Table
 from BritefuryJ.Controls import IntSpinEntry, TextEntry
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
