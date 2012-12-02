@@ -248,11 +248,8 @@ def _paragraphEmbeddedObjectContextMenuFactory(element, menu):
 class WorksheetEditor (MethodDispatchView):
 	@ObjectDispatchMethod( EditorSchema.WorksheetEditor )
 	def Worksheet(self, fragment, inheritedState, node):
-		bodyView = Pres.coerce( node.getBody() )
-		
 		viewLocation = fragment.getSubjectContext()['viewLocation']
 		
-		homeLink = Hyperlink( 'HOME PAGE', Location( '' ) )
 		viewLink = Hyperlink( 'Switch to user mode', viewLocation )
 		linkHeader = AppLocationPath.appLinkheaderBar( fragment.getSubjectContext(), [ viewLink ] )
 
@@ -262,7 +259,7 @@ class WorksheetEditor (MethodDispatchView):
 			      'larchcore.worksheet.edit.howto' )
 
 
-		w = Page( [ linkHeader, bodyView, tip ] )
+		w = Page( [ linkHeader, node.getBody(), tip ] )
 		w = w.withContextMenuInteractor( _worksheetContextMenuFactory )
 		w = w.withDropDest( _embeddedObject_dropDest )
 		w = w.withCommands( worksheetCommands )
@@ -272,9 +269,7 @@ class WorksheetEditor (MethodDispatchView):
 	
 	@ObjectDispatchMethod( EditorSchema.BodyEditor )
 	def Body(self, fragment, inheritedState, node):
-		contentViews = list( Pres.mapCoerce( node.getContents() ) )
-
-		b = Body( contentViews ).padX( _worksheetMargin )
+		b = Body( node.getContents() ).padX( _worksheetMargin )
 		b = WorksheetRichTextController.instance.editableBlock( node, b )
 		return b
 	
@@ -402,7 +397,7 @@ class WorksheetEditor (MethodDispatchView):
 		def _onDeleteButton(button, event):
 			WorksheetRichTextController.instance.deleteParagraphContainingElement( button.getElement() )
 
-		codeView = Python2.python2EditorPerspective.applyTo( Pres.coerce( node.getCode() ) )
+		codeView = Python2.python2EditorPerspective.applyTo( node.getCode() )
 		
 		executionResultView = None
 		executionResult = node.getResult()

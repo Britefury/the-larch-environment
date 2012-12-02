@@ -196,8 +196,8 @@ class Console (object):
 
 
 	def __present__(self, fragment, inheritedState):
-		blocks = Pres.mapCoerce( self.getBlocks() )
-		currentModule = Python2.python2EditorPerspective.applyTo( Pres.coerce( self.getCurrentPythonModule() ) )
+		blocks = self.getBlocks()
+		currentModule = Python2.python2EditorPerspective.applyTo( self.getCurrentPythonModule() )
 
 		def _onDrop(element, pos, data, action):
 			class _VarNameEntryListener (TextEntry.TextEntryListener):
@@ -309,9 +309,9 @@ class ConsoleBlock (object):
 		result = executionResult.getResult()
 		streams = executionResult.getStreams()
 
-		moduleView = StyleSheet.style( Primitive.editable( False ) ).applyTo( Python2.python2EditorPerspective.applyTo( Pres.coerce( pythonModule ) ) )
-		caughtExceptionView = ApplyPerspective.defaultPerspective( Pres.coerce( caughtException ) )   if caughtException is not None   else None
-		resultView = ApplyPerspective.defaultPerspective( Pres.coerce( result[0] ) )   if result is not None   else None
+		moduleView = StyleSheet.style( Primitive.editable( False ) ).applyTo( Python2.python2EditorPerspective.applyTo( pythonModule ) )
+		caughtExceptionView = ApplyPerspective.defaultPerspective( caughtException )   if caughtException is not None   else None
+		resultView = ApplyPerspective.defaultPerspective( result[0] )   if result is not None   else None
 
 		code = _pythonModuleBorderStyle.applyTo( Border( moduleView.alignHExpand() ).alignHExpand() )
 		outputContents = []
