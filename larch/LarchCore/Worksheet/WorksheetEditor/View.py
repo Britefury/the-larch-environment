@@ -259,8 +259,7 @@ class WorksheetEditor (MethodDispatchView):
 			      'larchcore.worksheet.edit.howto' )
 
 
-		w = Page( pageContents + [ bodyView, tip ] )
-		w = Page( [ linkHeader, node.getBody(), tip ] )
+		w = Page( pageContents + [ node.getBody(), tip ] )
 		w = w.withContextMenuInteractor( _worksheetContextMenuFactory )
 		w = w.withDropDest( _embeddedObject_dropDest )
 		w = w.withCommands( worksheetCommands )
