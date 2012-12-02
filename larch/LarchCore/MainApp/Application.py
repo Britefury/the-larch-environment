@@ -9,8 +9,6 @@ from copy import copy
 
 from javax.swing import JOptionPane
 
-from BritefuryJ.Browser import Location
-
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from LarchCore.PythonConsole import Console
@@ -31,13 +29,9 @@ class AppState (object):
 		self._incr.onAccess()
 		return copy( self._openDocuments )
 	
-	def registerOpenDocument(self, document, documentCollectionLocation):
-		assert isinstance( documentCollectionLocation, Location )
-		relativeLocation = 'Doc%03d'  %  ( self._documentIDCounter, )
-		location = documentCollectionLocation + '.' + relativeLocation
+	def registerOpenDocument(self, document):
 		self._documentIDCounter += 1
-		appDocument = AppDocument( document, relativeLocation, self )
-		document.setLocation( location )
+		appDocument = AppDocument( document, self )
 		self._openDocuments.append( appDocument )
 		self._docToAppDoc[document] = appDocument
 		self._incr.onChanged()
@@ -79,11 +73,10 @@ class AppState (object):
 		
 	
 class AppDocument (object):
-	def __init__(self, doc, relativeLocation, appState):
+	def __init__(self, doc, appState):
 		self._incr = IncrementalValueMonitor( self )
 		
 		self._doc = doc
-		self._relativeLocation = relativeLocation
 		self.__appState = appState
 		
 		
@@ -96,11 +89,7 @@ class AppDocument (object):
 		self._incr.onAccess()
 		return self._doc
 	
-	def getRelativeLocation(self):
-		self._incr.onAccess()
-		return self._relativeLocation
-	
-	
+
 	def hasUnsavedData(self):
 		return self._doc.hasUnsavedData()
 
@@ -117,7 +106,10 @@ class AppConsole (object):
 		
 		self._index = index
 		self._console = Console.Console( '<console%d>'  %  ( index, ) )
-		
+
+
+	def subject(self, enclosingSubject):
+		return Console.ConsoleSubject( self._console, enclosingSubject )
 		
 		
 	def getIndex(self):
