@@ -92,7 +92,7 @@ public class CommandName extends CommandMnemonic
 				}
 				
 				// Highlighted text
-				addElement( elements, name, highlightStart, Math.min( segEnd, highlightEnd ), autocompleteHighlightStyle );
+				addElement( elements, name, Math.max( segStart, highlightStart ), Math.min( segEnd, highlightEnd ), autocompleteHighlightStyle );
 				
 				if ( highlightEnd < segEnd )
 				{
