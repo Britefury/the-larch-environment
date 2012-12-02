@@ -17,12 +17,11 @@ from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from BritefuryJ.Controls import Hyperlink
 
-from BritefuryJ.Graphics import *
+from BritefuryJ.Graphics import SolidBorder
 
-from BritefuryJ.Pres import *
-from BritefuryJ.Pres.Primitive import *
-from BritefuryJ.Pres.RichText import *
-from BritefuryJ.StyleSheet import *
+from BritefuryJ.Pres.Primitive import Primitive, Label, Spacer, Border, Row, Column, Table
+from BritefuryJ.Pres.RichText import Heading3, Body
+from BritefuryJ.StyleSheet import StyleSheet
 
 from BritefuryJ.GraphViz import GraphViz, Configuration as GraphVizConfiguration
 

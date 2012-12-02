@@ -5,10 +5,10 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
+from copy import deepcopy
 
-
-from BritefuryJ.Parser import *
-from BritefuryJ.Parser.Utils import *
+from BritefuryJ.Parser import Literal, RegEx, Keyword, Suppress, SeparatedList
+from BritefuryJ.Parser.Utils import Tokens
 from BritefuryJ.Parser.Utils.OperatorParser import PrefixLevel, SuffixLevel, InfixLeftLevel, InfixRightLevel, InfixChainLevel, UnaryOperator, BinaryOperator, OperatorTable
 
 
@@ -18,6 +18,22 @@ from Britefury.Grammar.Grammar import Grammar, Rule
 from LarchCore.Languages.Java import Keywords
 from LarchCore.Languages.Java import Schema
 
+
+def _incrementParens(node):
+	def _xform(node, innerNodeXform):
+		return node
+	p = node['parens']
+	numParens = 0
+	if p is not None   and   ( isinstance( p, str )  or  isinstance( p, unicode ) ):
+		p = str( p )
+		try:
+			numParens = int( p )
+		except ValueError:
+			pass
+	numParens += 1
+	newNode = deepcopy( node )
+	newNode['parens'] = str( numParens )
+	return  newNode
 
 
 class JavaGrammar (Grammar):

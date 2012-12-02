@@ -10,24 +10,22 @@ from javax.swing.filechooser import FileNameExtensionFilter
 
 from java.awt import Color, Font, GraphicsEnvironment
 
-import os
 import sys
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
-from BritefuryJ.Controls import *
+from BritefuryJ.Controls import DropDownExpander, ScrolledViewport, Button, OptionMenu
 
-from BritefuryJ.Graphics import *
+from BritefuryJ.Graphics import FilledOutlinePainter
 
-from BritefuryJ.Pres import *
-from BritefuryJ.Pres.Primitive import *
-from BritefuryJ.Pres.RichText import *
-from BritefuryJ.Pres.UI import *
-from BritefuryJ.StyleSheet import *
-from BritefuryJ.LSpace.Interactor import *
+from BritefuryJ.Pres.Primitive import Primitive, Label, Spacer, Blank, Bin, Row, Column, FlowGrid
+from BritefuryJ.Pres.RichText import RichText, TitleBar, Heading1, NormalText, Body, Page
+from BritefuryJ.Pres.UI import UI, Section, SectionHeading1
+from BritefuryJ.StyleSheet import StyleSheet, StyleValues
+from BritefuryJ.LSpace.Interactor import PushElementInteractor
 from BritefuryJ.LSpace.Input import Modifier
 
-from BritefuryJ.Live import *
+from BritefuryJ.Live import LiveValue, LiveFunction
 
 from Britefury.Config.UserConfig import loadUserConfig, saveUserConfig
 from Britefury.Config import Configuration

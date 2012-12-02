@@ -11,7 +11,7 @@ from javax.swing import JOptionPane, JFileChooser
 from javax.swing.filechooser import FileNameExtensionFilter
 
 from BritefuryJ.Controls import Button, EditableLabel
-from BritefuryJ.Pres.Primitive import *
+from BritefuryJ.Pres.Primitive import Primitive, Label, Spacer, Row
 from BritefuryJ.StyleSheet import StyleSheet
 
 from Britefury.Util.Abstract import abstractmethod

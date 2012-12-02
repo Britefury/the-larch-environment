@@ -8,48 +8,35 @@
 from java.awt import Color
 from java.awt.event import KeyEvent
 
-from java.util.regex import Pattern
-import java.util.List
-
-from javax.swing import AbstractAction
-from javax.swing import JPopupMenu, JOptionPane, JFileChooser
-from javax.swing.filechooser import FileNameExtensionFilter
-
 from Britefury.Kernel.View.DispatchView import MethodDispatchView
 from Britefury.Dispatch.MethodDispatch import ObjectDispatchMethod
 
 from BritefuryJ.Command import CommandName, Command, CommandSet
 from BritefuryJ.Shortcut import Shortcut
 
-from BritefuryJ.AttributeTable import *
-
 from BritefuryJ.Projection import Perspective, Subject
 from BritefuryJ.Pres import InnerFragment
 
 
-from BritefuryJ.Controls import *
-from BritefuryJ.LSpace import *
-from BritefuryJ.Graphics import *
+from BritefuryJ.Controls import Controls, MenuItem, VPopupMenu, Hyperlink, Button, TextEntry, OptionMenu
+from BritefuryJ.Graphics import SolidBorder, BorderWithHeaderBar, FilledOutlinePainter
 from BritefuryJ.LSpace.Input import ObjectDndHandler, Modifier
 from BritefuryJ.LSpace.TextFocus import TextSelection
 from BritefuryJ.LSpace.Marker import Marker
 from BritefuryJ.StyleSheet import StyleSheet
-from BritefuryJ.Pres import *
-from BritefuryJ.Pres.Primitive import *
-from BritefuryJ.Pres.RichText import *
-from BritefuryJ.Pres.ContextMenu import *
-from BritefuryJ.Pres.ObjectPres import *
-from BritefuryJ.Pres.UI import *
-from BritefuryJ.Pres.Help import *
+from BritefuryJ.Pres import ApplyStyleSheetFromAttribute, ApplyPerspective
+from BritefuryJ.Pres.Primitive import Primitive, Label, StaticText, Spacer, Image, Bin, Border, SpaceBin, Row, Column
+from BritefuryJ.Pres.RichText import TitleBar, Heading1, Heading2, Heading3, Heading4, Heading4, Heading5, Heading6, NormalText, RichSpan, Page, Body
+from BritefuryJ.Pres.ContextMenu import ControlsRow
+from BritefuryJ.Pres.ObjectPres import ObjectBorder
+from BritefuryJ.Pres.UI import Section, SectionHeading2, SectionHeading3
+from BritefuryJ.Pres.Help import TipBox
 
 from BritefuryJ.EditPerspective import EditPerspective
 
 from BritefuryJ.IncrementalView import FragmentData
 
-from BritefuryJ.LSpace.Interactor import KeyElementInteractor
-
 from BritefuryJ.Editor.Sequential import SequentialEditorPerspective
-from BritefuryJ.Editor.Sequential.Item import *
 
 from LarchCore.Languages.Python2 import Python2
 

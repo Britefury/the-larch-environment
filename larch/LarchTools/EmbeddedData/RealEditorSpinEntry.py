@@ -6,7 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
 from BritefuryJ.Parser.Utils import Tokens
-from BritefuryJ.Pres.Primitive import *
+from BritefuryJ.Pres.Primitive import Label, Table
 from BritefuryJ.Controls import RealSpinEntry, TextEntry
 from BritefuryJ.Incremental import IncrementalValueMonitor
 

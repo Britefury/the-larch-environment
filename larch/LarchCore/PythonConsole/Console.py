@@ -23,19 +23,19 @@ from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from BritefuryJ.Live import LiveValue
 
-from BritefuryJ.AttributeTable import *
+from BritefuryJ.AttributeTable import SimpleAttributeTable
 
 from BritefuryJ.Controls import TextEntry
-from BritefuryJ.StyleSheet import *
-from BritefuryJ.Graphics import *
+from BritefuryJ.StyleSheet import StyleSheet
+from BritefuryJ.Graphics import SolidBorder
 from BritefuryJ.LSpace.Input import ObjectDndHandler, Modifier
 from BritefuryJ.Shortcut import Shortcut
 
 from BritefuryJ.DefaultPerspective import DefaultPerspective
 
 from BritefuryJ.Pres import InnerFragment, ApplyPerspective
-from BritefuryJ.Pres.Primitive import *
-from BritefuryJ.Pres.RichText import *
+from BritefuryJ.Pres.Primitive import Primitive, Blank, Label, LineBreak, Border, Paragraph, Row, Column, Span
+from BritefuryJ.Pres.RichText import NormalText
 
 from BritefuryJ.Projection import Perspective, TransientSubject
 from BritefuryJ.IncrementalView import FragmentView, FragmentData

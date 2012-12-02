@@ -12,15 +12,13 @@ from java.awt.event import KeyEvent
 
 from BritefuryJ.Command import Command, CommandSet
 
-from BritefuryJ.Controls import *
-
-from BritefuryJ.Graphics import *
+from BritefuryJ.Graphics import SolidBorder
 from BritefuryJ.LSpace.Interactor import KeyElementInteractor
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
-from BritefuryJ.Pres.Primitive import *
-from BritefuryJ.StyleSheet import *
+from BritefuryJ.Pres.Primitive import Primitive, Label, Column
+from BritefuryJ.StyleSheet import StyleSheet
 
 from LarchCore.Languages.Python2.PythonCommands import pythonCommandSet, WrapSelectedStatementRangeInEmbeddedObjectAction, EmbeddedStatementAtCaretAction, chainActions
 from LarchCore.Languages.Python2.Embedded import EmbeddedPython2Suite, removeEmbeddedObjectContainingElement

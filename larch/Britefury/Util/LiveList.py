@@ -9,7 +9,8 @@ from copy import deepcopy
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
-from Britefury.Util.TrackedList import *
+from Britefury.Util.TrackedList import onTrackedListSetItem, onTrackedListSetContents, onTrackedListAppend, onTrackedListExtend, onTrackedListInsert, \
+	onTrackedListPop, onTrackedListRemove, onTrackedListReverse
 
 
 
