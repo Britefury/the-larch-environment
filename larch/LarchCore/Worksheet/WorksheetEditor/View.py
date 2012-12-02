@@ -15,7 +15,6 @@ from BritefuryJ.Command import CommandName, Command, CommandSet
 from BritefuryJ.Shortcut import Shortcut
 
 from BritefuryJ.Projection import Perspective, Subject
-from BritefuryJ.Pres import InnerFragment
 
 
 from BritefuryJ.Controls import Controls, MenuItem, VPopupMenu, Hyperlink, Button, TextEntry, OptionMenu
