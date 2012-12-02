@@ -11,14 +11,14 @@ from BritefuryJ.Controls import *
 
 from BritefuryJ.LSpace import ElementPainter, PageController
 
-from BritefuryJ.Browser import Location
+from BritefuryJ.DefaultPerspective import DefaultPerspective
 
 from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.LSpace.Interactor import *
 from BritefuryJ.LSpace.Input import Modifier
 
 
-from BritefuryJ.Projection import Subject
+from BritefuryJ.Projection import TransientSubject
 
 
 
@@ -38,9 +38,9 @@ class _SlidePage (object):
 		def buttonRelease(self, element, event):
 			pageController = element.getRootElement().getPageController()
 			if ( event.getPointer().getModifiers() & Modifier.CTRL )  !=  0:
-				pageController.openLocation( self._page._prevLoc, PageController.OpenOperation.OPEN_IN_CURRENT_TAB )
+				pageController.openSubject( self._page._prevLoc, PageController.OpenOperation.OPEN_IN_CURRENT_TAB )
 			else:
-				pageController.openLocation( self._page._nextLoc, PageController.OpenOperation.OPEN_IN_CURRENT_TAB )
+				pageController.openSubject( self._page._nextLoc, PageController.OpenOperation.OPEN_IN_CURRENT_TAB )
 	
 	
 	def __init__(self, slide, prevLoc, nextLoc):
@@ -92,11 +92,8 @@ class _SlideShowLink (object):
 		self._subject = _SlideShowSubject( self._slideShow )
 		
 	def __present__(self, fragment, inheritedState):
-		location = fragment.getLocationForObject( self._subject )
-		self._subject._baseLocation = location
-		link = Hyperlink( 'Slide show', location + '[0]' )
-		return link
-	
+		return HyperLink( 'Slide show', self._subject )
+
 	
 class SlideShow (object):
 	def __init__(self, slides):
@@ -110,7 +107,7 @@ class SlideShow (object):
 	
 
 		
-class _SlideSubject (Subject):
+class _SlideSubject (TransientSubject):
 	def __init__(self, slideShowSubject, slide, index):
 		self._slideShowSubject = slideShowSubject
 		self._slide = slide

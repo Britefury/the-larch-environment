@@ -8,7 +8,9 @@ package BritefuryJ.Browser.TestPages;
 
 import java.util.ArrayList;
 
-import BritefuryJ.Browser.BrowserPage;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.DefaultPerspective.Presentable;
+import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.RichText.Body;
@@ -18,11 +20,21 @@ import BritefuryJ.Pres.RichText.Page;
 import BritefuryJ.Pres.RichText.TitleBar;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public abstract class TestPage extends BrowserPage
+public abstract class TestPage extends AbstractTestPage implements Presentable
 {
-	public Pres getContentsPres()
+	protected String getDescription()
 	{
-		Pres linkHeader = TestsRootPage.createLinkHeader( TestsRootPage.LINKHEADER_ROOTPAGE | TestsRootPage.LINKHEADER_SYSTEMPAGE );
+		return null;
+	}
+	
+	protected abstract Pres createContents();
+	
+	
+	
+	@Override
+	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
+	{
+		Pres linkHeader = TestsRootPage.createLinkHeader( TestsRootPage.LINKHEADER_SYSTEMPAGE );
 		Pres title = new TitleBar( "Test page: " + getTitle() );
 		
 		Pres head = new Head( new Pres[] { linkHeader, title } );
@@ -40,12 +52,6 @@ public abstract class TestPage extends BrowserPage
 	}
 
 
-	protected String getDescription()
-	{
-		return null;
-	}
-	
-	protected abstract Pres createContents();
 
 
 	private static final StyleSheet staticStyle = StyleSheet.style( Primitive.editable.as( false ) );

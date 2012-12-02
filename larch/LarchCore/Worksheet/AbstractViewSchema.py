@@ -13,8 +13,6 @@ from BritefuryJ.Incremental import IncrementalValueMonitor
 from BritefuryJ.Live import LiveFunction
 
 from BritefuryJ.Pres import Pres
-from BritefuryJ.Browser import Location
-
 from BritefuryJ.Pres.Primitive import Primitive
 from BritefuryJ.StyleSheet import StyleSheet
 
@@ -200,15 +198,9 @@ class LinkAbstractView (NodeAbstractView):
 		return self._model['text']
 
 
-	def getAbsoluteLocation(self, docLocation):
-		loc = self._model['location']
-		if self._model['absolute'] is not None:
-			return Location( loc )
-		else:
-			if loc == '':
-				return docLocation
-			else:
-				return docLocation.join( loc )
+	def getSubject(self, docSubject):
+		raise NotImplementedError
+
 
 
 
