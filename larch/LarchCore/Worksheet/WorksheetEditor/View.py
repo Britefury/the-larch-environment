@@ -387,6 +387,7 @@ class WorksheetEditor (MethodDispatchView):
 		        EditorSchema.PythonCodeEditor.STYLE_CODE,
 		        EditorSchema.PythonCodeEditor.STYLE_EDITABLE_CODE_AND_RESULT,
 		        EditorSchema.PythonCodeEditor.STYLE_EDITABLE_CODE,
+			EditorSchema.PythonCodeEditor.STYLE_ERRORS,
 		        EditorSchema.PythonCodeEditor.STYLE_HIDDEN ]
 
 		
@@ -407,7 +408,7 @@ class WorksheetEditor (MethodDispatchView):
 			executionResultView = executionResult.view()
 			
 			
-		optionTexts = [ 'Minimal result', 'Result', 'Code with result', 'Code', 'Editable code with result', 'Editable code', 'Hidden' ]
+		optionTexts = [ 'Minimal result', 'Result', 'Code with result', 'Code', 'Editable code with result', 'Editable code', 'Errors only', 'Hidden' ]
 		optionChoices = [ StaticText( text )   for text in optionTexts ]
 		styleOptionMenu = OptionMenu( optionChoices, choiceValues.index( node.getStyle() ), _onStyleOptionMenu )
 		

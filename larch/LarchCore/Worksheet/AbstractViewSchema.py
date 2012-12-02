@@ -220,7 +220,8 @@ class PythonCodeAbstractView (NodeAbstractView):
 	STYLE_CODE = 3
 	STYLE_EDITABLE_CODE_AND_RESULT = 4
 	STYLE_EDITABLE_CODE = 5
-	STYLE_HIDDEN = 6
+	STYLE_ERRORS = 6
+	STYLE_HIDDEN = 7
 	
 	_styleToName  = { STYLE_MINIMAL_RESULT : 'minimal_result',
 	                    STYLE_RESULT : 'result',
@@ -228,6 +229,7 @@ class PythonCodeAbstractView (NodeAbstractView):
 	                    STYLE_CODE : 'code',
 	                    STYLE_EDITABLE_CODE_AND_RESULT : 'editable_code_result',
 	                    STYLE_EDITABLE_CODE : 'editable_code',
+			    STYLE_ERRORS : 'errors',
 	                    STYLE_HIDDEN : 'hidden' }
 	
 	_nameToStyle  = { 'minimal_result' : STYLE_MINIMAL_RESULT,
@@ -236,6 +238,7 @@ class PythonCodeAbstractView (NodeAbstractView):
 	                  'code' : STYLE_CODE,
 	                  'editable_code_result' : STYLE_EDITABLE_CODE_AND_RESULT,
 	                  'editable_code' : STYLE_EDITABLE_CODE,
+			  'errors' : STYLE_ERRORS,
 	                  'hidden' : STYLE_HIDDEN }
 	
 	
@@ -273,11 +276,21 @@ class PythonCodeAbstractView (NodeAbstractView):
 	def isResultMinimal(self):
 		style = self.getStyle()
 		return style == self.STYLE_MINIMAL_RESULT
-	
+
+	def isMinimal(self):
+		style = self.getStyle()
+		return style == self.STYLE_MINIMAL_RESULT  or  style == self.STYLE_ERRORS
+
 	def isVisible(self):
 		style = self.getStyle()
-		return style != self.STYLE_HIDDEN
-		
+		if style == self.STYLE_HIDDEN:
+			return False
+		elif style == self.STYLE_ERRORS:
+			result = self.getResult()
+			return result.hasErrors()
+		else:
+			return True
+
 		
 		
 	def getResult(self):

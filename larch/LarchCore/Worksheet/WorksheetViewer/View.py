@@ -146,12 +146,12 @@ class WorksheetViewer (MethodDispatchView):
 			if executionResult is not None:
 				if not node.isResultVisible():
 					executionResult = executionResult.suppressStdOut().suppressResult()
-				if node.isCodeVisible():
-					executionResultView = executionResult.view()
-				else:
+				if node.isMinimal():
 					executionResultView = executionResult.minimalView()
+				else:
+					executionResultView = executionResult.view()
 
-			if node.isResultMinimal():
+			if node.isMinimal():
 				return executionResultView.alignHExpand()   if executionResultView is not None   else Blank()
 			else:
 				boxContents = []
