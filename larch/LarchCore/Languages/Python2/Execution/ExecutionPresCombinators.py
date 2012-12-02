@@ -7,13 +7,11 @@
 ##-*************************
 from java.awt import Color
 
-from BritefuryJ.AttributeTable import *
-from BritefuryJ.StyleSheet import *
-from BritefuryJ.Graphics import *
-from BritefuryJ.Pres import *
-from BritefuryJ.Pres.Primitive import *
-from BritefuryJ.Pres.RichText import *
-from BritefuryJ.Pres.Sequence import *
+from BritefuryJ.AttributeTable import AttributeNamespace, InheritedAttributeNonNull, PyDerivedValueTable
+from BritefuryJ.StyleSheet import StyleSheet
+from BritefuryJ.Graphics import SolidBorder
+from BritefuryJ.Pres import ApplyStyleSheetFromAttribute, InnerFragment, ApplyPerspective
+from BritefuryJ.Pres.Primitive import Primitive, Label, StaticText, Column, Overlay, Bin, Border, Paragraph
 
 
 

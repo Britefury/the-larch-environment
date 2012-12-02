@@ -5,8 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from BritefuryJ.Parser import *
-from BritefuryJ.Parser.Utils.OperatorParser import *
+from BritefuryJ.Parser import Literal, Production, Choice, Sequence, Action
+from BritefuryJ.Parser.Utils.OperatorParser import OperatorTable, InfixLeftLevel, BinaryOperator
 
 
 from Britefury.Grammar.Grammar import Grammar, Rule, RuleList

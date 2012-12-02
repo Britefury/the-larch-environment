@@ -12,7 +12,7 @@ from BritefuryJ.DocModel import DMObject, DMList, DMEmbeddedObject, DMEmbeddedIs
 from Britefury.Dispatch.MethodDispatch import ObjectDispatchMethod, DMObjectNodeDispatchMethod, methodDispatch
 
 from LarchCore.Languages.Python2 import Schema
-from LarchCore.Languages.Python2.PythonEditor.Precedence import *
+from LarchCore.Languages.Python2.PythonEditor import Precedence
 
 
 class Line (object):
@@ -136,10 +136,10 @@ class Python2CodeGenerator (object):
 	
 	
 	# Callable - use document model node method dispatch mechanism
-	def __call__(self, x, outerPrec=PRECEDENCE_NONE):
+	def __call__(self, x, outerPrec=Precedence.PRECEDENCE_NONE):
 		s = methodDispatch( self, x )
-		if parensRequired[x]:
-			prec = nodePrecedence[x]
+		if Precedence.parensRequired[x]:
+			prec = Precedence.nodePrecedence[x]
 			if prec != -1  and  outerPrec != -1  and  prec > outerPrec:
 				s = '(' + s + ')'
 		return s
@@ -148,9 +148,9 @@ class Python2CodeGenerator (object):
 	
 	def _tupleElements(self, xs):
 		if len( xs ) == 1:
-			return self( xs[0], PRECEDENCE_CONTAINER_ELEMENT ) + ','
+			return self( xs[0], Precedence.PRECEDENCE_CONTAINER_ELEMENT ) + ','
 		else:
-			return ', '.join( [ self( x, PRECEDENCE_CONTAINER_ELEMENT )   for x in xs ] )
+			return ', '.join( [ self( x, Precedence.PRECEDENCE_CONTAINER_ELEMENT )   for x in xs ] )
 	
 	
 	# Misc
@@ -240,7 +240,7 @@ class Python2CodeGenerator (object):
 	
 	@DMObjectNodeDispatchMethod( Schema.ListTarget )
 	def ListTarget(self, node, targets):
-		return '['  +  ', '.join( [ self( i, PRECEDENCE_CONTAINER_ELEMENT )   for i in targets ] )  +  ']'
+		return '['  +  ', '.join( [ self( i, Precedence.PRECEDENCE_CONTAINER_ELEMENT )   for i in targets ] )  +  ']'
 	
 	
 
@@ -261,52 +261,52 @@ class Python2CodeGenerator (object):
 	# List literal
 	@DMObjectNodeDispatchMethod( Schema.ListLiteral )
 	def ListLiteral(self, node, values):
-		return '['  +  ', '.join( [ self( i, PRECEDENCE_CONTAINER_ELEMENT )   for i in values ] )  +  ']'
+		return '['  +  ', '.join( [ self( i, Precedence.PRECEDENCE_CONTAINER_ELEMENT )   for i in values ] )  +  ']'
 	
 	
 	
 	# List comprehension / generator expression
 	@DMObjectNodeDispatchMethod( Schema.ComprehensionFor )
 	def ComprehensionFor(self, node, target, source):
-		return 'for ' + self( target, PRECEDENCE_CONTAINER_COMPREHENSIONFOR ) + ' in ' + self( source, PRECEDENCE_CONTAINER_COMPREHENSIONFOR )
+		return 'for ' + self( target, Precedence.PRECEDENCE_CONTAINER_COMPREHENSIONFOR ) + ' in ' + self( source, Precedence.PRECEDENCE_CONTAINER_COMPREHENSIONFOR )
 	
 	@DMObjectNodeDispatchMethod( Schema.ComprehensionIf )
 	def ComprehensionIf(self, node, condition):
-		return 'if ' + self( condition, PRECEDENCE_CONTAINER_COMPREHENSIONIF )
+		return 'if ' + self( condition, Precedence.PRECEDENCE_CONTAINER_COMPREHENSIONIF )
 	
 	@DMObjectNodeDispatchMethod( Schema.ListComp )
 	def ListComp(self, node, resultExpr, comprehensionItems):
-		return '[' + self( resultExpr, PRECEDENCE_CONTAINER_ELEMENT ) + '   ' + '   '.join( [ self( x, PRECEDENCE_CONTAINER_ELEMENT )   for x in comprehensionItems ] )  +  ']'
+		return '[' + self( resultExpr, Precedence.PRECEDENCE_CONTAINER_ELEMENT ) + '   ' + '   '.join( [ self( x, Precedence.PRECEDENCE_CONTAINER_ELEMENT )   for x in comprehensionItems ] )  +  ']'
 	
 	@DMObjectNodeDispatchMethod( Schema.GeneratorExpr )
 	def GeneratorExpr(self, node, resultExpr, comprehensionItems):
-		return '(' + self( resultExpr, PRECEDENCE_CONTAINER_ELEMENT ) + '   ' + '   '.join( [ self( c, PRECEDENCE_CONTAINER_ELEMENT )   for c in comprehensionItems ] )  +  ')'
+		return '(' + self( resultExpr, Precedence.PRECEDENCE_CONTAINER_ELEMENT ) + '   ' + '   '.join( [ self( c, Precedence.PRECEDENCE_CONTAINER_ELEMENT )   for c in comprehensionItems ] )  +  ')'
 	
 	
 	
 	# Dictionary literal
 	@DMObjectNodeDispatchMethod( Schema.DictKeyValuePair )
 	def DictKeyValuePair(self, node, key, value):
-		return self( key, PRECEDENCE_CONTAINER_ELEMENT ) + ':' + self( value, PRECEDENCE_CONTAINER_ELEMENT )
+		return self( key, Precedence.PRECEDENCE_CONTAINER_ELEMENT ) + ':' + self( value, Precedence.PRECEDENCE_CONTAINER_ELEMENT )
 	
 	@DMObjectNodeDispatchMethod( Schema.DictLiteral )
 	def DictLiteral(self, node, values):
-		return '{'  +  ', '.join( [ self( i, PRECEDENCE_CONTAINER_ELEMENT )   for i in values ] )  +  '}'
+		return '{'  +  ', '.join( [ self( i, Precedence.PRECEDENCE_CONTAINER_ELEMENT )   for i in values ] )  +  '}'
 
 	@DMObjectNodeDispatchMethod( Schema.DictComp )
 	def DictComp(self, node, resultExpr, comprehensionItems):
-		return '{' + self( resultExpr, PRECEDENCE_CONTAINER_ELEMENT ) + '   ' + '   '.join( [ self( x, PRECEDENCE_CONTAINER_ELEMENT )   for x in comprehensionItems ] )  +  '}'
+		return '{' + self( resultExpr, Precedence.PRECEDENCE_CONTAINER_ELEMENT ) + '   ' + '   '.join( [ self( x, Precedence.PRECEDENCE_CONTAINER_ELEMENT )   for x in comprehensionItems ] )  +  '}'
 
 
 
 	# Set literal
 	@DMObjectNodeDispatchMethod( Schema.SetLiteral )
 	def SetLiteral(self, node, values):
-		return '{'  +  ', '.join( [ self( i, PRECEDENCE_CONTAINER_ELEMENT )   for i in values ] )  +  '}'
+		return '{'  +  ', '.join( [ self( i, Precedence.PRECEDENCE_CONTAINER_ELEMENT )   for i in values ] )  +  '}'
 
 	@DMObjectNodeDispatchMethod( Schema.SetComp )
 	def SetComp(self, node, resultExpr, comprehensionItems):
-		return '{' + self( resultExpr, PRECEDENCE_CONTAINER_ELEMENT ) + '   ' + '   '.join( [ self( x, PRECEDENCE_CONTAINER_ELEMENT )   for x in comprehensionItems ] )  +  '}'
+		return '{' + self( resultExpr, Precedence.PRECEDENCE_CONTAINER_ELEMENT ) + '   ' + '   '.join( [ self( x, Precedence.PRECEDENCE_CONTAINER_ELEMENT )   for x in comprehensionItems ] )  +  '}'
 
 
 
@@ -314,7 +314,7 @@ class Python2CodeGenerator (object):
 	@DMObjectNodeDispatchMethod( Schema.YieldExpr )
 	def YieldExpr(self, node, value):
 		if value is not None:
-			return '(yield ' + self( value, PRECEDENCE_CONTAINER_YIELDEXPR ) + ')'
+			return '(yield ' + self( value, Precedence.PRECEDENCE_CONTAINER_YIELDEXPR ) + ')'
 		else:
 			return '(yield)'
 		
@@ -324,21 +324,21 @@ class Python2CodeGenerator (object):
 	@DMObjectNodeDispatchMethod( Schema.AttributeRef )
 	def AttributeRef(self, node, target, name):
 		if target.isInstanceOf( Schema.IntLiteral ):
-			return '(' + self( target, PRECEDENCE_CONTAINER_ATTRIBUTEREFTARGET ) + ').' + name
+			return '(' + self( target, Precedence.PRECEDENCE_CONTAINER_ATTRIBUTEREFTARGET ) + ').' + name
 		else:
-			return self( target, PRECEDENCE_CONTAINER_ATTRIBUTEREFTARGET ) + '.' + name
+			return self( target, Precedence.PRECEDENCE_CONTAINER_ATTRIBUTEREFTARGET ) + '.' + name
 
 	
 
 	# Subscript
 	@DMObjectNodeDispatchMethod( Schema.SubscriptSlice )
 	def SubscriptSlice(self, node, lower, upper):
-		txt = lambda x:  self( x, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX )   if x is not None   else ''
+		txt = lambda x:  self( x, Precedence.PRECEDENCE_CONTAINER_SUBSCRIPTINDEX )   if x is not None   else ''
 		return txt( lower ) + ':' + txt( upper )
 
 	@DMObjectNodeDispatchMethod( Schema.SubscriptLongSlice )
 	def SubscriptLongSlice(self, node, lower, upper, stride):
-		txt = lambda x:  self( x, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX )   if x is not None   else ''
+		txt = lambda x:  self( x, Precedence.PRECEDENCE_CONTAINER_SUBSCRIPTINDEX )   if x is not None   else ''
 		return txt( lower ) + ':' + txt( upper ) + ':' + txt( stride )
 	
 	@DMObjectNodeDispatchMethod( Schema.SubscriptEllipsis )
@@ -354,44 +354,44 @@ class Python2CodeGenerator (object):
 		if index.isInstanceOf( Schema.SubscriptTuple ):
 			indexSrc = self._tupleElements( index['values'] )
 		else:
-			indexSrc = self( index, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX )
-		return self( target, PRECEDENCE_CONTAINER_SUBSCRIPTTARGET ) + '[' + indexSrc + ']'
+			indexSrc = self( index, Precedence.PRECEDENCE_CONTAINER_SUBSCRIPTINDEX )
+		return self( target, Precedence.PRECEDENCE_CONTAINER_SUBSCRIPTTARGET ) + '[' + indexSrc + ']'
 	
 
 	
 	# Call	
 	@DMObjectNodeDispatchMethod( Schema.CallKWArg )
 	def CallKWArg(self, node, name, value):
-		return name + '=' + self( value, PRECEDENCE_CONTAINER_CALLARG )
+		return name + '=' + self( value, Precedence.PRECEDENCE_CONTAINER_CALLARG )
 	
 	@DMObjectNodeDispatchMethod( Schema.CallArgList )
 	def CallArgList(self, node, value):
-		return '*' + self( value, PRECEDENCE_CONTAINER_CALLARG )
+		return '*' + self( value, Precedence.PRECEDENCE_CONTAINER_CALLARG )
 	
 	@DMObjectNodeDispatchMethod( Schema.CallKWArgList )
 	def CallKWArgList(self, node, value):
-		return '**' + self( value, PRECEDENCE_CONTAINER_CALLARG )
+		return '**' + self( value, Precedence.PRECEDENCE_CONTAINER_CALLARG )
 	
 	@DMObjectNodeDispatchMethod( Schema.Call )
 	def Call(self, node, target, args):
-		return self( target, PRECEDENCE_CONTAINER_CALLTARGET ) + '(' + ', '.join( [ self( a, PRECEDENCE_CONTAINER_CALLARG )   for a in args ] ) + ')'
+		return self( target, Precedence.PRECEDENCE_CONTAINER_CALLTARGET ) + '(' + ', '.join( [ self( a, Precedence.PRECEDENCE_CONTAINER_CALLARG )   for a in args ] ) + ')'
 	
 	
 	
 	# Operators
 	def _prefixOp(self, node, x, op):
-		p = nodePrecedence[node]
+		p = Precedence.nodePrecedence[node]
 		return op + self( x, p )
 
 	def _binOp(self, node, x, y, op):
-		p = nodePrecedence[node]
-		if rightAssociative[node]:
+		p = Precedence.nodePrecedence[node]
+		if Precedence.rightAssociative[node]:
 			return self( x, p - 1 )  +  op  +  self( y, p )
 		else:
 			return self( x, p  )  +  op  +  self( y, p - 1 )
 	
 	def _cmpOp(self, node, y, op):
-		p = nodePrecedence[node]
+		p = Precedence.nodePrecedence[node]
 		return op + self( y, p )
 	
 	@DMObjectNodeDispatchMethod( Schema.Pow )
@@ -457,7 +457,7 @@ class Python2CodeGenerator (object):
 
 	@DMObjectNodeDispatchMethod( Schema.Cmp )
 	def Cmp(self, node, x, ops):
-		return self( x, PRECEDENCE_CMP )  +  ''.join( [ self( op, PRECEDENCE_CMP )   for op in ops ] )
+		return self( x, Precedence.PRECEDENCE_CMP )  +  ''.join( [ self( op, Precedence.PRECEDENCE_CMP )   for op in ops ] )
 	
 	@DMObjectNodeDispatchMethod( Schema.CmpOpLte )
 	def CmpOpLte(self, node, y):
@@ -524,11 +524,11 @@ class Python2CodeGenerator (object):
 	
 	@DMObjectNodeDispatchMethod( Schema.TupleParam )
 	def TupleParam(self, node, params, paramsTrailingSeparator):
-		return '(' + ', '.join( [ self( p, PRECEDENCE_NONE )   for p in params ] ) + ( ','   if paramsTrailingSeparator is not None   else '' ) + ')'
+		return '(' + ', '.join( [ self( p, Precedence.PRECEDENCE_NONE )   for p in params ] ) + ( ','   if paramsTrailingSeparator is not None   else '' ) + ')'
 
 	@DMObjectNodeDispatchMethod( Schema.DefaultValueParam )
 	def DefaultValueParam(self, node, param, defaultValue):
-		return self( param, PRECEDENCE_NONE )  +  '='  +  self( defaultValue, PRECEDENCE_NONE )
+		return self( param, Precedence.PRECEDENCE_NONE )  +  '='  +  self( defaultValue, Precedence.PRECEDENCE_NONE )
 	
 	@DMObjectNodeDispatchMethod( Schema.ParamList )
 	def ParamList(self, node, name):
@@ -543,14 +543,14 @@ class Python2CodeGenerator (object):
 	# Lambda expression
 	@DMObjectNodeDispatchMethod( Schema.LambdaExpr )
 	def LambdaExpr(self, node, params, expr):
-		return 'lambda '  +  ', '.join( [ self( p, PRECEDENCE_NONE )   for p in params ] )  +  ': '  +  self( expr, PRECEDENCE_CONTAINER_LAMBDAEXPR )
+		return 'lambda '  +  ', '.join( [ self( p, Precedence.PRECEDENCE_NONE )   for p in params ] )  +  ': '  +  self( expr, Precedence.PRECEDENCE_CONTAINER_LAMBDAEXPR )
 	
 	
 	
 	# Conditional expression
 	@DMObjectNodeDispatchMethod( Schema.ConditionalExpr )
 	def ConditionalExpr(self, node, condition, expr, elseExpr):
-		return self( expr, PRECEDENCE_CONTAINER_CONDITIONALEXPR )  +  '   if '  +  self( condition, PRECEDENCE_CONTAINER_CONDITIONALEXPR )  +  '   else '  +  self( elseExpr, PRECEDENCE_CONTAINER_CONDITIONALEXPR )
+		return self( expr, Precedence.PRECEDENCE_CONTAINER_CONDITIONALEXPR )  +  '   if '  +  self( condition, Precedence.PRECEDENCE_CONTAINER_CONDITIONALEXPR )  +  '   else '  +  self( elseExpr, Precedence.PRECEDENCE_CONTAINER_CONDITIONALEXPR )
 
 	
 	
@@ -587,7 +587,7 @@ class Python2CodeGenerator (object):
 	# Expression statement
 	@DMObjectNodeDispatchMethod( Schema.ExprStmt )
 	def ExprStmt(self, node, expr):
-		return Line( self( expr, PRECEDENCE_STMT ),   node )
+		return Line( self( expr, Precedence.PRECEDENCE_STMT ),   node )
 	
 	
 	# Expression statement
@@ -599,19 +599,19 @@ class Python2CodeGenerator (object):
 	# Assert statement
 	@DMObjectNodeDispatchMethod( Schema.AssertStmt )
 	def AssertStmt(self, node, condition, fail):
-		return Line( 'assert '  +  self( condition, PRECEDENCE_STMT )  +  ( ', ' + self( fail, PRECEDENCE_STMT )   if fail is not None   else  '' ),   node )
+		return Line( 'assert '  +  self( condition, Precedence.PRECEDENCE_STMT )  +  ( ', ' + self( fail, Precedence.PRECEDENCE_STMT )   if fail is not None   else  '' ),   node )
 	
 	
 	# Assignment statement
 	@DMObjectNodeDispatchMethod( Schema.AssignStmt )
 	def AssignStmt(self, node, targets, value):
-		return Line( ''.join( [ self( t, PRECEDENCE_STMT ) + ' = '   for t in targets ] )  +  self( value, PRECEDENCE_STMT ),   node )
+		return Line( ''.join( [ self( t, Precedence.PRECEDENCE_STMT ) + ' = '   for t in targets ] )  +  self( value, Precedence.PRECEDENCE_STMT ),   node )
 	
 	
 	# Augmented assignment statement
 	@DMObjectNodeDispatchMethod( Schema.AugAssignStmt )
 	def AugAssignStmt(self, node, op, target, value):
-		return Line( self( target, PRECEDENCE_STMT )  +  ' '  +  op  +  ' '  +  self( value, PRECEDENCE_STMT ),   node )
+		return Line( self( target, Precedence.PRECEDENCE_STMT )  +  ' '  +  op  +  ' '  +  self( value, Precedence.PRECEDENCE_STMT ),   node )
 	
 	
 	# Pass statement
@@ -623,14 +623,14 @@ class Python2CodeGenerator (object):
 	# Del statement
 	@DMObjectNodeDispatchMethod( Schema.DelStmt )
 	def DelStmt(self, node, target):
-		return Line( 'del '  +  self( target, PRECEDENCE_STMT ),   node )
+		return Line( 'del '  +  self( target, Precedence.PRECEDENCE_STMT ),   node )
 	
 	
 	# Return statement
 	@DMObjectNodeDispatchMethod( Schema.ReturnStmt )
 	def ReturnStmt(self, node, value):
 		if value is not None:
-			return Line( 'return '  +  self( value, PRECEDENCE_STMT ),   node )
+			return Line( 'return '  +  self( value, Precedence.PRECEDENCE_STMT ),   node )
 		else:
 			return Line( 'return',  node )
 	
@@ -639,7 +639,7 @@ class Python2CodeGenerator (object):
 	@DMObjectNodeDispatchMethod( Schema.YieldStmt )
 	def YieldStmt(self, node, value):
 		if value is not None:
-			return Line( 'yield '  +  self( value, PRECEDENCE_STMT ),   node )
+			return Line( 'yield '  +  self( value, Precedence.PRECEDENCE_STMT ),   node )
 		else:
 			return Line( 'yield',  node )
 	
@@ -647,7 +647,7 @@ class Python2CodeGenerator (object):
 	# Raise statement
 	@DMObjectNodeDispatchMethod( Schema.RaiseStmt )
 	def RaiseStmt(self, node, excType, excValue, traceback):
-		params = ', '.join( [ self( x, PRECEDENCE_STMT )   for x in excType, excValue, traceback   if x is not None ] )
+		params = ', '.join( [ self( x, Precedence.PRECEDENCE_STMT )   for x in excType, excValue, traceback   if x is not None ] )
 		if params != '':
 			return Line( 'raise ' + params,   node )
 		else:
@@ -689,15 +689,15 @@ class Python2CodeGenerator (object):
 	
 	@DMObjectNodeDispatchMethod( Schema.ImportStmt )
 	def ImportStmt(self, node, modules):
-		return Line( 'import '  +  ', '.join( [ self( x, PRECEDENCE_STMT )   for x in modules ] ),   node )
+		return Line( 'import '  +  ', '.join( [ self( x, Precedence.PRECEDENCE_STMT )   for x in modules ] ),   node )
 	
 	@DMObjectNodeDispatchMethod( Schema.FromImportStmt )
 	def FromImportStmt(self, node, module, imports):
-		return Line( 'from ' + self( module, PRECEDENCE_STMT ) + ' import ' + ', '.join( [ self( x, PRECEDENCE_STMT )   for x in imports ] ),   node )
+		return Line( 'from ' + self( module, Precedence.PRECEDENCE_STMT ) + ' import ' + ', '.join( [ self( x, Precedence.PRECEDENCE_STMT )   for x in imports ] ),   node )
 	
 	@DMObjectNodeDispatchMethod( Schema.FromImportAllStmt )
 	def FromImportAllStmt(self, node, module):
-		return Line( 'from ' + self( module, PRECEDENCE_STMT ) + ' import *',   node )
+		return Line( 'from ' + self( module, Precedence.PRECEDENCE_STMT ) + ' import *',   node )
 	
 	
 	# Global statement
@@ -707,17 +707,17 @@ class Python2CodeGenerator (object):
 	
 	@DMObjectNodeDispatchMethod( Schema.GlobalStmt )
 	def GlobalStmt(self, node, vars):
-		return Line( 'global '  +  ', '.join( [ self( x, PRECEDENCE_STMT )   for x in vars ] ),   node )
+		return Line( 'global '  +  ', '.join( [ self( x, Precedence.PRECEDENCE_STMT )   for x in vars ] ),   node )
 	
 	
 	# Exec statement
 	@DMObjectNodeDispatchMethod( Schema.ExecStmt )
 	def ExecStmt(self, node, source, globals, locals):
-		txt = 'exec '  +  self( source, PRECEDENCE_STMT )
+		txt = 'exec '  +  self( source, Precedence.PRECEDENCE_STMT )
 		if globals is not None:
-			txt += ' in '  +  self( globals, PRECEDENCE_STMT )
+			txt += ' in '  +  self( globals, Precedence.PRECEDENCE_STMT )
 		if locals is not None:
-			txt += ', '  +  self( locals, PRECEDENCE_STMT )
+			txt += ', '  +  self( locals, Precedence.PRECEDENCE_STMT )
 		return Line( txt,   node )
 	
 	
@@ -726,12 +726,12 @@ class Python2CodeGenerator (object):
 	def PrintStmt(self, node, destination, values):
 		txt = 'print'
 		if destination is not None:
-			txt += ' >> %s'  %  self( destination, PRECEDENCE_STMT )
+			txt += ' >> %s'  %  self( destination, Precedence.PRECEDENCE_STMT )
 		if len( values ) > 0:
 			if destination is not None:
 				txt += ','
 			txt += ' '
-			txt += ', '.join( [ self( v, PRECEDENCE_STMT )   for v in values ] )
+			txt += ', '.join( [ self( v, Precedence.PRECEDENCE_STMT )   for v in values ] )
 		return Line( txt,   node )
 	
 	
@@ -756,9 +756,9 @@ class Python2CodeGenerator (object):
 	# If statement
 	@DMObjectNodeDispatchMethod( Schema.IfStmt )
 	def IfStmt(self, node, condition, suite, elifBlocks, elseSuite):
-		lines = self._indentedSuite( Line( 'if '  +  self( condition, PRECEDENCE_STMT ) + ':', node ),  suite )
+		lines = self._indentedSuite( Line( 'if '  +  self( condition, Precedence.PRECEDENCE_STMT ) + ':', node ),  suite )
 		for b in elifBlocks:
-			lines += self( b, PRECEDENCE_STMT )
+			lines += self( b, Precedence.PRECEDENCE_STMT )
 		lines += self._elseSuite( node, elseSuite )
 		return lines
 	
@@ -766,19 +766,19 @@ class Python2CodeGenerator (object):
 	# Elif block
 	@DMObjectNodeDispatchMethod( Schema.ElifBlock )
 	def ElifBlock(self, node, condition, suite):
-		return self._indentedSuite( Line( 'elif '  +  self( condition, PRECEDENCE_STMT ) + ':', node ),  suite )
+		return self._indentedSuite( Line( 'elif '  +  self( condition, Precedence.PRECEDENCE_STMT ) + ':', node ),  suite )
 	
 
 	# While statement
 	@DMObjectNodeDispatchMethod( Schema.WhileStmt )
 	def WhileStmt(self, node, condition, suite, elseSuite):
-		return self._indentedSuite( Line( 'while '  +  self( condition, PRECEDENCE_STMT ) + ':', node ),  suite )  +  self._elseSuite( node, elseSuite )
+		return self._indentedSuite( Line( 'while '  +  self( condition, Precedence.PRECEDENCE_STMT ) + ':', node ),  suite )  +  self._elseSuite( node, elseSuite )
 	
 
 	# For statement
 	@DMObjectNodeDispatchMethod( Schema.ForStmt )
 	def ForStmt(self, node, target, source, suite, elseSuite):
-		return self._indentedSuite( Line( 'for '  +  self( target, PRECEDENCE_STMT )  +  ' in '  +  self( source, PRECEDENCE_STMT ) + ':', node ),  suite )  +  self._elseSuite( node, elseSuite )
+		return self._indentedSuite( Line( 'for '  +  self( target, Precedence.PRECEDENCE_STMT )  +  ' in '  +  self( source, Precedence.PRECEDENCE_STMT ) + ':', node ),  suite )  +  self._elseSuite( node, elseSuite )
 	
 
 	# Try statement
@@ -786,7 +786,7 @@ class Python2CodeGenerator (object):
 	def TryStmt(self, node, suite, exceptBlocks, elseSuite, finallySuite):
 		lines = self._indentedSuite( Line( 'try:', node ),  suite )
 		for b in exceptBlocks:
-			lines += self( b, PRECEDENCE_STMT )
+			lines += self( b, Precedence.PRECEDENCE_STMT )
 		lines += self._elseSuite( node, elseSuite )
 		lines += self._finallySuite( node, finallySuite )
 		return lines
@@ -797,16 +797,16 @@ class Python2CodeGenerator (object):
 	def ExceptBlock(self, node, exception, target, suite):
 		txt = 'except'
 		if exception is not None:
-			txt += ' ' + self( exception, PRECEDENCE_STMT )
+			txt += ' ' + self( exception, Precedence.PRECEDENCE_STMT )
 		if target is not None:
-			txt += ', ' + self( target, PRECEDENCE_STMT )
+			txt += ', ' + self( target, Precedence.PRECEDENCE_STMT )
 		return self._indentedSuite( Line( txt + ':', node ),  suite )
 	
 
 	# With statement
 	@DMObjectNodeDispatchMethod( Schema.WithContext )
 	def WithContext(self, node, expr, target):
-		return self( expr, PRECEDENCE_STMT )  +  ( ( ' as ' + self( target, PRECEDENCE_STMT ) )   if target is not None   else   '' )
+		return self( expr, Precedence.PRECEDENCE_STMT )  +  ( ( ' as ' + self( target, Precedence.PRECEDENCE_STMT ) )   if target is not None   else   '' )
 
 	@DMObjectNodeDispatchMethod( Schema.WithStmt )
 	def WithStmt(self, node, contexts, suite):
@@ -818,7 +818,7 @@ class Python2CodeGenerator (object):
 	def Decorator(self, node, name, args):
 		text = '@' + name
 		if args is not None:
-			text += '(' + ', '.join( [ self( a, PRECEDENCE_STMT )   for a in args ] ) + ')'
+			text += '(' + ', '.join( [ self( a, Precedence.PRECEDENCE_STMT )   for a in args ] ) + ')'
 		return Line( text, node )
 	
 	
@@ -826,7 +826,7 @@ class Python2CodeGenerator (object):
 	@DMObjectNodeDispatchMethod( Schema.DefStmt )
 	def DefStmt(self, node, decorators, name, params, suite):
 		decos = Block( [ self( d )   for d in decorators ] )
-		return decos + self._indentedSuite( Line( 'def '  +  name  +  '('  +  ', '.join( [ self( p, PRECEDENCE_STMT )   for p in params ] )  +  '):' ,   node ),   suite )
+		return decos + self._indentedSuite( Line( 'def '  +  name  +  '('  +  ', '.join( [ self( p, Precedence.PRECEDENCE_STMT )   for p in params ] )  +  '):' ,   node ),   suite )
 	
 
 	# Class statement
@@ -836,7 +836,7 @@ class Python2CodeGenerator (object):
 
 		text = 'class '  +  name
 		if bases is not None:
-			text += ' ('  +  ', '.join( [ self( h, PRECEDENCE_STMT )   for h in bases ] )  +  ')'
+			text += ' ('  +  ', '.join( [ self( h, Precedence.PRECEDENCE_STMT )   for h in bases ] )  +  ')'
 		clsStmt = text  +  ':'
 		
 		return decos + self._indentedSuite( Line( clsStmt,  node ),   suite )
@@ -882,7 +882,7 @@ class Python2CodeGenerator (object):
 	# Target
 	@DMObjectNodeDispatchMethod( Schema.PythonTarget )
 	def PythonTarget(self, node, target):
-		if expr is None:
+		if target is None:
 			return 'None'
 		else:
 			return self( target )

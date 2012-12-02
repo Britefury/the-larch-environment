@@ -28,22 +28,20 @@ from Britefury.Kernel.View.DispatchView import MethodDispatchView
 
 from BritefuryJ.Live import LiveValue
 
-from BritefuryJ.AttributeTable import *
-
 from BritefuryJ.DefaultPerspective import DefaultPerspective
 
 from BritefuryJ.Browser import Location
-from BritefuryJ.Graphics import *
+from BritefuryJ.Graphics import FilledOutlinePainter
 from BritefuryJ.StyleSheet import StyleSheet
 from BritefuryJ.LSpace import Anchor
 from BritefuryJ.LSpace.Input import ObjectDndHandler
 from BritefuryJ.LSpace.Interactor import ClickElementInteractor
-from BritefuryJ.Controls import *
-from BritefuryJ.Pres import *
-from BritefuryJ.Pres.Primitive import *
-from BritefuryJ.Pres.RichText import *
-from BritefuryJ.Pres.UI import *
-from BritefuryJ.Pres.Help import *
+from BritefuryJ.Controls import Controls, EditableLabel, MenuItem, Button, TextEntry, Hyperlink
+from BritefuryJ.Pres import InnerFragment
+from BritefuryJ.Pres.Primitive import Primitive, Label, StaticText, Image, Spacer, Bin, Row, Column
+from BritefuryJ.Pres.RichText import TitleBar, Body, Head, Page, HSeparator
+from BritefuryJ.Pres.UI import BubblePopup, SectionHeading1, SectionHeading2, Section
+from BritefuryJ.Pres.Help import AttachTooltip, TipBox
 from BritefuryJ.Util.Jython import JythonException
 
 from BritefuryJ.Projection import Perspective

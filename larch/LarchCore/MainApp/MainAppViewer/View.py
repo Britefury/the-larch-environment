@@ -23,19 +23,17 @@ from Britefury.Kernel.View.DispatchView import MethodDispatchView
 from Britefury.Kernel.Document import Document
 
 
-from BritefuryJ.AttributeTable import *
-
-from BritefuryJ.StyleSheet import *
+from BritefuryJ.StyleSheet import StyleSheet
 from BritefuryJ.Browser import Location
 from BritefuryJ.LSpace import PageController
-from BritefuryJ.Graphics import *
+from BritefuryJ.Graphics import FilledBorder
 
-from BritefuryJ.Controls import *
-from BritefuryJ.Pres import *
-from BritefuryJ.Pres.Primitive import *
-from BritefuryJ.Pres.RichText import *
-from BritefuryJ.Pres.UI import *
-from BritefuryJ.Pres.Help import *
+from BritefuryJ.Controls import Hyperlink
+from BritefuryJ.Pres import InnerFragment
+from BritefuryJ.Pres.Primitive import Primitive, Border, Row, Column, RGrid, GridRow
+from BritefuryJ.Pres.RichText import TitleBar, HSeparator, Head, Body, Page
+from BritefuryJ.Pres.UI import Section, SectionHeading1
+from BritefuryJ.Pres.Help import AttachTooltip, TipBox
 
 from BritefuryJ.Projection import Perspective
 

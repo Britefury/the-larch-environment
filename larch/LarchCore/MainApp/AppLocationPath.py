@@ -9,9 +9,9 @@ from java.awt import Color
 
 from BritefuryJ.Browser import Location
 
-from BritefuryJ.Pres.Primitive import *
-from BritefuryJ.Pres.RichText import *
-from BritefuryJ.Controls import *
+from BritefuryJ.Pres.Primitive import Primitive, Arrow, LineBreak, Paragraph
+from BritefuryJ.Pres.RichText import SplitLinkHeaderBar
+from BritefuryJ.Controls import Hyperlink
 from BritefuryJ.Graphics import FilledOutlinePainter
 from BritefuryJ.StyleSheet import StyleSheet
 from BritefuryJ.DefaultPerspective import DefaultPerspective

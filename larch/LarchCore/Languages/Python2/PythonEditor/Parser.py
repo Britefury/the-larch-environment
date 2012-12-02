@@ -23,7 +23,7 @@ from Britefury.Tests.BritefuryJ.Parser.ParserTestCase import ParserTestCase
 from Britefury.Grammar.Grammar import Grammar, Rule, RuleList
 
 from LarchCore.Languages.Python2 import Schema
-from LarchCore.Languages.Python2.PythonEditor.Keywords import *
+from LarchCore.Languages.Python2.PythonEditor import Keywords
 
 
 
@@ -69,7 +69,7 @@ class Python2Grammar (Grammar):
 	# Python identifier
 	@Rule
 	def pythonIdentifier(self):
-		return identifier  &  ( lambda input, begin, end, x, bindings: x not in nonIdentifierKeywordsSet )
+		return identifier  &  ( lambda input, begin, end, x, bindings: x not in Keywords.nonIdentifierKeywordsSet )
 
 
 	@Rule
@@ -293,12 +293,12 @@ class Python2Grammar (Grammar):
 	# List comprehension
 	@Rule
 	def listCompFor(self):
-		return ( Keyword( forKeyword )  +  self.targetListOrTargetItem()  +  Keyword( inKeyword )  +  self.oldTupleOrExpression() ).action(
+		return ( Keyword( Keywords.forKeyword )  +  self.targetListOrTargetItem()  +  Keyword( Keywords.inKeyword )  +  self.oldTupleOrExpression() ).action(
 			lambda input, begin, end, xs, bindings: Schema.ComprehensionFor( target=xs[1], source=xs[3] ) )
 
 	@Rule
 	def listCompIf(self):
-		return ( Keyword( ifKeyword )  +  self.oldExpression() ).action( lambda input, begin, end, xs, bindings: Schema.ComprehensionIf( condition=xs[1] ) )
+		return ( Keyword( Keywords.ifKeyword )  +  self.oldExpression() ).action( lambda input, begin, end, xs, bindings: Schema.ComprehensionIf( condition=xs[1] ) )
 
 	@Rule
 	def listCompItem(self):
@@ -315,11 +315,11 @@ class Python2Grammar (Grammar):
 	# Generator expression
 	@Rule
 	def genExpFor(self):
-		return ( Keyword( forKeyword )  +  self.targetListOrTargetItem()  +  Keyword( inKeyword )  +  self.orTest() ).action( lambda input, begin, end, xs, bindings: Schema.ComprehensionFor( target=xs[1], source=xs[3] ) )
+		return ( Keyword( Keywords.forKeyword )  +  self.targetListOrTargetItem()  +  Keyword( Keywords.inKeyword )  +  self.orTest() ).action( lambda input, begin, end, xs, bindings: Schema.ComprehensionFor( target=xs[1], source=xs[3] ) )
 
 	@Rule
 	def genExpIf(self):
-		return ( Keyword( ifKeyword )  +  self.oldExpression() ).action( lambda input, begin, end, xs, bindings: Schema.ComprehensionIf( condition=xs[1] ) )
+		return ( Keyword( Keywords.ifKeyword )  +  self.oldExpression() ).action( lambda input, begin, end, xs, bindings: Schema.ComprehensionIf( condition=xs[1] ) )
 
 	@Rule
 	def genExpItem(self):
@@ -369,7 +369,7 @@ class Python2Grammar (Grammar):
 	# Yield expression
 	@Rule
 	def yieldExpression(self):
-		return ( Keyword( yieldKeyword )  +  self.tupleOrExpression().optional() ).action( lambda input, begin, end, xs, bindings: Schema.YieldExpr( value=( xs[1]   if len( xs ) > 1   else None ) ) )
+		return ( Keyword( Keywords.yieldKeyword )  +  self.tupleOrExpression().optional() ).action( lambda input, begin, end, xs, bindings: Schema.YieldExpr( value=( xs[1]   if len( xs ) > 1   else None ) ) )
 
 
 	@Rule
@@ -531,14 +531,14 @@ class Python2Grammar (Grammar):
 					ChainOperator( Literal( '>' ),  Schema.CmpOpGt, 'y' ),
 					ChainOperator( Literal( '==' ),  Schema.CmpOpEq, 'y' ),
 					ChainOperator( Literal( '!=' ),  Schema.CmpOpNeq, 'y' ),
-					ChainOperator( Keyword( isKeyword ) + Keyword( notKeyword ),  Schema.CmpOpIsNot, 'y' ),
-					ChainOperator( Keyword( isKeyword ),  Schema.CmpOpIs, 'y' ),
-					ChainOperator( Keyword( notKeyword ) + Keyword( inKeyword ),  Schema.CmpOpNotIn, 'y' ),
-					ChainOperator( Keyword( inKeyword ),  Schema.CmpOpIn, 'y' ),
+					ChainOperator( Keyword( Keywords.isKeyword ) + Keyword( Keywords.notKeyword ),  Schema.CmpOpIsNot, 'y' ),
+					ChainOperator( Keyword( Keywords.isKeyword ),  Schema.CmpOpIs, 'y' ),
+					ChainOperator( Keyword( Keywords.notKeyword ) + Keyword( Keywords.inKeyword ),  Schema.CmpOpNotIn, 'y' ),
+					ChainOperator( Keyword( Keywords.inKeyword ),  Schema.CmpOpIn, 'y' ),
 					],  Schema.Cmp, 'x', 'ops' ),
-				PrefixLevel( [ UnaryOperator( Keyword( notKeyword ),  Schema.NotTest, 'x' ) ] ),
-				InfixLeftLevel( [ BinaryOperator( Keyword( andKeyword ),  Schema.AndTest, 'x', 'y' ) ] ),
-				InfixLeftLevel( [ BinaryOperator( Keyword( orKeyword ),  Schema.OrTest, 'x', 'y' ) ] ),
+				PrefixLevel( [ UnaryOperator( Keyword( Keywords.notKeyword ),  Schema.NotTest, 'x' ) ] ),
+				InfixLeftLevel( [ BinaryOperator( Keyword( Keywords.andKeyword ),  Schema.AndTest, 'x', 'y' ) ] ),
+				InfixLeftLevel( [ BinaryOperator( Keyword( Keywords.orKeyword ),  Schema.OrTest, 'x', 'y' ) ] ),
 				],  self.primary() )
 
 		return opTable.buildParsers()
@@ -628,12 +628,12 @@ class Python2Grammar (Grammar):
 	# Lambda expression_checkParams
 	@Rule
 	def oldLambdaExpr(self):
-		return ( Keyword( lambdaKeyword )  +  self.params()  +  Literal( ':' )  +  self.oldExpression() ).action(
+		return ( Keyword( Keywords.lambdaKeyword )  +  self.params()  +  Literal( ':' )  +  self.oldExpression() ).action(
 			lambda input, begin, end, xs, bindings: Schema.LambdaExpr( params=xs[1][0], expr=xs[3], paramsTrailingSeparator=xs[1][1] ) )
 
 	@Rule
 	def lambdaExpr(self):
-		return ( Keyword( lambdaKeyword )  +  self.params()  +  Literal( ':' )  +  self.expression() ).action(
+		return ( Keyword( Keywords.lambdaKeyword )  +  self.params()  +  Literal( ':' )  +  self.expression() ).action(
 			lambda input, begin, end, xs, bindings: Schema.LambdaExpr( params=xs[1][0], expr=xs[3], paramsTrailingSeparator=xs[1][1] ) )
 
 
@@ -642,7 +642,7 @@ class Python2Grammar (Grammar):
 	# Conditional expression
 	@Rule
 	def conditionalExpression(self):
-		return ( self.orTest()  +  Keyword( ifKeyword )  +  self.orTest()  +  Keyword( elseKeyword )  +  self.expression() ).action(
+		return ( self.orTest()  +  Keyword( Keywords.ifKeyword )  +  self.orTest()  +  Keyword( Keywords.elseKeyword )  +  self.expression() ).action(
 			lambda input, begin, end, xs, bindings: Schema.ConditionalExpr( condition=xs[2], expr=xs[0], elseExpr=xs[4] ) )
 
 
@@ -706,7 +706,7 @@ class Python2Grammar (Grammar):
 	# Assert statement
 	@Rule
 	def assertStmt(self):
-		return ( Keyword( assertKeyword ) + self.expression()  +  Optional( Literal( ',' ) + self.expression() ) + Literal( '\n' ) ).action(
+		return ( Keyword( Keywords.assertKeyword ) + self.expression()  +  Optional( Literal( ',' ) + self.expression() ) + Literal( '\n' ) ).action(
 			lambda input, begin, end, xs, bindings: Schema.AssertStmt( condition=xs[1], fail=xs[2][1]   if xs[2] is not None  else  None ) )
 
 
@@ -724,7 +724,7 @@ class Python2Grammar (Grammar):
 	# Augmented assignment statement
 	@Rule
 	def augOp(self):
-		return Choice( [ Literal( op )   for op in augAssignOps ] )
+		return Choice( [ Literal( op )   for op in Keywords.augAssignOps ] )
 
 	@Rule
 	def augAssignStmt(self):
@@ -737,28 +737,28 @@ class Python2Grammar (Grammar):
 	# Pass statement
 	@Rule
 	def passStmt(self):
-		return ( Keyword( passKeyword ) + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.PassStmt() )
+		return ( Keyword( Keywords.passKeyword ) + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.PassStmt() )
 
 
 
 	# Del statement
 	@Rule
 	def delStmt(self):
-		return ( Keyword( delKeyword )  +  self.targetListOrTargetItem() + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.DelStmt( target=xs[1] ) )
+		return ( Keyword( Keywords.delKeyword )  +  self.targetListOrTargetItem() + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.DelStmt( target=xs[1] ) )
 
 
 
 	# Return statement
 	@Rule
 	def returnStmt(self):
-		return ( Keyword( returnKeyword )  +  self.tupleOrExpression().optional() + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.ReturnStmt( value=( xs[1]   if len( xs ) > 1   else None ) ) )
+		return ( Keyword( Keywords.returnKeyword )  +  self.tupleOrExpression().optional() + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.ReturnStmt( value=( xs[1]   if len( xs ) > 1   else None ) ) )
 
 
 
 	# Yield statement
 	@Rule
 	def yieldStmt(self):
-		return ( Keyword( yieldKeyword )  +  self.expression().optional() + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.YieldStmt( value=( xs[1]   if len( xs ) > 1   else None ) ) )
+		return ( Keyword( Keywords.yieldKeyword )  +  self.expression().optional() + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.YieldStmt( value=( xs[1]   if len( xs ) > 1   else None ) ) )
 
 
 
@@ -778,7 +778,7 @@ class Python2Grammar (Grammar):
 
 	@Rule
 	def raiseStmt(self):
-		return ( Keyword( raiseKeyword ) + Optional( self.expression() + Optional( Literal( ',' ) + self.expression() + Optional( Literal( ',' ) + self.expression() ) ) ) + Literal( '\n' ) ).action(
+		return ( Keyword( Keywords.raiseKeyword ) + Optional( self.expression() + Optional( Literal( ',' ) + self.expression() + Optional( Literal( ',' ) + self.expression() ) ) ) + Literal( '\n' ) ).action(
 			lambda input, begin, end, xs, bindings: self._buildRaise( xs ) )
 
 
@@ -787,7 +787,7 @@ class Python2Grammar (Grammar):
 	# Break statement
 	@Rule
 	def breakStmt(self):
-		return ( Keyword( breakKeyword ) + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.BreakStmt() )
+		return ( Keyword( Keywords.breakKeyword ) + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.BreakStmt() )
 
 
 
@@ -795,7 +795,7 @@ class Python2Grammar (Grammar):
 	# Continue statement
 	@Rule
 	def continueStmt(self):
-		return ( Keyword( continueKeyword ) + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.ContinueStmt() )
+		return ( Keyword( Keywords.continueKeyword ) + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.ContinueStmt() )
 
 
 
@@ -828,28 +828,28 @@ class Python2Grammar (Grammar):
 	# ( <moduleName> 'as' <pythonIdentifier> )  |  <moduleName>
 	@Rule
 	def moduleImport(self):
-		return ( self.moduleName() + Keyword( asKeyword ) + self.pythonIdentifier() ).action( lambda input, begin, end, xs, bindings: Schema.ModuleImportAs( name=xs[0], asName=xs[2] ) )   |	\
+		return ( self.moduleName() + Keyword( Keywords.asKeyword ) + self.pythonIdentifier() ).action( lambda input, begin, end, xs, bindings: Schema.ModuleImportAs( name=xs[0], asName=xs[2] ) )   |	\
 		       self.moduleName().action( lambda input, begin, end, xs, bindings: Schema.ModuleImport( name=xs ) )
 
 
 	# 'import' <separatedList( moduleImport )>
 	@Rule
 	def simpleImport(self):
-		return ( Keyword( importKeyword )  +  SeparatedList( self.moduleImport(), 1, -1, SeparatedList.TrailingSeparatorPolicy.NEVER ) + Literal( '\n' ) ).action(
+		return ( Keyword( Keywords.importKeyword )  +  SeparatedList( self.moduleImport(), 1, -1, SeparatedList.TrailingSeparatorPolicy.NEVER ) + Literal( '\n' ) ).action(
 			lambda input, begin, end, xs, bindings: Schema.ImportStmt( modules=xs[1] ) )
 
 
 	# ( <pythonIdentifier> 'as' <pythonIdentifier> )  |  <pythonIdentifier>
 	@Rule
 	def moduleContentImport(self):
-		return ( self.pythonIdentifier() + Keyword( asKeyword ) + self.pythonIdentifier() ).action( lambda input, begin, end, xs, bindings: Schema.ModuleContentImportAs( name=xs[0], asName=xs[2] ) )   |   \
+		return ( self.pythonIdentifier() + Keyword( Keywords.asKeyword ) + self.pythonIdentifier() ).action( lambda input, begin, end, xs, bindings: Schema.ModuleContentImportAs( name=xs[0], asName=xs[2] ) )   |   \
 		       self.pythonIdentifier().action( lambda input, begin, end, xs, bindings: Schema.ModuleContentImport( name=xs ) )
 
 
 	# 'from' <relativeModule> 'import' ( <separatedList( moduleContentImport )>  |  ( '(' <separatedList( moduleContentImport )> ',' ')' )
 	@Rule
 	def fromImport(self):
-		return ( Keyword( fromKeyword ) + self.relativeModule() + Keyword( importKeyword ) + \
+		return ( Keyword( Keywords.fromKeyword ) + self.relativeModule() + Keyword( Keywords.importKeyword ) + \
 			 (  \
 				 SeparatedList( self.moduleContentImport(), 1, -1, SeparatedList.TrailingSeparatorPolicy.NEVER )  |  
 				 SeparatedList( self.moduleContentImport(), '(', ')', 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL )\
@@ -860,7 +860,7 @@ class Python2Grammar (Grammar):
 	# 'from' <relativeModule> 'import' '*'
 	@Rule
 	def fromImportAll(self):
-		return ( Keyword( fromKeyword ) + self.relativeModule() + Keyword( importKeyword ) + '*' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.FromImportAllStmt( module=xs[1] ) )
+		return ( Keyword( Keywords.fromKeyword ) + self.relativeModule() + Keyword( Keywords.importKeyword ) + '*' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.FromImportAllStmt( module=xs[1] ) )
 
 
 	# Final :::
@@ -878,7 +878,7 @@ class Python2Grammar (Grammar):
 
 	@Rule
 	def globalStmt(self):
-		return ( Keyword( globalKeyword )  +  SeparatedList( self.globalVar(), 1, -1, SeparatedList.TrailingSeparatorPolicy.NEVER ) + Literal( '\n' ) ).action(
+		return ( Keyword( Keywords.globalKeyword )  +  SeparatedList( self.globalVar(), 1, -1, SeparatedList.TrailingSeparatorPolicy.NEVER ) + Literal( '\n' ) ).action(
 			lambda input, begin, end, xs, bindings: Schema.GlobalStmt( vars=xs[1] ) )
 
 
@@ -888,16 +888,16 @@ class Python2Grammar (Grammar):
 	# Exec statement
 	@Rule
 	def execCodeStmt(self):
-		return ( Keyword( execKeyword )  +  self.orOp() + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.ExecStmt( source=xs[1], locals=None, globals=None ) )
+		return ( Keyword( Keywords.execKeyword )  +  self.orOp() + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.ExecStmt( source=xs[1], locals=None, globals=None ) )
 
 	@Rule
 	def execCodeInGlobalsStmt(self):
-		return ( Keyword( execKeyword )  +  self.orOp()  +  Keyword( inKeyword )  +  self.expression() + Literal( '\n' ) ).action(
+		return ( Keyword( Keywords.execKeyword )  +  self.orOp()  +  Keyword( Keywords.inKeyword )  +  self.expression() + Literal( '\n' ) ).action(
 			lambda input, begin, end, xs, bindings: Schema.ExecStmt( source=xs[1], globals=xs[3], locals=None ) )
 
 	@Rule
 	def execCodeInLocalsAndGlobalsStmt(self):
-		return ( Keyword( execKeyword )  +  self.orOp()  +  Keyword( inKeyword )  +  self.expression()  +  ','  +  self.expression() + Literal( '\n' ) ).action(
+		return ( Keyword( Keywords.execKeyword )  +  self.orOp()  +  Keyword( Keywords.inKeyword )  +  self.expression()  +  ','  +  self.expression() + Literal( '\n' ) ).action(
 			lambda input, begin, end, xs, bindings: Schema.ExecStmt( source=xs[1], globals=xs[3], locals=xs[5] ) )
 
 	@Rule
@@ -910,11 +910,11 @@ class Python2Grammar (Grammar):
 	# Print statement
 	@Rule
 	def printStmt(self):
-		return ( Keyword( printKeyword )  +  SeparatedList( self.expression(), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.PrintStmt( values=xs[1] ) )
+		return ( Keyword( Keywords.printKeyword )  +  SeparatedList( self.expression(), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.PrintStmt( values=xs[1] ) )
 
 	@Rule
 	def redirectedPrintStmt(self):
-		return ( Keyword( printKeyword )  +  Literal( '>>' )  +  self.expression()  +  ( Literal( ',' )  +
+		return ( Keyword( Keywords.printKeyword )  +  Literal( '>>' )  +  self.expression()  +  ( Literal( ',' )  +
 		                                                                                        SeparatedList( self.expression(), 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ).optional() + Literal( '\n' ) ).action(
 			lambda input, begin, end, xs, bindings: Schema.PrintStmt( destination=xs[2], values=xs[3][1]   if xs[3] is not None   else   [] ) )
 
@@ -932,7 +932,7 @@ class Python2Grammar (Grammar):
 	@Rule
 	def ifStmtHeader(self):
 		return ObjectNode( Schema.IfStmtHeader )  |  \
-		       ( Keyword( ifKeyword )  +  self.expression()  +  ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.IfStmtHeader( condition=xs[1] ) )
+		       ( Keyword( Keywords.ifKeyword )  +  self.expression()  +  ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.IfStmtHeader( condition=xs[1] ) )
 
 
 
@@ -940,7 +940,7 @@ class Python2Grammar (Grammar):
 	@Rule
 	def elifStmtHeader(self):
 		return ObjectNode( Schema.ElifStmtHeader )  |  \
-		       ( Keyword( elifKeyword )  +  self.expression()  +  ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.ElifStmtHeader( condition=xs[1] ) )
+		       ( Keyword( Keywords.elifKeyword )  +  self.expression()  +  ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.ElifStmtHeader( condition=xs[1] ) )
 
 
 
@@ -948,7 +948,7 @@ class Python2Grammar (Grammar):
 	@Rule
 	def elseStmtHeader(self):
 		return ObjectNode( Schema.ElseStmtHeader )  |  \
-		       ( Keyword( elseKeyword )  +  ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.ElseStmtHeader() )
+		       ( Keyword( Keywords.elseKeyword )  +  ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.ElseStmtHeader() )
 
 
 
@@ -956,7 +956,7 @@ class Python2Grammar (Grammar):
 	@Rule
 	def whileStmtHeader(self):
 		return ObjectNode( Schema.WhileStmtHeader )  |  \
-		       ( Keyword( whileKeyword )  +  self.expression()  +  ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.WhileStmtHeader( condition=xs[1] ) )
+		       ( Keyword( Keywords.whileKeyword )  +  self.expression()  +  ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.WhileStmtHeader( condition=xs[1] ) )
 
 
 
@@ -964,7 +964,7 @@ class Python2Grammar (Grammar):
 	@Rule
 	def forStmtHeader(self):
 		return ObjectNode( Schema.ForStmtHeader )  |  \
-		       ( Keyword( forKeyword )  +  self.targetListOrTargetItem()  +  Keyword( inKeyword )  +  self.tupleOrExpression()  +  ':' + Literal( '\n' ) ).action(
+		       ( Keyword( Keywords.forKeyword )  +  self.targetListOrTargetItem()  +  Keyword( Keywords.inKeyword )  +  self.tupleOrExpression()  +  ':' + Literal( '\n' ) ).action(
 			lambda input, begin, end, xs, bindings: Schema.ForStmtHeader( target=xs[1], source=xs[3] ) )
 
 
@@ -973,7 +973,7 @@ class Python2Grammar (Grammar):
 	@Rule
 	def tryStmtHeader(self):
 		return ObjectNode( Schema.TryStmtHeader )  |  \
-		       ( Keyword( tryKeyword )  +  ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.TryStmtHeader() )
+		       ( Keyword( Keywords.tryKeyword )  +  ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.TryStmtHeader() )
 
 
 
@@ -981,15 +981,15 @@ class Python2Grammar (Grammar):
 	# Except statement
 	@Rule
 	def exceptAllStmtHeader(self):
-		return ( Keyword( exceptKeyword ) + ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.ExceptStmtHeader( exception=None, target=None ) )
+		return ( Keyword( Keywords.exceptKeyword ) + ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.ExceptStmtHeader( exception=None, target=None ) )
 
 	@Rule
 	def exceptExcStmtHeader(self):
-		return ( Keyword( exceptKeyword )  +  self.expression() + ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.ExceptStmtHeader( exception=xs[1], target=None ) )
+		return ( Keyword( Keywords.exceptKeyword )  +  self.expression() + ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.ExceptStmtHeader( exception=xs[1], target=None ) )
 
 	@Rule
 	def exceptExcIntoTargetStmtHeader(self):
-		return ( Keyword( exceptKeyword )  +  self.expression()  +  ( Literal( ',' ) | Keyword( asKeyword ) )  +  self.targetItem() + ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.ExceptStmtHeader( exception=xs[1], target=xs[3] ) )
+		return ( Keyword( Keywords.exceptKeyword )  +  self.expression()  +  ( Literal( ',' ) | Keyword( Keywords.asKeyword ) )  +  self.targetItem() + ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.ExceptStmtHeader( exception=xs[1], target=xs[3] ) )
 
 	@Rule
 	def exceptStmtHeader(self):
@@ -1003,20 +1003,20 @@ class Python2Grammar (Grammar):
 	@Rule
 	def finallyStmtHeader(self):
 		return ObjectNode( Schema.FinallyStmtHeader )  |  \
-		       ( Keyword( finallyKeyword )  +  ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.FinallyStmtHeader() )
+		       ( Keyword( Keywords.finallyKeyword )  +  ':' + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.FinallyStmtHeader() )
 
 
 
 	# With statement
 	@Rule
 	def withContext(self):
-		return ( self.expression()  +  ( Keyword( asKeyword )  +  self.targetItem() ).optional() ).action(
+		return ( self.expression()  +  ( Keyword( Keywords.asKeyword )  +  self.targetItem() ).optional() ).action(
 			lambda input, begin, end, xs, bindings: Schema.WithContext( expr=xs[0], target=xs[1][1]   if xs[1] is not None   else None ) )
 
 	@Rule
 	def withStmtHeader(self):
 		return ObjectNode( Schema.WithStmtHeader )  |  \
-		       ( Keyword( withKeyword )  + SeparatedList( self.withContext(), 1, -1, SeparatedList.TrailingSeparatorPolicy.NEVER )  +  ':' + Literal( '\n' ) ).action(
+		       ( Keyword( Keywords.withKeyword )  + SeparatedList( self.withContext(), 1, -1, SeparatedList.TrailingSeparatorPolicy.NEVER )  +  ':' + Literal( '\n' ) ).action(
 			lambda input, begin, end, xs, bindings: Schema.WithStmtHeader( contexts=xs[1] ) )
 
 
@@ -1025,7 +1025,7 @@ class Python2Grammar (Grammar):
 	@Rule
 	def defStmtHeader(self):
 		return ObjectNode( Schema.DefStmtHeader )  |  \
-		       ( Keyword( defKeyword )  +  self.pythonIdentifier()  +  '('  +  self.params()  +  ')'  +  ':' + Literal( '\n' ) ).action(
+		       ( Keyword( Keywords.defKeyword )  +  self.pythonIdentifier()  +  '('  +  self.params()  +  ')'  +  ':' + Literal( '\n' ) ).action(
 			lambda input, begin, end, xs, bindings: Schema.DefStmtHeader( name=xs[1], params=xs[3][0], paramsTrailingSeparator=xs[3][1] ) )
 
 
@@ -1060,7 +1060,7 @@ class Python2Grammar (Grammar):
 				trailingSep = None
 			return Schema.ClassStmtHeader( name=xs[1], bases=bases, basesTrailingSeparator=trailingSep )
 		return ObjectNode( Schema.ClassStmtHeader )  |  \
-		       ( Keyword( classKeyword )  +  self.pythonIdentifier()  +  Optional( bases )  +  ':' + Literal( '\n' ) ).action( _action )
+		       ( Keyword( Keywords.classKeyword )  +  self.pythonIdentifier()  +  Optional( bases )  +  ':' + Literal( '\n' ) ).action( _action )
 
 
 
