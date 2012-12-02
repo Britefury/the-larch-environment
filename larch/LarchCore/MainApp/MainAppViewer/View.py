@@ -24,7 +24,8 @@ from Britefury.Kernel.Document import Document
 
 
 from BritefuryJ.StyleSheet import StyleSheet
-from BritefuryJ.Browser import Location
+from BritefuryJ.Browser.TestPages import TestsRootPage
+
 from BritefuryJ.LSpace import PageController
 from BritefuryJ.Graphics import FilledBorder
 
@@ -39,9 +40,6 @@ from BritefuryJ.Projection import Perspective
 
 from LarchCore.MainApp import Application
 from LarchCore.MainApp import DocumentManagement
-from LarchCore.MainApp import AppLocationPath
-
-
 
 
 _appDocRightPadding = 30.0
@@ -50,17 +48,6 @@ _appDocumentControlsStyle = StyleSheet.style( Primitive.rowSpacing( 20.0 ), Prim
 _documentListTableStyle = StyleSheet.style( Primitive.tableColumnSpacing( 15.0 ), Primitive.tableRowSpacing( 5.0 ) )
 
 
-
-def _joinLocation(x, y):
-	if x == '':
-		return y
-	elif y == '':
-		return x
-	else:
-		return x + '.' + y
-
-
-	
 
 def _newDocumentName(docs):
 	usedNames = set( [ doc.getName()   for doc in docs ] )
@@ -112,17 +99,17 @@ class AppView (MethodDispatchView):
 				name = _newDocumentName( openDocuments )
 				document.setDocumentName( name )
 				
-				appDoc = node.registerOpenDocument( document, fragment.getSubjectContext()['location'] + '.documents' )
+				node.registerOpenDocument( document )
 
-				location = fragment.getSubjectContext()['location'] + '.documents.' + appDoc.getRelativeLocation()
+				subject = document.newSubject( fragment.subject, None, document.getDocumentName() )
 
 				pageController = link.element.rootElement.pageController
-				pageController.openLocation( location, PageController.OpenOperation.OPEN_IN_CURRENT_TAB )
+				pageController.openSubject( subject, PageController.OpenOperation.OPEN_IN_CURRENT_TAB )
 
 				
 			element = link.getElement()
 			openDocuments = node.getOpenDocuments()
-			DocumentManagement.promptNewDocument( fragment.getSubjectContext()['world'], element, handleNewDocumentFn )
+			DocumentManagement.promptNewDocument( fragment.subject.world, element, handleNewDocumentFn )
 			
 			return True
 		
@@ -130,23 +117,23 @@ class AppView (MethodDispatchView):
 			
 		def _onOpenDoc(link, event):
 			def handleOpenedDocumentFn(fullPath, document):
-				appDoc = node.registerOpenDocument( document, fragment.getSubjectContext()['location'] + '.documents' )
+				appDoc = node.registerOpenDocument( document )
 
 				
 			element = link.getElement()
-			DocumentManagement.promptOpenDocument( fragment.getSubjectContext()['world'], element.getRootElement().getComponent(), handleOpenedDocumentFn )
+			DocumentManagement.promptOpenDocument( fragment.subject.world, element.getRootElement().getComponent(), handleOpenedDocumentFn )
 			
 			return True
 		
 		
 		
 		def _onFileListDrop(element, targetPosition, data, action):
-			world = fragment.getSubjectContext()['world']
+			world = fragment.subject.world
 			for filename in data:
 				filename = str( filename )
 				
 				document = Document.readFile( world, filename )
-				node.registerOpenDocument( document, fragment.getSubjectContext()['location'] + '.documents' )
+				node.registerOpenDocument( document )
 			return True
 
 		
@@ -156,21 +143,22 @@ class AppView (MethodDispatchView):
 			appConsole = Application.AppConsole( index )
 			node.addConsole( appConsole )
 
-			location = fragment.getSubjectContext()['location'] + '.consoles.c%d'  %  ( index, )
+			subject = appConsole.subject( fragment.subject )
 
 			pageController = link.element.rootElement.pageController
-			pageController.openLocation( location, PageController.OpenOperation.OPEN_IN_CURRENT_TAB )
+			pageController.openSubject( subject, PageController.OpenOperation.OPEN_IN_CURRENT_TAB )
 
 			return True
 		
 			
 			
-		openDocViews = InnerFragment.map( node.getOpenDocuments(), state.withAttrs( location='' ) )
-		consoles = InnerFragment.map( node.getConsoles(), state.withAttrs( location='' ) )
-		
-		systemLink = Hyperlink( 'TEST PAGES', Location( 'tests' ) )
-		configurationLink = Hyperlink( 'CONFIGURATION PAGE', Location( 'config' ) )
-		linkHeader = AppLocationPath.appLinkheaderBar( fragment.getSubjectContext(), [ configurationLink, systemLink ] )
+		openDocViews = Pres.mapCoerce( node.getOpenDocuments() )
+		consoles = Pres.mapCoerce( node.getConsoles() )
+
+
+		systemLink = Hyperlink( 'TEST PAGES', TestsRootPage.instanceSubject )
+		configurationLink = Hyperlink( 'CONFIGURATION PAGE', fragment.subject.world.configuration.subject( fragment.subject ) )
+		linkHeader = LinkHeaderBar( [ configurationLink, systemLink ])
 
 		title = TitleBar( 'The Larch Environment' )
 		
@@ -200,7 +188,7 @@ class AppView (MethodDispatchView):
 	def AppDocument(self, fragment, state, node):
 		def _onSave(link, event):
 			element = link.getElement()
-			world = fragment.getSubjectContext()['world']
+			world = fragment.subject.world
 			document = node.getDocument()
 			
 			if document.hasFilename():
@@ -214,7 +202,7 @@ class AppView (MethodDispatchView):
 		
 		def _onSaveAs(link, event):
 			element = link.getElement()
-			world = fragment.getSubjectContext()['world']
+			world = fragment.subject.world
 			document = node.getDocument()
 			
 			def handleSaveDocumentAsFn(filename):
@@ -225,7 +213,7 @@ class AppView (MethodDispatchView):
 
 		def _onClose(link, event):
 			element = link.getElement()
-			world = fragment.getSubjectContext()['world']
+			world = fragment.subject.world
 			document = node.getDocument()
 
 			def _performClose():
@@ -245,11 +233,11 @@ class AppView (MethodDispatchView):
 
 
 		name = node.getName()
-		relLocation = node.getRelativeLocation()
-			
-		
-		location = fragment.getSubjectContext()['location'] + '.documents.' + relLocation
-		docLink = Hyperlink( name, location ).padX( 0.0, _appDocRightPadding )
+
+		document = node.getDocument()
+
+		subject = node.getDocument().newSubject( fragment.subject, None, document.getDocumentName() )
+		docLink = Hyperlink( name, subject ).padX( 0.0, _appDocRightPadding )
 		saveLink = Hyperlink( 'Save', _onSave )
 		saveAsLink = Hyperlink( 'Save as', _onSaveAs )
 		closeLink = Hyperlink( 'Close', _onClose )
@@ -262,8 +250,8 @@ class AppView (MethodDispatchView):
 	def AppConsole(self, fragment, state, node):
 		index = node.getIndex()
 		name = 'Console %d'  %  ( index, )
-		location = fragment.getSubjectContext()['location'] + '.consoles.c%d'  %  ( index, )
-		consoleLink = Hyperlink( name, location ).padX( 0.0, _appDocRightPadding )
+		subject = node.subject( fragment.subject )
+		consoleLink = Hyperlink( name, subject ).padX( 0.0, _appDocRightPadding )
 	
 		return GridRow( [ consoleLink ] )
 
