@@ -23,7 +23,7 @@ from BritefuryJ.LSpace.Input import ObjectDndHandler, Modifier
 from BritefuryJ.LSpace.TextFocus import TextSelection
 from BritefuryJ.LSpace.Marker import Marker
 from BritefuryJ.StyleSheet import StyleSheet
-from BritefuryJ.Pres import ApplyStyleSheetFromAttribute, ApplyPerspective
+from BritefuryJ.Pres import Pres, ApplyStyleSheetFromAttribute, ApplyPerspective
 from BritefuryJ.Pres.Primitive import Primitive, Label, StaticText, Spacer, Image, Bin, Border, SpaceBin, Row, Column
 from BritefuryJ.Pres.RichText import TitleBar, Heading1, Heading2, Heading3, Heading4, Heading4, Heading5, Heading6, NormalText, RichSpan, Page, Body, LinkHeaderBar
 from BritefuryJ.Pres.ContextMenu import ControlsRow
