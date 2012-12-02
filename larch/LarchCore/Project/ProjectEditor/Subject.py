@@ -18,8 +18,7 @@ from BritefuryJ.Command import CommandName, Command, CommandSet
 from BritefuryJ.Shortcut import Shortcut
 
 from BritefuryJ.Controls import Hyperlink
-from BritefuryJ.Pres.Pres import *
-from BritefuryJ.Pres.Primitive import *
+from BritefuryJ.Pres.Primitive import Spacer, Column
 
 from LarchCore.MainApp import DocumentManagement
 from LarchCore.MainApp import AppLocationPath

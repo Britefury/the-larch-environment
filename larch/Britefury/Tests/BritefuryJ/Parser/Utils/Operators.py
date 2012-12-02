@@ -6,8 +6,6 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 
-from BritefuryJ.Parser import *
-from BritefuryJ.Parser.Utils import *
 from BritefuryJ.Parser.Utils.OperatorParser import PrefixLevel, SuffixLevel, InfixLeftLevel, InfixRightLevel, InfixChainLevel, InfixUniformChainLevel, OperatorTable, UnaryOperator, BinaryOperator, ChainOperator
 from BritefuryJ.Parser.Utils.Tokens import identifier
 
