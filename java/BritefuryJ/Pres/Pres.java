@@ -25,6 +25,7 @@ import BritefuryJ.LSpace.Interactor.AbstractElementInteractor;
 import BritefuryJ.LSpace.Interactor.ContextMenuElementInteractor;
 import BritefuryJ.LSpace.Layout.HAlignment;
 import BritefuryJ.LSpace.Layout.VAlignment;
+import BritefuryJ.Projection.TransientSubject;
 import BritefuryJ.Projection.AbstractPerspective;
 import BritefuryJ.Projection.Subject;
 import BritefuryJ.Shortcut.Shortcut;
@@ -33,7 +34,7 @@ import BritefuryJ.StyleSheet.StyleValues;
 
 public abstract class Pres
 {
-	private static class PopupSubject extends Subject
+	private static class PopupSubject extends TransientSubject
 	{
 		private Object focus;
 		private AbstractPerspective perspective;

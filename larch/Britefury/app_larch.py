@@ -13,9 +13,8 @@ from java.util.jar import JarInputStream
 from javax.swing import UIManager
 
 from BritefuryJ.DocModel import DMIOReader, DMNode
-from BritefuryJ.Browser import Location
 
-from Britefury.Kernel.World import World, WorldDefaultOuterSubject
+from Britefury.Kernel.World import World
 from Britefury.Kernel.Document import Document
 from Britefury import app, app_startup, app_in_jar
 
@@ -81,8 +80,7 @@ def start_larch():
 			# Load a document
 			filename = sys.argv[1]
 			document = Document.readFile( world, filename )
-			outerSubject = WorldDefaultOuterSubject( world )
-			subject = document.newSubject( outerSubject, Location( 'main' ), None, filename )
+			subject = document.newSubject( world.worldSubject, None, filename )
 			world.setRootSubject( subject )
 	else:
 		foundAppInJar = False
@@ -90,8 +88,7 @@ def start_larch():
 		if len( jarCustomLarchApp ) > 0:
 			inputStream = jarCustomLarchApp[0]
 			document = Document.readFromInputStream( world, inputStream, 'app' )
-			outerSubject = WorldDefaultOuterSubject( world )
-			subject = document.newSubject( outerSubject, Location( 'main' ), None, 'app' )
+			subject = document.newSubject( world.worldSubject, None, 'app' )
 			world.setRootSubject( subject )
 		elif jarCustomPythonApp[0]:
 			from mainapp import app as appModule
