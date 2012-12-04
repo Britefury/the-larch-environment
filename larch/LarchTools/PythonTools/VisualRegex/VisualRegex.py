@@ -25,6 +25,7 @@ from BritefuryJ.Graphics import SolidBorder
 from BritefuryJ.Pres.Primitive import Paragraph, HiddenText
 
 from LarchCore.Languages.Python2.PythonCommands import pythonCommandSet, EmbeddedExpressionAtCaretAction, chainActions
+from LarchCore.Languages.Python2 import Schema as Py
 
 from LarchTools.PythonTools.VisualRegex import Schema
 from LarchTools.PythonTools.VisualRegex.Parser import VisualRegexGrammar
@@ -65,8 +66,14 @@ class VisualPythonRegex (object):
 			raise TypeError, 'Invalid regular expression type'
 
 
-	def __py_eval__(self, _globals, _locals, codeGen):
+	def __py_evalmodel__(self, codeGen):
+		s = self.asString()
+		return Py.strToStrLiteral( s )
+
+
+	def asString(self):
 		return self._codeGen( self.regex )
+
 
 	__embed_hide_frame__ = True
 
