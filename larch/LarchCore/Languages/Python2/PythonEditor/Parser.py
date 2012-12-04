@@ -101,7 +101,7 @@ class Python2Grammar (Grammar):
 		flags = xs[:-1]
 		if flags[0] == 'u'  or  flags[0] == 'U':
 			format = 'unicode'
-		elif flags[0] == 'b'  or  flags[0] == 'b':
+		elif flags[0] == 'b'  or  flags[0] == 'B':
 			format = 'bytes'
 		else:
 			format = 'ascii'

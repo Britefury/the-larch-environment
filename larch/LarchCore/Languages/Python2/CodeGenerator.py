@@ -1231,8 +1231,25 @@ class TestCase_Python2CodeGenerator (unittest.TestCase):
 			print result.replace( '\n', '\\n' ) + '<<'
 			
 		self.assert_( result == expected )
-		
-		
+
+
+	def _testNode(self, node, expected):
+		gen = Python2CodeGenerator( '<test>' )
+		result = str( gen( node ) )
+
+		if result != expected:
+			print 'UNEXPECTED RESULT'
+			print 'INPUT:'
+			print node
+			print 'EXPECTED:'
+			print expected.replace( '\n', '\\n' ) + '<<'
+			print 'RESULT:'
+			print result.replace( '\n', '\\n' ) + '<<'
+
+		self.assert_( result == expected )
+
+
+
 	def _binOpTest(self, sxOp, expectedOp):
 		self._testSX( '(py %s x=(py Load name=a) y=(py Load name=b))'  %  sxOp,  'a %s b'  %  expectedOp )
 		
@@ -1249,6 +1266,12 @@ class TestCase_Python2CodeGenerator (unittest.TestCase):
 		self._testSX( '(py StringLiteral format=ascii quotation=single value="Hi there")', '\'Hi there\'' )
 		self._testSX( '(py StringLiteral format=unicode quotation=single value="Hi there")', 'u\'Hi there\'' )
 		self._testSX( '(py StringLiteral format=bytes quotation=single value="Hi there")', 'b\'Hi there\'' )
+
+		self._testNode( Schema.strToStrLiteral( 'Hi there' ), '\'Hi there\'' )
+		self._testNode( Schema.strToStrLiteral( 'Hi \'there\'' ), '"Hi \'there\'"' )
+		self._testNode( Schema.strToStrLiteral( 'Hi \\there' ), '\'Hi \\\\there\'' )
+		self._testNode( Schema.strToStrLiteral( u'Hi \uff00there' ), 'u\'Hi \\uff00there\'' )
+		self._testNode( Schema.strToStrLiteral( b'Hi \x00there' ), '\'Hi \\x00there\'' )
 
 
 	def test_IntLiteral(self):

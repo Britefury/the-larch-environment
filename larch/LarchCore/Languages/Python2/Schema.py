@@ -47,6 +47,37 @@ def stringPrefixToFormat(prefix):
 
 
 
+def strToStrLiteral(x):
+	r = repr( x )
+	if r.startswith( 'ur' ):
+		format = 'unicode-regex'
+		q = 2
+	elif r.startswith( 'br' ):
+		format = 'bytes-regex'
+		q = 2
+	elif r.startswith( 'u' ):
+		format = 'unicode'
+		q = 1
+	elif r.startswith( 'b' ):
+		format = 'bytes'
+		q = 1
+	elif r.startswith( 'r' ):
+		format = 'regex'
+		q = 1
+	else:
+		format = 'ascii'
+		q = 0
+	qchar = r[q]
+	if qchar == '\'':
+		quotation = 'single'
+	elif qchar == '\"':
+		quotation = 'double'
+	value = r[q+1:-1]
+	return StringLiteral( format=format, quotation=quotation, value=value )
+
+
+
+
 
 schema = DMSchema( 'Python2', 'py', 'LarchCore.Languages.Python2', 6 )
 
@@ -259,7 +290,7 @@ IndentedBlock = schema.newClass( 'IndentedBlock', CompoundStmt, [ 'suite' ] )
 
 # Embedded object
 EmbeddedObjectLiteral = schema.newClass( 'EmbeddedObjectLiteral', Expr, [ 'embeddedValue' ] )
-EmbeddedObjectExpr = schema.newClass( 'EmbeddedObjectExpr', Expr, [ 'embeddedValue', 'asLiteral' ] )
+EmbeddedObjectExpr = schema.newClass( 'EmbeddedObjectExpr', Expr, [ 'embeddedValue' ] )
 EmbeddedObjectStmt = schema.newClass( 'EmbeddedObjectStmt', SimpleStmt, [ 'embeddedValue' ] )
 
 
