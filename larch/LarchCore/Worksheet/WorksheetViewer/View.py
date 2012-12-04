@@ -20,7 +20,6 @@ from BritefuryJ.Shortcut import Shortcut
 
 from BritefuryJ.LSpace.Input import Modifier
 from BritefuryJ.Graphics import SolidBorder
-from BritefuryJ.Browser import Location
 from BritefuryJ.StyleSheet import StyleSheet
 from BritefuryJ.Controls import Button, Hyperlink
 from BritefuryJ.Pres import Pres, ApplyPerspective
@@ -31,13 +30,11 @@ from BritefuryJ.Pres.ObjectPres import ObjectBorder
 from BritefuryJ.Pres.UI import Section, SectionHeading2
 from BritefuryJ.Pres.Help import TipBox
 
-from BritefuryJ.Projection import Perspective, Subject
+from BritefuryJ.Projection import Perspective, Subject, SubjectPathEntry
 
 
 from LarchCore.Languages.Python2 import Python2
 from LarchCore.Languages.Python2.CodeGenerator import compileForModuleExecution
-
-from LarchCore.MainApp import AppLocationPath
 
 from LarchCore.Worksheet import Schema
 from LarchCore.Worksheet.WorksheetViewer import ViewSchema
@@ -71,16 +68,21 @@ class WorksheetViewer (MethodDispatchView):
 	@ObjectDispatchMethod( ViewSchema.WorksheetView )
 	def Worksheet(self, fragment, inheritedState, node):
 		bodyView = Pres.coerce( node.getBody() )
-		
-		editLocation = fragment.getSubjectContext()['editLocation']
 
-		editLink = Hyperlink( 'Switch to developer mode', editLocation )
-		linkHeader = AppLocationPath.appLinkheaderBar( fragment.getSubjectContext(), [ editLink ] )
+		try:
+			editSubject = fragment.subject.editSubject
+		except AttributeError:
+			pageContents = []
+		else:
+			editLink = Hyperlink( 'Switch to developer mode', editSubject )
+			linkHeader = LinkHeaderBar( [ editLink ] )
+			pageContents = [ linkHeader ]
+
 
 		tip = TipBox( 'To edit this worksheet, or add content, click Developer mode at the top right',
 			      'larchcore.worksheet.view.toedit' )
 
-		w = Page( [ linkHeader, bodyView, tip ] )
+		w = Page( pageContents + [ bodyView, tip ] )
 		w = w.withContextMenuInteractor( _worksheetContextMenuFactory )
 		return StyleSheet.style( Primitive.editable( False ) ).applyTo( w )
 
@@ -126,8 +128,8 @@ class WorksheetViewer (MethodDispatchView):
 
 	@ObjectDispatchMethod( ViewSchema.LinkView )
 	def Link(self, fragment, inheritedState, node):
-		docLocation = fragment.getSubjectContext()['docLocation']
-		return Hyperlink( node.text, node.getAbsoluteLocation( docLocation ) )
+		subject = node.getSubject( fragment.subject.documentSubject )
+		return Hyperlink( node.text, subject )
 
 
 	
@@ -226,28 +228,45 @@ _refreshCommand = Command( CommandName( '&Refresh worksheet' ), _refreshWorkshee
 _worksheetViewerCommands = CommandSet( 'LarchCore.Worksheet.Viewer', [ _refreshCommand ] )
 
 
+
+class _WorksheetEditorPathEntry (SubjectPathEntry):
+	def follow(self, outerSubject):
+		return outerSubject.editSubject
+
+	def canPersist(self):
+		return True
+
+
+_WorksheetEditorPathEntry.instance = _WorksheetEditorPathEntry()
+
+
 class WorksheetViewerSubject (Subject):
-	def __init__(self, document, model, enclosingSubject, location, importName, title):
-		super( WorksheetViewerSubject, self ).__init__( enclosingSubject )
-		assert isinstance( location, Location )
+	def __init__(self, document, model, enclosingSubject, path, importName, title):
+		super( WorksheetViewerSubject, self ).__init__( enclosingSubject, path )
 		self._document = document
 		self._model = model
 		# Defer the creation of the model view - it involves executing all the code in the worksheet which can take some time
 		self._modelView = None
-		self._location = location
 		self._importName = importName
-		self._editLocation = self._location + '.edit'
 		self._title = title
 		
-		self.edit = WorksheetEditorSubject( document, model, self, self._editLocation, self._importName, title )
+		self.editSubject = WorksheetEditorSubject( document, model, self, path.followedBy( _WorksheetEditorPathEntry.instance ), self._importName, title )
+
+
+	@property
+	def viewSubject(self):
+		return self
 
 	
 	def _getModelView(self):
 		if self._modelView is None:
 			self._modelView = ViewSchema.WorksheetView( None, self._model, self._importName )
 		return self._modelView
-		
-	
+
+
+	def getTrailLinkText(self):
+		return self._title + '[Ws]'
+
 
 	def getFocus(self):
 		return self._getModelView()
@@ -256,12 +275,8 @@ class WorksheetViewerSubject (Subject):
 		return perspective
 	
 	def getTitle(self):
-		return self._title + ' [Ws-User]'
+		return self._title + ' [Ws]'
 	
-	def getSubjectContext(self):
-		t = self.enclosingSubject.getSubjectContext().withAttrs( location=self._location, editLocation=self._editLocation, viewLocation=self._location )
-		return AppLocationPath.addLocationPathEntry( t, 'Worksheet', self._location )
-
 	def getChangeHistory(self):
 		return self._document.getChangeHistory()
 
@@ -271,19 +286,3 @@ class WorksheetViewerSubject (Subject):
 
 	def createModuleLoader(self, document):
 		return _WorksheetModuleLoader( self._model, document )
-	
-	
-	def __getattr__(self, name):
-		module = self._getModelView().getModule()
-		try:
-			subjectFactory = module.__subject__
-		except AttributeError:
-			return getattr( module, name )
-		else:
-			subject = subjectFactory( self._document, module, self, self._location )
-			return getattr( subject, name )
-
-	
-
-	
-	

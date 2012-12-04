@@ -12,8 +12,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.Browser.Location;
-import BritefuryJ.DefaultPerspective.DefaultPerspective;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.DefaultPerspective.PrimitivePresenter;
 import BritefuryJ.Incremental.IncrementalFunctionMonitor;
@@ -40,7 +38,6 @@ import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Region;
 import BritefuryJ.Projection.AbstractPerspective;
-import BritefuryJ.Projection.ProjectiveBrowserContext;
 import BritefuryJ.Projection.Subject;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -336,15 +333,10 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 		return f.style;
 	}
 	
-	public ProjectiveBrowserContext getBrowserContext()
+
+	public Subject getSubject()
 	{
-		return incView.getBrowserContext();
-	}
-	
-	
-	public SimpleAttributeTable getSubjectContext()
-	{
-		return getFragmentFactory().subjectContext;
+		return incView.getSubject();
 	}
 	
 	public AbstractPerspective getPerspective()
@@ -712,7 +704,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	public LSElement presentInnerFragment(Object x, AbstractPerspective perspective, StyleValues style, SimpleAttributeTable inheritedState)
 	{
 		IncrementalView.FragmentFactory factory = getFragmentFactory();
-		LSElement e = presentInnerFragment( x, perspective, factory.subjectContext, style, inheritedState );
+		LSElement e = presentInnerFragmentRaw( x, perspective, style, inheritedState );
 		if ( perspective != factory.perspective )
 		{
 			e = perspectiveFragmentRegion( e, perspective );
@@ -722,24 +714,6 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	
 	
 	
-	public LSElement presentLocationAsElement(Location location, StyleValues style, SimpleAttributeTable inheritedState)
-	{
-		Subject subject = getBrowserContext().resolveLocationAsSubject( location );
-		AbstractPerspective perspective = subject.getPerspective();
-		if ( perspective == null )
-		{
-			perspective = DefaultPerspective.instance;
-		}
-		LSElement e = presentInnerFragment( subject.getFocus(), perspective, subject.getSubjectContext(), style, inheritedState );
-		return perspectiveFragmentRegion( e, perspective );
-	}
-	
-	public Location getLocationForObject(Object x)
-	{
-		return getBrowserContext().getLocationForObject( x );
-	}
-	
-	
 	protected static LSElement perspectiveFragmentRegion(LSElement fragmentContents, AbstractPerspective perspective)
 	{
 		return new Region( fragmentContents, perspective.getClipboardHandler() ).present();
@@ -747,7 +721,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	
 
 
-	private LSElement presentInnerFragment(Object model, AbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
+	private LSElement presentInnerFragmentRaw(Object model, AbstractPerspective perspective, StyleValues style, SimpleAttributeTable inheritedState)
 	{
 		if ( model == null )
 		{
@@ -761,7 +735,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 		}
 
 		// A call to IncrementalView.buildFragment builds the fragment, and puts it in the IncrementalView's table
-		FragmentView incrementalNode = incView.buildFragment( model, incView.getUniqueFragmentFactory( perspective, subjectContext, style, inheritedState ) );
+		FragmentView incrementalNode = incView.buildFragment( model, incView.getUniqueFragmentFactory( perspective, style, inheritedState ) );
 		
 		
 		// Register the parent <-> child relationship before refreshing the node, so that the relationship is 'available' during (re-computation)
