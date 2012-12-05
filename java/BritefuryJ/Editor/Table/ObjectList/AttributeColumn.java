@@ -120,12 +120,14 @@ public class AttributeColumn extends AbstractColumn
 		{
 			if ( e.match( Py.AttributeError ) )
 			{
-				System.out.println( "Warning: AttributeColumn.set() attempting to set read-only attribute" );
+				if ( e.value.toString().contains( attrname.asString() ) )
+				{
+					System.out.println( "Warning: AttributeColumn.set() attempting to set read-only attribute '" + attrname.asString() + "'" );
+					return;
+				}
 			}
-			else
-			{
-				throw e;
-			}
+
+			throw e;
 		}
 	}
 
