@@ -249,7 +249,7 @@ def _convertEmbeddedObjectLiteralToExpression(model, element):
 
 def _convertEmbeddedObjectStmtToLiteral(model):
 	isolated = model['embeddedValue']
-	replacement = Schema.ExprStmt( expr=Schema.EmbeddedObjectExpr( embeddedValue=isolated, asLiteral='1' ) )
+	replacement = Schema.ExprStmt( expr=Schema.EmbeddedObjectLiteral( embeddedValue=isolated ) )
 	pyReplaceNode( model, replacement )
 
 
