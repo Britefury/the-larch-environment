@@ -124,6 +124,7 @@ def compoundStatementEditor(pythonView, inheritedState, model, compoundBlocks):
 			suiteElement = SoftStructuralItem( PythonSyntaxRecognizingController.instance,
 							   PythonSyntaxRecognizingController.instance._makeCompoundSuiteEditFilter( suite ),
 							   Schema.IndentedBlock( suite=suite ), suiteElement )
+			suiteElement = suiteElement.withProperty( SuiteProperty.instance, suite )
 
 			statementContents.extend( [ headerStatementLine.alignHExpand(), suiteElement.alignHExpand() ] )
 		else:
@@ -410,6 +411,7 @@ def Unparsed(method):
 def UnparsedStatement(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
+		v = v.withProperty( StatementProperty.instance, model )
 		v = PythonSyntaxRecognizingController.instance._unparsedStatementEditRule.applyToFragment( statementLine( v ), model, inheritedState )
 		v = _applyIndentationShortcuts( v )
 		return v
@@ -452,7 +454,9 @@ def ExpressionTopLevel(method):
 def Statement(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
-		v = PythonSyntaxRecognizingController.instance._statementEditRule.applyToFragment( statementLine( v ), model, inheritedState )
+		v = statementLine( v )
+		v = v.withProperty( StatementProperty.instance, model )
+		v = PythonSyntaxRecognizingController.instance._statementEditRule.applyToFragment( v, model, inheritedState )
 		v = _applyIndentationShortcuts( v )
 		return v
 	return redecorateDispatchMethod( method, _m )
@@ -463,13 +467,17 @@ def CompoundStatementHeader(method):
 	def _m(self, fragment, inheritedState, model, *args):
 		v = method(self, fragment, inheritedState, model, *args )
 		if isinstance( v, tuple ):
-			e = PythonSyntaxRecognizingController.instance._compoundStatementHeaderEditRule.applyToFragment( statementLine( v[0] ), model, inheritedState )
+			e = statementLine( v[0] )
+			e = e.withProperty( StatementProperty.instance, model )
+			e = PythonSyntaxRecognizingController.instance._compoundStatementHeaderEditRule.applyToFragment( e, model, inheritedState )
 			e = _applyIndentationShortcuts( e )
 			for f in v[1:]:
 				e = f( e )
 			return e
 		else:
-			v = PythonSyntaxRecognizingController.instance._compoundStatementHeaderEditRule.applyToFragment( statementLine( v ), model, inheritedState )
+			v = statementLine( v )
+			v = v.withProperty( StatementProperty.instance, model )
+			v = PythonSyntaxRecognizingController.instance._compoundStatementHeaderEditRule.applyToFragment( v, model, inheritedState )
 			v = _applyIndentationShortcuts( v )
 			return v
 	return redecorateDispatchMethod( method, _m )
@@ -481,9 +489,13 @@ def CompoundStatement(method):
 		v = method(self, fragment, inheritedState, model, *args )
 		if isinstance( v, tuple ):
 			f = v[1]
-			return f( compoundStatementEditor( self, inheritedState, model, v[0] ) )
+			e = compoundStatementEditor( self, inheritedState, model, v[0] )
+			e = e.withProperty( StatementProperty.instance, model )
+			return f( e )
 		else:
-			return compoundStatementEditor( self, inheritedState, model, v )
+			v = compoundStatementEditor( self, inheritedState, model, v )
+			v = v.withProperty( StatementProperty.instance, model )
+			return v
 	return redecorateDispatchMethod( method, _m )
 
 
@@ -502,6 +514,7 @@ def SpecialFormStatement(method):
 		v = method(self, fragment, inheritedState, model, *args )
 		v = StructuralItem( PythonSyntaxRecognizingController.instance, model, v )
 		v = specialFormStatementLine( v )
+		v = v.withProperty( StatementProperty.instance, model )
 		v = PythonSyntaxRecognizingController.instance._specialFormStatementEditRule.applyToFragment( v, model, inheritedState )
 		v = _applyIndentationShortcuts( v )
 		return v
@@ -532,6 +545,7 @@ class Python2View (MethodDispatchView):
 		else:
 			lineViews = SREInnerFragment.map( suite, PRECEDENCE_NONE, EditMode.EDIT )
 		s = suiteView( lineViews ).alignHPack().alignVRefY()
+		s = s.withProperty( SuiteProperty.instance, suite )
 		s = s.withDropDest( _embeddedObject_dropDest )
 		s = s.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		s = s.withCommands( PythonCommands.pythonTargetCommands )
@@ -551,6 +565,7 @@ class Python2View (MethodDispatchView):
 		else:
 			lineViews = SREInnerFragment.map( suite, PRECEDENCE_NONE, EditMode.EDIT )
 		s = suiteView( lineViews ).alignHPack().alignVRefY()
+		s = s.withProperty( SuiteProperty.instance, suite )
 		s = s.withDropDest( _embeddedObject_dropDest )
 		s = s.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		s = s.withCommands( PythonCommands.pythonTargetCommands )
@@ -1595,6 +1610,7 @@ class Python2View (MethodDispatchView):
 		dedent = StructuralItem( PythonSyntaxRecognizingController.instance, Schema.Dedent(), dedentElement() )
 
 		suiteElement = badIndentedBlock( indent, lineViews, dedent )
+		suiteElement = suiteElement.withProperty( SuiteProperty.instance, suite )
 		suiteElement = SoftStructuralItem( PythonSyntaxRecognizingController.instance,
 		                                       PythonSyntaxRecognizingController.instance.parsingEditFilter( 'Suite', _parser.compoundSuite(), _makeSuiteCommitFn( suite ) ),
 		                                       model, suiteElement )
