@@ -8,23 +8,24 @@ package BritefuryJ.Browser;
 
 import BritefuryJ.LSpace.PersistentState.PersistentState;
 import BritefuryJ.LSpace.PersistentState.PersistentStateStore;
+import BritefuryJ.Projection.SubjectPath;
 
 class BrowserState
 {
-	private Location location;
+	private SubjectPath path;
 	private PersistentState viewportState;
 	private PersistentStateStore pageState;
 	
 	
-	public BrowserState(Location location)
+	public BrowserState(SubjectPath path)
 	{
-		this.location = location;
+		this.path = path;
 		this.viewportState = new PersistentState();
 	}
 	
-	public Location getLocation()
+	public SubjectPath getSubjectPath()
 	{
-		return location;
+		return path;
 	}
 
 	public PersistentState getViewportState()
