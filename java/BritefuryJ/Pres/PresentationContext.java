@@ -48,11 +48,6 @@ public class PresentationContext
 		return inheritedState;
 	}
 	
-	public SimpleAttributeTable getSubjectContext()
-	{
-		return fragment != null  ?  fragment.getSubjectContext()  :  null;
-	}
-	
 	
 	public PersistentState persistentState(Object key)
 	{

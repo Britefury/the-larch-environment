@@ -7,57 +7,23 @@
 ##-*************************
 from BritefuryJ.AttributeTable import SimpleAttributeTable
 
-from BritefuryJ.Browser import Location
-
-from BritefuryJ.Projection import Subject
+from BritefuryJ.Projection import TransientSubject, SubjectTrailLink
 from Britefury.Kernel.Document import Document
 
-from LarchCore.PythonConsole import Console
-
 from LarchCore.MainApp.MainAppViewer.View import perspective
-from LarchCore.MainApp import AppLocationPath
 
 
-
-class _ConsoleListSubject (object):
-	def __init__(self, appState, enclosingSubject):
-		self._appState = appState
-		self._enclosingSubject = enclosingSubject
-
-		
-	def __resolve__(self, key):
-		index = int( key[1:] )
-		for console in self._appState.getConsoles():
-			if console.getIndex() == index:
-				return Console.ConsoleSubject( console.getConsole(), self._enclosingSubject )
-		raise KeyError, 'No console at index %s'  %  ( key, )
-		
-
-class _DocumentListSubject (object):
-	def __init__(self, appState, enclosingSubject):
-		self._appState = appState
-		self._enclosingSubject = enclosingSubject
-
-
-	def __resolve__(self, relativeLocation):
-		for appDocument in self._appState.getOpenDocuments():
-			if appDocument.getRelativeLocation() == relativeLocation:
-				doc = appDocument.getDocument()
-				return doc.newSubject( self._enclosingSubject, self._enclosingSubject._rootLocation + '.documents.' + relativeLocation, None, appDocument.getName() )
-		raise AttributeError, 'no document at %s'  %  ( relativeLocation, )
-		
-
-class MainAppSubject (Subject):
-	def __init__(self, appState, world, rootLocation):
-		super( MainAppSubject, self ).__init__( None )
-		assert isinstance( rootLocation, Location )
+class MainAppSubject (TransientSubject):
+	def __init__(self, appState, world):
+		super( MainAppSubject, self ).__init__( world.worldSubject )
 		self._appState = appState
 		self._world = world
-		self._rootLocation = rootLocation
-		self.consoles = _ConsoleListSubject( self._appState, self )
-		self.documents = _DocumentListSubject( self._appState, self )
 
-		
+
+	def getTrailLinkText(self):
+		return 'Home'
+
+
 	def getFocus(self):
 		return self._appState
 	
@@ -67,15 +33,11 @@ class MainAppSubject (Subject):
 	def getTitle(self):
 		return 'Larch'
 	
-	def getSubjectContext(self):
-		t = SimpleAttributeTable.instance.withAttrs( world=self._world, document=None, docLocation=None, location=self._rootLocation )
-		return AppLocationPath.addLocationPathEntry( t, 'Home', self._rootLocation )
 
-	
 	def loadDocument(self, filename):
 		document = Document.readFile( self._world, filename )
 		if document is not None:
-			self._appState.registerOpenDocument( document, self._rootLocation + '.documents' )
+			self._appState.registerOpenDocument( document )
 			return document
 		return None
 		
@@ -84,7 +46,7 @@ class MainAppSubject (Subject):
 	def import_resolve(self, name, fullname, path):
 		for appDocument in self._appState.getOpenDocuments():
 			doc = appDocument.getDocument()
-			subject = doc.newSubject( self, self._rootLocation + '.documents.' + appDocument.getRelativeLocation(), None, appDocument.getName() )
+			subject = doc.newSubject( self, None, appDocument.getName() )
 			try:
 				resolve = subject.import_resolve
 			except AttributeError:

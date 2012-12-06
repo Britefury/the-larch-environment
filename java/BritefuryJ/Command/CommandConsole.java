@@ -13,7 +13,6 @@ import java.util.List;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Browser.Browser;
-import BritefuryJ.Browser.BrowserPage;
 import BritefuryJ.ChangeHistory.ChangeHistory;
 import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.DefaultPerspective.Presentable;
@@ -40,8 +39,8 @@ import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Pres.Primitive.Spacer;
 import BritefuryJ.Pres.Primitive.Text;
 import BritefuryJ.Pres.UI.BubblePopup;
+import BritefuryJ.Projection.TransientSubject;
 import BritefuryJ.Projection.AbstractPerspective;
-import BritefuryJ.Projection.ProjectiveBrowserContext;
 import BritefuryJ.Projection.Subject;
 import BritefuryJ.Shortcut.Shortcut;
 import BritefuryJ.Shortcut.ShortcutElementAction;
@@ -55,7 +54,7 @@ public class CommandConsole extends AbstractCommandConsole
 		public boolean keyPressed(Keyboard keyboard, KeyEvent event)
 		{
 			ArrayList<BoundCommandSet> boundCommandSets = new ArrayList<BoundCommandSet>();
-			page.buildBoundCommandSetList( boundCommandSets );
+			pageSubject.buildBoundCommandSetList( boundCommandSets );
 			for (BoundCommandSet cmdSet: boundCommandSets)
 			{
 				BoundCommand cmd = cmdSet.getCommandForKeyPressed( event );
@@ -72,7 +71,7 @@ public class CommandConsole extends AbstractCommandConsole
 		public boolean keyReleased(Keyboard keyboard, KeyEvent event)
 		{
 			ArrayList<BoundCommandSet> boundCommandSets = new ArrayList<BoundCommandSet>();
-			page.buildBoundCommandSetList( boundCommandSets );
+			pageSubject.buildBoundCommandSetList( boundCommandSets );
 			for (BoundCommandSet cmdSet: boundCommandSets)
 			{
 				BoundCommand cmd = cmdSet.getCommandForKeyPressed( event );
@@ -92,7 +91,7 @@ public class CommandConsole extends AbstractCommandConsole
 	}
 	
 	
-	private class CommandConsoleSubject extends Subject
+	private class CommandConsoleSubject extends TransientSubject
 	{
 		public CommandConsoleSubject()
 		{
@@ -115,11 +114,6 @@ public class CommandConsole extends AbstractCommandConsole
 			return "Command console";
 		}
 
-		public SimpleAttributeTable getSubjectContext()
-		{
-			return SimpleAttributeTable.instance;
-		}
-		
 		public ChangeHistory getChangeHistory()
 		{
 			return null;
@@ -271,11 +265,10 @@ public class CommandConsole extends AbstractCommandConsole
 	}
 	
 	
-	private CommandConsoleSubject subject = new CommandConsoleSubject();
+	private CommandConsoleSubject cmdConsoleSubject = new CommandConsoleSubject();
 	private CommandKeyboardInteractor keyInteractor = new CommandKeyboardInteractor();
 	private Browser browser;
-	private ProjectiveBrowserContext browserContext;
-	private BrowserPage page;
+	private Subject pageSubject;
 	private PresentationComponent presentation;
 	private PresentationStateListenerList listeners = null;
 	private Contents contents;
@@ -296,10 +289,9 @@ public class CommandConsole extends AbstractCommandConsole
 	
 	
 	
-	public CommandConsole(Browser browser, ProjectiveBrowserContext browserContext, PresentationComponent presentation)
+	public CommandConsole(Browser browser, PresentationComponent presentation)
 	{
 		this.browser = browser;
-		this.browserContext = browserContext;
 		this.presentation = presentation;
 		contents = new UnreckognisedContents( "" );
 	}
@@ -308,19 +300,13 @@ public class CommandConsole extends AbstractCommandConsole
 	@Override
 	public Subject getSubject()
 	{
-		return subject;
+		return cmdConsoleSubject;
 	}
 
 	@Override
-	public ProjectiveBrowserContext getBrowserContext()
+	public void pageChanged(Subject subject)
 	{
-		return browserContext;
-	}
-	
-	@Override
-	public void pageChanged(BrowserPage page)
-	{
-		this.page = page;
+		this.pageSubject = subject;
 	}
 
 	@Override
@@ -573,10 +559,10 @@ public class CommandConsole extends AbstractCommandConsole
 	//
 	private BoundCommand getPageCommandForMnemonic(String mnemonic)
 	{
-		if ( page != null )
+		if ( pageSubject != null )
 		{
 			ArrayList<BoundCommandSet> boundCommandSets = new ArrayList<BoundCommandSet>();
-			page.buildBoundCommandSetList( boundCommandSets );
+			pageSubject.buildBoundCommandSetList( boundCommandSets );
 			for (BoundCommandSet commands: boundCommandSets)
 			{
 				BoundCommand c = commands.getCommand( mnemonic );
@@ -592,10 +578,10 @@ public class CommandConsole extends AbstractCommandConsole
 
 	private void buildPageAutocompleteList(List<BoundCommand> autocomplete, String text)
 	{
-		if ( page != null )
+		if ( pageSubject != null )
 		{
 			ArrayList<BoundCommandSet> boundCommandSets = new ArrayList<BoundCommandSet>();
-			page.buildBoundCommandSetList( boundCommandSets );
+			pageSubject.buildBoundCommandSetList( boundCommandSets );
 			for (BoundCommandSet commands: boundCommandSets)
 			{
 				commands.buildAutocompleteList( autocomplete, text );
