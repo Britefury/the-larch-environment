@@ -310,6 +310,19 @@ def joinRichStringsForInsertion(commonRootCtx, before, insertion, after):
 
 
 
+class StatementProperty (object):
+	pass
+
+StatementProperty.instance = StatementProperty()
+
+
+class SuiteProperty (object):
+	pass
+
+SuiteProperty.instance = SuiteProperty()
+
+
+
 # Special form inserting
 
 class _InsertSpecialFormTreeEvent (TextEditEvent):
@@ -348,7 +361,33 @@ def insertSpecialFormExpressionAtCaret(caret, specialForm):
 
 
 def insertSpecialFormStatementAtMarker(marker, specialForm):
-	_insertSpecialFormAtMarker( marker, Schema._temp_SpecialFormStmtWrapper( value=specialForm ) )
+	element = marker.getElement()
+
+	stmtVal = element.findPropertyInAncestors( StatementProperty.instance )
+	suiteVal = element.findPropertyInAncestors( SuiteProperty.instance )
+
+	if suiteVal is not None  and  suiteVal.getElement().getRegion() is element.getRegion():
+		suite = suiteVal.getValue()
+		if stmtVal is not None  and  stmtVal.getElement().getRegion() is element.getRegion():
+			stmt = stmtVal.getValue()
+			index = suite.indexOfById( stmt )
+
+			if index != -1:
+				if stmt.isInstanceOf( Schema.BlankLine ):
+					suite[index] = specialForm
+					return
+				else:
+					i = marker.getClampedIndexInSubtree( stmtVal.getElement() )
+					if i > 0:
+						index += 1
+					suite.insert( index, specialForm )
+					return
+		suite.append( specialForm )
+	else:
+		if suiteVal is not None:
+			print 'insertSpecialFormStatementAtMarker: Could not find suite'
+		else:
+			print 'insertSpecialFormStatementAtMarker: Could not find suite; regions did not match'
 
 
 def insertSpecialFormStatementAtCaret(caret, specialForm):

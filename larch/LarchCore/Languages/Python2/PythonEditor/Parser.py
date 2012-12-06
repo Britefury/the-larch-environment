@@ -1198,14 +1198,9 @@ class Python2Grammar (Grammar):
 	#
 
 	@Rule
-	def specialFormStmtWrapper_temporary(self):
-		return ( ObjectNode( Schema._temp_SpecialFormStmtWrapper ) + '\n' ).action( lambda input, begin, end, xs, bindings: xs[0]['value'] )
-
-	@Rule
 	def simpleStmt(self):
 		# Try to match print statement last; this way it can be used as a function
 		return ObjectNode( Schema.SimpleStmt )  |  \
-			self.specialFormStmtWrapper_temporary()  |  \
 		       self.assertStmt() | self.assignmentStmt() | self.augAssignStmt() | self.passStmt() | self.delStmt() | self.returnStmt() | self.yieldStmt() | self.raiseStmt() | self.breakStmt() | \
 		       self.continueStmt() | self.importStmt() | self.globalStmt() | self.execStmt() | self.redirectedPrintStmt() | self.exprStmt() | self.printStmt()
 

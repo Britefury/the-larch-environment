@@ -79,7 +79,7 @@ def strToStrLiteral(x):
 
 
 
-schema = DMSchema( 'Python2', 'py', 'LarchCore.Languages.Python2', 6 )
+schema = DMSchema( 'Python2', 'py', 'LarchCore.Languages.Python2', 7 )
 
 
 #
@@ -294,10 +294,6 @@ EmbeddedObjectExpr = schema.newClass( 'EmbeddedObjectExpr', Expr, [ 'embeddedVal
 EmbeddedObjectStmt = schema.newClass( 'EmbeddedObjectStmt', SimpleStmt, [ 'embeddedValue' ] )
 
 
-# TEMPORARY Special form statement wrapper
-_temp_SpecialFormStmtWrapper = schema.newClass( '_temp_SpecialFormStmtWrapper', Node, [ 'value' ] )
-
-
 
 #
 # Top level nodes
@@ -412,3 +408,33 @@ def _readDefaultValueParam_v4(fieldValues):
 	return DefaultValueParam( param=SimpleParam( name=name ), defaultValue=defaultValue )
 
 schema.registerReader( 'DefaultValueParam', 4, _readDefaultValueParam_v4 )
+
+
+
+
+#
+#
+# Version 6 backwards compatibility
+#
+#
+
+def _read_temp_SpecialFormStmtWrapper_v6(fieldValues):
+	# Version 4 stored a name and defaultValue
+	value = fieldValues['value']
+	if value.isInstanceOf( EmbeddedObjectStmt ):
+		return EmbeddedObjectLiteral( embeddedValue=value['embeddedValue'] )
+	else:
+		print 'WARNING: Unable to load _temp_SpecialFormStmtWrapper node; converted to None'
+		return Load( name='None' )
+
+def _readEmbeddedObjectExpr_v6(fieldValues):
+	# Version 4 stored a name and defaultValue
+	embeddedValue = fieldValues['embeddedValue']
+	asLiteral = fieldValues['asLiteral']
+	if asLiteral is not None:
+		return EmbeddedObjectLiteral( embeddedValue=embeddedValue )
+	else:
+		return EmbeddedObjectExpr( embeddedValue=embeddedValue)
+
+schema.registerReader( '_temp_SpecialFormStmtWrapper', 6, _read_temp_SpecialFormStmtWrapper_v6 )
+schema.registerReader( 'EmbeddedObjectExpr', 6, _readEmbeddedObjectExpr_v6 )
