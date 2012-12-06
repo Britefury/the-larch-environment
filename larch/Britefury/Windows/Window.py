@@ -16,9 +16,11 @@ from java.beans import PropertyChangeListener
 
 from BritefuryJ.ChangeHistory import ChangeHistory, ChangeHistoryListener
 
+from BritefuryJ.DefaultPerspective import DefaultPerspective
+
 from BritefuryJ.DocModel import DMIOReader, DMIOWriter, DMNode
 
-from BritefuryJ.Browser import TabbedBrowser, Location
+from BritefuryJ.Browser import TabbedBrowser
 
 from BritefuryJ.Pres.Help import AttachTooltip, TipBox
 
@@ -52,7 +54,7 @@ class _TransferActionListener (ActionListener):
 
 		
 class Window (object):
-	def __init__(self, windowManager, commandConsoleFactory, location=Location( '' )):
+	def __init__(self, windowManager, commandConsoleFactory, subject):
 		self._windowManager = windowManager
 
 
@@ -146,17 +148,25 @@ class Window (object):
 
 
 
-		# Create browser after creating menus, as the listener is invoked on construction, which make use them
+		# BROWSER
+
+		# Initialise here, as the browser listener may invoke methods upon the browser's creation
 		class _BrowserListener (TabbedBrowser.TabbedBrowserListener):
-			def createNewBrowserWindow(_self, location):
-				self._onOpenNewWindow( location )
+			def createNewBrowserWindow(_self, subject):
+				self._onOpenNewWindow( subject )
 
 			def onTabbledBrowserChangePage(_self, browser):
 				self._onChangePage( browser )
 
 
-		self._browser = TabbedBrowser( self._windowManager.browserContext.getPageLocationResolver(), _BrowserListener(), location, commandConsoleFactory )
+		def inspectFragment(fragment, sourceElement, triggeringEvent):
+			return self._windowManager.world.inspectFragment( fragment, sourceElement, triggeringEvent )
+
+
+		self._browser = TabbedBrowser( self._windowManager.world.rootSubject, subject, inspectFragment, _BrowserListener(), commandConsoleFactory )
 		self._browser.getComponent().setPreferredSize( Dimension( 800, 600 ) )
+
+
 
 
 
@@ -267,8 +277,8 @@ class Window (object):
 			
 
 	
-	def _onOpenNewWindow(self, location):
-		self._windowManager._createNewWindow( location )
+	def _onOpenNewWindow(self, subject):
+		self._windowManager._createNewWindow( subject )
 	
 	
 	
@@ -288,8 +298,8 @@ class Window (object):
 	def __onShowUndoHistory(self):
 		changeHistory = self._browser.getChangeHistory()
 		if changeHistory is not None:
-			location = self._windowManager.browserContext.getLocationForObject( changeHistory )
-			self._browser.openLocationInNewWindow( location )
+			subject = DefaultPerspective.instance.objectSubject( changeHistory )
+			self._browser.openSubjectInNewWindow( subject )
 
 
 
