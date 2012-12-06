@@ -64,6 +64,12 @@ class LiveList (object):
 	def __get_trackable_contents__(self):
 		return self._items
 
+
+	def __clipboard_copy__(self, memo):
+		self._incr.onAccess()
+		t = type( self )
+		return t( [ memo.copy( x )   for x in self ] )
+
 	
 	
 	def __iter__(self):
