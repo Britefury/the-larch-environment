@@ -131,8 +131,8 @@ class _FragmentSelector (object):
 
 	def _onFragmentSelected(self, fragment):
 		inspector = _FragmentInspector( fragment )
-		location = fragment.view.browserContext.getLocationForObject( inspector )
-		fragment.fragmentElement.rootElement.pageController.openLocation( location, PageController.OpenOperation.OPEN_IN_NEW_WINDOW )
+		subject = DefaultPerspective.instance.objectSubject( inspector )
+		fragment.fragmentElement.rootElement.pageController.openSubject( subject, PageController.OpenOperation.OPEN_IN_NEW_WINDOW )
 
 
 	def __present__(self, fragment, inheritedState):

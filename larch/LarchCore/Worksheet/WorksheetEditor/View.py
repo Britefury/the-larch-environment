@@ -15,17 +15,15 @@ from BritefuryJ.Command import CommandName, Command, CommandSet
 from BritefuryJ.Shortcut import Shortcut
 
 from BritefuryJ.Projection import Perspective, Subject
-from BritefuryJ.Pres import Pres, LocationAsInnerFragment
 
 
 from BritefuryJ.Controls import Controls, MenuItem, VPopupMenu, Hyperlink, Button, TextEntry, OptionMenu
 from BritefuryJ.Graphics import SolidBorder, BorderWithHeaderBar, FilledOutlinePainter
 from BritefuryJ.LSpace.Input import ObjectDndHandler, Modifier
-from BritefuryJ.Browser import Location
 from BritefuryJ.LSpace.TextFocus import TextSelection
 from BritefuryJ.LSpace.Marker import Marker
 from BritefuryJ.StyleSheet import StyleSheet
-from BritefuryJ.Pres import ApplyStyleSheetFromAttribute, ApplyPerspective
+from BritefuryJ.Pres import Pres, ApplyStyleSheetFromAttribute, ApplyPerspective
 from BritefuryJ.Pres.Primitive import Primitive, Label, StaticText, Spacer, Image, Bin, Border, SpaceBin, Row, Column
 from BritefuryJ.Pres.RichText import TitleBar, Heading1, Heading2, Heading3, Heading4, Heading4, Heading5, Heading6, NormalText, RichSpan, Page, Body, LinkHeaderBar
 from BritefuryJ.Pres.ContextMenu import ControlsRow
@@ -40,8 +38,6 @@ from BritefuryJ.IncrementalView import FragmentData
 from BritefuryJ.Editor.Sequential import SequentialEditorPerspective
 
 from LarchCore.Languages.Python2 import Python2
-
-from LarchCore.MainApp import AppLocationPath
 
 from LarchCore.Worksheet.WorksheetCommands import worksheetCommands
 from LarchCore.Worksheet.WorksheetEditor import EditorSchema
@@ -248,10 +244,14 @@ def _paragraphEmbeddedObjectContextMenuFactory(element, menu):
 class WorksheetEditor (MethodDispatchView):
 	@ObjectDispatchMethod( EditorSchema.WorksheetEditor )
 	def Worksheet(self, fragment, inheritedState, node):
-		viewLocation = fragment.getSubjectContext()['viewLocation']
-		
-		viewLink = Hyperlink( 'Switch to user mode', viewLocation )
-		linkHeader = AppLocationPath.appLinkheaderBar( fragment.getSubjectContext(), [ viewLink ] )
+		try:
+			viewSubject = fragment.subject.viewSubject
+		except AttributeError:
+			pageContents = []
+		else:
+			viewLink = Hyperlink( 'Switch to user mode', viewSubject )
+			linkHeader = LinkHeaderBar( [ viewLink ] )
+			pageContents = [ linkHeader ]
 
 
 		tip = TipBox( 'Type to add text to the worksheet.\nRight click to access the context menu, from which styles can be applied.\n' + \
@@ -259,7 +259,7 @@ class WorksheetEditor (MethodDispatchView):
 			      'larchcore.worksheet.edit.howto' )
 
 
-		w = Page( [ linkHeader, node.getBody(), tip ] )
+		w = Page( pageContents + [ node.getBody(), tip ] )
 		w = w.withContextMenuInteractor( _worksheetContextMenuFactory )
 		w = w.withDropDest( _embeddedObject_dropDest )
 		w = w.withCommands( worksheetCommands )
@@ -312,7 +312,7 @@ class WorksheetEditor (MethodDispatchView):
 
 	@ObjectDispatchMethod( EditorSchema.LinkEditor )
 	def Link(self, fragment, inheritedState, node):
-		docLocation = fragment.getSubjectContext()['docLocation']
+		docSubject = fragment.documentSubject
 
 		def _linkContextMenuFactory(element, menu):
 			def _onRemove(control, event):
@@ -324,23 +324,23 @@ class WorksheetEditor (MethodDispatchView):
 					node.text = text
 
 
-			class _LocationListener (TextEntry.TextEntryListener):
+			class _TargetListener (TextEntry.TextEntryListener):
 				def onAccept(self, textEntry, text):
-					node.setAbsoluteLocation( docLocation, Location( text ) )
+					raise NotImplementedError
 
 
 			textEntry = TextEntry( node.text, _TextListener() )
 
-			absLoc = node.getAbsoluteLocation( docLocation )
+			subject = node.getSubject( docSubject )
 
-			locationEntry = TextEntry( absLoc.getLocationString(), _LocationListener() )
+			targetEntry = TextEntry( '<<TODO: replace this>>', _TargetListener() )
 
-			link = Hyperlink( 'Go to location...', absLoc )
+			link = Hyperlink( 'Go to target...', subject )
 
 			onRemove = Button.buttonWithLabel( 'Remove', _onRemove )
 
 			menu.add( Section( SectionHeading3( 'Text:' ), textEntry ) )
-			menu.add( Section( SectionHeading3( 'Location:' ), Column( [ locationEntry, link ] ) ) )
+			menu.add( Section( SectionHeading3( 'Target:' ), Column( [ targetEntry, link ] ) ) )
 			menu.add( Spacer( 0.0, 20.0 ) )
 			menu.add( onRemove )
 			return True
@@ -476,14 +476,12 @@ perspective2 = SequentialEditorPerspective( _view.fragmentViewFunction, Workshee
 
 
 class WorksheetEditorSubject (Subject):
-	def __init__(self, document, model, enclosingSubject, location, importName, title):
-		super( WorksheetEditorSubject, self ).__init__( enclosingSubject )
-		assert isinstance( location, Location )
+	def __init__(self, document, model, enclosingSubject, path, importName, title):
+		super( WorksheetEditorSubject, self ).__init__( enclosingSubject, path )
 		self._document = document
 		self._model = model
 		# Defer the creation of the model view - it involves executing all the code in the worksheet which can take some time
 		self._modelView = None
-		self._location = location
 		self._importName = importName
 		self._title = title
 
@@ -492,8 +490,12 @@ class WorksheetEditorSubject (Subject):
 		if self._modelView is None:
 			self._modelView = EditorSchema.WorksheetEditor( None, self._model, self._importName )
 		return self._modelView
-		
-	
+
+
+	def getTrailLinkText(self):
+		return 'Edit'
+
+
 	def getFocus(self):
 		return self._getModelView()
 	
@@ -501,10 +503,7 @@ class WorksheetEditorSubject (Subject):
 		return perspective2
 	
 	def getTitle(self):
-		return self._title + ' [Ws-Devel]'
-	
-	def getSubjectContext(self):
-		return self.enclosingSubject.getSubjectContext().withAttrs( location=self._location )
+		return self._title + ' [WsEdit]'
 	
 	def getChangeHistory(self):
 		return self._document.getChangeHistory()

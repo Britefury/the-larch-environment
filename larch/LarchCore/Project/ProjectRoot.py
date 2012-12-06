@@ -12,7 +12,7 @@ from BritefuryJ.ChangeHistory import Trackable
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from LarchCore.Project.ProjectContainer import ProjectContainer
-from LarchCore.Project import ProjectEditor
+from LarchCore.Project import ProjectEditor, ProjectPage
 
 
 
@@ -22,18 +22,28 @@ class ProjectRoot (ProjectContainer):
 		super( ProjectRoot, self ).__init__( contents )
 		self._pythonPackageName = packageName
 		self._startupExecuted = False
-	
-	
+		self.__idToNode = {}
+		self.__idCounter = 0
+
+
+	@property
+	def importName(self):
+		return self._pythonPackageName   if self._pythonPackageName is not None   else ''
+
+
 	def __getstate__(self):
 		state = super( ProjectRoot, self ).__getstate__()
 		state['pythonPackageName'] = self._pythonPackageName
 		return state
 	
 	def __setstate__(self, state):
+		# Need to initialise the ID table before loading contents
+		self.__idToNode = {}
+		self.__idCounter = 0
 		super( ProjectRoot, self ).__setstate__( state )
 		self._pythonPackageName = state['pythonPackageName']
 		self._startupExecuted = False
-	
+
 	def __copy__(self):
 		return ProjectRoot( self._pythonPackageName, self[:] )
 	
@@ -41,23 +51,16 @@ class ProjectRoot (ProjectContainer):
 		return ProjectRoot( self._pythonPackageName, [ deepcopy( x, memo )   for x in self ] )
 	
 	
-	def __new_subject__(self, document, enclosingSubject, location, importName, title):
-		return ProjectEditor.Subject.ProjectSubject( document, self, enclosingSubject, location, importName, title )
+	def __new_subject__(self, document, enclosingSubject, path, importName, title):
+		"""Used to create the subject that displays the project as a page"""
+		projectSubject = ProjectEditor.Subject.ProjectSubject( document, self, enclosingSubject, path, importName, title )
+		if 'index' in self.contentsMap:
+			index = self.contentsMap['index']
+			if isinstance( index, ProjectPage.ProjectPage ):
+				return document.newModelSubject( index.data, projectSubject, path, index.importName, index.name )
+		return projectSubject
 
 		
-	def getPythonPackageName(self):
-		self._incr.onAccess()
-		return self._pythonPackageName
-	
-	def setPythonPackageName(self, name):
-		oldName = self._pythonPackageName
-		self._pythonPackageName = name
-		self._incr.onChanged()
-		if self.__change_history__ is not None:
-			self.__change_history__.addChange( lambda: self.setPythonPackageName( name ), lambda: self.setPythonPackageName( oldName ), 'Project root set python package name' )
-
-
-
 	def startup(self):
 		if not self._startupExecuted:
 			if self._pythonPackageName is not None:
@@ -89,4 +92,56 @@ class ProjectRoot (ProjectContainer):
 
 
 
-	pythonPackageName = property( getPythonPackageName, setPythonPackageName )
+	def _registerRoot(self, root):
+		# No need to register the root package
+		pass
+
+	def _unregisterRoot(self, root):
+		# No need to register the root package
+		pass
+
+
+
+
+	@property
+	def pythonPackageName(self):
+		self._incr.onAccess()
+		return self._pythonPackageName
+
+	@pythonPackageName.setter
+	def pythonPackageName(self, name):
+		oldName = self._pythonPackageName
+		self._pythonPackageName = name
+		self._incr.onChanged()
+		if self.__change_history__ is not None:
+			def set(name):
+				self.pythonPackageName = name
+			self.__change_history__.addChange( lambda: set( name ), lambda: set( oldName ), 'Project root set python package name' )
+
+
+
+	def _registerNode(self, node):
+		nodeId = node._id
+		if nodeId is None  or  nodeId in self.__idToNode:
+			# Either, no node ID or node ID already in use
+			# Create a new one
+			self.__idCounter = max( self.__idCounter, len( self.__idToNode) )
+			nodeId = self.__idCounter
+			self.__idCounter += 1
+			node._id = nodeId
+
+		self.__idToNode[nodeId] = node
+
+	def _unregisterNode(self, node):
+		nodeId = node._id
+		del self.__idToNode[nodeId]
+
+
+	def getNodeById(self, nodeId):
+		return self.__idToNode.get(nodeId)
+
+
+
+	@property
+	def rootNode(self):
+		return self

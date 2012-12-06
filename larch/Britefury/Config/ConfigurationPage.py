@@ -9,10 +9,9 @@ from BritefuryJ.Controls import Hyperlink
 
 from BritefuryJ.Pres.Primitive import Primitive
 from BritefuryJ.Pres.RichText import SplitLinkHeaderBar, TitleBar, Page, Head, Body
-from BritefuryJ.Browser import Location
 from BritefuryJ.StyleSheet import StyleSheet
 
-from BritefuryJ.Projection import Subject
+from BritefuryJ.Projection import TransientSubject
 
 from Britefury.Util.Abstract import abstractmethod
 
@@ -22,9 +21,9 @@ _staticStyle = StyleSheet.style( Primitive.editable( False ) )
 
 
 class ConfigurationPage (object):
-	class _ConfigPageSubject (Subject):
-		def __init__(self, page):
-			super( ConfigurationPage._ConfigPageSubject, self ).__init__( None )
+	class _ConfigPageSubject (TransientSubject):
+		def __init__(self, enclosingSubject, page):
+			super( ConfigurationPage._ConfigPageSubject, self ).__init__( enclosingSubject )
 			self._page = page
 		
 		def getFocus(self):
@@ -35,19 +34,19 @@ class ConfigurationPage (object):
 		
 	
 	def __init__(self):
-		self._subject = self._ConfigPageSubject( self )
-		
+		pass
+
 		
 	def __getstate__(self):
 		return {}
 	
 	def __setstate__(self, state):
-		self._subject = self._ConfigPageSubject( self )
+		pass
+
 		
 		
-		
-	def getSubject(self):
-		return self._subject
+	def subject(self, enclosingSubject):
+		return self._ConfigPageSubject( enclosingSubject, self )
 		
 		
 	@abstractmethod
@@ -69,10 +68,9 @@ class ConfigurationPage (object):
 
 
 	def __present__(self, fragment, inheritedState):
-		homeLink = Hyperlink( 'HOME PAGE', Location( '' ) )
-		configLink = Hyperlink( 'CONFIGURATION PAGE', Location( 'config' ) )
-		systemLink = Hyperlink( 'SYSTEM PAGE', Location( 'system' ) )
-		linkHeader = SplitLinkHeaderBar( [ homeLink ], [ configLink, systemLink ] )
+		homeLink = Hyperlink( 'HOME PAGE', fragment.subject.rootSubject )
+		configLink = Hyperlink( 'CONFIGURATION PAGE', fragment.subject.configSubject )
+		linkHeader = SplitLinkHeaderBar( [ homeLink ], [ configLink ] )
 		
 		title = TitleBar( self.getTitleText() )
 
