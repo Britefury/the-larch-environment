@@ -26,9 +26,8 @@ from BritefuryJ.StyleSheet import StyleSheet
 from BritefuryJ.Pres import Pres, ApplyStyleSheetFromAttribute, ApplyPerspective
 from BritefuryJ.Pres.Primitive import Primitive, Label, StaticText, Spacer, Image, Bin, Border, SpaceBin, Row, Column
 from BritefuryJ.Pres.RichText import TitleBar, Heading1, Heading2, Heading3, Heading4, Heading4, Heading5, Heading6, NormalText, RichSpan, Page, Body, LinkHeaderBar
-from BritefuryJ.Pres.ContextMenu import ControlsRow
 from BritefuryJ.Pres.ObjectPres import ObjectBorder
-from BritefuryJ.Pres.UI import Section, SectionHeading2, SectionHeading3
+from BritefuryJ.Pres.UI import Section, SectionHeading2, SectionHeading3, ControlsRow
 from BritefuryJ.Pres.Help import TipBox
 
 from BritefuryJ.EditPerspective import EditPerspective
