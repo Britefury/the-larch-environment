@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.Pres.ContextMenu;
+package BritefuryJ.Pres.UI;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ public class ControlsRow extends SequentialPres
 	@Override
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		LSElement xs[] = mapPresent( ctx, ContextMenuStyle.controlsRowUsage.useAttrs( style ), children );
-		return new ApplyStyleSheetFromAttribute( ContextMenuStyle.controlsRowStyle, new Row( xs ) ).present( ctx, style );
+		LSElement xs[] = mapPresent( ctx, UI.controlsRowUsage.useAttrs( style ), children );
+		return new ApplyStyleSheetFromAttribute( UI.controlsRowStyle, new Row( xs ) ).present( ctx, style );
 	}
 }
