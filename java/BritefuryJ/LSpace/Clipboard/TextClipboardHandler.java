@@ -44,6 +44,7 @@ public abstract class TextClipboardHandler extends ClipboardHandlerInterface
 		{
 			TextSelection ts = (TextSelection)selection;
 			deleteText( ts, (Caret)target );
+			ts.clear();
 			return true;
 		}
 		return false;
