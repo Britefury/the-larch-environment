@@ -25,20 +25,46 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Browser.Browser;
-import BritefuryJ.Browser.Location;
 import BritefuryJ.Browser.TabbedBrowser;
+import BritefuryJ.Browser.TestPages.TestsRootPage;
 import BritefuryJ.Command.AbstractCommandConsole;
 import BritefuryJ.Command.CommandConsole;
 import BritefuryJ.Command.CommandConsoleFactory;
+import BritefuryJ.DefaultPerspective.DefaultPerspective;
+import BritefuryJ.DefaultPerspective.Presentable;
+import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.PresentationComponent;
-import BritefuryJ.Projection.ProjectiveBrowserContext;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.Label;
+import BritefuryJ.Pres.Primitive.Primitive;
+import BritefuryJ.Pres.RichText.Head;
+import BritefuryJ.Pres.RichText.Page;
+import BritefuryJ.Pres.RichText.TitleBar;
+import BritefuryJ.Projection.TransientSubject;
+import BritefuryJ.Projection.Subject;
+import BritefuryJ.StyleSheet.StyleSheet;
 
 public class BrowserTest implements TabbedBrowser.TabbedBrowserListener
 {
-	final ProjectiveBrowserContext browserContext = new ProjectiveBrowserContext( true );
-
+	private static class DefaultRootPage implements Presentable
+	{
+		@Override
+		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
+		{
+			Pres linkHeader = TestsRootPage.createLinkHeader( TestsRootPage.LINKHEADER_SYSTEMPAGE );
+			Pres title = new TitleBar( "Default Root Page" );
+			
+			Pres contents = StyleSheet.style( Primitive.fontSize.as( 16 ) ).applyTo( new Label( "Empty document" ) ).alignHCentre();
+			
+			Pres head = new Head( new Pres[] { linkHeader, title } );
+			
+			return new Page( new Pres[] { head, contents } );
+		}
+	}
+	
 	
 	private static class TransferActionListener implements ActionListener
 	{
@@ -60,16 +86,47 @@ public class BrowserTest implements TabbedBrowser.TabbedBrowserListener
 	}
 	
 	
+	
+	private static class RootSubject extends TransientSubject
+	{
+		private Object focus;
+		
+		public RootSubject(Object focus)
+		{
+			super( null );
+			this.focus = focus;
+		}
+
+		@Override
+		public Object getFocus()
+		{
+			return focus;
+		}
+
+		@Override
+		public String getTitle()
+		{
+			return "root";
+		}
+	}
+	
+	
+	
+	private static DefaultRootPage root = new DefaultRootPage();
+	private static Subject rootSubject = new RootSubject( root );
+
+	
 	public static void main(final String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException
 	{
 		UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
 		
 		BrowserTest test = new BrowserTest();
-		test.createNewBrowserWindow( new Location( "" ) );
+		
+		test.createNewBrowserWindow( rootSubject );
 	}
 
 	
-	public void createNewBrowserWindow(Location location)
+	public void createNewBrowserWindow(Subject subject)
 	{
 		// EDIT MENU
 		
@@ -78,12 +135,14 @@ public class BrowserTest implements TabbedBrowser.TabbedBrowserListener
 			@Override
 			public AbstractCommandConsole createCommandConsole(PresentationComponent pres, Browser browser)
 			{
-				return new CommandConsole( browser, browserContext, pres );
+				return new CommandConsole( browser, pres );
 			}
 		};
 		
 		
-		final TabbedBrowser browser = new TabbedBrowser( browserContext.getPageLocationResolver(), this, location, fac );
+		
+		
+		final TabbedBrowser browser = new TabbedBrowser( rootSubject, subject, null, this, fac );
 
 		
 		
@@ -125,8 +184,8 @@ public class BrowserTest implements TabbedBrowser.TabbedBrowserListener
 			{
 				Browser currentTab = browser.getCurrentBrowser();
 				LSElement.ElementTreeExplorer treeExplorer = currentTab.getRootElement().treeExplorer();
-				Location location = browserContext.getLocationForObject( treeExplorer );
-				browser.openLocationInNewWindow( location );
+				Subject subject = DefaultPerspective.instance.objectSubject( treeExplorer );
+				browser.openSubjectInNewWindow( subject );
 			}
 		};
 		

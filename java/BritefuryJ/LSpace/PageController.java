@@ -6,7 +6,8 @@
 //##************************
 package BritefuryJ.LSpace;
 
-import BritefuryJ.Browser.Location;
+import BritefuryJ.Projection.Subject;
+
 
 public interface PageController
 {
@@ -17,5 +18,5 @@ public interface PageController
 		OPEN_IN_NEW_WINDOW
 	}
 	
-	public void openLocation(Location location, OpenOperation op);
+	public void openSubject(Subject subject, OpenOperation op);
 }

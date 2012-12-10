@@ -18,8 +18,13 @@ class ProjectNode (object):
 		self._incr = IncrementalValueMonitor()
 		self.__change_history__ = None
 		self._parent = None
-	
-	
+
+
+	@property
+	def importName(self):
+		raise NotImplementedError, 'abstract'
+
+
 	def __getstate__(self):
 		return {}
 	
@@ -29,11 +34,6 @@ class ProjectNode (object):
 		self._parent = None
 	
 	
-	def getParent(self):
-		return self._parent
-
-
-
 	@abstractmethod
 	def export(self, path):
 		pass
@@ -42,6 +42,33 @@ class ProjectNode (object):
 	def __get_trackable_contents__(self):
 		return None
 
-	
-	parent = property( getParent )
 
+	def _setParent(self, parent):
+		self._parent = parent
+		newRoot = parent.rootNode
+		if newRoot is not None:
+			self._registerRoot( newRoot )
+
+
+	def _clearParent(self):
+		oldRoot = self.rootNode
+		if oldRoot is not None:
+			self._unregisterRoot( oldRoot )
+		self._parent = None
+
+
+	def _registerRoot(self, root):
+		pass
+
+	def _unregisterRoot(self, root):
+		pass
+
+	
+	@property
+	def parent(self):
+		return self._parent
+
+
+	@property
+	def rootNode(self):
+		return self._parent.rootNode   if self._parent is not None   else None

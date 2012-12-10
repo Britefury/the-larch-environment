@@ -5,8 +5,6 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from BritefuryJ.Browser import Location
-
 from LarchCore.MainApp.MainAppViewer.View import perspective as mainAppViewerPerspective
 from LarchCore.MainApp.MainAppViewer.Subject import MainAppSubject
 from LarchCore.MainApp import Application
@@ -16,7 +14,7 @@ def newAppState():
 	return Application.AppState()
 
 def newAppStateSubject(world, appState):
-	return MainAppSubject( appState, world, Location( 'main' ) )
+	return MainAppSubject( appState, world )
 
 
 

@@ -6,10 +6,8 @@
 //##************************
 package BritefuryJ.Command;
 
-import BritefuryJ.Browser.BrowserPage;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.LSpace.Input.Keyboard.KeyboardInteractor;
-import BritefuryJ.Projection.ProjectiveBrowserContext;
 import BritefuryJ.Projection.Subject;
 
 public abstract class AbstractCommandConsole implements Presentable
@@ -35,7 +33,6 @@ public abstract class AbstractCommandConsole implements Presentable
 
 	
 	public abstract Subject getSubject();
-	public abstract ProjectiveBrowserContext getBrowserContext();
-	public abstract void pageChanged(BrowserPage page);
+	public abstract void pageChanged(Subject subject);
 	public abstract KeyboardInteractor getShortcutKeyboardInteractor();
 }

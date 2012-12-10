@@ -4,29 +4,34 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.Pres;
+package BritefuryJ.Pres.UI;
 
-import BritefuryJ.Browser.Location;
-import BritefuryJ.IncrementalView.FragmentView;
+import java.util.List;
+
 import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.Pres.ApplyStyleSheetFromAttribute;
+import BritefuryJ.Pres.PresentationContext;
+import BritefuryJ.Pres.SequentialPres;
+import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.StyleSheet.StyleValues;
 
-public class LocationAsInnerFragment extends Pres
+public class ControlsRow extends SequentialPres
 {
-	private Location location;
-	
-	
-	public LocationAsInnerFragment(Location location)
+	public ControlsRow(Object children[])
 	{
-		this.location = location;
+		super( children );
 	}
 	
+	public ControlsRow(List<Object> children)
+	{
+		super( children );
+	}
 	
 	
 	@Override
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
-		FragmentView fragment = ctx.getFragment();
-		return fragment.presentLocationAsElement( location, style, ctx.getInheritedState() );
+		LSElement xs[] = mapPresent( ctx, UI.controlsRowUsage.useAttrs( style ), children );
+		return new ApplyStyleSheetFromAttribute( UI.controlsRowStyle, new Row( xs ) ).present( ctx, style );
 	}
 }

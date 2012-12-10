@@ -10,6 +10,7 @@ import java.awt.Color;
 
 import BritefuryJ.AttributeTable.AttributeNamespace;
 import BritefuryJ.AttributeTable.AttributeNonNull;
+import BritefuryJ.AttributeTable.AttributeUsageSet;
 import BritefuryJ.AttributeTable.InheritedAttributeNonNull;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleSheet;
@@ -57,6 +58,11 @@ public class UI
 			StyleSheet.style( Primitive.columnSpacing.as( 5.0 ) ) );
 	public static final AttributeNonNull sectionPadding = new AttributeNonNull( uiNamespace, "sectionPadding", Double.class, 10.0 );
 	
+	public static final AttributeNonNull controlsRowStyle = new AttributeNonNull( uiNamespace, "controlsRowStyle", StyleSheet.class,
+			    StyleSheet.style( Primitive.rowSpacing.as( 10.0 ) ) );
+		
+		
+		
 	
 	public static final AttributeNonNull formTitleSpacing = new AttributeNonNull( uiNamespace, "formTitleSpacing", Double.class, 10.0 );
 	public static final AttributeNonNull formNotesSpacing = new AttributeNonNull( uiNamespace, "formNotesSpacing", Double.class, 5.0 );
@@ -145,4 +151,7 @@ public class UI
 	{
 		return style.useAttr( formNotesSpacing );
 	}
+
+
+	protected static final AttributeUsageSet controlsRowUsage = new AttributeUsageSet( controlsRowStyle );
 }
