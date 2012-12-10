@@ -6,10 +6,10 @@
 //##************************
 package BritefuryJ.Controls;
 
-import BritefuryJ.Browser.Location;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Interactor.ContextMenuElementInteractor;
 import BritefuryJ.Pres.PresentationContext;
+import BritefuryJ.Projection.Subject;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class HyperlinkContainer extends AbstractHyperlink
@@ -26,12 +26,12 @@ public class HyperlinkContainer extends AbstractHyperlink
 	
 	public HyperlinkContainer(Object contents, LinkListener listener)
 	{
-		super( contents, new FixedLinkListenerFactory( listener ) );
+		super( contents, listener );
 	}
 	
-	public HyperlinkContainer(Object contents, Location targetLocation)
+	public HyperlinkContainer(Object contents, Subject targetSubject)
 	{
-		super( contents, new LocationLinkListenerFactory( targetLocation ) );
+		super( contents, targetSubject );
 	}
 	
 	

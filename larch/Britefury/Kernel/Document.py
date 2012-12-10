@@ -15,6 +15,8 @@ from BritefuryJ.ChangeHistory import ChangeHistory, ChangeHistoryListener
 
 from BritefuryJ.Isolation import IsolationPickle
 
+from BritefuryJ.Projection import SubjectPath, SubjectPathEntry
+
 from Britefury import LoadBuiltins
 
 
@@ -29,8 +31,8 @@ class Document (ChangeHistoryListener):
 		self._changeHistory.addChangeHistoryListener( self )
 		
 		self._docName = ''
-		self._location = None
-		
+		self._subject = None
+
 		self._bHasUnsavedData = True
 		self._filename = None
 		self._saveTime = None
@@ -62,16 +64,6 @@ class Document (ChangeHistoryListener):
 	def setDocumentName(self, name):
 		self._docName = name
 		
-		
-	def setLocation(self, location):
-		self._location = location
-	
-	def getLocation(self):
-		return self._location
-	
-	def relativeToAbsoluteLocation(self, relativeLocation):
-		return self._location + relativeLocation
-	
 		
 	def getChangeHistory(self):
 		return self._changeHistory
@@ -121,11 +113,12 @@ class Document (ChangeHistoryListener):
 
 	
 	
-	def newSubject(self, enclosingSubject, location, importName, title):
-		return self.newModelSubject( self._contents, enclosingSubject, location, importName, title )
+	def newSubject(self, enclosingSubject, importName, title):
+		path = SubjectPath( _DocumentPathEntry( self, importName, title ) )
+		return self.newModelSubject( self._contents, enclosingSubject, path, importName, title )
 
-	def newModelSubject(self, model, enclosingSubject, location, importName, title):
-		return model.__new_subject__( self, enclosingSubject, location, importName, title )
+	def newModelSubject(self, model, enclosingSubject, path, importName, title):
+		return model.__new_subject__( self, enclosingSubject, path, importName, title )
 
 		
 	
@@ -206,6 +199,22 @@ class Document (ChangeHistoryListener):
 		if not self._bHasUnsavedData:
 			self._bHasUnsavedData = True
 
+
+
+
+class _DocumentPathEntry (SubjectPathEntry):
+	def __init__(self, document, importName, title):
+		self.__document = document
+		self.__importName = importName
+		self.__title = title
+
+
+	def follow(self, outerSubject):
+		return self.__document.newModelSubject( self.__document._contents, outerSubject, SubjectPath( self ), self.__importName, self.__title)
+
+
+	def canPersist(self):
+		return False
 
 
 			
