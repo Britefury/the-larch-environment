@@ -13,6 +13,7 @@ import java.util.List;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.IncrementalView.FragmentViewFilter;
 import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSRegion;
 import BritefuryJ.LSpace.Focus.Selection;
 import BritefuryJ.LSpace.Focus.Target;
 import BritefuryJ.LSpace.Marker.Marker;
@@ -240,11 +241,25 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	
 	
 	
+	private boolean isSelectionConsistent(TextSelection selection)
+	{
+		LSRegion startRegion = selection.getStartMarker().getElement().getRegion();
+		LSRegion endRegion = selection.getEndMarker().getElement().getRegion();
+		return startRegion == endRegion  &&  startRegion.getClipboardHandler() == this;
+	}
+	
 	private Object getSequentialContentInSelection(TextSelection selection)
 	{
 		LSElement root = selection.getCommonRoot();
 		FragmentView fragment = FragmentView.getEnclosingFragment( root, editLevelFragmentFilter );
-		return sequentialController.getSequentialContentInSelection( fragment, fragment.getFragmentContentElement(), selection );
+		if ( isSelectionConsistent( selection ) )
+		{
+			return sequentialController.getSequentialContentInSelection( fragment, fragment.getFragmentContentElement(), selection );
+		}
+		else
+		{
+			return null;
+		}
 	}
 
 	private void replaceSelection(Selection selection, Caret caret, Object replacement)
@@ -253,7 +268,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 		{
 			TextSelection ts = (TextSelection)selection;
 			
-			if ( ts.isValid()  &&  ts.isEditable() )
+			if ( ts.isValid()  &&  ts.isEditable()  &&  isSelectionConsistent( ts ) )
 			{
 				Marker startMarker = ts.getStartMarker();
 				Marker endMarker = ts.getEndMarker();

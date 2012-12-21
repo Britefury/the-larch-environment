@@ -17,7 +17,6 @@ import javax.swing.ImageIcon;
 import javax.swing.filechooser.FileSystemView;
 
 import BritefuryJ.LSpace.LSElement;
-import BritefuryJ.LSpace.LSText;
 import BritefuryJ.LSpace.Interactor.ContextMenuElementInteractor;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;

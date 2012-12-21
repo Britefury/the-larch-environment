@@ -95,10 +95,16 @@ abstract public class AbstractSelectionExporter <SelectionContentsType, Selectio
 		@SuppressWarnings("unchecked")
 		SelectionContentsType contents = getSelectionContents( (SelectionType)selection );
 		
-		@SuppressWarnings("unchecked")
-		SelectionContentsTransferable<SelectionContentsType, SelectionType> xfer = new SelectionContentsTransferable<SelectionContentsType, SelectionType>( this, contents, (SelectionType)selection );
-		
-		return xfer;
+		if ( contents != null )
+		{
+			@SuppressWarnings("unchecked")
+			SelectionContentsTransferable<SelectionContentsType, SelectionType> xfer = new SelectionContentsTransferable<SelectionContentsType, SelectionType>( this, contents, (SelectionType)selection );
+			return xfer;
+		}
+		else
+		{
+			return null;
+		}
 	}
 
 	@SuppressWarnings("unchecked")
