@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
+print 'Start'
+
 import sys
 import jarray
 
@@ -19,9 +21,6 @@ from Britefury.Kernel.Document import Document
 from Britefury import app, app_startup, app_in_jar
 
 from Britefury.Windows.WindowManager import WindowManager
-
-from LarchCore.MainApp import MainApp
-
 
 
 world = None
@@ -47,8 +46,8 @@ def start_larch():
 	def _handle_python_app(name, reader):
 		jarCustomPythonApp[0] = True
 
-	app_in_jar.registerJarEntryHandler( lambda name: name == 'mainapp/app.larch', _handle_larch_app )
-	app_in_jar.registerJarEntryHandler( lambda name: name == 'mainapp/app.py'  or  name == 'mainapp/app$py.class', _handle_python_app )
+	app_in_jar.registerJarEntryHandler( lambda name: name == 'app.larch', _handle_larch_app )
+	app_in_jar.registerJarEntryHandler( lambda name: name == 'app.py'  or  name == 'app$py.class', _handle_python_app )
 
 
 
@@ -83,8 +82,6 @@ def start_larch():
 			subject = document.newSubject( world.worldSubject, None, filename )
 			world.setRootSubject( subject )
 	else:
-		foundAppInJar = False
-
 		if len( jarCustomLarchApp ) > 0:
 			inputStream = jarCustomLarchApp[0]
 			document = Document.readFromInputStream( world, inputStream, 'app' )
@@ -95,6 +92,7 @@ def start_larch():
 			appState = appModule.newAppState()
 			world.setRootSubject( appModule.newAppStateSubject( world, appState ) )
 		else:
+			from LarchCore.MainApp import MainApp
 			appState = MainApp.newAppState()
 			world.setRootSubject( MainApp.newAppStateSubject( world, appState ) )
 
