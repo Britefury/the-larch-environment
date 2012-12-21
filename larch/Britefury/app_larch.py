@@ -86,7 +86,7 @@ def start_larch():
 			subject = document.newSubject( world.worldSubject, None, 'app' )
 			world.setRootSubject( subject )
 		elif jarCustomPythonApp[0]:
-			from mainapp import app as appModule
+			import app as appModule
 			appState = appModule.newAppState()
 			world.setRootSubject( appModule.newAppStateSubject( world, appState ) )
 		else:
