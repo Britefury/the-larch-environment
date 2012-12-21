@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.Controls;
 
+import java.net.URI;
+
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Interactor.ContextMenuElementInteractor;
 import BritefuryJ.Pres.PresentationContext;
@@ -32,6 +34,11 @@ public class HyperlinkContainer extends AbstractHyperlink
 	public HyperlinkContainer(Object contents, Subject targetSubject)
 	{
 		super( contents, targetSubject );
+	}
+	
+	public HyperlinkContainer(Object contents, URI uri)
+	{
+		super( contents, uri );
 	}
 	
 	

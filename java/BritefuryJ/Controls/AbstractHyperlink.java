@@ -6,6 +6,11 @@
 //##************************
 package BritefuryJ.Controls;
 
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URI;
+
+import BritefuryJ.LSpace.Anchor;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSElement.PropertyValue;
 import BritefuryJ.LSpace.PageController;
@@ -18,6 +23,8 @@ import BritefuryJ.LSpace.Interactor.ClickElementInteractor;
 import BritefuryJ.LSpace.Interactor.ContextMenuElementInteractor;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
+import BritefuryJ.Pres.Primitive.Label;
+import BritefuryJ.Pres.UI.BubblePopup;
 import BritefuryJ.Projection.Subject;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -130,6 +137,32 @@ public abstract class AbstractHyperlink extends ControlPres
 
 	
 	
+	protected static class LinkURIListener implements LinkListener
+	{
+		private URI uri;
+		
+		
+		public LinkURIListener(URI uri)
+		{
+			this.uri = uri;
+		}
+		
+		public void onLinkClicked(AbstractHyperlinkControl link, PointerButtonClickedEvent buttonEvent)
+		{
+			try
+			{
+				Desktop.getDesktop().browse( uri );
+			}
+			catch (IOException e)
+			{
+				Pres warning = new Label( "Unable to launch browser" );
+				BubblePopup.popupInBubbleAdjacentTo( warning, link.getElement(), Anchor.TOP, true, false );
+			}
+		}
+	}
+
+	
+	
 	public static abstract class AbstractHyperlinkControl extends Control
 	{
 		private class LinkInteractor implements ClickElementInteractor
@@ -207,6 +240,12 @@ public abstract class AbstractHyperlink extends ControlPres
 		this.contents = Pres.coerce( contents );
 	}
 
+	public AbstractHyperlink(Object contents, URI uri)
+	{
+		this.listener = new LinkURIListener( uri );
+		this.contents = Pres.coerce( contents );
+	}
+
 
 
 	@Override
@@ -226,7 +265,7 @@ public abstract class AbstractHyperlink extends ControlPres
 		}
 		if ( targetSubject != null )
 		{
-			controlElement.addDragSource( dndSource );
+			//controlElement.addDragSource( dndSource );
 			controlElement.setProperty( TargetKey.instance, targetSubject );
 		}
 
