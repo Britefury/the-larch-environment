@@ -177,18 +177,18 @@ def _worksheetContextMenuFactory(element, menu):
 	menu.add( Section( SectionHeading2( 'Text style' ), styles ).alignHExpand() )
 
 
-	def _onLink(link, event):
-		def _makeLink():
-			return EditorSchema.LinkEditor.newHomeLink( 'Link' )
-
-		caret = rootElement.getCaret()
-		if caret.isValid():
-			WorksheetRichTextController.instance.insertInlineEmbedAtCaret( caret, _makeLink )
-
-
-	insertLink = Hyperlink( 'Hyperlink', _onLink )
-	insert = ControlsRow( [ insertLink ] )
-	menu.add( Section( SectionHeading2( 'Insert' ), insert ).alignHExpand() )
+#	def _onLink(link, event):
+#		def _makeLink():
+#			return EditorSchema.LinkEditor.newHomeLink( 'Link' )
+#
+#		caret = rootElement.getCaret()
+#		if caret.isValid():
+#			WorksheetRichTextController.instance.insertInlineEmbedAtCaret( caret, _makeLink )
+#
+#
+#	insertLink = Hyperlink( 'Hyperlink', _onLink )
+#	insert = ControlsRow( [ insertLink ] )
+#	menu.add( Section( SectionHeading2( 'Insert' ), insert ).alignHExpand() )
 
 
 
