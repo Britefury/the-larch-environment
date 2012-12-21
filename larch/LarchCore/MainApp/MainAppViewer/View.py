@@ -166,15 +166,15 @@ class AppView (MethodDispatchView):
 		openLink = Hyperlink( 'OPEN', _onOpenDoc )
 		openDocumentsBox = _contentsList( [ newLink, openLink ], openDocViews, 'Documents' )
 		openDocumentsBox = openDocumentsBox.withNonLocalDropDest( DataFlavor.javaFileListFlavor, _onFileListDrop )
-		openDocumentsBox = AttachTooltip( openDocumentsBox, 'Click NEW to create a new document. To open, click OPEN, or drag files from a file explorer application.', False )
+		openDocumentsBox = AttachTooltip( openDocumentsBox, 'Click NEW to create a new document. To open from a file, click OPEN, or drag files from a file explorer application.', False )
 		
 		
 		newConsoleLink = Hyperlink( 'NEW', _onNewConsole )
 		consolesBox = _contentsList( [ newConsoleLink ], consoles, 'Python consoles' )
 
 
-		tip = TipBox( 'You can highlight items that have help types by pressing F2. Hover the pointer over them to display the tips. ' + \
-			      'Some items have tips that will not appear unless highlighting is enabled.',
+		tip = TipBox( 'You can highlight items that have help tips by pressing F2. Hover the pointer over them to display the tips. ' + \
+			      'Some items do not display their tips unless highlighting is enabled, in order to reduce clutter.',
 			      'larchcore.mainapp.tooltiphighlights' )
 		
 		
