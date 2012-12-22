@@ -7,6 +7,11 @@
 package BritefuryJ.Controls;
 
 import java.awt.Desktop;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.io.IOException;
 import java.net.URI;
 
@@ -80,12 +85,12 @@ public abstract class AbstractHyperlink extends ControlPres
 
 	
 	
-	protected static class LinkContextMenuFactory implements ContextMenuElementInteractor
+	protected static class LinkTargetContextMenuFactory implements ContextMenuElementInteractor
 	{
 		private Subject targetSubject;
 		
 		
-		public LinkContextMenuFactory(Subject targetSubject)
+		public LinkTargetContextMenuFactory(Subject targetSubject)
 		{
 			this.targetSubject = targetSubject;
 		}
@@ -123,6 +128,55 @@ public abstract class AbstractHyperlink extends ControlPres
 	}
 
 	
+	protected static class LinkURIContextMenuFactory implements ContextMenuElementInteractor, ClipboardOwner
+	{
+		private URI uri;
+		
+		
+		public LinkURIContextMenuFactory(URI uri)
+		{
+			this.uri = uri;
+		}
+		
+		
+		@Override
+		public boolean contextMenu(LSElement element, PopupMenu menu)
+		{
+			MenuItem.MenuItemListener open = new MenuItem.MenuItemListener()
+			{
+				@Override
+				public void onMenuItemClicked(MenuItem.MenuItemControl menuItem)
+				{
+					openURIInExternalBrowser( menuItem, uri );
+				}
+			};
+
+			MenuItem.MenuItemListener copyURI = new MenuItem.MenuItemListener()
+			{
+				@Override
+				public void onMenuItemClicked(MenuItem.MenuItemControl menuItem)
+				{
+					StringSelection contents = new StringSelection( uri.toASCIIString() );
+					Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+					clipboard.setContents( contents, LinkURIContextMenuFactory.this );
+				}
+			};
+			
+			
+			menu.add( MenuItem.menuItemWithLabel( "Open", open ) );
+			menu.add( MenuItem.menuItemWithLabel( "Copy link location", copyURI ) );
+			
+			return true;
+		}
+
+
+		@Override
+		public void lostOwnership(Clipboard clipboard, Transferable contents)
+		{
+		}
+	}
+
+	
 	private static final SourceDataFn sourceDataFn = new ObjectDndHandler.SourceDataFn()
 	{
 		@Override
@@ -149,15 +203,7 @@ public abstract class AbstractHyperlink extends ControlPres
 		
 		public void onLinkClicked(AbstractHyperlinkControl link, PointerButtonClickedEvent buttonEvent)
 		{
-			try
-			{
-				Desktop.getDesktop().browse( uri );
-			}
-			catch (IOException e)
-			{
-				Pres warning = new Label( "Unable to launch browser" );
-				BubblePopup.popupInBubbleAdjacentTo( warning, link.getElement(), Anchor.TOP, true, false );
-			}
+			openURIInExternalBrowser( link, uri );
 		}
 	}
 
@@ -219,8 +265,9 @@ public abstract class AbstractHyperlink extends ControlPres
 	
 	
 	
+
 	protected LinkListener listener;
-	protected LinkContextMenuFactory contextMenuInteractor;
+	protected ContextMenuElementInteractor contextMenuInteractor;
 	private Subject targetSubject;
 	private Pres contents;
 	
@@ -235,7 +282,7 @@ public abstract class AbstractHyperlink extends ControlPres
 	public AbstractHyperlink(Object contents, Subject targetSubject)
 	{
 		this.listener = new LinkTargetListener( targetSubject );
-		this.contextMenuInteractor = new LinkContextMenuFactory( targetSubject );
+		this.contextMenuInteractor = new LinkTargetContextMenuFactory( targetSubject );
 		this.targetSubject = targetSubject;
 		this.contents = Pres.coerce( contents );
 	}
@@ -243,6 +290,7 @@ public abstract class AbstractHyperlink extends ControlPres
 	public AbstractHyperlink(Object contents, URI uri)
 	{
 		this.listener = new LinkURIListener( uri );
+		this.contextMenuInteractor = new LinkURIContextMenuFactory( uri );
 		this.contents = Pres.coerce( contents );
 	}
 
@@ -275,4 +323,19 @@ public abstract class AbstractHyperlink extends ControlPres
 
 	protected abstract Control createHyperlinkControl(PresentationContext ctx, StyleValues style, LSElement contentsElement, boolean bClosePopupOnActivate, LinkListener listener,
 			ContextMenuElementInteractor contextMenuInteractor);
+
+	
+
+	private static void openURIInExternalBrowser(Control link, URI uri)
+	{
+		try
+		{
+			Desktop.getDesktop().browse( uri );
+		}
+		catch (IOException e)
+		{
+			Pres warning = new Label( "Unable to launch browser" );
+			BubblePopup.popupInBubbleAdjacentTo( warning, link.getElement(), Anchor.TOP, true, false );
+		}
+	}
 }
