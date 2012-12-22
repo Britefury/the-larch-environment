@@ -105,13 +105,13 @@ class BodyEditor (AbstractViewSchema.BodyAbstractView):
 
 
 	def _computeContents(self):
-		blank = BlankParagraphEditor( self._worksheet, self )
-		xs = [ self._viewOf( x )   for x in self._model['contents'] ]  +  [ blank ]
+		xs = [ self._viewOf( x )   for x in self._model['contents'] ]
 		self._editorModel.setModelContents( WSEditor.RichTextController.WorksheetRichTextController.instance, xs )
 		return xs
 
 
 
+# Must derive from NodeAbstractView so that WorksheetRichTextController.isDataModelObject will recognise it
 class BlankParagraphEditor (AbstractViewSchema.NodeAbstractView):
 	def __init__(self, worksheet, blockEditor):
 		super( BlankParagraphEditor, self ).__init__( worksheet, None )

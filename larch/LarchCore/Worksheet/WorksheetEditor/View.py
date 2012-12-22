@@ -268,7 +268,8 @@ class WorksheetEditor (MethodDispatchView):
 	
 	@ObjectDispatchMethod( EditorSchema.BodyEditor )
 	def Body(self, fragment, inheritedState, node):
-		b = Body( node.getContents() ).padX( _worksheetMargin )
+		contents = node.getContents() + [ EditorSchema.BlankParagraphEditor( node._worksheet, node ) ]
+		b = Body( contents ).padX( _worksheetMargin )
 		b = WorksheetRichTextController.instance.editableBlock( node, b )
 		return b
 	
