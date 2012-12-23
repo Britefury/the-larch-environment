@@ -245,7 +245,7 @@ class WorksheetViewerSubject (Subject):
 		self._document = document
 		self._model = model
 		# Defer the creation of the model view - it involves executing all the code in the worksheet which can take some time
-		self._modelView = None
+		self.__modelView = None
 		self._importName = importName
 		self._title = title
 		
@@ -257,10 +257,11 @@ class WorksheetViewerSubject (Subject):
 		return self
 
 	
-	def _getModelView(self):
-		if self._modelView is None:
-			self._modelView = ViewSchema.WorksheetView( None, self._model, self._importName )
-		return self._modelView
+	@property
+	def _modelView(self):
+		if self.__modelView is None:
+			self.__modelView = ViewSchema.WorksheetView( None, self._model, self._importName )
+		return self.__modelView
 
 
 	def getTrailLinkText(self):
@@ -268,7 +269,7 @@ class WorksheetViewerSubject (Subject):
 
 
 	def getFocus(self):
-		return self._getModelView()
+		return self._modelView
 	
 	def getPerspective(self):
 		return perspective

@@ -76,10 +76,12 @@ class WorksheetAbstractView (NodeAbstractView):
 	
 	
 	def _viewOf(self, model):
-		key = id( model )
+		key = model
 		try:
 			return self._modelToView[key]
 		except KeyError:
+			# Try putting None in first, in case the view of a model is being created more than once
+			self._modelToView[key] = None
 			p = self._projection( model, self )
 			self._modelToView[key] = p
 			return p
@@ -302,7 +304,6 @@ class InlineEmbeddedObjectAbstractView (NodeAbstractView):
 	def __init__(self, worksheet, model):
 		NodeAbstractView.__init__( self, worksheet, model )
 		self._incr = IncrementalValueMonitor( self )
-		self._result = None
 
 
 	@property
@@ -320,7 +321,6 @@ class ParagraphEmbeddedObjectAbstractView (NodeAbstractView):
 	def __init__(self, worksheet, model):
 		NodeAbstractView.__init__( self, worksheet, model )
 		self._incr = IncrementalValueMonitor( self )
-		self._result = None
 
 
 	@property
