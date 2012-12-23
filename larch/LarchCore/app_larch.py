@@ -6,13 +6,8 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
 import sys
-import jarray
 
-from java.lang import String, Thread
-from java.util.jar import JarInputStream
 from javax.swing import UIManager
-
-from BritefuryJ.DocModel import DMIOReader, DMNode
 
 from Britefury.Kernel.World import World
 from Britefury.Kernel.Document import Document
