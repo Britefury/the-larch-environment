@@ -76,15 +76,18 @@ class WorksheetAbstractView (NodeAbstractView):
 	
 	
 	def _viewOf(self, model):
-		key = model
-		try:
-			return self._modelToView[key]
-		except KeyError:
-			# Try putting None in first, in case the view of a model is being created more than once
-			self._modelToView[key] = None
-			p = self._projection( model, self )
-			self._modelToView[key] = p
-			return p
+		if model is self._model:
+			return self
+		else:
+			key = id( model )
+			try:
+				return self._modelToView[key]
+			except KeyError:
+				# Try putting None in first, in case the view of a model is being created more than once
+				self._modelToView[key] = None
+				p = self._projection( model, self )
+				self._modelToView[key] = p
+				return p
 		
 		
 
