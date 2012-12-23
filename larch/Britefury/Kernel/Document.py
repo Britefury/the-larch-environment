@@ -138,6 +138,14 @@ class Document (ChangeHistoryListener):
 		self._saveTime = datetime.now()
 
 
+	def writeAsBytes(self):
+		return IsolationPickle.dumpToBytes( self._contents )
+
+
+	def writeToOutputStream(self, stream):
+		IsolationPickle.dumpToOutputStream( self._contents, stream )
+
+
 	def reload(self):
 		# Shut down
 		self.shutdown()
@@ -182,6 +190,15 @@ class Document (ChangeHistoryListener):
 				return document
 			except IOError:
 				return None
+
+
+	@staticmethod
+	def readFromBytes(world, buf, documentName):
+		documentRoot = IsolationPickle.loadFromBytes( buf )
+
+		document = Document( world, documentRoot )
+		document._docName = documentName
+		return document
 
 
 	@staticmethod

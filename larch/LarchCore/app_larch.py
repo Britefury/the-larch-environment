@@ -33,8 +33,8 @@ def start_larch():
 
 	# Register a JAR entry handler so that we can pick up custom apps
 	def _handle_larch_app(name, reader):
-		inputStream = reader()
-		jarCustomLarchApp.append( inputStream )
+		buf = reader()
+		jarCustomLarchApp.append( buf )
 
 	def _handle_python_app(name, reader):
 		jarCustomPythonApp[0] = True
@@ -76,8 +76,8 @@ def start_larch():
 			world.setRootSubject( subject )
 	else:
 		if len( jarCustomLarchApp ) > 0:
-			inputStream = jarCustomLarchApp[0]
-			document = Document.readFromInputStream( world, inputStream, 'app' )
+			buf = jarCustomLarchApp[0]
+			document = Document.readFromBytes( world, buf, 'app' )
 			subject = document.newSubject( world.worldSubject, None, 'app' )
 			world.setRootSubject( subject )
 		elif jarCustomPythonApp[0]:

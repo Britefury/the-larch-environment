@@ -6,8 +6,11 @@
 //##************************
 package BritefuryJ.Isolation;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 
 import org.python.core.Py;
 import org.python.core.PyFile;
@@ -51,6 +54,7 @@ public class IsolationPickle
 			return x;
 		}
 	}
+
 	
 	public static String dumps(PyObject obj)
 	{
@@ -64,10 +68,45 @@ public class IsolationPickle
 		StringIO stream = cStringIO.StringIO( s );
 		return load( stream );		
 	}
+	
 
-	public static void dumpToOutputStream(PyObject obj, OutputStream stream)
+	public static byte[] dumpToBytes(PyObject obj)
 	{
+		/*ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		dump( obj, new PyFile( stream ) );
+		return stream.toByteArray();*/
+		String content = dumps( obj );
+		try
+		{
+			return content.getBytes( "ISO-8859-1" );
+		}
+		catch (UnsupportedEncodingException e)
+		{
+			return new byte[] {};
+		}
+	}
+	
+	public static PyObject loadFromBytes(byte buf[])
+	{
+		String name = "<Java byte array of " + buf.length + " bytes as file>";
+		ByteArrayInputStream stream = new ByteArrayInputStream( buf );
+		PyFile f = new PyFile( stream, name, "rU", -1, true );
+		return load( f );		
+	}
+	
+
+	public static void dumpToOutputStream(PyObject obj, OutputStream stream) throws IOException
+	{
+		/*dump( obj, new PyFile( stream ) );*/
+		String content = dumps( obj );
+		try
+		{
+			byte bytes[] = content.getBytes( "ISO-8859-1" );
+			stream.write( bytes );
+		}
+		catch (UnsupportedEncodingException e)
+		{
+		}
 	}
 	
 	public static PyObject loadFromInputStream(InputStream stream)

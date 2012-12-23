@@ -59,19 +59,15 @@ def promptSaveDocumentAs(world, component, handleSaveDocumentAsFn, existingFilen
 		if response == JFileChooser.APPROVE_OPTION:
 			sf = saveDialog.getSelectedFile()
 			if sf is not None:
-				filenameFromDialog = sf.getPath()
-				if filenameFromDialog is not None:
-					if os.path.exists( filenameFromDialog ):
-						response = JOptionPane.showOptionDialog( component, 'File already exists. Overwrite?', 'File already exists', JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, None, [ 'Overwrite', 'Cancel' ], 'Cancel' )
-						if response == JFileChooser.APPROVE_OPTION:
-							filename = filenameFromDialog
-							bFinished = True
-						else:
-							bFinished = False
-					else:
-						filename = filenameFromDialog
+				if sf.exists():
+					response = JOptionPane.showOptionDialog( component, 'File already exists. Overwrite?', 'File already exists', JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, None, [ 'Overwrite', 'Cancel' ], 'Cancel' )
+					if response == JFileChooser.APPROVE_OPTION:
+						filename = sf.getPath()
 						bFinished = True
+					else:
+						bFinished = False
 				else:
+					filename = sf.getPath()
 					bFinished = True
 			else:
 				bFinished = True
