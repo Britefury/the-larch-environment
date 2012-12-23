@@ -10,10 +10,8 @@ import os
 
 from java.lang import Object
 
-from java.awt import Color
+from java.awt import Color, BasicStroke
 from java.awt.geom import Rectangle2D
-from java.awt import BasicStroke
-
 from java.awt.event import KeyEvent
 
 from javax.swing import JOptionPane, JFileChooser

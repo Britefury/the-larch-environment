@@ -6,16 +6,20 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
 from javax.swing import JFileChooser
+from java.awt import Color, BasicStroke
 
 import os
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
-from BritefuryJ.Controls import Hyperlink
+from BritefuryJ.Controls import Hyperlink, MenuItem
 
 from BritefuryJ.Pres.Primitive import Primitive, Label, Column
-from BritefuryJ.Pres.RichText import Heading3, Body
+from BritefuryJ.Pres.RichText import Body
+from BritefuryJ.Pres.UI import Section, SectionHeading2
 from BritefuryJ.StyleSheet import StyleSheet
+
+from BritefuryJ.Graphics import FilledOutlinePainter
 
 from Britefury.Config import Configuration
 from Britefury.Config.UserConfig import loadUserConfig, saveUserConfig
@@ -27,6 +31,8 @@ from Britefury.Config.ConfigurationPage import ConfigurationPage
 _pathsConfigFilename = 'paths'
 
 
+_itemHoverHighlightStyle = StyleSheet.style( Primitive.hoverBackground( FilledOutlinePainter( Color( 0.8, 0.825, 0.9 ), Color( 0.125, 0.341, 0.574 ), BasicStroke( 1.0 ) ) ) )
+
 
 
 
@@ -34,29 +40,34 @@ class PathsConfigurationPage (ConfigurationPage):
 	def __init__(self):
 		super( PathsConfigurationPage, self ).__init__()
 		self._pluginPaths = []
-		self._pluginRootPaths = []
+		self._libraryPaths = []
 		self._incr = IncrementalValueMonitor()
 	
 	
 	def __getstate__(self):
 		state = super( PathsConfigurationPage, self ).__getstate__()
 		state['pluginPaths'] = self._pluginPaths
-		state['pluginRootPaths'] = self._pluginRootPaths
+		state['libraryPaths'] = self._libraryPaths
 		return state
 	
 	def __setstate__(self, state):
 		super( PathsConfigurationPage, self ).__setstate__( state )
 		self._pluginPaths = state['pluginPaths']
-		self._pluginRootPaths = state['pluginRootPaths']
+		try:
+			self._libraryPaths = state['libraryPaths']
+		except KeyError:
+			self._libraryPaths = state['pluginRootPaths']
 		self._incr = IncrementalValueMonitor()
 	
 		
 		
-	def getPluginPaths(self):
+	@property
+	def pluginPaths(self):
 		return self._pluginPaths
 	
-	def getPluginRootPaths(self):
-		return self._pluginRootPaths
+	@property
+	def libraryPaths(self):
+		return self._libraryPaths
 
 
 	
@@ -71,6 +82,18 @@ class PathsConfigurationPage (ConfigurationPage):
 	
 	
 	def presentPathList(self, pathList):
+		def pathItem(index):
+			def _onDelete(menuItem):
+				del pathList[index]
+				self._incr.onChanged()
+
+			def buildContextMenu(element, menu):
+				menu.add( MenuItem.menuItemWithLabel( 'Delete', _onDelete ) )
+				return True
+
+			return _itemHoverHighlightStyle.applyTo( Label( pathList[index] ) ).withContextMenuInteractor( buildContextMenu )
+
+
 		def _onNew(hyperlink, event):
 			component = hyperlink.getElement().getRootElement().getComponent()
 			openDialog = JFileChooser()
@@ -86,29 +109,22 @@ class PathsConfigurationPage (ConfigurationPage):
 		
 		newLink = Hyperlink( 'NEW', _onNew )
 		controls = newLink.pad( 10.0, 5.0 )
-		pathPres = Column( [ Label( path )   for path in pathList ] )
+
+		pathPres = Column( [ pathItem( i )   for i in xrange( len( pathList ) ) ] )
 		return Column( [ controls, pathPres.padX( 5.0 ) ] )
 	
 	
 	def pathsSection(self, title, pathList):
-		titlePres = Heading3( title )
 		pathsPres = self.presentPathList( pathList )
-		return self._sectionStyle.applyTo( Column( [ titlePres, pathsPres ] ) )
-		
+		return Section( SectionHeading2( title ), pathsPres )
+
 	
 
 	def __present_contents__(self, fragment, inheritedState):
 		self._incr.onAccess()
-		pluginPathsPres = self.pathsSection( 'Plugin Paths', self._pluginPaths )
-		pluginRootPathsPres = self.pathsSection( 'Plugin Root Paths', self._pluginRootPaths )
+		pluginPathsPres = self.pathsSection( 'Plugin paths', self._pluginPaths )
+		pluginRootPathsPres = self.pathsSection( 'Library paths', self._libraryPaths )
 		return Body( [ pluginPathsPres, pluginRootPathsPres ] )
-	
-	
-	pluginPaths = property( getPluginPaths )
-	pluginRootPaths = property( getPluginRootPaths )
-	
-	_sectionStyle = StyleSheet.style( Primitive.columnSpacing( 1.0 ) )
-	
 
 	
 def _loadPathsConfig():

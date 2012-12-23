@@ -20,7 +20,8 @@ from BritefuryJ.Controls import Hyperlink
 from BritefuryJ.Graphics import SolidBorder
 
 from BritefuryJ.Pres.Primitive import Primitive, Label, Spacer, Border, Row, Column, Table
-from BritefuryJ.Pres.RichText import Heading3, Body
+from BritefuryJ.Pres.RichText import Body
+from BritefuryJ.Pres.UI import Section, SectionHeading2
 from BritefuryJ.StyleSheet import StyleSheet
 
 from BritefuryJ.GraphViz import GraphViz, Configuration as GraphVizConfiguration
@@ -126,7 +127,6 @@ class GraphVizConfigurationPage (ConfigurationPage):
 		dirLabel = Label( self._graphVizDir )   if self._graphVizDir is not None   else   self._notSetStyle.applyTo( Label( '<Not set>' ) )
 						
 		setLink = Hyperlink( 'CHANGE', _onSet )
-		controls = setLink.pad( 10.0, 5.0 )
 		return self._dirBorderStyle.applyTo( Border( Row( [ dirLabel, Spacer( 25.0, 0.0 ), setLink ] ) ) )
 	
 	
@@ -147,12 +147,6 @@ class GraphVizConfigurationPage (ConfigurationPage):
 			return self._configTableStyle.applyTo( Table( rows ) ).pad( 15.0, 5.0 )
 	
 	
-	def section(self, title, contents):
-		titlePres = Heading3( title )
-		return self._sectionStyle.applyTo( Column( [ titlePres, contents ] ) )
-		
-	
-
 	def __present_contents__(self, fragment, inheritedState):
 		self._incr.onAccess()
 		dirPres = self._presentDir()
@@ -160,16 +154,15 @@ class GraphVizConfigurationPage (ConfigurationPage):
 		if self._config is not None:
 			columnContents.append( self._presentConfig() )
 		pathContents = Column( columnContents )
-		pathSection = self.section( 'GraphViz Path', pathContents )
-		return Body( [ pathSection ] )
+		sec = Section( SectionHeading2( 'GraphViz path' ), pathContents )
+		return Body( [ sec ] )
 	
 	
-	_sectionStyle = StyleSheet.style( Primitive.columnSpacing( 1.0 ) )
 	_dirBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 1.0, 0.85, 0.0 ), Color( 1.0, 1.0, 0.85 ) ) ) )
 	_notSetStyle = StyleSheet.style( Primitive.fontItalic( True ) )
 	_configTableStyle = StyleSheet.style( Primitive.tableColumnSpacing( 10.0 ) )
 	_configTableHeadingStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.0, 0.5 ) ), Primitive.fontBold( True ) )
-	_configTableToolNameStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.25, 0.5 ) ) )
+	_configTableToolNameStyle = StyleSheet.style( Primitive.foreground( Color( 0.25, 0.0, 0.5 ) ) )
 	
 
 	
