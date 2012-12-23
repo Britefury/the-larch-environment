@@ -50,13 +50,7 @@ def _pathToDottedName(path):
 	return '.'.join( _splitPath( path ) )
 
 
-def _getUserPluginDirs():
-	return getPathsConfig().pluginPaths
 
-def _getUserPluginRootPaths():
-	return getPathsConfig().pluginRootPaths
-
-	
 
 def _loadPlugin(plugins, pluginName):
 	importName = pluginName + '.larchplugin'
@@ -104,7 +98,7 @@ class Plugin (object):
 		
 	@staticmethod
 	def loadPlugins():
-		sys.path.extend( _getUserPluginRootPaths() )
+		sys.path.extend( getPathsConfig().libraryPaths )
 		
 		
 		plugins = []
@@ -115,7 +109,7 @@ class Plugin (object):
 			for pluginDir in _localPluginDirectories:
 				_loadPluginsInDir( plugins, os.path.join( 'larch', pluginDir ), True )
 		
-		for pluginDir in _getUserPluginDirs():
+		for pluginDir in getPathsConfig().pluginPaths:
 			_loadPluginsInDir( plugins, pluginDir, False )
 		
 		return plugins
