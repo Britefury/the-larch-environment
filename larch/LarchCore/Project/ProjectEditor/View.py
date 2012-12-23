@@ -10,6 +10,8 @@ import os
 
 from java.lang import Object
 
+from java.io import FileOutputStream
+
 from java.awt import Color, BasicStroke
 from java.awt.geom import Rectangle2D
 from java.awt.event import KeyEvent
@@ -36,12 +38,13 @@ from BritefuryJ.LSpace.Interactor import ClickElementInteractor
 from BritefuryJ.Controls import Controls, EditableLabel, MenuItem, Button, TextEntry, Hyperlink
 from BritefuryJ.Pres.Primitive import Primitive, Label, StaticText, Image, Spacer, Bin, Row, Column
 from BritefuryJ.Pres.RichText import TitleBar, Body, Head, Page, HSeparator
-from BritefuryJ.Pres.UI import BubblePopup, SectionHeading1, SectionHeading2, Section
+from BritefuryJ.Pres.UI import BubblePopup, SectionHeading1, SectionHeading2, Section, Form
 from BritefuryJ.Pres.Help import AttachTooltip, TipBox
 from BritefuryJ.Util.Jython import JythonException
 
 from BritefuryJ.Projection import Perspective
 
+from Britefury import app_in_jar
 
 from LarchCore.MainApp import DocumentManagement
 
@@ -247,6 +250,63 @@ _pythonPackageNameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*(\\.[a-zA-Z_][
 
 
 
+def _buildProjectJar(element, document):
+	component = element.getRootElement().getComponent()
+
+	larchJarURL = app_in_jar.getLarchJarURL()
+	chosenJarURL = None
+	if larchJarURL is None:
+		openDialog = JFileChooser()
+		openDialog.setFileFilter( FileNameExtensionFilter( 'Larch executable JAR (*.jar)', [ 'jar' ] ) )
+		response = openDialog.showDialog( component, 'Choose Larch JAR' )
+		if response == JFileChooser.APPROVE_OPTION:
+			sf = openDialog.getSelectedFile()
+			if sf is not None:
+				chosenJarURL = sf.toURI().toURL()
+		else:
+			return
+
+
+
+	jarFile = None
+	bFinished = False
+	while not bFinished:
+		saveDialog = JFileChooser()
+		saveDialog.setFileFilter( FileNameExtensionFilter( 'JAR file (*.jar)', [ 'jar' ] ) )
+		response = saveDialog.showSaveDialog( component )
+		if response == JFileChooser.APPROVE_OPTION:
+			sf = saveDialog.getSelectedFile()
+			if sf is not None:
+				if sf.exists():
+					response = JOptionPane.showOptionDialog( component, 'File already exists. Overwrite?', 'File already exists', JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, None, [ 'Overwrite', 'Cancel' ], 'Cancel' )
+					if response == JFileChooser.APPROVE_OPTION:
+						jarFile = sf
+						bFinished = True
+					else:
+						bFinished = False
+				else:
+					jarFile = sf
+					bFinished = True
+			else:
+				bFinished = True
+		else:
+			bFinished = True
+
+
+	if jarFile is not None:
+		outStream = FileOutputStream( jarFile )
+
+		documentBytes = document.writeAsBytes()
+
+		nameBytesPairs = [ ( 'app.larch', documentBytes ) ]
+
+		app_in_jar.buildLarchJar( outStream, nameBytesPairs, larchJarURL=chosenJarURL )
+
+		outStream.close()
+
+
+
+
 class ProjectView (MethodDispatchView):
 	@ObjectDispatchMethod( ProjectRoot )
 	def ProjectRoot(self, fragment, inheritedState, project):
@@ -404,15 +464,28 @@ class ProjectView (MethodDispatchView):
 		indexSection = Section( indexHeader, contentsView )
 
 
-		tip = TipBox( 'Larch projects act like Python programs. Packages act as directories/packages and pages act as Python source files. Pages can import code from one another as if they are modules.\n' + \
+		indexTip = TipBox( 'Larch projects act like Python programs. Packages act as directories/packages and pages act as Python source files. Pages can import code from one another as if they are modules.\n' + \
 			'If a page called index is present in the root of the project, then it will appear instead of the project page.\n' +\
 			'If a page called __startup__ (2 underscores) is present at the root, code within it will be executed before all other pages. This can be used for registering editor extensions.',
 			      'larchcore.worksheet.worksheeteditor')
 
 
+		# Packaging
+
+		def _onBuildJar(button, event):
+			_buildProjectJar( button.element, document )
+
+
+
+		buildJarButton = Button.buttonWithLabel( 'Build JAR', _onBuildJar )
+		jarRow = Form.Section( 'Build executable app', 'Export the project as an executable JAR', buildJarButton )
+		packagingSection = Form( 'Packaging', [ jarRow ] )
+
+
+
 		# The page
 		head = Head( [ title ] )
-		body = Body( [ saveExportSection, projectSection, indexSection, tip ] ).alignHPack()
+		body = Body( [ saveExportSection, projectSection, indexSection, indexTip, packagingSection ] ).alignHPack()
 
 		return StyleSheet.style( Primitive.editable( False ) ).applyTo( Page( [ head, body ] ) )
 
