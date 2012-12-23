@@ -29,10 +29,6 @@ class _Projection (object):
 	def __call__(self, node, worksheet):
 		return methodDispatch( self, node, worksheet )
 
-	@DMObjectNodeDispatchMethod( Schema.Worksheet )
-	def worksheet(self, worksheet, node):
-		return WorksheetEditor( worksheet, node )
-
 	@DMObjectNodeDispatchMethod( Schema.Body )
 	def body(self, worksheet, node):
 		return BodyEditor( worksheet, node )
