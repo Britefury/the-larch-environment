@@ -70,7 +70,7 @@ public class Main
 			
 			
 			// Start Larch
-			interp.exec( "from Britefury.app_larch import start_larch" );
+			interp.exec( "from LarchCore.app_larch import start_larch" );
 			interp.exec( "start_larch()" );
 		}
 		catch (Throwable t)

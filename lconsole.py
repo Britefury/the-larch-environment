@@ -13,7 +13,7 @@ sys.path.append( os.path.join( os.getcwd(), 'bin' ) )
 sys.path.append( os.path.join( os.getcwd(), 'extlibs', 'jericho-html-3.2.jar' ) )
 sys.path.append( os.path.join( os.getcwd(), 'extlibs', 'svgSalamander.jar' ) )
 
-from Britefury.app_lconsole import start_lconsole
+from LarchCore.app_lconsole import start_lconsole
 
 if __name__ == '__main__':
 	start_lconsole()

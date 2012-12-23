@@ -6,18 +6,13 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
 import sys
-import os
 
 from javax.swing import UIManager
 
-from BritefuryJ.DocModel import DMIOReader, DMNode
-
 from Britefury.Kernel.World import World
-from Britefury.Kernel.Document import Document
 from Britefury import app
 
 from Britefury.Windows.WindowManager import WindowManager
-
 
 from LarchCore.PythonConsole import Console
 

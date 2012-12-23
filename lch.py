@@ -13,7 +13,7 @@ sys.path.append( os.path.join( os.getcwd(), 'bin' ) )
 sys.path.append( os.path.join( os.getcwd(), 'extlibs', 'jericho-html-3.2.jar' ) )
 sys.path.append( os.path.join( os.getcwd(), 'extlibs', 'svgSalamander.jar' ) )
 
-from Britefury.app_larch import start_larch
+from LarchCore.app_larch import start_larch
 
 if __name__ == '__main__':
 	start_larch()
