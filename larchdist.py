@@ -29,6 +29,7 @@ dirsForSource = [
 	( larchDir( 'LarchCore' ), '*.py', '*.png' ),
 	( larchDir( 'LarchTools' ), '*.py', '*.png' ),
 	( larchDir( 'images' ), '*.png' ),
+
 	( 'java', '*.java' ),
 	( 'extlibs', '*.jar' ),
 ]
@@ -59,6 +60,7 @@ rootFiles = [
 	'lch.py',
 	'LICENSE',
 	'REFERENCES',
+	'larchdist.py'
 ]
 
 

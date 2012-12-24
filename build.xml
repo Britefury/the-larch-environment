@@ -13,6 +13,7 @@
 				<section name="Build-Info">
 					<attribute name="version" value="${larch.version}" />
 				</section>
+                <attribute name="SplashScreen-Image" value="images/SplashScreen.png"/>
             </manifest>
             <fileset dir="./bin">
 				<exclude name="tests/**/*"/>
