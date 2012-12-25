@@ -76,11 +76,11 @@ class ProjectPage (ProjectNode):
 
 
 
-	def _registerRoot(self, root):
-		root._registerNode( self )
+	def _registerRoot(self, root, takePriority):
+		root._registerPage( self, takePriority )
 
 	def _unregisterRoot(self, root):
-		root._unregisterNode( self )
+		root._unregisterPage( self )
 
 
 
