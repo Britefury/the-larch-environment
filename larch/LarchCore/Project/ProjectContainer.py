@@ -36,7 +36,7 @@ class ProjectContainer (ProjectNode):
 		self._contentsMapLive = LiveFunction( self._computeContentsMap )
 
 		for x in self._contents_:
-			x._setParent( self )
+			x._setParent( self, True )
 		
 	
 	def _computeContentsMap(self):
@@ -107,10 +107,10 @@ class ProjectContainer (ProjectNode):
 
 
 
-	def _registerRoot(self, root):
-		super( ProjectContainer, self )._registerRoot( root )
+	def _registerRoot(self, root, takePriority):
+		super( ProjectContainer, self )._registerRoot( root, takePriority )
 		for x in self._contents_:
-			x._registerRoot( root )
+			x._registerRoot( root, takePriority )
 
 	def _unregisterRoot(self, root):
 		super( ProjectContainer, self )._unregisterRoot( root )
@@ -133,7 +133,7 @@ class ProjectContainer (ProjectNode):
 		for x in removed:
 			x._clearParent()
 		for x in added:
-			x._setParent( self )
+			x._setParent( self, False )
 		self._prevContents = self._contents_[:]
 		self._incr.onChanged()
 

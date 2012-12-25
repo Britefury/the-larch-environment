@@ -79,6 +79,11 @@ class ProjectSubject (Subject):
 	def documentSubject(self):
 		return self
 
+	@property
+	def project(self):
+		self._model.startup()
+		return self._model
+
 
 	def getTrailLinkText(self):
 		return 'Project'
@@ -119,8 +124,8 @@ class _PageSubjectPathEntry (SubjectPathEntry):
 
 
 	def follow(self, outerSubject):
-		rootNode = outerSubject._model
-		page = rootNode.getNodeById( self.__nodeId )
+		rootNode = outerSubject.project
+		page = rootNode.getPageById( self.__nodeId )
 		document = outerSubject._document
 		return document.newModelSubject( page.data, outerSubject, outerSubject.path().followedBy( self ), page.importName, page.getName() )
 

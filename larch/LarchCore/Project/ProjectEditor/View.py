@@ -30,7 +30,7 @@ from BritefuryJ.Live import LiveValue
 
 from BritefuryJ.DefaultPerspective import DefaultPerspective
 
-from BritefuryJ.Graphics import FilledOutlinePainter
+from BritefuryJ.Graphics import FilledOutlinePainter, SolidBorder
 from BritefuryJ.StyleSheet import StyleSheet
 from BritefuryJ.LSpace import Anchor
 from BritefuryJ.LSpace.Input import ObjectDndHandler
@@ -237,6 +237,13 @@ _pythonPackageNameStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.
 _pythonPackageNameNotSetStyle = StyleSheet.style( Primitive.foreground( Color( 0.5, 0.0, 0.0 ) ) )
 _pythonPackageNameNotSetCommentStyle = StyleSheet.style( Primitive.foreground( Color( 0.2, 0.2, 0.2 ) ), Primitive.fontItalic( True ) )
 
+_frontPageNoteBorder = SolidBorder( 1.0, 1.0, 3.0, 3.0, Color( 0.0, 1.0, 0.0 ), Color( 0.85, 0.95, 0.85 ) )
+_frontPageNoteStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.5, 0.0 ) ), Primitive.fontSize( 10 ) )
+_startupPageNoteBorder = SolidBorder( 1.0, 1.0, 3.0, 3.0, Color( 0.75, 0.5, 1.0 ), Color( 0.925, 0.9, 0.95 ) )
+_startupPageNoteStyle = StyleSheet.style( Primitive.foreground( Color( 0.25, 0.0, 0.5 ) ), Primitive.fontSize( 10 ) )
+_notesRowStyle = StyleSheet.style( Primitive.rowSpacing( 10.0 ) )
+_notesGap = 15.0
+
 _packageContentsIndentation = 20.0
 
 
@@ -244,7 +251,7 @@ _packageIcon = Image( Image.getResource( '/LarchCore/Project/images/Package.png'
 
 
 _nameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*' )
-_pythonPackageNameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*(\\.[a-zA-Z_][a-zA-Z0-9_]*)*' )
+_pythonPackageNameRegex = Pattern.compile( '([a-zA-Z_][a-zA-Z0-9_]*(\\.[a-zA-Z_][a-zA-Z0-9_]*)*)?' )
 
 
 
@@ -370,7 +377,10 @@ class ProjectView (MethodDispatchView):
 		# Python package name
 		class _PythonPackageNameListener (EditableLabel.EditableLabelListener):
 			def onTextChanged(self, editableLabel, text):
-				project.pythonPackageName = text
+				if text != '':
+					project.pythonPackageName = text
+				else:
+					project.pythonPackageName = None
 
 
 
@@ -549,6 +559,12 @@ class ProjectView (MethodDispatchView):
 
 	@ObjectDispatchMethod( ProjectPage )
 	def Page(self, fragment, inheritedState, page):
+		root = page.rootNode
+		if root is None:
+			raise RuntimeError, 'No root node'
+		isFrontPage = root.frontPage is page
+		isStartupPage = root.startupPage is page
+
 		class _RenameListener (TextEntry.TextEntryListener):
 			def onAccept(self, textEntry, text):
 				page.name = text
@@ -565,10 +581,37 @@ class ProjectView (MethodDispatchView):
 			if page.parent is not None:
 				page.parent.remove( page )
 
+
+		def _onClearFrontPage(menuItem):
+			root.frontPage = None
+
+		def _onSetAsFrontPage(menuItem):
+			root.frontPage = page
+
+
+		def _onClearStartupPage(menuItem):
+			root.startupPage = None
+
+		def _onSetAsStartupPage(menuItem):
+			root.startupPage = page
+
+
 		def _pageContextMenuFactory(element, menu):
 			menu.add( MenuItem.menuItemWithLabel( 'Rename', _onRename ) )
 			menu.add( HSeparator() )
 			menu.add( MenuItem.menuItemWithLabel( 'Delete', _onDelete ) )
+			menu.add( HSeparator() )
+
+			if isFrontPage:
+				menu.add( MenuItem.menuItemWithLabel( 'Clear front page', _onClearFrontPage ) )
+			else:
+				menu.add( MenuItem.menuItemWithLabel( 'Set as front page', _onSetAsFrontPage ) )
+
+			if isStartupPage:
+				menu.add( MenuItem.menuItemWithLabel( 'Clear startup page', _onClearStartupPage ) )
+			else:
+				menu.add( MenuItem.menuItemWithLabel( 'Set as startup page', _onSetAsStartupPage ) )
+
 			return True
 
 
@@ -583,7 +626,18 @@ class ProjectView (MethodDispatchView):
 
 		nameLive = LiveValue( nameBox )
 
-		return nameLive
+		if isFrontPage or isStartupPage:
+			notes = []
+			if isFrontPage:
+				notes.append( _frontPageNoteBorder.surround( _frontPageNoteStyle.applyTo( Label( 'Front page' ) ) ) )
+			if isStartupPage:
+				notes.append( _startupPageNoteBorder.surround( _startupPageNoteStyle.applyTo( Label( 'Startup page' ) ) ) )
+			notesPres = _notesRowStyle.applyTo( Row( notes ) )
+			pagePres = Row( [ nameLive, notesPres.padX( _notesGap, 0.0 ) ] )
+		else:
+			pagePres = nameLive
+
+		return pagePres
 
 
 

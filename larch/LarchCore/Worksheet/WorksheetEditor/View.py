@@ -117,6 +117,19 @@ def _applyParagraphShortcuts(p):
 
 
 
+def _applyBlankParagraphShortcuts(p):
+	def insertCodeAction(element):
+		marker = Marker.atEndOf( element, True )
+		def _makeParagraph():
+			return EditorSchema.PythonCodeEditor.newPythonCodeModel()
+		WorksheetRichTextController.instance.insertParagraphAtMarker( marker, _makeParagraph )
+
+
+	p = p.withShortcut( Shortcut( KeyEvent.VK_C, Modifier.ALT ), insertCodeAction )
+	return p
+
+
+
 _italicButtonLabelStyle = StyleSheet.style( Primitive.fontFace( 'Monospaced' ), Primitive.fontItalic( True ) )
 _boldButtonLabelStyle = StyleSheet.style( Primitive.fontFace( 'Monospaced' ), Primitive.fontBold( True ) )
 _underlineButtonLabelStyle = StyleSheet.style( Primitive.fontFace( 'Monospaced' ), Primitive.fontUnderline( True ) )
@@ -374,7 +387,7 @@ class WorksheetEditor (MethodDispatchView):
 		else:
 			p = NormalText( '' )
 		p = WorksheetRichTextController.instance.editableParagraph( node, p )
-		p = _applyParagraphShortcuts( p )
+		p = _applyBlankParagraphShortcuts( p )
 		return p
 
 
