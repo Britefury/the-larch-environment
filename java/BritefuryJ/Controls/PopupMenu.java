@@ -51,70 +51,50 @@ public abstract class PopupMenu extends Pres
 	// Popup methods
 	//
 
-	public void popup(LSElement element, StyleValues style, Anchor targetAnchor, Anchor popupAnchor)
+	public void popupMenu(LSElement element, StyleValues style, Anchor targetAnchor, Anchor popupAnchor)
 	{
-		popup( element, style, targetAnchor, popupAnchor, true, true );
+		chainPopup( element, style, targetAnchor, popupAnchor, true, true );
 	}
 	
-	public void popup(LSElement element, Anchor targetAnchor, Anchor popupAnchor)
+	public void popupMenu(LSElement element, Anchor targetAnchor, Anchor popupAnchor)
 	{
 		FragmentContext ctx = element.getFragmentContext();
 		if ( ctx != null )
 		{
-			popup( element, ctx.getStyleValues().withAttrs( popupMenuContentsStyle ), targetAnchor, popupAnchor );
+			popupMenu( element, ctx.getStyleValues().withAttrs( popupMenuContentsStyle ), targetAnchor, popupAnchor );
 		}
 		else
 		{
-			popup( element, defaultPopupMenuContentsStyleValues, targetAnchor, popupAnchor );
+			popupMenu( element, defaultPopupMenuContentsStyleValues, targetAnchor, popupAnchor );
 		}
 	}
 	
-	public void popupToRightOf(LSElement element, StyleValues style)
+	public void popupMenuAtMousePosition(LSElement element, StyleValues style, Anchor popupAnchor)
 	{
-		popup( element, style, Anchor.TOP_RIGHT, Anchor.TOP_LEFT );
+		chainPopupAtMousePosition( element, style, popupAnchor, true, true );
 	}
 	
-	public void popupToRightOf(LSElement element)
-	{
-		popup( element, Anchor.TOP_RIGHT, Anchor.TOP_LEFT );
-	}
-	
-	public void popupBelow(LSElement element, StyleValues style)
-	{
-		popup( element, style, Anchor.BOTTOM_LEFT, Anchor.TOP_LEFT );
-	}
-	
-	public void popupBelow(LSElement element)
-	{
-		popup( element, Anchor.BOTTOM_LEFT, Anchor.TOP_LEFT );
-	}
-	
-	public void popupAtMousePosition(LSElement element, StyleValues style, Anchor popupAnchor)
-	{
-		popupAtMousePosition( element, style, popupAnchor, true, true );
-	}
-	
-	public void popupAtMousePosition(LSElement element, Anchor popupAnchor)
+	public void popupMenuAtMousePosition(LSElement element, Anchor popupAnchor)
 	{
 		FragmentContext ctx = element.getFragmentContext();
 		if ( ctx != null )
 		{
-			popupAtMousePosition( element, ctx.getStyleValues().withAttrs( popupMenuContentsStyle ), popupAnchor );
+			popupMenuAtMousePosition( element, ctx.getStyleValues().withAttrs( popupMenuContentsStyle ), popupAnchor );
 		}
 		else
 		{
-			popupAtMousePosition( element, defaultPopupMenuContentsStyleValues, popupAnchor );
+			popupMenuAtMousePosition( element, defaultPopupMenuContentsStyleValues, popupAnchor );
 		}
 	}
 	
 	public void popupAtMousePosition(LSElement element, StyleValues style)
 	{
-		popupAtMousePosition( element, style, Anchor.TOP_LEFT );
+		popupMenuAtMousePosition( element, style, Anchor.TOP_LEFT );
 	}
 	
-	public void popupAtMousePosition(LSElement element)
+	public void popupMenuAtMousePosition(LSElement element)
 	{
-		popupAtMousePosition( element, Anchor.TOP_LEFT );
+		popupMenuAtMousePosition( element, Anchor.TOP_LEFT );
 	}
 
 	

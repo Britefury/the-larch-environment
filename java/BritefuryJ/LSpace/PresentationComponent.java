@@ -87,16 +87,17 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		private JWindow popupWindow;
 		private PresentationComponent popupComponent;
 		private PopupChain chain;
-		private boolean isOpen;
+		private boolean open, chainStart;
 		private Point2 screenPosition;
 		private Vector2 screenSize;
 		
 		private PresentationPopup(PopupChain popupChain, Window ownerWindow, PresentationComponent parentComponent, LSElement popupContents, int screenX, int screenY,
-				Anchor popupAnchor, boolean closeOnLoseFocus, boolean requestFocus)
+				Anchor popupAnchor, boolean closeOnLoseFocus, boolean requestFocus, boolean chainStart)
 		{
 			chain = popupChain;
 			chain.addPopup( this );
-			isOpen = true;
+			open = true;
+			this.chainStart = chainStart;
 			
 			// Create the popup window
 			popupWindow = new JWindow( ownerWindow );
@@ -155,7 +156,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				public void windowLostFocus(WindowEvent arg0)
 				{
 					// If the popup has no child
-					if ( isOpen )
+					if ( open )
 					{
 						if ( !chain.popupHasChild( PresentationPopup.this ) )
 						{
@@ -174,7 +175,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		public void closePopup()
 		{
-			isOpen = false;
+			open = false;
 			popupWindow.setVisible( false );
 		}
 		
@@ -193,6 +194,12 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		public Vector2 getSizeOnScreen()
 		{
 			return screenSize;
+		}
+		
+		
+		public boolean isChainStart()
+		{
+			return chainStart;
 		}
 	}
 	
@@ -272,11 +279,24 @@ public class PresentationComponent extends JComponent implements ComponentListen
 
 		public void closeChain()
 		{
+			int index = 0;
 			for (PresentationPopup p: popups)
 			{
+				if ( p.isChainStart() )
+				{
+					// Request focus for remaining popup window
+					p.popupWindow.requestFocus();
+					break;
+				}
+				
 				p.closePopup();
+				
+				index++;
 			}
-			popups.clear();
+
+			ArrayList<PresentationPopup> ps = new ArrayList<PresentationPopup>();
+			ps.addAll( popups.subList( index, popups.size() ) );
+			popups = ps;
 		}
 	}
 	
@@ -977,8 +997,8 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	}
 	
 	
-	PresentationPopup createPopupPresentation(LSElement popupContents, int targetX, int targetY, Anchor popupAnchor,
-			boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	protected PresentationPopup createPopupPresentation(LSElement popupContents, int targetX, int targetY, Anchor popupAnchor,
+			boolean bCloseOnLoseFocus, boolean bRequestFocus, boolean chainStart)
 	{
 		// Offset the popup position by the location of this presentation component on the screen
 		Point locOnScreen = getLocationOnScreen();
@@ -1011,7 +1031,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			ownerWindow = SwingUtilities.getWindowAncestor( root );
 		}
 
-		return new PresentationPopup( chain, ownerWindow, this, popupContents, targetX, targetY, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+		return new PresentationPopup( chain, ownerWindow, this, popupContents, targetX, targetY, popupAnchor, bCloseOnLoseFocus, bRequestFocus, chainStart );
 	}
 
 

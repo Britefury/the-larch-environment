@@ -14,6 +14,7 @@ import javax.swing.Timer;
 import BritefuryJ.LSpace.Anchor;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.FragmentContext;
+import BritefuryJ.Pres.CustomElementActionPres;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -27,7 +28,7 @@ public class TimedPopup
 	
 	public TimedPopup(Object child, double timeout, boolean bRequestFocus)
 	{
-		this.child = Pres.coerce( child );
+		this.child = Pres.coerce( child ).withCustomElementAction( action );
 		this.timeout = timeout;
 		this.bRequestFocus = bRequestFocus;
 	}
@@ -36,16 +37,12 @@ public class TimedPopup
 
 	public void popup(LSElement element, Anchor targetAnchor, Anchor popupAnchor, PresentationContext ctx, StyleValues style)
 	{
-		LSElement childElement = child.present( ctx, style );
-		childElement.popup( element, targetAnchor, popupAnchor, true, bRequestFocus );
-		initialiseTimeout( childElement );
+		child.popup( element, targetAnchor, popupAnchor, true, bRequestFocus );
 	}
 	
 	public void popupAtMousePosition(LSElement element, Anchor popupAnchor, PresentationContext ctx, StyleValues style)
 	{
-		LSElement childElement = child.present( ctx, style );
-		element.getRootElement().createPopupAtMousePosition( childElement, popupAnchor, true, bRequestFocus );
-		initialiseTimeout( childElement );
+		child.popupAtMousePosition( element, popupAnchor, true, bRequestFocus );
 	}
 	
 	
@@ -78,18 +75,23 @@ public class TimedPopup
 	
 	
 	
-	private void initialiseTimeout(final LSElement childElement)
+	private CustomElementActionPres.CustomElementAction action = new CustomElementActionPres.CustomElementAction()
 	{
-		ActionListener timeoutListener = new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				childElement.closeContainingPopupChain();
-			}
-		};
 		
-		final Timer timer = new Timer( (int)( timeout * 1000.0 ), timeoutListener );
-		timer.setRepeats( false );
-		timer.start();
-	}
+		@Override
+		public void action(final LSElement element, PresentationContext ctx, StyleValues style)
+		{
+			ActionListener timeoutListener = new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					element.closeContainingPopupChain();
+				}
+			};
+			
+			final Timer timer = new Timer( (int)( timeout * 1000.0 ), timeoutListener );
+			timer.setRepeats( false );
+			timer.start();
+		}
+	};
 }

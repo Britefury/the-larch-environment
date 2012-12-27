@@ -14,6 +14,7 @@ import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.Controls.MenuItem;
 import BritefuryJ.Controls.PopupMenu;
 import BritefuryJ.Controls.VPopupMenu;
+import BritefuryJ.LSpace.Anchor;
 import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
 import BritefuryJ.Pres.ElementRef;
 import BritefuryJ.Pres.Pres;
@@ -23,6 +24,7 @@ import BritefuryJ.Pres.Primitive.Proxy;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.RichText.Heading2;
 import BritefuryJ.Pres.RichText.NormalText;
+import BritefuryJ.Pres.UI.BubblePopup;
 import BritefuryJ.StyleSheet.StyleSheet;
 
 public class PopupTestPage extends TestPage
@@ -84,13 +86,24 @@ public class PopupTestPage extends TestPage
 		{
 			public void onLinkClicked(Hyperlink.AbstractHyperlinkControl link, PointerButtonClickedEvent event)
 			{
-				mainMenu.popupToRightOf( link.getElement() );
+				mainMenu.popupMenu( link.getElement(), Anchor.TOP_RIGHT, Anchor.TOP_LEFT );
 			}
 		};
 		
-		AbstractHyperlink popupLink = new Hyperlink( "Popup", popupListener );
+		final AbstractHyperlink popupLink = new Hyperlink( "Popup", popupListener );
+		
+		Hyperlink.LinkListener showBubblePopupListener = new Hyperlink.LinkListener()
+		{
+			public void onLinkClicked(Hyperlink.AbstractHyperlinkControl link, PointerButtonClickedEvent event)
+			{
+				BubblePopup.popupInBubbleAdjacentTo( popupLink, link.getElement(), Anchor.BOTTOM, true, true );
+			}
+		};
+		
+		AbstractHyperlink displayBubblePopup = new Hyperlink( "Display in nested bubble popup", showBubblePopupListener );
+		
 		Pres colourBox = new Column( new Pres[] { colouredTextProxyRef, popupLink } );
 		
-		return new Body( new Object[] { new Heading2( "Action hyperlinks" ), colourBox } );
+		return new Body( new Object[] { new Heading2( "Action hyperlinks" ), colourBox, displayBubblePopup } );
 	}
 }

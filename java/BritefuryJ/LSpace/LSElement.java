@@ -2707,14 +2707,16 @@ abstract public class LSElement implements Presentable
 	//
 	//
 	
-	public PresentationComponent.PresentationPopup popup(LSElement targetElement, Anchor targetAnchor, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationComponent.PresentationPopup popup(LSElement targetElement, Anchor targetAnchor, Anchor popupAnchor,
+			boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		AABox2 visibleBox = targetElement.getVisibleBoxInLocalSpace();
 		Point2 targerCorner = targetAnchor.getBoxCorner( visibleBox );
 		return popupOver( targetElement, targerCorner, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public PresentationComponent.PresentationPopup popupOver(LSElement targetElement, Point2 targetLocalPos, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationComponent.PresentationPopup popupOver(LSElement targetElement, Point2 targetLocalPos, Anchor popupAnchor,
+			boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		if ( targetElement.isLocalSpacePointVisible( targetLocalPos ) )
 		{
@@ -2728,6 +2730,31 @@ abstract public class LSElement implements Presentable
 		}
 	}
 	
+
+	public PresentationComponent.PresentationPopup chainPopup(LSElement targetElement, Anchor targetAnchor, Anchor popupAnchor,
+			boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	{
+		AABox2 visibleBox = targetElement.getVisibleBoxInLocalSpace();
+		Point2 targerCorner = targetAnchor.getBoxCorner( visibleBox );
+		return chainPopupOver( targetElement, targerCorner, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+	}
+	
+	public PresentationComponent.PresentationPopup chainPopupOver(LSElement targetElement, Point2 targetLocalPos, Anchor popupAnchor,
+			boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	{
+		if ( targetElement.isLocalSpacePointVisible( targetLocalPos ) )
+		{
+			Xform2 x = targetElement.getLocalToRootXform();
+			Point2 rootPos = x.transform( targetLocalPos );
+			return targetElement.getRootElement().createChainPopupPresentation( this, rootPos, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+		}
+		else
+		{
+			return targetElement.getRootElement().createChainPopupAtMousePosition( this, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+		}
+	}
+	
+
 	public boolean isInsidePopup()
 	{
 		return getRootElement().getComponent().isPopup();

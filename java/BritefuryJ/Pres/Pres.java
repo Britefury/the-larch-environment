@@ -401,31 +401,6 @@ public abstract class Pres
 	// Popup methods
 	//
 	
-	public void popup(LSElement element, PresentationContext ctx, StyleValues style, Anchor targetAnchor, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
-	{
-		LSElement popupElement = present( ctx, style );
-		popupElement.popup( element, targetAnchor, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
-	}
-	
-	public void popupToRightOf(LSElement element, PresentationContext ctx, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
-	{
-		LSElement popupElement = present( ctx, style );
-		popupElement.popup( element, Anchor.TOP_RIGHT, Anchor.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
-	}
-	
-	public void popupBelow(LSElement element, PresentationContext ctx, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
-	{
-		LSElement popupElement = present( ctx, style );
-		popupElement.popup( element, Anchor.BOTTOM_LEFT, Anchor.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
-	}
-	
-	public void popupAtMousePosition(LSElement element, PresentationContext ctx, StyleValues style, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
-	{
-		LSElement popupElement = present( ctx, style );
-		element.getRootElement().createPopupAtMousePosition( popupElement, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
-	}
-	
-	
 	private LSElement createPopupElement(LSElement contextElement, StyleValues style)
 	{
 		PresentationContext presCtx = PresentationContext.defaultCtx;
@@ -482,26 +457,6 @@ public abstract class Pres
 		return popupElement.popup( element, targetAnchor, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public PresentationComponent.PresentationPopup popupToRightOf(LSElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
-	{
-		return popup( element, Anchor.RIGHT, Anchor.LEFT, bCloseOnLoseFocus, bRequestFocus );
-	}
-	
-	public PresentationComponent.PresentationPopup popupToRightOf(LSElement element, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
-	{
-		return popup( element, style, Anchor.RIGHT, Anchor.LEFT, bCloseOnLoseFocus, bRequestFocus );
-	}
-	
-	public PresentationComponent.PresentationPopup popupBelow(LSElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
-	{
-		return popup( element, Anchor.BOTTOM, Anchor.TOP, bCloseOnLoseFocus, bRequestFocus );
-	}
-	
-	public PresentationComponent.PresentationPopup popupBelow(LSElement element, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
-	{
-		return popup( element, style, Anchor.BOTTOM, Anchor.TOP, bCloseOnLoseFocus, bRequestFocus );
-	}
-	
 	public PresentationComponent.PresentationPopup popupAtMousePosition(LSElement element, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		LSElement popupElement = createPopupElement( element );
@@ -522,6 +477,41 @@ public abstract class Pres
 	public PresentationComponent.PresentationPopup popupAtMousePosition(LSElement element, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		return popupAtMousePosition( element, style, Anchor.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
+	}
+	
+	
+	public PresentationComponent.PresentationPopup chainPopup(LSElement element, Anchor targetAnchor, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	{
+		LSElement popupElement = createPopupElement( element );
+		return popupElement.chainPopup( element, targetAnchor, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+	}
+	
+	public PresentationComponent.PresentationPopup chainPopup(LSElement element, StyleValues style, Anchor targetAnchor, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	{
+		LSElement popupElement = createPopupElement( element, style );
+		return popupElement.chainPopup( element, targetAnchor, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+	}
+	
+	public PresentationComponent.PresentationPopup chainPopupAtMousePosition(LSElement element, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	{
+		LSElement popupElement = createPopupElement( element );
+		return element.getRootElement().createChainPopupAtMousePosition( popupElement, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+	}
+	
+	public PresentationComponent.PresentationPopup chainPopupAtMousePosition(LSElement element, StyleValues style, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	{
+		LSElement popupElement = createPopupElement( element, style );
+		return element.getRootElement().createChainPopupAtMousePosition( popupElement, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+	}
+	
+	public PresentationComponent.PresentationPopup chainPopupAtMousePosition(LSElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	{
+		return chainPopupAtMousePosition( element, Anchor.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
+	}
+	
+	public PresentationComponent.PresentationPopup chainPopupAtMousePosition(LSElement element, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	{
+		return chainPopupAtMousePosition( element, style, Anchor.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
 	

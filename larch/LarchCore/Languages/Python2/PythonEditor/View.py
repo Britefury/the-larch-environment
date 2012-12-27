@@ -214,7 +214,7 @@ def _onDrop_embeddedObject(element, pos, data, action):
 		                     MenuItem.menuItemWithLabel( 'Reference', _makeOnDrop( _performDropByRef ) ),
 				     MenuItem.menuItemWithLabel( 'Copy (as literal)', _makeOnDrop( _performDropAsLiteralByCopy ) ),
 				     MenuItem.menuItemWithLabel( 'Reference (as literal)', _makeOnDrop( _performDropAsLiteralByRef ) ) ] )
-		menu.popupAtMousePosition( marker.getElement() )
+		menu.popupMenuAtMousePosition( marker.getElement() )
 	return True
 
 
