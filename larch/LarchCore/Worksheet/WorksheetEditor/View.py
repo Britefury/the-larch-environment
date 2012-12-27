@@ -76,7 +76,7 @@ def _onDrop_embeddedObject(element, pos, data, action):
 
 		menu = VPopupMenu( [ MenuItem.menuItemWithLabel( 'Inline', _onDropInline ),
 		                     MenuItem.menuItemWithLabel( 'As paragraph', _onDropParagraph ) ] )
-		menu.popupAtMousePosition( marker.getElement() )
+		menu.popupMenuAtMousePosition( marker.getElement() )
 	return True
 
 

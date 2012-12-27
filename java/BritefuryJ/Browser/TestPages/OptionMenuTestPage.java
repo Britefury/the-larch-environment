@@ -6,7 +6,11 @@
 //##************************
 package BritefuryJ.Browser.TestPages;
 
+import BritefuryJ.Controls.AbstractHyperlink;
+import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.Controls.OptionMenu;
+import BritefuryJ.LSpace.Anchor;
+import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
 import BritefuryJ.Live.LiveFunction;
 import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.Pres;
@@ -16,6 +20,7 @@ import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Pres.Primitive.SpaceBin;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.RichText.Heading2;
+import BritefuryJ.Pres.UI.BubblePopup;
 
 public class OptionMenuTestPage extends TestPage
 {
@@ -53,8 +58,20 @@ public class OptionMenuTestPage extends TestPage
 		
 		Pres choices[] = new Pres[] { new Label( "Zero" ), new Label( "One" ), new Label( "Two" ), new Label( "Three" ), new Label( "Four" ) };
 		OptionMenu optionMenu = new OptionMenu( choices, value );
-		Pres optionMenuBox = new SpaceBin( 100.0, -1.0, optionMenu.alignHExpand() ).padX( 5.0 );
-		Pres optionMenuSectionContents = new Column( new Object[] { new Row( new Object[] { new Label( "Value = " ), f } ), optionMenuBox } );
+		final Pres optionMenuBox = new SpaceBin( 100.0, -1.0, optionMenu.alignHExpand() ).padX( 5.0 );
+
+		Hyperlink.LinkListener showBubblePopupListener = new Hyperlink.LinkListener()
+		{
+			public void onLinkClicked(Hyperlink.AbstractHyperlinkControl link, PointerButtonClickedEvent event)
+			{
+				BubblePopup.popupInBubbleAdjacentTo( optionMenuBox, link.getElement(), Anchor.BOTTOM, true, false );
+			}
+		};
+		
+		AbstractHyperlink displayBubblePopup = new Hyperlink( "Display in nested bubble popup", showBubblePopupListener );
+		
+		
+		Pres optionMenuSectionContents = new Column( new Object[] { new Row( new Object[] { new Label( "Value = " ), f } ), optionMenuBox, displayBubblePopup } );
 		
 		return new Body( new Pres[] { new Heading2( "Option menu" ), optionMenuSectionContents } );
 	}

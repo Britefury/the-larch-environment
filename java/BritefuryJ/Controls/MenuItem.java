@@ -7,6 +7,7 @@
 package BritefuryJ.Controls;
 
 import BritefuryJ.Graphics.Painter;
+import BritefuryJ.LSpace.Anchor;
 import BritefuryJ.LSpace.LSBin;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.AbstractPointerButtonEvent;
@@ -55,11 +56,11 @@ public class MenuItem extends ControlPres
 			{
 				if ( direction == SubmenuPopupDirection.RIGHT )
 				{
-					subMenu.popupToRightOf( menuItem.getElement(), style );
+					subMenu.popupMenu( menuItem.getElement(), style, Anchor.TOP_RIGHT, Anchor.TOP_LEFT );
 				}
 				else
 				{
-					subMenu.popupBelow( menuItem.getElement(), style );
+					subMenu.popupMenu( menuItem.getElement(), style, Anchor.BOTTOM_LEFT, Anchor.TOP_LEFT );
 				}
 			}
 		}

@@ -12,6 +12,8 @@ from javax.swing.filechooser import FileNameExtensionFilter
 
 from BritefuryJ.Controls import MenuItem, VPopupMenu
 
+from BritefuryJ.LSpace import Anchor
+
 
 from Britefury.Kernel.Document import Document
 
@@ -29,7 +31,7 @@ def promptNewDocument(world, element, handleNewDocumentFn):
 		items.append( MenuItem.menuItemWithLabel( newDocumentFactory.menuLabelText, _make_newDocument( newDocumentFactory ) ) )
 	newDocumentMenu = VPopupMenu( items )
 	
-	newDocumentMenu.popupToRightOf( element )
+	newDocumentMenu.popupMenu( element, Anchor.TOP_RIGHT, Anchor.TOP_LEFT )
 
 	
 	

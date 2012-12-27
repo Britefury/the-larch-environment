@@ -9,6 +9,7 @@ package BritefuryJ.Controls;
 import java.util.List;
 
 import BritefuryJ.Graphics.Painter;
+import BritefuryJ.LSpace.Anchor;
 import BritefuryJ.LSpace.LSBorder;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.AbstractPointerButtonEvent;
@@ -118,7 +119,7 @@ public class OptionMenu extends ControlPres
 		
 		private void displayDropdown()
 		{
-			choiceMenu.popupBelow( element, style.withAttr( Controls.bClosePopupOnActivate, true ) );
+			choiceMenu.popupMenu( element, style.withAttr( Controls.bClosePopupOnActivate, true ), Anchor.BOTTOM_LEFT, Anchor.TOP_LEFT );
 		}
 		
 		

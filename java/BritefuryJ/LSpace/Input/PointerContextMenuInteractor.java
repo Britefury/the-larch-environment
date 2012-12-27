@@ -28,7 +28,7 @@ public class PointerContextMenuInteractor extends PointerInteractor
 			
 			if ( !menu.isEmpty() )
 			{
-				menu.popupAtMousePosition( pointer.getComponent().getRootElement() );
+				menu.popupMenuAtMousePosition( pointer.getComponent().getRootElement() );
 				return true;
 			}
 		}

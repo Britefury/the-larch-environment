@@ -1207,16 +1207,33 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	//
 	//
 	
-	protected PresentationPopup createPopupPresentation(LSElement popupContents, Point2 localPos, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	protected PresentationPopup createPopupPresentation(LSElement popupContents, Point2 localPos, Anchor popupAnchor,
+			boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		return component.createPopupPresentation( popupContents, (int)( localPos.x + 0.5 ), (int)( localPos.y + 0.5 ),
-				popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+				popupAnchor, bCloseOnLoseFocus, bRequestFocus, true );
 	}
 	
-	public PresentationPopup createPopupAtMousePosition(LSElement popupContents, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationPopup createPopupAtMousePosition(LSElement popupContents, Anchor popupAnchor,
+			boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		Point mouse = component.getMousePosition();
-		return component.createPopupPresentation( popupContents, mouse.x, mouse.y, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+		return component.createPopupPresentation( popupContents, mouse.x, mouse.y, popupAnchor, bCloseOnLoseFocus, bRequestFocus, true );
+	}
+
+	
+	protected PresentationPopup createChainPopupPresentation(LSElement popupContents, Point2 localPos, Anchor popupAnchor,
+			boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	{
+		return component.createPopupPresentation( popupContents, (int)( localPos.x + 0.5 ), (int)( localPos.y + 0.5 ),
+				popupAnchor, bCloseOnLoseFocus, bRequestFocus, false );
+	}
+	
+	public PresentationPopup createChainPopupAtMousePosition(LSElement popupContents, Anchor popupAnchor,
+			boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	{
+		Point mouse = component.getMousePosition();
+		return component.createPopupPresentation( popupContents, mouse.x, mouse.y, popupAnchor, bCloseOnLoseFocus, bRequestFocus, false );
 	}
 
 	
