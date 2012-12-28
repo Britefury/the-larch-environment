@@ -186,11 +186,6 @@ class Flatten
 	}
 	
 	
-	protected static ArrayList<Object> flattenSpans(Iterable<Object> xs)
-	{
-		return flatten( textJoin( newlineSplit( xs ) ) );
-	}
-
 	protected static ArrayList<Object> flattenParagraphs(Iterable<Object> xs)
 	{
 		return flatten( textJoin( newlineSplit( xs ) ) );

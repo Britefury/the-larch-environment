@@ -16,6 +16,7 @@ from BritefuryJ.Pres.UI import Section, SectionHeading1, BubblePopup
 from BritefuryJ.StyleSheet import StyleSheet
 from BritefuryJ.Controls import TabbedBox
 from BritefuryJ.Util import TypeUtils
+from BritefuryJ.Logging import LogView
 
 from BritefuryJ.ObjectPresentation import PresentationStateListenerList
 
@@ -166,7 +167,16 @@ class _FragmentInspector (object):
 
 		explorer = LazyPres( _explorerPres )
 
-		tabs = [ [ Label( 'Console' ), _consoleStyle( self._console ).alignVTop() ], [ Label( 'Element explorer' ), explorer ] ]
+		def _log():
+			l = self._fragment.view.log
+			l.startRecording()
+			return Pres.coerce( LogView( l ) )
+
+		log = LazyPres( _log )
+
+		tabs = [ [ Label( 'Console' ), _consoleStyle( self._console ).alignVTop() ],
+			 [ Label( 'Element explorer' ), explorer ],
+			 [ Label( 'Page log' ), log ] ]
 		return TabbedBox( tabs, None ).alignVTop()
 
 
