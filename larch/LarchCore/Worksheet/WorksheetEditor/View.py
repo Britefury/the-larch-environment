@@ -568,7 +568,9 @@ class WorksheetEditorSubject (Subject):
 
 
 	def getFocus(self):
-		return self._modelView
+		f = self._modelView
+		f.refreshResults()
+		return f
 	
 	def getPerspective(self):
 		return perspective2
