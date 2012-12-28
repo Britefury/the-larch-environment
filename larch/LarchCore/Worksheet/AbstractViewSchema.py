@@ -354,7 +354,6 @@ class InlinePythonCodeAbstractView (NodeAbstractView):
 
 
 	def _refreshResults(self, module):
-		print 'InlinePythonCodeAbstractView._refreshResults'
 		self._result = Execution.getResultOfEvaluationWithinModule( self.getExpr(), module )
 		self._incr.onChanged()
 

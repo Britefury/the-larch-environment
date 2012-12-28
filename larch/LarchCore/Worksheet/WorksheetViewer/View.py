@@ -186,18 +186,15 @@ class WorksheetViewer (MethodDispatchView):
 			else:
 				executionResultView = executionResult.view()
 
-		if node.isResultMinimal():
-			return executionResultView.alignHPack()   if executionResultView is not None   else Proxy()
-		else:
-			boxContents = []
-			if node.isCodeVisible():
-				boxContents.append( _pythonCodeBorderStyle.applyTo( Border( exprView.alignHExpand() ).alignHExpand() ) )
+		if node.isCodeVisible():
+			boxContents = [ _pythonCodeBorderStyle.applyTo( Border( exprView.alignHExpand() ).alignHExpand() ) ]
 			if executionResultView is not None:
 				boxContents.append( executionResultView.alignHExpand() )
 			box = StyleSheet.style( Primitive.rowSpacing( 5.0 ) ).applyTo( Row( boxContents ) )
 
 			return _pythonCodeEditorBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
-
+		else:
+			return executionResultView.alignHPack()   if executionResultView is not None   else Proxy()
 
 
 	@ObjectDispatchMethod( ViewSchema.InlineEmbeddedObjectView )
@@ -299,7 +296,9 @@ class WorksheetViewerSubject (Subject):
 
 
 	def getFocus(self):
-		return self._modelView
+		f = self._modelView
+		f.refreshResults()
+		return f
 	
 	def getPerspective(self):
 		return perspective
