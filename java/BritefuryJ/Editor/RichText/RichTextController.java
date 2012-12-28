@@ -780,22 +780,22 @@ public abstract class RichTextController extends SequentialController
 
 
 
-	protected Object modelToPrefixTag(Object model)
+	protected Tag modelToPrefixTag(Object model)
 	{
 		return modelToEditorModel( model ).prefixTag();
 	}
 	
-	protected Object modelToSuffixTag(Object model)
+	protected Tag modelToSuffixTag(Object model)
 	{
 		return modelToEditorModel( model ).suffixTag();
 	}
 	
-	protected Object modelToRegionStartTag(Object model)
+	protected Tag modelToRegionStartTag(Object model)
 	{
 		return modelToEditorModel( model ).regionStartTag();
 	}
 	
-	protected Object modelToRegionEndTag(Object model)
+	protected Tag modelToRegionEndTag(Object model)
 	{
 		return modelToEditorModel( model ).regionEndTag();
 	}
