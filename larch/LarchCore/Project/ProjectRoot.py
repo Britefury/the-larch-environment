@@ -50,8 +50,8 @@ class ProjectRoot (ProjectContainer):
 		# Need to initialise the ID table before loading contents
 		super( ProjectRoot, self ).__setstate__( state )
 		self._pythonPackageName = state['pythonPackageName']
-		self.__frontPageId = state['frontPageId']
-		self.__startupPageId = state['startupPageId']
+		self.__frontPageId = state.get( 'frontPageId' )
+		self.__startupPageId = state.get( 'startupPageId' )
 
 
 	def __copy__(self):
