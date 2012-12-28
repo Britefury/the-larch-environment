@@ -206,7 +206,7 @@ def _worksheetContextMenuFactory(element, menu):
 
 
 
-	def _onPythonCode(link, event):
+	def _onPythonBlock(link, event):
 		def _makePythonCode():
 			return EditorSchema.PythonCodeEditor.newPythonCode()
 		
@@ -214,7 +214,7 @@ def _worksheetContextMenuFactory(element, menu):
 		if caret.isValid():
 			WorksheetRichTextController.instance.insertParagraphAtCaret( caret, _makePythonCode )
 
-	def _onInlinePythonCode(link, event):
+	def _onPythonExpression(link, event):
 		def _makeInlinePythonCode():
 			return EditorSchema.InlinePythonCodeEditor.newInlinePythonCode()
 
@@ -222,10 +222,10 @@ def _worksheetContextMenuFactory(element, menu):
 		if caret.isValid():
 			WorksheetRichTextController.instance.insertInlineEmbedAtCaret( caret, _makeInlinePythonCode )
 
-	newCode = Hyperlink( 'Python code', _onPythonCode )
-	newInlineCode = Hyperlink( 'Inline Python expression', _onInlinePythonCode )
+	newCode = Button.buttonWithLabel( 'Block', _onPythonBlock )
+	newInlineCode = Button.buttonWithLabel( 'Expression', _onPythonExpression )
 	codeControls = ControlsRow( [ newCode, newInlineCode ] )
-	menu.add( Section( SectionHeading2( 'Code' ), codeControls ).alignHExpand() )
+	menu.add( Section( SectionHeading2( 'Python code' ), codeControls ).alignHExpand() )
 	
 	
 	def _onRefresh(button, event):
@@ -295,8 +295,34 @@ class WorksheetEditor (MethodDispatchView):
 		b = Body( contents ).padX( _worksheetMargin )
 		b = WorksheetRichTextController.instance.editableBlock( node, b )
 		return b
-	
-	
+
+
+	@ObjectDispatchMethod( EditorSchema.BlankParagraphEditor )
+	def BlankParagraph(self, fragment, inheritedState, node):
+		style = node.getStyle()
+		if style == 'normal':
+			p = NormalText( '' )
+		elif style == 'h1':
+			p = Heading1( '' )
+		elif style == 'h2':
+			p = Heading2( '' )
+		elif style == 'h3':
+			p = Heading3( '' )
+		elif style == 'h4':
+			p = Heading4( '' )
+		elif style == 'h5':
+			p = Heading5( '' )
+		elif style == 'h6':
+			p = Heading6( '' )
+		elif style == 'title':
+			p = TitleBar( '' )
+		else:
+			p = NormalText( '' )
+		p = WorksheetRichTextController.instance.editableParagraph( node, p )
+		p = _applyBlankParagraphShortcuts( p )
+		return p
+
+
 	@ObjectDispatchMethod( EditorSchema.ParagraphEditor )
 	def Paragraph(self, fragment, inheritedState, node):
 		text = node.getText()
@@ -372,32 +398,6 @@ class WorksheetEditor (MethodDispatchView):
 		p = _linkStyle.applyTo( ApplyStyleSheetFromAttribute( Controls.hyperlinkAttrs, Label( node.text ) ) )
 		p = p.withContextMenuInteractor( _linkContextMenuFactory )
 		p = WorksheetRichTextController.instance.editableInlineEmbed( node, p )
-		return p
-
-
-	@ObjectDispatchMethod( EditorSchema.BlankParagraphEditor )
-	def BlankParagraph(self, fragment, inheritedState, node):
-		style = node.getStyle()
-		if style == 'normal':
-			p = NormalText( '' )
-		elif style == 'h1':
-			p = Heading1( '' )
-		elif style == 'h2':
-			p = Heading2( '' )
-		elif style == 'h3':
-			p = Heading3( '' )
-		elif style == 'h4':
-			p = Heading4( '' )
-		elif style == 'h5':
-			p = Heading5( '' )
-		elif style == 'h6':
-			p = Heading6( '' )
-		elif style == 'title':
-			p = TitleBar( '' )
-		else:
-			p = NormalText( '' )
-		p = WorksheetRichTextController.instance.editableParagraph( node, p )
-		p = _applyBlankParagraphShortcuts( p )
 		return p
 
 
@@ -569,6 +569,7 @@ class WorksheetEditorSubject (Subject):
 
 	def getFocus(self):
 		f = self._modelView
+		# This causes execution results to refresh on page view
 		f.refreshResults()
 		return f
 	

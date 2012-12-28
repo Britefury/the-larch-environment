@@ -282,7 +282,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			int index = 0;
 			for (PresentationPopup p: popups)
 			{
-				if ( p.isChainStart() )
+				if ( p.isChainStart()  &&  index != 0 )
 				{
 					// Request focus for remaining popup window
 					p.popupWindow.requestFocus();

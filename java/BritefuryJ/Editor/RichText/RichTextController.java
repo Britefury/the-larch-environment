@@ -649,10 +649,16 @@ public abstract class RichTextController extends SequentialController
 		modelToTags( tags, model );
 		
 		List<Object> flattened = Flatten.flattenParagraphs( tags );
+		List<Object> flattenedForLog = null;
+		if ( log.isRecording() )
+		{
+			flattenedForLog = new ArrayList<Object>();
+			flattenedForLog.addAll( flattened );
+		}
 		List<Object> paras = Merge.mergeParagraphs( flattened );
 		if ( log.isRecording() )
 		{
-			log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setBlockContentsFromRawRichString" ).vItem( "tags", tags ).vItem( "paras", paras ) );
+			log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setBlockContentsFromRawRichString" ).vItem( "tags", tags ).vItem( "flattened", flattenedForLog ).vItem( "paras", paras ) );
 		}
 		setModelContentsFromEditorModelRichString( model, new RichStringBuilder( paras ).richString() );
 	}

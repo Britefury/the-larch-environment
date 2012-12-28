@@ -297,6 +297,7 @@ class WorksheetViewerSubject (Subject):
 
 	def getFocus(self):
 		f = self._modelView
+		# This causes execution results to refresh on page view
 		f.refreshResults()
 		return f
 	

@@ -100,7 +100,6 @@ class BodyEditor (AbstractViewSchema.BodyAbstractView):
 
 
 	def setContents(self, contents):
-		print 'setContents {0}'.format(contents)
 		modelContents = [ x.getModel()   for x in contents   if not isinstance( x, BlankParagraphEditor ) ]
 		self._model['contents'] = modelContents
 
@@ -127,7 +126,7 @@ class BlankParagraphEditor (AbstractViewSchema.NodeAbstractView):
 		return ''
 
 	def setContents(self, contents):
-		print 'BlankParagraphEditor.setContents: contents={0}'.format(repr(contents))
+		self._editorModel.setModelContents( WSEditor.RichTextController.WorksheetRichTextController.instance, contents )
 		if len( contents ) == 0:
 			return
 		elif len( contents ) == 1  and  contents[0] == '':
