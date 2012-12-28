@@ -31,7 +31,7 @@ class WorksheetRichTextController (RichTextController):
 #		else:
 #			raise TypeError, 'Unknown inline embed type {0}'.format( value.getDMClass().getName() )
 		assert not isinstance( value, DMObject )
-		if isinstance( value, EditorSchema.LinkEditor )  or  isinstance( value, EditorSchema.InlineEmbeddedObjectEditor ):
+		if isinstance( value, EditorSchema.InlinePythonCodeEditor )  or  isinstance( value, EditorSchema.LinkEditor )  or  isinstance( value, EditorSchema.InlineEmbeddedObjectEditor ):
 			return value.copy()
 		else:
 			raise TypeError, 'Unknown inline embed proxy type {0}'.format( type( value ) )

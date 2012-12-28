@@ -1181,9 +1181,13 @@ def compileForExecution(pythonCode, filename):
 def compileForExecutionAndEvaluation(pythonCode, filename):
 	return Python2CodeGenerator( filename ).compileForExecutionAndEvaluation( pythonCode )
 
-				
-				
-				
+
+
+
+def compileForModuleEvaluation(module, pythonExpression, filename):
+	return Python2ModuleCodeGenerator( module, filename ).compileForEvaluation( pythonExpression )
+
+
 def compileForModuleExecution(module, pythonCode, filename):
 	return Python2ModuleCodeGenerator( module, filename ).compileForExecution( pythonCode )
 

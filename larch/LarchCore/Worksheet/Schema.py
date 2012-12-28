@@ -10,6 +10,7 @@ from BritefuryJ.DocModel import DMSchema, DMObjectClass
 
 
 
+
 schema = DMSchema( 'Worksheet', 'ws', 'LarchCore.Worksheet', 3 )
 
 
@@ -30,6 +31,7 @@ StyleAttr = schema.newClass( 'StyleAttr', WorksheetNode, [ 'name', 'value' ] )
 
 
 PythonCode = schema.newClass( 'PythonCode', WorksheetNode, [ 'code', 'style' ] )
+InlinePythonCode = schema.newClass( 'InlinePythonCode', WorksheetNode, [ 'expr', 'style' ] )
 
 
 InlineEmbeddedObject = schema.newClass( 'InlineEmbeddedObject', WorksheetNode, [ 'embeddedValue' ] )
