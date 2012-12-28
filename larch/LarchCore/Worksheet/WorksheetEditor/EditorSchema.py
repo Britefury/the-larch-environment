@@ -12,7 +12,7 @@ from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, methodDispatch
 
-from LarchCore.Languages.Python2 import Python2
+from LarchCore.Languages.Python2.Embedded import _py25NewModule, _py25NewExpr
 
 from LarchCore.Worksheet import Schema
 from LarchCore.Worksheet import AbstractViewSchema
@@ -48,7 +48,11 @@ class _Projection (object):
 	@DMObjectNodeDispatchMethod( Schema.PythonCode )
 	def pythonCode(self, worksheet, node):
 		return PythonCodeEditor( worksheet, node )
-	
+
+	@DMObjectNodeDispatchMethod( Schema.InlinePythonCode )
+	def inlinePythonCode(self, worksheet, node):
+		return InlinePythonCodeEditor( worksheet, node )
+
 	@DMObjectNodeDispatchMethod( Schema.InlineEmbeddedObject )
 	def inlineEmbeddedObject(self, worksheet, node):
 		return InlineEmbeddedObjectEditor( worksheet, node )
@@ -319,7 +323,45 @@ class PythonCodeEditor (AbstractViewSchema.PythonCodeAbstractView):
 
 	@staticmethod
 	def newPythonCodeModel():
-		return Schema.PythonCode( style='code_result', code=Python2._py25NewModule() )
+		return Schema.PythonCode( style='code_result', code=_py25NewModule() )
+
+
+
+class InlinePythonCodeEditor (AbstractViewSchema.InlinePythonCodeAbstractView):
+	def __init__(self, worksheet, model):
+		super( InlinePythonCodeEditor, self ).__init__( worksheet, model )
+		self._editorModel = WSEditor.RichTextController.WorksheetRichTextController.instance.editorModelInlineEmbed( self )
+
+
+	def setExpr(self, expr):
+		self._model['expr'] = expr
+
+
+
+	def setStyle(self, style):
+		try:
+			name = self._styleToName[style]
+		except KeyError:
+			raise ValueError, 'invalid style'
+		self._model['style'] = name
+
+
+	def copy(self, worksheet=None):
+		return InlinePythonCodeEditor( worksheet, self._model )
+
+
+	def __clipboard_copy__(self, memo):
+		return InlinePythonCodeEditor( None, memo.copy( self._model ) )
+
+
+	@staticmethod
+	def newInlinePythonCode():
+		m = InlinePythonCodeEditor.newInlinePythonCodeModel()
+		return InlinePythonCodeEditor( None, m )
+
+	@staticmethod
+	def newInlinePythonCodeModel():
+		return Schema.InlinePythonCode( style='minimal_result', expr=_py25NewExpr() )
 
 
 

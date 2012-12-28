@@ -124,7 +124,9 @@ class _TextAbstractView (NodeAbstractView):
 
 
 	def _refreshResults(self, module):
-		pass
+		for x in self.getText():
+			if not isinstance( x, str )  and  not isinstance( x, unicode ):
+				x._refreshResults( module )
 
 
 	def _computeText(self):
@@ -144,10 +146,6 @@ class ParagraphAbstractView (_TextAbstractView):
 		
 	def getStyle(self):
 		return self._model['style']
-	
-
-	def _refreshResults(self, module):
-		pass
 
 		
 		
@@ -166,10 +164,6 @@ class TextSpanAbstractView (_TextAbstractView):
 
 
 
-	def _refreshResults(self, module):
-		pass
-
-		
 	_styleMap = {}
 	_styleMap['italic'] = lambda value: Primitive.fontItalic( bool( value ) )
 	_styleMap['bold'] = lambda value: Primitive.fontBold( bool( value ) )
@@ -248,8 +242,8 @@ class PythonCodeAbstractView (NodeAbstractView):
 	def getCode(self):
 		return self._model['code']
 
-		
-		
+
+
 	def getStyle(self):
 		name = self._model['style']
 		try:
@@ -298,6 +292,70 @@ class PythonCodeAbstractView (NodeAbstractView):
 		
 	def _refreshResults(self, module):
 		self._result = Execution.getResultOfExecutionWithinModule( self.getCode(), module, self.isResultVisible() )
+		self._incr.onChanged()
+
+
+
+
+class InlinePythonCodeAbstractView (NodeAbstractView):
+	STYLE_MINIMAL_RESULT = 0
+	STYLE_RESULT = 1
+	STYLE_CODE_AND_RESULT = 2
+	STYLE_EDITABLE_CODE_AND_RESULT = 3
+
+	_styleToName  = { STYLE_MINIMAL_RESULT : 'minimal_result',
+			  STYLE_RESULT : 'result',
+			  STYLE_CODE_AND_RESULT : 'code_result',
+			  STYLE_EDITABLE_CODE_AND_RESULT : 'editable_code_result' }
+
+	_nameToStyle  = { 'minimal_result' : STYLE_MINIMAL_RESULT,
+			  'result' : STYLE_RESULT,
+			  'code_result' : STYLE_CODE_AND_RESULT,
+			  'editable_code_result' : STYLE_EDITABLE_CODE_AND_RESULT }
+
+
+	def __init__(self, worksheet, model):
+		NodeAbstractView.__init__( self, worksheet, model )
+		self._incr = IncrementalValueMonitor( self )
+		self._result = None
+
+
+	def getExpr(self):
+		return self._model['expr']
+
+
+
+	def getStyle(self):
+		name = self._model['style']
+		try:
+			return self._nameToStyle[name]
+		except KeyError:
+			return self.STYLE_CODE_AND_RESULT
+
+
+	def isCodeVisible(self):
+		style = self.getStyle()
+		return style == self.STYLE_CODE_AND_RESULT  or  style == self.STYLE_EDITABLE_CODE_AND_RESULT
+
+	def isCodeEditable(self):
+		style = self.getStyle()
+		return style == self.STYLE_EDITABLE_CODE_AND_RESULT
+
+	def isResultMinimal(self):
+		style = self.getStyle()
+		return style == self.STYLE_MINIMAL_RESULT
+
+
+
+	def getResult(self):
+		self._incr.onAccess()
+		return self._result
+
+
+
+	def _refreshResults(self, module):
+		print 'InlinePythonCodeAbstractView._refreshResults'
+		self._result = Execution.getResultOfEvaluationWithinModule( self.getExpr(), module )
 		self._incr.onChanged()
 
 

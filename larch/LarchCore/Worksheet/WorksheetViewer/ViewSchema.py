@@ -43,7 +43,11 @@ class _Projection (object):
 	@DMObjectNodeDispatchMethod( Schema.PythonCode )
 	def pythonCode(self, worksheet, node):
 		return PythonCodeView( worksheet, node )
-	
+
+	@DMObjectNodeDispatchMethod( Schema.InlinePythonCode )
+	def inlinePythonCode(self, worksheet, node):
+		return InlinePythonCodeView( worksheet, node )
+
 	@DMObjectNodeDispatchMethod( Schema.InlineEmbeddedObject )
 	def inlineEmbeddedObject(self, worksheet, node):
 		return InlineEmbeddedObjectView( worksheet, node )
@@ -77,9 +81,14 @@ class TextSpanView (AbstractViewSchema.TextSpanAbstractView):
 class LinkView (AbstractViewSchema.LinkAbstractView):
 	pass
 
-		
-		
+
+
 class PythonCodeView (AbstractViewSchema.PythonCodeAbstractView):
+	pass
+
+		
+		
+class InlinePythonCodeView (AbstractViewSchema.InlinePythonCodeAbstractView):
 	pass
 
 

@@ -198,13 +198,6 @@ def getResultOfExecutionWithinModule(pythonCode, module, bEvaluate):
 		setattr( module, 'display', std.out.display )
 		setattr( module, 'displayerr', std.err.display )
 
-		def _exec():
-			exec execCode in module.__dict__
-			if evalCode is not None:
-				return [ eval( evalCode, module.__dict__ ) ]
-			else:
-				return None
-
 		try:
 			exec execCode in module.__dict__
 			if evalCode is not None:
@@ -245,13 +238,6 @@ def getResultOfExecutionInScopeWithinModule(pythonCode, globals, locals, module,
 		setattr( module, 'display', std.out.display )
 		setattr( module, 'displayerr', std.err.display )
 
-		def _exec():
-			exec execCode in globals, locals
-			if evalCode is not None:
-				return [ eval( evalCode, globals, locals ) ]
-			else:
-				return None
-
 		try:
 			exec execCode in globals, locals
 			if evalCode is not None:
@@ -260,7 +246,64 @@ def getResultOfExecutionInScopeWithinModule(pythonCode, globals, locals, module,
 			caughtException = JythonException.getCurrentException()
 
 		sys.stdout, sys.stderr = savedStdout, savedStderr
+	return ExecutionResult( std, caughtException, result )
 
+
+
+
+
+def getResultOfEvaluationWithinModule(pythonExpr, module):
+	std = MultiplexedRichStream( [ 'out', 'err' ] )
+
+	evalCode = None
+	caughtException = None
+	result = None
+	try:
+		evalCode = CodeGenerator.compileForModuleEvaluation( module, pythonExpr, module.__name__ )
+	except:
+		caughtException = JythonException.getCurrentException()
+
+	if evalCode is not None:
+		savedStdout, savedStderr = sys.stdout, sys.stderr
+		sys.stdout = std.out
+		sys.stderr = std.err
+
+		try:
+			result = [ eval( evalCode, module.__dict__ ) ]
+		except:
+			caughtException = JythonException.getCurrentException()
+
+		sys.stdout, sys.stderr = savedStdout, savedStderr
+	return ExecutionResult( std, caughtException, result )
+
+
+def getResultOfEvaluationInScopeWithinModule(pythonExpr, globals, locals, module):
+	std = MultiplexedRichStream( [ 'out', 'err' ] )
+
+	evalCode = None
+	caughtException = None
+	result = None
+	try:
+		evalCode = CodeGenerator.compileForModuleEvaluation( module, pythonExpr, module.__name__ )
+	except:
+		caughtException = JythonException.getCurrentException()
+
+	if globals is None:
+		globals = module.__dict__
+	if locals is None:
+		locals = module.__dict__
+
+	if evalCode is not None:
+		savedStdout, savedStderr = sys.stdout, sys.stderr
+		sys.stdout = std.out
+		sys.stderr = std.err
+
+		try:
+			result = [ eval( evalCode, globals, locals ) ]
+		except:
+			caughtException = JythonException.getCurrentException()
+
+		sys.stdout, sys.stderr = savedStdout, savedStderr
 	return ExecutionResult( std, caughtException, result )
 
 

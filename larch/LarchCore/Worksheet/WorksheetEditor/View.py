@@ -48,6 +48,7 @@ _editableStyle = StyleSheet.style( Primitive.editable( True ) )
 
 _pythonCodeBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) ) )
 _pythonCodeBox = BorderWithHeaderBar( SolidBorder( 1.5, 4.0, 10.0, 10.0, Color( 0.4, 0.4, 0.5 ), None ), Color( 0.825, 0.825, 0.875 ) )
+_inlinePythonCodeBorder = SolidBorder( 1.5, 4.0, 10.0, 10.0, Color( 0.4, 0.4, 0.5 ), None )
 
 _worksheetMargin = 10.0
 
@@ -213,8 +214,17 @@ def _worksheetContextMenuFactory(element, menu):
 		if caret.isValid():
 			WorksheetRichTextController.instance.insertParagraphAtCaret( caret, _makePythonCode )
 
+	def _onInlinePythonCode(link, event):
+		def _makeInlinePythonCode():
+			return EditorSchema.InlinePythonCodeEditor.newInlinePythonCode()
+
+		caret = rootElement.getCaret()
+		if caret.isValid():
+			WorksheetRichTextController.instance.insertInlineEmbedAtCaret( caret, _makeInlinePythonCode )
+
 	newCode = Hyperlink( 'Python code', _onPythonCode )
-	codeControls = ControlsRow( [ newCode ] )
+	newInlineCode = Hyperlink( 'Inline Python expression', _onInlinePythonCode )
+	codeControls = ControlsRow( [ newCode, newInlineCode ] )
 	menu.add( Section( SectionHeading2( 'Code' ), codeControls ).alignHExpand() )
 	
 	
@@ -441,6 +451,53 @@ class WorksheetEditor (MethodDispatchView):
 		p = _pythonCodeBox.surround( headerBox.padY( 0.0, 3.0 ), box.padY( 5.0, 0.0 ) )
 
 		p = WorksheetRichTextController.instance.editableParagraphEmbed( node, p )
+		return p.alignHExpand()
+
+
+	@ObjectDispatchMethod( EditorSchema.InlinePythonCodeEditor )
+	def InlinePythonCode(self, fragment, inheritedState, node):
+		assert isinstance( node, EditorSchema.InlinePythonCodeEditor )
+		choiceValues = [
+			EditorSchema.InlinePythonCodeEditor.STYLE_MINIMAL_RESULT,
+			EditorSchema.InlinePythonCodeEditor.STYLE_RESULT,
+			EditorSchema.InlinePythonCodeEditor.STYLE_CODE_AND_RESULT,
+			EditorSchema.InlinePythonCodeEditor.STYLE_EDITABLE_CODE_AND_RESULT ]
+
+
+		def _onStyleOptionMenu(optionMenu, prevChoice, choice):
+			style = choiceValues[choice]
+			node.setStyle( style )
+
+
+		def _inlinePythonCodeContextMenuFactory(element, menu):
+			def _onDelete(control):
+				WorksheetRichTextController.instance.deleteInlineEmbedContainingElement( element )
+
+			optionTexts = [ 'Minimal result', 'Result', 'Code with result', 'Editable code with result' ]
+			optionChoices = [ StaticText( text )   for text in optionTexts ]
+			styleOptionMenu = OptionMenu( optionChoices, choiceValues.index( node.getStyle() ), _onStyleOptionMenu )
+
+			deleteItem = MenuItem.menuItemWithLabel( 'Delete', _onDelete )
+
+			menu.add( deleteItem )
+			menu.add( Row( [ Label( 'Style: ' ), styleOptionMenu ] ) )
+			return True
+
+
+		exprView = Python2.python2EditorPerspective.applyTo( node.getExpr() )
+
+		executionResult = node.getResult()
+		executionResultView = executionResult.view()   if executionResult is not None   else None
+
+		boxContents = [ _pythonCodeBorderStyle.applyTo( Border( exprView ) ) ]
+		if executionResultView is not None:
+			boxContents.append( executionResultView )
+		box = StyleSheet.style( Primitive.rowSpacing( 5.0 ) ).applyTo( Row( boxContents ) )
+
+		p = _inlinePythonCodeBorder.surround( box )
+
+		p = p.withContextMenuInteractor( _inlinePythonCodeContextMenuFactory )
+		p = WorksheetRichTextController.instance.editableInlineEmbed( node, p )
 		return p.alignHExpand()
 
 

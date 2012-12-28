@@ -23,7 +23,7 @@ from BritefuryJ.Graphics import SolidBorder
 from BritefuryJ.StyleSheet import StyleSheet
 from BritefuryJ.Controls import Button, Hyperlink
 from BritefuryJ.Pres import Pres, ApplyPerspective
-from BritefuryJ.Pres.Primitive import Primitive, Blank, Border, Column
+from BritefuryJ.Pres.Primitive import Primitive, Blank, Border, Column, Row, Proxy
 from BritefuryJ.Pres.RichText import TitleBar, Heading1, Heading2, Heading3, Heading4, Heading4, Heading5, Heading6, NormalText, RichSpan, Page, Body, LinkHeaderBar
 from BritefuryJ.Pres.ObjectPres import ObjectBorder
 from BritefuryJ.Pres.UI import Section, SectionHeading2, ControlsRow
@@ -168,6 +168,38 @@ class WorksheetViewer (MethodDispatchView):
 
 
 
+	@ObjectDispatchMethod( ViewSchema.InlinePythonCodeView )
+	def InlinePythonCode(self, fragment, inheritedState, node):
+		assert isinstance(node, ViewSchema.InlinePythonCodeView)
+		if node.isCodeVisible():
+			exprView = Python2.python2EditorPerspective.applyTo( Pres.coerce( node.getExpr() ) )
+			if node.isCodeEditable():
+				exprView = StyleSheet.style( Primitive.editable( True ) ).applyTo( exprView )
+		else:
+			exprView = None
+
+		executionResultView = None
+		executionResult = node.getResult()
+		if executionResult is not None:
+			if node.isResultMinimal():
+				executionResultView = executionResult.minimalView()
+			else:
+				executionResultView = executionResult.view()
+
+		if node.isResultMinimal():
+			return executionResultView.alignHPack()   if executionResultView is not None   else Proxy()
+		else:
+			boxContents = []
+			if node.isCodeVisible():
+				boxContents.append( _pythonCodeBorderStyle.applyTo( Border( exprView.alignHExpand() ).alignHExpand() ) )
+			if executionResultView is not None:
+				boxContents.append( executionResultView.alignHExpand() )
+			box = StyleSheet.style( Primitive.rowSpacing( 5.0 ) ).applyTo( Row( boxContents ) )
+
+			return _pythonCodeEditorBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
+
+
+
 	@ObjectDispatchMethod( ViewSchema.InlineEmbeddedObjectView )
 	def InlineEmbeddedObject(self, fragment, inheritedState, node):
 		value = node.value
@@ -205,8 +237,6 @@ class _WorksheetModuleLoader (object):
 			pass
 
 		mod = self._document.newModule( fullname, self )
-		
-		sources = []
 		
 		worksheet = self._model
 		body = worksheet['body']
