@@ -10,8 +10,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Stack;
+import java.util.regex.Pattern;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
@@ -22,7 +22,6 @@ import BritefuryJ.Pres.Primitive.Border;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleSheet;
-import BritefuryJ.Util.StringSplit;
 
 class Flatten
 {
@@ -41,6 +40,9 @@ class Flatten
 	}
 	
 	
+	private static Pattern newlinePattern = Pattern.compile( "\n" );
+	
+	
 	// Replace newline characters in strings with newline tokens
 	// SHOULD IMPLEMENT AS ITERATOR, BUT I'M BUGGERED IF I AM GOING TO SPEND TIME CONVERTING A NICE PYTHON GENERATOR TO A JAVA ITERATOR......
 	private static ArrayList<Object> newlineSplit(Iterable<Object> xs)
@@ -50,15 +52,15 @@ class Flatten
 		{
 			if ( x instanceof String  &&  ((String)x).contains( "\n" ) )
 			{
-				List<String> lines = StringSplit.split( (String)x, "\n" );
-				result.add( lines.get( 0 ) );
-				for (int i = 1; i < lines.size(); i++)
+				String lines[] = newlinePattern.split( (String)x, -1 );
+				result.add( lines[0] );
+				for (int i = 1; i < lines.length; i++)
 				{
 					result.add( Newline.instance );
-					String line = lines.get( i );
+					String line = lines[i];
 					if ( line.length() > 0 )
 					{
-						result.add( lines.get( i ) );
+						result.add( line );
 					}
 				}
 			}
@@ -85,7 +87,7 @@ class Flatten
 			}
 			else
 			{
-				if ( text.length() > 0 )
+				if ( text.length() > 0  ||  result.size() == 0 )
 				{
 					result.add( text.toString() );
 					text = new StringBuilder();
