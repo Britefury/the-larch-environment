@@ -646,7 +646,20 @@ public abstract class RichTextController extends SequentialController
 	private void setBlockContentsFromRawRichString(Log log, Object model, RichString value)
 	{
 		ArrayList<Object> tags = new ArrayList<Object>();
-		modelToTags( tags, model );
+		
+		for (RichString.Item item: value.getItems())
+		{
+			if ( item.isStructural() )
+			{
+				RichString.StructuralItem structural = (RichString.StructuralItem)item;
+				modelToTags( tags, structural.getValue() );
+			}
+			else
+			{
+				RichString.TextItem text = (RichString.TextItem)item;
+				tags.add( text.getValue() );
+			}
+		}
 		
 		List<Object> flattened = Flatten.flattenParagraphs( tags );
 		List<Object> flattenedForLog = null;
