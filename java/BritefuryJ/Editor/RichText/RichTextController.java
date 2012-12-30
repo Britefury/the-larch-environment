@@ -583,7 +583,7 @@ public abstract class RichTextController extends SequentialController
 	//
 
 
-	protected boolean setTextContentsFromRichString(Log log, Object model, RichString value)
+	private boolean setTextContentsFromRichString(Log log, Object model, RichString value)
 	{
 		if ( log.isRecording() )
 		{
@@ -593,7 +593,7 @@ public abstract class RichTextController extends SequentialController
 		return !value.contains( "\n" );
 	}
 
-	protected boolean setParagraphTextContentsFromRichString(Log log, Object model, RichString value)
+	private boolean setParagraphTextContentsFromRichString(Log log, Object model, RichString value)
 	{
 		if ( value.endsWith( "\n" ) )
 		{
@@ -619,7 +619,7 @@ public abstract class RichTextController extends SequentialController
 	}
 
 
-	protected boolean setParagraphContentsFromCompleteParagraphRichString(Log log, Object paragraph, RichString richStr)
+	private boolean setParagraphContentsFromCompleteParagraphRichString(Log log, Object paragraph, RichString richStr)
 	{
 		if ( log.isRecording() )
 		{
@@ -643,7 +643,7 @@ public abstract class RichTextController extends SequentialController
 	}
 
 
-	protected void setBlockContentsFromRawRichString(Log log, Object model, RichString value)
+	private void setBlockContentsFromRawRichString(Log log, Object model, RichString value)
 	{
 		ArrayList<Object> tags = new ArrayList<Object>();
 		modelToTags( tags, model );
@@ -687,7 +687,7 @@ public abstract class RichTextController extends SequentialController
 	}
 
 	
-	protected Object convertModelToEditorModel(Object model)
+	private Object convertModelToEditorModel(Object model)
 	{
 		if ( model instanceof String )
 		{
@@ -764,7 +764,7 @@ public abstract class RichTextController extends SequentialController
 	}
 
 	
-	protected void setModelContentsFromEditorModelRichString(Object model, RichString richString)
+	private void setModelContentsFromEditorModelRichString(Object model, RichString richString)
 	{
 		List<Object> modelValues = editorModelListToModelList( richString.getItemValues() );
 		
@@ -780,44 +780,44 @@ public abstract class RichTextController extends SequentialController
 
 
 
-	protected Tag modelToPrefixTag(Object model)
+	private Tag modelToPrefixTag(Object model)
 	{
 		return modelToEditorModel( model ).prefixTag();
 	}
 	
-	protected Tag modelToSuffixTag(Object model)
+	private Tag modelToSuffixTag(Object model)
 	{
 		return modelToEditorModel( model ).suffixTag();
 	}
 	
-	protected Tag modelToRegionStartTag(Object model)
+	private Tag modelToRegionStartTag(Object model)
 	{
 		return modelToEditorModel( model ).regionStartTag();
 	}
 	
-	protected Tag modelToRegionEndTag(Object model)
+	private Tag modelToRegionEndTag(Object model)
 	{
 		return modelToEditorModel( model ).regionEndTag();
 	}
 	
-	protected void modelToTags(List<Object> tags, Object model)
+	private void modelToTags(List<Object> tags, Object model)
 	{
 		modelToEditorModel( model ).buildTagList( tags );
 	}
 	
 	
 	
-	protected boolean isStyleSpan(Object model)
+	private boolean isStyleSpan(Object model)
 	{
 		return modelToEditorModel( model ) instanceof EdStyleSpan;
 	}
 	
-	protected boolean isParagraph(Object model)
+	private boolean isParagraph(Object model)
 	{
 		return modelToEditorModel( model ) instanceof EdParagraph;
 	}
 	
-	protected boolean isBlock(Object model)
+	private boolean isBlock(Object model)
 	{
 		return modelToEditorModel( model ) instanceof EdBlock;
 	}
@@ -924,7 +924,7 @@ public abstract class RichTextController extends SequentialController
 
 
 
-	protected void insertInlineEmbed(Log log, LSElement element, Object paragraph, Marker marker, EdInlineEmbed embed)
+	private void insertInlineEmbed(Log log, LSElement element, Object paragraph, Marker marker, EdInlineEmbed embed)
 	{
 		Visitor v1 = new TagsVisitor( this );
 		v1.visitFromStartOfRootToMarker( marker, element );
@@ -938,7 +938,7 @@ public abstract class RichTextController extends SequentialController
 		setParagraphContentsFromCompleteParagraphRichString( log, paragraph, new RichStringBuilder( splicedMerged ).richString() );
 	}
 
-	protected void removeInlineEmbedFromText(Log log, LSElement paragraphElement, LSElement embedElement, Object paragraphModel, Object textModel, Object embedModel)
+	private void removeInlineEmbedFromText(Log log, LSElement paragraphElement, LSElement embedElement, Object paragraphModel, Object textModel, Object embedModel)
 	{
 		Visitor v1 = new TagsVisitor( this );
 		v1.visitFromStartOfRootToElement( embedElement, paragraphElement );
@@ -1038,7 +1038,7 @@ public abstract class RichTextController extends SequentialController
 	
 
 	
-	protected RichString richStringWithModifiedSelectionStyle(LSElement element, TextSelection selection, ComputeSpanStylesFn computeStylesFn)
+	private RichString richStringWithModifiedSelectionStyle(LSElement element, TextSelection selection, ComputeSpanStylesFn computeStylesFn)
 	{
 		FragmentView editFragment = (FragmentView)element.getFragmentContext();
 		LSElement editFragmentElement = editFragment.getFragmentElement();
