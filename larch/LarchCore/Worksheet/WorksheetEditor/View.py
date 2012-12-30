@@ -224,7 +224,7 @@ def _worksheetContextMenuFactory(element, menu):
 
 	newCode = Button.buttonWithLabel( 'Block', _onPythonBlock )
 	newInlineCode = Button.buttonWithLabel( 'Expression', _onPythonExpression )
-	codeControls = ControlsRow( [ newCode, newInlineCode ] )
+	codeControls = ControlsRow( [ newCode, newInlineCode ] ).alignHPack()
 	menu.add( Section( SectionHeading2( 'Python code' ), codeControls ).alignHExpand() )
 	
 	
