@@ -41,9 +41,9 @@ class ObjectDispatchMethodWrapper (object):
 		args, varargs, varkw, defaults = inspect.getargspec( unwrapped )
 		
 		if varargs is not None:
-			raise ObjectNodeDispatchMethodCannotHaveVarArgs( function.__name__ )
+			raise ObjectDispatchMethodCannotHaveVarArgs( unwrapped.__name__ )
 		if varkw is not None:
-			raise ObjectDispatchMethodCannotHaveVarKWArgs( function.__name__ )
+			raise ObjectDispatchMethodCannotHaveVarKWArgs( unwrapped.__name__ )
 		
 		return ObjectDispatchPyMethodInvoker( self._function )
 
