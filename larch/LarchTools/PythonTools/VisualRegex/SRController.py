@@ -12,11 +12,9 @@ from BritefuryJ.DocModel import DMNode
 from BritefuryJ.LSpace.TextFocus import TextSelection
 
 from BritefuryJ.Editor.Sequential import SequentialClipboardHandler, SelectionEditTreeEvent
+from BritefuryJ.Editor.Sequential.py import EditRuleApplicator
 
 from BritefuryJ.Editor.SyntaxRecognizing import SyntaxRecognizingController
-
-
-from Britefury.SequentialEditor.Helpers import EditRuleDecorator
 
 
 from LarchTools.PythonTools.VisualRegex import Schema, Parser
@@ -95,9 +93,9 @@ class VisualRegexSyntaxRecognizingController (SyntaxRecognizingController):
 
 
 
-	expression = EditRuleDecorator( lambda self: self._expressionEditRule )
-	unparsed = EditRuleDecorator( lambda self: self._unparsedEditRule )
-	expressionTopLevel = EditRuleDecorator( lambda self: self._expressionTopLevelEditRule )
+	expression = EditRuleApplicator( lambda self: self._expressionEditRule )
+	unparsed = EditRuleApplicator( lambda self: self._unparsedEditRule )
+	expressionTopLevel = EditRuleApplicator( lambda self: self._expressionTopLevelEditRule )
 
 
 
