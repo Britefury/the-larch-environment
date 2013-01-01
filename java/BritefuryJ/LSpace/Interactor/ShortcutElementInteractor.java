@@ -45,7 +45,14 @@ public class ShortcutElementInteractor implements KeyElementInteractor
 		ShortcutElementAction action = shortcuts.get( Shortcut.fromPressedEvent( event ) );
 		if ( action != null )
 		{
-			action.invoke( element );
+			try
+			{
+				action.invoke( element );
+			}
+			catch (Throwable e)
+			{
+				element.notifyExceptionDuringElementInteractor( action, "invoke", e );
+			}
 			return true;
 		}
 		return false;

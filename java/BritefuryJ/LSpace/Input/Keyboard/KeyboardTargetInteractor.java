@@ -245,9 +245,16 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 					for (AbstractElementInteractor interactor: interactors )
 					{
 						KeyElementInteractor keyInt = (KeyElementInteractor)interactor;
-						if ( keyInt.keyPressed( element, event ) )
+						try
 						{
-							return true;
+							if ( keyInt.keyPressed( element, event ) )
+							{
+								return true;
+							}
+						}
+						catch (Throwable e)
+						{
+							element.notifyExceptionDuringElementInteractor( keyInt, "keyPressed", e );
 						}
 					}
 				}
@@ -273,9 +280,16 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 					for (AbstractElementInteractor interactor: interactors )
 					{
 						KeyElementInteractor keyInt = (KeyElementInteractor)interactor;
-						if ( keyInt.keyReleased( element, event ) )
+						try
 						{
-							return true;
+							if ( keyInt.keyReleased( element, event ) )
+							{
+								return true;
+							}
+						}
+						catch (Throwable e)
+						{
+							element.notifyExceptionDuringElementInteractor( keyInt, "keyReleased", e );
 						}
 					}
 				}
@@ -301,9 +315,16 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 					for (AbstractElementInteractor interactor: interactors )
 					{
 						KeyElementInteractor keyInt = (KeyElementInteractor)interactor;
-						if ( keyInt.keyTyped( element, event ) )
+						try
 						{
-							return true;
+							if ( keyInt.keyTyped( element, event ) )
+							{
+								return true;
+							}
+						}
+						catch (Throwable e)
+						{
+							element.notifyExceptionDuringElementInteractor( keyInt, "keyTyped", e );
 						}
 					}
 				}

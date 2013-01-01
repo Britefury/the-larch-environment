@@ -805,7 +805,14 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		rootSpaceMouse.setButtonModifiers( buttonModifiers );
 		rootSpaceMouse.setKeyModifiers( keyModifiers );
 		
-		rootSpaceMouse.buttonDown( windowPos, button );
+		try
+		{
+			rootSpaceMouse.buttonDown( windowPos, button );
+		}
+		catch (Throwable e)
+		{
+			notifyExceptionDuringEventHandler( "mouseDownEvent", e );
+		}
 
 		emitImmediateEvents();
 	}
@@ -820,7 +827,14 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		rootSpaceMouse.setKeyModifiers( keyModifiers );
 
 		
-		rootSpaceMouse.buttonUp( windowPos, button );
+		try
+		{
+			rootSpaceMouse.buttonUp( windowPos, button );
+		}
+		catch (Throwable e)
+		{
+			notifyExceptionDuringEventHandler( "mouseUpEvent", e );
+		}
 
 
 		emitImmediateEvents();
@@ -835,7 +849,14 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		rootSpaceMouse.setLocalPos( windowPos );
 		rootSpaceMouse.setButtonModifiers( buttonModifiers );
 		
-		rootSpaceMouse.buttonClicked( windowPos, button, clickCount );
+		try
+		{
+			rootSpaceMouse.buttonClicked( windowPos, button, clickCount );
+		}
+		catch (Throwable e)
+		{
+			notifyExceptionDuringEventHandler( "mouseClicked", e );
+		}
 	}
 
 
@@ -849,7 +870,14 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		rootSpaceMouse.setButtonModifiers( buttonModifiers );
 		rootSpaceMouse.setKeyModifiers( keyModifiers );
 		
-		rootSpaceMouse.motion( windowPos, mouseEvent );
+		try
+		{
+			rootSpaceMouse.motion( windowPos, mouseEvent );
+		}
+		catch (Throwable e)
+		{
+			notifyExceptionDuringEventHandler( "mouseMotionEvent", e );
+		}
 
 		emitImmediateEvents();
 	}
@@ -863,7 +891,14 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		rootSpaceMouse.setButtonModifiers( buttonModifiers );
 		rootSpaceMouse.setKeyModifiers( keyModifiers );
 		
-		rootSpaceMouse.drag( windowPos, mouseEvent );
+		try
+		{
+			rootSpaceMouse.drag( windowPos, mouseEvent );
+		}
+		catch (Throwable e)
+		{
+			notifyExceptionDuringEventHandler( "mouseDragEvent", e );
+		}
 
 		emitImmediateEvents();
 	}
@@ -880,7 +915,14 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		rootSpaceMouse.setButtonModifiers( buttonModifiers );
 		rootSpaceMouse.setKeyModifiers( keyModifiers );
 		
-		rootSpaceMouse.enter( windowPos );
+		try
+		{
+			rootSpaceMouse.enter( windowPos );
+		}
+		catch (Throwable e)
+		{
+			notifyExceptionDuringEventHandler( "mouseEnterEvent", e );
+		}
 		
 		emitImmediateEvents();
 	}
@@ -894,7 +936,14 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		rootSpaceMouse.setButtonModifiers( buttonModifiers );
 		rootSpaceMouse.setKeyModifiers( keyModifiers );
 		
-		rootSpaceMouse.leave( windowPos );
+		try
+		{
+			rootSpaceMouse.leave( windowPos );
+		}
+		catch (Throwable e)
+		{
+			notifyExceptionDuringEventHandler( "mouseLeaveEvent", e );
+		}
 		
 		emitImmediateEvents();
 	}
@@ -908,7 +957,15 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		rootSpaceMouse.setLocalPos( windowPos );
 		rootSpaceMouse.setButtonModifiers( buttonModifiers );
 		
-		rootSpaceMouse.scroll( 0, -wheelClicks );
+		try
+		{
+			rootSpaceMouse.scroll( 0, -wheelClicks );
+		}
+		catch (Throwable e)
+		{
+			notifyExceptionDuringEventHandler( "mouseWheelEvent", e );
+		}
+		
 		emitImmediateEvents();
 	}
 	
@@ -941,7 +998,7 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		}
 		catch (Throwable e)
 		{
-			notifyExceptionDuringEventHandler( keyboard, "keyPressed", e );
+			notifyExceptionDuringEventHandler( "keyPressed", e );
 		}
 		emitImmediateEvents();
 		return bHandled;
@@ -961,7 +1018,7 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		}
 		catch (Throwable e)
 		{
-			notifyExceptionDuringEventHandler( keyboard, "keyReleased", e );
+			notifyExceptionDuringEventHandler( "keyReleased", e );
 		}
 		emitImmediateEvents();
 		return bHandled;
@@ -983,7 +1040,7 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		}
 		catch (Throwable e)
 		{
-			notifyExceptionDuringEventHandler( keyboard, "keyTyped", e );
+			notifyExceptionDuringEventHandler( "keyTyped", e );
 		}
 		emitImmediateEvents();
 		return bHandled;

@@ -163,7 +163,14 @@ public class PointerMotionInteractor extends PointerInteractor implements Pointe
 				for (AbstractElementInteractor interactor: interactors )
 				{
 					MotionElementInteractor motionInt = (MotionElementInteractor)interactor;
-					motionInt.pointerMotion( element, event );
+					try
+					{
+						motionInt.pointerMotion( element, event );
+					}
+					catch (Throwable e)
+					{
+						element.notifyExceptionDuringElementInteractor( motionInt, "pointerMotion", e );
+					}
 				}
 			}
 		}
@@ -179,7 +186,14 @@ public class PointerMotionInteractor extends PointerInteractor implements Pointe
 				for (AbstractElementInteractor interactor: interactors )
 				{
 					HoverElementInteractor motionInt = (HoverElementInteractor)interactor;
-					motionInt.pointerEnter( element, event );
+					try
+					{
+						motionInt.pointerEnter( element, event );
+					}
+					catch (Throwable e)
+					{
+						element.notifyExceptionDuringElementInteractor( motionInt, "pointerEnter", e );
+					}
 				}
 			}
 			
@@ -201,7 +215,14 @@ public class PointerMotionInteractor extends PointerInteractor implements Pointe
 				for (AbstractElementInteractor interactor: interactors )
 				{
 					HoverElementInteractor motionInt = (HoverElementInteractor)interactor;
-					motionInt.pointerLeave( element, event );
+					try
+					{
+						motionInt.pointerLeave( element, event );
+					}
+					catch (Throwable e)
+					{
+						element.notifyExceptionDuringElementInteractor( motionInt, "pointerLeave", e );
+					}
 				}
 			}
 		}
@@ -217,7 +238,14 @@ public class PointerMotionInteractor extends PointerInteractor implements Pointe
 				for (AbstractElementInteractor interactor: interactors )
 				{
 					MotionElementInteractor motionInt = (MotionElementInteractor)interactor;
-					motionInt.pointerLeaveIntoChild( element, event );
+					try
+					{
+						motionInt.pointerLeaveIntoChild( element, event );
+					}
+					catch (Throwable e)
+					{
+						element.notifyExceptionDuringElementInteractor( motionInt, "pointerLeaveIntoChild", e );
+					}
 				}
 			}
 		}
@@ -233,7 +261,14 @@ public class PointerMotionInteractor extends PointerInteractor implements Pointe
 				for (AbstractElementInteractor interactor: interactors )
 				{
 					MotionElementInteractor motionInt = (MotionElementInteractor)interactor;
-					motionInt.pointerEnterFromChild( element, event );
+					try
+					{
+						motionInt.pointerEnterFromChild( element, event );
+					}
+					catch (Throwable e)
+					{
+						element.notifyExceptionDuringElementInteractor( motionInt, "pointerEnterFromChild", e );
+					}
 				}
 			}
 		}

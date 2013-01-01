@@ -156,12 +156,19 @@ public class PointerNavigationInteractor extends AbstractPointerDragInteractor
 				for (AbstractElementInteractor interactor: interactors )
 				{
 					NavigationElementInteractor navInt = (NavigationElementInteractor)interactor;
-					if ( navInt.navigationGestureBegin( element, elementSpaceEvent ) )
+					try
 					{
-						navElement = element;
-						navigationDragElementRootToLocalXform = Pointer.rootToLocalTransform( elements );
-						navInteractor = navInt;
-						return;
+						if ( navInt.navigationGestureBegin( element, elementSpaceEvent ) )
+						{
+							navElement = element;
+							navigationDragElementRootToLocalXform = Pointer.rootToLocalTransform( elements );
+							navInteractor = navInt;
+							return;
+						}
+					}
+					catch (Throwable e)
+					{
+						element.notifyExceptionDuringElementInteractor( navInt, "navigationGestureBegin", e );
 					}
 				}
 			}
@@ -175,7 +182,14 @@ public class PointerNavigationInteractor extends AbstractPointerDragInteractor
 	{
 		if ( navInteractor != null )
 		{
-			navInteractor.navigationGestureEnd( navElement, (PointerButtonEvent)event.transformed( navigationDragElementRootToLocalXform ) );
+			try
+			{
+				navInteractor.navigationGestureEnd( navElement, (PointerButtonEvent)event.transformed( navigationDragElementRootToLocalXform ) );
+			}
+			catch (Throwable e)
+			{
+				navElement.notifyExceptionDuringElementInteractor( navInteractor, "navigationGestureEnd", e );
+			}
 		}
 	}
 
@@ -183,7 +197,14 @@ public class PointerNavigationInteractor extends AbstractPointerDragInteractor
 	{
 		if ( navInteractor != null )
 		{
-			navInteractor.navigationGesture( navElement, (PointerNavigationEvent)event.transformed( navigationDragElementRootToLocalXform ) );
+			try
+			{
+				navInteractor.navigationGesture( navElement, (PointerNavigationEvent)event.transformed( navigationDragElementRootToLocalXform ) );
+			}
+			catch (Throwable e)
+			{
+				navElement.notifyExceptionDuringElementInteractor( navInteractor, "navigationGesture", e );
+			}
 		}
 	}
 
@@ -204,7 +225,14 @@ public class PointerNavigationInteractor extends AbstractPointerDragInteractor
 				if ( iter.hasNext() )
 				{
 					NavigationElementInteractor navInt = (NavigationElementInteractor)iter.next();
-					navInt.navigationGesture( element, elementSpaceEvent );
+					try
+					{
+						navInt.navigationGesture( element, elementSpaceEvent );
+					}
+					catch (Throwable e)
+					{
+						element.notifyExceptionDuringElementInteractor( navInt, "navigationGesture", e );
+					}
 					return;
 				}
 			}

@@ -44,7 +44,15 @@ public class PointerDragInteractor extends AbstractPointerDragInteractor
 					for (AbstractElementInteractor interactor: interactors)
 					{
 						DragElementInteractor pressInt = (DragElementInteractor)interactor;
-						boolean bHandled = pressInt.dragBegin( element, elementSpaceEvent );
+						boolean bHandled = false;
+						try
+						{
+							bHandled = pressInt.dragBegin( element, elementSpaceEvent );
+						}
+						catch (Throwable e)
+						{
+							element.notifyExceptionDuringElementInteractor( pressInt, "dragBegin", e );
+						}
 						if ( bHandled )
 						{
 							dragElement = element;
@@ -68,7 +76,14 @@ public class PointerDragInteractor extends AbstractPointerDragInteractor
 	{
 		if ( dragElement != null )
 		{
-			dragInteractor.dragEnd( dragElement, (PointerButtonEvent)event.transformed( dragElementRootToLocalXform ), dragStartPos.transform( dragElementRootToLocalXform ), dragButton );
+			try
+			{
+				dragInteractor.dragEnd( dragElement, (PointerButtonEvent)event.transformed( dragElementRootToLocalXform ), dragStartPos.transform( dragElementRootToLocalXform ), dragButton );
+			}
+			catch (Throwable e)
+			{
+				dragElement.notifyExceptionDuringElementInteractor( dragInteractor, "dragEnd", e );
+			}
 			dragElement = null;
 			dragElementRootToLocalXform = null;
 			dragInteractor = null;
@@ -80,7 +95,14 @@ public class PointerDragInteractor extends AbstractPointerDragInteractor
 	{
 		if ( dragElement != null )
 		{
-			dragInteractor.dragMotion( dragElement, (PointerMotionEvent)event.transformed( dragElementRootToLocalXform ), dragStartPos.transform( dragElementRootToLocalXform ), dragButton );
+			try
+			{
+				dragInteractor.dragMotion( dragElement, (PointerMotionEvent)event.transformed( dragElementRootToLocalXform ), dragStartPos.transform( dragElementRootToLocalXform ), dragButton );
+			}
+			catch (Throwable e)
+			{
+				dragElement.notifyExceptionDuringElementInteractor( dragInteractor, "dragMotion", e );
+			}
 		}
 	}
 }

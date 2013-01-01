@@ -67,14 +67,21 @@ public class PointerTargetInteractor
 							for (AbstractElementInteractor interactor: interactors)
 							{
 								TargetElementInteractor pressInt = (TargetElementInteractor)interactor;
-								startPoint = pressInt.targetDragBegin( element, elementSpaceEvent );
-								if ( startPoint != null )
+								try
 								{
-									targetDragElement = element;
-									targetDragElementRootToLocalXform = Pointer.rootToLocalTransform( elements );
-									targetDragInteractor = pressInt;
-									bHandled = true;
-									break;
+									startPoint = pressInt.targetDragBegin( element, elementSpaceEvent );
+									if ( startPoint != null )
+									{
+										targetDragElement = element;
+										targetDragElementRootToLocalXform = Pointer.rootToLocalTransform( elements );
+										targetDragInteractor = pressInt;
+										bHandled = true;
+										break;
+									}
+								}
+								catch (Throwable e)
+								{
+									element.notifyExceptionDuringElementInteractor( pressInt, "targetDragBegin", e );
 								}
 							}
 						}
@@ -133,7 +140,14 @@ public class PointerTargetInteractor
 		{
 			if ( targetDragElement != null )
 			{
-				targetDragInteractor.targetDragEnd( targetDragElement, (PointerButtonEvent)event.transformed( targetDragElementRootToLocalXform ), dragStartPos.transform( targetDragElementRootToLocalXform ), dragButton );
+				try
+				{
+					targetDragInteractor.targetDragEnd( targetDragElement, (PointerButtonEvent)event.transformed( targetDragElementRootToLocalXform ), dragStartPos.transform( targetDragElementRootToLocalXform ), dragButton );
+				}
+				catch (Throwable e)
+				{
+					targetDragElement.notifyExceptionDuringElementInteractor( targetDragInteractor, "targetDragEnd", e );
+				}
 				targetDragElement = null;
 				targetDragElementRootToLocalXform = null;
 				targetDragInteractor = null;
@@ -149,7 +163,14 @@ public class PointerTargetInteractor
 			
 			if ( targetDragElement != null )
 			{
-				selCurrent = targetDragInteractor.targetDragMotion( targetDragElement, (PointerMotionEvent)event.transformed( targetDragElementRootToLocalXform ), dragStartPos.transform( targetDragElementRootToLocalXform ), dragButton );
+				try
+				{
+					selCurrent = targetDragInteractor.targetDragMotion( targetDragElement, (PointerMotionEvent)event.transformed( targetDragElementRootToLocalXform ), dragStartPos.transform( targetDragElementRootToLocalXform ), dragButton );
+				}
+				catch (Throwable e)
+				{
+					targetDragElement.notifyExceptionDuringElementInteractor( targetDragInteractor, "targetDragMotion", e );
+				}
 			}
 			
 			if ( selCurrent == null  &&  dragButton == 1 )

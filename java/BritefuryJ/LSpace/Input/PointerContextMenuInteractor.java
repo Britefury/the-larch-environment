@@ -64,7 +64,16 @@ public class PointerContextMenuInteractor extends PointerInteractor
 					for (AbstractElementInteractor interactor: interactors )
 					{
 						ContextMenuElementInteractor menuInt = (ContextMenuElementInteractor)interactor;
-						boolean bHandled = menuInt.contextMenu( element, menu );
+						boolean bHandled = false;
+						try
+						{
+							bHandled = menuInt.contextMenu( element, menu );
+						}
+						catch (Throwable e)
+						{
+							element.notifyExceptionDuringElementInteractor( menuInt, "contextMenu", e );
+						}
+
 						bElementHandled = bElementHandled || bHandled;
 					}
 				}

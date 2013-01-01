@@ -1564,7 +1564,14 @@ abstract public class LSElement implements Presentable
 			for (AbstractElementInteractor interactor: interactors )
 			{
 				RealiseElementInteractor realiseInt = (RealiseElementInteractor)interactor;
-				realiseInt.elementRealised( this );
+				try
+				{
+					realiseInt.elementRealised( this );
+				}
+				catch (Throwable e)
+				{
+					notifyExceptionDuringElementInteractor( realiseInt, "elementRealised", e );
+				}
 			}
 		}
 		
@@ -1599,7 +1606,14 @@ abstract public class LSElement implements Presentable
 			for (AbstractElementInteractor interactor: interactors )
 			{
 				RealiseElementInteractor realiseInt = (RealiseElementInteractor)interactor;
-				realiseInt.elementUnrealised( this );
+				try
+				{
+					realiseInt.elementUnrealised( this );
+				}
+				catch (Throwable e)
+				{
+					notifyExceptionDuringElementInteractor( realiseInt, "elementUnrealised", e );
+				}
 			}
 		}
 
@@ -1653,7 +1667,7 @@ abstract public class LSElement implements Presentable
 				}
 				catch (Throwable e)
 				{
-					notifyExceptionDuringEventHandler( painter, "drawBackground", e );
+					notifyExceptionDuringEventHandler( "drawBackground", e );
 				}
 			}
 		}
@@ -1673,7 +1687,7 @@ abstract public class LSElement implements Presentable
 				}
 				catch (Throwable e)
 				{
-					notifyExceptionDuringEventHandler( painter, "draw", e );
+					notifyExceptionDuringEventHandler( "draw", e );
 				}
 			}
 		}
@@ -1831,7 +1845,14 @@ abstract public class LSElement implements Presentable
 			for (AbstractElementInteractor interactor: interactors )
 			{
 				CaretCrossingElementInteractor caretCrossInt = (CaretCrossingElementInteractor)interactor;
-				caretCrossInt.caretEnter( this, c );
+				try
+				{
+					caretCrossInt.caretEnter( this, c );
+				}
+				catch (Throwable e)
+				{
+					notifyExceptionDuringElementInteractor( caretCrossInt, "caretEnter", e );
+				}
 			}
 		}
 	}
@@ -1845,7 +1866,14 @@ abstract public class LSElement implements Presentable
 			for (AbstractElementInteractor interactor: interactors )
 			{
 				CaretCrossingElementInteractor caretCrossInt = (CaretCrossingElementInteractor)interactor;
-				caretCrossInt.caretLeave( this, c );
+				try
+				{
+					caretCrossInt.caretLeave( this, c );
+				}
+				catch (Throwable e)
+				{
+					notifyExceptionDuringElementInteractor( caretCrossInt, "caretLeave", e );
+				}
 			}
 		}
 	}
@@ -3155,9 +3183,16 @@ abstract public class LSElement implements Presentable
 	
 	
 	
-	public void notifyExceptionDuringEventHandler(Object eventHandler, String event, Throwable e)
+	public void notifyExceptionDuringEventHandler(String event, Throwable e)
 	{
-		System.err.println( "Exception during element event handler " + eventHandler + ":" );
+		System.err.println( "Exception during element event handler for " + event + ":" );
+		e.printStackTrace();
+	}
+
+	public void notifyExceptionDuringElementInteractor(Object interactor, String event, Throwable e)
+	{
+		String intractorClassName = interactor.getClass().getName();
+		System.err.println( "Exception during element event handler " + intractorClassName + "." + event + ":" );
 		e.printStackTrace();
 	}
 

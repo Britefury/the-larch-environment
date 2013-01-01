@@ -32,9 +32,16 @@ public class PointerClickInteractor extends PointerInteractor
 					for (AbstractElementInteractor interactor: interactors )
 					{
 						ClickElementInteractor clickInt = (ClickElementInteractor)interactor;
-						if ( clickInt.testClickEvent( element, event ) )
+						try
 						{
-							return true;
+							if ( clickInt.testClickEvent( element, event ) )
+							{
+								return true;
+							}
+						}
+						catch (Throwable e)
+						{
+							element.notifyExceptionDuringElementInteractor( clickInt, "testClickEvent", e );
 						}
 					}
 				}
@@ -60,9 +67,16 @@ public class PointerClickInteractor extends PointerInteractor
 					for (AbstractElementInteractor interactor: interactors )
 					{
 						ClickElementInteractor clickInt = (ClickElementInteractor)interactor;
-						if ( clickInt.testClickEvent( element, event ) )
+						try
 						{
-							return true;
+							if ( clickInt.testClickEvent( element, event ) )
+							{
+								return true;
+							}
+						}
+						catch (Throwable e)
+						{
+							element.notifyExceptionDuringElementInteractor( clickInt, "testClickEvent", e );
 						}
 					}
 				}
@@ -90,14 +104,30 @@ public class PointerClickInteractor extends PointerInteractor
 					for (AbstractElementInteractor interactor: interactors )
 					{
 						ClickElementInteractor clickInt = (ClickElementInteractor)interactor;
-						if ( clickInt.testClickEvent( element, event ) )
+						boolean clickAccepted = false;
+						try
 						{
-							boolean bHandled = clickInt.buttonClicked( element, event );
-							if ( bHandled )
-							{
-								return true;
-							}
+							clickAccepted = clickInt.testClickEvent( element, event );
 						}
+						catch (Throwable e)
+						{
+							element.notifyExceptionDuringElementInteractor( clickInt, "testClickEvent", e );
+						}
+
+						if ( clickAccepted )
+						{
+							try
+							{
+								if ( clickInt.buttonClicked( element, event ) )
+								{
+									return true;
+								}
+							}
+							catch (Throwable e)
+							{
+								element.notifyExceptionDuringElementInteractor( clickInt, "buttonClicked", e );
+							}
+					}
 					}
 				}
 			}
