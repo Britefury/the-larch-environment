@@ -41,7 +41,15 @@ public class PointerPushInteractor extends PointerInteractor
 					for (AbstractElementInteractor interactor: interactors )
 					{
 						PushElementInteractor pressInt = (PushElementInteractor)interactor;
-						boolean bHandled = pressInt.buttonPress( element, elementSpaceEvent );
+						boolean bHandled = false;
+						try
+						{
+							bHandled = pressInt.buttonPress( element, elementSpaceEvent );
+						}
+						catch (Throwable e)
+						{
+							element.notifyExceptionDuringElementInteractor( pressInt, "buttonPress", e );
+						}
 						if ( bHandled )
 						{
 							pressedElement = element;
@@ -65,7 +73,14 @@ public class PointerPushInteractor extends PointerInteractor
 	{
 		if ( pressedElement != null  &&  event.getButton() == pressedButton )
 		{
-			pressedInteractor.buttonRelease( pressedElement, (PointerButtonEvent)event.transformed( pressedElementRootToLocalXform ) );
+			try
+			{
+				pressedInteractor.buttonRelease( pressedElement, (PointerButtonEvent)event.transformed( pressedElementRootToLocalXform ) );
+			}
+			catch (Throwable e)
+			{
+				pressedElement.notifyExceptionDuringElementInteractor( pressedInteractor, "buttonRelease", e );
+			}
 			pressedElement = null;
 			pressedElementRootToLocalXform = null;
 			pressedInteractor = null;

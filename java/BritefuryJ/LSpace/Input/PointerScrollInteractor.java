@@ -33,9 +33,16 @@ public class PointerScrollInteractor extends PointerInteractor
 					for (AbstractElementInteractor interactor: interactors )
 					{
 						ScrollElementInteractor scrollInt = (ScrollElementInteractor)interactor;
-						if ( scrollInt.scroll( element, elementSpaceEvent ) )
+						try
 						{
-							return true;
+							if ( scrollInt.scroll( element, elementSpaceEvent ) )
+							{
+								return true;
+							}
+						}
+						catch (Throwable e)
+						{
+							element.notifyExceptionDuringElementInteractor( scrollInt, "scroll", e );
 						}
 					}
 				}

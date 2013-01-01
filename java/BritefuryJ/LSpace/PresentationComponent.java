@@ -410,7 +410,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			}
 			catch (Throwable e)
 			{
-				rootElement.notifyExceptionDuringEventHandler( "PresTransferHandler", "canImport", e );
+				rootElement.notifyExceptionDuringEventHandler( "canImport", e );
 				return false;
 			}
 		}
@@ -441,7 +441,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			}
 			catch (Throwable e)
 			{
-				rootElement.notifyExceptionDuringEventHandler( "PresTransferHandler", "importData", e );
+				rootElement.notifyExceptionDuringEventHandler( "importData", e );
 				return false;
 			}
 		}

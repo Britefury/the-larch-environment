@@ -103,7 +103,14 @@ public class PointerDndInteractor extends PointerInteractor
 							dndDrag.bInProgress = true;
 							dndDrag.initialise( transferable, requestedAction );
 						
-							dndController.dndInitiateDrag( dndDrag, mouseEvent, requestedAction );
+							try
+							{
+								dndController.dndInitiateDrag( dndDrag, mouseEvent, requestedAction );
+							}
+							catch (Throwable e)
+							{
+								dndDrag.sourceElement.notifyExceptionDuringElementInteractor( dndController, "dndInitiateDrag", e );
+							}
 							
 							return true;
 						}
