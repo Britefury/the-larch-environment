@@ -44,7 +44,8 @@ from LarchCore.MainApp import DocumentManagement
 
 _appDocRightPadding = 30.0
 _controlsPadding = 5.0
-_appDocumentControlsStyle = StyleSheet.style( Primitive.rowSpacing( 20.0 ), Primitive.border( FilledBorder( 5.0, 5.0, 5.0, 5.0, Color( 0.9, 0.9, 0.9 ) ) ) )
+_appDocumentControlsStyle = StyleSheet.style( Primitive.rowSpacing( 20.0 ) )
+_appDocumentControlsBorder = FilledBorder( 5.0, 5.0, 5.0, 5.0, Color( 0.9, 0.9, 0.9 ) )
 _documentListTableStyle = StyleSheet.style( Primitive.tableColumnSpacing( 15.0 ), Primitive.tableRowSpacing( 5.0 ) )
 
 
@@ -76,18 +77,18 @@ def _newConsoleIndex(consoles):
 
 						
 def _contentsList(controls, contentsLists, title):
-	controlsBox = Row( [ c.padX( _controlsPadding )   for c in controls ] )
-	controlsBorder = _appDocumentControlsStyle.applyTo( Border( controlsBox ) )
+	controlsBox = _appDocumentControlsStyle.applyTo( Row( [ c.padX( _controlsPadding )   for c in controls ] ) )
+	controlsBorder = _appDocumentControlsBorder.surround( controlsBox )
 
 	openDocumentsSeparator = HSeparator()
 	
 	docListBox = _documentListTableStyle.applyTo( RGrid( contentsLists ) )
 
-	contentsBox = Column( [ controlsBorder.pad( 2.0, 2.0 ), openDocumentsSeparator, docListBox.pad( 10.0, 2.0 ) ] )
+	contentsBox = Column( [ controlsBorder.pad( 2.0, 2.0 ), openDocumentsSeparator, docListBox.pad( 12.0, 2.0 ) ] )
 	
 	heading = SectionHeading1( title )
 	
-	return Section( heading, contentsBox.padX( 5.0, 0.0 ) )
+	return Section( heading, contentsBox )
 						
 						
 						

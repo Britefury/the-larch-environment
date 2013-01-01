@@ -1667,7 +1667,7 @@ abstract public class LSElement implements Presentable
 				}
 				catch (Throwable e)
 				{
-					notifyExceptionDuringEventHandler( "drawBackground", e );
+					notifyExceptionDuringElementInteractor( painter, "drawBackground", e );
 				}
 			}
 		}
@@ -1687,7 +1687,7 @@ abstract public class LSElement implements Presentable
 				}
 				catch (Throwable e)
 				{
-					notifyExceptionDuringEventHandler( "draw", e );
+					notifyExceptionDuringElementInteractor( painter, "draw", e );
 				}
 			}
 		}
@@ -3183,7 +3183,7 @@ abstract public class LSElement implements Presentable
 	
 	
 	
-	public void notifyExceptionDuringEventHandler(String event, Throwable e)
+	public static void notifyExceptionDuringEventHandler(String event, Throwable e)
 	{
 		System.err.println( "Exception during element event handler for " + event + ":" );
 		e.printStackTrace();
