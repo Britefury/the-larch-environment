@@ -1315,6 +1315,20 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	
 	//
 	//
+	// Error notification methods
+	//
+	//
+	
+	public void notifyExceptionDuringEventHandler(String event, Throwable e)
+	{
+		System.err.println( "Exception during element event handler for " + event + ":" );
+		e.printStackTrace();
+	}
+
+	
+	
+	//
+	//
 	// TYPESET PROFILE METHODS
 	//
 	//
