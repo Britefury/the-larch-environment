@@ -3183,12 +3183,12 @@ abstract public class LSElement implements Presentable
 	
 	
 	
-	public static void notifyExceptionDuringEventHandler(String event, Throwable e)
-	{
-		System.err.println( "Exception during element event handler for " + event + ":" );
-		e.printStackTrace();
-	}
-
+	//
+	//
+	// Error notification methods
+	//
+	//
+	
 	public void notifyExceptionDuringElementInteractor(Object interactor, String event, Throwable e)
 	{
 		String intractorClassName = interactor.getClass().getName();

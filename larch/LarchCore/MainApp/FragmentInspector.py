@@ -8,7 +8,7 @@
 from java.awt import Color
 
 from BritefuryJ.Graphics import SolidBorder, FilledOutlinePainter
-from BritefuryJ.LSpace import Anchor, ElementPainter, PageController
+from BritefuryJ.LSpace import Anchor, PageController, ElementHighlighter
 from BritefuryJ.LSpace.Interactor import HoverElementInteractor, PushElementInteractor
 from BritefuryJ.Pres import LazyPres, Pres
 from BritefuryJ.Pres.Primitive import Primitive, Label, Spacer, LineBreak, SpaceBin, Column, Paragraph
@@ -27,7 +27,7 @@ from LarchCore.PythonConsole import Console
 
 _fragSelectorEntryBorder = SolidBorder( 1.0, 3.0, 6.0, 6.0, Color( 0.8, 0.8, 0.8 ), None, Color( 0.5, 0.5, 0.5 ), Color( 0.9, 0.9, 0.9 ) )
 
-_fragContentHighlighterPainter = FilledOutlinePainter( Color( 0.0, 1.0, 0.0, 0.1 ), Color( 0.0, 0.5, 0.0, 0.5 ) )
+_fragContentHighlighter = ElementHighlighter( FilledOutlinePainter( Color( 0.0, 1.0, 0.0, 0.1 ), Color( 0.0, 0.5, 0.0, 0.5 ) ) )
 _objectKindStyleJava = StyleSheet.style( Primitive.fontSize( 10 ), Primitive.foreground( Color( 0.0, 0.0, 0.5 ) ) )
 _objectKindStylePython = StyleSheet.style( Primitive.fontSize( 10 ), Primitive.foreground( Color( 0.0, 0.5, 0.0 ) ) )
 _objectKindStyleDocModel = StyleSheet.style( Primitive.fontSize( 10 ), Primitive.foreground( Color( 0.5, 0.5, 0.5 ) ) )
@@ -46,16 +46,6 @@ _objectKindMap = {
 
 
 
-class _FragmentContentHighlighter (ElementPainter):
-	def drawBackground(self, element, graphics):
-		pass
-
-	def draw(self, element, graphics):
-		_fragContentHighlighterPainter.drawShapes( graphics, element.getShapes() )
-
-_FragmentContentHighlighter.instance = _FragmentContentHighlighter()
-
-
 class _FragmentSelectorEntryInteractor (HoverElementInteractor, PushElementInteractor):
 	def __init__(self, selectorEntry, fragmentElement):
 		self._selectorEntry = selectorEntry
@@ -64,20 +54,17 @@ class _FragmentSelectorEntryInteractor (HoverElementInteractor, PushElementInter
 
 	def pointerEnter(self, element, event):
 		if self._fragmentElement is not None:
-			self._fragmentElement.addPainter( _FragmentContentHighlighter.instance )
-			self._fragmentElement.queueFullRedraw()
+			_fragContentHighlighter.highlight( self._fragmentElement )
 
 	def pointerLeave(self, element, event):
 		if self._fragmentElement is not None:
-			self._fragmentElement.removePainter( _FragmentContentHighlighter.instance )
-			self._fragmentElement.queueFullRedraw()
+			_fragContentHighlighter.unhighlight( self._fragmentElement )
 
 
 	def buttonPress(self, element, event):
 		if event.button == 1:
 			if self._fragmentElement is not None:
-				self._fragmentElement.removePainter( _FragmentContentHighlighter.instance )
-				self._fragmentElement.queueFullRedraw()
+				_fragContentHighlighter.unhighlight( self._fragmentElement )
 				self._fragmentElement = None
 			self._selectorEntry._onClick()
 			element.closeContainingPopupChain()
