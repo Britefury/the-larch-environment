@@ -30,8 +30,11 @@ public class ElementHighlighter implements ElementPainter
 	 */
 	public void highlight(LSElement element)
 	{
-		element.addPainter( this );
-		element.queueFullRedraw();
+		if ( element.isRealised() )
+		{
+			element.addPainter( this );
+			element.queueFullRedraw();
+		}
 	}
 	
 	/*
@@ -39,8 +42,11 @@ public class ElementHighlighter implements ElementPainter
 	 */
 	public void unhighlight(LSElement element)
 	{
-		element.removePainter( this );
-		element.queueFullRedraw();
+		if ( element.isRealised() )
+		{
+			element.removePainter( this );
+			element.queueFullRedraw();
+		}
 	}
 	
 

@@ -161,9 +161,12 @@ class _FragmentInspector (object):
 
 		log = LazyPres( _log )
 
-		tabs = [ [ Label( 'Console' ), _consoleStyle( self._console ).alignVTop() ],
-			 [ Label( 'Element explorer' ), explorer ],
-			 [ Label( 'Page log' ), log ] ]
+		tabs = [
+			[ Label( 'Console' ), _consoleStyle( self._console ).alignVTop() ],
+			[ Label( 'Element explorer' ), explorer ],
+			[ Label( 'Page log' ), log ],
+			[ Label( 'Event errors' ), self._fragment.view.presentationRootElement.eventErrorLog ]
+		]
 		return TabbedBox( tabs, None ).alignVTop()
 
 

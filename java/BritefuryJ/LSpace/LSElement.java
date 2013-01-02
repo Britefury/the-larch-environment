@@ -3191,9 +3191,7 @@ abstract public class LSElement implements Presentable
 	
 	public void notifyExceptionDuringElementInteractor(Object interactor, String event, Throwable e)
 	{
-		String intractorClassName = interactor.getClass().getName();
-		System.err.println( "Exception during element event handler " + intractorClassName + "." + event + ":" );
-		e.printStackTrace();
+		getRootElement().notifyExceptionDuringElementInteractor( this, interactor, event, e );
 	}
 
 
