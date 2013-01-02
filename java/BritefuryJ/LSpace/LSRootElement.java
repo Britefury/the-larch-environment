@@ -110,6 +110,7 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	protected PageController pageController = null;
 	
 	
+	private PresentationEventErrorLog eventErrorLog = new PresentationEventErrorLog();
 	private TypesetProfile profile;
 	
 	
@@ -1319,12 +1320,20 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	//
 	//
 	
-	public void notifyExceptionDuringEventHandler(String event, Throwable e)
+	public PresentationEventErrorLog getEventErrorLog()
 	{
-		System.err.println( "Exception during element event handler for " + event + ":" );
-		e.printStackTrace();
+		return eventErrorLog;
+	}
+	
+	public void notifyExceptionDuringEventHandler(String event, Throwable error)
+	{
+		eventErrorLog.exceptionDuringPresentationEventHandler( event, error );
 	}
 
+	protected void notifyExceptionDuringElementInteractor(LSElement element, Object interactor, String event, Throwable error)
+	{
+		eventErrorLog.exceptionDuringElementInteractor( element, interactor, event, error );
+	}
 	
 	
 	//
