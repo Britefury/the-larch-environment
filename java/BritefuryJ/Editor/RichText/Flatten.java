@@ -168,12 +168,14 @@ class Flatten
 					// Previous element is a newline, a paragraph, or nothing - emit the tag as is
 					result.add( x );
 				}
+				// Otherwise, a newline was deleted by the user in at attempt to join the paragraphs, in which case don't emit the paragraph start tag
 			}
 			else if ( x instanceof Newline )
 			{
 				if ( prevElement == null )
 				{
-					// Emit a paragraph start tag
+					// There is no previous element. The user inserted a newline at the beginning of the document to insert a new paragraph
+					// before all other content.
 					result.add( new TagPStart( null ) );
 				}
 			}
