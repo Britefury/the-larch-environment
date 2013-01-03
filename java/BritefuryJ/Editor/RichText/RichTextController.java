@@ -590,7 +590,7 @@ public abstract class RichTextController extends SequentialController
 	{
 		if ( log.isRecording() )
 		{
-			log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setTextContentsFromRichString" ).vItem( "richStr", value ) );
+			log.log( new LogEntry( "RichTextController" ).hItem( "Description", "RichTextEditor.setTextContentsFromRichString" ).vItem( "richStr", value ) );
 		}
 		setModelContentsFromEditorModelRichString( model, value );
 		return !value.contains( "\n" );
@@ -602,7 +602,7 @@ public abstract class RichTextController extends SequentialController
 		{
 			if ( log.isRecording() )
 			{
-				log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setParagraphTextContentsFromRichString - with trailing newline" ).vItem( "richStr", value ) );
+				log.log( new LogEntry( "RichTextController" ).hItem( "Description", "RichTextEditor.setParagraphTextContentsFromRichString - with trailing newline" ).vItem( "richStr", value ) );
 			}
 			RichString toLast = value.substring( 0, value.length() - 1 );
 			setModelContentsFromEditorModelRichString( model, toLast );
@@ -612,7 +612,7 @@ public abstract class RichTextController extends SequentialController
 		{
 			if ( log.isRecording() )
 			{
-				log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setParagraphTextContentsFromRichString - no trailing newline" ).vItem( "richStr", value ) );
+				log.log( new LogEntry( "RichTextController" ).hItem( "Description", "RichTextEditor.setParagraphTextContentsFromRichString - no trailing newline" ).vItem( "richStr", value ) );
 			}
 			setModelContentsFromEditorModelRichString( model, value );
 			EdNode e = modelToEditorModel( model );
@@ -626,7 +626,7 @@ public abstract class RichTextController extends SequentialController
 	{
 		if ( log.isRecording() )
 		{
-			log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setParagraphContentsFromCompleteParagraphRichString" ).vItem( "richStr", richStr ) );
+			log.log( new LogEntry( "RichTextController" ).hItem( "Description", "RichTextEditor.setParagraphContentsFromCompleteParagraphRichString" ).vItem( "richStr", richStr ) );
 		}
 		List<Object> items = richStr.getItemValues();
 		if ( items.size() == 1 )
@@ -674,7 +674,7 @@ public abstract class RichTextController extends SequentialController
 		List<Object> paras = Merge.mergeParagraphs( flattened );
 		if ( log.isRecording() )
 		{
-			log.log( new LogEntry( "RichTextEditor" ).hItem( "Description", "RichTextEditor.setBlockContentsFromRawRichString" ).vItem( "tags", tags ).vItem( "flattened", flattenedForLog ).vItem( "paras", paras ) );
+			log.log( new LogEntry( "RichTextController" ).hItem( "Description", "RichTextEditor.setBlockContentsFromRawRichString" ).vItem( "tags", tags ).vItem( "flattened", flattenedForLog ).vItem( "paras", paras ) );
 		}
 		setModelContentsFromEditorModelRichString( model, new RichStringBuilder( paras ).richString() );
 	}
