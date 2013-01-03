@@ -15,23 +15,53 @@ import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Util.Jython.DescriptorBase;
 
-public class EditRuleApplicator extends DescriptorBase
+public class EditRuleMethodApplicator extends DescriptorBase
 {
 	// Has to extend DescriptorBase to work around that prevents Java objects from acting as descriptors by defining descriptor methods, if they directly derive from Object.
 	
 
-	public static class BoundEditRuleApplicator
+	public static class RuleApplicator
 	{
 		// Must be public in order for jython to find __call__
-		public class BoundEditRuleApplicatorFn
+		// Has to extend DescriptorBase to work around that prevents Java objects from acting as descriptors by defining descriptor methods, if they directly derive from Object.
+		public class ApplicatorMethod extends DescriptorBase
 		{
+			// Must be public in order for jython to find __call__
+			public class BoundApplicatorMethod
+			{
+				// Must be public in order for jython to find __dispatch_unwrapped_method__, __name__ and __call__
+				private PyObject instance;
+				private ApplicatorMethod method;
+				public PyObject __dispatch_unwrapped_method__;
+				public PyObject __name__;
+				
+				
+				public BoundApplicatorMethod(PyObject instance, ApplicatorMethod method)
+				{
+					this.instance = instance;
+					this.method = method;
+					this.__dispatch_unwrapped_method__ = method.__dispatch_unwrapped_method__;
+					this.__name__ = method.__name__;
+				}
+				
+				
+				public PyObject __call__(PyObject args[])
+				{
+					PyObject argsWithInstance[] = new PyObject[args.length + 1];
+					argsWithInstance[0] = instance;
+					System.arraycopy( args, 0, argsWithInstance, 1, args.length );
+					return method.__call__( argsWithInstance );
+				}
+			}
+
+			
 			// Must be public in order for jython to find __dispatch_unwrapped_method__, __name__ and __call__
 			private PyObject method;
 			public PyObject __dispatch_unwrapped_method__;
 			public PyObject __name__;
 			
 			
-			public BoundEditRuleApplicatorFn(PyObject method)
+			public ApplicatorMethod(PyObject method)
 			{
 				this.method = method;
 				this.__dispatch_unwrapped_method__ = method;
@@ -53,6 +83,20 @@ public class EditRuleApplicator extends DescriptorBase
 			}
 			
 			
+			public PyObject __get__(PyObject instance, PyObject type)
+			{
+				if ( instance == Py.None )
+				{
+					return Py.java2py( this );
+				}
+				else
+				{
+					BoundApplicatorMethod bound = new BoundApplicatorMethod( instance, this );
+					return Py.java2py( bound );
+				}
+			}
+
+			
 			public PyObject __call__(PyObject args[])
 			{
 				Pres p = Py.tojava( method.__call__( args ), Pres.class );
@@ -66,7 +110,7 @@ public class EditRuleApplicator extends DescriptorBase
 		private AbstractEditRule rule;
 		
 		
-		public BoundEditRuleApplicator(AbstractEditRule rule)
+		public RuleApplicator(AbstractEditRule rule)
 		{
 			this.rule = rule;
 		}
@@ -80,7 +124,7 @@ public class EditRuleApplicator extends DescriptorBase
 		
 		public PyObject __call__(PyObject method)
 		{
-			BoundEditRuleApplicatorFn fn = new BoundEditRuleApplicatorFn( method );
+			ApplicatorMethod fn = new ApplicatorMethod( method );
 			return Py.java2py( fn );
 		}
 	}
@@ -90,7 +134,7 @@ public class EditRuleApplicator extends DescriptorBase
 	private PyObject ruleFn;
 	
 	
-	public EditRuleApplicator(PyObject ruleFn)
+	public EditRuleMethodApplicator(PyObject ruleFn)
 	{
 		this.ruleFn = ruleFn;
 	}
@@ -105,7 +149,7 @@ public class EditRuleApplicator extends DescriptorBase
 		else
 		{
 			AbstractEditRule rule = Py.tojava( ruleFn.__call__( instance ), AbstractEditRule.class );
-			BoundEditRuleApplicator bound = new BoundEditRuleApplicator( rule );
+			RuleApplicator bound = new RuleApplicator( rule );
 			return Py.java2py( bound );
 		}
 	}
