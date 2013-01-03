@@ -87,7 +87,7 @@ class Flatten
 			}
 			else
 			{
-				if ( text.length() > 0  ||  result.size() == 0 )
+				if ( text.length() > 0 )
 				{
 					result.add( text.toString() );
 					text = new StringBuilder();
@@ -171,6 +171,11 @@ class Flatten
 			}
 			else if ( x instanceof Newline )
 			{
+				if ( prevElement == null )
+				{
+					// Emit a paragraph start tag
+					result.add( new TagPStart( null ) );
+				}
 			}
 			else if ( isPara( x ) )
 			{
