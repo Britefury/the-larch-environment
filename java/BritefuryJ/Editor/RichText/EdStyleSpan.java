@@ -58,13 +58,13 @@ public class EdStyleSpan extends EdAbstractText
 	
 	
 	@Override
-	protected Tag regionStartTag()
+	protected Tag containingPrefixTag()
 	{
 		return new TagSStart( styleAttrs );
 	}
 
 	@Override
-	protected Tag regionEndTag()
+	protected Tag containingSuffixTag()
 	{
 		return new TagSEnd();
 	}
