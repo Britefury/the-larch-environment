@@ -13,12 +13,12 @@ import BritefuryJ.DefaultPerspective.Presentable;
 
 public abstract class EdNode implements Presentable, ClipboardCopyable
 {
-	protected Tag regionStartTag()
+	protected Tag containingPrefixTag()
 	{
 		return null;
 	}
 
-	protected Tag regionEndTag()
+	protected Tag containingSuffixTag()
 	{
 		return null;
 	}

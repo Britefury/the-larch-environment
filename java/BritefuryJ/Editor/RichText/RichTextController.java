@@ -26,7 +26,9 @@ import BritefuryJ.LSpace.EditEvent;
 import BritefuryJ.LSpace.ElementTreeVisitor;
 import BritefuryJ.LSpace.LSContentLeafEditable;
 import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.SequentialRichStringVisitor;
 import BritefuryJ.LSpace.TextEditEvent;
+import BritefuryJ.LSpace.TreeEventListener;
 import BritefuryJ.LSpace.Marker.Marker;
 import BritefuryJ.LSpace.TextFocus.Caret;
 import BritefuryJ.LSpace.TextFocus.TextSelection;
@@ -72,8 +74,8 @@ public abstract class RichTextController extends SequentialController
 				
 				if ( !complete )
 				{
-					Object regionStart = controller.modelToRegionStartTag( model );
-					Object regionEnd = controller.modelToRegionEndTag( model );
+					Object regionStart = controller.modelToContainingPrefixTag( model );
+					Object regionEnd = controller.modelToContainingSuffixTag( model );
 					
 					if ( regionStart != null )
 					{
@@ -115,8 +117,8 @@ public abstract class RichTextController extends SequentialController
 				
 				if ( !complete )
 				{
-					Object start = controller.modelToRegionStartTag( model );
-					Object end = controller.modelToRegionEndTag( model );
+					Object start = controller.modelToContainingPrefixTag( model );
+					Object end = controller.modelToContainingSuffixTag( model );
 					
 					if ( start != null )
 					{
@@ -251,6 +253,58 @@ public abstract class RichTextController extends SequentialController
 	
 	private RichStringEditFilter textEditListener, paraEditListener, blockEditListener;
 	
+	private TreeEventListener richTextBreakListener = new TreeEventListener()
+	{
+		@Override
+		public boolean onTreeEvent(LSElement element, LSElement sourceElement, Object event)
+		{
+			if ( event instanceof EditEvent )
+			{
+				EditEvent editEvent = (EditEvent)event;
+				if ( event instanceof TextEditEvent  ||  isSelectionEditEvent( editEvent )  ||  isEditEvent( editEvent ) )
+				{
+					// If event is a selection edit event, and its source element is @element, then @element has had its fixed value
+					// set by a SequentialClipboardHandler - so don't clear it.
+					// Otherwise, clear it
+					if ( !( isSelectionEditEvent( editEvent )  &&  getEventSourceElement( editEvent ) == element ) )
+					{
+						SequentialRichStringVisitor visitor = editEvent.getRichStringVisitor();
+						Object model = element.getFixedValue();
+						if ( model == null )
+						{
+							throw new RuntimeException( "Could not get model from element" );
+						}
+						EdNode ed = modelToEditorModel( model );
+						
+						Tag prefix = ed.prefixTag();
+						if ( prefix != null )
+						{
+							visitor.setElementPrefix( element, prefix );
+						}
+
+						Tag regionStart = ed.containingPrefixTag();
+						if ( regionStart != null )
+						{
+							visitor.setElementPrefix( element, regionStart );
+						}
+
+						Tag regionEnd = ed.containingSuffixTag();
+						if ( regionEnd != null )
+						{
+							visitor.setElementSuffix( element, regionEnd );
+						}
+
+						Tag suffix = ed.suffixTag();
+						if ( suffix != null )
+						{
+							visitor.setElementSuffix( element, suffix );
+						}
+					}
+				}
+			}
+			return false;
+		}
+	};
 	
 	public RichTextController(String controllerName)
 	{
@@ -351,17 +405,17 @@ public abstract class RichTextController extends SequentialController
 	
 	public Pres editableSpan(Object model, Object child)
 	{
-		Pres p =  new SoftStructuralItem( this, textEditListener, model, child );
+		Pres p = richTextSoftStructuralItem( model, Pres.coerce( child ), textEditListener );
 		return p.withProperty( spanPropertyKey, model );
 	}
 	
 	public Pres editableParagraph(Object model, Object child)
 	{
-		child = editableParaStyle.applyTo( child );
-		Pres p = new SoftStructuralItem( this, paraEditListener, model, child );
+		Pres p = editableParaStyle.applyTo( child );
+		p = richTextSoftStructuralItem( model, p, paraEditListener );
 		return p.withProperty( paragraphPropertyKey, model ).withProperty( blockItemPropertyKey, model );
 	}
-	
+
 	public Pres editableParagraphEmbed(Object model, Object child)
 	{
 		Pres p = new StructuralItem( this, model, child );
@@ -375,6 +429,21 @@ public abstract class RichTextController extends SequentialController
 		return p.withProperty( blockPropertyKey, model );
 	}
 	
+
+	private Pres richTextSoftStructuralItem(Object model, Pres child, TreeEventListener editListener)
+	{
+		// Give the element a fixed value; the model
+		Pres p = child.withFixedValue( model );
+		// The first event handler suppresses the structural value, so that the next event handler gets the contents of the paragraph, rather than
+		// the unmodified data model
+		p = p.withTreeEventListener( getClearStructuralValueListener() );
+		// The next event handler will apply modifications to the paragraph in response to user edits, provided that the paragraph does not get split with a newline
+		p = p.withTreeEventListener( editListener );
+		// Finally, the break event handler attaches the paragraph prefix tag to the beginning, so that the outer stages (block-level edits) can re-assemble the paragraph
+		// with styling attributes intact
+		p = p.withTreeEventListener( richTextBreakListener );
+		return p;
+	}
 	
 	
 	//
@@ -654,8 +723,16 @@ public abstract class RichTextController extends SequentialController
 		{
 			if ( item.isStructural() )
 			{
-				RichString.StructuralItem structural = (RichString.StructuralItem)item;
-				modelToTags( tags, structural.getValue() );
+				RichString.StructuralItem structuralItem = (RichString.StructuralItem)item;
+				Object structuralValue = structuralItem.getValue();
+				if ( structuralValue instanceof Tag )
+				{
+					tags.add( (Tag)structuralValue );
+				}
+				else
+				{
+					modelToTags( tags, structuralValue );
+				}
 			}
 			else
 			{
@@ -806,14 +883,14 @@ public abstract class RichTextController extends SequentialController
 		return modelToEditorModel( model ).suffixTag();
 	}
 	
-	private Tag modelToRegionStartTag(Object model)
+	private Tag modelToContainingPrefixTag(Object model)
 	{
-		return modelToEditorModel( model ).regionStartTag();
+		return modelToEditorModel( model ).containingPrefixTag();
 	}
 	
-	private Tag modelToRegionEndTag(Object model)
+	private Tag modelToContainingSuffixTag(Object model)
 	{
-		return modelToEditorModel( model ).regionEndTag();
+		return modelToEditorModel( model ).containingSuffixTag();
 	}
 	
 	private void modelToTags(List<Object> tags, Object model)
@@ -990,8 +1067,8 @@ public abstract class RichTextController extends SequentialController
 		while ( rootFragment != editFragment )
 		{
 			Object m = rootFragment.getModel();
-			Object regionStart = modelToRegionStartTag( m );
-			Object regionEnd = modelToRegionEndTag( m );
+			Object regionStart = modelToContainingPrefixTag( m );
+			Object regionEnd = modelToContainingSuffixTag( m );
 			if ( regionStart != null )
 			{
 				v.prefix.add( 0, regionStart );
