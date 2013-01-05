@@ -261,7 +261,7 @@ public abstract class RichTextController extends SequentialController
 			if ( event instanceof EditEvent )
 			{
 				EditEvent editEvent = (EditEvent)event;
-				if ( event instanceof TextEditEvent  ||  isSelectionEditEvent( editEvent )  ||  isEditEvent( editEvent ) )
+				if ( event instanceof TextEditEvent  ||  isSelectionEditEvent( editEvent )  ||  isEditEvent( editEvent )  ||  event instanceof ClearNeighbourEditEvent )
 				{
 					// If event is a selection edit event, and its source element is @element, then @element has had its fixed value
 					// set by a SequentialClipboardHandler - so don't clear it.
@@ -719,6 +719,7 @@ public abstract class RichTextController extends SequentialController
 	{
 		ArrayList<Object> tags = new ArrayList<Object>();
 		
+		// Convert items, leaving tags in place, convering model objects to editor model objects
 		for (RichString.Item item: value.getItems())
 		{
 			if ( item.isStructural() )
@@ -731,7 +732,7 @@ public abstract class RichTextController extends SequentialController
 				}
 				else
 				{
-					modelToTags( tags, structuralValue );
+					tags.add( modelToEditorModel( structuralValue ) );
 				}
 			}
 			else
@@ -751,7 +752,7 @@ public abstract class RichTextController extends SequentialController
 		List<Object> paras = Merge.mergeParagraphs( flattened );
 		if ( log.isRecording() )
 		{
-			log.log( new LogEntry( "RichTextController" ).hItem( "Description", "RichTextEditor.setBlockContentsFromRawRichString" ).vItem( "tags", tags ).vItem( "flattened", flattenedForLog ).vItem( "paras", paras ) );
+			log.log( new LogEntry( "RichTextController" ).hItem( "Description", "RichTextEditor.setBlockContentsFromRawRichString" ).vItem( "value", value ).vItem( "tags", tags ).vItem( "flattened", flattenedForLog ).vItem( "paras", paras ) );
 		}
 		setModelContentsFromEditorModelRichString( model, new RichStringBuilder( paras ).richString() );
 	}
@@ -927,6 +928,11 @@ public abstract class RichTextController extends SequentialController
 		return isParagraph( model )  ||  isBlock( model );
 	}
 	
+	@Override
+	public boolean isClearNeighbouringStructuresEnabled()
+	{
+		return true;
+	}
 	
 	
 	

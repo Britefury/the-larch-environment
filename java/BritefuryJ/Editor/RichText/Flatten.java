@@ -109,16 +109,19 @@ class Flatten
 		return x instanceof EdNode  &&  ((EdNode)x).isParagraph();
 	}
 	
+	private static boolean isStyleSpan(Object x)
+	{
+		return x instanceof EdStyleSpan;
+	}
+	
 	// Create a flattened version of the sequence of tags and strings in @xs
 	// Paragraph start tags (TagPStart) remain
 	// Newlines are converted to paragraph start tags (TagPStart)
 	// Strings are wrapped in EdStyleSpan objects, with styles determined by the style span start and end tags (TagSStart and TagSEnd)
 	// Paragraphs (editor model paragraphs) that have not been 'flattened out' but remain as structural items are left as is.
 	// SHOULD IMPLEMENT AS ITERATOR, BUT I'M BUGGERED IF I AM GOING TO SPEND TIME CONVERTING A NICE PYTHON GENERATOR TO A JAVA ITERATOR......
-	private static ArrayList<Object> flatten(Iterable<Object> xs)
+	private static void flatten(ArrayList<Object> result, Iterable<Object> xs, HashMap<Object, Object> currentStyleAttrs)
 	{
-		ArrayList<Object> result = new ArrayList<Object>();
-		HashMap<Object, Object> currentStyleAttrs = new HashMap<Object, Object>();
 		Stack<HashMap<Object, Object>> styleStack = new Stack<HashMap<Object, Object>>();
 		styleStack.add( new HashMap<Object, Object>() );
 		Object prevElement = null;
@@ -183,6 +186,14 @@ class Flatten
 			{
 				result.add( x );
 			}
+			else if ( isStyleSpan( x ) )
+			{
+				EdStyleSpan span = (EdStyleSpan)x;
+				HashMap<Object, Object> attrs = new HashMap<Object, Object>();
+				attrs.putAll( currentStyleAttrs );
+				attrs.putAll( span.getStyleAttrs() );
+				flatten( result, span.getContents(), attrs );
+			}
 			else
 			{
 				throw new RuntimeException( "Could not process element " + x.getClass().getName() );
@@ -190,7 +201,13 @@ class Flatten
 			
 			prevElement = x;
 		}
-		
+	}
+	
+	private static ArrayList<Object> flatten(Iterable<Object> xs)
+	{
+		ArrayList<Object> result = new ArrayList<Object>();
+		HashMap<Object, Object> currentStyleAttrs = new HashMap<Object, Object>();
+		flatten( result, xs, currentStyleAttrs );
 		return result;
 	}
 	
