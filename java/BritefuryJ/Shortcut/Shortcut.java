@@ -92,7 +92,7 @@ public class Shortcut implements Presentable
 			contents.add( modifierBorder.surround( modifierStyle.applyTo( new Label( modName ) ) ) );
 		}
 		contents.add( key );
-		return new Row( contents.toArray( new Pres[] {} ) );
+		return new Row( contents.toArray( new Pres[contents.size()] ) );
 	}
 	
 	

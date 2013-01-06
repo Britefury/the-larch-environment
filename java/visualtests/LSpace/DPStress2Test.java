@@ -99,7 +99,7 @@ public class DPStress2Test
 			elems.add( args[i] );
 		}
 		elems.add( closeParen );
-		return new LSSpan( ContainerStyleParams.defaultStyleParams, elems.toArray( new LSElement[] {} ) );
+		return new LSSpan( ContainerStyleParams.defaultStyleParams, elems.toArray( new LSElement[elems.size()] ) );
 	}
 	
 	

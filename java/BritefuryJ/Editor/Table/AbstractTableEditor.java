@@ -340,11 +340,13 @@ public abstract class AbstractTableEditor<ModelType>
 		{
 			Segment[] htmlRow = htmlBlock[rowIndex];
 			String[] textRow = new String[htmlRow.length];
-			
+
 			for (int colIndex = 0; colIndex < htmlRow.length; colIndex++)
 			{
 				textRow[colIndex] = htmlRow[colIndex].getTextExtractor().toString();
 			}
+
+			textBlock[rowIndex] = textRow;
 		}
 		
 		return textBlock;

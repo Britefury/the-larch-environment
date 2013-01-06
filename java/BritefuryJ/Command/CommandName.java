@@ -62,7 +62,7 @@ public class CommandName extends CommandMnemonic
 		}
 		addSegment( elements, name, pos, name.length(), highlighStart, highlightEnd );
 		
-		return new Row( elements.toArray( new Pres[0] ) );
+		return new Row( elements.toArray( new Pres[elements.size()] ) );
 	}
 	
 	private void addSegment(List<Pres> elements, String name, int segStart, int segEnd, int highlightStart, int highlightEnd)

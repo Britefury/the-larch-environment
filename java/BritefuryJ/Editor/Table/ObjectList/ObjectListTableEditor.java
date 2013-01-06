@@ -320,7 +320,6 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 		}
 		catch (UnsupportedOperationException e)
 		{
-			return;
 		}
 	}
 	

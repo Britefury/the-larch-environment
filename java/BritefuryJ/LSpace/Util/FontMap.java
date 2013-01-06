@@ -48,6 +48,7 @@ public class FontMap
 		if ( availableName == null )
 		{
 			availableName = findAvailableFont( name );
+			fontNameToAvailableFontName.put( name, availableName );
 		}
 		
 		return availableName;

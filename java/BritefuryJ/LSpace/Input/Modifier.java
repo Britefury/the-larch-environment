@@ -72,7 +72,7 @@ public class Modifier
 	
 	public static String keyModifiersToString(int modifiers)
 	{
-		StringBuilder b = new StringBuilder( '<' );
+		StringBuilder b = new StringBuilder( "<" );
 		addModifiersToString( b, modifiers, CTRL, "CTRL" );
 		addModifiersToString( b, modifiers, SHIFT, "SHIFT" );
 		addModifiersToString( b, modifiers, ALT, "ALT" );
