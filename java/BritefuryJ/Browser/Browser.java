@@ -41,7 +41,7 @@ import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.IncrementalView.IncrementalView;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.PageController;
-import BritefuryJ.LSpace.PresentationComponent;
+import BritefuryJ.LSpace.RootPresentationComponent;
 import BritefuryJ.LSpace.PersistentState.PersistentState;
 import BritefuryJ.LSpace.PersistentState.PersistentStateStore;
 import BritefuryJ.Pres.Pres;
@@ -51,9 +51,9 @@ import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.RichText.Page;
-import BritefuryJ.Projection.TransientSubject;
 import BritefuryJ.Projection.Subject;
 import BritefuryJ.Projection.SubjectPath;
+import BritefuryJ.Projection.TransientSubject;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
 
@@ -170,7 +170,7 @@ public class Browser
 	private BrowserTrail trail;
 	private JPanel panel;
 
-	private PresentationComponent presComponent;
+	private RootPresentationComponent presComponent;
 	private CommandBar commandBar;
 	private ScrolledViewport.ScrolledViewportControl viewport;
 	private BrowserHistory history;
@@ -192,7 +192,7 @@ public class Browser
 		
 		viewport = makeViewport( new Blank(), history.getCurrentState().getViewportState() );
 		
-		presComponent = new PresentationComponent();
+		presComponent = new RootPresentationComponent();
 		presComponent.setPageController( pageController );
 		presComponent.getRootElement().setChild( viewport.getElement() );
 		

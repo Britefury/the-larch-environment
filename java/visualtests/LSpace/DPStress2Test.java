@@ -19,7 +19,7 @@ import BritefuryJ.LSpace.LSParagraph;
 import BritefuryJ.LSpace.LSSpan;
 import BritefuryJ.LSpace.LSText;
 import BritefuryJ.LSpace.LSViewport;
-import BritefuryJ.LSpace.PresentationComponent;
+import BritefuryJ.LSpace.RootPresentationComponent;
 import BritefuryJ.LSpace.Layout.HAlignment;
 import BritefuryJ.LSpace.Layout.VAlignment;
 import BritefuryJ.LSpace.PersistentState.PersistentState;
@@ -132,7 +132,7 @@ public class DPStress2Test
 		//This stops the app on window close.
 		frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
 
-		PresentationComponent presentation = new PresentationComponent();
+		RootPresentationComponent presentation = new RootPresentationComponent();
 	     
 		System.out.println( "Start memory usage = "  + ( Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() ) );
 	     

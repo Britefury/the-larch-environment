@@ -33,7 +33,6 @@ import javax.swing.Timer;
 import javax.swing.TransferHandler;
 
 import BritefuryJ.LSpace.PresentationComponent.CannotGetGraphics2DException;
-import BritefuryJ.LSpace.PresentationComponent.PresentationPopup;
 import BritefuryJ.LSpace.PresentationComponent.TypesetProfile;
 import BritefuryJ.LSpace.PresentationComponent.TypesetProfileMeasurement;
 import BritefuryJ.LSpace.Focus.Selection;
@@ -110,7 +109,6 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	protected PageController pageController = null;
 	
 	
-	private PresentationEventErrorLog eventErrorLog = new PresentationEventErrorLog();
 	private TypesetProfile profile;
 	
 	
@@ -1265,14 +1263,14 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	//
 	//
 	
-	protected PresentationPopup createPopupPresentation(LSElement popupContents, Point2 localPos, Anchor popupAnchor,
+	protected PresentationPopupWindow createPopupPresentation(LSElement popupContents, Point2 localPos, Anchor popupAnchor,
 			boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		return component.createPopupPresentation( popupContents, (int)( localPos.x + 0.5 ), (int)( localPos.y + 0.5 ),
 				popupAnchor, bCloseOnLoseFocus, bRequestFocus, true );
 	}
 	
-	public PresentationPopup createPopupAtMousePosition(LSElement popupContents, Anchor popupAnchor,
+	public PresentationPopupWindow createPopupAtMousePosition(LSElement popupContents, Anchor popupAnchor,
 			boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		Point mouse = component.getMousePosition();
@@ -1280,14 +1278,14 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	}
 
 	
-	protected PresentationPopup createChainPopupPresentation(LSElement popupContents, Point2 localPos, Anchor popupAnchor,
+	protected PresentationPopupWindow createChainPopupPresentation(LSElement popupContents, Point2 localPos, Anchor popupAnchor,
 			boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		return component.createPopupPresentation( popupContents, (int)( localPos.x + 0.5 ), (int)( localPos.y + 0.5 ),
 				popupAnchor, bCloseOnLoseFocus, bRequestFocus, false );
 	}
 	
-	public PresentationPopup createChainPopupAtMousePosition(LSElement popupContents, Anchor popupAnchor,
+	public PresentationPopupWindow createChainPopupAtMousePosition(LSElement popupContents, Anchor popupAnchor,
 			boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		Point mouse = component.getMousePosition();
@@ -1322,17 +1320,17 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	
 	public PresentationEventErrorLog getEventErrorLog()
 	{
-		return eventErrorLog;
+		return component.getEventErrorLog();
 	}
 	
 	public void notifyExceptionDuringEventHandler(String event, Throwable error)
 	{
-		eventErrorLog.exceptionDuringPresentationEventHandler( event, error );
+		getEventErrorLog().exceptionDuringPresentationEventHandler( event, error );
 	}
 
 	protected void notifyExceptionDuringElementInteractor(LSElement element, Object interactor, String event, Throwable error)
 	{
-		eventErrorLog.exceptionDuringElementInteractor( element, interactor, event, error );
+		getEventErrorLog().exceptionDuringElementInteractor( element, interactor, event, error );
 	}
 	
 	
