@@ -121,8 +121,13 @@ public class TextEntryTestPage extends TestPage
 		
 		LiveValue live = new LiveValue( "Its alive..." );
 		Pres liveLine = new Paragraph( new Object[] { new Label( "Live: "), TextEntry.textEntryCommitOnChange( live ), new Spacer( 10.0, 0.0 ), live } );
+		LiveValue live2 = new LiveValue( "2013" );
+		Pres liveValidatedLine = new Paragraph( new Object[] { new Label( "Live (4-digit integers): "),
+				TextEntry.textEntryCommitOnChange( live2 ).regexValidated( Pattern.compile( "[0-9_]{4}" ),
+						"Please enter a valid identifier.\n(alphabetic or underscore, followed by alphanumeric or underscore)" ),
+						new Spacer( 10.0, 0.0 ), live2 } );
 		
-		Pres entriesBox = new Column( new Object[] { hello, world, identifierLine, integerLine, liveLine } );
+		Pres entriesBox = new Column( new Object[] { hello, world, identifierLine, integerLine, liveLine, liveValidatedLine } );
 		
 		return new Body( new Pres[] { new Heading2( "Text entries" ), entriesBox } );
 	}
