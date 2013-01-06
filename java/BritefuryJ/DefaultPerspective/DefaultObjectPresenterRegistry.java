@@ -850,12 +850,8 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 		Class<?> superClass = cls.getSuperclass();
 		Class<?> interfaces[] = cls.getInterfaces();
 		
-		ArrayList<Object> lines = new ArrayList<Object>();
-		
-		Pres headerName = new Row( new Pres[] { javaKeywordStyle.applyTo( new StaticText( "Class " ) ), 
+		Pres headerName = new Row( new Pres[] { javaKeywordStyle.applyTo( new StaticText( "Class " ) ),
 				PrimitivePresenter.presentJavaClassName( cls, classNameStyle ) } );
-		
-		lines.add( headerName );
 		
 		if ( superClass != null  ||  interfaces.length > 0 )
 		{

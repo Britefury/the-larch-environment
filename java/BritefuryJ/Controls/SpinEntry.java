@@ -166,7 +166,7 @@ public abstract class SpinEntry extends ControlPres
 		{
 			return String.valueOf( value.getValue() );
 		}
-	};
+	}
 	
 	
 	

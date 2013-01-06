@@ -692,7 +692,6 @@ public class Marker implements Comparable<Marker>
 		}
 		
 		clear();
-		return;
 	}
 	
 	

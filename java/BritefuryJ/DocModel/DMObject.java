@@ -577,7 +577,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Pr
 					Object xv = dx.get( i );
 					if ( v == null  ||  xv == null )
 					{
-						if ( ( v != null )  !=  ( xv != null ) )
+						if ( ( v == null )  !=  ( xv == null ) )
 						{
 							return false;
 						}

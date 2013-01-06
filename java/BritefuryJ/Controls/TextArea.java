@@ -168,7 +168,7 @@ public class TextArea extends ControlPres
 				}
 				else
 				{
-					return new Span( p.toArray( new Pres[] {} ) );
+					return new Span( p.toArray( new Pres[p.size()] ) );
 				}
 			}
 		}

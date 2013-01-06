@@ -737,7 +737,7 @@ public class LSTable extends LSContainerNonOverlayed implements TableElement
 
 	public TableLayout.TablePackingParams[] getTablePackingParamsArray()
 	{
-		return childEntries.toArray( new TableLayout.TablePackingParams[0] );
+		return childEntries.toArray( new TableLayout.TablePackingParams[childEntries.size()] );
 	}
 
 	public TableLayout.TablePackingParams getTablePackingParamsForChild(LSElement child)

@@ -179,7 +179,7 @@ public abstract class NumericLabel extends ControlPres
 		{
 			return String.valueOf( value.getValue() );
 		}
-	};
+	}
 	
 	
 	

@@ -118,7 +118,7 @@ public class DPStressTest
 			elems.add( args[i] );
 		}
 		elems.add( closeParen );
-		return new LSParagraph( paraStyle, elems.toArray( new LSElement[] {} ) );
+		return new LSParagraph( paraStyle, elems.toArray( new LSElement[elems.size()] ) );
 	}
 	
 	
