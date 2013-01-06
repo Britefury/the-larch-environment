@@ -15,7 +15,7 @@ import BritefuryJ.LSpace.LSHiddenText;
 import BritefuryJ.LSpace.LSParagraph;
 import BritefuryJ.LSpace.LSRow;
 import BritefuryJ.LSpace.LSText;
-import BritefuryJ.LSpace.PresentationComponent;
+import BritefuryJ.LSpace.RootPresentationComponent;
 import BritefuryJ.LSpace.StyleParams.ContainerStyleParams;
 
 public class ElementContentTest extends TestCase
@@ -43,7 +43,7 @@ public class ElementContentTest extends TestCase
 
 		LSBin b = new LSBin( ContainerStyleParams.defaultStyleParams, t0 );
 		
-		PresentationComponent component = new PresentationComponent();
+		RootPresentationComponent component = new RootPresentationComponent();
 		component.getRootElement().setChild( b );
 
 		assertEquals( b.getTextRepresentation(), "abc" );
@@ -60,7 +60,7 @@ public class ElementContentTest extends TestCase
 		
 		LSRow p = new LSRow( new LSElement[] { t0, t1, t2, t3 } );
 		
-		PresentationComponent component = new PresentationComponent();
+		RootPresentationComponent component = new RootPresentationComponent();
 		component.getRootElement().setChild( p );
 	
 		assertEquals( p.getTextRepresentation(), "abcghimnostu" );
@@ -99,7 +99,7 @@ public class ElementContentTest extends TestCase
 		LSRow root = new LSRow( new LSElement[] { pa, e, b, tx, ty } );
 		
 		
-		PresentationComponent component = new PresentationComponent();
+		RootPresentationComponent component = new RootPresentationComponent();
 		component.getRootElement().setChild( root );
 
 		
@@ -236,7 +236,7 @@ public class ElementContentTest extends TestCase
 		LSParagraph root = new LSParagraph( new LSElement[] { pa, e, pb, tx, ty } );
 		
 		
-		PresentationComponent component = new PresentationComponent();
+		RootPresentationComponent component = new RootPresentationComponent();
 		component.getRootElement().setChild( root );
 
 		

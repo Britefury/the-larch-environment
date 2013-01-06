@@ -21,6 +21,7 @@ import BritefuryJ.LSpace.Anchor;
 import BritefuryJ.LSpace.ElementPainter;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.PresentationComponent;
+import BritefuryJ.LSpace.PresentationPopupWindow;
 import BritefuryJ.LSpace.Event.PointerMotionEvent;
 import BritefuryJ.LSpace.Interactor.HoverElementInteractor;
 import BritefuryJ.LSpace.Interactor.MotionElementInteractor;
@@ -170,7 +171,7 @@ public class AttachTooltip extends CompositePres
 	private class HelpPopup
 	{
 		private Timer timer;
-		private PresentationComponent.PresentationPopup popup;
+		private PresentationPopupWindow popup;
 		
 		
 		private HelpPopup(final LSElement targetElement, int timeout)

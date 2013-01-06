@@ -14,7 +14,7 @@ import BritefuryJ.Graphics.SolidBorder;
 import BritefuryJ.LSpace.LSBorder;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSViewport;
-import BritefuryJ.LSpace.PresentationComponent;
+import BritefuryJ.LSpace.RootPresentationComponent;
 import BritefuryJ.LSpace.Layout.HAlignment;
 import BritefuryJ.LSpace.Layout.VAlignment;
 import BritefuryJ.LSpace.PersistentState.PersistentState;
@@ -30,7 +30,7 @@ import BritefuryJ.Projection.SubjectTrailLink;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
 
-class BrowserTrail extends PresentationComponent
+class BrowserTrail extends RootPresentationComponent
 {
 	private static final long serialVersionUID = 1L;
 

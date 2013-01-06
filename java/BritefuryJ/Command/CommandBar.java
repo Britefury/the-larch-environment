@@ -11,6 +11,7 @@ import java.awt.event.KeyEvent;
 import BritefuryJ.LSpace.Anchor;
 import BritefuryJ.LSpace.PageController;
 import BritefuryJ.LSpace.PresentationComponent;
+import BritefuryJ.LSpace.PresentationPopupWindow;
 import BritefuryJ.LSpace.Input.Keyboard.Keyboard;
 import BritefuryJ.LSpace.Input.Keyboard.KeyboardInteractor;
 import BritefuryJ.Pres.Pres;
@@ -75,7 +76,7 @@ public class CommandBar
 	
 	private AbstractCommandConsole console;
 	
-	private PresentationComponent.PresentationPopup popup = null;
+	private PresentationPopupWindow popup = null;
 	
 	
 	public CommandBar(PresentationComponent presentation, AbstractCommandConsole console, PageController pageController)

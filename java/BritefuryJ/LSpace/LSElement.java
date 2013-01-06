@@ -2735,7 +2735,7 @@ abstract public class LSElement implements Presentable
 	//
 	//
 	
-	public PresentationComponent.PresentationPopup popup(LSElement targetElement, Anchor targetAnchor, Anchor popupAnchor,
+	public PresentationPopupWindow popup(LSElement targetElement, Anchor targetAnchor, Anchor popupAnchor,
 			boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		AABox2 visibleBox = targetElement.getVisibleBoxInLocalSpace();
@@ -2743,7 +2743,7 @@ abstract public class LSElement implements Presentable
 		return popupOver( targetElement, targerCorner, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public PresentationComponent.PresentationPopup popupOver(LSElement targetElement, Point2 targetLocalPos, Anchor popupAnchor,
+	public PresentationPopupWindow popupOver(LSElement targetElement, Point2 targetLocalPos, Anchor popupAnchor,
 			boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		if ( targetElement.isLocalSpacePointVisible( targetLocalPos ) )
@@ -2759,7 +2759,7 @@ abstract public class LSElement implements Presentable
 	}
 	
 
-	public PresentationComponent.PresentationPopup chainPopup(LSElement targetElement, Anchor targetAnchor, Anchor popupAnchor,
+	public PresentationPopupWindow chainPopup(LSElement targetElement, Anchor targetAnchor, Anchor popupAnchor,
 			boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		AABox2 visibleBox = targetElement.getVisibleBoxInLocalSpace();
@@ -2767,7 +2767,7 @@ abstract public class LSElement implements Presentable
 		return chainPopupOver( targetElement, targerCorner, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public PresentationComponent.PresentationPopup chainPopupOver(LSElement targetElement, Point2 targetLocalPos, Anchor popupAnchor,
+	public PresentationPopupWindow chainPopupOver(LSElement targetElement, Point2 targetLocalPos, Anchor popupAnchor,
 			boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		if ( targetElement.isLocalSpacePointVisible( targetLocalPos ) )
@@ -2792,7 +2792,8 @@ abstract public class LSElement implements Presentable
 	{
 		if ( isInsidePopup() )
 		{
-			getRootElement().getComponent().closeContainingPopupChain();
+			PopupPresentationComponent comp = (PopupPresentationComponent)getRootElement().getComponent(); 
+			comp.closeContainingPopupChain();
 		}
 	}
 	

@@ -21,6 +21,7 @@ import BritefuryJ.LSpace.Anchor;
 import BritefuryJ.LSpace.ElementPainter;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.PresentationComponent;
+import BritefuryJ.LSpace.PresentationPopupWindow;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -441,14 +442,14 @@ public class BubblePopup
 	
 	
 	
-	public static PresentationComponent.PresentationPopup popupInBubbleAdjacentTo(Object contents, LSElement target, Anchor targetAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public static PresentationPopupWindow popupInBubbleAdjacentTo(Object contents, LSElement target, Anchor targetAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		ElementBubblePres b = new ElementBubblePres( contents, target );
 		
 		return b.popup( target, targetAnchor, targetAnchor.opposite(), bCloseOnLoseFocus, bRequestFocus );
 	}
 
-	public static PresentationComponent.PresentationPopup popupInBubbleAdjacentToMouse(Object contents, LSElement target, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public static PresentationPopupWindow popupInBubbleAdjacentToMouse(Object contents, LSElement target, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		PresentationComponent component = target.getRootElement().getComponent();
 		Point mouse = component.getMousePosition();
