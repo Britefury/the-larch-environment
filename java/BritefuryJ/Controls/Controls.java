@@ -32,7 +32,7 @@ public class Controls
 	
 	
 	public static final InheritedAttributeNonNull buttonBorder = new InheritedAttributeNonNull( controlsNamespace, "buttonBorder", AbstractBorder.class,
-			new SolidBorder( 1.5, 2.0, 8.0, 8.0, new Color( 0.7f, 0.7f, 0.7f ), new Color( 0.925f, 0.925f, 0.925f  ), new Color( 0.6f, 0.6f, 0.6f ), new Color( 0.875f, 0.875f, 0.875f ) ) );
+			new SolidBorder( 1.0, 2.0, new Color( 0.7f, 0.7f, 0.7f ), new Color( 0.925f, 0.925f, 0.925f  ), new Color( 0.6f, 0.6f, 0.6f ), new Color( 0.875f, 0.875f, 0.875f ) ) );
 	public static final InheritedAttributeNonNull buttonAttrs = new InheritedAttributeNonNull( controlsNamespace, "buttonAttrs", StyleSheet.class,
 			    StyleSheet.style( Primitive.foreground.as( new Color( 0, 111, 128 ) ) ) );
 	
@@ -44,17 +44,17 @@ public class Controls
 			    StyleSheet.style( Primitive.editable.as( false ), Primitive.foreground.as( new Color( 0, 111, 128 ) ), Primitive.hoverForeground.as( new Color( 0.0f, 0.5f, 0.0f ) ), Primitive.cursor.as( new Cursor( Cursor.HAND_CURSOR ) ) ) );
 
 	public static final InheritedAttributeNonNull checkboxHoverBackground = new InheritedAttributeNonNull( controlsNamespace, "checkboxHoverBackground", Painter.class,
-			new FilledOutlinePainter( new Color( 0.6f, 0.6f, 0.75f  ), new Color( 0.95f, 0.95f, 0.975f  ) ) );
+			new FilledOutlinePainter( new Color( 0.95f, 0.95f, 0.95f  ), new Color( 0.8f, 0.8f, 0.8f  ) ) );
 	public static final InheritedAttributeNonNull checkboxCheckBorder = new InheritedAttributeNonNull( controlsNamespace, "checkboxCheckBorder", AbstractBorder.class,
-			new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.6f, 0.6f, 0.75f ), new Color( 0.8f, 0.8f, 0.9f  ) ) );
-	public static final InheritedAttributeNonNull checkboxCheckForeground = new InheritedAttributeNonNull( controlsNamespace, "checkboxCheckForeground", Paint.class, new Color( 0.4f, 0.4f, 0.5f ) );
+			new SolidBorder( 1.0, 3.0, new Color( 0.7f, 0.7f, 0.7f ), new Color( 0.925f, 0.925f, 0.925f  ) ) );
+	public static final InheritedAttributeNonNull checkboxCheckForeground = new InheritedAttributeNonNull( controlsNamespace, "checkboxCheckForeground", Paint.class, new Color( 0.4f, 0.4f, 0.4f ) );
 	public static final InheritedAttributeNonNull checkboxCheckSize = new InheritedAttributeNonNull( controlsNamespace, "checkboxCheckSize", Double.class, 8.0 );
 	public static final InheritedAttributeNonNull checkboxSpacing = new InheritedAttributeNonNull( controlsNamespace, "checkboxSpacing", Double.class, 5.0 );
 	public static final InheritedAttributeNonNull checkboxPadding = new InheritedAttributeNonNull( controlsNamespace, "checkboxPadding", Double.class, 1.0 );
 
 	
 	public static final InheritedAttributeNonNull optionMenuBorder = new InheritedAttributeNonNull( controlsNamespace, "optionMenuBorder", AbstractBorder.class,
-			new SolidBorder( 1.5, 2.0, 8.0, 8.0, new Color( 0.7f, 0.7f, 0.7f ), new Color( 0.925f, 0.925f, 0.925f  ), new Color( 0.6f, 0.6f, 0.6f ), new Color( 0.875f, 0.875f, 0.875f ) ) );
+			new SolidBorder( 1.0, 2.0, new Color( 0.7f, 0.7f, 0.7f ), new Color( 0.925f, 0.925f, 0.925f  ), new Color( 0.6f, 0.6f, 0.6f ), new Color( 0.875f, 0.875f, 0.875f ) ) );
 	public static final InheritedAttributeNonNull optionMenuContentsSpacing = new InheritedAttributeNonNull( controlsNamespace, "optionMenuContentsSpacing", Double.class, 5.0 );
 	public static final InheritedAttributeNonNull optionMenuArrowSize = new InheritedAttributeNonNull( controlsNamespace, "optionMenuArrowSize", Double.class, 14.0 );
 	public static final InheritedAttributeNonNull optionMenuArrowPainter = new InheritedAttributeNonNull( controlsNamespace, "optionMenuArrowPainter", Painter.class,
@@ -76,13 +76,13 @@ public class Controls
 	public static final InheritedAttributeNonNull tabbedBoxHeaderSpacing = new InheritedAttributeNonNull( controlsNamespace, "tabbedBoxHeaderSpacing", Double.class, 5.0 );
 	public static final InheritedAttributeNonNull tabbedBoxHeaderTabRounding = new InheritedAttributeNonNull( controlsNamespace, "tabbedBoxHeaderTabRounding", Double.class, 3.0 );
 	public static final InheritedAttributeNonNull tabbedBoxHeaderFillPaint = new InheritedAttributeNonNull( controlsNamespace, "tabbedBoxHeaderFillPaint", Paint.class,
-			new Color( 0.7f, 0.8f, 0.9f ) );
+			new Color( 0.9f, 0.9f, 0.9f ) );
 	public static final InheritedAttributeNonNull tabbedBoxHeaderOutlinePaint = new InheritedAttributeNonNull( controlsNamespace, "tabbedBoxHeaderOutlinePaint", Paint.class,
-			new Color( 0.0f, 0.25f, 0.5f ) );
+			new Color( 0.6f, 0.6f, 0.6f ) );
 	public static final InheritedAttributeNonNull tabbedBoxHeaderInactiveTabFillPaint = new InheritedAttributeNonNull( controlsNamespace, "tabbedBoxHeaderInactiveTabFillPaint", Paint.class,
-			new Color( 0.85f, 0.9f, 0.95f ) );
+			new Color( 0.95f, 0.95f, 0.95f ) );
 	public static final InheritedAttributeNonNull tabbedBoxHeaderInactiveTabOutlinePaint = new InheritedAttributeNonNull( controlsNamespace, "tabbedBoxHeaderInactiveTabOutlinePaint", Paint.class,
-			new Color( 0.0f, 0.5f, 1.0f ) );
+			new Color( 0.7f, 0.7f, 0.7f ) );
 
 	
 	public static final InheritedAttributeNonNull textEntryBorder = new InheritedAttributeNonNull( controlsNamespace, "textEntryBorder", AbstractBorder.class,
@@ -98,7 +98,7 @@ public class Controls
 
 	
 	public static final InheritedAttributeNonNull editableLabelHoverAttrs = new InheritedAttributeNonNull( controlsNamespace, "editableLabelHoverAttrs", StyleSheet.class,
-		    StyleSheet.style( Primitive.hoverBackground.as( new FilledOutlinePainter( new Color( 0.8f, 0.825f, 0.9f ), new Color( 0.125f, 0.341f, 0.574f ), new BasicStroke( 1.0f ) ) ) ) );
+		    StyleSheet.style( Primitive.hoverBackground.as( new FilledOutlinePainter( new Color( 0.9f, 0.9f, 0.9f ), new Color( 0.7f, 0.7f, 0.7f ), new BasicStroke( 1.0f ) ) ) ) );
 	public static final InheritedAttributeNonNull editableLabelTextAttrs = new InheritedAttributeNonNull( controlsNamespace, "editableLabelTextAttrs", StyleSheet.class,
 		    StyleSheet.style( Primitive.foreground.as( new Color( 0.0f, 0.3f, 0.5f ) ), Primitive.cursor.as( new Cursor( Cursor.TEXT_CURSOR ) )  ) );
 	
