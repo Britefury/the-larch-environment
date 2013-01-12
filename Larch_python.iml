@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="PYTHON_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="false">
+    <content url="file://$MODULE_DIR$/larch">
+      <sourceFolder url="file://$MODULE_DIR$/larch" isTestSource="false" />
+    </content>
+    <orderEntry type="jdk" jdkName="Jython 2.7a2 (C:/jython2.7a2/jython.bat)" jdkType="Python SDK" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>
+

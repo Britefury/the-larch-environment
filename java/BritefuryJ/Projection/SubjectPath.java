@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.Projection;
 
+import org.python.core.*;
+
 import java.util.ArrayList;
 
 public class SubjectPath
@@ -105,5 +107,54 @@ public class SubjectPath
 		}
 		
 		return true;
+	}
+
+
+
+	public PyObject __getstate__()
+	{
+		if ( canPersist() )
+		{
+			PyObject elts[] = new PyObject[entries.size()];
+			for (int i = 0; i < elts.length; i++)
+			{
+				elts[i] = Py.java2py( entries.get( i ) );
+			}
+			PyList eltsList = new PyList( elts );
+			PyDictionary d = new PyDictionary();
+			d.__setitem__( Py.newString( "pathEntries" ), eltsList );
+			return d;
+		}
+		else
+		{
+			throw Py.ValueError( "SubjectPath cannot be persisted; contains one or more un-persistable path entries" );
+		}
+	}
+
+	public void __setstate__(PyObject state)
+	{
+		if ( state instanceof PyDictionary )
+		{
+			PyObject e = state.__getitem__( Py.newString( "pathEntries" ) );
+			if ( e instanceof PyList )
+			{
+				PyList l = (PyList)e;
+				entries = new ArrayList<SubjectPathEntry>();
+				entries.addAll( (PyList)e );
+			}
+			else
+			{
+				throw Py.TypeError( "Elements list must be a list" );
+			}
+		}
+		else
+		{
+			throw Py.TypeError( "State must be a dictionary" );
+		}
+	}
+
+	public PyObject __reduce__()
+	{
+		return new PyTuple( Py.java2py( getClass() ), new PyTuple(), __getstate__() );
 	}
 }

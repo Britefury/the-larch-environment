@@ -466,7 +466,7 @@ def subscriptTuple(items, bTrailingSeparator):
 
 
 def subscript(target, index):
-	return Span( [ target, _lineBreak, _openBracket, index, _closeBracket ] )
+	return Span( [ target, _openBracket, index, _closeBracket ] )
 
 
 
