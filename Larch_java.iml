@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="EclipseModuleManager">
+    <libelement value="jar://C:/jython2.7a2/jython.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/extlibs/jericho-html-3.2.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/extlibs/svgSalamander.jar!/" />
+    <libelement value="file://C:\code\larch\larch" />
+    <src_description expected_position="0">
+      <src_folder value="file://$MODULE_DIR$/java" expected_position="0" />
+    </src_description>
+  </component>
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6" inherit-compiler-output="false">
+    <output url="file://$APPLICATION_HOME_DIR$/bin/bin" />
+    <content url="file://$MODULE_DIR$/java">
+      <sourceFolder url="file://$MODULE_DIR$/java" isTestSource="false" />
+    </content>
+    <orderEntry type="jdk" jdkName="1.6" jdkType="JavaSDK" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library name="junit3">
+        <CLASSES>
+          <root url="jar://$APPLICATION_HOME_DIR$/lib/junit.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library name="jericho-html-3.2.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/extlibs/jericho-html-3.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library name="svgSalamander.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/extlibs/svgSalamander.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="larch">
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/larch" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="jython" level="project" />
+  </component>
+</module>
+
