@@ -41,6 +41,11 @@ class Document (ChangeHistoryListener):
 
 
 
+	@property
+	def contents(self):
+		return self._contents
+
+
 	def hasUnsavedData(self):
 		return self._bHasUnsavedData
 	

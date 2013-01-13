@@ -96,13 +96,14 @@ class AppView (MethodDispatchView):
 	@ObjectDispatchMethod( Application.AppState )
 	def AppState(self, fragment, state, node):
 		def _onNewDoc(link, event):
-			def handleNewDocumentFn(document):
+			def handleNewDocumentFn(document, firstPageSubjectFn):
 				name = _newDocumentName( openDocuments )
 				document.setDocumentName( name )
 				
 				node.registerOpenDocument( document )
 
 				subject = document.newSubject( fragment.subject, None, document.getDocumentName() )
+				subject = firstPageSubjectFn( subject )
 
 				pageController = link.element.rootElement.pageController
 				pageController.openSubject( subject, PageController.OpenOperation.OPEN_IN_CURRENT_TAB )

@@ -45,11 +45,27 @@ class _DocumentFactory (object):
 	def __init__(self, menuLabelText, newDocumentContentFn):
 		self.menuLabelText = menuLabelText
 		self.__newDocumentContentFn = newDocumentContentFn
+		self.__firstPageSubjectFn = None
 
 
 	def makeDocument(self, world):
 		content = self.__newDocumentContentFn()
 		return Document( world, content )
+
+	def firstPageSubject(self, documentContentSubject):
+		if self.__firstPageSubjectFn is not None:
+			return self.__firstPageSubjectFn( documentContentSubject )
+		else:
+			return documentContentSubject
+
+
+	def firstPageSubjectFn(self, fn):
+		"""
+		fn: (documentContentSubject) -> firstPageSubject
+		"""
+		self.__firstPageSubjectFn = fn
+		return self
+
 
 
 
@@ -156,8 +172,9 @@ class World (object):
 			return SomethingContent()
 		"""
 		def decorate(contentFactoryFn):
-			self.newDocumentFactories.append( _DocumentFactory( description, contentFactoryFn ) )
-			return contentFactoryFn
+			factory = _DocumentFactory( description, contentFactoryFn )
+			self.newDocumentFactories.append( factory )
+			return factory
 		return decorate
 
 

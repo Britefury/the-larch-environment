@@ -10,7 +10,7 @@
     </src_description>
   </component>
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6" inherit-compiler-output="false">
-    <output url="file://$APPLICATION_HOME_DIR$/bin/bin" />
+    <output url="file://$MODULE_DIR$/bin" />
     <content url="file://$MODULE_DIR$/java">
       <sourceFolder url="file://$MODULE_DIR$/java" isTestSource="false" />
     </content>
