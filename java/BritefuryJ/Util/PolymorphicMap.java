@@ -74,7 +74,29 @@ public class PolymorphicMap <ValueType> implements Serializable
 		registeredPythonValues.putAll( values.registeredPythonValues );
 		cachedPythonValues.clear();
 	}
-	
+
+
+	public ValueType getWithoutInheritance(Class<?> type)
+	{
+		if ( registeredJavaValues.isEmpty() )
+		{
+			return null;
+		}
+		Entry<ValueType> e = registeredJavaValues.get( type );
+		return e != null  ?  e.value  :  null;
+	}
+
+	public ValueType getWithoutInheritance(PyType type)
+	{
+		if ( registeredPythonValues.isEmpty() )
+		{
+			return null;
+		}
+		Entry<ValueType> e = registeredPythonValues.get( type );
+		return e != null  ?  e.value  :  null;
+	}
+
+
 	public ValueType getForInstance(Object x)
 	{
 		if ( x instanceof PyObject )

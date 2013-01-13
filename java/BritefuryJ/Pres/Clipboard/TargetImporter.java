@@ -29,6 +29,12 @@ public class TargetImporter <TargetType extends Target>
 	}
 
 
+	public void addDataImporter(DataImporterInterface<TargetType> importer)
+	{
+		importers.add( 0, importer );
+	}
+
+
 	public Class<? extends Target> getTargetClass()
 	{
 		return targetClass;
