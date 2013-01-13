@@ -38,6 +38,7 @@ import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Proxy;
 import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Pres.Primitive.Segment;
+import BritefuryJ.Pres.Primitive.Text;
 import BritefuryJ.Pres.RichText.RichText;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.Util.RichString.RichString;
@@ -419,7 +420,7 @@ public abstract class RichTextController extends SequentialController
 	public Pres editableParagraphEmbed(Object model, Object child)
 	{
 		Pres p = new StructuralItem( this, model, child );
-		p = new Row( new Pres[] { new Segment( p ) } );
+		p = new Row( new Pres[] { new Text( "" ), p, new Text( "" ) } );
 		return p.withProperty( paragraphEmbedPropertyKey, model ).withProperty( blockItemPropertyKey, model );
 	}
 	
