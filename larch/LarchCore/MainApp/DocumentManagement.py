@@ -24,7 +24,7 @@ def promptNewDocument(world, element, handleNewDocumentFn):
 	def _make_newDocument(documentFactory):
 		def newDoc(menuItem):
 			doc = documentFactory.makeDocument( world )
-			handleNewDocumentFn( doc )
+			handleNewDocumentFn( doc, documentFactory.firstPageSubject )
 		return newDoc
 	items = []
 	for newDocumentFactory in world.newDocumentFactories:

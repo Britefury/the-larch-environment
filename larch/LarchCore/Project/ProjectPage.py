@@ -61,7 +61,8 @@ class ProjectPage (ProjectNode):
 			self.__change_history__.addChange( lambda: self.setName( name ), lambda: self.setName( oldName ), 'Page set name' )
 		
 		
-	def getData(self):
+	@property
+	def data(self):
 		self._incr.onAccess()
 		return self._data
 
@@ -94,4 +95,3 @@ class ProjectPage (ProjectNode):
 
 
 	name = property( getName, setName )
-	data = property( getData )
