@@ -47,6 +47,11 @@ abstract public class AbstractSelectionExporter <SelectionContentsType, Selectio
 	{
 		return exporters;
 	}
+
+	public void addDataExporter(DataExporterInterface<SelectionContentsType> exporter)
+	{
+		exporters.add( 0, exporter );
+	}
 	
 	
 	

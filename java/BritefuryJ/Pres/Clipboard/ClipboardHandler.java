@@ -84,8 +84,24 @@ public class ClipboardHandler extends ClipboardHandlerInterface
 		}
 		selectionEditors.put( selectionEditor.getSelectionClass(), selectionEditor );
 	}
-	
-	
+
+
+	public <SelectionType> AbstractSelectionExporter<SelectionType,?> getExporter(Class<SelectionType> selectionClass)
+	{
+		return (AbstractSelectionExporter<SelectionType,?>)(exporters == null  ?  null  :  exporters.getWithoutInheritance( selectionClass ));
+	}
+
+	public <TargetType extends Target> TargetImporter<TargetType> getImporter(Class<TargetType> targetClass)
+	{
+		return (TargetImporter<TargetType>)(importers == null  ?  null  :  importers.getWithoutInheritance( targetClass ));
+	}
+
+	public SelectionEditorInterface getSelectionEditor(Class<?> selectionClass)
+	{
+		return selectionEditors == null  ?  null  :  selectionEditors.getWithoutInheritance( selectionClass );
+	}
+
+
 	@Override
 	public boolean deleteSelection(Selection selection, Target target)
 	{
