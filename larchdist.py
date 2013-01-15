@@ -49,9 +49,11 @@ dirsForBinCompile = [ larchDir( 'Britefury' ), larchDir( 'LarchCore' ), larchDir
 rootFiles = [
 	'AUTHORS',
 	'BUGS',
+	'build.xml',
 	'COPYING',
 	'COPYING-Jericho.txt',
 	'COPYING-svgSalamander.txt',
+	'larchdist.py',
 	'lconsole',
 	'lconsole.bat',
 	'lconsole.py',
