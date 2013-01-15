@@ -26,6 +26,7 @@ import BritefuryJ.Pres.Primitive.Proxy;
 import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Pres.Primitive.Spacer;
 import BritefuryJ.Pres.RichText.NormalText;
+import BritefuryJ.Pres.RichText.RichSpan;
 import BritefuryJ.Pres.UI.SectionHeading3;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -36,6 +37,8 @@ public class TipBox extends CompositePres
 	private static final StyleSheet tipControlStyle = StyleSheet.style( Primitive.fontSize.as( 10 ) );
 	private static final StyleSheet tipStyle = StyleSheet.style( Primitive.fontSize.as( 11 ), Primitive.foreground.as( new Color( 0.1f, 0.1f, 0.1f ) ), Primitive.editable.as( false ) );
 	private static final StyleSheet multilineStyle = StyleSheet.style( Primitive.columnSpacing.as( 5.0 ) );
+	private static final StyleSheet strongStyle = StyleSheet.style( Primitive.fontBold.as( true ) );
+	private static final StyleSheet emphStyle = StyleSheet.style( Primitive.fontItalic.as( true ) );
 	private static final double marginX = 15.0, marginY = 5.0;
 	
 	
@@ -54,11 +57,9 @@ public class TipBox extends CompositePres
 	
 	public TipBox(Object tip)
 	{
-		this.tip = Pres.coerce( tip );
-		this.tipKey = null;
-		liveFn = buildLiveFn();
+		this( tip, null );
 	}
-	
+
 	public TipBox(String tip, String tipKey)
 	{
 		this.tip = multilineTextTip( tip );
@@ -68,12 +69,36 @@ public class TipBox extends CompositePres
 	
 	public TipBox(String tip)
 	{
-		this.tip = multilineTextTip( tip );
-		this.tipKey = null;
+		this( tip, null );
+	}
+
+	public TipBox(Object tips[], String tipKey)
+	{
+		Pres p[] = new Pres[tips.length];
+		for (int i = 0; i < tips.length; i++)
+		{
+			Object t = tips[i];
+			if ( t instanceof String )
+			{
+				p[i] = new NormalText( (String)t );
+			}
+			else
+			{
+				p[i] = Pres.coerce( t );
+			}
+		}
+
+		this.tip = multilineTips( p );
+		this.tipKey = tipKey;
 		liveFn = buildLiveFn();
 	}
-	
-	
+
+	public TipBox(Object tips[])
+	{
+		this( tips, null );
+	}
+
+
 	protected static Pres multilineTextTip(String tip)
 	{
 		String lineTexts[] = tip.split( "\\r?\\n" );
@@ -82,10 +107,15 @@ public class TipBox extends CompositePres
 		{
 			lines[i] = new NormalText( lineTexts[i] );
 		}
-		return multilineStyle.applyTo( new Column( lines ) );
+		return multilineTips( lines );
 	}
 	
-	
+	protected static Pres multilineTips(Pres tips[])
+	{
+		return multilineStyle.applyTo( new Column( tips ) );
+	}
+
+
 	private LiveFunction buildLiveFn()
 	{
 		LiveFunction.Function fn = new LiveFunction.Function()
@@ -165,7 +195,25 @@ public class TipBox extends CompositePres
 	{
 		hiddenFlag( key ).setLiteralValue( hidden );
 	}
-	
+
+
+
+	public static Pres tipText(Object values[])
+	{
+		return new NormalText( values );
+	}
+
+	public static Pres emph(String text)
+	{
+		return emphStyle.applyTo( new RichSpan( text ) );
+	}
+
+	public static Pres strong(String text)
+	{
+		return strongStyle.applyTo( new RichSpan( text ) );
+	}
+
+
 	
 	public static void resetTipHiddenStates()
 	{
