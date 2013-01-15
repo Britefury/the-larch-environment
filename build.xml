@@ -15,7 +15,7 @@
 				</section>
                 <attribute name="SplashScreen-Image" value="images/SplashScreen.png"/>
             </manifest>
-            <fileset dir="./bin/production/Larch_java">
+            <fileset dir="./bin">
 				<exclude name="tests/**/*"/>
 				<exclude name="visualtests/**/*"/>
 				<exclude name="tests"/>
