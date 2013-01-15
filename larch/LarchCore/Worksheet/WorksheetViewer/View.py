@@ -78,7 +78,7 @@ class WorksheetViewer (MethodDispatchView):
 			pageContents = [ linkHeader ]
 
 
-		tip = TipBox( 'To edit this worksheet, or add content, click Developer mode at the top right',
+		tip = TipBox( [ TipBox.tipText( [ 'To edit this worksheet or add content, click ', TipBox.emph( 'Switch to developer mode' ), ' at the top right' ] ) ],
 			      'larchcore.worksheet.view.toedit' )
 
 		w = Page( pageContents + [ bodyView, tip ] )

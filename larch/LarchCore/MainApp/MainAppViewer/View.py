@@ -32,7 +32,7 @@ from BritefuryJ.Graphics import FilledBorder
 from BritefuryJ.Controls import Hyperlink
 from BritefuryJ.Pres import Pres
 from BritefuryJ.Pres.Primitive import Primitive, Border, Row, Column, RGrid, GridRow
-from BritefuryJ.Pres.RichText import TitleBar, HSeparator, Head, Body, Page, LinkHeaderBar
+from BritefuryJ.Pres.RichText import TitleBar, HSeparator, Head, Body, Page, LinkHeaderBar, NormalText, RichSpan
 from BritefuryJ.Pres.UI import Section, SectionHeading1
 from BritefuryJ.Pres.Help import AttachTooltip, TipBox
 
@@ -42,11 +42,13 @@ from LarchCore.MainApp import Application
 from LarchCore.MainApp import DocumentManagement
 
 
+
 _appDocRightPadding = 30.0
 _controlsPadding = 5.0
 _appDocumentControlsStyle = StyleSheet.style( Primitive.rowSpacing( 20.0 ) )
 _appDocumentControlsBorder = FilledBorder( 5.0, 5.0, 5.0, 5.0, Color( 0.9, 0.9, 0.9 ) )
 _documentListTableStyle = StyleSheet.style( Primitive.tableColumnSpacing( 15.0 ), Primitive.tableRowSpacing( 5.0 ) )
+
 
 
 
@@ -175,8 +177,15 @@ class AppView (MethodDispatchView):
 		consolesBox = _contentsList( [ newConsoleLink ], consoles, 'Python consoles' )
 
 
-		tip = TipBox( 'You can highlight items that have help tips by pressing F2. Hover the pointer over them to display the tips. ' + \
-			      'Some items do not display their tips unless highlighting is enabled, in order to reduce clutter.',
+		tip = TipBox( [ TipBox.tipText( [ TipBox.strong( 'Getting started: ' ), 'To get programming quickly, create a new Python console by pressing ', TipBox.emph( 'new' ), ', beneath', TipBox.emph( ' Python consoles' ), '.' ] ),
+				TipBox.tipText( [ 'For something more easily modifiable and something you can save, press ', TipBox.emph( 'new' ), ' beneath ', TipBox.emph( 'Documents' ), ' and choose the ', TipBox.emph( 'Quickstart: worksheet' ), ' option.' ] ),
+				TipBox.tipText( [ TipBox.strong( 'Tips: ' ), 'You can highlight items that have help tips by pressing F2. Hover the pointer over them to display the tips. ' + \
+							      'Some items do not display their tips unless highlighting is enabled, in order to reduce clutter.' ] ),
+				TipBox.tipText( [ TipBox.strong( 'Command bar: ' ), 'The command bar can be invoked by pressing the ', TipBox.emph( 'escape' ), ' key. From there you can type abbreviated commands to invoke them. '
+						'Alternatively, type in part of the full name of a command and autocomplete will show a list of commands that match. '
+						'Press ', TipBox.emph( 'tab' ), ' to switch between the entries in the autocomplete list and press ', TipBox.emph( 'enter' ), ' to execute the highlighted command. '
+						'Bold letters shown within command names indicate abbreviations, e.g. ', TipBox.emph( 's' ), ' for ', TipBox.emph( 'save' ), ' and ', TipBox.emph( 'sa' ), ' for ', TipBox.emph( 'save as' ), '. '
+						'You can type these to execute them quickly.' ] )],
 			      'larchcore.mainapp.tooltiphighlights' )
 		
 		

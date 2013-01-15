@@ -276,8 +276,9 @@ class WorksheetEditor (MethodDispatchView):
 			pageContents = [ linkHeader ]
 
 
-		tip = TipBox( 'Type to add text to the worksheet.\nRight click to access the context menu, from which styles can be applied.\n' + \
-			      'Code can also be added from the context menu. To re-execute all code within the worksheet, press Control-Enter',
+		tip = TipBox( [ TipBox.tipText( [ TipBox.strong( 'Text: ' ), 'Type to add text to the worksheet.\nRight click to access the context menu, from which styles can be applied.' ] ),
+			      TipBox.tipText( [ TipBox.strong( 'Code: ' ), 'Code can be added from the context menu. You can add complete blocks of python code in between paragraphs, or single expressions to be evaluated with paragraph text.' ] ),
+			      TipBox.tipText( [ 'To re-execute all code within the worksheet, press ', TipBox.emph( 'Control-Enter' ) ] ) ],
 			      'larchcore.worksheet.edit.howto' )
 
 
