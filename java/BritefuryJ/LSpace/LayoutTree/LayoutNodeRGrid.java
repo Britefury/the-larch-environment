@@ -11,10 +11,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
-import BritefuryJ.LSpace.LSElement;
-import BritefuryJ.LSpace.LSGridRow;
-import BritefuryJ.LSpace.LSRGrid;
-import BritefuryJ.LSpace.ElementFilter;
+import BritefuryJ.LSpace.*;
 import BritefuryJ.LSpace.Layout.GridLayout;
 import BritefuryJ.LSpace.Layout.LAllocBox;
 import BritefuryJ.LSpace.Layout.LAllocBoxInterface;
@@ -281,14 +278,22 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 	}
 	
 
+	@Override
 	protected LSElement getChildLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter)
 	{
 		return getChildLeafClosestToLocalPointVertical( getLeaves(), localPos, filter );
 	}
 
+	@Override
+	public LSElement getChildLeafClosestToLocalPointWithinBranch(LSContainer withinBranch, Point2 localPos, ElementFilter filter)
+	{
+		return getChildLeafClosestToLocalPointVertical( getLeavesWithinBranch( withinBranch ), localPos, filter );
+	}
+
 
 	
 	
+	@Override
 	protected AABox2[] computeCollatedBranchBoundsBoxes(int rangeStart, int rangeEnd)
 	{
 		refreshSubtree();

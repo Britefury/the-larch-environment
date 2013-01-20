@@ -180,8 +180,9 @@ public class LayoutNodeFlowGrid extends ArrangedSequenceLayoutNode
 		}
 	}
 
-	@Override
-	protected LSElement getChildLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter)
+
+
+	private LSElement getChildLeafWithinRangeClosestToLocalPoint(Point2 localPos, ElementFilter filter, int rangeStart, int rangeEnd)
 	{
 		refreshSubtree();
 		
@@ -192,6 +193,11 @@ public class LayoutNodeFlowGrid extends ArrangedSequenceLayoutNode
 			int childIndex = cellPos[1] * columnBounds.getNumColumns()  +  cellPos[0];
 			
 			childIndex = Math.min( childIndex, leaves.length - 1 );
+			if ( childIndex < rangeStart  ||  childIndex >= rangeEnd )
+			{
+				return null;
+			}
+
 			LSElement child = leaves[childIndex];
 			
 			
@@ -203,7 +209,7 @@ public class LayoutNodeFlowGrid extends ArrangedSequenceLayoutNode
 			}
 			
 			LSElement next = null;
-			for (int j = childIndex + 1; j < leaves.length; j++)
+			for (int j = childIndex + 1; j < rangeEnd; j++)
 			{
 				next = getLeafClosestToLocalPointFromChild( leaves[j], localPos, filter );
 				if ( next != null )
@@ -213,7 +219,7 @@ public class LayoutNodeFlowGrid extends ArrangedSequenceLayoutNode
 			}
 
 			LSElement prev = null;
-			for (int j = childIndex - 1; j >= 0; j--)
+			for (int j = childIndex - 1; j >= rangeStart; j--)
 			{
 				prev = getLeafClosestToLocalPointFromChild( leaves[j], localPos, filter );
 				if ( prev != null )
@@ -248,8 +254,21 @@ public class LayoutNodeFlowGrid extends ArrangedSequenceLayoutNode
 		}
 	}
 
-
+	@Override
+	protected LSElement getChildLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter)
+	{
+		return getChildLeafWithinRangeClosestToLocalPoint( localPos, filter, 0, leaves.length );
+	}
 	
+	@Override
+	public LSElement getChildLeafClosestToLocalPointWithinBranch(LSContainer withinBranch, Point2 localPos, ElementFilter filter)
+	{
+		int range[] = getBranchRange( withinBranch );
+		return getChildLeafWithinRangeClosestToLocalPoint( localPos, filter, range[0], range[1] );
+	}
+
+
+
 	public int getNumColumns()
 	{
 		refreshSubtree();

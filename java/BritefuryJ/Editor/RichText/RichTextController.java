@@ -420,7 +420,7 @@ public abstract class RichTextController extends SequentialController
 	public Pres editableParagraphEmbed(Object model, Object child)
 	{
 		Pres p = new StructuralItem( this, model, child );
-		p = new Row( new Pres[] { new Text( "" ), p, new Text( "" ) } );
+		p = new Row( new Pres[] { new Segment( p ) } );
 		return p.withProperty( paragraphEmbedPropertyKey, model ).withProperty( blockItemPropertyKey, model );
 	}
 	

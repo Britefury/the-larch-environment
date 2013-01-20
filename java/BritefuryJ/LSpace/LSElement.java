@@ -2401,7 +2401,7 @@ abstract public class LSElement implements Presentable
 		else
 		{
 			ArrangedSequenceLayoutNode branchLayout = (ArrangedSequenceLayoutNode)getValidLayoutNodeOfClass( ArrangedSequenceLayoutNode.class );
-			return branchLayout.getLeafClosestToLocalPointWithinElement( this, localPos, filter );
+			return branchLayout.getChildLeafClosestToLocalPointWithinBranch( (LSContainer)this, localPos, filter );
 		}
 	}
 	

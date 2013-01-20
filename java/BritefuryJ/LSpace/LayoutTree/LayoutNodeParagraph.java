@@ -187,15 +187,17 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 		}
 	}
 
-	private LSElement getLineChildClosestToLocalPoint(ParagraphLayout.Line line, Point2 localPos)
+	private LSElement getLineChildClosestToLocalPoint(ParagraphLayout.Line line, Point2 localPos, int index[])
 	{
 		LAllocBoxInterface children[] = line.getChildAllocBoxes();
 		if ( children.length == 0 )
 		{
+			index[0] = -1;
 			return null;
 		}
 		else if ( children.length == 1 )
 		{
+			index[0] = 0;
 			return children[0].getAllocLayoutNode().element;
 		}
 		else
@@ -211,27 +213,43 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 				
 				if ( localPos.x < midX )
 				{
+					index[0] = i;
 					return childI.getAllocLayoutNode().element;
 				}
 				
 				childI = childJ;
 			}
-			
+
+			index[0] = children.length - 1;
 			return children[children.length-1].getAllocLayoutNode().element;
 		}
 	}
 
-	protected LSElement getChildLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter)
+
+
+	private LSElement getChildLeafWithinRangeClosestToLocalPoint(Point2 localPos, ElementFilter filter, int rangeStart, int rangeEnd)
 	{
 		refreshSubtree();
 		ParagraphLayout.Line line = getLineClosestToLocalPoint( localPos );
 		
 		if ( line != null )
 		{
-			LSElement child = getLineChildClosestToLocalPoint( line, localPos );
+			int indexOfChildInLine[] = new int[1];
+			LSElement child = getLineChildClosestToLocalPoint( line, localPos, indexOfChildInLine );
 			
 			if ( child != null )
 			{
+				int index = line.getRangeStart() + indexOfChildInLine[0];
+				if ( index == leaves.length )
+				{
+					throw new RuntimeException( "Could not find child in leaves list - this shouldn't have happened" );
+				}
+
+				if ( index < rangeStart  ||  index >= rangeEnd )
+				{
+					return null;
+				}
+
 				LSElement c = getLeafClosestToLocalPointFromChild( child, localPos, filter );
 				
 				if ( c != null )
@@ -239,22 +257,8 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 					return c;
 				}
 				
-				int index = 0;
-				for (LSElement w: leaves)
-				{
-					if ( w == child )
-					{
-						break;
-					}
-					index++;
-				}
-				if ( index == leaves.length )
-				{
-					throw new RuntimeException( "Could not find child in leaves list - this shouldn't have happened" );
-				}
-				
 				LSElement next = null;
-				for (int j = index + 1; j < leaves.length; j++)
+				for (int j = index + 1; j < rangeEnd; j++)
 				{
 					next = getLeafClosestToLocalPointFromChild( leaves[j], localPos, filter );
 					if ( next != null )
@@ -264,7 +268,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 				}
 	
 				LSElement prev = null;
-				for (int j = index - 1; j >= 0; j--)
+				for (int j = index - 1; j >= rangeStart; j--)
 				{
 					prev = getLeafClosestToLocalPointFromChild( leaves[j], localPos, filter );
 					if ( prev != null )
@@ -297,6 +301,18 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 		return null;
 	}
 	
+	@Override
+	protected LSElement getChildLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter)
+	{
+		return getChildLeafWithinRangeClosestToLocalPoint( localPos, filter, 0, leaves.length );
+	}
+
+	@Override
+	public LSElement getChildLeafClosestToLocalPointWithinBranch(LSContainer withinBranch, Point2 localPos, ElementFilter filter)
+	{
+		int range[] = getBranchRange( withinBranch );
+		return getChildLeafWithinRangeClosestToLocalPoint( localPos, filter, range[0], range[1] );
+	}
 
 	
 	
@@ -542,13 +558,13 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 		
 		// Need to find the start point
 		@SuppressWarnings("unchecked")
-		int lineStartIndex = Collections.binarySearch( Arrays.asList( lines ), localBox.getLowerY(), visibilityStartComparator );
+		int lineStartIndex = Collections.binarySearch( Arrays.asList( lines ), (Double)localBox.getLowerY(), visibilityStartComparator );
 		if ( lineStartIndex < 0 )
 		{
 			lineStartIndex = -( lineStartIndex + 1 );
 		}
 		@SuppressWarnings("unchecked")
-		int lineEndIndex = Collections.binarySearch( Arrays.asList( lines ), localBox.getUpperY(), visibilityEndComparator );
+		int lineEndIndex = Collections.binarySearch( Arrays.asList( lines ), (Double)localBox.getUpperY(), visibilityEndComparator );
 		if ( lineEndIndex < 0 )
 		{
 			lineEndIndex = -( lineEndIndex + 1 );

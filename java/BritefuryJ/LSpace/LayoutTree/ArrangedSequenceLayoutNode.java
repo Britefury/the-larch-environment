@@ -345,10 +345,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 		return null;
 	}
 
-	public LSElement getLeafClosestToLocalPointWithinElement(LSElement withinElement, Point2 localPos, ElementFilter filter)
-	{
-		return null;
-	}
+	public abstract LSElement getChildLeafClosestToLocalPointWithinBranch(LSContainer withinBranch, Point2 localPos, ElementFilter filter);
 
 
 	
@@ -368,6 +365,16 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 			index++;
 		}
 		return -1;
+	}
+
+	protected int[] getBranchRange(LSElement branch)
+	{
+		int index = indexOfBranch( branch );
+		if ( index == -1 )
+		{
+			throw new RuntimeException( "Could not find branch" );
+		}
+		return new int[] { branchRanges[index*2], branchRanges[index*2+1] };
 	}
 	
 	
@@ -399,6 +406,19 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 		}
 		
 		return bounds;
+	}
+
+
+	protected List<LSElement> getLeavesWithinBranch(LSContainer branch)
+	{
+		refreshSubtree();
+
+		int index = indexOfBranch( branch );
+		if ( index == -1 )
+		{
+			throw new RuntimeException( "Could not find branch" );
+		}
+		return getLeaves().subList( branchRanges[index*2], branchRanges[index*2+1] );
 	}
 
 
