@@ -423,22 +423,18 @@ class ProjectView (MethodDispatchView):
 
 
 
-		# Project
-		projectHeader = SectionHeading1( 'Project' )
+		#
+		# Project Section
+		#
 
 		# Python package name
-		pythonPackageNamePrompt = Label( 'Root Python package name: ' )
 		notSet = _pythonPackageNameNotSetStyle.applyTo( Label( '<not set>' ) )
 		pythonPackageNameLabel = EditableLabel( project.pythonPackageName, notSet, _PythonPackageNameListener() ).regexValidated( _pythonPackageNameRegex, 'Please enter a valid dotted identifier' )
-		if project.pythonPackageName is None:
-			comment = _pythonPackageNameNotSetCommentStyle.applyTo( Label( '(pages will not be importable until this is set)' ) )
-			pythonPackageNameBox = Row( [ pythonPackageNamePrompt, pythonPackageNameLabel, Spacer( 25.0, 0.0 ), comment ] )
-		else:
-			pythonPackageNameBox = Row( [ pythonPackageNamePrompt, pythonPackageNameLabel ] )
-		pythonPackageNameBox = AttachTooltip( pythonPackageNameBox, 'The root python package name is the name under which the contents of the project can be imported using import statements within the project.\n' + \
+		pythonPackageNameLabel = AttachTooltip( pythonPackageNameLabel, 'The root python package name is the name under which the contents of the project can be imported using import statements within the project.\n' + \
 			'If this is not set, pages from this project cannot be imported.', False )
-		
-		
+		pythonPackageNameRow = Form.Section( 'Root Python package name', 'Pages will not be importable unless this is set', pythonPackageNameLabel )
+
+
 		# Clear imported modules
 		def _onReset(button, event):
 			project.reset()
@@ -447,13 +443,12 @@ class ProjectView (MethodDispatchView):
 			modules = Column( [ Label( module )   for module in modules ] )
 			report = Section( heading, modules )
 			BubblePopup.popupInBubbleAdjacentTo( report, button.getElement(), Anchor.BOTTOM, True, True )
-		resetPrompt = Label( 'Reset (unload project modules): ' )
 		resetButton = Button.buttonWithLabel( 'Reset', _onReset )
-		resetButton = AttachTooltip( resetButton, 'Unloads all modules that were imported from this project from the Python module cache.' )
-		reset = Row( [ resetPrompt, resetButton ] )
+		resetButton = AttachTooltip( resetButton, 'Unloads all modules that were imported from this project from the Python module cache. This way they can be re-imported, allowing modifications to take effect.' )
+		resetRow = Form.Section( 'Reset', 'Unload project modules', resetButton )
 
 
-		projectSection = Section( projectHeader, Body( [ pythonPackageNameBox, reset ] ) )
+		projectSection = Form( 'Project', [ pythonPackageNameRow, resetRow ] )
 
 
 		# Project index
@@ -474,6 +469,15 @@ class ProjectView (MethodDispatchView):
 		indexSection = Section( indexHeader, contentsView )
 
 
+		def _onBuildJar(button, event):
+			_buildProjectJar( button.element, document )
+
+		buildJarButton = Button.buttonWithLabel( 'Build JAR', _onBuildJar )
+		jarRow = Form.Section( 'Build executable app', 'Export the project as an executable JAR', buildJarButton )
+
+		packagingSection = Form( 'Packaging', [ jarRow ] )
+
+
 		indexTip = TipBox( [ TipBox.tipText( [ TipBox.strong( 'Index: ' ), 'Larch projects act like Python programs. Packages act as directories/packages and pages act as Python source files. Pages can import code from one another as if they are modules.' ] ),
 				     TipBox.tipText( [ 'New pages and packages can be created by right clicking on the entries in the index or on ', TipBox.emph( 'Project root' ), ' (they will highlight as you hover over them).' ] ),
 				     TipBox.tipText( [ TipBox.strong( 'Front and startup pages: ' ), 'If a page is set as the front page it will appear instead of the project page. In these cases, the project page can still be reached using the links in the location bar at the top of the window.' ] ),
@@ -482,22 +486,10 @@ class ProjectView (MethodDispatchView):
 			      'larchcore.worksheet.worksheeteditor')
 
 
-		# Packaging
-
-		def _onBuildJar(button, event):
-			_buildProjectJar( button.element, document )
-
-
-
-		buildJarButton = Button.buttonWithLabel( 'Build JAR', _onBuildJar )
-		jarRow = Form.Section( 'Build executable app', 'Export the project as an executable JAR', buildJarButton )
-		packagingSection = Form( 'Packaging', [ jarRow ] )
-
-
 
 		# The page
 		head = Head( [ title ] )
-		body = Body( [ saveExportSection, projectSection, indexSection, indexTip, packagingSection ] ).alignHPack()
+		body = Body( [ saveExportSection, projectSection, indexSection, packagingSection, indexTip ] ).alignHPack()
 
 		return StyleSheet.style( Primitive.editable( False ) ).applyTo( Page( [ head, body ] ) )
 
