@@ -13,13 +13,7 @@ import java.awt.Paint;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
-import BritefuryJ.LSpace.AbstractTextRepresentationManager;
-import BritefuryJ.LSpace.LSCaretSlot;
-import BritefuryJ.LSpace.LSContentLeaf;
-import BritefuryJ.LSpace.LSContentLeafEditable;
-import BritefuryJ.LSpace.LSElement;
-import BritefuryJ.LSpace.LSSegment;
-import BritefuryJ.LSpace.LSRootElement;
+import BritefuryJ.LSpace.*;
 import BritefuryJ.LSpace.Focus.SelectionPoint;
 import BritefuryJ.LSpace.Focus.Target;
 import BritefuryJ.LSpace.Marker.Marker;
@@ -710,6 +704,7 @@ public class Caret extends Target implements MarkerListener
 			else
 			{
 				boolean contentDeleted = false;
+				LSRegion region = start.getRegion();
 				
 				// Delete the textual content within any non-editable or empty elements. Stop when something has been deleted.
 				while ( !left.isEditable()  ||  left.getTextRepresentationLength() == 0 )
@@ -726,8 +721,9 @@ public class Caret extends Target implements MarkerListener
 					
 					prev = left;
 					left = left.getContentLeafToLeft();
-					if ( left == null )
+					if ( left == null  ||  left.getRegion() != region )
 					{
+						// No leaf to left, or leaf is in a different region; bail out
 						return true;
 					}
 
@@ -737,7 +733,7 @@ public class Caret extends Target implements MarkerListener
 					}
 				}
 				
-				// Jump over non-editable elements until we reach over an editable one
+				// Jump over non-editable elements until we reach an editable one
 				while ( !left.isEditable()  ||  left.isCaretSlot() )
 				{
 					if ( left.isCaretSlot()  &&  ((LSCaretSlot)left).shouldCaretStopHere( prev ) )
@@ -746,8 +742,9 @@ public class Caret extends Target implements MarkerListener
 					}
 					prev = left;
 					left = left.getContentLeafToLeft();
-					if ( left == null )
+					if ( left == null  ||  left.getRegion() != region )
 					{
+						// No leaf to left, or leaf is in a different region; bail out
 						return false;
 					}
 				}
@@ -790,6 +787,8 @@ public class Caret extends Target implements MarkerListener
 			else
 			{
 				boolean contentDeleted = false;
+				LSRegion region = start.getRegion();
+
 				// Delete the textual content within any non-editable or empty elements. Stop when something has been deleted.
 				while ( !right.isEditable()  ||  right.getTextRepresentationLength() == 0 )
 				{
@@ -805,8 +804,9 @@ public class Caret extends Target implements MarkerListener
 					
 					prev = right;
 					right = right.getContentLeafToLeft();
-					if ( right == null )
+					if ( right == null  ||  right.getRegion() != region )
 					{
+						// No leaf to right, or leaf is in a different region; bail out
 						return true;
 					}
 
@@ -825,8 +825,9 @@ public class Caret extends Target implements MarkerListener
 					}
 					prev = right;
 					right = right.getContentLeafToRight();
-					if ( right == null )
+					if ( right == null  ||  right.getRegion() != region )
 					{
+						// No leaf to right, or leaf is in a different region; bail out
 						return false;
 					}
 				}

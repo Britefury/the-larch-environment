@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import BritefuryJ.LSpace.LSContainer;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSRow;
 import BritefuryJ.LSpace.ElementFilter;
@@ -115,13 +116,20 @@ public class LayoutNodeRow extends LayoutNodeAbstractBox
 	
 	
 	
+	@Override
 	protected LSElement getChildLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter)
 	{
 		return getChildLeafClosestToLocalPointHorizontal( getLeaves(), localPos, filter );
 	}
 
+	@Override
+	public LSElement getChildLeafClosestToLocalPointWithinBranch(LSContainer withinBranch, Point2 localPos, ElementFilter filter)
+	{
+		return getChildLeafClosestToLocalPointHorizontal( getLeavesWithinBranch( withinBranch ), localPos, filter );
+	}
 
 
+	@Override
 	protected AABox2[] computeCollatedBranchBoundsBoxes(int rangeStart, int rangeEnd)
 	{
 		refreshSubtree();
@@ -173,13 +181,13 @@ public class LayoutNodeRow extends LayoutNodeAbstractBox
 		List<LSElement> elements = getLeaves();
 		
 		@SuppressWarnings("unchecked")
-		int startPoint = Collections.binarySearch( elements, localBox.getLowerX(), visiblityStartComparator );
+		int startPoint = Collections.binarySearch( elements, (Double)localBox.getLowerX(), visiblityStartComparator );
 		if ( startPoint < 0 )
 		{
 			startPoint = -( startPoint + 1 );
 		}
 		@SuppressWarnings("unchecked")
-		int endPoint = Collections.binarySearch( elements, localBox.getUpperX(), visibilityEndComparator );
+		int endPoint = Collections.binarySearch( elements, (Double)localBox.getUpperX(), visibilityEndComparator );
 		if ( endPoint < 0 )
 		{
 			endPoint = -( endPoint + 1 );

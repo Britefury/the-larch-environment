@@ -78,13 +78,21 @@ public class LayoutNodeGridRow extends ArrangedSequenceLayoutNode
 	
 	
 	
+	@Override
 	protected LSElement getChildLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter)
 	{
 		return getChildLeafClosestToLocalPointHorizontal( getLeaves(), localPos, filter );
 	}
 
+	@Override
+	public LSElement getChildLeafClosestToLocalPointWithinBranch(LSContainer withinBranch, Point2 localPos, ElementFilter filter)
+	{
+		return getChildLeafClosestToLocalPointHorizontal( getLeavesWithinBranch( withinBranch ), localPos, filter );
+	}
 
 
+
+	@Override
 	protected AABox2[] computeCollatedBranchBoundsBoxes(int rangeStart, int rangeEnd)
 	{
 		refreshSubtree();

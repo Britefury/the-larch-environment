@@ -62,7 +62,6 @@ rootFiles = [
 	'lch.py',
 	'LICENSE',
 	'REFERENCES',
-	'larchdist.py'
 ]
 
 
