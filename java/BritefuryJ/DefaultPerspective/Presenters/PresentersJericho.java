@@ -11,10 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import net.htmlparser.jericho.Attribute;
-import net.htmlparser.jericho.Attributes;
-import net.htmlparser.jericho.Element;
-import net.htmlparser.jericho.Source;
+import BritefuryJ.Pres.RichText.NormalText;
+import net.htmlparser.jericho.*;
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Graphics.FillPainter;
 import BritefuryJ.IncrementalView.FragmentView;
@@ -64,6 +62,7 @@ public class PresentersJericho extends ObjectPresenterRegistry
 			
 			Pres tag = tagStyle.applyTo( new Label( element.getName() ) );
 			List<Object> headerElements = new ArrayList<Object>();
+			headerElements.add( openAngleBracket );
 			headerElements.add( tag );
 			Attributes attrs = element.getAttributes();
 			if ( attrs != null )
@@ -83,14 +82,40 @@ public class PresentersJericho extends ObjectPresenterRegistry
 				}
 				headerElements.add( new ParagraphIndentMatchSpan( attrElements ) );
 			}
+			headerElements.add( closeAngleBracket );
 			Pres header = new Paragraph( headerElements );
 			
-			List<Element> children = element.getChildElements();
+			Segment content = element.getContent();
+			List<Element> childElements = element.getChildElements();
+
+			ArrayList<Object> children = new ArrayList<Object>();
+			int textStart = content.getBegin();
+			Source source = element.getSource();
+			for (Element e: element.getChildElements())
+			{
+				addCData( children, source, textStart, e.getBegin() );
+				children.add( e );
+
+				textStart = e.getEnd();
+			}
+
+			addCData( children, source, textStart, content.getEnd() );
+
 			Pres childPres = new Column( children.toArray() );
 
 			return new Column( new Pres[] { header, childPres.padX( 15.0, 0.0 ) } );
 		}
 	};
+
+
+	private static void addCData(ArrayList<Object> children, Source source, int begin, int end)
+	{
+		if ( end > begin )
+		{
+			String text =  source.subSequence( begin, end ).toString();
+			children.add( new NormalText( text ) );
+		}
+	}
 	
 	
 	private static final Pattern whitespacePattern = Pattern.compile( "[ ]+" );
@@ -120,8 +145,11 @@ public class PresentersJericho extends ObjectPresenterRegistry
 
 
 	private static final StyleSheet htmlSourceStyle = StyleSheet.style( Primitive.fontBold.as( true ), Primitive.foreground.as( new Color( 0.2f, 0.4f, 0.6f ) ), Primitive.background.as( new FillPainter( new Color( 0.85f, 0.85f, 0.85f ) ) ) );
+	private static final StyleSheet angleBracketStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.5f, 0.5f, 0.5f, 0.5f ) ) );
 	private static final StyleSheet tagStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.0f, 0.2f, 0.5f ) ) );
 	private static final StyleSheet attrNameStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.4f, 0.4f, 0.4f ) ) );
 	private static final StyleSheet attrPunctuationStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.3f, 0.4f, 0.3f ) ) );
 	private static final StyleSheet attrValueStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.2f, 0.4f, 0.2f ) ) );
+	private static final Pres openAngleBracket = angleBracketStyle.applyTo( new Label( "<" ) );
+	private static final Pres closeAngleBracket = angleBracketStyle.applyTo( new Label( ">" ) );
 }
