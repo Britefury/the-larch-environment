@@ -5,12 +5,12 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
-from BritefuryJ.AttributeTable import SimpleAttributeTable
-
-from BritefuryJ.Projection import TransientSubject, SubjectTrailLink
+from BritefuryJ.DefaultPerspective import DefaultPerspective
+from BritefuryJ.Projection import TransientSubject
 from Britefury.Kernel.Document import Document
 
 from LarchCore.MainApp.MainAppViewer.View import perspective
+from LarchCore.MainApp.MainAppViewer.AboutPage import AboutPage
 
 
 class MainAppSubject (TransientSubject):
@@ -18,7 +18,13 @@ class MainAppSubject (TransientSubject):
 		super( MainAppSubject, self ).__init__( world.worldSubject )
 		self._appState = appState
 		self._world = world
+		self._about = AboutPageSubject( self )
 
+
+
+	@property
+	def aboutPageSubject(self):
+		return self._about
 
 	def getTrailLinkText(self):
 		return 'Home'
@@ -57,4 +63,24 @@ class MainAppSubject (TransientSubject):
 					return result
 		return None
 		
-	
+
+
+class AboutPageSubject (TransientSubject):
+	def __init__(self, appStateSubject):
+		super( AboutPageSubject, self ).__init__( appStateSubject )
+		self._aboutPage = AboutPage()
+		self._appStateSubject = appStateSubject
+
+
+	def getTrailLinkText(self):
+		return 'About'
+
+
+	def getFocus(self):
+		return self._aboutPage
+
+	def getPerspective(self):
+		return DefaultPerspective.instance
+
+	def getTitle(self):
+		return 'About Larch'

@@ -3,7 +3,7 @@
 ##-* under the terms of the GNU General Public License version 2 as published by the
 ##-* Free Software Foundation. The full text of the GNU General Public License
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
-##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
+##-* program. This source code is (C)copyright Geoffrey French 1999-2013.
 ##-*************************
 from java.awt import Color
 
@@ -32,7 +32,7 @@ from BritefuryJ.Graphics import FilledBorder
 from BritefuryJ.Controls import Hyperlink
 from BritefuryJ.Pres import Pres
 from BritefuryJ.Pres.Primitive import Primitive, Border, Row, Column, RGrid, GridRow
-from BritefuryJ.Pres.RichText import TitleBar, HSeparator, Head, Body, Page, LinkHeaderBar, NormalText, RichSpan
+from BritefuryJ.Pres.RichText import TitleBar, HSeparator, Head, Body, Page, SplitLinkHeaderBar, NormalText, RichSpan
 from BritefuryJ.Pres.UI import Section, SectionHeading1
 from BritefuryJ.Pres.Help import AttachTooltip, TipBox
 
@@ -162,7 +162,8 @@ class AppView (MethodDispatchView):
 
 		systemLink = Hyperlink( 'TEST PAGES', TestsRootPage.instanceSubject )
 		configurationLink = Hyperlink( 'CONFIGURATION PAGE', fragment.subject.world.configuration.subject( fragment.subject ) )
-		linkHeader = LinkHeaderBar( [ configurationLink, systemLink ])
+		aboutLink = Hyperlink( 'ABOUT', fragment.subject.aboutPageSubject )
+		linkHeader = SplitLinkHeaderBar( [ aboutLink ], [ configurationLink, systemLink ])
 
 		title = TitleBar( 'The Larch Environment' )
 		
