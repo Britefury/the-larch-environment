@@ -2736,49 +2736,49 @@ abstract public class LSElement implements Presentable
 	//
 	
 	public PresentationPopupWindow popup(LSElement targetElement, Anchor targetAnchor, Anchor popupAnchor,
-			boolean bCloseOnLoseFocus, boolean bRequestFocus)
+			boolean closeAutomatically, boolean requestFocus)
 	{
 		AABox2 visibleBox = targetElement.getVisibleBoxInLocalSpace();
 		Point2 targerCorner = targetAnchor.getBoxCorner( visibleBox );
-		return popupOver( targetElement, targerCorner, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+		return popupOver( targetElement, targerCorner, popupAnchor, closeAutomatically, requestFocus );
 	}
 	
 	public PresentationPopupWindow popupOver(LSElement targetElement, Point2 targetLocalPos, Anchor popupAnchor,
-			boolean bCloseOnLoseFocus, boolean bRequestFocus)
+			boolean closeAutomatically, boolean requestFocus)
 	{
 		if ( targetElement.isLocalSpacePointVisible( targetLocalPos ) )
 		{
 			Xform2 x = targetElement.getLocalToRootXform();
 			Point2 rootPos = x.transform( targetLocalPos );
-			return targetElement.getRootElement().createPopupPresentation( this, rootPos, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+			return targetElement.getRootElement().createPopupPresentation( this, rootPos, popupAnchor, closeAutomatically, requestFocus );
 		}
 		else
 		{
-			return targetElement.getRootElement().createPopupAtMousePosition( this, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+			return targetElement.getRootElement().createPopupAtMousePosition( this, popupAnchor, closeAutomatically, requestFocus );
 		}
 	}
 	
 
 	public PresentationPopupWindow chainPopup(LSElement targetElement, Anchor targetAnchor, Anchor popupAnchor,
-			boolean bCloseOnLoseFocus, boolean bRequestFocus)
+			boolean closeAutomatically, boolean requestFocus)
 	{
 		AABox2 visibleBox = targetElement.getVisibleBoxInLocalSpace();
 		Point2 targerCorner = targetAnchor.getBoxCorner( visibleBox );
-		return chainPopupOver( targetElement, targerCorner, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+		return chainPopupOver( targetElement, targerCorner, popupAnchor, closeAutomatically, requestFocus );
 	}
 	
 	public PresentationPopupWindow chainPopupOver(LSElement targetElement, Point2 targetLocalPos, Anchor popupAnchor,
-			boolean bCloseOnLoseFocus, boolean bRequestFocus)
+			boolean closeAutomatically, boolean requestFocus)
 	{
 		if ( targetElement.isLocalSpacePointVisible( targetLocalPos ) )
 		{
 			Xform2 x = targetElement.getLocalToRootXform();
 			Point2 rootPos = x.transform( targetLocalPos );
-			return targetElement.getRootElement().createChainPopupPresentation( this, rootPos, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+			return targetElement.getRootElement().createChainPopupPresentation( this, rootPos, popupAnchor, closeAutomatically, requestFocus );
 		}
 		else
 		{
-			return targetElement.getRootElement().createChainPopupAtMousePosition( this, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+			return targetElement.getRootElement().createChainPopupAtMousePosition( this, popupAnchor, closeAutomatically, requestFocus );
 		}
 	}
 	

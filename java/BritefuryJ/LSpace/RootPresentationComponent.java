@@ -8,6 +8,7 @@ package BritefuryJ.LSpace;
 
 import java.awt.Point;
 import java.awt.Window;
+import java.util.ArrayList;
 
 import javax.swing.SwingUtilities;
 
@@ -17,6 +18,7 @@ public class RootPresentationComponent extends PresentationComponent
 
 	
 	private PresentationEventErrorLog eventErrorLog = new PresentationEventErrorLog();
+	private ArrayList<PopupChain> popupChains = new ArrayList<PopupChain>();
 
 
 	public RootPresentationComponent()
@@ -33,9 +35,10 @@ public class RootPresentationComponent extends PresentationComponent
 		}
 	}
 
-	
+
+	@Override
 	protected PresentationPopupWindow createPopupPresentation(LSElement popupContents, int targetX, int targetY, Anchor popupAnchor,
-			boolean bCloseOnLoseFocus, boolean bRequestFocus, boolean chainStart)
+			boolean closeAutomatically, boolean requestFocus, boolean chainStart)
 	{
 		// Offset the popup position by the location of this presentation component on the screen
 		Point locOnScreen = getLocationOnScreen();
@@ -44,16 +47,51 @@ public class RootPresentationComponent extends PresentationComponent
 		
 		// Create a popup chain rooted here
 		PopupChain chain = new PopupChain( this );
+		pruneChains();
+		popupChains.add( chain );
 		
 		// Get the owning window of this presentation component
 		Window ownerWindow = SwingUtilities.getWindowAncestor( this );
 
-		return new PresentationPopupWindow( chain, ownerWindow, this, popupContents, targetX, targetY, popupAnchor, bCloseOnLoseFocus, bRequestFocus, chainStart );
+		return new PresentationPopupWindow( chain, ownerWindow, this, popupContents, targetX, targetY, popupAnchor, closeAutomatically, requestFocus, chainStart );
 	}
 
 
 	public PresentationEventErrorLog getEventErrorLog()
 	{
 		return eventErrorLog;
+	}
+
+
+
+	@Override
+	protected void onPopupClosingEvent()
+	{
+		pruneChains();
+
+		ArrayList<PopupChain> chains = new ArrayList<PopupChain>();
+		chains.addAll( popupChains );
+		for (PopupChain chain: chains)
+		{
+			chain.autoCloseChain();
+		}
+	}
+
+
+	protected void notifyChainClosed(PopupChain chain)
+	{
+		popupChains.remove( chain );
+	}
+
+
+	private void pruneChains()
+	{
+		for (int i = popupChains.size() - 1; i >= 0; i--)
+		{
+			if ( popupChains.get( i ).isEmpty() )
+			{
+				popupChains.remove( i );
+			}
+		}
 	}
 }

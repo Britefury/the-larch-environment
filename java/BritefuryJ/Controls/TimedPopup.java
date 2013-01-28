@@ -23,26 +23,26 @@ public class TimedPopup
 {
 	private Pres child;
 	private double timeout;
-	private boolean bRequestFocus;
+	private boolean requestFocus;
 	
 	
-	public TimedPopup(Object child, double timeout, boolean bRequestFocus)
+	public TimedPopup(Object child, double timeout, boolean requestFocus)
 	{
 		this.child = Pres.coerce( child ).withCustomElementAction( action );
 		this.timeout = timeout;
-		this.bRequestFocus = bRequestFocus;
+		this.requestFocus = requestFocus;
 	}
 
 
 
 	public void popup(LSElement element, Anchor targetAnchor, Anchor popupAnchor, PresentationContext ctx, StyleValues style)
 	{
-		child.popup( element, targetAnchor, popupAnchor, true, bRequestFocus );
+		child.popup( element, targetAnchor, popupAnchor, true, requestFocus);
 	}
 	
 	public void popupAtMousePosition(LSElement element, Anchor popupAnchor, PresentationContext ctx, StyleValues style)
 	{
-		child.popupAtMousePosition( element, popupAnchor, true, bRequestFocus );
+		child.popupAtMousePosition( element, popupAnchor, true, requestFocus);
 	}
 	
 	
