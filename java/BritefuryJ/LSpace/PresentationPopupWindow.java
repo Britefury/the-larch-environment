@@ -10,8 +10,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.Window;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowFocusListener;
 
 import javax.swing.JWindow;
 
@@ -26,17 +24,18 @@ public class PresentationPopupWindow
 	protected JWindow popupWindow;
 	protected PresentationComponent popupComponent;
 	protected PopupChain chain;
-	private boolean open, chainStart;
+	private boolean chainStart;
+	protected boolean closeAutomatically;
 	private Point2 screenPosition;
 	private Vector2 screenSize;
 	
 	protected PresentationPopupWindow(PopupChain popupChain, Window ownerWindow, PresentationComponent parentComponent, LSElement popupContents, int screenX, int screenY,
-			Anchor popupAnchor, boolean closeOnLoseFocus, boolean requestFocus, boolean chainStart)
+			Anchor popupAnchor, boolean closeAutomatically, boolean requestFocus, boolean chainStart)
 	{
 		chain = popupChain;
 		chain.addPopup( this );
-		open = true;
 		this.chainStart = chainStart;
+		this.closeAutomatically = closeAutomatically;
 		
 		// Create the popup window
 		popupWindow = new JWindow( ownerWindow );
@@ -45,6 +44,7 @@ public class PresentationPopupWindow
 			popupWindow.setAlwaysOnTop( true );
 			popupWindow.setFocusable( true );
 		}
+
 		popupWindow.getContentPane().setBackground( Color.WHITE );
 		
 		// Create a presentation component for the popup contents, and add them
@@ -84,38 +84,13 @@ public class PresentationPopupWindow
 		
 		
 		WindowTransparency.setWindowOpaque( popupWindow, false );
-
-	
-		WindowFocusListener focusListener = new WindowFocusListener()
-		{
-			public void windowGainedFocus(WindowEvent arg0)
-			{
-			}
-
-			public void windowLostFocus(WindowEvent arg0)
-			{
-				// If the popup has no child
-				if ( open )
-				{
-					if ( !chain.popupHasChild( PresentationPopupWindow.this ) )
-					{
-						chain.closeChainNotContainingPointers();
-					}
-				}
-			}
-		};
-		
-		if ( closeOnLoseFocus )
-		{
-			popupWindow.addWindowFocusListener( focusListener );
-		}
 	}
 	
 	
 	public void closePopup()
 	{
-		open = false;
 		popupWindow.setVisible( false );
+		chain.notifyPopupClosed(this);
 	}
 	
 	
@@ -135,7 +110,7 @@ public class PresentationPopupWindow
 	{
 		return screenPosition;
 	}
-	
+
 	public Vector2 getSizeOnScreen()
 	{
 		return screenSize;
@@ -145,5 +120,12 @@ public class PresentationPopupWindow
 	public boolean isChainStart()
 	{
 		return chainStart;
+	}
+
+
+
+	protected void autoClosePopupChildren()
+	{
+		chain.autoCloseChildrenOf( this );
 	}
 }

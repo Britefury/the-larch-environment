@@ -445,73 +445,73 @@ public abstract class Pres
 	
 	
 	
-	public PresentationPopupWindow popup(LSElement element, Anchor targetAnchor, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationPopupWindow popup(LSElement element, Anchor targetAnchor, Anchor popupAnchor, boolean closeAutomatically, boolean requestFocus)
 	{
 		LSElement popupElement = createPopupElement( element );
-		return popupElement.popup( element, targetAnchor, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+		return popupElement.popup( element, targetAnchor, popupAnchor, closeAutomatically, requestFocus );
 	}
 	
-	public PresentationPopupWindow popup(LSElement element, StyleValues style, Anchor targetAnchor, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationPopupWindow popup(LSElement element, StyleValues style, Anchor targetAnchor, Anchor popupAnchor, boolean closeAutomatically, boolean requestFocus)
 	{
 		LSElement popupElement = createPopupElement( element, style );
-		return popupElement.popup( element, targetAnchor, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+		return popupElement.popup( element, targetAnchor, popupAnchor, closeAutomatically, requestFocus );
 	}
 	
-	public PresentationPopupWindow popupAtMousePosition(LSElement element, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationPopupWindow popupAtMousePosition(LSElement element, Anchor popupAnchor, boolean closeAutomatically, boolean requestFocus)
 	{
 		LSElement popupElement = createPopupElement( element );
-		return element.getRootElement().createPopupAtMousePosition( popupElement, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+		return element.getRootElement().createPopupAtMousePosition( popupElement, popupAnchor, closeAutomatically, requestFocus );
 	}
 	
-	public PresentationPopupWindow popupAtMousePosition(LSElement element, StyleValues style, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationPopupWindow popupAtMousePosition(LSElement element, StyleValues style, Anchor popupAnchor, boolean closeAutomatically, boolean requestFocus)
 	{
 		LSElement popupElement = createPopupElement( element, style );
-		return element.getRootElement().createPopupAtMousePosition( popupElement, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+		return element.getRootElement().createPopupAtMousePosition( popupElement, popupAnchor, closeAutomatically, requestFocus );
 	}
 	
-	public PresentationPopupWindow popupAtMousePosition(LSElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationPopupWindow popupAtMousePosition(LSElement element, boolean closeAutomatically, boolean requestFocus)
 	{
-		return popupAtMousePosition( element, Anchor.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
+		return popupAtMousePosition( element, Anchor.TOP_LEFT, closeAutomatically, requestFocus );
 	}
 	
-	public PresentationPopupWindow popupAtMousePosition(LSElement element, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationPopupWindow popupAtMousePosition(LSElement element, StyleValues style, boolean closeAutomatically, boolean requestFocus)
 	{
-		return popupAtMousePosition( element, style, Anchor.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
+		return popupAtMousePosition( element, style, Anchor.TOP_LEFT, closeAutomatically, requestFocus );
 	}
 	
 	
-	public PresentationPopupWindow chainPopup(LSElement element, Anchor targetAnchor, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationPopupWindow chainPopup(LSElement element, Anchor targetAnchor, Anchor popupAnchor, boolean closeAutomatically, boolean requestFocus)
 	{
 		LSElement popupElement = createPopupElement( element );
-		return popupElement.chainPopup( element, targetAnchor, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+		return popupElement.chainPopup( element, targetAnchor, popupAnchor, closeAutomatically, requestFocus );
 	}
 	
-	public PresentationPopupWindow chainPopup(LSElement element, StyleValues style, Anchor targetAnchor, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationPopupWindow chainPopup(LSElement element, StyleValues style, Anchor targetAnchor, Anchor popupAnchor, boolean closeAutomatically, boolean requestFocus)
 	{
 		LSElement popupElement = createPopupElement( element, style );
-		return popupElement.chainPopup( element, targetAnchor, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+		return popupElement.chainPopup( element, targetAnchor, popupAnchor, closeAutomatically, requestFocus );
 	}
 	
-	public PresentationPopupWindow chainPopupAtMousePosition(LSElement element, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationPopupWindow chainPopupAtMousePosition(LSElement element, Anchor popupAnchor, boolean closeAutomatically, boolean requestFocus)
 	{
 		LSElement popupElement = createPopupElement( element );
-		return element.getRootElement().createChainPopupAtMousePosition( popupElement, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+		return element.getRootElement().createChainPopupAtMousePosition( popupElement, popupAnchor, closeAutomatically, requestFocus );
 	}
 	
-	public PresentationPopupWindow chainPopupAtMousePosition(LSElement element, StyleValues style, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationPopupWindow chainPopupAtMousePosition(LSElement element, StyleValues style, Anchor popupAnchor, boolean closeAutomatically, boolean requestFocus)
 	{
 		LSElement popupElement = createPopupElement( element, style );
-		return element.getRootElement().createChainPopupAtMousePosition( popupElement, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+		return element.getRootElement().createChainPopupAtMousePosition( popupElement, popupAnchor, closeAutomatically, requestFocus );
 	}
 	
-	public PresentationPopupWindow chainPopupAtMousePosition(LSElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationPopupWindow chainPopupAtMousePosition(LSElement element, boolean closeAutomatically, boolean requestFocus)
 	{
-		return chainPopupAtMousePosition( element, Anchor.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
+		return chainPopupAtMousePosition( element, Anchor.TOP_LEFT, closeAutomatically, requestFocus );
 	}
 	
-	public PresentationPopupWindow chainPopupAtMousePosition(LSElement element, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public PresentationPopupWindow chainPopupAtMousePosition(LSElement element, StyleValues style, boolean closeAutomatically, boolean requestFocus)
 	{
-		return chainPopupAtMousePosition( element, style, Anchor.TOP_LEFT, bCloseOnLoseFocus, bRequestFocus );
+		return chainPopupAtMousePosition( element, style, Anchor.TOP_LEFT, closeAutomatically, requestFocus );
 	}
 	
 	

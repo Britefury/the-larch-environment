@@ -1264,32 +1264,56 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	//
 	
 	protected PresentationPopupWindow createPopupPresentation(LSElement popupContents, Point2 localPos, Anchor popupAnchor,
-			boolean bCloseOnLoseFocus, boolean bRequestFocus)
+			boolean closeAutomatically, boolean requestFocus)
 	{
-		return component.createPopupPresentation( popupContents, (int)( localPos.x + 0.5 ), (int)( localPos.y + 0.5 ),
-				popupAnchor, bCloseOnLoseFocus, bRequestFocus, true );
+		PresentationPopupWindow popup = component.createPopupPresentation( popupContents, (int)( localPos.x + 0.5 ), (int)( localPos.y + 0.5 ),
+				popupAnchor, closeAutomatically, requestFocus, true );
+		if ( !requestFocus )
+		{
+			// Ensure focus is returned to the invoking component
+			getComponent().requestFocus();
+		}
+		return popup;
 	}
 	
 	public PresentationPopupWindow createPopupAtMousePosition(LSElement popupContents, Anchor popupAnchor,
-			boolean bCloseOnLoseFocus, boolean bRequestFocus)
+			boolean closeAutomatically, boolean requestFocus)
 	{
 		Point mouse = component.getMousePosition();
-		return component.createPopupPresentation( popupContents, mouse.x, mouse.y, popupAnchor, bCloseOnLoseFocus, bRequestFocus, true );
+		PresentationPopupWindow popup =  component.createPopupPresentation( popupContents, mouse.x, mouse.y, popupAnchor, closeAutomatically, requestFocus, true );
+		if ( !requestFocus )
+		{
+			// Ensure focus is returned to the invoking component
+			getComponent().requestFocus();
+		}
+		return popup;
 	}
 
 	
 	protected PresentationPopupWindow createChainPopupPresentation(LSElement popupContents, Point2 localPos, Anchor popupAnchor,
-			boolean bCloseOnLoseFocus, boolean bRequestFocus)
+			boolean closeAutomatically, boolean requestFocus)
 	{
-		return component.createPopupPresentation( popupContents, (int)( localPos.x + 0.5 ), (int)( localPos.y + 0.5 ),
-				popupAnchor, bCloseOnLoseFocus, bRequestFocus, false );
+		PresentationPopupWindow popup =  component.createPopupPresentation( popupContents, (int)( localPos.x + 0.5 ), (int)( localPos.y + 0.5 ),
+				popupAnchor, closeAutomatically, requestFocus, false );
+		if ( !requestFocus )
+		{
+			// Ensure focus is returned to the invoking component
+			getComponent().requestFocus();
+		}
+		return popup;
 	}
 	
 	public PresentationPopupWindow createChainPopupAtMousePosition(LSElement popupContents, Anchor popupAnchor,
-			boolean bCloseOnLoseFocus, boolean bRequestFocus)
+			boolean closeAutomatically, boolean requestFocus)
 	{
 		Point mouse = component.getMousePosition();
-		return component.createPopupPresentation( popupContents, mouse.x, mouse.y, popupAnchor, bCloseOnLoseFocus, bRequestFocus, false );
+		PresentationPopupWindow popup =  component.createPopupPresentation( popupContents, mouse.x, mouse.y, popupAnchor, closeAutomatically, requestFocus, false );
+		if ( !requestFocus )
+		{
+			// Ensure focus is returned to the invoking component
+			getComponent().requestFocus();
+		}
+		return popup;
 	}
 
 	

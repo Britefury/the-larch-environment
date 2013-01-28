@@ -67,8 +67,9 @@ public class PopupPresentationComponent extends PresentationComponent
 	}
 	
 
+	@Override
 	protected PresentationPopupWindow createPopupPresentation(LSElement popupContents, int targetX, int targetY, Anchor popupAnchor,
-			boolean bCloseOnLoseFocus, boolean bRequestFocus, boolean chainStart)
+			boolean closeAutomatically, boolean requestFocus, boolean chainStart)
 	{
 		// Offset the popup position by the location of this presentation component on the screen
 		Point locOnScreen = getLocationOnScreen();
@@ -86,7 +87,7 @@ public class PopupPresentationComponent extends PresentationComponent
 		// Get the owning window of the root presentation component
 		Window ownerWindow = SwingUtilities.getWindowAncestor( root );
 
-		return new PresentationPopupWindow( chain, ownerWindow, this, popupContents, targetX, targetY, popupAnchor, bCloseOnLoseFocus, bRequestFocus, chainStart );
+		return new PresentationPopupWindow( chain, ownerWindow, this, popupContents, targetX, targetY, popupAnchor, closeAutomatically, requestFocus, chainStart );
 	}
 
 
@@ -94,5 +95,13 @@ public class PopupPresentationComponent extends PresentationComponent
 	public PresentationEventErrorLog getEventErrorLog()
 	{
 		return containingPopup.chain.owner.getEventErrorLog();
+	}
+
+
+
+	@Override
+	protected void onPopupClosingEvent()
+	{
+		containingPopup.autoClosePopupChildren();
 	}
 }

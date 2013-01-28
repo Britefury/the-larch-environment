@@ -442,14 +442,14 @@ public class BubblePopup
 	
 	
 	
-	public static PresentationPopupWindow popupInBubbleAdjacentTo(Object contents, LSElement target, Anchor targetAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public static PresentationPopupWindow popupInBubbleAdjacentTo(Object contents, LSElement target, Anchor targetAnchor, boolean closeAutomatically, boolean requestFocus)
 	{
 		ElementBubblePres b = new ElementBubblePres( contents, target );
 		
-		return b.popup( target, targetAnchor, targetAnchor.opposite(), bCloseOnLoseFocus, bRequestFocus );
+		return b.popup( target, targetAnchor, targetAnchor.opposite(), closeAutomatically, requestFocus );
 	}
 
-	public static PresentationPopupWindow popupInBubbleAdjacentToMouse(Object contents, LSElement target, Anchor popupAnchor, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public static PresentationPopupWindow popupInBubbleAdjacentToMouse(Object contents, LSElement target, Anchor popupAnchor, boolean closeAutomatically, boolean requestFocus)
 	{
 		PresentationComponent component = target.getRootElement().getComponent();
 		Point mouse = component.getMousePosition();
@@ -457,6 +457,6 @@ public class BubblePopup
 		Point2 mousePos = new Point2( (double)( mouse.x + loc.x ), (double)( mouse.y + loc.y ) );
 		MouseBubblePres b = new MouseBubblePres( contents, mousePos );
 		
-		return b.popupAtMousePosition( target, popupAnchor, bCloseOnLoseFocus, bRequestFocus );
+		return b.popupAtMousePosition( target, popupAnchor, closeAutomatically, requestFocus );
 	}
 }

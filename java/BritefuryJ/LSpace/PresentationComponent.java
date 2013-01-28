@@ -433,6 +433,7 @@ public abstract class PresentationComponent extends JComponent implements Compon
 	@Override
 	public void mousePressed(MouseEvent e)
 	{
+		onPopupClosingEvent();
 		rootElement.mouseDownEvent( getButton( e ), new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), Modifier.getKeyModifiersFromEvent( e ) );
 	}
 
@@ -709,7 +710,11 @@ public abstract class PresentationComponent extends JComponent implements Compon
 	}
 	
 	protected abstract PresentationPopupWindow createPopupPresentation(LSElement popupContents, int targetX, int targetY, Anchor popupAnchor,
-			boolean bCloseOnLoseFocus, boolean bRequestFocus, boolean chainStart);
+			boolean closeAutomatically, boolean requestFocus, boolean chainStart);
+
+	protected void onPopupClosingEvent()
+	{
+	}
 
 
 
