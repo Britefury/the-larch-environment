@@ -7,6 +7,7 @@
 package BritefuryJ.LSpace.Input;
 
 import java.awt.geom.AffineTransform;
+import java.util.List;
 import java.util.Stack;
 
 import BritefuryJ.LSpace.LSElement;
@@ -38,7 +39,7 @@ public class PointerDragInteractor extends AbstractPointerDragInteractor
 			
 			if ( element.isRealised() )
 			{
-				Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( DragElementInteractor.class );
+				List<AbstractElementInteractor> interactors = element.getElementInteractorsCopy( DragElementInteractor.class );
 				if ( interactors != null )
 				{
 					for (AbstractElementInteractor interactor: interactors)

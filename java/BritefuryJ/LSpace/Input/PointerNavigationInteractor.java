@@ -8,6 +8,7 @@ package BritefuryJ.LSpace.Input;
 
 import java.awt.geom.AffineTransform;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Stack;
 
 import BritefuryJ.LSpace.LSElement;
@@ -150,7 +151,7 @@ public class PointerNavigationInteractor extends AbstractPointerDragInteractor
 			LSElement element = elements.peek();
 			PointerButtonEvent elementSpaceEvent = events.peek();
 			
-			Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( NavigationElementInteractor.class );
+			List<AbstractElementInteractor> interactors = element.getElementInteractorsCopy( NavigationElementInteractor.class );
 			if ( interactors != null )
 			{
 				for (AbstractElementInteractor interactor: interactors )
@@ -218,7 +219,7 @@ public class PointerNavigationInteractor extends AbstractPointerDragInteractor
 			LSElement element = elements.pop();
 			PointerNavigationEvent elementSpaceEvent = events.pop();
 			
-			Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( NavigationElementInteractor.class );
+			List<AbstractElementInteractor> interactors = element.getElementInteractorsCopy( NavigationElementInteractor.class );
 			if ( interactors != null )
 			{
 				Iterator<AbstractElementInteractor> iter = interactors.iterator();

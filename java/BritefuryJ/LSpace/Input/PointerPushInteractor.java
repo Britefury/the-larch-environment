@@ -7,6 +7,7 @@
 package BritefuryJ.LSpace.Input;
 
 import java.awt.geom.AffineTransform;
+import java.util.List;
 import java.util.Stack;
 
 import BritefuryJ.LSpace.LSElement;
@@ -35,7 +36,7 @@ public class PointerPushInteractor extends PointerInteractor
 			
 			if ( element.isRealised() )
 			{
-				Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( PushElementInteractor.class );
+				List<AbstractElementInteractor> interactors = element.getElementInteractorsCopy( PushElementInteractor.class );
 				if ( interactors != null )
 				{
 					for (AbstractElementInteractor interactor: interactors )

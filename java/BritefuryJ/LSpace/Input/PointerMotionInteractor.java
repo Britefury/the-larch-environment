@@ -7,6 +7,7 @@
 package BritefuryJ.LSpace.Input;
 
 import java.awt.event.MouseEvent;
+import java.util.List;
 import java.util.Stack;
 
 import BritefuryJ.LSpace.LSElement;
@@ -157,7 +158,7 @@ public class PointerMotionInteractor extends PointerInteractor implements Pointe
 	{
 		if ( element.isRealised() )
 		{
-			Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( MotionElementInteractor.class );
+			List<AbstractElementInteractor> interactors = element.getElementInteractorsCopy( MotionElementInteractor.class );
 			if ( interactors != null )
 			{
 				for (AbstractElementInteractor interactor: interactors )
@@ -180,7 +181,7 @@ public class PointerMotionInteractor extends PointerInteractor implements Pointe
 	{
 		if ( element.isRealised() )
 		{
-			Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( HoverElementInteractor.class );
+			List<AbstractElementInteractor> interactors = element.getElementInteractorsCopy( HoverElementInteractor.class );
 			if ( interactors != null )
 			{
 				for (AbstractElementInteractor interactor: interactors )
@@ -209,7 +210,7 @@ public class PointerMotionInteractor extends PointerInteractor implements Pointe
 			event.getPointer().concretePointer().notifyLeaveElement( element );
 			element.handlePointerLeave( event );
 
-			Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( HoverElementInteractor.class );
+			List<AbstractElementInteractor> interactors = element.getElementInteractorsCopy( HoverElementInteractor.class );
 			if ( interactors != null )
 			{
 				for (AbstractElementInteractor interactor: interactors )
@@ -232,7 +233,7 @@ public class PointerMotionInteractor extends PointerInteractor implements Pointe
 	{
 		if ( element.isRealised() )
 		{
-			Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( MotionElementInteractor.class );
+			List<AbstractElementInteractor> interactors = element.getElementInteractorsCopy( MotionElementInteractor.class );
 			if ( interactors != null )
 			{
 				for (AbstractElementInteractor interactor: interactors )
@@ -255,7 +256,7 @@ public class PointerMotionInteractor extends PointerInteractor implements Pointe
 	{
 		if ( element.isRealised() )
 		{
-			Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( MotionElementInteractor.class );
+			List<AbstractElementInteractor> interactors = element.getElementInteractorsCopy( MotionElementInteractor.class );
 			if ( interactors != null )
 			{
 				for (AbstractElementInteractor interactor: interactors )

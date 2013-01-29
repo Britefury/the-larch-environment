@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.LSpace.Input;
 
+import java.util.List;
 import java.util.Stack;
 
 import BritefuryJ.Controls.PopupMenu;
@@ -58,7 +59,7 @@ public class PointerContextMenuInteractor extends PointerInteractor
 			
 			if ( element.isRealised() )
 			{
-				Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( ContextMenuElementInteractor.class );
+				List<AbstractElementInteractor> interactors = element.getElementInteractorsCopy( ContextMenuElementInteractor.class );
 				if ( interactors != null )
 				{
 					for (AbstractElementInteractor interactor: interactors )

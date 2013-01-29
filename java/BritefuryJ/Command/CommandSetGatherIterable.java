@@ -8,6 +8,7 @@ package BritefuryJ.Command;
 
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Focus.Target;
@@ -34,10 +35,10 @@ public class CommandSetGatherIterable implements Iterable<BoundCommandSet>
 			{
 				if ( element.isRealised() )
 				{
-					Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( GatherCommandSetInteractor.class );
+					List<AbstractElementInteractor> interactors = element.getElementInteractorsCopy( GatherCommandSetInteractor.class );
 					if ( interactors != null )
 					{
-						for (AbstractElementInteractor interactor: interactors )
+						for (AbstractElementInteractor interactor: interactors)
 						{
 							GatherCommandSetInteractor cmdInt = (GatherCommandSetInteractor)interactor;
 							cmdInt.gatherCommandSets( element, commandSets );

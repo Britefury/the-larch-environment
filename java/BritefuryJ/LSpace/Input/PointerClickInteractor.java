@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.LSpace.Input;
 
+import java.util.List;
 import java.util.Stack;
 
 import BritefuryJ.LSpace.LSElement;
@@ -26,7 +27,7 @@ public class PointerClickInteractor extends PointerInteractor
 			
 			if ( element.isRealised() )
 			{
-				Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( ClickElementInteractor.class );
+				List<AbstractElementInteractor> interactors = element.getElementInteractorsCopy( ClickElementInteractor.class );
 				if ( interactors != null )
 				{
 					for (AbstractElementInteractor interactor: interactors )
@@ -61,7 +62,7 @@ public class PointerClickInteractor extends PointerInteractor
 			
 			if ( element.isRealised() )
 			{
-				Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( ClickElementInteractor.class );
+				List<AbstractElementInteractor> interactors = element.getElementInteractorsCopy( ClickElementInteractor.class );
 				if ( interactors != null )
 				{
 					for (AbstractElementInteractor interactor: interactors )
@@ -98,7 +99,7 @@ public class PointerClickInteractor extends PointerInteractor
 			
 			if ( element.isRealised() )
 			{
-				Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( ClickElementInteractor.class );
+				List<AbstractElementInteractor> interactors = element.getElementInteractorsCopy( ClickElementInteractor.class );
 				if ( interactors != null )
 				{
 					for (AbstractElementInteractor interactor: interactors )

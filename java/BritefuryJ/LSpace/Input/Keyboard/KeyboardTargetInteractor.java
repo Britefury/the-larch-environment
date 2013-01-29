@@ -7,6 +7,7 @@
 package BritefuryJ.LSpace.Input.Keyboard;
 
 import java.awt.event.KeyEvent;
+import java.util.List;
 
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSRootElement;
@@ -239,7 +240,7 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 		{
 			if ( element.isRealised() )
 			{
-				Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( KeyElementInteractor.class );
+				List<AbstractElementInteractor> interactors = element.getElementInteractorsCopy( KeyElementInteractor.class );
 				if ( interactors != null )
 				{
 					for (AbstractElementInteractor interactor: interactors )
@@ -274,7 +275,7 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 		{
 			if ( element.isRealised() )
 			{
-				Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( KeyElementInteractor.class );
+				List<AbstractElementInteractor> interactors = element.getElementInteractorsCopy( KeyElementInteractor.class );
 				if ( interactors != null )
 				{
 					for (AbstractElementInteractor interactor: interactors )
@@ -309,7 +310,7 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 		{
 			if ( element.isRealised() )
 			{
-				Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( KeyElementInteractor.class );
+				List<AbstractElementInteractor> interactors = element.getElementInteractorsCopy( KeyElementInteractor.class );
 				if ( interactors != null )
 				{
 					for (AbstractElementInteractor interactor: interactors )

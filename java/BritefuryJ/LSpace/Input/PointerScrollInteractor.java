@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.LSpace.Input;
 
+import java.util.List;
 import java.util.Stack;
 
 import BritefuryJ.LSpace.LSElement;
@@ -27,7 +28,7 @@ public class PointerScrollInteractor extends PointerInteractor
 			
 			if ( element.isRealised() )
 			{
-				Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( ScrollElementInteractor.class );
+				List<AbstractElementInteractor> interactors = element.getElementInteractorsCopy( ScrollElementInteractor.class );
 				if ( interactors != null )
 				{
 					for (AbstractElementInteractor interactor: interactors )
