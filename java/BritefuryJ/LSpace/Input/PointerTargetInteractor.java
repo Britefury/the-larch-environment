@@ -7,6 +7,7 @@
 package BritefuryJ.LSpace.Input;
 
 import java.awt.geom.AffineTransform;
+import java.util.List;
 import java.util.Stack;
 
 import BritefuryJ.LSpace.LSContentLeafEditable;
@@ -61,7 +62,7 @@ public class PointerTargetInteractor
 					
 					if ( element.isRealised() )
 					{
-						Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( TargetElementInteractor.class );
+						List<AbstractElementInteractor> interactors = element.getElementInteractorsCopy( TargetElementInteractor.class );
 						if ( interactors != null )
 						{
 							for (AbstractElementInteractor interactor: interactors)

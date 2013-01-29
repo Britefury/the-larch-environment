@@ -1558,7 +1558,7 @@ abstract public class LSElement implements Presentable
 		setFlagRealised();
 		onRealise();
 		
-		Iterable<AbstractElementInteractor> interactors = getElementInteractors( RealiseElementInteractor.class );
+		List<AbstractElementInteractor> interactors = getElementInteractorsCopy( RealiseElementInteractor.class );
 		if ( interactors != null )
 		{
 			for (AbstractElementInteractor interactor: interactors )
@@ -1600,10 +1600,10 @@ abstract public class LSElement implements Presentable
 			rootElement.elementUnrealised( this );
 		}
 		
-		Iterable<AbstractElementInteractor> interactors = getElementInteractors( RealiseElementInteractor.class );
+		List<AbstractElementInteractor> interactors = getElementInteractorsCopy( RealiseElementInteractor.class );
 		if ( interactors != null )
 		{
-			for (AbstractElementInteractor interactor: interactors )
+			for (AbstractElementInteractor interactor: interactors)
 			{
 				RealiseElementInteractor realiseInt = (RealiseElementInteractor)interactor;
 				try
@@ -1839,7 +1839,7 @@ abstract public class LSElement implements Presentable
 	public void handleCaretEnter(Caret c)
 	{
 		onCaretEnter( c );
-		Iterable<AbstractElementInteractor> interactors = getElementInteractors( CaretCrossingElementInteractor.class );
+		List<AbstractElementInteractor> interactors = getElementInteractorsCopy( CaretCrossingElementInteractor.class );
 		if ( interactors != null )
 		{
 			for (AbstractElementInteractor interactor: interactors )
@@ -1860,7 +1860,7 @@ abstract public class LSElement implements Presentable
 	public void handleCaretLeave(Caret c)
 	{
 		onCaretLeave( c );
-		Iterable<AbstractElementInteractor> interactors = getElementInteractors( CaretCrossingElementInteractor.class );
+		List<AbstractElementInteractor> interactors = getElementInteractorsCopy( CaretCrossingElementInteractor.class );
 		if ( interactors != null )
 		{
 			for (AbstractElementInteractor interactor: interactors )
@@ -2099,7 +2099,27 @@ abstract public class LSElement implements Presentable
 		}
 	}
 	
-	
+	public List<AbstractElementInteractor> getElementInteractorsCopy(final Class<?> interactorClass)
+	{
+		if ( interactionFields != null  &&  interactionFields.elementInteractors != null )
+		{
+			ArrayList<AbstractElementInteractor> interactors = new ArrayList<AbstractElementInteractor>();
+
+			for (AbstractElementInteractor interactor: interactionFields.elementInteractors)
+			{
+				if ( interactorClass.isInstance( interactor ) )
+				{
+					interactors.add( interactor );
+				}
+			}
+
+			return interactors;
+		}
+
+		return null;
+	}
+
+
 	
 	//
 	//
@@ -2484,7 +2504,8 @@ abstract public class LSElement implements Presentable
 			ArrayList<TreeEventListener> listeners = getTreeEventListeners();
 			if ( listeners != null )
 			{
-				for (TreeEventListener listener: listeners)
+				ArrayList<TreeEventListener> listenersCopy = new ArrayList<TreeEventListener>( listeners );
+				for (TreeEventListener listener: listenersCopy)
 				{
 					if ( listener.onTreeEvent( this, event.sourceElement, event.value ) )
 					{
