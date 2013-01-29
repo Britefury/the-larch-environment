@@ -80,7 +80,12 @@ public class RootPresentationComponent extends PresentationComponent
 
 	protected void notifyChainClosed(PopupChain chain)
 	{
+		boolean reacquireFocus = chain.wasFocusRequested();
 		popupChains.remove( chain );
+		if ( reacquireFocus )
+		{
+			requestFocus();
+		}
 	}
 
 
