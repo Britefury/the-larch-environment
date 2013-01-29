@@ -13,7 +13,7 @@ public class PopupChain
 	// List of popup windows. The popup at the tip is at index 0, the last is the one closest to the root
 	private ArrayList<PresentationPopupWindow> popups = new ArrayList<PresentationPopupWindow>();
 	protected RootPresentationComponent owner;
-	private boolean closed = false, ignoreCloseNotifications = false;
+	private boolean closed = false, ignoreCloseNotifications = false, focusRequested = false;
 	
 	
 	public PopupChain(RootPresentationComponent owner)
@@ -26,10 +26,19 @@ public class PopupChain
 	{
 		return popups.isEmpty();
 	}
-	
-	
-	protected void addPopup(PresentationPopupWindow popup)
+
+	protected boolean wasFocusRequested()
 	{
+		return focusRequested;
+	}
+	
+	
+	protected void addPopup(PresentationPopupWindow popup, boolean focusRequested)
+	{
+		if ( popups.size() == 0 )
+		{
+			this.focusRequested = focusRequested;
+		}
 		popups.add( 0, popup );
 	}
 	

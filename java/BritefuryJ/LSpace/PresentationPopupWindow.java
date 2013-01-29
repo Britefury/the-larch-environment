@@ -22,7 +22,7 @@ import BritefuryJ.Math.Vector2;
 public class PresentationPopupWindow
 {
 	protected JWindow popupWindow;
-	protected PresentationComponent popupComponent;
+	protected PopupPresentationComponent popupComponent;
 	protected PopupChain chain;
 	private boolean chainStart;
 	protected boolean closeAutomatically;
@@ -33,10 +33,10 @@ public class PresentationPopupWindow
 			Anchor popupAnchor, boolean closeAutomatically, boolean requestFocus, boolean chainStart)
 	{
 		chain = popupChain;
-		chain.addPopup( this );
+		chain.addPopup( this, requestFocus );
 		this.chainStart = chainStart;
 		this.closeAutomatically = closeAutomatically;
-		
+
 		// Create the popup window
 		popupWindow = new JWindow( ownerWindow );
 		if ( requestFocus )
@@ -90,7 +90,8 @@ public class PresentationPopupWindow
 	public void closePopup()
 	{
 		popupWindow.setVisible( false );
-		chain.notifyPopupClosed(this);
+		popupWindow.dispose();
+		chain.notifyPopupClosed( this );
 	}
 	
 	
@@ -100,7 +101,7 @@ public class PresentationPopupWindow
 	}
 	
 	
-	public PresentationComponent getPresentationComponent()
+	public PopupPresentationComponent getPresentationComponent()
 	{
 		return popupComponent;
 	}

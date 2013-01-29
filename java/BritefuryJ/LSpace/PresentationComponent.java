@@ -6,32 +6,14 @@
 //##************************
 package BritefuryJ.LSpace;
 
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.datatransfer.Transferable;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
+import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import javax.swing.JComponent;
-import javax.swing.TransferHandler;
+import javax.swing.*;
 
 import org.python.core.Py;
 
@@ -52,7 +34,7 @@ import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 import BritefuryJ.Pres.Pres;
 
-public abstract class PresentationComponent extends JComponent implements ComponentListener, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, HierarchyListener, FocusListener
+public abstract class PresentationComponent extends JComponent implements ComponentListener, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, HierarchyListener, FocusListener, WindowListener
 {
 	public static class CannotGetGraphics2DException extends RuntimeException
 	{
@@ -332,7 +314,8 @@ public abstract class PresentationComponent extends JComponent implements Compon
 	
 	
 	public LSRootElement rootElement;
-	private boolean realised, configured;
+	private boolean realised, configured, closed;
+	private Window window;
 	
 	
 	
@@ -345,6 +328,7 @@ public abstract class PresentationComponent extends JComponent implements Compon
 		
 		realised = false;
 		configured = false;
+		closed = false;
 		
 		addComponentListener( this );
 		addMouseListener( this );
@@ -361,9 +345,10 @@ public abstract class PresentationComponent extends JComponent implements Compon
 		
 		setTransferHandler( new PresAreaTransferHandler() );
 	}
-	
-	
-	
+
+
+
+
 	//
 	//
 	// ROOT ELEMENT METHODS
@@ -563,8 +548,17 @@ public abstract class PresentationComponent extends JComponent implements Compon
 			return clampSize( rootElement.getMaximumSize() );
 		}
 	}
-	
-	
+
+
+
+
+
+	//
+	//
+	// ComponentListener: resized, moved, shown, hidden
+	//
+	//
+
 	@Override
 	public void componentResized(ComponentEvent e)
 	{
@@ -578,16 +572,114 @@ public abstract class PresentationComponent extends JComponent implements Compon
 	}
 
 	@Override
+	public void componentShown(ComponentEvent e)
+	{
+	}
+
+	@Override
+	public void componentHidden(ComponentEvent e)
+	{
+	}
+
+
+
+	//
+	//
+	// HierarchyListener: hierarchyChanged
+	//
+	//
+
+	@Override
 	public void hierarchyChanged(HierarchyEvent e)
 	{
-		sendRealiseEvents();
+		Window w = SwingUtilities.getWindowAncestor( this );
+
+		if ( !closed  ||  isHierarchyVisible()  &&  w != null )
+		{
+			sendRealiseEvents();
+		}
+
+		if ( w != window )
+		{
+			// Window changed
+			if ( window != null )
+			{
+				window.removeWindowListener( this );
+			}
+			window = w;
+			if ( window != null )
+			{
+				window.addWindowListener( this );
+			}
+		}
+	}
+
+
+
+	private boolean isHierarchyVisible()
+	{
+		Container c = getParent();
+		while ( c != null )
+		{
+			if ( !c.isVisible() )
+			{
+				return false;
+			}
+			c = c.getParent();
+		}
+
+		return true;
 	}
 	
 	
 	
 	abstract void notifyQueueReallocation();
-	
-	
+
+
+
+	//
+	//
+	// WINDOW EVENTS
+	//
+	//
+
+	@Override
+	public void windowOpened(WindowEvent e)
+	{
+	}
+
+	@Override
+	public void windowClosing(WindowEvent e)
+	{
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e)
+	{
+		sendUnrealiseEvents();
+	}
+
+	@Override
+	public void windowActivated(WindowEvent e)
+	{
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e)
+	{
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e)
+	{
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e)
+	{
+	}
+
+
 	
 	
 	//
@@ -619,6 +711,7 @@ public abstract class PresentationComponent extends JComponent implements Compon
 		if ( !realised )
 		{
 			initialise();
+
 			rootElement.realiseEvent();
 			
 			realised = true;
@@ -650,29 +743,10 @@ public abstract class PresentationComponent extends JComponent implements Compon
 			configured = true;
 		}
 	}
-	
-	
-	
-	
-	//
-	//
-	// SHOW / HIDE
-	//
-	//
-	
-	@Override
-	public void componentShown(ComponentEvent e)
-	{
-		sendRealiseEvents();
-	}
 
-	@Override
-	public void componentHidden(ComponentEvent e)
-	{
-		sendUnrealiseEvents();
-	}
-	
-	
+
+
+
 	//
 	//
 	// FOCUS GAIN / LOSS
