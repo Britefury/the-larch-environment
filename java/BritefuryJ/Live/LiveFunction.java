@@ -132,7 +132,12 @@ public class LiveFunction extends LiveInterface
 		return valueCache;
 	}
 	
-	
+
+
+	public void onChanged()
+	{
+		inc.onChanged();
+	}
 	
 
 
