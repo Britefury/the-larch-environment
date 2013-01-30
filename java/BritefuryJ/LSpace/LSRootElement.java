@@ -131,9 +131,10 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		bAllocationRequired = true;
 		
 		caret = new Caret();
-		
-		target = null;
-		
+
+		target = caret;
+		target.notifyActivate();
+
 		selectionManager = new SelectionManager( this );
 		
 		keyboard = new Keyboard( this );
@@ -197,34 +198,22 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	//
 	//
 	
-	private Target validTarget(Target t)
-	{
-		return t == null  ?  caret  :  t;
-	}
-	
 	public Target getTarget()
 	{
-		return validTarget( target );
+		return target;
 	}
 	
 	public void setTarget(Target t)
 	{
-		Target prev = getTarget();
-		Target cur = validTarget( t );
-		
-		if ( cur != prev )
+		if ( t == null )
 		{
-			if ( prev != null )
-			{
-				prev.notifyDeactivate();
-			}
-			
+			throw new RuntimeException( "Cannot set NULL target" );
+		}
+		if ( t != target )
+		{
+			target.notifyDeactivate();
 			target = t;
-	
-			if ( cur != null )
-			{
-				cur.notifyActivate();
-			}
+			target.notifyActivate();
 		}
 
 		queueFullRedraw();
@@ -232,7 +221,7 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	
 	public void setCaretAsTarget()
 	{
-		setTarget( null );
+		setTarget( caret );
 	}
 	
 	
