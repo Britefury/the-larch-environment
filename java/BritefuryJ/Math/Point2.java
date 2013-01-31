@@ -117,8 +117,19 @@ public class Point2 implements Presentable, Serializable
 	{
 		return new Point2( x*s, y*s );
 	}
+
+
+	public double distanceTo(Point2 p)
+	{
+		return p.sub( this ).length();
+	}
 	
-	
+	public double sqrDistanceTo(Point2 p)
+	{
+		return p.sub( this ).sqrLength();
+	}
+
+
 	
 	public Vector2 toVector2()
 	{

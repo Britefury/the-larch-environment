@@ -13,9 +13,10 @@ import java.awt.Stroke;
 import java.awt.geom.Line2D;
 
 import BritefuryJ.LSpace.ElementPainter;
+import BritefuryJ.LSpace.Event.AbstractPointerButtonEvent;
+import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
+import BritefuryJ.LSpace.Interactor.ClickElementInteractor;
 import BritefuryJ.LSpace.LSElement;
-import BritefuryJ.LSpace.Event.PointerButtonEvent;
-import BritefuryJ.LSpace.Interactor.PushElementInteractor;
 
 class CheckboxHelper
 {
@@ -60,7 +61,7 @@ class CheckboxHelper
 	}
 
 
-	protected static class CheckboxCheckInteractor implements PushElementInteractor
+	protected static class CheckboxCheckInteractor implements ClickElementInteractor
 	{
 		private Checkbox.CheckboxControl checkbox;
 		
@@ -73,22 +74,16 @@ class CheckboxHelper
 		
 		
 		@Override
-		public boolean buttonPress(LSElement element, PointerButtonEvent event)
+		public boolean testClickEvent(LSElement element, AbstractPointerButtonEvent event)
 		{
-			if ( event.getButton() == 1 )
-			{
-				checkbox.toggle();
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			return event.getButton() == 1;
 		}
 
 		@Override
-		public void buttonRelease(LSElement element, PointerButtonEvent event)
+		public boolean buttonClicked(LSElement element, PointerButtonClickedEvent event)
 		{
+			checkbox.toggle();
+			return true;
 		}
 	}
 }

@@ -32,7 +32,10 @@ public class Pointer extends PointerInterface
 	{
 		public void notifyPointerElementUnrealised(Pointer pointer, LSElement element);
 	}
-	
+
+
+
+	private static final double CLICK_DISTANCE_THRESHOLD = 10.0;
 	
 	private static final int TARGET_CLICK_INTERACTOR_PRIORITY = -3000;
 	private static final int SCROLL_INTERACTOR_PRIORITY = -2000;
@@ -55,6 +58,10 @@ public class Pointer extends PointerInterface
 	protected PresentationComponent component;
 	protected PriorityList<PointerInteractor> interactors = new PriorityList<PointerInteractor>();
 	protected boolean isWithinBoundsOfRoot = false;
+
+	// This array of button positions records the position of the pointer at which a button was pressed.
+	// Used for detecting clicks.
+	protected Point2 buttonDownPositions[] = new Point2[8];
 	
 	// Introduced as an optimisation -- elements become 'unrealised' VERY FREQUENTLY, so iterating through all interactors and notifying them is very inefficient.
 	// Keeping a map of listener lists allows certain interactors to register an interest in ONLY the elements that they want to know about.
@@ -220,6 +227,12 @@ public class Pointer extends PointerInterface
 	
 	public boolean buttonDown(Point2 pos, int button)
 	{
+		// Set the button down position
+		if ( button < 8 )
+		{
+			buttonDownPositions[button] = pos;
+		}
+
 		PointerButtonEvent event = new PointerButtonEvent( this, button, PointerButtonEvent.Action.DOWN );
 
 		for (PointerInteractor interactor: interactors)
@@ -237,15 +250,33 @@ public class Pointer extends PointerInterface
 	{
 		PointerButtonEvent event = new PointerButtonEvent( this, button, PointerButtonEvent.Action.UP );
 
+		boolean handled = false;
 		for (PointerInteractor interactor: interactors)
 		{
 			if ( interactor.buttonUp( this, event ) )
 			{
-				return true;
+				handled = true;
+				break;
 			}
 		}
 
-		return false;
+		// Detect clicks that occur where the mouse has moved by a small amount during clicking.
+		// AWT will NOT report a click when the mouse moves even so much as 1 pixel during the click.
+		if ( button < 8 )
+		{
+			// Compute the sqr distance and clear the button down position
+			double sqrDistanceMoved = buttonDownPositions[button].sqrDistanceTo( pos );
+			buttonDownPositions[button] = null;
+
+			// Only emit if the mouse has moved; if it has not moved at all, then AWT will have reported the click
+			// Do not emit the click if the mouse has moved over more distance than a threshold value
+			if ( sqrDistanceMoved > 0.0  &&  sqrDistanceMoved  <  CLICK_DISTANCE_THRESHOLD * CLICK_DISTANCE_THRESHOLD )
+			{
+				buttonClicked( pos, button, 1 );
+			}
+		}
+
+		return handled;
 	}
 	
 	public boolean buttonClicked(Point2 pos, int button, int clickCount)
