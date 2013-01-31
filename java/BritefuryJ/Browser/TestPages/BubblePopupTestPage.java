@@ -9,7 +9,7 @@ package BritefuryJ.Browser.TestPages;
 import BritefuryJ.Controls.Button;
 import BritefuryJ.Controls.Button.ButtonControl;
 import BritefuryJ.LSpace.Anchor;
-import BritefuryJ.LSpace.Event.PointerButtonEvent;
+import BritefuryJ.LSpace.Event.AbstractPointerButtonEvent;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
@@ -38,7 +38,7 @@ public class BubblePopupTestPage extends TestPage
 		Button.ButtonListener listener = new Button.ButtonListener()
 		{
 			@Override
-			public void onButtonClicked(ButtonControl button, PointerButtonEvent event)
+			public void onButtonClicked(ButtonControl button, AbstractPointerButtonEvent event)
 			{
 				Pres contents = contentsStyle.applyTo( new Label( popupContent ) );
 				

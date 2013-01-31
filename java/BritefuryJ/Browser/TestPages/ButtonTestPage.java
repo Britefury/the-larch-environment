@@ -9,9 +9,9 @@ package BritefuryJ.Browser.TestPages;
 import java.awt.Color;
 
 import BritefuryJ.Controls.Button;
+import BritefuryJ.LSpace.Event.AbstractPointerButtonEvent;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSProxy;
-import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.Pres.ElementRef;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Column;
@@ -54,7 +54,7 @@ public class ButtonTestPage extends TestPage
 		}
 
 
-		public void onButtonClicked(Button.ButtonControl button, PointerButtonEvent event)
+		public void onButtonClicked(Button.ButtonControl button, AbstractPointerButtonEvent event)
 		{
 			for (LSElement element: parentElement.getElements())
 			{

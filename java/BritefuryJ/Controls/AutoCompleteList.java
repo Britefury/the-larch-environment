@@ -7,8 +7,11 @@
 package BritefuryJ.Controls;
 
 import BritefuryJ.Graphics.FilledOutlinePainter;
+import BritefuryJ.LSpace.Event.AbstractPointerButtonEvent;
+import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Input.Modifier;
+import BritefuryJ.LSpace.Interactor.ClickElementInteractor;
 import BritefuryJ.LSpace.Interactor.KeyElementInteractor;
 import BritefuryJ.LSpace.Interactor.PushElementInteractor;
 import BritefuryJ.LSpace.Interactor.RealiseElementInteractor;
@@ -60,7 +63,7 @@ public class AutoCompleteList extends ControlPres
 		private static final double itemPadding = 2.0;
 
 
-		private class ItemPushInteractor implements PushElementInteractor
+		private class ItemPushInteractor implements ClickElementInteractor
 		{
 			private ItemChooseFn chooseFn;
 
@@ -70,17 +73,18 @@ public class AutoCompleteList extends ControlPres
 				this.chooseFn = chooseFn;
 			}
 
-			public boolean buttonPress(LSElement element, PointerButtonEvent event)
+
+			@Override
+			public boolean testClickEvent(LSElement element, AbstractPointerButtonEvent event)
 			{
 				return event.getButton() == 1;
 			}
 
-			public void buttonRelease(LSElement element, PointerButtonEvent event)
+			@Override
+			public boolean buttonClicked(LSElement element, PointerButtonClickedEvent event)
 			{
-				if ( event.getButton() == 1 )
-				{
-					chooseFn.itemChosen( value );
-				}
+				chooseFn.itemChosen( value );
+				return true;
 			}
 		}
 

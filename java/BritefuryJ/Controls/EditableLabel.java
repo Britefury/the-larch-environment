@@ -13,6 +13,9 @@ import BritefuryJ.Controls.TextEntry.TextEntryValidator;
 import BritefuryJ.DefaultPerspective.DefaultPerspective;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
+import BritefuryJ.LSpace.Event.AbstractPointerButtonEvent;
+import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
+import BritefuryJ.LSpace.Interactor.ClickElementInteractor;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Interactor.PushElementInteractor;
@@ -35,18 +38,19 @@ public class EditableLabel extends ControlPres
 	
 	public static class EditableLabelControl extends Control implements IncrementalMonitorListener
 	{
-		private PushElementInteractor labelInteractor = new PushElementInteractor()
+		private ClickElementInteractor labelInteractor = new ClickElementInteractor()
 		{
 			@Override
-			public boolean buttonPress(LSElement element, PointerButtonEvent event)
+			public boolean testClickEvent(LSElement element, AbstractPointerButtonEvent event)
 			{
 				return event.getButton() == 1;
 			}
 
 			@Override
-			public void buttonRelease(LSElement element, PointerButtonEvent event)
+			public boolean buttonClicked(LSElement element, PointerButtonClickedEvent event)
 			{
 				showTextEntry();
+				return true;
 			}
 		};
 		

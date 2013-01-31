@@ -12,6 +12,9 @@ import java.awt.Cursor;
 import javax.swing.JColorChooser;
 
 import BritefuryJ.Graphics.FillPainter;
+import BritefuryJ.LSpace.Event.AbstractPointerButtonEvent;
+import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
+import BritefuryJ.LSpace.Interactor.ClickElementInteractor;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Interactor.PushElementInteractor;
@@ -116,23 +119,25 @@ public class ColourPicker extends ControlPres
 				Object v = value.getValue();
 				final Color colour = v instanceof Color  ?  (Color)v  :  Color.GRAY;
 				
-				PushElementInteractor swatchInteractor = new PushElementInteractor()
+				ClickElementInteractor swatchInteractor = new ClickElementInteractor()
 				{
 					@Override
-					public void buttonRelease(LSElement element, PointerButtonEvent event)
+					public boolean testClickEvent(LSElement element, AbstractPointerButtonEvent event)
+					{
+						return event.getButton() == 1;
+					}
+
+					@Override
+					public boolean buttonClicked(LSElement element, PointerButtonClickedEvent event)
 					{
 						Color newColour = JColorChooser.showDialog( element.getRootElement().getComponent(), "Choose colour", colour );
-						
+
 						if ( newColour != null )
 						{
 							listener.onColourChanged( ctl, newColour );
 						}
-					}
-					
-					@Override
-					public boolean buttonPress(LSElement element, PointerButtonEvent event)
-					{
-						return event.getButton() == 1;
+
+						return true;
 					}
 				};
 				

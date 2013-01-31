@@ -6,6 +6,9 @@
 //##************************
 package BritefuryJ.Controls;
 
+import BritefuryJ.LSpace.Event.AbstractPointerButtonEvent;
+import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
+import BritefuryJ.LSpace.Interactor.ClickElementInteractor;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Interactor.PushElementInteractor;
@@ -19,13 +22,13 @@ public class Button extends ControlPres
 {
 	public static interface ButtonListener
 	{
-		public void onButtonClicked(ButtonControl button, PointerButtonEvent event);
+		public void onButtonClicked(ButtonControl button, AbstractPointerButtonEvent event);
 	}
 	
 	
 	public static class ButtonControl extends Control
 	{
-		private class ButtonInteractor implements PushElementInteractor
+		private class ButtonInteractor implements ClickElementInteractor
 		{
 			private ButtonInteractor()
 			{
@@ -33,7 +36,13 @@ public class Button extends ControlPres
 			
 			
 			@Override
-			public boolean buttonPress(LSElement element, PointerButtonEvent event)
+			public boolean testClickEvent(LSElement element, AbstractPointerButtonEvent event)
+			{
+				return element.isRealised();
+			}
+
+			@Override
+			public boolean buttonClicked(LSElement element, PointerButtonClickedEvent event)
 			{
 				if ( element.isRealised() )
 				{
@@ -47,13 +56,8 @@ public class Button extends ControlPres
 					}
 					return true;
 				}
-				
-				return false;
-			}
 
-			@Override
-			public void buttonRelease(LSElement element, PointerButtonEvent event)
-			{
+				return false;
 			}
 		}
 		

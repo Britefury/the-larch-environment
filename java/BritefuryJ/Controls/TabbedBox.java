@@ -15,6 +15,9 @@ import java.awt.geom.Path2D;
 import java.util.List;
 
 import BritefuryJ.LSpace.ElementPainter;
+import BritefuryJ.LSpace.Event.AbstractPointerButtonEvent;
+import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
+import BritefuryJ.LSpace.Interactor.ClickElementInteractor;
 import BritefuryJ.LSpace.LSBin;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSRow;
@@ -100,7 +103,7 @@ public class TabbedBox extends ControlPres
 
 	
 	
-	protected static class TabbedBoxHeaderInteractor implements PushElementInteractor, ElementPainter
+	protected static class TabbedBoxHeaderInteractor implements ClickElementInteractor, ElementPainter
 	{
 		TabbedBoxControl control;
 		double spacing, rounding, tabRounding;
@@ -121,14 +124,13 @@ public class TabbedBox extends ControlPres
 		
 		
 		@Override
-		public boolean buttonPress(LSElement element, PointerButtonEvent event)
+		public boolean testClickEvent(LSElement element, AbstractPointerButtonEvent event)
 		{
 			return event.getButton() == 1;
 		}
 
-
 		@Override
-		public void buttonRelease(LSElement element, PointerButtonEvent event)
+		public boolean buttonClicked(LSElement element, PointerButtonClickedEvent event)
 		{
 			LSRow header = (LSRow)element;
 			Point2 clickPos = event.getLocalPointerPos();
@@ -137,13 +139,15 @@ public class TabbedBox extends ControlPres
 			// Ignore first and last elements - they are for padding
 			for (LSElement child: children.subList( 1, children.size() - 1 ))
 			{
-				if ( child.containsParentSpacePoint( clickPos ) )
+				Point2 clickPosInChildSpace = child.getAncestorToLocalXform( element ).transform( clickPos );
+				if ( child.containsLocalSpacePoint( clickPosInChildSpace ) )
 				{
 					control.setTab( i );
-					break;
+					return true;
 				}
 				i++;
 			}
+			return false;
 		}
 
 		

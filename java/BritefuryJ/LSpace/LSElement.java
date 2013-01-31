@@ -47,21 +47,13 @@ import BritefuryJ.Graphics.Painter;
 import BritefuryJ.Graphics.SolidBorder;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.IncrementalView.ViewFragmentFunction;
-import BritefuryJ.LSpace.Event.PointerButtonEvent;
-import BritefuryJ.LSpace.Event.PointerEvent;
-import BritefuryJ.LSpace.Event.PointerMotionEvent;
+import BritefuryJ.LSpace.Event.*;
 import BritefuryJ.LSpace.Input.DndHandler;
 import BritefuryJ.LSpace.Input.DndTarget;
 import BritefuryJ.LSpace.Input.Modifier;
 import BritefuryJ.LSpace.Input.ObjectDndHandler;
 import BritefuryJ.LSpace.Input.PointerInterface;
-import BritefuryJ.LSpace.Interactor.AbstractElementInteractor;
-import BritefuryJ.LSpace.Interactor.CaretCrossingElementInteractor;
-import BritefuryJ.LSpace.Interactor.ContextMenuElementInteractor;
-import BritefuryJ.LSpace.Interactor.MotionElementInteractor;
-import BritefuryJ.LSpace.Interactor.PushElementInteractor;
-import BritefuryJ.LSpace.Interactor.RealiseElementInteractor;
-import BritefuryJ.LSpace.Interactor.ShortcutElementInteractor;
+import BritefuryJ.LSpace.Interactor.*;
 import BritefuryJ.LSpace.Layout.ElementAlignment;
 import BritefuryJ.LSpace.Layout.HAlignment;
 import BritefuryJ.LSpace.Layout.LAllocV;
@@ -3104,16 +3096,16 @@ abstract public class LSElement implements Presentable
 		}
 	};
 
-	private static PushElementInteractor explorerHeaderInspectInteractor = new PushElementInteractor()
+	private static ClickElementInteractor explorerHeaderInspectInteractor = new ClickElementInteractor()
 	{
 		@Override
-		public boolean buttonPress(LSElement element, PointerButtonEvent event)
+		public boolean testClickEvent(LSElement element, AbstractPointerButtonEvent event)
 		{
 			return event.getButton() == 1;
 		}
 
 		@Override
-		public void buttonRelease(LSElement element, PointerButtonEvent event)
+		public boolean buttonClicked(LSElement element, PointerButtonClickedEvent event)
 		{
 			LSElement el = (LSElement)element;
 			FragmentView fragment = (FragmentView)el.getFragmentContext();
@@ -3121,6 +3113,8 @@ abstract public class LSElement implements Presentable
 
 			Pres p = inspectorBorder.surround( inspect( model ) );
 			p.popupAtMousePosition( el, Anchor.TOP_LEFT, true, true );
+
+			return true;
 		}
 		
 		

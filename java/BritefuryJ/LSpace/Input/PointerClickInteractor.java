@@ -20,10 +20,12 @@ public class PointerClickInteractor extends PointerInteractor
 	public boolean buttonDown(Pointer pointer, PointerButtonEvent event)
 	{
 		Stack<LSElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
-		
+		Stack<PointerButtonEvent> events = Pointer.eventStack( event, elements );
+
 		while ( !elements.isEmpty() )
 		{
-			LSElement element = elements.pop();
+			LSElement element = elements.peek();
+			PointerButtonEvent elementSpaceEvent = events.peek();
 			
 			if ( element.isRealised() )
 			{
@@ -35,7 +37,7 @@ public class PointerClickInteractor extends PointerInteractor
 						ClickElementInteractor clickInt = (ClickElementInteractor)interactor;
 						try
 						{
-							if ( clickInt.testClickEvent( element, event ) )
+							if ( clickInt.testClickEvent( element, elementSpaceEvent ) )
 							{
 								return true;
 							}
@@ -47,6 +49,9 @@ public class PointerClickInteractor extends PointerInteractor
 					}
 				}
 			}
+
+			elements.pop();
+			events.pop();
 		}
 		
 		return false;
@@ -55,10 +60,12 @@ public class PointerClickInteractor extends PointerInteractor
 	public boolean buttonUp(Pointer pointer, PointerButtonEvent event)
 	{
 		Stack<LSElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
-		
+		Stack<PointerButtonEvent> events = Pointer.eventStack( event, elements );
+
 		while ( !elements.isEmpty() )
 		{
-			LSElement element = elements.pop();
+			LSElement element = elements.peek();
+			PointerButtonEvent elementSpaceEvent = events.peek();
 			
 			if ( element.isRealised() )
 			{
@@ -70,7 +77,7 @@ public class PointerClickInteractor extends PointerInteractor
 						ClickElementInteractor clickInt = (ClickElementInteractor)interactor;
 						try
 						{
-							if ( clickInt.testClickEvent( element, event ) )
+							if ( clickInt.testClickEvent( element, elementSpaceEvent ) )
 							{
 								return true;
 							}
@@ -82,6 +89,9 @@ public class PointerClickInteractor extends PointerInteractor
 					}
 				}
 			}
+
+			elements.pop();
+			events.pop();
 		}
 		
 		return false;
@@ -92,10 +102,12 @@ public class PointerClickInteractor extends PointerInteractor
 	public boolean buttonClicked(Pointer pointer, PointerButtonClickedEvent event)
 	{
 		Stack<LSElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
-		
+		Stack<PointerButtonClickedEvent> events = Pointer.eventStack( event, elements );
+
 		while ( !elements.isEmpty() )
 		{
-			LSElement element = elements.pop();
+			LSElement element = elements.peek();
+			PointerButtonClickedEvent elementSpaceEvent = events.peek();
 			
 			if ( element.isRealised() )
 			{
@@ -108,7 +120,7 @@ public class PointerClickInteractor extends PointerInteractor
 						boolean clickAccepted = false;
 						try
 						{
-							clickAccepted = clickInt.testClickEvent( element, event );
+							clickAccepted = clickInt.testClickEvent( element, elementSpaceEvent );
 						}
 						catch (Throwable e)
 						{
@@ -119,7 +131,7 @@ public class PointerClickInteractor extends PointerInteractor
 						{
 							try
 							{
-								if ( clickInt.buttonClicked( element, event ) )
+								if ( clickInt.buttonClicked( element, elementSpaceEvent ) )
 								{
 									return true;
 								}
@@ -132,6 +144,9 @@ public class PointerClickInteractor extends PointerInteractor
 					}
 				}
 			}
+
+			elements.pop();
+			events.pop();
 		}
 		
 		return false;
