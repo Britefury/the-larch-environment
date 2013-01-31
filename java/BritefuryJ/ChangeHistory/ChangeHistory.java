@@ -214,7 +214,17 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 		
 		protected static boolean isTrackable(PyObject x)
 		{
-			return __builtin__.hasattr( x, __change_history__ )  &&  __builtin__.hasattr( x, __get_trackable_contents__ );
+			boolean history = __builtin__.hasattr( x, __change_history__ );
+			boolean trackable = __builtin__.hasattr( x, __get_trackable_contents__ );
+			if ( history && !trackable )
+			{
+				System.out.println( "WARNING: Potentially trackable Python object " + x + " has __change_history__ but not __get_trackable_contents__" );
+			}
+			else if ( !history && trackable )
+			{
+				System.out.println( "WARNING: Potentially trackable Python object " + x + " has __get_trackable_contents__ but not __change_history__" );
+			}
+			return history && trackable;
 		}
 	}
 	
