@@ -37,8 +37,6 @@ public class TipBox extends CompositePres
 	private static final StyleSheet tipControlStyle = StyleSheet.style( Primitive.fontSize.as( 10 ) );
 	private static final StyleSheet tipStyle = StyleSheet.style( Primitive.fontSize.as( 11 ), Primitive.foreground.as( new Color( 0.1f, 0.1f, 0.1f ) ), Primitive.editable.as( false ) );
 	private static final StyleSheet multilineStyle = StyleSheet.style( Primitive.columnSpacing.as( 5.0 ) );
-	private static final StyleSheet strongStyle = StyleSheet.style( Primitive.fontBold.as( true ) );
-	private static final StyleSheet emphStyle = StyleSheet.style( Primitive.fontItalic.as( true ) );
 	private static final double marginX = 15.0, marginY = 5.0;
 	
 	
@@ -198,23 +196,6 @@ public class TipBox extends CompositePres
 
 
 
-	public static Pres tipText(Object values[])
-	{
-		return new NormalText( values );
-	}
-
-	public static Pres emph(String text)
-	{
-		return emphStyle.applyTo( new RichSpan( text ) );
-	}
-
-	public static Pres strong(String text)
-	{
-		return strongStyle.applyTo( new RichSpan( text ) );
-	}
-
-
-	
 	public static void resetTipHiddenStates()
 	{
 		for (LiveValue state: tipHiddenFlags.values())

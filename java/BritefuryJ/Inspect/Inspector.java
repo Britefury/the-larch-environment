@@ -11,6 +11,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 
+import BritefuryJ.Pres.UI.SectionHeading3;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
 import org.python.core.PyList;
@@ -108,7 +109,7 @@ public class Inspector
 		ArrayList<Object> contents = new ArrayList<Object>();
 		
 		// Type
-		Pres type = new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Type" ) ), DefaultPerspective.instance.applyTo( x.getClass() ) );
+		Pres type = new DropDownExpander( new SectionHeading3( "Type" ), DefaultPerspective.instance.applyTo( x.getClass() ) );
 		contents.add( type );
 		
 		
@@ -189,9 +190,9 @@ public class Inspector
 				return new Column( fields );
 			}
 		};
-		contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Fields" ) ), new LazyPres( fieldsLazyFac ) ) );
+		contents.add( new DropDownExpander( new SectionHeading3( "Fields" ), new LazyPres( fieldsLazyFac ) ) );
 		
-		contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "toString" ) ), asString ) );
+		contents.add( new DropDownExpander( new SectionHeading3( "toString" ), asString ) );
 		
 		return new Column( contents );
 	}
@@ -203,7 +204,7 @@ public class Inspector
 		ArrayList<Object> contents = new ArrayList<Object>();
 		
 		// Type
-		Pres type = new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Type" ) ), DefaultPerspective.instance.applyTo( x.getType() ) );
+		Pres type = new DropDownExpander( new SectionHeading3( "Type" ), DefaultPerspective.instance.applyTo( x.getType() ) );
 		contents.add( type );
 		
 		
@@ -274,9 +275,9 @@ public class Inspector
 			}
 		};
 		
-		contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Attributes" ) ), new LazyPres( lazyAttrsFac ) ) );
+		contents.add( new DropDownExpander( new SectionHeading3( "Attributes" ), new LazyPres( lazyAttrsFac ) ) );
 		
-		contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "__str__" ) ), asString ) );
+		contents.add( new DropDownExpander( new SectionHeading3( "__str__" ), asString ) );
 		
 		return new Column( contents );
 	}

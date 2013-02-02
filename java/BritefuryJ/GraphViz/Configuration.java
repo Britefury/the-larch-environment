@@ -6,11 +6,16 @@
 //##************************
 package BritefuryJ.GraphViz;
 
+import BritefuryJ.Projection.Subject;
+
+
 public class Configuration
 {
 	private String dotPath, neatoPath, twopiPath, circoPath, fdpPath, sfdpPath, osagePath;
 	
 	
+	protected static Subject configurationPageSubject = null;
+
 	protected static Configuration instance;
 	
 	
@@ -68,5 +73,12 @@ public class Configuration
 	public static void setInstance(Configuration config)
 	{
 		instance = config;
+	}
+
+
+
+	public static void setConfigurationPageSubject(Subject s)
+	{
+		configurationPageSubject = s;
 	}
 }

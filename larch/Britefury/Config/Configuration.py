@@ -39,13 +39,19 @@ class Configuration (object):
 	def __init__(self, world):
 		self._pages = []
 		self.__world = world
+		self.__subject = self._ConfigurationSubject( self.__world.worldSubject, self )
 
 		for page in _systemConfigPages:
 			self.registerConfigurationPage( page )
 
 
-	def subject(self, enclosingSubject):
-		return self._ConfigurationSubject( enclosingSubject, self )
+	@property
+	def world(self):
+		return self.__world
+
+
+	def subject(self):
+		return self.__subject
 
 
 	def __present__(self, fragment, inheritedState):
@@ -68,6 +74,7 @@ class Configuration (object):
 	
 	def registerConfigurationPage(self, page):
 		self._pages.append( page )
+		page.initPage( self )
 
 
 
