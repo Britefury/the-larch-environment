@@ -37,7 +37,7 @@ from BritefuryJ.LSpace.Input import ObjectDndHandler
 from BritefuryJ.LSpace.Interactor import ClickElementInteractor
 from BritefuryJ.Controls import Controls, EditableLabel, MenuItem, Button, TextEntry, Hyperlink
 from BritefuryJ.Pres.Primitive import Primitive, Label, StaticText, Image, Spacer, Bin, Row, Column
-from BritefuryJ.Pres.RichText import TitleBar, Body, Head, Page, HSeparator
+from BritefuryJ.Pres.RichText import TitleBar, Body, Head, Page, HSeparator, NormalText, StrongSpan, EmphSpan
 from BritefuryJ.Pres.UI import BubblePopup, SectionHeading1, SectionHeading2, Section, Form
 from BritefuryJ.Pres.Help import AttachTooltip, TipBox
 from BritefuryJ.Util.Jython import JythonException
@@ -478,9 +478,9 @@ class ProjectView (MethodDispatchView):
 		packagingSection = Form( 'Packaging', [ jarRow ] )
 
 
-		indexTip = TipBox( [ TipBox.tipText( [ TipBox.strong( 'Index: ' ), 'Larch projects act like Python programs. Packages act as directories/packages and pages act as Python source files. Pages can import code from one another as if they are modules.' ] ),
-				     TipBox.tipText( [ 'New pages and packages can be created by right clicking on the entries in the index or on ', TipBox.emph( 'Project root' ), ' (they will highlight as you hover over them).' ] ),
-				     TipBox.tipText( [ TipBox.strong( 'Front and startup pages: ' ), 'If a page is set as the front page it will appear instead of the project page. In these cases, the project page can still be reached using the links in the location bar at the top of the window.' ] ),
+		indexTip = TipBox( [ NormalText( [ StrongSpan( 'Index: ' ), 'Larch projects act like Python programs. Packages act as directories/packages and pages act as Python source files. Pages can import code from one another as if they are modules.' ] ),
+				     NormalText( [ 'New pages and packages can be created by right clicking on the entries in the index or on ', EmphSpan( 'Project root' ), ' (they will highlight as you hover over them).' ] ),
+				     NormalText( [ StrongSpan( 'Front and startup pages: ' ), 'If a page is set as the front page it will appear instead of the project page. In these cases, the project page can still be reached using the links in the location bar at the top of the window.' ] ),
 				     'If a page is set as the startup page, code within it will be executed before all other pages. This can be used for registering editor extensions.',
 				     'To set a page as the front page or the startup page, right-click on it to show its context menu and choose the appropriate option.' ],
 			      'larchcore.worksheet.worksheeteditor')
