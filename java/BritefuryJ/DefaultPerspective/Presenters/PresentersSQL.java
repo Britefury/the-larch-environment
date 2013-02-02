@@ -27,6 +27,7 @@ import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Table;
+import BritefuryJ.Pres.UI.SectionHeading3;
 import BritefuryJ.StyleSheet.StyleSheet;
 
 public class PresentersSQL extends ObjectPresenterRegistry
@@ -61,7 +62,7 @@ public class PresentersSQL extends ObjectPresenterRegistry
 				{
 					tablesPres = Pres.coerceNonNull( e );
 				}
-				Pres tables = new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Tables" ) ),  tablesPres );
+				Pres tables = new DropDownExpander( new SectionHeading3( "Tables" ), tablesPres );
 				
 				return new ObjectBox( "Connection", new Column( new Object[] { url, tables } ) );
 			}

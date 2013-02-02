@@ -10,6 +10,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import BritefuryJ.Pres.UI.SectionHeading2;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.__builtin__;
@@ -233,7 +234,7 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 	
 	
 	private ArrayList<Entry> past, future;
-	private boolean bCommandsBlocked, bFrozen;
+	private boolean changesBlocked, bFrozen;
 	private int freezeCount;
 	private ArrayList<ChangeHistoryListener> listeners;
 	private PresentationStateListenerList presStateListeners = null;
@@ -250,7 +251,7 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 	{
 		past = new ArrayList<Entry>();
 		future = new ArrayList<Entry>();
-		bCommandsBlocked = false;
+		changesBlocked = false;
 		bFrozen = false;
 		freezeCount = 0;
 		listeners = new ArrayList<ChangeHistoryListener>();
@@ -273,10 +274,10 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 	
 	public void addChange(Change change)
 	{
-		if ( !bCommandsBlocked )
+		if ( !changesBlocked )
 		{
 			future.clear();
-			Change top = topCommand();
+			Change top = topChange();
 			// Attempt to merge @command into @top
 			if ( top != null  &&  top.canMergeFrom( change ) )
 			{
@@ -392,12 +393,12 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 	}
 
 	
-	public int getNumUndoCommands()
+	public int getNumUndoChanges()
 	{
 		return past.size();
 	}
 
-	public int getNumRedoCommands()
+	public int getNumRedoChanges()
 	{
 		return future.size();
 	}
@@ -460,7 +461,7 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 	
 	
 	
-	protected Change topCommand()
+	protected Change topChange()
 	{
 		if ( past.size() > 0 )
 		{
@@ -489,29 +490,29 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 	
 	
 	
-	private void blockCommands()
+	private void blockChanges()
 	{
-		bCommandsBlocked = true;
+		changesBlocked = true;
 	}
 	
-	private void unblockCommands()
+	private void unblockChanges()
 	{
-		bCommandsBlocked = false;
+		changesBlocked = false;
 	}
 	
 	
 	private void executeEntry(Entry entry)
 	{
-		blockCommands();
+		blockChanges();
 		entry.execute();
-		unblockCommands();
+		unblockChanges();
 	}
 
 	private void unexecuteEntry(Entry entry)
 	{
-		blockCommands();
+		blockChanges();
 		entry.unexecute();
-		unblockCommands();
+		unblockChanges();
 	}
 	
 	
@@ -564,14 +565,14 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 	{
 		presStateListeners = PresentationStateListenerList.addListener( presStateListeners, fragment );
 
-		Pres pastTitleTop = pastTitleStyle.applyTo( new Row( new Pres[] { new Arrow( Arrow.Direction.DOWN, 14.0 ).alignVCentre(), new Label( "Past" ) } ) );
+		Pres pastTitleTop = pastTitleStyle.applyTo( new Row( new Pres[] { new Arrow( Arrow.Direction.DOWN, 14.0 ).alignVCentre(), new SectionHeading2( "Past" ) } ) );
 		Pres pastContents = new Column( Pres.mapCoerce( past ) );
-		Pres pastTitleBottom = pastTitleStyle.applyTo( new Row( new Pres[] { new Arrow( Arrow.Direction.UP, 14.0 ).alignVCentre(), new Label( "Past" ) } ) );
+		Pres pastTitleBottom = pastTitleStyle.applyTo( new Row( new Pres[] { new Arrow( Arrow.Direction.UP, 14.0 ).alignVCentre(), new SectionHeading2( "Past" ) } ) );
 		Pres pastBox = pastBorder.surround( listBoxStyle.applyTo( new Column( new Pres[] { pastTitleTop, pastContents, pastTitleBottom } ) ) );
 
-		Pres futureTitleTop = futureTitleStyle.applyTo( new Row( new Pres[] { new Arrow( Arrow.Direction.DOWN, 14.0 ).alignVCentre(), new Label( "Future" ) } ) );
+		Pres futureTitleTop = futureTitleStyle.applyTo( new Row( new Pres[] { new Arrow( Arrow.Direction.DOWN, 14.0 ).alignVCentre(), new SectionHeading2( "Future" ) } ) );
 		Pres futureContents = new Column( Pres.mapCoerce( future ) );
-		Pres futureTitleBottom = futureTitleStyle.applyTo( new Row( new Pres[] { new Arrow( Arrow.Direction.UP, 14.0 ).alignVCentre(), new Label( "Future" ) } ) );
+		Pres futureTitleBottom = futureTitleStyle.applyTo( new Row( new Pres[] { new Arrow( Arrow.Direction.UP, 14.0 ).alignVCentre(), new SectionHeading2( "Future" ) } ) );
 		Pres futureBox = futureBorder.surround( listBoxStyle.applyTo( new Column( new Pres[] { futureTitleTop, futureContents, futureTitleBottom } ) ) );
 		
 		Pres mainBox = changeHistoryColumnStyle.applyTo( new Column( new Pres[] { pastBox, futureBox } ) );
@@ -580,8 +581,8 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 	}
 
 
-	private static final StyleSheet pastTitleStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.5f, 0.0f, 0.5f ) ), Primitive.shapePainter.as( new FillPainter( new Color( 0.5f, 0.0f, 0.5f ) ) ), Primitive.fontFace.as( "Serif" ), Primitive.fontSmallCaps.as( true ) );
-	private static final StyleSheet futureTitleStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.0f, 0.25f, 0.5f ) ), Primitive.shapePainter.as( new FillPainter( new Color( 0.0f, 0.25f, 0.5f ) ) ), Primitive.fontFace.as( "Serif" ), Primitive.fontSmallCaps.as( true ) );
+	private static final StyleSheet pastTitleStyle = StyleSheet.style( Primitive.shapePainter.as( new FillPainter( new Color( 0.5f, 0.0f, 0.5f ) ) ), Primitive.fontSmallCaps.as( true ) );
+	private static final StyleSheet futureTitleStyle = StyleSheet.style( Primitive.shapePainter.as( new FillPainter( new Color( 0.0f, 0.25f, 0.5f ) ) ), Primitive.fontSmallCaps.as( true ) );
 	private static final SolidBorder pastBorder = new SolidBorder( 2.0, 3.0, 10.0, 10.0, new Color( 0.5f, 0.0f, 0.5f ), null );
 	private static final SolidBorder futureBorder = new SolidBorder( 2.0, 3.0, 10.0, 10.0, new Color( 0.0f, 0.25f, 0.5f ), null );
 	private static final StyleSheet listBoxStyle = StyleSheet.style( Primitive.columnSpacing.as( 10.0 ) );

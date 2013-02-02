@@ -182,63 +182,63 @@ public class Test_ChangeHistory extends TestCase
 		h.track( d );
 		
 		assertEquals( d.getX(), 0 );
-		assertEquals( h.getNumUndoCommands(), 0 );
-		assertEquals( h.getNumRedoCommands(), 0 );
+		assertEquals( h.getNumUndoChanges(), 0 );
+		assertEquals( h.getNumRedoChanges(), 0 );
 		
 		d.setX( 1 );
 		assertEquals( d.getX(), 1 );
-		assertEquals( h.getNumUndoCommands(), 1 );
-		assertEquals( h.getNumRedoCommands(), 0 );
+		assertEquals( h.getNumUndoChanges(), 1 );
+		assertEquals( h.getNumRedoChanges(), 0 );
 
 		d.setX( 2 );
 		assertEquals( d.getX(), 2 );
-		assertEquals( h.getNumUndoCommands(), 2 );
-		assertEquals( h.getNumRedoCommands(), 0 );
+		assertEquals( h.getNumUndoChanges(), 2 );
+		assertEquals( h.getNumRedoChanges(), 0 );
 
 		d.setX( 3 );
 		assertEquals( d.getX(), 3 );
-		assertEquals( h.getNumUndoCommands(), 3 );
-		assertEquals( h.getNumRedoCommands(), 0 );
+		assertEquals( h.getNumUndoChanges(), 3 );
+		assertEquals( h.getNumRedoChanges(), 0 );
 
 		d.setX( 4 );
 		assertEquals( d.getX(), 4 );
-		assertEquals( h.getNumUndoCommands(), 4 );
-		assertEquals( h.getNumRedoCommands(), 0 );
+		assertEquals( h.getNumUndoChanges(), 4 );
+		assertEquals( h.getNumRedoChanges(), 0 );
 		
 		h.undo();
 		assertEquals( d.getX(), 3 );
-		assertEquals( h.getNumUndoCommands(), 3 );
-		assertEquals( h.getNumRedoCommands(), 1 );
+		assertEquals( h.getNumUndoChanges(), 3 );
+		assertEquals( h.getNumRedoChanges(), 1 );
 
 		h.undo();
 		assertEquals( d.getX(), 2 );
-		assertEquals( h.getNumUndoCommands(), 2 );
-		assertEquals( h.getNumRedoCommands(), 2 );
+		assertEquals( h.getNumUndoChanges(), 2 );
+		assertEquals( h.getNumRedoChanges(), 2 );
 
 		h.redo();
 		assertEquals( d.getX(), 3 );
-		assertEquals( h.getNumUndoCommands(), 3 );
-		assertEquals( h.getNumRedoCommands(), 1 );
+		assertEquals( h.getNumUndoChanges(), 3 );
+		assertEquals( h.getNumRedoChanges(), 1 );
 
 		d.setX( 5 );
 		assertEquals( d.getX(), 5 );
-		assertEquals( h.getNumUndoCommands(), 4 );
-		assertEquals( h.getNumRedoCommands(), 0 );
+		assertEquals( h.getNumUndoChanges(), 4 );
+		assertEquals( h.getNumRedoChanges(), 0 );
 		
 		h.undo();
 		assertEquals( d.getX(), 3 );
-		assertEquals( h.getNumUndoCommands(), 3 );
-		assertEquals( h.getNumRedoCommands(), 1 );
+		assertEquals( h.getNumUndoChanges(), 3 );
+		assertEquals( h.getNumRedoChanges(), 1 );
 
 		h.undo();
 		assertEquals( d.getX(), 2 );
-		assertEquals( h.getNumUndoCommands(), 2 );
-		assertEquals( h.getNumRedoCommands(), 2 );
+		assertEquals( h.getNumUndoChanges(), 2 );
+		assertEquals( h.getNumRedoChanges(), 2 );
 		
 		h.clear();
 		assertEquals( d.getX(), 2 );
-		assertEquals( h.getNumUndoCommands(), 0 );
-		assertEquals( h.getNumRedoCommands(), 0 );
+		assertEquals( h.getNumUndoChanges(), 0 );
+		assertEquals( h.getNumRedoChanges(), 0 );
 	}
 
 
@@ -252,48 +252,48 @@ public class Test_ChangeHistory extends TestCase
 		h.track( d );
 		
 		assertEquals( d.getY(), 0 );
-		assertEquals( h.getNumUndoCommands(), 0 );
-		assertEquals( h.getNumRedoCommands(), 0 );
+		assertEquals( h.getNumUndoChanges(), 0 );
+		assertEquals( h.getNumRedoChanges(), 0 );
 		
 		d.setY( 1 );
 		assertEquals( d.getY(), 1 );
-		assertEquals( h.getNumUndoCommands(), 1 );
-		assertEquals( h.getNumRedoCommands(), 0 );
+		assertEquals( h.getNumUndoChanges(), 1 );
+		assertEquals( h.getNumRedoChanges(), 0 );
 
 		d.setY( 2 );
 		assertEquals( d.getY(), 2 );
-		assertEquals( h.getNumUndoCommands(), 1 );
-		assertEquals( h.getNumRedoCommands(), 0 );
+		assertEquals( h.getNumUndoChanges(), 1 );
+		assertEquals( h.getNumRedoChanges(), 0 );
 
 		d.setY( 3 );
 		assertEquals( d.getY(), 3 );
-		assertEquals( h.getNumUndoCommands(), 1 );
-		assertEquals( h.getNumRedoCommands(), 0 );
+		assertEquals( h.getNumUndoChanges(), 1 );
+		assertEquals( h.getNumRedoChanges(), 0 );
 
 		d.setY( 4 );
 		assertEquals( d.getY(), 4 );
-		assertEquals( h.getNumUndoCommands(), 1 );
-		assertEquals( h.getNumRedoCommands(), 0 );
+		assertEquals( h.getNumUndoChanges(), 1 );
+		assertEquals( h.getNumRedoChanges(), 0 );
 		
 		h.undo();
 		assertEquals( d.getY(), 0 );
-		assertEquals( h.getNumUndoCommands(), 0 );
-		assertEquals( h.getNumRedoCommands(), 1 );
+		assertEquals( h.getNumUndoChanges(), 0 );
+		assertEquals( h.getNumRedoChanges(), 1 );
 
 		h.redo();
 		assertEquals( d.getY(), 4 );
-		assertEquals( h.getNumUndoCommands(), 1 );
-		assertEquals( h.getNumRedoCommands(), 0 );
+		assertEquals( h.getNumUndoChanges(), 1 );
+		assertEquals( h.getNumRedoChanges(), 0 );
 
 		d.setY( 5 );
 		assertEquals( d.getY(), 5 );
-		assertEquals( h.getNumUndoCommands(), 1 );
-		assertEquals( h.getNumRedoCommands(), 0 );
+		assertEquals( h.getNumUndoChanges(), 1 );
+		assertEquals( h.getNumRedoChanges(), 0 );
 		
 		h.undo();
 		assertEquals( d.getY(), 0 );
-		assertEquals( h.getNumUndoCommands(), 0 );
-		assertEquals( h.getNumRedoCommands(), 1 );
+		assertEquals( h.getNumUndoChanges(), 0 );
+		assertEquals( h.getNumRedoChanges(), 1 );
 	}
 
 
@@ -308,55 +308,55 @@ public class Test_ChangeHistory extends TestCase
 		h.track( d );
 		
 		assertEquals( d.getX(), 0 );
-		assertEquals( h.getNumUndoCommands(), 0 );
-		assertEquals( h.getNumRedoCommands(), 0 );
+		assertEquals( h.getNumUndoChanges(), 0 );
+		assertEquals( h.getNumRedoChanges(), 0 );
 		
 		d.setX( 1 );
 		assertEquals( d.getX(), 1 );
-		assertEquals( h.getNumUndoCommands(), 1 );
-		assertEquals( h.getNumRedoCommands(), 0 );
+		assertEquals( h.getNumUndoChanges(), 1 );
+		assertEquals( h.getNumRedoChanges(), 0 );
 
 		h.freeze();
 		assertEquals( d.getX(), 1 );
-		assertEquals( h.getNumUndoCommands(), 2 );
-		assertEquals( h.getNumRedoCommands(), 0 );
+		assertEquals( h.getNumUndoChanges(), 2 );
+		assertEquals( h.getNumRedoChanges(), 0 );
 		d.setX( 2 );
 		assertEquals( d.getX(), 2 );
-		assertEquals( h.getNumUndoCommands(), 2 );
-		assertEquals( h.getNumRedoCommands(), 0 );
+		assertEquals( h.getNumUndoChanges(), 2 );
+		assertEquals( h.getNumRedoChanges(), 0 );
 
 		d.setX( 3 );
 		assertEquals( d.getX(), 3 );
-		assertEquals( h.getNumUndoCommands(), 2 );
-		assertEquals( h.getNumRedoCommands(), 0 );
+		assertEquals( h.getNumUndoChanges(), 2 );
+		assertEquals( h.getNumRedoChanges(), 0 );
 
 		d.setX( 4 );
 		assertEquals( d.getX(), 4 );
-		assertEquals( h.getNumUndoCommands(), 2 );
-		assertEquals( h.getNumRedoCommands(), 0 );
+		assertEquals( h.getNumUndoChanges(), 2 );
+		assertEquals( h.getNumRedoChanges(), 0 );
 		h.thaw();
 		assertEquals( d.getX(), 4 );
-		assertEquals( h.getNumUndoCommands(), 2 );
-		assertEquals( h.getNumRedoCommands(), 0 );
+		assertEquals( h.getNumUndoChanges(), 2 );
+		assertEquals( h.getNumRedoChanges(), 0 );
 		
 		h.undo();
 		assertEquals( d.getX(), 1 );
-		assertEquals( h.getNumUndoCommands(), 1 );
-		assertEquals( h.getNumRedoCommands(), 1 );
+		assertEquals( h.getNumUndoChanges(), 1 );
+		assertEquals( h.getNumRedoChanges(), 1 );
 
 		h.undo();
 		assertEquals( d.getX(), 0 );
-		assertEquals( h.getNumUndoCommands(), 0 );
-		assertEquals( h.getNumRedoCommands(), 2 );
+		assertEquals( h.getNumUndoChanges(), 0 );
+		assertEquals( h.getNumRedoChanges(), 2 );
 
 		h.redo();
 		assertEquals( d.getX(), 1 );
-		assertEquals( h.getNumUndoCommands(), 1 );
-		assertEquals( h.getNumRedoCommands(), 1 );
+		assertEquals( h.getNumUndoChanges(), 1 );
+		assertEquals( h.getNumRedoChanges(), 1 );
 
 		h.redo();
 		assertEquals( d.getX(), 4 );
-		assertEquals( h.getNumUndoCommands(), 2 );
-		assertEquals( h.getNumRedoCommands(), 0 );
+		assertEquals( h.getNumUndoChanges(), 2 );
+		assertEquals( h.getNumRedoChanges(), 0 );
 	}
 }
