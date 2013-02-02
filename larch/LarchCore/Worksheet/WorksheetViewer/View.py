@@ -24,7 +24,7 @@ from BritefuryJ.StyleSheet import StyleSheet
 from BritefuryJ.Controls import Button, Hyperlink
 from BritefuryJ.Pres import Pres, ApplyPerspective
 from BritefuryJ.Pres.Primitive import Primitive, Blank, Border, Column, Row, Proxy
-from BritefuryJ.Pres.RichText import TitleBar, Heading1, Heading2, Heading3, Heading4, Heading4, Heading5, Heading6, NormalText, RichSpan, Page, Body, LinkHeaderBar
+from BritefuryJ.Pres.RichText import TitleBar, Heading1, Heading2, Heading3, Heading4, Heading4, Heading5, Heading6, NormalText, RichSpan, Page, Body, LinkHeaderBar, EmphSpan
 from BritefuryJ.Pres.ObjectPres import ObjectBorder
 from BritefuryJ.Pres.UI import Section, SectionHeading2, ControlsRow
 from BritefuryJ.Pres.Help import TipBox
@@ -78,7 +78,7 @@ class WorksheetViewer (MethodDispatchView):
 			pageContents = [ linkHeader ]
 
 
-		tip = TipBox( [ TipBox.tipText( [ 'To edit this worksheet or add content, click ', TipBox.emph( 'Switch to developer mode' ), ' at the top right' ] ) ],
+		tip = TipBox( [ NormalText( [ 'To edit this worksheet or add content, click ', EmphSpan( 'Switch to developer mode' ), ' at the top right' ] ) ],
 			      'larchcore.worksheet.view.toedit' )
 
 		w = Page( pageContents + [ bodyView, tip ] )

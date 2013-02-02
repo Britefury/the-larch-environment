@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import BritefuryJ.Pres.UI.SectionHeading3;
 import org.python.core.Py;
 import org.python.core.PyBaseException;
 import org.python.core.PyBoolean;
@@ -306,7 +307,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 		if ( doc != null  &&  doc != Py.None )
 		{
 			Pres docPres = new Column( NormalText.paragraphs( doc.toString() ) );
-			contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Documentation" ) ), docPres ) );
+			contents.add( new DropDownExpander( new SectionHeading3( "Documentation" ), docPres ) );
 		}
 		
 		
@@ -360,15 +361,15 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 		
 		if ( methods.size() > 0 )
 		{
-			contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Methods" ) ),   new Column( methods ) ) );
+			contents.add( new DropDownExpander( new SectionHeading3( "Methods" ), new Column( methods ) ) );
 		}
 		if ( properties.size() > 0 )
 		{
-			contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Properties" ) ),   new Column( properties ) ) );
+			contents.add( new DropDownExpander( new SectionHeading3( "Properties" ), new Column( properties ) ) );
 		}
 		if ( attributes.size() > 0 )
 		{
-			contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Attributes" ) ),   new Column( attributes ) ) );
+			contents.add( new DropDownExpander( new SectionHeading3( "Attributes" ), new Column( attributes ) ) );
 		}
 		
 		
@@ -584,7 +585,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 			if ( doc != null  &&  doc != Py.None )
 			{
 				Pres docPres = new Column( NormalText.paragraphs( doc.toString() ) );
-				contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Documentation" ) ), docPres ) );
+				contents.add( new DropDownExpander( new SectionHeading3( "Documentation" ), docPres ) );
 			}
 			
 			
@@ -635,7 +636,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 			
 			if ( attributes.size() > 0 )
 			{
-				contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Attributes" ) ),   new Column( attributes ) ) );
+				contents.add( new DropDownExpander( new SectionHeading3( "Attributes" ), new Column( attributes ) ) );
 			}
 			
 			
@@ -945,32 +946,32 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 		
 		if ( constructorDeclarations.size() > 0 )
 		{
-			contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Constructors" ) ),   new Column( constructorDeclarations ) ) );
+			contents.add( new DropDownExpander( new SectionHeading3( "Constructors" ), new Column( constructorDeclarations ) ) );
 		}
 
 		if ( methodDeclarations.size() > 0 )
 		{
-			contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Methods" ) ),   new Column( methodDeclarations ) ) );
+			contents.add( new DropDownExpander( new SectionHeading3( "Methods" ), new Column( methodDeclarations ) ) );
 		}
 
 		if ( staticMethodDeclarations.size() > 0 )
 		{
-			contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Static methods" ) ),   new Column( staticMethodDeclarations ) ) );
+			contents.add( new DropDownExpander( new SectionHeading3( "Static methods" ), new Column( staticMethodDeclarations ) ) );
 		}
 
 		if ( fieldDeclarations.size() > 0 )
 		{
-			contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Fields" ) ),   new Column( fieldDeclarations ) ) );
+			contents.add( new DropDownExpander( new SectionHeading3( "Fields" ), new Column( fieldDeclarations ) ) );
 		}
 
 		if ( staticFieldDeclarations.size() > 0 )
 		{
-			contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Static fields" ) ),   new Column( staticFieldDeclarations ) ) );
+			contents.add( new DropDownExpander( new SectionHeading3( "Static fields" ), new Column( staticFieldDeclarations ) ) );
 		}
 
 		if ( classDeclarations.size() > 0 )
 		{
-			contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Classes" ) ),   new Column( classDeclarations ) ) );
+			contents.add( new DropDownExpander( new SectionHeading3( "Classes" ), new Column( classDeclarations ) ) );
 		}
 		
 		return new Column( contents );

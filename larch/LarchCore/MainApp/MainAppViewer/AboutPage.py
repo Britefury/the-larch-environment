@@ -18,7 +18,7 @@ from BritefuryJ.StyleSheet import StyleSheet
 
 class AboutPage (object):
 	def __present__(self, fragment, inheritedState):
-		configurationLink = Hyperlink( 'CONFIGURATION PAGE', fragment.subject.world.configuration.subject( fragment.subject ) )
+		configurationLink = Hyperlink( 'CONFIGURATION PAGE', fragment.subject.world.configuration.subject() )
 		linkHeader = LinkHeaderBar( [ configurationLink ])
 
 		title = TitleBar( 'About' )

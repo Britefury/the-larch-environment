@@ -7,6 +7,7 @@
 ##-*************************
 from javax.swing import JOptionPane, JFileChooser
 from javax.swing.filechooser import FileNameExtensionFilter
+from java.net import URI
 
 from java.awt import Color
 
@@ -20,8 +21,8 @@ from BritefuryJ.Controls import Hyperlink
 from BritefuryJ.Graphics import SolidBorder
 
 from BritefuryJ.Pres.Primitive import Primitive, Label, Spacer, Border, Row, Column, Table
-from BritefuryJ.Pres.RichText import Body
-from BritefuryJ.Pres.UI import Section, SectionHeading2
+from BritefuryJ.Pres.RichText import Body, NormalText, EmphSpan
+from BritefuryJ.Pres.UI import Section, SectionHeading2, SectionHeading3, NotesText
 from BritefuryJ.StyleSheet import StyleSheet
 
 from BritefuryJ.GraphViz import GraphViz, Configuration as GraphVizConfiguration
@@ -52,6 +53,13 @@ class GraphVizConfigurationPage (ConfigurationPage):
 		self._incr = IncrementalValueMonitor()
 	
 	
+	def initPage(self, config):
+		super( GraphVizConfigurationPage, self ).initPage( config )
+		GraphVizConfiguration.setConfigurationPageSubject( self.subject() )
+
+
+
+
 	def __getstate__(self):
 		state = super( GraphVizConfigurationPage, self ).__getstate__()
 		state['graphVizDir'] = self._graphVizDir
@@ -79,6 +87,20 @@ class GraphVizConfigurationPage (ConfigurationPage):
 		self._graphVizDir = dir
 		self._refreshConfig()
 		self._incr.onChanged()
+
+
+	def __isConfigured(self):
+		if self._graphVizDir is not None  and  os.path.isdir( self._graphVizDir ):
+			dotPath = self._checkedToolPath( 'dot' )
+			neatoPath = self._checkedToolPath( 'neato' )
+			twopiPath = self._checkedToolPath( 'twopi' )
+			circoPath = self._checkedToolPath( 'circo' )
+			fdpPath = self._checkedToolPath( 'fdp' )
+			sfdpPath = self._checkedToolPath( 'sfdp' )
+			osagePath = self._checkedToolPath( 'osage' )
+			return dotPath is not None  and  neatoPath is not None  and  twopiPath is not None  and  circoPath is not None  and  fdpPath is not None  and  sfdpPath is not None  and  osagePath is not None
+		return False
+
 		
 		
 	def _refreshConfig(self):
@@ -136,7 +158,7 @@ class GraphVizConfigurationPage (ConfigurationPage):
 	def _presentConfig(self):
 		if self._config is not None:
 			rows = []
-			rows.append( [ self._configTableHeadingStyle.applyTo( Label( 'Tool' ) ), self._configTableHeadingStyle.applyTo( Label( 'Path' ) ) ] )
+			rows.append( [ SectionHeading3( 'Tool' ), SectionHeading3( 'Path' ) ] )
 			rows.append( [ self._toolLabel( 'dot' ), Label( self._config.getDotPath() ) ] )
 			rows.append( [ self._toolLabel( 'neato' ), Label( self._config.getNeatoPath() ) ] )
 			rows.append( [ self._toolLabel( 'twopi' ), Label( self._config.getTwopiPath() ) ] )
@@ -149,19 +171,33 @@ class GraphVizConfigurationPage (ConfigurationPage):
 	
 	def __present_contents__(self, fragment, inheritedState):
 		self._incr.onAccess()
+
 		dirPres = self._presentDir()
-		columnContents = [ dirPres ]
+		note = NotesText( [ 'Note: please choose the location of the GraphViz ', EmphSpan( 'bin' ), ' directory.' ] )
+		columnContents = [ note, dirPres ]
 		if self._config is not None:
 			columnContents.append( self._presentConfig() )
 		pathContents = Column( columnContents )
-		sec = Section( SectionHeading2( 'GraphViz path' ), pathContents )
-		return Body( [ sec ] )
-	
-	
+		pathSection = Section( SectionHeading2( 'GraphViz path' ), pathContents )
+
+
+		downloadText = ''
+		if self.__isConfigured():
+			downloadText = 'GraphViz appears to be installed on this machine and configured. If it does not work correctly, you may need to install it. You can download it from the '
+		else:
+			downloadText = 'If GraphViz is not installed on this machine, please install it. You can download it from the '
+
+		downloadLink = Hyperlink( 'GraphViz homepage', URI( 'http://www.graphviz.org/' ) )
+		download = NormalText( [ downloadText, downloadLink, '.' ] )
+		downloadSec = Section( SectionHeading2( 'GraphViz download/installation' ), download )
+
+
+		return Body( [ pathSection, downloadSec ] )
+
+
 	_dirBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 1.0, 0.85, 0.0 ), Color( 1.0, 1.0, 0.85 ) ) ) )
 	_notSetStyle = StyleSheet.style( Primitive.fontItalic( True ) )
 	_configTableStyle = StyleSheet.style( Primitive.tableColumnSpacing( 10.0 ) )
-	_configTableHeadingStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.0, 0.5 ) ), Primitive.fontBold( True ) )
 	_configTableToolNameStyle = StyleSheet.style( Primitive.foreground( Color( 0.25, 0.0, 0.5 ) ) )
 	
 
@@ -187,5 +223,5 @@ def initGraphVizConfig():
 		
 		if _graphvizConfig is None:
 			_graphvizConfig = GraphVizConfigurationPage()
-	
+
 		Configuration.registerSystemConfigurationPage( _graphvizConfig )

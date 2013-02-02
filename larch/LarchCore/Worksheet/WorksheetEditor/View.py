@@ -25,7 +25,7 @@ from BritefuryJ.LSpace.Marker import Marker
 from BritefuryJ.StyleSheet import StyleSheet
 from BritefuryJ.Pres import Pres, ApplyStyleSheetFromAttribute, ApplyPerspective
 from BritefuryJ.Pres.Primitive import Primitive, Label, StaticText, Spacer, Image, Bin, Border, SpaceBin, Row, Column
-from BritefuryJ.Pres.RichText import TitleBar, Heading1, Heading2, Heading3, Heading4, Heading4, Heading5, Heading6, NormalText, RichSpan, Page, Body, LinkHeaderBar
+from BritefuryJ.Pres.RichText import TitleBar, Heading1, Heading2, Heading3, Heading4, Heading4, Heading5, Heading6, NormalText, RichSpan, Page, Body, LinkHeaderBar, StrongSpan, EmphSpan
 from BritefuryJ.Pres.ObjectPres import ObjectBorder
 from BritefuryJ.Pres.UI import Section, SectionHeading2, SectionHeading3, ControlsRow
 from BritefuryJ.Pres.Help import TipBox
@@ -276,9 +276,9 @@ class WorksheetEditor (MethodDispatchView):
 			pageContents = [ linkHeader ]
 
 
-		tip = TipBox( [ TipBox.tipText( [ TipBox.strong( 'Text: ' ), 'Type to add text to the worksheet.\nRight click to access the context menu, from which styles can be applied.' ] ),
-			      TipBox.tipText( [ TipBox.strong( 'Code: ' ), 'Code can be added from the context menu. You can add complete blocks of python code in between paragraphs, or single expressions to be evaluated with paragraph text.' ] ),
-			      TipBox.tipText( [ 'To re-execute all code within the worksheet, press ', TipBox.emph( 'Control-Enter' ) ] ) ],
+		tip = TipBox( [ NormalText( [ StrongSpan( 'Text: ' ), 'Type to add text to the worksheet.\nRight click to access the context menu, from which styles can be applied.' ] ),
+			      NormalText( [ StrongSpan( 'Code: ' ), 'Code can be added from the context menu. You can add complete blocks of python code in between paragraphs, or single expressions to be evaluated with paragraph text.' ] ),
+			      NormalText( [ 'To re-execute all code within the worksheet, press ', EmphSpan( 'Control-Enter' ) ] ) ],
 			      'larchcore.worksheet.edit.howto' )
 
 

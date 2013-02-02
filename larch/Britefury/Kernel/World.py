@@ -115,6 +115,8 @@ class World (object):
 	def __init__(self):
 		super( World, self ).__init__()
 
+		self.__worldOuterSubject = _WorldSubject( self )
+
 		self.__plugins = Plugin.loadPlugins()
 		self.newDocumentFactories = []
 		self._rootSubject = None
@@ -127,7 +129,6 @@ class World (object):
 
 		self.__import_hooks = _WorldImportHooks( self )
 
-		self.__worldOuterSubject = _WorldSubject( self )
 
 
 

@@ -34,7 +34,7 @@ class ConfigurationPage (object):
 		
 	
 	def __init__(self):
-		pass
+		self.__config = None
 
 		
 	def __getstate__(self):
@@ -45,9 +45,15 @@ class ConfigurationPage (object):
 
 		
 		
-	def subject(self, enclosingSubject):
+	def initPage(self, config):
+		self.__config = config
+
+
+	def subject(self, enclosingSubject=None):
+		if enclosingSubject is None:
+			enclosingSubject = self.__config.subject()
 		return self._ConfigPageSubject( enclosingSubject, self )
-		
+
 		
 	@abstractmethod
 	def getSubjectTitle(self):
