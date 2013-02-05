@@ -59,8 +59,26 @@ class LiveList (object):
 		self._incr.onAccess()
 		t = type( self )
 		return t( deepcopy( self._items, memo ) )
+
+
+	def __eq__(self, other):
+		if isinstance( other, LiveList ):
+			other = other._items
+		return self._items == other
 	
-	
+	def __ne__(self, other):
+		if isinstance( other, LiveList ):
+			other = other._items
+		return self._items != other
+
+
+	def __str__(self):
+		return str( self._items )
+
+	def __repr__(self):
+		return 'LiveList( {0} )'.format( repr( self._items ) )
+
+
 	def __get_trackable_contents__(self):
 		return self._items
 
