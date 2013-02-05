@@ -7,7 +7,7 @@
 ##-*************************
 from java.net import URI
 
-from BritefuryJ.Pres.Primitive import Primitive, Image
+from BritefuryJ.Pres.Primitive import Primitive, Image, Column, Row
 
 from BritefuryJ.Controls import Hyperlink
 
@@ -27,12 +27,17 @@ class AboutPage (object):
 
 		desc = NormalText( 'The Larch Environment was designed and written by Geoffrey French' )
 
+		jythonLink = Hyperlink( 'Jython', URI( 'http://www.jython.org/' ) )
+		jerichoLink = Hyperlink( 'Jericho HTML parser', URI( 'http://jericho.htmlparser.net' ) )
+		salamanderLink = Hyperlink( 'SVG Salamander', URI( 'http://svgsalamander.java.net/' ) )
+		notes = NormalText( [ 'This program makes use of ', jythonLink, ', the ', jerichoLink, ', and ', salamanderLink ] )
+
 		copyright = NormalText( '(C) copyright Geoffrey French 2008-2013' )
 
 		homePage = Hyperlink( 'The Larch Environment website', URI( 'http://www.larchenvironment.com' ) )
 
 		head = Head( [ linkHeader, title ] )
-		body = Body( [ splash.padY( 20.0 ).alignHCentre(), desc.padY( 10.0 ).alignHCentre(), copyright.padY( 10.0 ).alignHRight(), homePage.padY( 10.0 ).alignHRight() ] )
+		body = Body( [ splash.padY( 20.0 ).alignHCentre(), desc.padY( 10.0 ).alignHCentre(), notes.padY( 20.0 ).alignHCentre(), Row( [ copyright.alignHLeft(), homePage.alignHRight() ] ).pad( 10.0, 10.0 ).alignHExpand() ] )
 		return StyleSheet.style( Primitive.editable( False ) ).applyTo( Page( [ head, body ] ) )
 
 
