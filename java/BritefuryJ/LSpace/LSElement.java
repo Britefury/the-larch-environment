@@ -2948,6 +2948,28 @@ abstract public class LSElement implements Presentable
 		return null;
 	}
 	
+	public List<PropertyValue> gatherPropertyInAncestryTo(Object key, LSElement subtreeRoot)
+	{
+		ArrayList<PropertyValue> values = new ArrayList<PropertyValue>();
+		LSElement e = this;
+		while ( e != null  &&  e != subtreeRoot )
+		{
+			PropertyValue v = e.getProperty( key );
+			if ( v != null )
+			{
+				values.add( v );
+			}
+			e = e.parent;
+		}
+
+		if ( e == null  &&  subtreeRoot != null )
+		{
+			throw new IsNotInSubtreeException();
+		}
+
+		return values;
+	}
+
 	public PropertyValue findFirstPropertyInAncestors(Iterable<Object> keys)
 	{
 		LSElement e = this;
