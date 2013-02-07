@@ -259,8 +259,12 @@ class _WorksheetEditorPathEntry (SubjectPathEntry):
 	def follow(self, outerSubject):
 		return outerSubject.editSubject
 
-	def canPersist(self):
-		return True
+
+	def __getstate__(self):
+		return False
+
+	def __setstate__(self):
+		pass
 
 
 _WorksheetEditorPathEntry.instance = _WorksheetEditorPathEntry()

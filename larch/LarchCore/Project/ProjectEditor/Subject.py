@@ -130,4 +130,11 @@ class _PageSubjectPathEntry (SubjectPathEntry):
 		return document.newModelSubject( page.data, outerSubject, outerSubject.path().followedBy( self ), page.importName, page.getName() )
 
 
+	def __getstate__(self):
+		return { 'nodeId' : self.__nodeId }
+
+	def __setstate__(self, state):
+		self.__nodeId = state.get( 'nodeId', None )
+
+
 

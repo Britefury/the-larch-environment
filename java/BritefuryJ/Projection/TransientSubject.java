@@ -14,12 +14,12 @@ public abstract class TransientSubject extends Subject
 	// Transient path entry
 	//
 	
-	static class TransientSubjectPathEntry implements SubjectPathEntry
+	static class FixedSubjectPathEntry extends TransientSubjectPathEntry
 	{
 		protected Subject subject;
 		
 		
-		public TransientSubjectPathEntry(Subject subject)
+		public FixedSubjectPathEntry(Subject subject)
 		{
 		}
 		
@@ -28,19 +28,13 @@ public abstract class TransientSubject extends Subject
 		{
 			return subject;
 		}
-
-		@Override
-		public boolean canPersist()
-		{
-			return false;
-		}
 	}
 	
 	
 	public TransientSubject(Subject enclosingSubject)
 	{
-		super( enclosingSubject, new SubjectPath( new TransientSubjectPathEntry( null ) ) );
-		List<SubjectPathEntry> pathEntries = path().entries;
-		((TransientSubjectPathEntry)pathEntries.get( pathEntries.size() - 1 )).subject = this;
+		super( enclosingSubject, new SubjectPath( new FixedSubjectPathEntry( null ) ) );
+		List<AbstractSubjectPathEntry> pathEntries = path().entries;
+		((FixedSubjectPathEntry)pathEntries.get( pathEntries.size() - 1 )).subject = this;
 	}
 }

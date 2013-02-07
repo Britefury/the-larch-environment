@@ -165,7 +165,7 @@ class ProjectRoot (ProjectContainer):
 
 
 	def getPageById(self, nodeId):
-		return self.__idToPage.get(nodeId)
+		return self.__idToPage.get( nodeId )
 
 
 

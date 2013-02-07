@@ -15,7 +15,7 @@ from BritefuryJ.ChangeHistory import ChangeHistory, ChangeHistoryListener
 
 from BritefuryJ.Isolation import IsolationPickle
 
-from BritefuryJ.Projection import SubjectPath, SubjectPathEntry
+from BritefuryJ.Projection import SubjectPath, TransientSubjectPathEntry
 
 from Britefury import LoadBuiltins
 
@@ -224,7 +224,7 @@ class Document (ChangeHistoryListener):
 
 
 
-class _DocumentPathEntry (SubjectPathEntry):
+class _DocumentPathEntry (TransientSubjectPathEntry):
 	def __init__(self, document, importName, title):
 		self.__document = document
 		self.__importName = importName
