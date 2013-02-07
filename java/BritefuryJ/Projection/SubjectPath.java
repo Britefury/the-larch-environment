@@ -12,22 +12,22 @@ import java.util.ArrayList;
 
 public class SubjectPath
 {
-	protected ArrayList<SubjectPathEntry> entries;
+	protected ArrayList<AbstractSubjectPathEntry> entries;
 	
 	
 	public SubjectPath()
 	{
-		entries = new ArrayList<SubjectPathEntry>();
+		entries = new ArrayList<AbstractSubjectPathEntry>();
 	}
 
-	public SubjectPath(SubjectPathEntry entry)
+	public SubjectPath(AbstractSubjectPathEntry entry)
 	{
-		entries = new ArrayList<SubjectPathEntry>();
+		entries = new ArrayList<AbstractSubjectPathEntry>();
 		entries.add( entry );
 	}
 	
 	
-	public SubjectPath followedBy(SubjectPathEntry entry)
+	public SubjectPath followedBy(AbstractSubjectPathEntry entry)
 	{
 		SubjectPath joinedPath = new SubjectPath();
 		joinedPath.entries.addAll( entries );
@@ -87,7 +87,7 @@ public class SubjectPath
 	{
 		Subject subject = rootSubject;
 		
-		for (SubjectPathEntry e: entries)
+		for (AbstractSubjectPathEntry e: entries)
 		{
 			subject = e.follow( subject );
 		}
@@ -98,7 +98,7 @@ public class SubjectPath
 	
 	public boolean canPersist()
 	{
-		for (SubjectPathEntry e: entries)
+		for (AbstractSubjectPathEntry e: entries)
 		{
 			if ( !e.canPersist() )
 			{
@@ -139,7 +139,7 @@ public class SubjectPath
 			if ( e instanceof PyList )
 			{
 				PyList l = (PyList)e;
-				entries = new ArrayList<SubjectPathEntry>();
+				entries = new ArrayList<AbstractSubjectPathEntry>();
 				entries.addAll( (PyList)e );
 			}
 			else
