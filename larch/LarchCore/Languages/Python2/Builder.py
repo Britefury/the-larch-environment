@@ -15,13 +15,13 @@ from LarchCore.Languages.Python2 import Embedded
 
 
 def embeddedLiteral(x):
-	return Py.EmbeddedObjectLiteral( embeddedValue=DMNode.embedIsolated( x, False ) )
+	return Py.EmbeddedObjectLiteral( embeddedValue=DMNode.embedIsolated( x ) )
 
 def embeddedExpression(x):
-	return Py.EmbeddedObjectExpr( embeddedValue=DMNode.embedIsolated( x, False ) )
+	return Py.EmbeddedObjectExpr( embeddedValue=DMNode.embedIsolated( x ) )
 
 def embeddedStatement(x):
-	return Py.EmbeddedObjectStmt( embeddedValue=DMNode.embedIsolated( x, False ) )
+	return Py.EmbeddedObjectStmt( embeddedValue=DMNode.embedIsolated( x ) )
 
 
 class _Builder (object):

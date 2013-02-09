@@ -1162,7 +1162,7 @@ class Python2ModuleCodeGenerator (Python2CodeGenerator):
 
 
 	def _factory(self, fac):
-		return _FactoryWrapper( embeddedFactory=DMNode.embed( fac, False ) )
+		return _FactoryWrapper( embeddedFactory=DMNode.embed( fac ) )
 
 
 

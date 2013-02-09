@@ -64,7 +64,6 @@ public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterf
 
 
 	private PyObject value = null;
-	private boolean valueDeepCopyable = true;
 	private ChangeHistory changeHistory = null;
 	
 	
@@ -73,11 +72,10 @@ public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterf
 		super();
 	}
 	
-	public DMEmbeddedObject(PyObject value, boolean valueDeepCopyable)
+	public DMEmbeddedObject(PyObject value)
 	{
 		super();
 		this.value = value;
-		this.valueDeepCopyable = valueDeepCopyable;
 	}
 	
 	
@@ -96,11 +94,11 @@ public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterf
 				
 				if ( value != null  &&  e.value != null )
 				{
-					return value.equals( e.value )  &&  valueDeepCopyable == e.valueDeepCopyable;
+					return value.equals( e.value );
 				}
 				else
 				{
-					return ( value != null ) == ( e.value != null )  &&  valueDeepCopyable == e.valueDeepCopyable;
+					return ( value != null ) == ( e.value != null );
 				}
 			}
 			
@@ -121,8 +119,7 @@ public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterf
 		{
 			DMEmbeddedObject em = (DMEmbeddedObject)x;
 			this.value = em.value;
-			this.valueDeepCopyable = em.valueDeepCopyable;
-			
+
 			// We could remove this exception - just include an incremental monitor (as with DMList), and notify it when the value is accessed and modified
 			throw new RuntimeException( "DMEmbeddedObject does not support become()" );
 		}
@@ -138,7 +135,7 @@ public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterf
 		if ( value != null )
 		{
 			PyObject valueCopy = Jython_copy.deepcopy( value, memo );
-			return new DMEmbeddedObject( valueCopy, valueDeepCopyable );
+			return new DMEmbeddedObject( valueCopy );
 		}
 		else
 		{
@@ -151,8 +148,7 @@ public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterf
 	{
 		if ( value != null )
 		{
-			PyObject valueCopy = valueDeepCopyable  ?  memo.copy( value )  :  value;
-			return new DMEmbeddedObject( valueCopy, valueDeepCopyable );
+			return new DMEmbeddedObject( memo.copy( value ) );
 		}
 		else
 		{
@@ -175,7 +171,7 @@ public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterf
 
 	public PyObject __getstate__()
 	{
-		return new PyTuple( value, Py.newBoolean( valueDeepCopyable ) );
+		return new PyTuple( Py.java2py( value ) );
 	}
 	
 	public void __setstate__(PyObject state)
@@ -184,20 +180,10 @@ public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterf
 		{
 			PyTuple tupleState = (PyTuple)state;
 			value = tupleState.pyget( 0 );
-			
-			valueDeepCopyable = true;
-			if ( tupleState.size() > 1 )
-			{
-				PyObject elem1 = tupleState.pyget( 1 );
-				if ( elem1 instanceof PyBoolean )
-				{
-					valueDeepCopyable = ((PyBoolean)elem1).getBooleanValue();
-				}
-			}
 		}
 		else
 		{
-			throw Py.TypeError( "Pickle state should be a Python tuple" );
+			throw Py.TypeError( "Pickle state should be a Python dictionary" );
 		}
 	}
 
@@ -208,12 +194,7 @@ public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterf
 		return value;
 	}
 	
-	public boolean isDeepCopyable()
-	{
-		return valueDeepCopyable;
-	}
 
-	
 	
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{

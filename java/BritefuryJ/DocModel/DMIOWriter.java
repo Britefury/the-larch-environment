@@ -190,7 +190,6 @@ public class DMIOWriter extends DMIO
 		builder.append( "<<Em:" );
 		int index = embedPyValue( embed.getValue() );
 		builder.append( Integer.toString( index ) );
-		builder.append( embed.isDeepCopyable()  ?  ",t"  :  ",f" );
 		builder.append( ">>" );
 	}
 	
@@ -200,7 +199,6 @@ public class DMIOWriter extends DMIO
 		builder.append( "<<EmIso:" );
 		int index = embedValue( embed.getIsolationBarrier() );
 		builder.append( Integer.toString( index ) );
-		builder.append( embed.isDeepCopyable()  ?  ",t"  :  ",f" );
 		builder.append( ">>" );
 	}
 	
