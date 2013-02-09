@@ -66,9 +66,9 @@ public class DMObject extends DMNode implements Trackable, Presentable
 		int numToCopy = Math.min( values.length, fieldData.length );
 		for (int i = 0; i < numToCopy; i++)
 		{
-			Object x = coerce( values[i] );
+			Object x = coerceForStorage( values[i] );
 			notifyAddChild( x );
-			fieldData[i] = coerce( x );
+			fieldData[i] = coerceForStorage( x );
 		}
 	}
 	
@@ -81,7 +81,7 @@ public class DMObject extends DMNode implements Trackable, Presentable
 		int numToCopy = Math.min( values.length, fieldData.length );
 		for (int i = 0; i < numToCopy; i++)
 		{
-			Object x = coerce( Py.tojava( values[i], Object.class ) );
+			Object x = coerceForStorage( Py.tojava( values[i], Object.class ) );
 			notifyAddChild( x );
 			fieldData[i] = x;
 		}
@@ -104,7 +104,7 @@ public class DMObject extends DMNode implements Trackable, Presentable
 			}
 			else
 			{
-				Object x = coerce( values[i] );
+				Object x = coerceForStorage( values[i] );
 				notifyAddChild( x );
 				fieldData[index] = x;
 			}
@@ -128,7 +128,7 @@ public class DMObject extends DMNode implements Trackable, Presentable
 			}
 			else
 			{
-				Object x = coerce( Py.tojava( values[i], Object.class ) );
+				Object x = coerceForStorage( Py.tojava( values[i], Object.class ) );
 				notifyAddChild( x );
 				fieldData[index] = x;
 			}
@@ -144,7 +144,7 @@ public class DMObject extends DMNode implements Trackable, Presentable
 		int numToCopy = Math.min( values.length - 1, fieldData.length );
 		for (int i = 0; i < numToCopy; i++)
 		{
-			Object x = coerce( Py.tojava( values[i+1], Object.class ) );
+			Object x = coerceForStorage( Py.tojava( values[i + 1], Object.class ) );
 			notifyAddChild( x );
 			fieldData[i] = x;
 		}
@@ -178,7 +178,7 @@ public class DMObject extends DMNode implements Trackable, Presentable
 				}
 				else
 				{
-					Object x = coerce( Py.tojava( values[i+1], Object.class ) );
+					Object x = coerceForStorage( Py.tojava( values[i + 1], Object.class ) );
 					notifyAddChild( x );
 					fieldData[index] = x;
 				}
@@ -201,7 +201,7 @@ public class DMObject extends DMNode implements Trackable, Presentable
 			}
 			else
 			{
-				Object x = coerce( entry.getValue() );
+				Object x = coerceForStorage( entry.getValue() );
 				notifyAddChild( x );
 				fieldData[index] = x;
 			}
@@ -237,7 +237,7 @@ public class DMObject extends DMNode implements Trackable, Presentable
 			}
 			else
 			{
-				Object x = coerce( Py.tojava( (PyObject)entry.getValue(), Object.class ) );
+				Object x = coerceForStorage( Py.tojava( (PyObject)entry.getValue(), Object.class ) );
 				notifyAddChild( x );
 				fieldData[index] = x;
 			}
@@ -342,7 +342,7 @@ public class DMObject extends DMNode implements Trackable, Presentable
 	
 	public void set(int index, Object x)
 	{
-		x = coerce( x );
+		x = coerceForStorage( x );
 		Object oldX = fieldData[index];
 		fieldData[index] = x;
 		if ( oldX != x )
@@ -409,7 +409,7 @@ public class DMObject extends DMNode implements Trackable, Presentable
 			else
 			{
 				Object oldX = fieldData[index];
-				Object x = coerce( e.getValue() );
+				Object x = coerceForStorage( e.getValue() );
 				if ( oldX != x )
 				{
 					notifyRemoveChild( oldX );
@@ -437,7 +437,7 @@ public class DMObject extends DMNode implements Trackable, Presentable
 		{
 			int index = indices[i];
 			Object oldX = fieldData[index];
-			Object x = coerce( xs[i] );
+			Object x = coerceForStorage( xs[i] );
 			if ( oldX != x )
 			{
 				notifyRemoveChild( oldX );

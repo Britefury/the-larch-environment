@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import BritefuryJ.Isolation.IsolationBarrier;
 import org.python.core.Py;
 import org.python.core.PyList;
 import org.python.core.PyObject;
@@ -39,8 +40,7 @@ public class DMIOWriter extends DMIO
 	private HashMap<DMSchema, String> moduleToName;
 	private HashSet<String> names;
 	private ArrayList<DMSchema> modulesInOrder;
-	private ArrayList<Object> embeddedValues;
-	private PyList embeddedPyValues;
+	private PyList embeddedValues;
 	
 	
 	
@@ -55,8 +55,7 @@ public class DMIOWriter extends DMIO
 	
 	private void initEmbeddedValues()
 	{
-		embeddedValues = new ArrayList<Object>();
-		embeddedPyValues = new PyList();
+		embeddedValues = new PyList();
 	}
 	
 	private int embedValue(Object value)
@@ -67,22 +66,10 @@ public class DMIOWriter extends DMIO
 		}
 		
 		int index = embeddedValues.size();
-		embeddedValues.add( value );
+		embeddedValues.append( Py.java2py( value ) );
 		return index;
 	}
-	
-	private int embedPyValue(PyObject value)
-	{
-		if ( embeddedPyValues == null )
-		{
-			throw new CannotEmbedValue();
-		}
-		
-		int index = embeddedPyValues.size();
-		embeddedPyValues.append( value );
-		return index;
-	}
-	
+
 
 	
 
@@ -185,23 +172,14 @@ public class DMIOWriter extends DMIO
 	}
 	
 	
-	private void writeEmbeddedObject(StringBuilder builder, DMEmbeddedObject embed) throws InvalidDataTypeException
+	private void writeEmbeddedObject(StringBuilder builder, Object embed) throws InvalidDataTypeException
 	{
 		builder.append( "<<Em:" );
-		int index = embedPyValue( embed.getValue() );
+		int index = embedValue( embed );
 		builder.append( Integer.toString( index ) );
 		builder.append( ">>" );
 	}
-	
 
-	private void writeEmbeddedIsolatedObject(StringBuilder builder, DMEmbeddedIsolatedObject embed) throws InvalidDataTypeException
-	{
-		builder.append( "<<EmIso:" );
-		int index = embedValue( embed.getIsolationBarrier() );
-		builder.append( Integer.toString( index ) );
-		builder.append( ">>" );
-	}
-	
 
 	
 	@SuppressWarnings("unchecked")
@@ -231,18 +209,9 @@ public class DMIOWriter extends DMIO
 		{
 			writeObject( builder, (DMObject)content );
 		}
-		else if ( content instanceof DMEmbeddedObject )
-		{
-			writeEmbeddedObject( builder, (DMEmbeddedObject)content );
-		}
-		else if ( content instanceof DMEmbeddedIsolatedObject )
-		{
-			writeEmbeddedIsolatedObject( builder, (DMEmbeddedIsolatedObject)content );
-		}
 		else
 		{
-			System.out.println( "Content data type: " + content.getClass().getName() + ", content data: " + content.toString() );
-			throw new InvalidDataTypeException();
+			writeEmbeddedObject( builder, content );
 		}
 	}
 	
@@ -290,14 +259,9 @@ public class DMIOWriter extends DMIO
 		DMIOWriter writer = new DMIOWriter();
 		writer.initEmbeddedValues();
 		String s = writer.writeDocument( content );
-		if ( ( writer.embeddedValues != null  &&  writer.embeddedPyValues != null  &&  ( writer.embeddedValues.size() > 0  ||  writer.embeddedPyValues.size() > 0 ) ) )
+		if ( ( writer.embeddedValues != null  &&  writer.embeddedValues.size() > 0 ) )
 		{
-			PyList embedded = new PyList();
-			for (Object e: writer.embeddedValues)
-			{
-				embedded.add( e );
-			}
-			return new PyTuple( Py.newString( s ), embedded, writer.embeddedPyValues );
+			return new PyTuple( Py.newString( s ), writer.embeddedValues );
 		}
 		else
 		{

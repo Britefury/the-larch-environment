@@ -13,6 +13,7 @@ import java.util.List;
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Controls.DropDownExpander;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.Isolation.IsolationBarrier;
 import BritefuryJ.Pres.CompositePres;
 import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;
@@ -71,9 +72,13 @@ public class DocModelPresenter
 		{
 			return stringStyle.applyTo( new UnescapedStringAsRow( (String )x ) );
 		}
+		else if ( x instanceof DMNode )
+		{
+			return new InnerFragment( x );
+		}
 		else
 		{
-			return new InnerFragment( x ); 
+			return presentEmbeddedObject( x, fragment, inheritedState );
 		}
 	}
 	
@@ -175,17 +180,12 @@ public class DocModelPresenter
 	}
 
 
-	protected static Pres presentDMEmbeddedObject(DMEmbeddedObject node, FragmentView fragment, SimpleAttributeTable inheritedState)
+	protected static Pres presentEmbeddedObject(Object node, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return new ObjectBorder( new DropDownExpander( embedStyle.applyTo( new Label( "Embedded object" ) ), new EmbeddedValuePres( node ) ) );
+		return new ObjectBorder( new DropDownExpander( embedStyle.applyTo( new Label( "Embedded object" ) ), node ) );
 	}
 	
-	protected static Pres presentDMEmbeddedIsolatedObject(DMEmbeddedIsolatedObject node, FragmentView fragment, SimpleAttributeTable inheritedState)
-	{
-		return new ObjectBorder( new DropDownExpander( embedStyle.applyTo( new Label( "Embedded isolated object" ) ), new EmbeddedIsolatedValuePres( node ) ) );
-	}
-	
-	
+
 	public static Pres presentDMNode(DMNode node, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		if ( node instanceof DMObject )
@@ -196,54 +196,9 @@ public class DocModelPresenter
 		{
 			return presentDMList( (DMList)node, fragment, inheritedState );
 		}
-		if ( node instanceof DMEmbeddedObject )
-		{
-			return presentDMEmbeddedObject( (DMEmbeddedObject)node, fragment, inheritedState );
-		}
-		if ( node instanceof DMEmbeddedIsolatedObject )
-		{
-			return presentDMEmbeddedIsolatedObject( (DMEmbeddedIsolatedObject)node, fragment, inheritedState );
-		}
 		else
 		{
 			throw new RuntimeException( "Unknown DMNode type" );
-		}
-	}
-	
-	
-	private static class EmbeddedValuePres extends CompositePres
-	{
-		private DMEmbeddedObject embed;
-		
-		
-		public EmbeddedValuePres(DMEmbeddedObject embed)
-		{
-			this.embed = embed;
-		}
-		
-		
-		@Override
-		public Pres pres(PresentationContext ctx, StyleValues style)
-		{
-			return new InnerFragment( embed.getValue() );
-		}
-	}
-
-	private static class EmbeddedIsolatedValuePres extends CompositePres
-	{
-		private DMEmbeddedIsolatedObject embed;
-
-
-		public EmbeddedIsolatedValuePres(DMEmbeddedIsolatedObject embed)
-		{
-			this.embed = embed;
-		}
-
-
-		@Override
-		public Pres pres(PresentationContext ctx, StyleValues style)
-		{
-			return new InnerFragment( embed.getValue() );
 		}
 	}
 }

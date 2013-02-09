@@ -8,6 +8,7 @@ package BritefuryJ.DocModel;
 
 import java.util.List;
 
+import BritefuryJ.Isolation.IsolationBarrier;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
 import org.python.core.PyJavaType;
@@ -60,6 +61,18 @@ public abstract class DMNode implements ClipboardCopyable
 	public static class NodeNotAChildException extends RuntimeException
 	{
 		private static final long serialVersionUID = 1L;
+	}
+
+
+
+	protected static class WrappedRef
+	{
+		protected Object value;
+
+		public WrappedRef(Object value)
+		{
+			this.value = value;
+		}
 	}
 
 	
@@ -249,12 +262,58 @@ public abstract class DMNode implements ClipboardCopyable
 	
 	
 	
+
 	@SuppressWarnings("unchecked")
 	public static Object coerce(Object x)
 	{
 		if ( x == null )
 		{
 			return x;
+		}
+		else if ( x instanceof DMNode  ||  x instanceof WrappedRef )
+		{
+			return x;
+		}
+		else if ( x instanceof String )
+		{
+			// Create a clone of the string to ensure that all String objects in the document are
+			// distinct, even if their contents are the same
+			return new String( (String)x );
+		}
+		else if ( x instanceof List )
+		{
+			return new DMList( (List<Object>)x );
+		}
+		else if ( x instanceof PyJavaType  ||  x instanceof PyObjectDerived )
+		{
+			Object xx = Py.tojava( (PyObject)x, Object.class );
+			if ( xx instanceof PyJavaType  ||  xx instanceof PyObjectDerived )
+			{
+				System.out.println( "DMNode.coerceForStorage(): Could not unwrap " + x );
+				return null;
+			}
+			else
+			{
+				return coerce( xx );
+			}
+		}
+		else
+		{
+			return x;
+		}
+	}
+
+
+	@SuppressWarnings("unchecked")
+	protected static Object coerceForStorage(Object x)
+	{
+		if ( x == null )
+		{
+			return x;
+		}
+		else if ( x instanceof WrappedRef )
+		{
+			return ((WrappedRef)x).value;
 		}
 		else if ( x instanceof DMNode )
 		{
@@ -275,31 +334,36 @@ public abstract class DMNode implements ClipboardCopyable
 			Object xx = Py.tojava( (PyObject)x, Object.class );
 			if ( xx instanceof PyJavaType  ||  xx instanceof PyObjectDerived )
 			{
-				System.out.println( "DMNode.coerce(): Could not unwrap " + x );
+				System.out.println( "DMNode.coerceForStorage(): Could not unwrap " + x );
 				return null;
 			}
 			else
 			{
-				return coerce( xx );
+				return coerceForStorage( xx );
 			}
 		}
 		else
 		{
-			System.out.println( "DMNode.coerce(): attempted to coerce " + x.getClass().getName() + " (" + x.toString() + ")" );
-			//throw new RuntimeException();
 			return x;
 		}
 	}
-	
-	
-	
-	public static DMEmbeddedObject embed(PyObject x)
+
+
+
+	public static WrappedRef reference(Object x)
 	{
-		return new DMEmbeddedObject( x );
+		return new WrappedRef( x );
+	}
+	
+	
+	
+	public static WrappedRef embed(PyObject x)
+	{
+		return reference( x );
 	}
 
-	public static DMEmbeddedIsolatedObject embedIsolated(PyObject x)
+	public static IsolationBarrier<PyObject> embedIsolated(PyObject x)
 	{
-		return new DMEmbeddedIsolatedObject( x );
+		return new IsolationBarrier<PyObject>( x );
 	}
 }

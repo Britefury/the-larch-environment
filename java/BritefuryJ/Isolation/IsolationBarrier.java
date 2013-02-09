@@ -80,6 +80,12 @@ public class IsolationBarrier <ValueType> implements Presentable, Trackable
 		ValueType v = getValue();
 		return v != null  ?  v.hashCode()  :  0;
 	}
+
+
+	public String toString()
+	{
+		return "ISO<" + ( value != null  ?  value.toString()  :  "null" )  +  ">";
+	}
 	
 	
 	public PyObject __getstate__()

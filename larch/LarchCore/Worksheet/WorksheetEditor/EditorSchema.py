@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
-from BritefuryJ.DocModel import DMObject, DMNode
+from BritefuryJ.DocModel import DMNode
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
 

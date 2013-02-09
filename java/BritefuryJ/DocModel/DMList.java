@@ -375,7 +375,7 @@ public class DMList extends DMNode implements List<Object>, Trackable, Presentab
 			value.ensureCapacity(  xs.size() );
 			for (Object x: xs)
 			{
-				x = coerce( x );
+				x = coerceForStorage( x );
 				notifyAddChild( x );
 				value.add( x );
 			}
@@ -451,7 +451,7 @@ public class DMList extends DMNode implements List<Object>, Trackable, Presentab
 	
 	public boolean add(Object x)
 	{
-		x = coerce( x );
+		x = coerceForStorage( x );
 		notifyAddChild( x );
 		boolean bResult = value.add( x );
 		incr.onChanged();
@@ -461,7 +461,7 @@ public class DMList extends DMNode implements List<Object>, Trackable, Presentab
 	
 	public void add(int index, Object x)
 	{
-		x = coerce( x );
+		x = coerceForStorage( x );
 		notifyAddChild( x );
 		value.add( index, x );
 		incr.onChanged();
@@ -474,7 +474,7 @@ public class DMList extends DMNode implements List<Object>, Trackable, Presentab
 		cxs.ensureCapacity( xs.size() );
 		for (Object x: xs)
 		{
-			x = coerce( x );
+			x = coerceForStorage( x );
 			cxs.add( x );
 			notifyAddChild( x );
 		}
@@ -491,7 +491,7 @@ public class DMList extends DMNode implements List<Object>, Trackable, Presentab
 		cxs.ensureCapacity( xs.size() );
 		for (Object x: xs)
 		{
-			x = coerce( x );
+			x = coerceForStorage( x );
 			cxs.add( x );
 			notifyAddChild( x );
 		}
@@ -661,7 +661,7 @@ public class DMList extends DMNode implements List<Object>, Trackable, Presentab
 	
 	public Object set(int index, Object x)
 	{
-		x = coerce( x );
+		x = coerceForStorage( x );
 		Object oldX = value.set( index, x );
 		if ( oldX != x )
 		{
@@ -760,7 +760,7 @@ public class DMList extends DMNode implements List<Object>, Trackable, Presentab
 		cxs.ensureCapacity( xs.size() );
 		for (Object x: xs)
 		{
-			cxs.add( coerce( x ) );
+			cxs.add( coerceForStorage( x ) );
 		}
 		
 		Object[] src = cxs.toArray();
@@ -1050,7 +1050,7 @@ public class DMList extends DMNode implements List<Object>, Trackable, Presentab
 		int i = 0;
 		for (Object x: xs)
 		{
-			newContents[i] = coerce( x );
+			newContents[i] = coerceForStorage( x );
 			i++;
 		}
 		
