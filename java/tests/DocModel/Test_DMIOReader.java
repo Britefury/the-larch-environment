@@ -16,8 +16,6 @@ import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 
-import BritefuryJ.DocModel.DMEmbeddedIsolatedObject;
-import BritefuryJ.DocModel.DMEmbeddedObject;
 import BritefuryJ.DocModel.DMIOReader;
 import BritefuryJ.DocModel.DMIOWriter;
 import BritefuryJ.DocModel.DMIOWriter.InvalidDataTypeException;
@@ -147,18 +145,24 @@ public class Test_DMIOReader extends TestCase
 
 
 	@SuppressWarnings("unchecked")
-	public void readStateTest(String input, Object embedded[], PyObject embeddedPy[], Object expected)
+	public void readStateTest(String input, PyObject embedded[], PyObject embeddedPy[], Object expected)
 	{
+		PyTuple state;
+
 		PyList embAsPy = new PyList();
 		Collections.addAll( embAsPy, embedded );
-		
-		PyList embPyAsPy = new PyList();
-		for (PyObject e: embeddedPy)
+
+		if ( embeddedPy != null )
 		{
-			embPyAsPy.append( e );
+			PyList embPyAsPy = new PyList();
+			Collections.addAll( embPyAsPy, embeddedPy );
+
+			state = new PyTuple( Py.newString( input ), embAsPy, embPyAsPy );
 		}
-		
-		PyTuple state = new PyTuple( Py.newString( input ), embAsPy, embPyAsPy );
+		else
+		{
+			state = new PyTuple( Py.newString( input ), embAsPy );
+		}
 
 		Object res = null;
 		try
@@ -173,21 +177,15 @@ public class Test_DMIOReader extends TestCase
 		
 		boolean bEqual = res == expected  ||  res.equals( expected );
 
-		try
+		if ( !bEqual )
 		{
-			if ( !bEqual )
-			{
-				System.out.println( "VALUES ARE NOT THE SAME" );
-				System.out.println( "EXPECTED:" );
-				System.out.println( expected == null  ?  "<null>"  :  DMIOWriter.writeAsString( expected ) );
-				System.out.println( "RESULT:" );
-				System.out.println( res == null  ?  "<null>"  :  DMIOWriter.writeAsString( res ) );
-			}
+			System.out.println( "VALUES ARE NOT THE SAME" );
+			System.out.println( "EXPECTED:" );
+			System.out.println( expected == null  ?  "<null>"  :  expected.toString() );
+			System.out.println( "RESULT:" );
+			System.out.println( res == null  ?  "<null>"  :  res.toString() );
 		}
-		catch (InvalidDataTypeException e)
-		{
-		}
-		
+
 		assertTrue( bEqual );
 	}
 
@@ -268,26 +266,30 @@ public class Test_DMIOReader extends TestCase
 	
 	public void testReadEmbeddedObject() throws IOException
 	{
-		DMEmbeddedObject e0 = DMNode.embed( Py.newInteger( 0 ) );
-		DMEmbeddedObject e1 = DMNode.embed( Py.newInteger( 1 ) );
-		DMEmbeddedObject e2 = DMNode.embed( Py.newInteger( 2 ) );
-		List<Object> x = Arrays.asList( new Object[] { e0, e1, e2 } );
-		readStateTest( "[<<Em:0>> <<Em:1>> <<Em:2>>]", new Object[] {}, new PyObject[] { Py.newInteger( 0 ), Py.newInteger( 1 ), Py.newInteger( 2 ) }, x );
+		List<Object> x = Arrays.asList( new Object[] { 0, 1, 2 } );
+		readStateTest( "[<<Em:0>> <<Em:1>> <<Em:2>>]", new PyObject[] {}, new PyObject[] { Py.newInteger( 0 ), Py.newInteger( 1 ), Py.newInteger( 2 ) }, x );
+		readStateTest( "[<<Em:0>> <<Em:1>> <<Em:2>>]", new PyObject[] { Py.newInteger( 0 ), Py.newInteger( 1 ), Py.newInteger( 2 ) }, null, x );
 	}
 	
 	public void testReadEmbeddedIsolatedObject() throws IOException
 	{
-		DMEmbeddedIsolatedObject e0 = DMNode.embedIsolated( Py.newInteger( 0 ) );
-		DMEmbeddedIsolatedObject e1 = DMNode.embedIsolated( Py.newInteger( 1 ) );
-		DMEmbeddedIsolatedObject e2 = DMNode.embedIsolated( Py.newInteger( 2 ) );
+		Object e0 = DMNode.embedIsolated( Py.newInteger( 0 ) );
+		Object e1 = DMNode.embedIsolated( Py.newInteger( 1 ) );
+		Object e2 = DMNode.embedIsolated( Py.newInteger( 2 ) );
 		List<Object> x = Arrays.asList( new Object[] { e0, e1, e2 } );
-		readStateTest( "[<<EmIso:0>> <<EmIso:1>> <<EmIso:2>>]", new Object[] { new IsolationBarrier<PyObject>( Py.newInteger( 0 ) ),
-				new IsolationBarrier<PyObject>( Py.newInteger( 1 ) ),
-				new IsolationBarrier<PyObject>( Py.newInteger( 2 ) ) },
+		readStateTest( "[<<EmIso:0>> <<EmIso:1>> <<EmIso:2>>]", new PyObject[] {
+				Py.java2py( new IsolationBarrier<PyObject>( Py.newInteger( 0 ) ) ),
+				Py.java2py( new IsolationBarrier<PyObject>( Py.newInteger( 1 ) ) ),
+				Py.java2py( new IsolationBarrier<PyObject>( Py.newInteger( 2 ) ) ) },
 				new PyObject[] {}, x );
+		readStateTest( "[<<Em:0>> <<Em:1>> <<Em:2>>]", new PyObject[] {
+				Py.java2py( new IsolationBarrier<PyObject>( Py.newInteger( 0 ) ) ),
+				Py.java2py( new IsolationBarrier<PyObject>( Py.newInteger( 1 ) ) ),
+				Py.java2py( new IsolationBarrier<PyObject>( Py.newInteger( 2 ) ) ) },
+				null, x );
 	}
 
-	
+
 	public void testVersioning()
 	{
 		DMObject b;

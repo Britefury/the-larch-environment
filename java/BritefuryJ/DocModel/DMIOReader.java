@@ -432,8 +432,7 @@ public class DMIOReader extends DMIO
 	private ArrayList<Object> stack;
 	private Object result;
 	private HashMap<String, SchemaRef> moduleTable = new HashMap<String, SchemaRef>();
-	private ArrayList<Object> embeddedValues;
-	private PyList embeddedPyValues;
+	private PyList embeddedValues, embeddedPyValues;
 	private String source;
 	private int pos;
 	
@@ -447,37 +446,37 @@ public class DMIOReader extends DMIO
 	}
 	
 	
-	private void initEmbeddedValues()
+	private void initEmbeddedValues(PyList values)
 	{
-		embeddedValues = new ArrayList<Object>();
+		embeddedValues = values;
 	}
 	
 	private void initEmbeddedPyValues(PyList values)
 	{
 		embeddedPyValues = values;
 	}
-	
-	private Object getEmbeddedValue(int index)
+
+	private PyObject getEmbeddedValue(int index)
 	{
 		if ( embeddedValues == null )
 		{
 			throw new CannotReadEmbeddedValuesException();
 		}
 		
-		return embeddedValues.get( index );
+		return embeddedValues.pyget( index );
 	}
 	
 	private PyObject getEmbeddedPyValue(int index)
 	{
 		if ( embeddedPyValues == null )
 		{
-			throw new CannotReadEmbeddedValuesException();
+			return getEmbeddedValue( index );
 		}
-		
+
 		return embeddedPyValues.pyget( index );
 	}
-	
-	
+
+
 	private Object getTopOfStack()
 	{
 		return stack.get( stack.size() - 1 ); 
@@ -748,7 +747,7 @@ public class DMIOReader extends DMIO
 						pos += 2;
 						
 						PyObject value = getEmbeddedPyValue( index );
-						DMEmbeddedObject embed = new DMEmbeddedObject( value );
+						Object embed = Py.tojava( value, Object.class );
 						closeItem( embed );
 					}
 					else if ( source.substring( pos, pos+8 ).equals( "<<EmIso:" ) )
@@ -791,10 +790,9 @@ public class DMIOReader extends DMIO
 						}
 						pos += 2;
 						
-						Object value = getEmbeddedValue( index );
-						DMEmbeddedIsolatedObject embed = new DMEmbeddedIsolatedObject();
-						embed.setIsolationBarrier( (IsolationBarrier<PyObject>)value );
-						closeItem( embed );
+						PyObject value = getEmbeddedValue( index );
+						IsolationBarrier<Object> iso = (IsolationBarrier<Object>)Py.tojava( value, IsolationBarrier.class );
+						closeItem( iso );
 					}
 					else
 					{
@@ -1028,14 +1026,13 @@ public class DMIOReader extends DMIO
 
 			
 			PyList embedded = (PyList)tup.pyget( 1 );
-			reader.initEmbeddedValues();
-			for (Object e: embedded)
-			{
-				reader.embeddedValues.add( e );
-			}
+			reader.initEmbeddedValues(embedded );
 
-			PyList embeddedPy = (PyList)tup.pyget( 2 );
-			reader.initEmbeddedPyValues( embeddedPy );
+			if ( tup.size() > 2 )
+			{
+				PyList embeddedPy = (PyList)tup.pyget( 2 );
+				reader.initEmbeddedPyValues( embeddedPy );
+			}
 		}
 		else if ( state instanceof PyString  ||  state instanceof PyUnicode )
 		{

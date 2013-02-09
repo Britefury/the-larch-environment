@@ -1201,6 +1201,7 @@ class Python2View (MethodDispatchView):
 	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectLiteral )
 	@EmbeddedObjectExpression
 	def EmbeddedObjectLiteral(self, fragment, inheritedState, model, embeddedValue):
+		# Unwrap isolated value
 		value = embeddedValue.getValue()
 		valueView = ApplyPerspective( EditPerspective.instance, value )
 
@@ -1215,6 +1216,7 @@ class Python2View (MethodDispatchView):
 	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectExpr )
 	@EmbeddedObjectExpression
 	def EmbeddedObjectExpr(self, fragment, inheritedState, model, embeddedValue):
+		# Unwrap isolated value
 		value = embeddedValue.getValue()
 		valueView = ApplyPerspective( EditPerspective.instance, value )
 
@@ -1238,6 +1240,7 @@ class Python2View (MethodDispatchView):
 	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectStmt )
 	@SpecialFormStatement
 	def EmbeddedObjectStmt(self, fragment, inheritedState, model, embeddedValue):
+		# Unwrap isolated value
 		value = embeddedValue.getValue()
 		valueView = ApplyPerspective( EditPerspective.instance, value )
 		expansionFn = self._getExpansionFn( value )

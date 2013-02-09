@@ -419,7 +419,7 @@ schema.registerReader( 'DefaultValueParam', 4, _readDefaultValueParam_v4 )
 #
 
 def _read_temp_SpecialFormStmtWrapper_v6(fieldValues):
-	# Version 4 stored a name and defaultValue
+	# Version 6; convert temporary special form statement wrapper to an embedded object literal
 	value = fieldValues['value']
 	if value.isInstanceOf( EmbeddedObjectStmt ):
 		return EmbeddedObjectLiteral( embeddedValue=value['embeddedValue'] )
@@ -428,7 +428,7 @@ def _read_temp_SpecialFormStmtWrapper_v6(fieldValues):
 		return Load( name='None' )
 
 def _readEmbeddedObjectExpr_v6(fieldValues):
-	# Version 4 stored a name and defaultValue
+	# Version 6 embedded object expressions had an asLiteral field which determined if they acted as literals; convert
 	embeddedValue = fieldValues['embeddedValue']
 	asLiteral = fieldValues['asLiteral']
 	if asLiteral is not None:

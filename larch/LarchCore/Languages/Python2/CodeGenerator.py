@@ -7,7 +7,7 @@
 ##-*************************
 from copy import deepcopy
 
-from BritefuryJ.DocModel import DMObject, DMList, DMEmbeddedObject, DMEmbeddedIsolatedObject, DMSchema, DMObjectClass, DMNode
+from BritefuryJ.DocModel import DMObject, DMList, DMSchema, DMNode
 
 from Britefury.Dispatch.MethodDispatch import ObjectDispatchMethod, DMObjectNodeDispatchMethod, methodDispatch
 
@@ -984,11 +984,9 @@ class Python2ModuleCodeGenerator (Python2CodeGenerator):
 				return astMapExpr + '(' + ', '.join( [ '%s=%s' % ( k,v )   for k,v in args ] ) + ')'
 		elif isinstance( node, DMList ):
 			return _runtime_DMList_Name + '([' + ', '.join( [ self._quotedNode( v )   for v in node ] ) + '])'
-		elif isinstance( node, DMEmbeddedObject )  or  isinstance( node, DMEmbeddedIsolatedObject ):
-			return self._embeddedValueSrc( deepcopy( node ) )
 		else:
-			raise TypeError, 'Cannot quote a %s'  %  type( node )
-		
+			return self._embeddedValueSrc( deepcopy( node ) )
+
 		
 		
 
@@ -1009,6 +1007,7 @@ class Python2ModuleCodeGenerator (Python2CodeGenerator):
 	# Embedded object literal
 	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectLiteral )
 	def EmbeddedObjectLiteral(self, node, embeddedValue):
+		# Unwrap isolated value
 		value = embeddedValue.getValue()
 
 		# Use the object as a value
@@ -1019,9 +1018,10 @@ class Python2ModuleCodeGenerator (Python2CodeGenerator):
 	# Embedded object expression
 	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectExpr )
 	def EmbeddedObjectExpr(self, node, embeddedValue):
+		# Unwrap isolated value
 		value = embeddedValue.getValue()
-	
-		
+
+
 		# Try to use the __py_compile_visit__ method
 		try:
 			visitFn = value.__py_compile_visit__
@@ -1062,9 +1062,10 @@ class Python2ModuleCodeGenerator (Python2CodeGenerator):
 	# Embedded object statement
 	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectStmt )
 	def EmbeddedObjectStmt(self, node, embeddedValue):
+		# Unwrap isolated value
 		value = embeddedValue.getValue()
-	
-		
+
+
 		# Try to use the __py_compile_visit__ method
 		try:
 			visitFn = value.__py_compile_visit__

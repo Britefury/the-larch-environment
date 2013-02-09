@@ -7,8 +7,6 @@
 ##-*************************
 import _ast
 
-from BritefuryJ.DocModel import DMObject, DMList, DMEmbeddedObject, DMEmbeddedIsolatedObject
-
 from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, methodDispatch
 
 from LarchCore.Languages.Python2 import Schema
