@@ -270,10 +270,6 @@ public abstract class DMNode implements ClipboardCopyable
 		{
 			return new DMList( (List<Object>)x );
 		}
-		else if ( x instanceof DMObjectInterface )
-		{
-			return new DMObject( (DMObjectInterface)x );
-		}
 		else if ( x instanceof PyJavaType  ||  x instanceof PyObjectDerived )
 		{
 			Object xx = Py.tojava( (PyObject)x, Object.class );

@@ -18,7 +18,7 @@ from Britefury.Kernel.View.DispatchView import MethodDispatchView
 from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod
 
 
-from BritefuryJ.DocModel import DMObjectClass, DMObject, DMObjectInterface
+from BritefuryJ.DocModel import DMObject
 
 from BritefuryJ.Graphics import SolidBorder, FilledBorder, FillPainter
 from BritefuryJ.LSpace.Interactor import KeyElementInteractor
@@ -264,7 +264,7 @@ class VREView (MethodDispatchView):
 			if isinstance( x, str )  or  isinstance( x, unicode ):
 				view = unparseableText( x )
 				return view
-			elif isinstance( x, DMObjectInterface ):
+			elif isinstance( x, DMObject ):
 				view = SREInnerFragment( x, PRECEDENCE_NONE, EditMode.DISPLAY )
 				#<NO_TREE_EVENT_LISTENER>
 				view = StructuralItem( VisualRegexSyntaxRecognizingController.instance, x, view )

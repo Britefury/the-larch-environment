@@ -8,7 +8,7 @@ package BritefuryJ.Parser;
 
 import java.util.List;
 
-import BritefuryJ.DocModel.DMObjectInterface;
+import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.Util.RichString.RichStringAccessor;
 
 /*
@@ -28,7 +28,7 @@ public class AnyObject extends ParserExpression
 	
 	protected ParseResult evaluateNode(ParserState state, Object input)
 	{
-		if ( input instanceof DMObjectInterface )
+		if ( input instanceof DMObject )
 		{
 			return new ParseResult( input, 0, 1 );
 		}
@@ -51,7 +51,7 @@ public class AnyObject extends ParserExpression
 			
 			if ( valueArray != null )
 			{
-				if ( valueArray[0] instanceof DMObjectInterface )
+				if ( valueArray[0] instanceof DMObject )
 				{
 					return new ParseResult( valueArray[0], 0, 1 );
 				}
@@ -67,7 +67,7 @@ public class AnyObject extends ParserExpression
 		{
 			Object x = input.get( start );
 			
-			if ( x instanceof DMObjectInterface )
+			if ( x instanceof DMObject )
 			{
 				return new ParseResult( x, start, start + 1 );
 			}

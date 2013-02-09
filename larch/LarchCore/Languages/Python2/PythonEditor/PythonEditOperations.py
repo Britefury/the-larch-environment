@@ -8,7 +8,7 @@
 import copy
 
 
-from BritefuryJ.DocModel import DMList, DMObjectInterface
+from BritefuryJ.DocModel import DMList, DMObject
 
 
 
@@ -32,28 +32,28 @@ from LarchCore.Languages.Python2 import Schema
 #
 
 def isExpr(node):
-	return isinstance( node, DMObjectInterface )  and  ( node.isInstanceOf( Schema.Expr )  or  node.isInstanceOf( Schema.UNPARSED ) )
+	return isinstance( node, DMObject )  and  ( node.isInstanceOf( Schema.Expr )  or  node.isInstanceOf( Schema.UNPARSED ) )
 
 def isValidExpr(node):
-	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Schema.Expr )
+	return isinstance( node, DMObject )  and  node.isInstanceOf( Schema.Expr )
 
 def isStmt(node):
-	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Schema.Stmt )
+	return isinstance( node, DMObject )  and  node.isInstanceOf( Schema.Stmt )
 
 def isCompoundStmt(node):
-	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Schema.CompoundStmt )
+	return isinstance( node, DMObject )  and  node.isInstanceOf( Schema.CompoundStmt )
 
 def isCompoundStmtHeader(node):
-	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Schema.CompountStmtHeader )
+	return isinstance( node, DMObject )  and  node.isInstanceOf( Schema.CompountStmtHeader )
 
 def isCompoundStmtOrCompoundHeader(node):
-	return isinstance( node, DMObjectInterface )  and  ( node.isInstanceOf( Schema.CompoundStmt )  or  node.isInstanceOf( Schema.CompountStmtHeader ) )
+	return isinstance( node, DMObject )  and  ( node.isInstanceOf( Schema.CompoundStmt )  or  node.isInstanceOf( Schema.CompountStmtHeader ) )
 
 def isTopLevel(node):
-	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Schema.TopLevel )
+	return isinstance( node, DMObject )  and  node.isInstanceOf( Schema.TopLevel )
 
 def isIndentedBlock(node):
-	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Schema.IndentedBlock )
+	return isinstance( node, DMObject )  and  node.isInstanceOf( Schema.IndentedBlock )
 
 
 

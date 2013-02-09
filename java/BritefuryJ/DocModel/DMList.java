@@ -33,7 +33,7 @@ import BritefuryJ.Util.HashUtils;
 import BritefuryJ.Util.Jython.JythonIndex;
 import BritefuryJ.Util.Jython.JythonSlice;
 
-public class DMList extends DMNode implements DMListInterface, Trackable, Presentable
+public class DMList extends DMNode implements List<Object>, Trackable, Presentable
 {
 	protected static DMNodeClass listNodeClass = new DMNodeClass( "DMList" );
 	
@@ -899,7 +899,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Presen
 	}
 	
 	
-	public DMListInterface __add__(List<Object> xs)
+	public DMList __add__(List<Object> xs)
 	{
 		DMList result = new DMList( this );
 		result.addAll( xs );
@@ -908,7 +908,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Presen
 
 	
 	
-	public DMListInterface __mul__(int n)
+	public DMList __mul__(int n)
 	{
 		DMList result = new DMList();
 		for (int i = 0; i < n; i++)
@@ -919,7 +919,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Presen
 	}
 
 	
-	public DMListInterface __rmul__(int n)
+	public DMList __rmul__(int n)
 	{
 		return __mul__( n );
 	}

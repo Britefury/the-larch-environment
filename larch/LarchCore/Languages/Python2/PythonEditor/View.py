@@ -18,7 +18,7 @@ from Britefury.Kernel.View.TreeEventListenerObjectDispatch import TreeEventListe
 from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, ObjectDispatchMethod, redecorateDispatchMethod
 
 
-from BritefuryJ.DocModel import DMObjectClass, DMNode, DMObjectInterface, DMObject
+from BritefuryJ.DocModel import DMObjectClass, DMNode, DMObject
 
 from BritefuryJ.Command import Command
 from BritefuryJ.Shortcut import Shortcut
@@ -628,7 +628,7 @@ class Python2View (MethodDispatchView):
 			if isinstance( x, str )  or  isinstance( x, unicode ):
 				view = unparseableText( x )
 				return view
-			elif isinstance( x, DMObjectInterface ):
+			elif isinstance( x, DMObject ):
 				view = SREInnerFragment( x, PRECEDENCE_CONTAINER_UNPARSED, EditMode.DISPLAY )
 				#<NO_TREE_EVENT_LISTENER>
 				view = StructuralItem( PythonSyntaxRecognizingController.instance, x, view )
