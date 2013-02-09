@@ -7,7 +7,7 @@
 ##-*************************
 from java.util import List
 
-from BritefuryJ.DocModel import DMObjectInterface, DMListInterface, DMClassAttribute
+from BritefuryJ.DocModel import DMClassAttribute
 
 from LarchCore.Languages.Python2 import Schema
 

@@ -33,7 +33,7 @@ import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Util.HashUtils;
 
-public class DMObject extends DMNode implements DMObjectInterface, Trackable, Presentable
+public class DMObject extends DMNode implements Trackable, Presentable
 {
 	private IncrementalValueMonitor incr;
 	private DMObjectClass objClass;
@@ -135,20 +135,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Pr
 		}
 	}
 	
-	public DMObject(DMObjectInterface obj)
-	{
-		incr = new IncrementalValueMonitor( this );
-		this.objClass = obj.getDMObjectClass();
-		fieldData = new Object[objClass.getNumFields()];
-		
-		for (int i = 0; i < fieldData.length; i++)
-		{
-			Object x = coerce( obj.get( i ) );
-			notifyAddChild( x );
-			fieldData[i] = x;
-		}
-	}
-
 	public DMObject(PyObject values[])
 	{
 		incr = new IncrementalValueMonitor( this );
@@ -470,9 +456,9 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Pr
 	
 	public void become(Object x)
 	{
-		if ( x instanceof DMObjectInterface )
+		if ( x instanceof DMObject )
 		{
-			DMObjectInterface obj = (DMObjectInterface)x;
+			DMObject obj = (DMObject)x;
 			become( obj.getDMObjectClass(), obj.getFieldValues() );
 		}
 		else
@@ -564,11 +550,11 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Pr
 			return true;
 		}
 		
-		if ( x instanceof DMObjectInterface )
+		if ( x instanceof DMObject )
 		{
 			// Get the cell value, so that the access is tracked
 			onAccess();
-			DMObjectInterface dx = (DMObjectInterface)x;
+			DMObject dx = (DMObject)x;
 			if ( dx.getDMObjectClass() == objClass )
 			{
 				for (int i = 0; i < objClass.getNumFields(); i++)
