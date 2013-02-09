@@ -58,6 +58,7 @@ class EmbeddedPython2 (object):
 		return { 'model' : self.model }
 
 	def __setstate__(self, state):
+		self.__change_history__ = None
 		self.model = state['model']
 		self.model.realiseAsRoot()
 
