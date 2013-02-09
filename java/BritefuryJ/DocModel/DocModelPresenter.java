@@ -31,16 +31,11 @@ import BritefuryJ.Pres.Sequence.VerticalInlineSequenceView;
 import BritefuryJ.Pres.Sequence.VerticalSequenceView;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
+import com.sun.org.apache.xpath.internal.functions.FuncFalse;
+
 
 public class DocModelPresenter
 {
-	private static enum ObjectPresentMode
-	{
-		HORIZONTAL,
-		VERTICALINLINE
-	}
-
-
 	private static final StyleSheet defaultStyle = StyleSheet.style( Primitive.fontFace.as( "Sans serif" ), Primitive.fontSize.as( 14 ), Primitive.foreground.as( Color.black ), Primitive.paragraphIndentation.as( 60.0 ) );
 
 	private static final StyleSheet nullStyle = defaultStyle.withValues( Primitive.fontItalic.as( true ), Primitive.foreground.as( new Color( 0.5f, 0.0f, 0.25f ) ) );
@@ -114,7 +109,7 @@ public class DocModelPresenter
 		
 		// Check the contents, to determine the layout
 		// Default: horizontal (paragraph layout)
-		ObjectPresentMode mode = ObjectPresentMode.HORIZONTAL;
+		boolean presentVertically = false;
 		for (int i = 0; i < cls.getNumFields(); i++)
 		{
 			Object value = node.get( i );
@@ -123,7 +118,7 @@ public class DocModelPresenter
 				// If we encounter a non-string value, then this object cannot be displayed in a single line
 				if ( !( value instanceof String ) )
 				{
-					mode = ObjectPresentMode.VERTICALINLINE;
+					presentVertically = true;
 					break;
 				}
 			}
@@ -133,21 +128,17 @@ public class DocModelPresenter
 		Pres header;
 		Pres schemaName = schemaNameStyle.applyTo( new Label( cls.getSchema().getShortName() ) );
 		Pres className = classNameStyle.applyTo( new Label( cls.getName() ) );
-		if ( mode == ObjectPresentMode.HORIZONTAL )
-		{
-			header = defaultStyle.applyTo( new Span( new Object[] { schemaName, punctuationStyle.applyTo( new Label( "." ) ), className,
-					new Label( " " ), punctuationStyle.applyTo( new Label( ":" ) ) } ) );
-		}
-		else if ( mode == ObjectPresentMode.VERTICALINLINE )
+		if ( presentVertically )
 		{
 			header = defaultStyle.applyTo( new Paragraph( new Object[] { schemaName, punctuationStyle.applyTo( new Label( "." ) ), className,
 					new Label( " " ), punctuationStyle.applyTo( new Label( ":" ) ) } ) );
 		}
 		else
 		{
-			throw new RuntimeException( "Invalid mode" );
+			header = defaultStyle.applyTo( new Span( new Object[] { schemaName, punctuationStyle.applyTo( new Label( "." ) ), className,
+					new Label( " " ), punctuationStyle.applyTo( new Label( ":" ) ) } ) );
 		}
-		
+
 		ArrayList<Object> itemViews = new ArrayList<Object>();
 		itemViews.add( header );
 		// Create views of each item
@@ -158,48 +149,40 @@ public class DocModelPresenter
 			if ( value != null )
 			{
 				Pres line;
-				if ( mode == ObjectPresentMode.HORIZONTAL )
-				{
-					line = defaultStyle.applyTo( new Span( new Object[] { fieldNameStyle.applyTo( new StaticText( fieldName ) ), punctuationStyle.applyTo( new StaticText( "=" ) ),
-							 present( value, fragment, inheritedState ) } ) );
-				}
-				else if ( mode == ObjectPresentMode.VERTICALINLINE )
+				if ( presentVertically )
 				{
 					line = defaultStyle.applyTo( new Paragraph( new Object[] { fieldNameStyle.applyTo( new StaticText( fieldName ) ), punctuationStyle.applyTo( new StaticText( "=" ) ),
 							 present( value, fragment, inheritedState ) } ) );
 				}
 				else
 				{
-					throw new RuntimeException( "Invalid mode" );
+					line = defaultStyle.applyTo( new Span( new Object[] { fieldNameStyle.applyTo( new StaticText( fieldName ) ), punctuationStyle.applyTo( new StaticText( "=" ) ),
+							 present( value, fragment, inheritedState ) } ) );
 				}
 				itemViews.add( line );
 			}
 		}
 				
 		// Create the layout
-		if ( mode == ObjectPresentMode.HORIZONTAL )
-		{
-			return new ParagraphSequenceView( itemViews, openParen, closeParen, null, space, TrailingSeparator.NEVER ).alignHPack().alignVRefY();
-		}
-		else if ( mode == ObjectPresentMode.VERTICALINLINE )
+		if ( presentVertically )
 		{
 			return new VerticalInlineSequenceView( itemViews, openParen, closeParen, null, space, TrailingSeparator.NEVER ).alignHPack().alignVRefY();
 		}
 		else
 		{
-			throw new RuntimeException( "Invalid mode" );
+			return new ParagraphSequenceView( itemViews, openParen, closeParen, null, space, TrailingSeparator.NEVER ).alignHPack().alignVRefY();
 		}
 	}
 
 
 	protected static Pres presentDMEmbeddedObject(DMEmbeddedObject node, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return new ObjectBorder( new DropDownExpander( embedStyle.applyTo( new Label( "Embedded object" ) ), new ValuePres( node ) ) );
+		return new ObjectBorder( new DropDownExpander( embedStyle.applyTo( new Label( "Embedded object" ) ), new EmbeddedValuePres( node ) ) );
 	}
 	
 	protected static Pres presentDMEmbeddedIsolatedObject(DMEmbeddedIsolatedObject node, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return new ObjectBorder( new DropDownExpander( embedStyle.applyTo( new Label( "Embedded isolated object" ) ), new ValuePres( node ) ) );
+		return new ObjectBorder( new DropDownExpander( embedStyle.applyTo( new Label( "Embedded isolated object" ) ), new EmbeddedIsolatedValuePres( node ) ) );
 	}
 	
 	
@@ -228,17 +211,35 @@ public class DocModelPresenter
 	}
 	
 	
-	private static class ValuePres extends CompositePres
+	private static class EmbeddedValuePres extends CompositePres
 	{
-		private DMEmbeddedPyObjectInterface embed;
+		private DMEmbeddedObject embed;
 		
 		
-		public ValuePres(DMEmbeddedPyObjectInterface embed)
+		public EmbeddedValuePres(DMEmbeddedObject embed)
 		{
 			this.embed = embed;
 		}
 		
 		
+		@Override
+		public Pres pres(PresentationContext ctx, StyleValues style)
+		{
+			return new InnerFragment( embed.getValue() );
+		}
+	}
+
+	private static class EmbeddedIsolatedValuePres extends CompositePres
+	{
+		private DMEmbeddedIsolatedObject embed;
+
+
+		public EmbeddedIsolatedValuePres(DMEmbeddedIsolatedObject embed)
+		{
+			this.embed = embed;
+		}
+
+
 		@Override
 		public Pres pres(PresentationContext ctx, StyleValues style)
 		{

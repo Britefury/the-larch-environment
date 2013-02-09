@@ -26,7 +26,7 @@ import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Util.Jython.Jython_copy;
 
-public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterface, Presentable, Trackable
+public class DMEmbeddedObject extends DMNode implements Presentable, Trackable
 {
 	protected static class ChildrenIterator implements Iterator<Object>
 	{

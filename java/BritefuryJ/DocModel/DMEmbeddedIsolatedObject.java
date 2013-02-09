@@ -27,7 +27,7 @@ import BritefuryJ.Isolation.IsolationBarrier;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Util.Jython.Jython_copy;
 
-public class DMEmbeddedIsolatedObject extends DMNode implements DMEmbeddedPyObjectInterface, Presentable, Trackable
+public class DMEmbeddedIsolatedObject extends DMNode implements Presentable, Trackable
 {
 	protected static class ChildrenIterator implements Iterator<Object>
 	{
