@@ -297,13 +297,13 @@ public abstract class DMNode implements ClipboardCopyable
 	
 	
 	
-	public static DMEmbeddedObject embed(PyObject x, boolean valueDeepCopyable)
+	public static DMEmbeddedObject embed(PyObject x)
 	{
-		return new DMEmbeddedObject( x, valueDeepCopyable );
+		return new DMEmbeddedObject( x );
 	}
 
-	public static DMEmbeddedIsolatedObject embedIsolated(PyObject x, boolean valueDeepCopyable)
+	public static DMEmbeddedIsolatedObject embedIsolated(PyObject x)
 	{
-		return new DMEmbeddedIsolatedObject( x, valueDeepCopyable );
+		return new DMEmbeddedIsolatedObject( x );
 	}
 }

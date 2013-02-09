@@ -164,12 +164,12 @@ def _onDrop_embeddedObject(element, pos, data, action):
 	marker = Marker.atPointIn( element, pos, True )
 	if marker is not None  and  marker.isValid():
 		def _performLiteralInsertion(model):
-			isolated = DMNode.embedIsolated( model, False )
+			isolated = DMNode.embedIsolated( model )
 			expr = Schema.EmbeddedObjectLiteral( embeddedValue=isolated )
 			insertSpecialFormExpressionAtMarker( marker, expr )
 
 		def _performInsertion(model):
-			isolated = DMNode.embedIsolated( model, False )
+			isolated = DMNode.embedIsolated( model )
 			try:
 				modelType = Schema.getEmbeddedObjectModelType( model )
 			except Exception, e:

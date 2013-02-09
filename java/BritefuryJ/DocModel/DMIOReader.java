@@ -722,21 +722,19 @@ public class DMIOReader extends DMIO
 						pos = res.position;
 						int index = Integer.parseInt( res.value );
 						
-						boolean valueDeepCopyable;
 						if ( source.substring( pos, pos+2 ).equals( ",t" ) )
 						{
-							valueDeepCopyable = true;
+							// Copy-ability flag; ignore
 							pos += 2;
 						}
 						else if ( source.substring( pos, pos+2 ).equals( ",f" ) )
 						{
-							valueDeepCopyable = false;
+							// Copy-ability flag; ignore
 							pos += 2;
 						}
 						else if ( source.substring( pos, pos+2 ).equals( ">>" ) )
 						{
-							// No copy-ability flag - old version
-							valueDeepCopyable = false;
+							// No copy-ability flag
 						}
 						else
 						{
@@ -750,7 +748,7 @@ public class DMIOReader extends DMIO
 						pos += 2;
 						
 						PyObject value = getEmbeddedPyValue( index );
-						DMEmbeddedObject embed = new DMEmbeddedObject( value, valueDeepCopyable );
+						DMEmbeddedObject embed = new DMEmbeddedObject( value );
 						closeItem( embed );
 					}
 					else if ( source.substring( pos, pos+8 ).equals( "<<EmIso:" ) )
@@ -768,21 +766,19 @@ public class DMIOReader extends DMIO
 						pos = res.position;
 						int index = Integer.parseInt( res.value );
 						
-						boolean valueDeepCopyable;
 						if ( source.substring( pos, pos+2 ).equals( ",t" ) )
 						{
-							valueDeepCopyable = true;
+							// Copy-ability flag; ignore
 							pos += 2;
 						}
 						else if ( source.substring( pos, pos+2 ).equals( ",f" ) )
 						{
-							valueDeepCopyable = false;
+							// Copy-ability flag; ignore
 							pos += 2;
 						}
 						else if ( source.substring( pos, pos+2 ).equals( ">>" ) )
 						{
-							// No copy-ability flag - old version
-							valueDeepCopyable = false;
+							// No copy-ability flag
 						}
 						else
 						{
@@ -797,7 +793,7 @@ public class DMIOReader extends DMIO
 						
 						Object value = getEmbeddedValue( index );
 						DMEmbeddedIsolatedObject embed = new DMEmbeddedIsolatedObject();
-						embed.setIsolationBarrier( (IsolationBarrier<PyObject>)value, valueDeepCopyable );
+						embed.setIsolationBarrier( (IsolationBarrier<PyObject>)value );
 						closeItem( embed );
 					}
 					else

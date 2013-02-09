@@ -287,21 +287,21 @@ public class Test_DMIOWriter extends TestCase
 
 	public void testWriteEmbeddedObject() throws IOException
 	{
-		DMEmbeddedObject e0 = DMNode.embed( Py.newInteger( 0 ), true );
-		DMEmbeddedObject e1 = DMNode.embed( Py.newInteger( 1 ), true );
-		DMEmbeddedObject e2 = DMNode.embed( Py.newInteger( 2 ), false );
+		DMEmbeddedObject e0 = DMNode.embed( Py.newInteger( 0 ) );
+		DMEmbeddedObject e1 = DMNode.embed( Py.newInteger( 1 ) );
+		DMEmbeddedObject e2 = DMNode.embed( Py.newInteger( 2 ) );
 		List<Object> x = Arrays.asList( new Object[] { e0, e1, e2 } );
-		writeAsStateTest( x, "[<<Em:0,t>> <<Em:1,t>> <<Em:2,f>>]", new Object[] {}, new PyObject[] { Py.newInteger( 0 ), Py.newInteger( 1 ), Py.newInteger( 2 ) } );
+		writeAsStateTest( x, "[<<Em:0>> <<Em:1,t>> <<Em:2,f>>]", new Object[] {}, new PyObject[] { Py.newInteger( 0 ), Py.newInteger( 1 ), Py.newInteger( 2 ) } );
 	}
 
 
 	public void testWriteEmbeddedIsolatedObject() throws IOException
 	{
-		DMEmbeddedIsolatedObject e0 = DMNode.embedIsolated( Py.newInteger( 0 ), true );
-		DMEmbeddedIsolatedObject e1 = DMNode.embedIsolated( Py.newInteger( 1 ), true );
-		DMEmbeddedIsolatedObject e2 = DMNode.embedIsolated( Py.newInteger( 2 ), false );
+		DMEmbeddedIsolatedObject e0 = DMNode.embedIsolated( Py.newInteger( 0 ) );
+		DMEmbeddedIsolatedObject e1 = DMNode.embedIsolated( Py.newInteger( 1 ) );
+		DMEmbeddedIsolatedObject e2 = DMNode.embedIsolated( Py.newInteger( 2 ) );
 		List<Object> x = Arrays.asList( new Object[] { e0, e1, e2 } );
-		writeAsStateTest( x, "[<<EmIso:0,t>> <<EmIso:1,t>> <<EmIso:2,f>>]", new Object[] { new IsolationBarrier<PyObject>( Py.newInteger( 0 ) ),
+		writeAsStateTest( x, "[<<EmIso:0>> <<EmIso:1,t>> <<EmIso:2,f>>]", new Object[] { new IsolationBarrier<PyObject>( Py.newInteger( 0 ) ),
 				new IsolationBarrier<PyObject>( Py.newInteger( 1 ) ),
 				new IsolationBarrier<PyObject>( Py.newInteger( 2 ) ) },
 				new PyObject[] {} );
