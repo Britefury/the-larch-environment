@@ -91,6 +91,7 @@ public class DMSchema
 	
 	private static class ReadersByVersion
 	{
+		// Reader wrapper; contains a reader. This allows a map that contains readers as values to have an entry with a null reader.
 		private static class ReaderWrapper
 		{
 			public DMObjectReader reader;

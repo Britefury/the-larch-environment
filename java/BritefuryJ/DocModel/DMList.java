@@ -17,9 +17,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
-import org.python.core.Py;
-import org.python.core.PyDictionary;
-import org.python.core.PySlice;
+import org.python.core.*;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.ChangeHistory.ChangeHistory;
@@ -1152,6 +1150,44 @@ public class DMList extends DMNode implements List<Object>, Trackable, Presentab
 	private void writeObject(ObjectOutputStream stream) throws IOException
 	{
 		stream.writeObject( value );
+	}
+
+
+
+	//
+	// Pickling
+	//
+
+	public PyObject __getstate__()
+	{
+		PyList contents = new PyList();
+		contents.addAll( this );
+
+		PyTuple state = new PyTuple( contents );
+
+		return state;
+	}
+
+	public void __setstate__(PyObject state)
+	{
+		// DMList state is of the form of a list in a tuple
+		if ( state instanceof PyTuple )
+		{
+			PyTuple tupleState = (PyTuple)state;
+
+			if ( tupleState.size() == 1 )
+			{
+				PyList contents = (PyList)tupleState.pyget( 0 );
+
+				addAll( contents );
+
+				// Done
+				return;
+			}
+		}
+
+		// State did not match DMList pattern; fall back on old IO system
+		super.__setstate__( state );
 	}
 
 
