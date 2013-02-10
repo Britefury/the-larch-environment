@@ -64,6 +64,7 @@ class AbstractInlineTestTableRow (object):
 		return { 'expected' : self._expected.getStaticValue() }
 
 	def __setstate__(self, state):
+		self.__change_history__ = None
 		self.__testTable = None
 		self.__result = LiveValue( _resultNone )
 		self.__testMethodName = None

@@ -52,7 +52,7 @@ class MainAppSubject (TransientSubject):
 	def import_resolve(self, name, fullname, path):
 		for appDocument in self._appState.getOpenDocuments():
 			doc = appDocument.getDocument()
-			subject = doc.newSubject( self, None, appDocument.getName() )
+			subject = doc.newSubject( self, None, doc.getDocumentName() )
 			try:
 				resolve = subject.import_resolve
 			except AttributeError:

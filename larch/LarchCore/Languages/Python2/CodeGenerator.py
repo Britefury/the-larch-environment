@@ -1124,8 +1124,7 @@ class Python2ModuleCodeGenerator (Python2CodeGenerator):
 	# AST factory
 	@DMObjectNodeDispatchMethod( _FactoryWrapper )
 	def _FactoryWrapper(self, node, embeddedFactory):
-		factory = embeddedFactory.getValue()
-		return factory.generateCode( self )
+		return embeddedFactory.generateCode( self )
 
 
 

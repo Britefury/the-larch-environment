@@ -25,6 +25,11 @@ class ProjectNode (object):
 		raise NotImplementedError, 'abstract'
 
 
+	@property
+	def moduleNames(self):
+		raise NotImplementedError, 'abstract'
+
+
 	def __getstate__(self):
 		return {}
 	
@@ -38,7 +43,9 @@ class ProjectNode (object):
 	def export(self, path):
 		pass
 
-	
+
+
+
 	def __get_trackable_contents__(self):
 		return None
 

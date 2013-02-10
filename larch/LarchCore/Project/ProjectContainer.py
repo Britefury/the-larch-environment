@@ -24,6 +24,14 @@ class ProjectContainer (ProjectNode):
 			self[:] = contents
 	
 	
+	@property
+	def moduleNames(self):
+		names = []
+		for c in self._contents:
+			names.extend( c.moduleNames )
+		return names
+
+
 	def __getstate__(self):
 		state = super( ProjectContainer, self ).__getstate__()
 		state['contents'] = self._contents_
@@ -98,7 +106,6 @@ class ProjectContainer (ProjectNode):
 	def exportContents(self, myPath):
 		for x in self._contents:
 			x.export( myPath )
-
 
 
 
