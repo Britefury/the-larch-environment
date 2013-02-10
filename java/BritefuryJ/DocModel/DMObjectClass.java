@@ -6,13 +6,9 @@
 //##************************
 package BritefuryJ.DocModel;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import org.python.core.PyObject;
+import org.python.core.*;
 
 import BritefuryJ.Parser.ObjectNode;
 import BritefuryJ.Parser.ParserExpression.ParserCoerceException;
@@ -65,7 +61,9 @@ public class DMObjectClass extends DMNodeClass
 	private DMObjectField classFields[], allClassFields[];
 	private HashMap<String, Integer> fieldNameToIndex;
 	private DMObjectReaderDefault defaultReader = new DMObjectReaderDefault( this );
-	
+
+	private PyTuple pickleClassDescriptor = null;
+
 	
 	
 	public DMObjectClass(DMSchema schema, String name, DMObjectField fields[])
@@ -271,6 +269,30 @@ public class DMObjectClass extends DMNodeClass
 	public DMObject __call__(PyObject values[], String names[])
 	{
 		return newInstance( values, names );
+	}
+
+
+
+	//
+	// Pickling
+	//
+
+	protected PyTuple getPickleClassDescriptor()
+	{
+		if ( pickleClassDescriptor == null )
+		{
+			// String schemaLocation, Integer version, String className, PyList<String> fieldNames
+			PyString schemaLoc = Py.newString( schema.getLocation() );
+			PyInteger schemaVersion = Py.newInteger( schema.getVersion() );
+			PyString className = Py.newString( getName() );
+			PyList fieldNames = new PyList();
+			for (String field: getFieldNames())
+			{
+				fieldNames.append( Py.newString( field ) );
+			}
+			pickleClassDescriptor = new PyTuple( schemaLoc, schemaVersion, className, fieldNames );
+		}
+		return pickleClassDescriptor;
 	}
 
 

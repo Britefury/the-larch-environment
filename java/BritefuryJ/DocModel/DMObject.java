@@ -16,11 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import org.python.core.Py;
-import org.python.core.PyDictionary;
-import org.python.core.PyObject;
-import org.python.core.PyString;
-import org.python.core.PyUnicode;
+import org.python.core.*;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.ChangeHistory.ChangeHistory;
@@ -35,6 +31,16 @@ import BritefuryJ.Util.HashUtils;
 
 public class DMObject extends DMNode implements Trackable, Presentable
 {
+	public static class InvalidPickleFormatException extends RuntimeException
+	{
+		public InvalidPickleFormatException(String message)
+		{
+			super( message );
+		}
+	}
+
+
+
 	private IncrementalValueMonitor incr;
 	private DMObjectClass objClass;
 	private Object fieldData[];
@@ -758,6 +764,129 @@ public class DMObject extends DMNode implements Trackable, Presentable
 
 
 	
+	//
+	// Pickling
+	//
+
+	public PyObject __getstate__()
+	{
+		// Form: PyTuple(PyTuple classDescriptor, PyList fieldValues)
+
+		PyTuple classDesc = objClass.getPickleClassDescriptor();
+		PyList fieldValues = new PyList();
+
+		for (Object value: getFieldValues())
+		{
+			fieldValues.append( Py.java2py( value ) );
+		}
+
+		return new PyTuple( classDesc, fieldValues );
+	}
+
+	public void __setstate__(PyObject state)
+	{
+		// Form: PyTuple(PyTuple classDescriptor, PyList fieldValues)
+
+		if ( state instanceof PyTuple )
+		{
+			PyTuple tupleState = (PyTuple)state;
+
+			PyObject desc = tupleState.pyget( 0 );
+			PyObject vals = tupleState.pyget( 1 );
+
+			if ( desc instanceof PyTuple  &&  vals instanceof PyList )
+			{
+				PyTuple classDesc = (PyTuple)desc;
+				PyList fieldValues = (PyList)vals;
+
+
+				if ( classDesc.size() != 4 )
+				{
+					throw new InvalidPickleFormatException( "Class descriptor must be of length 4" );
+				}
+
+
+				PyObject schemaLocPy = classDesc.pyget( 0 );
+				PyObject schemaVersionPy = classDesc.pyget( 1 );
+				PyObject classNamePy = classDesc.pyget( 2 );
+				PyObject fieldNamesPy = classDesc.pyget( 3 );
+
+				if ( !( schemaLocPy instanceof PyString ) )
+				{
+					throw new InvalidPickleFormatException( "Class descriptor [0] schema location must be a string" );
+				}
+
+				if ( !( schemaVersionPy instanceof PyInteger ) )
+				{
+					throw new InvalidPickleFormatException( "Class descriptor [1] schema version must be an integer" );
+				}
+
+				if ( !( classNamePy instanceof PyString ) )
+				{
+					throw new InvalidPickleFormatException( "Class descriptor [2] class name must be a string" );
+				}
+
+				if ( !( fieldNamesPy instanceof PyList ) )
+				{
+					throw new InvalidPickleFormatException( "Class descriptor [3] field names must be a list" );
+				}
+
+
+				PyList fieldNames = (PyList)fieldNamesPy;
+
+				if ( fieldNames.size() != fieldValues.size() )
+				{
+					throw new InvalidPickleFormatException( "Lengths of field names and field values lists do not match" );
+				}
+
+
+
+				// Get the schema
+				DMSchema schema = DMSchemaResolver.getSchema( schemaLocPy.asString() );
+
+				if ( schema == null )
+				{
+					throw new DMSchema.UnknownSchemaException( schemaLocPy.asString() );
+				}
+
+				// Ensure that the requested version is supported
+				int version = schemaVersionPy.asIndex();
+				if ( version > schema.getVersion() )
+				{
+					// This input data uses a newer schema version than the one we have available here.
+					// We cannot load this.
+					throw new DMSchema.UnsupportedSchemaVersionException( schemaLocPy.asString(), schema.getVersion(), version );
+				}
+
+
+				// Get the reader
+				DMObjectReader reader = schema.getReader( classNamePy.asString(), version );
+
+				// Build the fields map
+				HashMap<String, Object> fields = new HashMap<String, Object>();
+				for (int i = 0; i < fieldValues.size(); i++)
+				{
+					String name = fieldNames.pyget( i ).asString();
+					Object value = Py.tojava( fieldValues.pyget( i ), Object.class );
+					fields.put( name, value );
+				}
+
+				// Read
+				DMObject obj = reader.readObject( fields );
+
+				// Become the newly read object
+				become( obj );
+
+				return;
+			}
+		}
+
+		// State did not match DMObject pattern; fall back on old IO system
+		super.__setstate__( state );
+	}
+
+
+
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return DocModelPresenter.presentDMObject( this, fragment, inheritedState );
