@@ -230,7 +230,7 @@ class AppView (MethodDispatchView):
 
 			def _performClose():
 				document.close()
-				node.appState.closeDocument( document )
+				node.appState.unregisterDocument( document )
 
 
 			if document.hasUnsavedData():

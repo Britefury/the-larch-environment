@@ -148,8 +148,10 @@ class LiterateSuite (object):
 		return { 'definition' : self._definition, 'expanded' : self._expanded }
 
 	def __setstate__(self, state):
-		self._definition = state['definition']
-		self._expanded = state['expanded']
+		self._definition = state.get( 'definition' )
+		self._expanded = state.get( 'expanded', True )
+		if self._definition is None:
+			self._definition = LiterateSuiteDefinition()
 		self._incr = IncrementalValueMonitor()
 		self.__change_history__ = None
 

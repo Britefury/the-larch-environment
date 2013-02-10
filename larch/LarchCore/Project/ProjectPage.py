@@ -26,7 +26,16 @@ class ProjectPage (ProjectNode):
 
 	@property
 	def importName(self):
-		return self.parent.importName + '.' + self._name
+		if self._name == '__init__':
+			return self.parent.importName
+		else:
+			return self.parent.importName + '.' + self._name
+
+
+	@property
+	def moduleNames(self):
+		return [ self.importName ]
+
 
 
 	def __getstate__(self):
@@ -74,6 +83,7 @@ class ProjectPage (ProjectNode):
 		f = open( myPath, 'w' )
 		f.write( s )
 		f.close()
+
 
 
 

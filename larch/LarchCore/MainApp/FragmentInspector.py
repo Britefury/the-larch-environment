@@ -143,6 +143,7 @@ class _FragmentInspector (object):
 
 		self._console = Console.Console( '<popup_console>', False )
 		self._console.assignVariable( 'm', fragment.model )
+		self._console.assignVariable( 'frag', fragment )
 
 		self._explorer = fragment.fragmentElement.treeExplorer()
 

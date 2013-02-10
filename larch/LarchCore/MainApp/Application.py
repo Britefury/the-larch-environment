@@ -11,6 +11,8 @@ from javax.swing import JOptionPane
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
+from Britefury.Kernel.Document import Document
+
 from LarchCore.PythonConsole import Console
 
 
@@ -37,13 +39,55 @@ class AppState (object):
 		self._incr.onChanged()
 		return appDocument
 
-	def closeDocument(self, document):
+	def unregisterDocument(self, document):
 		appDocument = self._docToAppDoc[document]
 		del self._docToAppDoc[document]
 		self._openDocuments.remove( appDocument )
 		self._incr.onChanged()
-		
-		
+
+
+
+	def refreshDocumentFile(self, world, inputPath, outputPath):
+		# Read the document
+		try:
+			document = Document.readFile( world, inputPath )
+		except:
+			# Failed
+			return False
+
+		success = True
+
+		# Register so that the import hooks can pick up its contents
+		self.registerOpenDocument( document )
+
+		# Get a list of modules that it defines
+		try:
+			moduleNames = document.contents.moduleNames
+		except AttributeError:
+			pass
+		else:
+			# Import each module
+			for name in moduleNames:
+				try:
+					__import__( name )
+				except:
+					# Import failed; refresh was not successful
+					success = False
+					# Don't read any more modules
+					break
+
+			if success:
+				# Successful; save into the output path
+				document.saveAs( outputPath )
+
+		# Close the document and un-register
+		document.close()
+		self.unregisterDocument( document )
+
+		return success
+
+
+
 	def hasUnsavedData(self):
 		for doc in self._openDocuments:
 			if doc.hasUnsavedData():

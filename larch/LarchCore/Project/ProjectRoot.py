@@ -35,6 +35,14 @@ class ProjectRoot (ProjectContainer):
 		return self._pythonPackageName   if self._pythonPackageName is not None   else ''
 
 
+	@property
+	def moduleNames(self):
+		if self._pythonPackageName is None:
+			return []
+		else:
+			return super( ProjectRoot, self ).moduleNames
+
+
 	def __getstate__(self):
 		state = super( ProjectRoot, self ).__getstate__()
 		state['pythonPackageName'] = self._pythonPackageName
@@ -98,7 +106,6 @@ class ProjectRoot (ProjectContainer):
 					f.close()
 
 		self.exportContents( myPath )
-
 
 
 	def _registerRoot(self, root, takePriority):
