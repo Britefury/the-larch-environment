@@ -282,9 +282,9 @@ public class DMObjectClass extends DMNodeClass
 		if ( pickleClassDescriptor == null )
 		{
 			// String schemaLocation, Integer version, String className, PyList<String> fieldNames
-			PyString schemaLoc = Py.newString( schema.getLocation() );
+			PyString schemaLoc = __builtin__.intern( Py.newString( schema.getLocation() ) );
 			PyInteger schemaVersion = Py.newInteger( schema.getVersion() );
-			PyString className = Py.newString( getName() );
+			PyString className = __builtin__.intern( Py.newString( getName() ) );
 			PyList fieldNames = new PyList();
 			for (String field: getFieldNames())
 			{
