@@ -811,6 +811,7 @@ public class DMObject extends DMNode implements Trackable, Presentable
 				PyObject classNamePy = classDesc.pyget( 2 );
 				PyObject fieldNamesPy = classDesc.pyget( 3 );
 
+				// No need to check PyUnicode as it subclasses PyString
 				if ( !( schemaLocPy instanceof PyString ) )
 				{
 					throw new InvalidPickleFormatException( "Class descriptor [0] schema location must be a string" );
@@ -821,6 +822,7 @@ public class DMObject extends DMNode implements Trackable, Presentable
 					throw new InvalidPickleFormatException( "Class descriptor [1] schema version must be an integer" );
 				}
 
+				// No need to check PyUnicode as it subclasses PyString
 				if ( !( classNamePy instanceof PyString ) )
 				{
 					throw new InvalidPickleFormatException( "Class descriptor [2] class name must be a string" );
@@ -850,7 +852,7 @@ public class DMObject extends DMNode implements Trackable, Presentable
 				}
 
 				// Ensure that the requested version is supported
-				int version = schemaVersionPy.asIndex();
+				int version = schemaVersionPy.asInt();
 				if ( version > schema.getVersion() )
 				{
 					// This input data uses a newer schema version than the one we have available here.
