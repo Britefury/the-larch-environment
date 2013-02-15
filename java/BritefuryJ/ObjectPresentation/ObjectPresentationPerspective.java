@@ -150,7 +150,7 @@ public abstract class ObjectPresentationPerspective extends AbstractPerspective
 				if ( presentMethod instanceof PyMethod )
 				{
 					PyMethod m = (PyMethod)presentMethod;
-					if ( m.im_self == Py.None  ||  m.im_self == null )
+					if ( m.__self__ == Py.None  ||  m.__self__ == null )
 					{
 						presentMethod = null;
 					}
