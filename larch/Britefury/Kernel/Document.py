@@ -9,11 +9,15 @@ import os
 import sys
 import imp
 
+from java.lang import Object
+
 from datetime import datetime
 
 from BritefuryJ.ChangeHistory import ChangeHistory, ChangeHistoryListener
 
 from BritefuryJ.Isolation import IsolationPickle
+
+from BritefuryJ.LSpace.Input import ObjectDndHandler
 
 from BritefuryJ.Projection import SubjectPath, TransientSubjectPathEntry
 
@@ -240,3 +244,8 @@ class _DocumentPathEntry (TransientSubjectPathEntry):
 
 
 			
+
+
+class LinkSubjectDrag (Object):
+	def __init__(self, subject):
+		self.subject = subject

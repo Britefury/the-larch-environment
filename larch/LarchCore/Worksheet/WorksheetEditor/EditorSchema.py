@@ -9,6 +9,8 @@ from BritefuryJ.DocModel import DMNode
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
+from BritefuryJ.Projection import SubjectPath
+
 
 from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, methodDispatch
 
@@ -241,11 +243,12 @@ class LinkEditor (AbstractViewSchema.LinkAbstractView):
 
 
 	def setSubject(self, docSubject, subject):
-		raise NotImplementedError
+		rel = self.__relativePath( docSubject, subject )
+		self._model['path'] = rel
 
 
 	def copy(self, worksheet=None):
-		model = Schema.Link( text=self._model['text'], location=self._model['location'], absolute=self._model['absolute'] )
+		model = Schema.Link( text=self._model['text'], path=self._model['path'] )
 		return LinkEditor( worksheet, model )
 
 
@@ -258,33 +261,31 @@ class LinkEditor (AbstractViewSchema.LinkAbstractView):
 		return LinkEditor( None, model )
 
 	@staticmethod
-	def newHomeLink(text):
-		return LinkEditor( None, LinkEditor.newHomeLinkModel( text ) )
+	def newDocumentLink(text):
+		return LinkEditor( None, LinkEditor.newDocumentLinkModel( text ) )
 
 	@staticmethod
-	def newHomeLinkModel(text):
-		return Schema.Link( text=text, location='', absolute='1' )
+	def newDocumentLinkModel(text):
+		return LinkEditor.newLinkModel( text, SubjectPath() )
 
 	@staticmethod
-	def newLink(docLocation, text, location):
-		m = LinkEditor.newLinkModel( docLocation, text, location )
+	def newLink(docSubject, text, subject):
+		rel = LinkEditor.__relativePath(docSubject, subject)
+		m = LinkEditor.newLinkModel( text, rel )
 		return LinkEditor( None, m )
 
 	@staticmethod
-	def newLinkModel(docLocation, text, location):
-		loc, absolute = LinkEditor._modelLocationAndAbsoluteFlag( docLocation, location )
-		return Schema.Link( text=text, location=loc, absolute=absolute )
+	def newLinkModel(text, relativePath):
+		return Schema.Link( text=text, path=relativePath )
 
 
 	@staticmethod
-	def _modelLocationAndAbsoluteFlag(docLocation, location):
-		relative = location.relativeTo( docLocation )
-		if relative is not None:
-			return str( relative ), None
-		else:
-			return str( location ), '1'
-
-
+	def __relativePath(docSubject, subject):
+		docPath = docSubject.path()
+		path = subject.path()
+		if not path.isWithin( docPath ):
+			raise ValueError, 'the subject must be contained within the document'
+		return path.relativeTo( docPath )
 		
 		
 		

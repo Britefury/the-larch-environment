@@ -16,6 +16,8 @@ from BritefuryJ.Pres import Pres
 from BritefuryJ.Pres.Primitive import Primitive
 from BritefuryJ.StyleSheet import StyleSheet
 
+from BritefuryJ.Projection import SubjectPath
+
 
 from Britefury import LoadBuiltins
 
@@ -197,8 +199,14 @@ class LinkAbstractView (NodeAbstractView):
 		return self._model['text']
 
 
+	def _refreshResults(self, module):
+		pass
+
+
 	def getSubject(self, docSubject):
-		raise NotImplementedError
+		path = self._model['path']
+		assert isinstance( path, SubjectPath )
+		return path.followFrom( docSubject )
 
 
 

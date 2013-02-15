@@ -9,10 +9,7 @@ package BritefuryJ.Projection;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.python.core.Py;
-import org.python.core.PyObject;
-import org.python.core.PyString;
-import org.python.core.__builtin__;
+import org.python.core.*;
 
 import BritefuryJ.ChangeHistory.ChangeHistory;
 import BritefuryJ.Command.BoundCommandSet;
@@ -86,7 +83,21 @@ public abstract class Subject
 	{
 		if ( enclosingSubject != null )
 		{
-			return __builtin__.getattr( Py.java2py( enclosingSubject ), key );
+			try
+			{
+				return __builtin__.getattr( Py.java2py( enclosingSubject ), key );
+			}
+			catch (PyException e)
+			{
+				if ( e.match( Py.AttributeError ) )
+				{
+					throw Py.AttributeError( "Object of class '" + Py.java2py( this ).getType().getName() + "' has no attribute '" + key.asString() + "'" );
+				}
+				else
+				{
+					throw e;
+				}
+			}
 		}
 		else
 		{

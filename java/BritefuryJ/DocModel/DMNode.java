@@ -6,15 +6,12 @@
 //##************************
 package BritefuryJ.DocModel;
 
+import java.math.BigInteger;
 import java.util.List;
 
 import BritefuryJ.Isolation.IsolationBarrier;
-import org.python.core.Py;
-import org.python.core.PyDictionary;
-import org.python.core.PyJavaType;
-import org.python.core.PyObject;
-import org.python.core.PyObjectDerived;
-import org.python.core.PyTuple;
+import BritefuryJ.ModelAccess.DocModel.StringToIntegerReader;
+import org.python.core.*;
 
 import BritefuryJ.ClipboardFilter.ClipboardCopyable;
 import BritefuryJ.DocModel.DMIOReader.BadModuleNameException;
@@ -261,7 +258,10 @@ public abstract class DMNode implements ClipboardCopyable
 	
 	
 	
-	
+	private static boolean isPrimitive(Object x)
+	{
+		return x instanceof String  ||  x.getClass().isPrimitive()  ||  x instanceof BigInteger  ||  x instanceof PyComplex;
+	}
 
 	@SuppressWarnings("unchecked")
 	public static Object coerce(Object x)
@@ -274,11 +274,9 @@ public abstract class DMNode implements ClipboardCopyable
 		{
 			return x;
 		}
-		else if ( x instanceof String )
+		else if ( isPrimitive( x ) )
 		{
-			// Create a clone of the string to ensure that all String objects in the document are
-			// distinct, even if their contents are the same
-			return new String( (String)x );
+			return x;
 		}
 		else if ( x instanceof List )
 		{
@@ -319,11 +317,9 @@ public abstract class DMNode implements ClipboardCopyable
 		{
 			return x;
 		}
-		else if ( x instanceof String )
+		else if ( isPrimitive( x ) )
 		{
-			// Create a clone of the string to ensure that all String objects in the document are
-			// distinct, even if their contents are the same
-			return new String( (String)x );
+			return x;
 		}
 		else if ( x instanceof List )
 		{
