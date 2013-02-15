@@ -700,11 +700,8 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 			}
 
 			Pres javaStackTrace = presentJavaStackTraceOfThrowable( e );
-			if ( javaStackTrace != null )
-			{
-				fields.add( new DropDownExpander( new Label( "Java stack trace" ), javaStackTrace ) );
-			}
-			
+			fields.add( new DropDownExpander( new Label( "Java stack trace" ), javaStackTrace ) );
+
 			
 			return new ErrorBoxWithFields( "PYTHON EXCEPTION", fields.toArray( new Pres[fields.size()] ) );
 		}
@@ -735,20 +732,12 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 		{
 			Throwable t = (Throwable)x;
 			
-			//ByteArrayOutputStream buf = new ByteArrayOutputStream();
-			//t.printStackTrace( new PrintStream( buf ) );
-			String stackTrace = t.toString();
-			String stackTraceLines[] = stackTrace.split( "\n" );
-			Pres stackTraceElements[] = new Pres[stackTraceLines.length];
-			
-			for (int i = 0; i < stackTraceLines.length; i++)
-			{
-				stackTraceElements[i] = stackTraceStyle.applyTo( new StaticText( stackTraceLines[i] ) );
-			}
+			Pres javaStackTrace = presentJavaStackTraceOfThrowable( t );
+
 			
 			Pres fields[] = {
 					new VerticalField( "Message", new InnerFragment( t.getMessage() ) ),
-					new VerticalField( "Traceback", new Column( stackTraceElements ) )
+					new VerticalField( "Traceback", javaStackTrace )
 			};
 			
 			return new ObjectBoxWithFields( "JAVA THROWABLE", fields );
@@ -762,29 +751,12 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			Exception e = (Exception)x;
-			
-			ByteArrayOutputStream buf = new ByteArrayOutputStream();
-			e.printStackTrace( new PrintStream( buf ) );
-			String stackTrace;
-			try
-			{
-				stackTrace = buf.toString( "ISO-8859-1" );
-			}
-			catch (UnsupportedEncodingException e1)
-			{
-				stackTrace = e.toString();
-			}
-			String stackTraceLines[] = stackTrace.split( "\n" );
-			Pres stackTraceElements[] = new Pres[stackTraceLines.length];
-			
-			for (int i = 0; i < stackTraceLines.length; i++)
-			{
-				stackTraceElements[i] = stackTraceStyle.applyTo( new StaticText( stackTraceLines[i] ) );
-			}
-			
+
+			Pres javaStackTrace = presentJavaStackTraceOfThrowable( e );
+
 			Pres fields[] = {
 					new VerticalField( "Message", new InnerFragment( e.getMessage() ) ),
-					new VerticalField( "Traceback", new Column( stackTraceElements ) )
+					new VerticalField( "Traceback", javaStackTrace )
 			};
 			
 			return new ErrorBoxWithFields( "JAVA EXCEPTION", fields );
