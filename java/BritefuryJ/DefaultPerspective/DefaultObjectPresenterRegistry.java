@@ -674,7 +674,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 				stackTraceElements[i] = stackTraceStyle.applyTo( new StaticText( stackTraceLines[i] ) );
 			}
 			
-			Pres[] fields;
+			ArrayList<Pres> fields = new ArrayList<Pres>();
 			
 			if ( e.value instanceof PyBaseException )
 			{
@@ -689,22 +689,24 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 				{
 					args = new Paragraph( new Object[] { b.args } );
 				}
-				fields = new Pres[] {
-						new VerticalField( "Type", new Label( b.getType().getName() ) ),
-						new VerticalField( "Arguments", args ),
-						new VerticalField( "Traceback", new Column( stackTraceElements ) )
-				};
+				fields.add( new VerticalField( "Type", new Label( b.getType().getName() ) ) );
+				fields.add( new VerticalField( "Arguments", args ) );
+				fields.add( new VerticalField( "Traceback", new Column( stackTraceElements ) ) );
 			}
 			else
 			{
-				fields = new Pres[] {
-						new VerticalField( "Message", new InnerFragment( e.value ) ),
-						new VerticalField( "Traceback", new Column( stackTraceElements ) )
-				};
+				fields.add( new VerticalField( "Message", new InnerFragment( e.value ) ) );
+				fields.add( new VerticalField( "Traceback", new Column( stackTraceElements ) ) );
+			}
+
+			Pres javaStackTrace = presentJavaStackTraceOfThrowable( e );
+			if ( javaStackTrace != null )
+			{
+				fields.add( new DropDownExpander( new Label( "Java stack trace" ), javaStackTrace ) );
 			}
 			
 			
-			return new ErrorBoxWithFields( "PYTHON EXCEPTION", fields );
+			return new ErrorBoxWithFields( "PYTHON EXCEPTION", fields.toArray( new Pres[fields.size()] ) );
 		}
 	};
 
@@ -788,6 +790,20 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 			return new ErrorBoxWithFields( "JAVA EXCEPTION", fields );
 		}
 	};
+
+
+	private static Pres presentJavaStackTraceOfThrowable(Throwable t)
+	{
+		StackTraceElement trace[] = t.getStackTrace();
+		Pres stackTraceElements[] = new Pres[trace.length];
+
+		for (int i = 0; i < trace.length; i++)
+		{
+			stackTraceElements[i] = stackTraceStyle.applyTo( new StaticText( trace[i].toString() ) );
+		}
+
+		return new Column( stackTraceElements );
+	}
 
 
 	
