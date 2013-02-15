@@ -130,7 +130,6 @@ class WorksheetViewer (MethodDispatchView):
 		subject = node.getSubject( fragment.subject.documentSubject )
 		return Hyperlink( node.text, subject )
 
-
 	
 	@ObjectDispatchMethod( ViewSchema.PythonCodeView )
 	def PythonCode(self, fragment, inheritedState, node):

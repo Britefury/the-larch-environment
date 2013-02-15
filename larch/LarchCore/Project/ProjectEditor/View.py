@@ -24,6 +24,7 @@ from java.util.regex import Pattern
 from Britefury.Dispatch.MethodDispatch import ObjectDispatchMethod
 
 from Britefury.Kernel.View.DispatchView import MethodDispatchView
+from Britefury.Kernel.Document import LinkSubjectDrag
 
 
 from BritefuryJ.Live import LiveValue
@@ -82,12 +83,24 @@ def _getModelOfProjectNameElement(element):
 		raise TypeError, 'model is not a project root, it is a %s' % type( model )
 	return model
 
+def _getSubjectOfPageNameElement(element):
+	model = _getProjectModelOfElement(element)
+	if not isinstance( model, ProjectPage ):
+		raise TypeError, 'model is not a project page, it is a %s' % type( model )
+	fragment = element.fragmentContext
+	pageSubject = fragment.subject._pageSubject( model )
+	return pageSubject
+
 
 def _dragSourceCreateSourceData(element, aspect):
 	return ProjectDrag( _getModelOfPackageOrPageNameElement( element ) )
 
+def _dragSourceCreateLink(element, aspect):
+	return LinkSubjectDrag( _getSubjectOfPageNameElement( element ) )
+
 
 _dragSource = ObjectDndHandler.DragSource( ProjectDrag, _dragSourceCreateSourceData )
+_linkDragSource = ObjectDndHandler.DragSource( LinkSubjectDrag, _dragSourceCreateLink )
 
 
 
@@ -615,6 +628,7 @@ class ProjectView (MethodDispatchView):
 		link = link.withContextMenuInteractor( _pageContextMenuFactory )
 		nameBox = _itemHoverHighlightStyle.applyTo( Row( [ link ] ) )
 		nameBox = nameBox.withDragSource( _dragSource )
+		#nameBox = nameBox.withDragSource( _linkDragSource )
 		nameBox = nameBox.withDropDest( _pageDropDest )
 		nameBox = AttachTooltip( nameBox, 'Click to enter page.\nRight click to access context menu.', False )
 

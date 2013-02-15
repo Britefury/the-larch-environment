@@ -9,6 +9,7 @@ from java.awt import Color
 from java.awt.event import KeyEvent
 
 from Britefury.Kernel.View.DispatchView import MethodDispatchView
+from Britefury.Kernel.Document import LinkSubjectDrag
 from Britefury.Dispatch.MethodDispatch import ObjectDispatchMethod
 
 from BritefuryJ.Command import CommandName, Command, CommandSet
@@ -82,6 +83,21 @@ def _onDrop_embeddedObject(element, pos, data, action):
 
 
 _embeddedObject_dropDest = ObjectDndHandler.DropDest( FragmentData, None, _highlightDrop_embeddedObject, _onDrop_embeddedObject )
+
+
+
+def _onDrop_link(element, pos, data, action):
+	marker = Marker.atPointIn( element, pos, True )
+	if marker is not None  and  marker.isValid():
+		def _makeInline():
+			subject = data.subject
+			docSubject = element.fragmentContext.subject.documentSubject
+			return EditorSchema.LinkEditor.newLink( docSubject, 'Link', subject )
+		WorksheetRichTextController.instance.insertInlineEmbedAtMarker( marker, _makeInline )
+	return True
+
+
+_link_dropDest = ObjectDndHandler.DropDest( LinkSubjectDrag, None, _highlightDrop_embeddedObject, _onDrop_link )
 
 
 
@@ -191,16 +207,15 @@ def _worksheetContextMenuFactory(element, menu):
 	menu.add( Section( SectionHeading2( 'Text style' ), styles ).alignHExpand() )
 
 
-#	def _onLink(link, event):
+#	def _onLink(button, event):
 #		def _makeLink():
-#			return EditorSchema.LinkEditor.newHomeLink( 'Link' )
+#			return EditorSchema.LinkEditor.newDocumentLink( 'Link' )
 #
 #		caret = rootElement.getCaret()
 #		if caret.isValid():
 #			WorksheetRichTextController.instance.insertInlineEmbedAtCaret( caret, _makeLink )
 #
-#
-#	insertLink = Hyperlink( 'Hyperlink', _onLink )
+#	insertLink = Button.buttonWithLabel( 'Hyperlink', _onLink )
 #	insert = ControlsRow( [ insertLink ] )
 #	menu.add( Section( SectionHeading2( 'Insert' ), insert ).alignHExpand() )
 
@@ -285,6 +300,7 @@ class WorksheetEditor (MethodDispatchView):
 		w = Page( pageContents + [ node.getBody(), tip ] )
 		w = w.withContextMenuInteractor( _worksheetContextMenuFactory )
 		w = w.withDropDest( _embeddedObject_dropDest )
+		w = w.withDropDest( _link_dropDest )
 		w = w.withCommands( worksheetCommands )
 		w = WorksheetRichTextController.instance.region( w )
 		return w
@@ -363,7 +379,7 @@ class WorksheetEditor (MethodDispatchView):
 
 	@ObjectDispatchMethod( EditorSchema.LinkEditor )
 	def Link(self, fragment, inheritedState, node):
-		docSubject = fragment.documentSubject
+		docSubject = fragment.subject.documentSubject
 
 		def _linkContextMenuFactory(element, menu):
 			def _onRemove(control, event):
@@ -561,7 +577,11 @@ class WorksheetEditorSubject (Subject):
 	@property
 	def _modelView(self):
 		if self.__modelView is None:
-			self.__modelView = EditorSchema.WorksheetEditor( None, self._model, self._importName )
+			try:
+				self.__modelView = EditorSchema.WorksheetEditor( None, self._model, self._importName )
+			except Exception as e:
+				print e
+				raise
 		return self.__modelView
 
 
