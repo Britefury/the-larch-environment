@@ -25,11 +25,12 @@ public class PointerContextMenuInteractor extends PointerInteractor
 		{
 			VPopupMenu menu = new VPopupMenu();
 			
-			handleContextButton( pointer, menu );
+			LSElement menuElement = handleContextButton( pointer, menu );
 			
 			if ( !menu.isEmpty() )
 			{
-				menu.popupMenuAtMousePosition( pointer.getComponent().getRootElement() );
+				menuElement = menuElement != null  ?  menuElement  :  pointer.getComponent().getRootElement();
+				menu.popupMenuAtMousePosition( menuElement );
 				return true;
 			}
 		}
@@ -48,8 +49,11 @@ public class PointerContextMenuInteractor extends PointerInteractor
 	}
 	
 	
-	private static void handleContextButton(Pointer pointer, PopupMenu menu)
+	private static LSElement handleContextButton(Pointer pointer, PopupMenu menu)
 	{
+		// We go to the trouble of determining the inner-most element that had a context menu interactor attached
+		// so that a valid fragment context can be obtained by the popup element
+		LSElement menuElement = null;
 		Stack<LSElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
 		
 		while ( !elements.isEmpty() )
@@ -64,6 +68,11 @@ public class PointerContextMenuInteractor extends PointerInteractor
 				{
 					for (AbstractElementInteractor interactor: interactors )
 					{
+						if ( menuElement == null )
+						{
+							menuElement = element;
+						}
+
 						ContextMenuElementInteractor menuInt = (ContextMenuElementInteractor)interactor;
 						boolean bHandled = false;
 						try
@@ -85,5 +94,7 @@ public class PointerContextMenuInteractor extends PointerInteractor
 				break;
 			}
 		}
+
+		return menuElement;
 	}
 }

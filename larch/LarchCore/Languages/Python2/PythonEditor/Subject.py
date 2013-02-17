@@ -63,7 +63,7 @@ class Python2Subject (Subject):
 		return DefaultPerspective.instance
 	
 	def getTitle(self):
-		return self._title + ' [Py25]'
+		return self._title
 	
 	def getChangeHistory(self):
 		return self._document.getChangeHistory()

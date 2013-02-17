@@ -72,10 +72,6 @@ class ProjectSubject (Subject):
 
 
 	@property
-	def document(self):
-		return self._document
-
-	@property
 	def documentSubject(self):
 		return self
 
@@ -96,12 +92,9 @@ class ProjectSubject (Subject):
 		return View.perspective
 
 	def getTitle(self):
-		return self._title + ' [Prj]'
+		return self._title
 
 
-	def getChangeHistory(self):
-		return self._document.getChangeHistory()
-	
 	def buildBoundCommandSetList(self, cmdSets):
 		cmdSets.add( _projectCommands.bindTo( self ) )
 		self.enclosingSubject.buildBoundCommandSetList( cmdSets )

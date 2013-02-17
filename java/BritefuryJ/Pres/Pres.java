@@ -421,7 +421,7 @@ public abstract class Pres
 				FragmentView fragView = (FragmentView)fragCtx;
 				
 				parentView = fragView.getView();
-				enclosingSubject = parentView.getSubject();
+				enclosingSubject = fragView.getSubject();
 			}
 		}
 		

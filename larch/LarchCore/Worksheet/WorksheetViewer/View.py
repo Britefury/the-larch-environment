@@ -308,7 +308,7 @@ class WorksheetViewerSubject (Subject):
 		return perspective
 	
 	def getTitle(self):
-		return self._title + ' [Ws]'
+		return self._title
 	
 	def getChangeHistory(self):
 		return self._document.getChangeHistory()

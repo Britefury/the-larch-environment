@@ -19,9 +19,40 @@ from BritefuryJ.Isolation import IsolationPickle
 
 from BritefuryJ.LSpace.Input import ObjectDndHandler
 
-from BritefuryJ.Projection import SubjectPath, TransientSubjectPathEntry
+from BritefuryJ.Projection import SubjectPath, Subject, TransientSubjectPathEntry
 
 from Britefury import LoadBuiltins
+
+
+
+class _DocumentSubject (Subject):
+	def __init__(self, enclosingSubject, path, document):
+		super( _DocumentSubject, self ).__init__( enclosingSubject, path )
+		self.__document = document
+
+
+	@property
+	def document(self):
+		return self.__document
+
+	@property
+	def documentSubject(self):
+		return self
+
+
+	def getFocus(self):
+		return None
+
+	def getPerspective(self):
+		return None
+
+	def getTitle(self):
+		return self.__document.getFilename()
+
+
+	def getChangeHistory(self):
+		return self.__document.getChangeHistory()
+
 
 
 
@@ -124,7 +155,8 @@ class Document (ChangeHistoryListener):
 	
 	def newSubject(self, enclosingSubject, importName, title):
 		path = SubjectPath( _DocumentPathEntry( self, importName, title ) )
-		return self.newModelSubject( self._contents, enclosingSubject, path, importName, title )
+		documentSubject = _DocumentSubject( enclosingSubject, path, self )
+		return self.newModelSubject( self._contents, documentSubject, path, importName, title )
 
 	def newModelSubject(self, model, enclosingSubject, path, importName, title):
 		return model.__new_subject__( self, enclosingSubject, path, importName, title )
@@ -234,9 +266,10 @@ class _DocumentPathEntry (TransientSubjectPathEntry):
 		self.__importName = importName
 		self.__title = title
 
-
-	def follow(self, outerSubject):
-		return self.__document.newModelSubject( self.__document._contents, outerSubject, SubjectPath( self ), self.__importName, self.__title)
+	def follow(self, enclosingSubject):
+		path = SubjectPath( self )
+		documentSubject = _DocumentSubject( enclosingSubject, path, self.__document )
+		return self.__document.newModelSubject( self.__document._contents, documentSubject, path, self.__importName, self.__title)
 
 
 	def canPersist(self):

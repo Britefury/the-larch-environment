@@ -91,7 +91,7 @@ class _WorldSubject (TransientSubject):
 		return None
 
 	def getTitle(self):
-		return '<world subject>'
+		return '<World>'
 
 
 
