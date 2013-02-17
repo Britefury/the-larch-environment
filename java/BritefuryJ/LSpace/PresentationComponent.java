@@ -53,7 +53,8 @@ public abstract class PresentationComponent extends JComponent implements Compon
 	
 	
 	
-	
+	//
+	// Transfer handler for drag and drop AND copy and paste
 	class PresAreaTransferHandler extends TransferHandler
 	{
 		private static final long serialVersionUID = 1L;
@@ -117,6 +118,7 @@ public abstract class PresentationComponent extends JComponent implements Compon
 				rootElement.detachElementPreview( data );
 				drop.getSourceElement().getDndHandler().exportDone( drop.getSourceElement(), data, action );
 				drop = null;
+				rootElement.dndDragExportDone();
 			}
 			else
 			{

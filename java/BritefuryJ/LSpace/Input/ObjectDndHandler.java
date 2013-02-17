@@ -21,6 +21,7 @@ import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Clipboard.LocalDataFlavor;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Util.HashUtils;
+import BritefuryJ.Util.PolymorphicMap;
 
 
 public class ObjectDndHandler extends DndHandler
@@ -491,7 +492,7 @@ public class ObjectDndHandler extends DndHandler
 	private ArrayList<DropDest> dests;
 	private int sourceAspectsMask = 0;
 	private ArrayList<NonLocalDropDest> nonLocalDests;
-	private HashMap<Class<?>, DropDest> typeToDest;
+	private PolymorphicMap<DropDest> typeToDest;
 	
 	private HashMap<DndPin, WeakReference<ObjectDndHandler>> derivedDndHandlers = new HashMap<DndPin, WeakReference<ObjectDndHandler>>();
 	
@@ -517,7 +518,7 @@ public class ObjectDndHandler extends DndHandler
 		
 		if ( dests != null )
 		{
-			typeToDest = new HashMap<Class<?>, DropDest>();
+			typeToDest = new PolymorphicMap<DropDest>();
 			for (DropDest dest: dests)
 			{
 				typeToDest.put( dest.dataType, dest );
@@ -832,8 +833,8 @@ public class ObjectDndHandler extends DndHandler
 			{
 				if ( ( transferData.sourceAspect & src.sourceAspects )  !=  0 )
 				{
-					DropDest dest = getDestForType( src.dataType );
-					
+					DropDest dest = typeToDest.get( src.dataType );
+
 					if ( dest != null )
 					{
 						boolean bCanDrop = true;
@@ -881,28 +882,6 @@ public class ObjectDndHandler extends DndHandler
 		return matches;
 	}
 
-	private DropDest getDestForType(Class<?> type)
-	{
-		if ( typeToDest != null  &&  typeToDest.containsKey( type ) )
-		{
-			return typeToDest.get( type );
-		}
-		else
-		{
-			Class<?> superClass = type.getSuperclass();
-			DropDest destForSuperClass = null;  
-			
-			if ( superClass != null )
-			{
-				destForSuperClass = getDestForType( superClass );
-			}
-			
-			typeToDest = new HashMap<Class<?>, DropDest>();
-			typeToDest.put( type, destForSuperClass );
-			return destForSuperClass;
-		}
-	}
-	
 	
 	
 	public static final ObjectDndHandler instance = new ObjectDndHandler();

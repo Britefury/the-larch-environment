@@ -246,4 +246,27 @@ public class PolymorphicMap <ValueType> implements Serializable
 		cachedPythonValues.put( type, nullEntry );
 		return null;
 	}
+
+
+	@Override
+	public String toString()
+	{
+		StringBuilder builder = new StringBuilder( "PolymorphicMap(" );
+		boolean gotJava = false;
+		if ( !registeredJavaValues.isEmpty() )
+		{
+			builder.append( registeredJavaValues.toString() );
+			gotJava = true;
+		}
+		if ( !registeredPythonValues.isEmpty() )
+		{
+			if ( gotJava )
+			{
+				builder.append( ", " );
+			}
+			builder.append( registeredPythonValues.toString() );
+		}
+		builder.append( ")" );
+		return builder.toString();
+	}
 }

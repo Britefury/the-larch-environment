@@ -77,4 +77,10 @@ public class PointerInteractor
 	{
 		return false;
 	}
+
+
+	public boolean dndDragExportDone(Pointer pointer)
+	{
+		return false;
+	}
 }
