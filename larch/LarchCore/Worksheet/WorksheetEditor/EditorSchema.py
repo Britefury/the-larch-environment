@@ -270,7 +270,7 @@ class LinkEditor (AbstractViewSchema.LinkAbstractView):
 
 	@staticmethod
 	def newLink(docSubject, text, subject):
-		rel = LinkEditor.__relativePath(docSubject, subject)
+		rel = LinkEditor.__relativePath( docSubject, subject )
 		m = LinkEditor.newLinkModel( text, rel )
 		return LinkEditor( None, m )
 

@@ -17,6 +17,8 @@ from BritefuryJ.Shortcut import Shortcut
 
 from BritefuryJ.Projection import Perspective, Subject
 
+from BritefuryJ.Live import LiveFunction
+
 
 from BritefuryJ.Controls import Controls, MenuItem, VPopupMenu, Hyperlink, Button, TextEntry, OptionMenu
 from BritefuryJ.Graphics import SolidBorder, BorderWithHeaderBar, FilledOutlinePainter
@@ -28,7 +30,7 @@ from BritefuryJ.Pres import Pres, ApplyStyleSheetFromAttribute, ApplyPerspective
 from BritefuryJ.Pres.Primitive import Primitive, Label, StaticText, Spacer, Image, Bin, Border, SpaceBin, Row, Column
 from BritefuryJ.Pres.RichText import TitleBar, Heading1, Heading2, Heading3, Heading4, Heading4, Heading5, Heading6, NormalText, RichSpan, Page, Body, LinkHeaderBar, StrongSpan, EmphSpan
 from BritefuryJ.Pres.ObjectPres import ObjectBorder
-from BritefuryJ.Pres.UI import Section, SectionHeading2, SectionHeading3, ControlsRow
+from BritefuryJ.Pres.UI import Form, Section, SectionHeading2, SectionHeading3, ControlsRow
 from BritefuryJ.Pres.Help import TipBox
 
 from BritefuryJ.EditPerspective import EditPerspective
@@ -50,6 +52,7 @@ _editableStyle = StyleSheet.style( Primitive.editable( True ) )
 _pythonCodeBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) ) )
 _pythonCodeBox = BorderWithHeaderBar( SolidBorder( 1.5, 4.0, 10.0, 10.0, Color( 0.4, 0.4, 0.5 ), None ), Color( 0.825, 0.825, 0.875 ) )
 _inlinePythonCodeBorder = SolidBorder( 1.5, 4.0, 10.0, 10.0, Color( 0.4, 0.4, 0.5 ), None )
+_linkEditorTargetBorder = SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.5, 0.75, 1.0 ), Color( 0.9, 0.95, 1.0 ) )
 
 _worksheetMargin = 10.0
 
@@ -86,18 +89,45 @@ _embeddedObject_dropDest = ObjectDndHandler.DropDest( FragmentData, None, _highl
 
 
 
+def _canDrop_link(element, pos, data, action):
+	subject = data.subject
+	docSubject = element.fragmentContext.subject.documentSubject
+	return subject.path().isWithin( docSubject.path() )
+
+
 def _onDrop_link(element, pos, data, action):
 	marker = Marker.atPointIn( element, pos, True )
 	if marker is not None  and  marker.isValid():
 		def _makeInline():
 			subject = data.subject
 			docSubject = element.fragmentContext.subject.documentSubject
-			return EditorSchema.LinkEditor.newLink( docSubject, 'Link', subject )
+			return EditorSchema.LinkEditor.newLink( docSubject, subject.getTitle(), subject )
 		WorksheetRichTextController.instance.insertInlineEmbedAtMarker( marker, _makeInline )
 	return True
 
 
-_link_dropDest = ObjectDndHandler.DropDest( LinkSubjectDrag, None, _highlightDrop_embeddedObject, _onDrop_link )
+_link_dropDest = ObjectDndHandler.DropDest( LinkSubjectDrag, _canDrop_link, _highlightDrop_embeddedObject, _onDrop_link )
+
+
+
+class _LinkEditorModelPropertyKey (object):
+	pass
+
+_LinkEditorModelPropertyKey.instance = _LinkEditorModelPropertyKey()
+
+
+def _onDrop_link_onto_linkEditor(element, pos, data, action):
+	prop = element.getProperty( _LinkEditorModelPropertyKey.instance )
+	node = prop.value   if prop is not None   else None
+	if node is not None:
+		subject = data.subject
+		docSubject = element.fragmentContext.subject.documentSubject
+		node.setSubject( docSubject, subject )
+		return True
+	else:
+		return False
+
+_linkEditor_dropDest = ObjectDndHandler.DropDest( LinkSubjectDrag, _canDrop_link, None, _onDrop_link_onto_linkEditor )
 
 
 
@@ -207,17 +237,17 @@ def _worksheetContextMenuFactory(element, menu):
 	menu.add( Section( SectionHeading2( 'Text style' ), styles ).alignHExpand() )
 
 
-#	def _onLink(button, event):
-#		def _makeLink():
-#			return EditorSchema.LinkEditor.newDocumentLink( 'Link' )
-#
-#		caret = rootElement.getCaret()
-#		if caret.isValid():
-#			WorksheetRichTextController.instance.insertInlineEmbedAtCaret( caret, _makeLink )
-#
-#	insertLink = Button.buttonWithLabel( 'Hyperlink', _onLink )
-#	insert = ControlsRow( [ insertLink ] )
-#	menu.add( Section( SectionHeading2( 'Insert' ), insert ).alignHExpand() )
+	def _onLink(button, event):
+		def _makeLink():
+			return EditorSchema.LinkEditor.newDocumentLink( 'Link' )
+
+		caret = rootElement.getCaret()
+		if caret.isValid():
+			WorksheetRichTextController.instance.insertInlineEmbedAtCaret( caret, _makeLink )
+
+	insertLink = Button.buttonWithLabel( 'Hyperlink', _onLink )
+	insert = ControlsRow( [ insertLink ] )
+	menu.add( Section( SectionHeading2( 'Insert' ), insert ).alignHExpand() )
 
 
 
@@ -398,16 +428,20 @@ class WorksheetEditor (MethodDispatchView):
 
 			textEntry = TextEntry( node.text, _TextListener() )
 
-			subject = node.getSubject( docSubject )
-
-			targetEntry = TextEntry( '<<TODO: replace this>>', _TargetListener() )
-
-			link = Hyperlink( 'Go to target...', subject )
+			@LiveFunction
+			def targetHyperlink():
+				subject = node.getSubject( docSubject )
+				p = _linkEditorTargetBorder.surround( Hyperlink( subject.getTitle(), subject ) )
+				p = p.withProperty( _LinkEditorModelPropertyKey.instance, node )
+				p = p.withDropDest( _linkEditor_dropDest )
+				return p
 
 			onRemove = Button.buttonWithLabel( 'Remove', _onRemove )
 
-			menu.add( Section( SectionHeading3( 'Text:' ), textEntry ) )
-			menu.add( Section( SectionHeading3( 'Target:' ), Column( [ targetEntry, link ] ) ) )
+			textSection = Form.Section( 'Text', 'Edit and press enter to change', textEntry )
+			targetSection = Form.Section( 'Target', 'Drag links from a project page and drop to change', targetHyperlink )
+
+			menu.add( Form( 'Hyperlink', [ textSection, targetSection ] ) )
 			menu.add( Spacer( 0.0, 20.0 ) )
 			menu.add( onRemove )
 			return True
@@ -599,7 +633,7 @@ class WorksheetEditorSubject (Subject):
 		return perspective2
 	
 	def getTitle(self):
-		return self._title + ' [WsEdit]'
+		return self._title
 	
 	def getChangeHistory(self):
 		return self._document.getChangeHistory()

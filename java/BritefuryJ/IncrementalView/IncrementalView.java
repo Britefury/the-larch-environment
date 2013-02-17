@@ -719,7 +719,14 @@ public class IncrementalView
 	
 	protected boolean inspectFragment(FragmentView fragment, LSElement sourceElement, PointerButtonEvent triggeringEvent)
 	{
-		return inspector.inspectFragment( fragment, sourceElement, triggeringEvent );
+		if ( inspector != null )
+		{
+			return inspector.inspectFragment( fragment, sourceElement, triggeringEvent );
+		}
+		else
+		{
+			return false;
+		}
 	}
 	
 	
