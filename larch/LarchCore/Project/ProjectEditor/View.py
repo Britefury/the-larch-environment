@@ -628,7 +628,7 @@ class ProjectView (MethodDispatchView):
 		link = link.withContextMenuInteractor( _pageContextMenuFactory )
 		nameBox = _itemHoverHighlightStyle.applyTo( Row( [ link ] ) )
 		nameBox = nameBox.withDragSource( _dragSource )
-		#nameBox = nameBox.withDragSource( _linkDragSource )
+		nameBox = nameBox.withDragSource( _linkDragSource )
 		nameBox = nameBox.withDropDest( _pageDropDest )
 		nameBox = AttachTooltip( nameBox, 'Click to enter page.\nRight click to access context menu.', False )
 

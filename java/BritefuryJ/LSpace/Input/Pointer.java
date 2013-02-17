@@ -364,8 +364,22 @@ public class Pointer extends PointerInterface
 	}
 
 
+	public boolean dndDragExportDone()
+	{
+		for (PointerInteractor interactor: interactors)
+		{
+			if ( interactor.dndDragExportDone( this ) )
+			{
+				return true;
+			}
+		}
 
-	
+		return false;
+	}
+
+
+
+
 	public void notifyEnterElement(LSElement element)
 	{
 		inputTable.addPointerWithinElementBounds( this, element );

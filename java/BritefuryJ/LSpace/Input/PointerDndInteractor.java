@@ -131,4 +131,16 @@ public class PointerDndInteractor extends PointerInteractor
 		}
 		return false;
 	}
+
+
+	public boolean dndDragExportDone(Pointer pointer)
+	{
+		if ( dndController != null  &&  dndDrag != null  &&  dndDrag.bInProgress )
+		{
+			dndDrag = null;
+
+			return true;
+		}
+		return false;
+	}
 }

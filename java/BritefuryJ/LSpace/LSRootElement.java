@@ -956,6 +956,21 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		
 		emitImmediateEvents();
 	}
+
+
+	protected void dndDragExportDone()
+	{
+		try
+		{
+			rootSpaceMouse.dndDragExportDone();
+		}
+		catch (Throwable e)
+		{
+			notifyExceptionDuringEventHandler( "dndDragExportDone", e );
+		}
+
+		emitImmediateEvents();
+	}
 	
 	
 	
