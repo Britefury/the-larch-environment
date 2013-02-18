@@ -31,7 +31,7 @@ class _LiveListIter (object):
 
 
 class LiveList (object):
-	__slots__ = [ '__change_history__', '_items', '_incr' ]
+	__slots__ = [ '__change_history__', '_items', '_incr', '__changeListener' ]
 	
 	def __init__(self, xs=None):
 		self._items = []
@@ -39,6 +39,16 @@ class LiveList (object):
 			self._items[:] = xs[:]
 		self.__change_history__ = None
 		self._incr = IncrementalValueMonitor()
+		self.__changeListener = None
+
+
+	@property
+	def changeListener(self):
+		return self.__changeListener
+
+	@changeListener.setter
+	def changeListener(self, x):
+		self.__changeListener = x
 	
 		
 	def __getstate__(self):
@@ -134,13 +144,19 @@ class LiveList (object):
 	def __setitem__(self, index, x):
 		if isinstance( index, int )  or  isinstance( index, long ):
 			oldX = self._items[index]
+			if self.__changeListener is not None:
+				oldContents = self._items[:]
 			self._items[index] = x
 			onTrackedListSetItem( self.__change_history__, self, index, oldX, x, 'Live list set item' )
+			if self.__changeListener is not None:
+				self.__changeListener( oldContents, self._items[:] )
 		else:
 			oldContents = self._items[:]
 			self._items[index] = x
 			newContents = self._items[:]
 			onTrackedListSetContents( self.__change_history__, self, oldContents, newContents, 'Live list set item' )
+			if self.__changeListener is not None:
+				self.__changeListener( oldContents, newContents )
 		self._incr.onChanged()
 	
 	def __delitem__(self, index):
@@ -148,39 +164,65 @@ class LiveList (object):
 		del self._items[index]
 		newContents = self._items[:]
 		onTrackedListSetContents( self.__change_history__, self, oldContents, newContents, 'Live list del item' )
+		if self.__changeListener is not None:
+			self.__changeListener( oldContents, newContents )
 		self._incr.onChanged()
 		
 	def append(self, x):
+		if self.__changeListener is not None:
+			oldContents = self._items[:]
 		self._items.append( x )
 		onTrackedListAppend( self.__change_history__, self, x, 'Live list append' )
+		if self.__changeListener is not None:
+			self.__changeListener( oldContents, self._items[:] )
 		self._incr.onChanged()
 
 	def extend(self, xs):
+		if self.__changeListener is not None:
+			oldContents = self._items[:]
 		self._items.extend( xs )
 		onTrackedListExtend( self.__change_history__, self, xs, 'Live list extend' )
+		if self.__changeListener is not None:
+			self.__changeListener( oldContents, self._items[:] )
 		self._incr.onChanged()
 	
 	def insert(self, i, x):
+		if self.__changeListener is not None:
+			oldContents = self._items[:]
 		self._items.insert( i, x )
 		onTrackedListInsert( self.__change_history__, self, i, x, 'Live list insert' )
+		if self.__changeListener is not None:
+			self.__changeListener( oldContents, self._items[:] )
 		self._incr.onChanged()
 
 	def pop(self):
+		if self.__changeListener is not None:
+			oldContents = self._items[:]
 		x = self._items.pop()
 		onTrackedListPop( self.__change_history__, self, x, 'Live list pop' )
+		if self.__changeListener is not None:
+			self.__changeListener( oldContents, self._items[:] )
 		self._incr.onChanged()
 		return x
 		
 	def remove(self, x):
+		if self.__changeListener is not None:
+			oldContents = self._items[:]
 		i = self._items.index( x )
 		xFromList = self._items[i]
 		del self._items[i]
 		onTrackedListRemove( self.__change_history__, self, i, xFromList, 'Live list remove' )
+		if self.__changeListener is not None:
+			self.__changeListener( oldContents, self._items[:] )
 		self._incr.onChanged()
 		
 	def reverse(self):
+		if self.__changeListener is not None:
+			oldContents = self._items[:]
 		self._items.reverse()
 		onTrackedListReverse( self.__change_history__, self, 'Live list reverse' )
+		if self.__changeListener is not None:
+			self.__changeListener( oldContents, self._items[:] )
 		self._incr.onChanged()
 	
 	def sort(self, cmp=None, key=None, reverse=None):
@@ -188,10 +230,14 @@ class LiveList (object):
 		self._items.sort( cmp, key, reverse )
 		newContents = self._items[:]
 		onTrackedListSetContents( self.__change_history__, self, oldContents, newContents, 'Live list sort' )
+		if self.__changeListener is not None:
+			self.__changeListener( oldContents, newContents )
 		self._incr.onChanged()
 	
 	def _setContents(self, xs):
 		oldContents = self._items[:]
 		self._items[:] = xs
 		onTrackedListSetContents( self.__change_history__, self, oldContents, xs, 'Live list set contents' )
+		if self.__changeListener is not None:
+			self.__changeListener( oldContents, self._items[:] )
 		self._incr.onChanged()

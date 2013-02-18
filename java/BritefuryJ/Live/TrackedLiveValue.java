@@ -15,6 +15,12 @@ import BritefuryJ.ChangeHistory.Trackable;
 
 public class TrackedLiveValue extends LiveValue implements Trackable
 {
+	public static interface ChangeListener
+	{
+		public void onChanged(Object oldValue, Object newValue);
+	}
+
+
 	private static class SetValueCommand extends Change
 	{
 		private TrackedLiveValue live;
@@ -47,16 +53,30 @@ public class TrackedLiveValue extends LiveValue implements Trackable
 
 	
 	private ChangeHistory changeHistory;
+	private ChangeListener changeListener;
 	
 	
 	public TrackedLiveValue()
 	{
 		super();
+		changeListener = null;
 	}
 	
 	public TrackedLiveValue(Object value)
 	{
 		super( value );
+		changeListener = null;
+	}
+
+
+	public ChangeListener getChangeListener()
+	{
+		return changeListener;
+	}
+
+	public void setChangeListener(ChangeListener listener)
+	{
+		changeListener = listener;
 	}
 	
 	
@@ -78,6 +98,11 @@ public class TrackedLiveValue extends LiveValue implements Trackable
 			{
 				changeHistory.track( value );
 			}
+		}
+
+		if ( changeListener != null )
+		{
+			changeListener.onChanged( oldValue, value );
 		}
 	}
 
