@@ -262,7 +262,7 @@ public class Pointer extends PointerInterface
 
 		// Detect clicks that occur where the mouse has moved by a small amount during clicking.
 		// AWT will NOT report a click when the mouse moves even so much as 1 pixel during the click.
-		if ( button < 8 )
+		if ( button < 8  &&  buttonDownPositions[button] != null )
 		{
 			// Compute the sqr distance and clear the button down position
 			double sqrDistanceMoved = buttonDownPositions[button].sqrDistanceTo( pos );
