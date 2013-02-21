@@ -36,4 +36,18 @@ public class EdParagraphEmbed extends EdEmbed
 	{
 		return true;
 	}
+
+
+	@Override
+	public boolean equals(Object x)
+	{
+		if ( x instanceof EdParagraphEmbed )
+		{
+			return value.equals( ((EdParagraphEmbed)x).value );
+		}
+		else
+		{
+			return false;
+		}
+	}
 }

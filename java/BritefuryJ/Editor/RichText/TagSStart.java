@@ -19,7 +19,7 @@ class TagSStart extends TagStart
 	private HashMap<Object, Object> styleAttrs = new HashMap<Object, Object>();
 	
 	
-	public TagSStart(HashMap<Object, Object> styleAttrs)
+	public TagSStart(Map<Object, Object> styleAttrs)
 	{
 		this.styleAttrs.putAll( styleAttrs );
 	}
@@ -45,6 +45,19 @@ class TagSStart extends TagStart
 		return new Row( xs );
 	}
 	
+	@Override
+	public boolean equals(Object x)
+	{
+		if ( x instanceof TagSStart )
+		{
+			return styleAttrs.equals( ((TagSStart)x).styleAttrs );
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 	@Override
 	public String toString()
 	{

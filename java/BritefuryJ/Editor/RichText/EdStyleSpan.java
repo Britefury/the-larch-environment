@@ -53,10 +53,9 @@ public class EdStyleSpan extends EdAbstractText
 	}
 	
 	
-	
-	
-	
-	
+
+
+
 	@Override
 	protected Tag containingPrefixTag()
 	{
@@ -126,6 +125,28 @@ public class EdStyleSpan extends EdAbstractText
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return new Border( new Column( new Object[] { presentContents(), presentStyleAttrs( styleAttrs ) } ) );
+	}
+
+
+	@Override
+	public boolean equals(Object x)
+	{
+		if ( x instanceof EdStyleSpan )
+		{
+			EdStyleSpan e = (EdStyleSpan)x;
+			boolean s = styleAttrs == e.styleAttrs  ||  ( styleAttrs != null  &&  e.styleAttrs != null  &&  styleAttrs.equals( e.styleAttrs ) );
+			return contents.equals( e.contents )  &&  s;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	@Override
+	public String toString()
+	{
+		return "<SPAN " + styleAttrs + ">" + contents + "</SPAN>";
 	}
 
 

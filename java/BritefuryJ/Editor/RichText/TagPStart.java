@@ -34,6 +34,22 @@ class TagPStart extends TagStart
 	{
 		return new Row( new Object[] { new Label( " " ), Pres.coerceNonNull( styleAttrs ) } );
 	}
+
+
+	@Override
+	public boolean equals(Object x)
+	{
+		if ( x instanceof TagPStart )
+		{
+			TagPStart t = (TagPStart)x;
+			return styleAttrs == t.styleAttrs  ||  ( styleAttrs != null  &&  t.styleAttrs != null  &&  styleAttrs.equals( t.styleAttrs ) );
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 	
 	@Override
 	public String toString()

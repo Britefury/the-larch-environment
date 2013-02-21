@@ -15,6 +15,12 @@ class TagSEnd extends TagEnd
 	}
 	
 	@Override
+	public boolean equals(Object x)
+	{
+		return x instanceof TagSEnd;
+	}
+
+	@Override
 	public String toString()
 	{
 		return "</style>";
