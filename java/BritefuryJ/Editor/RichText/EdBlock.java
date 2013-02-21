@@ -97,4 +97,18 @@ public class EdBlock extends EdNode
 	{
 		return new Column( contents.toArray() );
 	}
+
+
+	@Override
+	public boolean equals(Object x)
+	{
+		if ( x instanceof EdBlock )
+		{
+			return contents.equals( ((EdBlock)x).contents );
+		}
+		else
+		{
+			return false;
+		}
+	}
 }

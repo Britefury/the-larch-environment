@@ -20,7 +20,7 @@ import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-class Flatten
+public class Flatten
 {
 	private static class FlattenInput
 	{
@@ -200,12 +200,25 @@ class Flatten
 		Stack<HashMap<Object, Object>> styleStack = new Stack<HashMap<Object, Object>>();
 		styleStack.add( new HashMap<Object, Object>() );
 		Object prevElement = null;
-		
+
+		// There are 9 possible types of element encountered in xs:
+		//
+		// String: text
+		// Newline: \n
+		// EdInlineEmbed: value as inline
+		// EdParagraphEmbed: value as paragraph
+		// EdParagraph: complete paragraph
+		// EdStyleSpan: complete span
+		// TagPStart: start of paragraph
+		// TagSStart: start of span
+		// TagSEnd: end of span
+
 		while ( xs.hasMoreContent() )
 		{
 			if ( xs.matches( Newline.class, EdParagraphEmbed.class ) )
 			{
 				// Newline followed by a paragraph embed
+
 				// If the newline is the first element, then the user has attempted to insert a newline before the paragraph embed, so emit
 				// a paragraph start tag
 				// otherwise, it is the end of one paragraph, just before the embed, so suppress it
@@ -219,39 +232,37 @@ class Flatten
 			else if ( xs.matches( Newline.class, TagPStart.class )  ||
 					xs.matches( Newline.class, EdParagraph.class ) )
 			{
-				// End of one paragraph and the beginning of another; emit the paragraph start tag
 				// Newline followed by:
 				// - paragraph start tag
-				// - paragraph embed
 				// - paragraph
-				// Discard the newline
+
+				// End of one paragraph and the beginning of another
+				// Discard the newline and emit the start tag or paragraph
 				xs.consume();
 				result.add( xs.consume() );
 			}
 			else if ( xs.matches( Newline.class, String.class )  ||
 					xs.matches( Newline.class, EdInlineEmbed.class )  ||
 					xs.matches( Newline.class, TagSStart.class )  ||
+					xs.matches( Newline.class, TagSEnd.class )  ||
 					xs.matches( Newline.class, EdStyleSpan.class )  ||
 					xs.matches( Newline.class, Newline.class ) )
 			{
-				// Newline followed by paragraph content
+				// Newline followed by text content
+
 				// The user has inserted a newline to split the paragraph
 				// Consume ONLY the newline and emit a paragraph start tag
 				xs.consume();
 				result.add( new TagPStart( null ) );
 			}
-			else if ( xs.matches( EdParagraphEmbed.class, Newline.class ) )
-			{
-				// Emit the paragraph embed, and a paragraph start tag
-				result.add( xs.consume() );
-				xs.consume();
-				result.add( new TagPStart( null ) );
-			}
 			else if ( xs.matches( Newline.class ) )
 			{
-				// Suppress
+				// Newline
+
+				// Should be at the end; this should be the last element. If not, something has gone wrong.
+
+				// Discard
 				xs.consume();
-				// Should be at the end
 				if ( xs.hasMoreContent() )
 				{
 					throw new RuntimeException( "Should have reached the end" );
@@ -260,6 +271,10 @@ class Flatten
 			else if ( xs.matches( TagPStart.class, EdParagraphEmbed.class )  ||
 					xs.matches( TagPStart.class, EdParagraph.class ) )
 			{
+				// Paragraph start tag followed by:
+				// - paragraph embed
+				// - paragraph
+
 				// Eliminate the paragraph start tag
 				xs.consume();
 				result.add( xs.consume() );
@@ -271,14 +286,35 @@ class Flatten
 					xs.matches( TagPStart.class, Newline.class ) )
 			{
 				// Paragraph start tag followed by text content
+
 				// Consume and emit only the paragraph start tag
+				// Leave the next element until next time round the loop
 				result.add( xs.consume() );
+			}
+			else if ( xs.matches( EdParagraphEmbed.class, Newline.class ) )
+			{
+				// Paragraph embed followed by newline
+				//
+				// User has inserted a newline after a paragraph embed
+				//
+				// Emit the paragraph embed, and a paragraph start tag
+				result.add( xs.consume() );
+				xs.consume();
+				result.add( new TagPStart( null ) );
 			}
 			else if ( xs.matches( String.class )  ||  xs.matches( EdInlineEmbed.class ) )
 			{
 				// Textual content; wrap in a style span
 				Object x = xs.consume();
 				result.add( new EdStyleSpan( Arrays.asList( new Object[] { x } ), currentStyleAttrs ) );
+
+				// Text content followed by paragraph start, with no newline in between
+				// The user has deleted the newline in an attempt to join paragraphs
+				// Discard the paragraph start
+				if ( xs.matches( TagPStart.class ) )
+				{
+					xs.consume();
+				}
 			}
 			else if ( xs.matches( TagSStart.class ) )
 			{
@@ -290,6 +326,14 @@ class Flatten
 				attrs.putAll( tag.getStyleAttrs() );
 				currentStyleAttrs = attrs;
 				styleStack.add( attrs );
+
+				// Text content followed by paragraph start, with no newline in between
+				// The user has deleted the newline in an attempt to join paragraphs
+				// Discard the paragraph start
+				if ( xs.matches( TagPStart.class ) )
+				{
+					xs.consume();
+				}
 			}
 			else if ( xs.matches( TagSEnd.class ) )
 			{
@@ -298,6 +342,31 @@ class Flatten
 				// Update the style stack
 				styleStack.pop();
 				currentStyleAttrs = styleStack.lastElement();
+
+				// Text content followed by paragraph start, with no newline in between
+				// The user has deleted the newline in an attempt to join paragraphs
+				// Discard the paragraph start
+				if ( xs.matches( TagPStart.class ) )
+				{
+					xs.consume();
+				}
+			}
+			else if ( xs.matches( EdStyleSpan.class ) )
+			{
+				// Style span; process recursively
+				EdStyleSpan span = (EdStyleSpan)xs.consume();
+				HashMap<Object, Object> attrs = new HashMap<Object, Object>();
+				attrs.putAll( currentStyleAttrs );
+				attrs.putAll( span.getStyleAttrs() );
+				flatten( result, new FlattenInput( span.getContents() ), attrs );
+
+				// Text content followed by paragraph start, with no newline in between
+				// The user has deleted the newline in an attempt to join paragraphs
+				// Discard the paragraph start
+				if ( xs.matches( TagPStart.class ) )
+				{
+					xs.consume();
+				}
 			}
 			else if ( xs.matches( TagPStart.class ) )
 			{
@@ -308,15 +377,6 @@ class Flatten
 			{
 				// Paragraph start
 				result.add( xs.consume() );
-			}
-			else if ( xs.matches( EdStyleSpan.class ) )
-			{
-				// Style span; process recursively
-				EdStyleSpan span = (EdStyleSpan)xs.consume();
-				HashMap<Object, Object> attrs = new HashMap<Object, Object>();
-				attrs.putAll( currentStyleAttrs );
-				attrs.putAll( span.getStyleAttrs() );
-				flatten( result, new FlattenInput( span.getContents() ), attrs );
 			}
 			else
 			{

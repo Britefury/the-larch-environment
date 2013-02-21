@@ -29,4 +29,19 @@ public class EdInlineEmbed extends EdEmbed
 	{
 		return controller.buildInlineEmbed( value );
 	}
+
+
+
+	@Override
+	public boolean equals(Object x)
+	{
+		if ( x instanceof EdInlineEmbed )
+		{
+			return value.equals( ((EdInlineEmbed)x).value );
+		}
+		else
+		{
+			return false;
+		}
+	}
 }

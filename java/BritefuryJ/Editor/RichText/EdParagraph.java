@@ -57,10 +57,9 @@ public class EdParagraph extends EdAbstractText
 	}
 	
 	
-	
-	
-	
-	
+
+
+
 	@Override
 	protected Tag prefixTag()
 	{
@@ -126,6 +125,29 @@ public class EdParagraph extends EdAbstractText
 	{
 		Pres attrs = new Paragraph( new Object[] { Pres.coerceNonNull( this.styleAttrs ) } );
 		return paraStyle.applyTo( new Border( new Column( new Object[] { presentContents(), new Box( 1.0, 1.0 ).pad( 1.0, 1.0 ).alignHExpand(), attrs } ) ) );
+	}
+
+
+	@Override
+	public boolean equals(Object x)
+	{
+		if ( x instanceof EdParagraph )
+		{
+			EdParagraph e = (EdParagraph)x;
+			boolean s = styleAttrs == e.styleAttrs  ||  ( styleAttrs != null  &&  e.styleAttrs != null  &&  styleAttrs.equals( e.styleAttrs ) );
+			return contents.equals( e.contents )  &&  s;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+
+	@Override
+	public String toString()
+	{
+		return "<P " + styleAttrs + ">" + contents + "</P>";
 	}
 
 
