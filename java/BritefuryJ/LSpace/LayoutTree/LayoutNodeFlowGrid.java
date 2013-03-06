@@ -10,16 +10,8 @@ import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
 import java.util.List;
 
-import BritefuryJ.LSpace.LSContainer;
-import BritefuryJ.LSpace.LSElement;
-import BritefuryJ.LSpace.LSFlowGrid;
-import BritefuryJ.LSpace.ElementFilter;
-import BritefuryJ.LSpace.Layout.FlowGridLayout;
-import BritefuryJ.LSpace.Layout.LAllocBox;
-import BritefuryJ.LSpace.Layout.LAllocBoxInterface;
-import BritefuryJ.LSpace.Layout.LAllocV;
-import BritefuryJ.LSpace.Layout.LReqBox;
-import BritefuryJ.LSpace.Layout.LReqBoxInterface;
+import BritefuryJ.LSpace.*;
+import BritefuryJ.LSpace.Layout.*;
 import BritefuryJ.LSpace.StyleParams.TableStyleParams;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
@@ -269,6 +261,7 @@ public class LayoutNodeFlowGrid extends ArrangedSequenceLayoutNode
 
 
 
+
 	public int getNumColumns()
 	{
 		refreshSubtree();
@@ -345,7 +338,7 @@ public class LayoutNodeFlowGrid extends ArrangedSequenceLayoutNode
 		refreshSubtree();
 		
 		// Find the closest row
-		int rowIndex = 0;
+		int rowIndex = -1;
 		
 		if ( rowAllocBoxes.length == 0 )
 		{
@@ -374,8 +367,11 @@ public class LayoutNodeFlowGrid extends ArrangedSequenceLayoutNode
 				
 				rowI = rowJ;
 			}
-			
-			rowIndex = rowAllocBoxes.length - 1;
+
+			if ( rowIndex == -1 )
+			{
+				rowIndex = rowAllocBoxes.length - 1;
+			}
 		}
 		
 		if ( columnBounds != null )

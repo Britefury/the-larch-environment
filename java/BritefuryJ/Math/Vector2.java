@@ -143,6 +143,12 @@ public class Vector2 implements Presentable, Serializable
 		double oneOverLength = 1.0 / length();
 		return mul( oneOverLength );
 	}
+
+
+	public Vector2 rotated90CCW()
+	{
+		return new Vector2( -y, x );
+	}
 	
 	
 	public Vector2 transform(AffineTransform affine)

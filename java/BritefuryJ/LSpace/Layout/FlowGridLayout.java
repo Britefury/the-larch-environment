@@ -40,6 +40,22 @@ public class FlowGridLayout
 		{
 			return ( width + spacing ) * column  +  width  +  spacing * 0.5;
 		}
+
+		public double boundaryLineX(int pos)
+		{
+			if ( pos == 0 )
+			{
+				return 0.0;
+			}
+			else if ( pos == numColumns )
+			{
+				return width * numColumns  +  spacing * ( numColumns - 1 );
+			}
+			else
+			{
+				return ( width + spacing ) * pos  -  spacing * 0.5;
+			}
+		}
 		
 		public int getColumnUnder(double x)
 		{

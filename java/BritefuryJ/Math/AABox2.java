@@ -248,6 +248,16 @@ public class AABox2 implements Serializable
 	{
 		return lowerY;
 	}
+
+	public double getCentreX()
+	{
+		return ( lowerX + upperX ) * 0.5;
+	}
+
+	public double getCentreY()
+	{
+		return ( lowerY + upperY ) * 0.5;
+	}
 	
 	public double getUpperX()
 	{
