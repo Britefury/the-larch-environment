@@ -366,7 +366,7 @@ public abstract class RichTextController extends SequentialController
 				}
 				else if ( event instanceof SelectionEditTreeEvent )
 				{
-					setModelContentsFromEditorModelRichString( model, value );
+					setBlockModelContentsFromEditorModelRichString( fragment.getView().getLog(), model, value );
 					return EditFilter.HandleEditResult.HANDLED;
 				}
 				return HandleEditResult.NOT_HANDLED;
@@ -421,6 +421,12 @@ public abstract class RichTextController extends SequentialController
 	{
 		Pres p = new StructuralItem( this, model, child );
 		p = new Row( new Pres[] { new Segment( p ) } );
+		// The Segment surrounding the content will add caret slot elements either side of the embedded object
+		// These elements will generate empty strings that will appear either side of the structural item when the rich
+		// string value is acquired. These can cause problems when copying and pasting into a block.
+		// To alleviate this issue, attached the value of the embedded object, along with a 'clear structural value' listener to @p.
+		p = p.withFixedValue( model );
+		p = p.withTreeEventListener( getClearStructuralValueListener() );
 		return p.withProperty( paragraphEmbedPropertyKey, model ).withProperty( blockItemPropertyKey, model );
 	}
 	
@@ -620,7 +626,8 @@ public abstract class RichTextController extends SequentialController
 						Object blockModel = targetPropValue.getValue();
 						LSElement blockElement = targetPropValue.getElement();
 						RichString richStr = richStringWithModifiedSelectionStyle( blockElement, (TextSelection)selection, computeSpanStyles );
-						setModelContentsFromEditorModelRichString( blockModel, richStr );
+						FragmentView blockFragment = (FragmentView)blockElement.getFragmentContext();
+						setBlockModelContentsFromEditorModelRichString( blockFragment.getView().getLog(), blockModel, richStr );
 					}
 				}
 
@@ -862,7 +869,19 @@ public abstract class RichTextController extends SequentialController
 	private void setModelContentsFromEditorModelRichString(Object model, RichString richString)
 	{
 		List<Object> modelValues = editorModelListToModelList( richString.getItemValues() );
-		
+
+		setModelContents( model, modelValues );
+	}
+
+	private void setBlockModelContentsFromEditorModelRichString(Log log, Object model, RichString richString)
+	{
+		List<Object> modelValues = editorModelListToModelList( richString.getItemValues() );
+
+		if ( log.isRecording() )
+		{
+			log.log( new LogEntry( "RichTextController" ).hItem( "Description", "RichTextEditor.setBlockModelContentsFromEditorModelRichString" ).vItem( "value", richString.getItemValues() ).vItem( "modelValues", modelValues ) );
+		}
+
 		setModelContents( model, modelValues );
 	}
 
@@ -1119,6 +1138,11 @@ public abstract class RichTextController extends SequentialController
 		splicedFlattened.addAll( clipboardCopyFlattenedList( (List<? extends Object>)insertedContent ) );
 		splicedFlattened.addAll( v2.flattened() );
 		ArrayList<Object> splicedMerged = Merge.mergeParagraphs( splicedFlattened );
+		Log log = subtreeRootFragment.getView().getLog();
+		if ( log.isRecording() )
+		{
+			log.log( new LogEntry( "RichTextController" ).hItem( "Description", "RichTextEditor.spliceForInsertion" ).vItem( "splicedFlattened", splicedFlattened ).vItem( "splicedMerged", splicedMerged ) );
+		}
 		return new RichStringBuilder( splicedMerged ).richString();
 	}
 
@@ -1133,6 +1157,11 @@ public abstract class RichTextController extends SequentialController
 		splicedFlattened.addAll( v1.flattened() );
 		splicedFlattened.addAll( v2.flattened() );
 		ArrayList<Object> splicedMerged = Merge.mergeParagraphs( splicedFlattened );
+		Log log = subtreeRootFragment.getView().getLog();
+		if ( log.isRecording() )
+		{
+			log.log( new LogEntry( "RichTextController" ).hItem( "Description", "RichTextEditor.spliceForDeletion" ).vItem( "splicedFlattened", splicedFlattened ).vItem( "splicedMerged", splicedMerged ) );
+		}
 		return new RichStringBuilder( splicedMerged ).richString();
 	}
 	

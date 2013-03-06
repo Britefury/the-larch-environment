@@ -29,7 +29,8 @@ public class LSSpan extends LSContainerSequence
 		super.drawBackground( graphics );
 	}
 
-	
+
+	@Override
 	protected AABox2 getVisibleBoxInLocalSpace()
 	{
 		AABox2 boxes[] = computeBoundingBoxes();
@@ -62,6 +63,7 @@ public class LSSpan extends LSContainerSequence
 
 	// For most elements, this is the bounding box. For layout-less elements, it is their bounds within the closest
 	// non-layout-less parent
+	@Override
 	public AABox2 getVisibleSpaceBox()
 	{
 		AABox2 bounds[] = computeBoundingBoxes();
