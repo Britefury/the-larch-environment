@@ -17,6 +17,8 @@ import BritefuryJ.LSpace.Layout.LAllocV;
 import BritefuryJ.LSpace.Layout.LReqBoxInterface;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
+import BritefuryJ.Math.Xform2;
+
 
 public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 {
@@ -352,7 +354,9 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 	{
 		AABox2 branchBox = branch.getLocalAABox();
 
-		LSElement leaf = branch.getLeafClosestToLocalPoint( localPos, null );
+		int childIndex[] = new int[1];
+		List<LSElement> children = branch == element  ?  getLeaves()  :  getLeavesWithinBranch( branch );
+		LSElement leaf = getChildClosestToLocalPointHorizontal( children, localPos, childIndex );
 		if ( leaf != null )
 		{
 			// Walk back up until we have an element that is a direct child of @withinBranch
@@ -366,14 +370,14 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 			}
 
 			LSElement child = leaf;
-			double leftX = getFirstAABoxOfChild( child ).getLowerX();
-			double rightX = getLastAABoxOfChild( child ).getUpperX();
+			double leftX = getFirstAABoxOfChild( branch, child ).getLowerX();
+			double rightX = getLastAABoxOfChild( branch, child ).getUpperX();
 
 			boolean left = Math.abs( localPos.x - leftX ) < Math.abs( localPos.x - rightX );
 
 			double x = left  ?  leftX  :  rightX;
 
-			int index = branch.getChildren().indexOf( child );
+			int index = childIndex[0];
 			index = left  ?  index  :  index + 1;
 			return new InsertionPoint( index, new Point2( x, branchBox.getLowerY() ), new Point2( x, branchBox.getUpperY() ) );
 		}
@@ -386,7 +390,9 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 	{
 		AABox2 branchBox = branch.getLocalAABox();
 
-		LSElement leaf = branch.getLeafClosestToLocalPoint( localPos, null );
+		int childIndex[] = new int[1];
+		List<LSElement> children = branch == element  ?  getLeaves()  :  getLeavesWithinBranch( branch );
+		LSElement leaf = getChildClosestToLocalPointVertical( children, localPos, childIndex );
 		if ( leaf != null )
 		{
 			// Walk back up until we have an element that is a direct child of @withinBranch
@@ -400,8 +406,8 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 			}
 
 			LSElement child = leaf;
-			double topY = getFirstAABoxOfChild( child ).getLowerY();
-			double bottomY = getLastAABoxOfChild( child ).getUpperY();
+			double topY = getFirstAABoxOfChild( branch, child ).getLowerY();
+			double bottomY = getLastAABoxOfChild( branch, child ).getUpperY();
 
 			boolean top = Math.abs( localPos.y - topY ) < Math.abs( localPos.y - bottomY );
 
@@ -417,7 +423,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 
 
 
-	protected AABox2 getFirstAABoxOfChild(LSElement child)
+	protected AABox2 getFirstAABoxOfChild(LSContainer branch, LSElement child)
 	{
 		AABox2 box = null;
 		if ( child instanceof LSContainer  &&  child.getLayoutNode() == null )
@@ -430,10 +436,11 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 			}
 		}
 
-		return child.getLocalAABox();
+		Xform2 childToLocal = child.getLocalToAncestorXform( branch );
+		return childToLocal.transform( child.getLocalAABox() );
 	}
 
-	protected AABox2 getLastAABoxOfChild(LSElement child)
+	protected AABox2 getLastAABoxOfChild(LSContainer branch, LSElement child)
 	{
 		AABox2 box = null;
 		if ( child instanceof LSContainer  &&  child.getLayoutNode() == null )
@@ -446,7 +453,8 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 			}
 		}
 
-		return child.getLocalAABox();
+		Xform2 childToLocal = child.getLocalToAncestorXform( branch );
+		return childToLocal.transform( child.getLocalAABox() );
 	}
 
 

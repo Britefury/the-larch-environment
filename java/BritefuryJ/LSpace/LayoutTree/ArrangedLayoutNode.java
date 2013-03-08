@@ -182,135 +182,87 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 	{
 		return child.getLayoutNode().getLeafClosestToLocalPoint( child.getParentToLocalXform().transform( localPos ), filter );
 	}
-	
-	protected LSElement getChildLeafClosestToLocalPointHorizontal(List<LSElement> searchList, Point2 localPos, ElementFilter filter)
+
+	protected LSElement getChildClosestToLocalPointHorizontal(List<LSElement> searchList, Point2 localPos, int index[])
 	{
 		if ( searchList.size() == 0 )
 		{
+			index[0] = -1;
 			return null;
 		}
 		else if ( searchList.size() == 1 )
 		{
-			return getLeafClosestToLocalPointFromChild( searchList.get( 0 ), localPos, filter );
+			index[0] = 0;
+			return searchList.get( 0 );
 		}
 		else
 		{
-			LSElement start = null;
-			int startIndex = -1;
 			LSElement childI = searchList.get( 0 );
 			for (int i = 0; i < searchList.size() - 1; i++)
 			{
 				LSElement childJ = searchList.get( i + 1 );
 				double iUpperX = childI.getPositionInParentSpaceX() + childI.getActualWidthInParentSpace();
 				double jLowerX = childJ.getPositionInParentSpaceX();
-				
+
 				double midx = ( iUpperX + jLowerX ) * 0.5;
-				
+
 				if ( localPos.x < midx )
 				{
-					startIndex = i;
-					start = childI;
-					break;
+					index[0] = i;
+					return childI;
 				}
-				
+
 				childI = childJ;
 			}
-			
-			if ( start == null )
-			{
-				startIndex = searchList.size() - 1;
-				start = searchList.get( startIndex );
-			}
-			
-			LSElement c = getLeafClosestToLocalPointFromChild( start, localPos, filter );
-			if ( c != null )
-			{
-				return c;
-			}
-			else
-			{
-				LSElement next = null;
-				for (int j = startIndex + 1; j < searchList.size(); j++)
-				{
-					next = getLeafClosestToLocalPointFromChild( searchList.get( j ), localPos, filter );
-					if ( next != null )
-					{
-						break;
-					}
-				}
 
-				LSElement prev = null;
-				for (int j = startIndex - 1; j >= 0; j--)
-				{
-					prev = getLeafClosestToLocalPointFromChild( searchList.get( j ), localPos, filter );
-					if ( prev != null )
-					{
-						break;
-					}
-				}
-				
-
-				if ( prev == null  &&  next == null )
-				{
-					return null;
-				}
-				else if ( prev == null  &&  next != null )
-				{
-					return next;
-				}
-				else if ( prev != null  &&  next == null )
-				{
-					return prev;
-				}
-				else
-				{
-					double sqrDistToPrev = prev.getLocalToAncestorXform( element ).transform( prev.getLocalAABox() ).sqrDistanceTo( localPos );
-					double sqrDistToNext = next.getLocalToAncestorXform( element ).transform( next.getLocalAABox() ).sqrDistanceTo( localPos );
-					return sqrDistToPrev > sqrDistToNext  ?  prev  :  next;
-				}
-			}
+			index[0] = searchList.size() - 1;
+			return searchList.get( searchList.size() - 1 );
 		}
 	}
-	
-	protected LSElement getChildLeafClosestToLocalPointVertical(List<LSElement> searchList, Point2 localPos, ElementFilter filter)
+
+	protected LSElement getChildClosestToLocalPointVertical(List<LSElement> searchList, Point2 localPos, int index[])
 	{
 		if ( searchList.size() == 0 )
 		{
+			index[0] = -1;
 			return null;
 		}
 		else if ( searchList.size() == 1 )
 		{
-			return getLeafClosestToLocalPointFromChild( searchList.get( 0 ), localPos, filter );
+			index[0] = 0;
+			return searchList.get( 0 );
 		}
 		else
 		{
-			LSElement start = null;
-			int startIndex = -1;
 			LSElement childI = searchList.get( 0 );
 			for (int i = 0; i < searchList.size() - 1; i++)
 			{
 				LSElement childJ = searchList.get( i + 1 );
 				double iUpperY = childI.getPositionInParentSpaceY() + childI.getActualHeightInParentSpace();
 				double jLowerY = childJ.getPositionInParentSpaceY();
-				
+
 				double midY = ( iUpperY + jLowerY ) * 0.5;
-				
+
 				if ( localPos.y < midY )
 				{
-					startIndex = i;
-					start = childI;
-					break;
+					index[0] = i;
+					return childI;
 				}
-				
+
 				childI = childJ;
 			}
-			
-			if ( start == null )
-			{
-				startIndex = searchList.size() - 1;
-				start = searchList.get( startIndex );
-			}
-			
+
+			index[0] = searchList.size() - 1;
+			return searchList.get( index[0] );
+		}
+	}
+	
+	protected LSElement getChildLeafClosestToLocalPointHorizontal(List<LSElement> searchList, Point2 localPos, ElementFilter filter)
+	{
+		int startIndex[] = new int[1];
+		LSElement start = getChildClosestToLocalPointHorizontal( searchList, localPos, startIndex );
+		if ( start != null )
+		{
 			LSElement c = getLeafClosestToLocalPointFromChild( start, localPos, filter );
 			if ( c != null )
 			{
@@ -319,7 +271,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 			else
 			{
 				LSElement next = null;
-				for (int j = startIndex + 1; j < searchList.size(); j++)
+				for (int j = startIndex[0] + 1; j < searchList.size(); j++)
 				{
 					next = getLeafClosestToLocalPointFromChild( searchList.get( j ), localPos, filter );
 					if ( next != null )
@@ -329,7 +281,64 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 				}
 
 				LSElement prev = null;
-				for (int j = startIndex - 1; j >= 0; j--)
+				for (int j = startIndex[0] - 1; j >= 0; j--)
+				{
+					prev = getLeafClosestToLocalPointFromChild( searchList.get( j ), localPos, filter );
+					if ( prev != null )
+					{
+						break;
+					}
+				}
+				
+
+				if ( prev == null  &&  next == null )
+				{
+					return null;
+				}
+				else if ( prev == null  &&  next != null )
+				{
+					return next;
+				}
+				else if ( prev != null  &&  next == null )
+				{
+					return prev;
+				}
+				else
+				{
+					double sqrDistToPrev = prev.getLocalToAncestorXform( element ).transform( prev.getLocalAABox() ).sqrDistanceTo( localPos );
+					double sqrDistToNext = next.getLocalToAncestorXform( element ).transform( next.getLocalAABox() ).sqrDistanceTo( localPos );
+					return sqrDistToPrev > sqrDistToNext  ?  prev  :  next;
+				}
+			}
+		}
+		return null;
+	}
+	
+	protected LSElement getChildLeafClosestToLocalPointVertical(List<LSElement> searchList, Point2 localPos, ElementFilter filter)
+	{
+		int startIndex[] = new int[1];
+		LSElement start = getChildClosestToLocalPointVertical( searchList, localPos, startIndex );
+		if ( start != null )
+		{
+			LSElement c = getLeafClosestToLocalPointFromChild( start, localPos, filter );
+			if ( c != null )
+			{
+				return c;
+			}
+			else
+			{
+				LSElement next = null;
+				for (int j = startIndex[0] + 1; j < searchList.size(); j++)
+				{
+					next = getLeafClosestToLocalPointFromChild( searchList.get( j ), localPos, filter );
+					if ( next != null )
+					{
+						break;
+					}
+				}
+
+				LSElement prev = null;
+				for (int j = startIndex[0] - 1; j >= 0; j--)
 				{
 					prev = getLeafClosestToLocalPointFromChild( searchList.get( j ), localPos, filter );
 					if ( prev != null )
@@ -359,6 +368,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 				}
 			}
 		}
+		return null;
 	}
 	
 	

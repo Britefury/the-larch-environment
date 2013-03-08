@@ -9,6 +9,7 @@ package BritefuryJ.Browser.TestPages;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import BritefuryJ.Graphics.FillPainter;
 import BritefuryJ.Graphics.SolidBorder;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.GridRow;
@@ -39,39 +40,45 @@ public class GridTestPage extends TestPage
 
 	private static final StyleSheet styleSheet = StyleSheet.instance;
 	private static StyleSheet t12 = styleSheet.withValues( Primitive.fontSize.as( 12 ) );
+	private static StyleSheet itemInSpanStyle = t12.withValues( Primitive.background.as( new FillPainter( new Color( 0.0f, 0.0f, 0.7f, 0.2f ) ) ) );
+	private static StyleSheet rowInSpanStyle = styleSheet.withValues( Primitive.background.as( new FillPainter( new Color( 0.0f, 0.5f, 0.0f, 0.2f ) ) ) );
 	private static StyleSheet tableStyle = styleSheet.withValues( Primitive.tableColumnSpacing.as( 5.0 ), Primitive.tableRowSpacing.as( 5.0 ), Primitive.tableBorder.as( new SolidBorder( 1.0, 0.0, Color.BLACK, null ) ), Primitive.tableCellBoundaryPaint.as( new Color( 0.5f, 0.5f, 0.5f ) ), Primitive.tableBackgroundPainter.as( TableTestPage.checkeredTableBackgroundPainter ) );
+	private static Color rowHighlightColour = new Color( 0.8f, 0.3f, 0.0f );
+	private static Color spanInRowColour = new Color( 0.4f, 0.0f, 0.8f );
+	private static Color gridHighlightColour = new Color( 0.3f, 0.8f, 0.0f );
+	private static Color spanInGridColour = new Color( 0.0f, 0.8f, 0.4f );
 
 	private Pres span(int row, int startCol, int endCol)
 	{
 		ArrayList<Object> children = new ArrayList<Object>();
 		for (int col = startCol; col < endCol; col++)
 		{
-			children.add(t12.applyTo( new Text( "<" + col + "_" + row + ">" ) ) );
+			children.add( itemInSpanStyle.applyTo( new Text( "<" + col + "_" + row + ">" ) ) );
 		}
 		return styleSheet.applyTo( new Span( children ) );
 	}
 	
 
-	private GridRow makeGridRow(int row, int length)
+	private Pres makeGridRow(int row, int length)
 	{
 		ArrayList<Object> children = new ArrayList<Object>();
 		for (int col = 0; col < length; col++)
 		{
 			children.add( t12.applyTo( new Text( "<" + col + "_" + row + ">" ) ) );
 		}
-		return new GridRow( children );
+		return highlightInsertionPoints( new GridRow( children ), rowHighlightColour );
 	}
 	
-	private GridRow makeGridRowCollated(int row)
+	private Pres makeGridRowCollated(int row)
 	{
 		ArrayList<Object> children = new ArrayList<Object>();
 		for (int col = 0; col < 2; col++)
 		{
 			children.add( t12.applyTo( new Text( "<" + col + "_" + row + ">" ) ) );
 		}
-		children.add( span( row, 2, 5 ) );
+		children.add( highlightInsertionPoints( span( row, 2, 5 ), spanInRowColour ) );
 		children.add( t12.applyTo( new Text( "<" + 5 + "_" + row + ">" ) ) );
-		return new GridRow( children );
+		return highlightInsertionPoints( new GridRow( children ), rowHighlightColour );
 	}
 	
 	private Pres makeGrid()
@@ -81,7 +88,7 @@ public class GridTestPage extends TestPage
 		{
 			children.add( makeGridRow( row, 6 ) );
 		}
-		return tableStyle.applyTo( new RGrid( children ) );
+		return tableStyle.applyTo( highlightInsertionPoints( new RGrid( children ), gridHighlightColour ) );
 	}
 	
 	private Pres makeGridwithShortenedRow()
@@ -91,7 +98,7 @@ public class GridTestPage extends TestPage
 		{
 			children.add( makeGridRow( row, row == 2  ?  3  :  6 ) );
 		}
-		return tableStyle.applyTo( new RGrid( children ) );
+		return tableStyle.applyTo( highlightInsertionPoints( new RGrid( children ), gridHighlightColour ) );
 	}
 	
 	private Pres makeGridWithCollatedRows()
@@ -101,7 +108,7 @@ public class GridTestPage extends TestPage
 		{
 			children.add( makeGridRowCollated( row ) );
 		}
-		return tableStyle.applyTo( new RGrid( children ) );
+		return tableStyle.applyTo( highlightInsertionPoints( new RGrid( children ), gridHighlightColour ) );
 	}
 	
 	private Pres makeCollatedGridWithCollatedRows()
@@ -117,9 +124,9 @@ public class GridTestPage extends TestPage
 		{
 			columns.add( makeGridRowCollated( row ) );
 		}
-		rows.add( new Span( columns ) );
+		rows.add( rowInSpanStyle.applyTo( highlightInsertionPoints( new Span( columns ), spanInGridColour ) ) );
 		rows.add( makeGridRowCollated( 5 ) );
-		return tableStyle.applyTo( new RGrid( rows ) );
+		return tableStyle.applyTo( highlightInsertionPoints( new RGrid( rows ), gridHighlightColour ) );
 	}
 	
 	private Pres makeCollatedGridWithCollatedRowsAndNonRows()
@@ -137,11 +144,11 @@ public class GridTestPage extends TestPage
 		}
 		columns.add( t12.applyTo( new Text( "Non-row in a span" ) ) );
 		
-		rows.add( new Span( columns ) );
+		rows.add( rowInSpanStyle.applyTo( highlightInsertionPoints( new Span( columns ), spanInGridColour ) ) );
 		rows.add( makeGridRowCollated( 5 ) );
 		rows.add( makeGridRowCollated( 6 ) );
 		rows.add( t12.applyTo( new Text( "Non-row in the grid" ) ) );
-		return tableStyle.applyTo( new RGrid( rows ) );
+		return tableStyle.applyTo( highlightInsertionPoints( new RGrid( rows ), gridHighlightColour ) );
 	}
 	
 	

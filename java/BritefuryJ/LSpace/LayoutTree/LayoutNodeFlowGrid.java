@@ -302,10 +302,10 @@ public class LayoutNodeFlowGrid extends ArrangedSequenceLayoutNode
 						childBounds = new int[] { index, index + 1 };
 					}
 					int numColumns = columnBounds.getNumColumns();
-					double beginX = columnBounds.boundaryLineX( childBounds[0] % numColumns );
-					double endX = columnBounds.boundaryLineX( childBounds[1] % numColumns );
+					double beginX = columnBounds.lowerX( childBounds[0] % numColumns );
+					double endX = columnBounds.upperX( ( childBounds[1] - 1 ) % numColumns );
 					LAllocBox beginRow = rowAllocBoxes[childBounds[0] / numColumns];
-					LAllocBox endRow = rowAllocBoxes[childBounds[1] / numColumns];
+					LAllocBox endRow = rowAllocBoxes[( childBounds[1] - 1 ) / numColumns];
 					double beginY0 = beginRow.getAllocPositionInParentSpaceY(),  beginY1 = beginY0 + beginRow.getAllocHeight();
 					double endY0 = endRow.getAllocPositionInParentSpaceY(),  endY1 = endY0 + endRow.getAllocHeight();
 					left = new Point2[] { new Point2( beginX, beginY0 ), new Point2( beginX, beginY1 ) };
