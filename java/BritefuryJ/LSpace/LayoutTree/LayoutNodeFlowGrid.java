@@ -330,6 +330,17 @@ public class LayoutNodeFlowGrid extends ArrangedSequenceLayoutNode
 
 					return new InsertionPoint( index, line );
 				}
+				else if ( cellIndex >= branchBounds[1]  &&  branchBounds[1] == leaves.length )
+				{
+					// targetPos is beyond the end of the flow grid; insert at the end
+					int numColumns = columnBounds.getNumColumns();
+					double endX = columnBounds.upperX( ( branchBounds[1] - 1 ) % numColumns );
+					LAllocBox endRow = rowAllocBoxes[( branchBounds[1] - 1 ) / numColumns];
+					double endY0 = endRow.getAllocPositionInParentSpaceY(),  endY1 = endY0 + endRow.getAllocHeight();
+					Point2 line[] = new Point2[] { new Point2( endX, endY0 ), new Point2( endX, endY1 ) };
+
+					return new InsertionPoint( branchBounds[1], line );
+				}
 			}
 		}
 

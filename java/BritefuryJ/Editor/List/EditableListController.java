@@ -7,11 +7,15 @@
 package BritefuryJ.Editor.List;
 
 import BritefuryJ.LSpace.Input.ObjectDndHandler;
+import BritefuryJ.LSpace.InsertionPoint;
+import BritefuryJ.LSpace.LSContainerSequence;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Math.Point2;
+import BritefuryJ.Math.Vector2;
 import BritefuryJ.Pres.Pres;
 
 import java.awt.*;
+import java.awt.geom.Path2D;
 
 
 public abstract class EditableListController
@@ -37,14 +41,6 @@ public abstract class EditableListController
 
 
 
-	public enum MajorDirection
-	{
-		HORIZONTAL,
-		VERTICAL
-	}
-
-
-	private MajorDirection direction;
 	private ObjectDndHandler.DragSource dragSource;
 	private ObjectDndHandler.DropDest dropDest;
 
@@ -52,12 +48,6 @@ public abstract class EditableListController
 
 	public EditableListController()
 	{
-		this( MajorDirection.HORIZONTAL );
-	}
-
-	public EditableListController(MajorDirection direction)
-	{
-		this.direction = direction;
 		dragSource = new ObjectDndHandler.DragSource( EditableListDrag.class,
 				new ObjectDndHandler.SourceDataFn()
 				{
@@ -93,18 +83,12 @@ public abstract class EditableListController
 
 
 
-	public boolean canInsertBefore(Object item, Object fromList, Object before, Object intoList, int action)
+	public boolean canInsert(Object item, Object fromList, int index, Object intoList, int action)
 	{
 		return true;
 	}
 
-	public boolean canInsertAfter(Object item, Object fromList, Object after, Object intoList, int action)
-	{
-		return true;
-	}
-
-	public abstract boolean insertBefore(Object item, Object fromList, Object before, Object intoList, int action);
-	public abstract boolean insertAfter(Object item, Object fromList, Object after, Object intoList, int action);
+	public abstract boolean insert(Object item, Object fromList, int index, Object intoList, int action);
 
 
 
@@ -112,55 +96,112 @@ public abstract class EditableListController
 	public Pres item(Object item, Pres p)
 	{
 		p = p.withProperty( ItemPropertyKey.instance, item );
-		p = p.withDragSource( dragSource ).withDropDest( dropDest );
+		p = p.withDragSource( dragSource );
 		return p;
 	}
 
 	public Pres editableList(Object list, Pres p)
 	{
 		p = p.withProperty( ListPropertyKey.instance, list );
+		p = p.withDropDest( dropDest );
 		return p;
 	}
 
 
 
-	private boolean shouldDropAfter(LSElement element, Point2 targetPos)
+	private Object createDragData(LSElement sourceElement, int aspect)
 	{
-		Shape shapes[] = element.getShapes();
-		if ( shapes.length > 0 )
+		LSElement.PropertyValue ls = sourceElement.findPropertyInAncestors( ListPropertyKey.instance );
+		LSElement.PropertyValue it = sourceElement.findPropertyInAncestors( ItemPropertyKey.instance );
+		if ( ls != null  &&  it != null )
 		{
-			if ( direction == MajorDirection.HORIZONTAL )
-			{
-				return targetPos.x > element.getActualWidth() * 0.5;
-			}
+			return new EditableListDrag( ls.getValue(), it.getValue() );
 		}
 		else
 		{
-			return false;
+			return null;
 		}
-		return false;
 	}
-
-
 
 	private boolean canDrop(LSElement destElement, Point2 targetPosition, Object data, int action)
 	{
+		LSElement.PropertyValue ls = destElement.findPropertyInAncestors( ListPropertyKey.instance );
+
+		if ( ls != null  &&  destElement instanceof LSContainerSequence )
+		{
+			InsertionPoint ins = ((LSContainerSequence)destElement).getInsertionPointClosestToLocalPoint( targetPosition );
+			if ( ins != null )
+			{
+				EditableListDrag drag = (EditableListDrag)data;
+				return canInsert( drag.getItem(), drag.getEditableList(), ins.getIndex(), ls.getValue(), action );
+			}
+		}
 		return false;
 	}
 
 	private void drawHighlight(LSElement destElement, Graphics2D graphics, Point2 targetPosition, int action)
 	{
+		ObjectDndHandler.dndHighlightPainter.drawShapes( graphics, destElement.getShapes() );
 
+		LSElement.PropertyValue ls = destElement.findPropertyInAncestors( ListPropertyKey.instance );
+
+		if ( ls != null  &&  destElement instanceof LSContainerSequence )
+		{
+			InsertionPoint ins = ((LSContainerSequence)destElement).getInsertionPointClosestToLocalPoint( targetPosition );
+			if ( ins != null )
+			{
+				Paint oldPaint = graphics.getPaint();
+				graphics.setPaint( new Color( 0.8f, 0.3f, 0.0f ) );
+
+				// Build the insertion shape
+				Point2 start = ins.getStartPoint();
+				Point2 end = ins.getEndPoint();
+				Vector2 u = end.sub( start ).getNormalised();
+				Vector2 v = u.rotated90CCW();
+
+				Point2 verts[] = new Point2[] {
+						start.add( v.mul( -4.0 ) ),
+						start.add( v.mul( 4.0 ) ),
+						start.add( v.mul( 1.0 ) ).add( u.mul( 8.0 ) ),
+						end.add( v.mul( 1.0 ) ).sub( u.mul( 8.0 ) ),
+						end.add( v.mul( 4.0 ) ),
+						end.add( v.mul( -4.0 ) ),
+						end.add( v.mul( -1.0 ) ).sub( u.mul( 8.0 ) ),
+						start.add( v.mul( -1.0 ) ).add( u.mul( 8.0 ) )
+				};
+
+				Path2D.Double path = new Path2D.Double();
+				Point2 first = verts[0];
+				path.moveTo( first.x, first.y );
+				for (int i = 1; i < verts.length; i++)
+				{
+					Point2 vtx = verts[i];
+					path.lineTo( vtx.x, vtx.y );
+				}
+
+				path.closePath();
+
+				graphics.fill( path );
+
+				graphics.setPaint( oldPaint );
+			}
+		}
 	}
 
 	private boolean drop(LSElement destElement, Point2 targetPosition, Object data, int action)
 	{
+		LSElement.PropertyValue ls = destElement.findPropertyInAncestors( ListPropertyKey.instance );
+
+		if ( ls != null  &&  destElement instanceof LSContainerSequence )
+		{
+			InsertionPoint ins = ((LSContainerSequence)destElement).getInsertionPointClosestToLocalPoint( targetPosition );
+			if ( ins != null )
+			{
+				EditableListDrag drag = (EditableListDrag)data;
+				return insert( drag.getItem(), drag.getEditableList(), ins.getIndex(), ls.getValue(), action );
+			}
+		}
+
 		return false;
-	}
-
-
-	private Object createDragData(LSElement sourceElement, int aspect)
-	{
-		return null;
 	}
 }
