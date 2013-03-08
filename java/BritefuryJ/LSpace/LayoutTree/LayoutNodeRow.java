@@ -10,10 +10,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import BritefuryJ.LSpace.LSContainer;
-import BritefuryJ.LSpace.LSElement;
-import BritefuryJ.LSpace.LSRow;
-import BritefuryJ.LSpace.ElementFilter;
+import BritefuryJ.LSpace.*;
 import BritefuryJ.LSpace.Layout.HorizontalLayout;
 import BritefuryJ.LSpace.Layout.LAllocBoxInterface;
 import BritefuryJ.LSpace.Layout.LAllocV;
@@ -127,6 +124,14 @@ public class LayoutNodeRow extends LayoutNodeAbstractBox
 	{
 		return getChildLeafClosestToLocalPointHorizontal( getLeavesWithinBranch( withinBranch ), localPos, filter );
 	}
+
+
+	@Override
+	public InsertionPoint getInsertionPointClosestToLocalPoint(LSContainer withinBranch, Point2 localPos)
+	{
+		return getInsertionPointClosestToLocalPointHorizontal( withinBranch, localPos );
+	}
+
 
 
 	@Override

@@ -71,7 +71,7 @@ public class ParagraphTestPage extends TestPage
 		{
 			children = addLineBreaks( children, lineBreakStep );
 		}
-		return style.applyTo( new Paragraph( children ) );
+		return style.applyTo( highlightInsertionPoints( new Paragraph( children ) ) );
 	}
 	
 	protected Pres makeParagraphWithNestedPara(String title, int lineBreakStep, StyleSheet textStyle, StyleSheet nestedTextStyle)
@@ -79,7 +79,7 @@ public class ParagraphTestPage extends TestPage
 		ArrayList<Object> children = makeTextNodes( title + ": " + textBlock );
 		children = addLineBreaks( children, lineBreakStep );
 		children.add( children.size()/2, makeParagraph( title + " (inner)", lineBreakStep, nestedTextStyle ) );
-		return textStyle.applyTo( new Paragraph( children ) );
+		return textStyle.applyTo(highlightInsertionPoints(  new Paragraph( children ) ) );
 	}
 	
 	

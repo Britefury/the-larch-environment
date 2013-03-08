@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import BritefuryJ.Math.Point2;
 import org.python.core.PySlice;
 
 import BritefuryJ.LSpace.Layout.LAllocV;
@@ -372,6 +373,15 @@ abstract public class LSContainerSequence extends LSContainerNonOverlayed
 	public List<LSElement> getChildren()
 	{
 		return registeredChildren;
+	}
+
+
+
+
+	public InsertionPoint getInsertionPointClosestToLocalPoint(Point2 localPoint)
+	{
+		ArrangedSequenceLayoutNode l = (ArrangedSequenceLayoutNode)getValidLayoutNodeOfClass( ArrangedSequenceLayoutNode.class );
+		return l.getInsertionPointClosestToLocalPoint( this, localPoint );
 	}
 
 

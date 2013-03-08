@@ -10,10 +10,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import BritefuryJ.LSpace.LSColumn;
-import BritefuryJ.LSpace.LSContainer;
-import BritefuryJ.LSpace.LSElement;
-import BritefuryJ.LSpace.ElementFilter;
+import BritefuryJ.LSpace.*;
 import BritefuryJ.LSpace.Layout.LAllocBoxInterface;
 import BritefuryJ.LSpace.Layout.LAllocV;
 import BritefuryJ.LSpace.Layout.LReqBoxInterface;
@@ -176,6 +173,13 @@ public class LayoutNodeColumn extends LayoutNodeAbstractBox
 	public LSElement getChildLeafClosestToLocalPointWithinBranch(LSContainer withinBranch, Point2 localPos, ElementFilter filter)
 	{
 		return getChildLeafClosestToLocalPointVertical( getLeavesWithinBranch( withinBranch ), localPos, filter );
+	}
+
+
+	@Override
+	public InsertionPoint getInsertionPointClosestToLocalPoint(LSContainer withinBranch, Point2 localPos)
+	{
+		return getInsertionPointClosestToLocalPointVertical( withinBranch, localPos );
 	}
 
 
