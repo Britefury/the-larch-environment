@@ -11,10 +11,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import BritefuryJ.LSpace.LSContainer;
-import BritefuryJ.LSpace.LSContentLeafEditable;
-import BritefuryJ.LSpace.LSElement;
-import BritefuryJ.LSpace.ElementFilter;
+import BritefuryJ.LSpace.*;
 import BritefuryJ.LSpace.Layout.LAllocBox;
 import BritefuryJ.LSpace.Layout.LAllocBoxInterface;
 import BritefuryJ.LSpace.Layout.LAllocV;
@@ -312,6 +309,90 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 	{
 		int range[] = getBranchRange( withinBranch );
 		return getChildLeafWithinRangeClosestToLocalPoint( localPos, filter, range[0], range[1] );
+	}
+
+
+
+	@Override
+	public InsertionPoint getInsertionPointClosestToLocalPoint(LSContainer withinBranch, Point2 localPos)
+	{
+		refreshSubtree();
+
+		ParagraphLayout.Line lineUnderLocalPos = getLineClosestToLocalPoint( localPos );
+
+		if ( lineUnderLocalPos != null )
+		{
+			int indexInLine[] = new int[1];
+			LSElement leaf = getLineChildClosestToLocalPoint( lineUnderLocalPos, localPos, indexInLine );
+			if ( leaf != null )
+			{
+				int branchBounds[] = withinBranch == element  ?  new int[] { 0, leaves.length }  :  getBranchRange( withinBranch );
+				int leafIndex = indexInLine[0] + lineUnderLocalPos.getRangeStart();
+
+				if ( leafIndex >=  branchBounds[0]  &&  leafIndex < branchBounds[1] )
+				{
+					// Walk back up until we have an element that is a direct child of @withinBranch
+					while ( leaf.getParent() != withinBranch )
+					{
+						leaf = leaf.getParent();
+						if ( leaf == null )
+						{
+							throw new RuntimeException( "Could not trace back to branch" );
+						}
+					}
+
+					LSElement child = leaf;
+					Point2 left[], right[];
+					int childBounds[];
+					if ( child instanceof LSContainer  &&  child.getLayoutNode() == null )
+					{
+						childBounds = getBranchRange( child );
+					}
+					else
+					{
+						childBounds = new int[] { leafIndex, leafIndex + 1 };
+					}
+
+					double beginX = leaves[childBounds[0]].getPositionInParentSpaceX();
+					double endX = leaves[childBounds[1]-1].getPositionInParentSpaceX()  +
+							leaves[childBounds[1]-1].getAllocWidth();
+
+					int beginLineIndex = ParagraphLayout.Line.searchForStartLine( lines, childBounds[0] );
+					int endLineIndex = ParagraphLayout.Line.searchForEndLine( lines, childBounds[1] );
+
+
+
+					LAllocBox beginRow = lines[beginLineIndex].getLineAllocBox();
+					LAllocBox endRow = lines[endLineIndex].getLineAllocBox();
+					double beginY0 = beginRow.getAllocPositionInParentSpaceY(),  beginY1 = beginY0 + beginRow.getAllocHeight();
+					double endY0 = endRow.getAllocPositionInParentSpaceY(),  endY1 = endY0 + endRow.getAllocHeight();
+					left = new Point2[] { new Point2( beginX, beginY0 ), new Point2( beginX, beginY1 ) };
+					right = new Point2[] { new Point2( endX, endY0 ), new Point2( endX, endY1 ) };
+					AABox2 leftBox = new AABox2( left[0], left[1] );
+					AABox2 rightBox = new AABox2( right[0], right[1] );
+
+					double leftSqrDist = leftBox.sqrDistanceTo( localPos );
+					double rightSqrDist = rightBox.sqrDistanceTo( localPos );
+					int index;
+					Point2 line[];
+					if ( leftSqrDist < rightSqrDist )
+					{
+						index = childBounds[0];
+						line = left;
+					}
+					else
+					{
+						index = childBounds[1];
+						line = right;
+					}
+
+					return new InsertionPoint( index, line );
+				}
+			}
+		}
+
+		AABox2 branchBox = withinBranch.getLocalAABox();
+		return new InsertionPoint( 0, branchBox.getLeftEdge() );
 	}
 
 	

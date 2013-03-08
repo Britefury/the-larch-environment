@@ -237,8 +237,50 @@ public class AABox2 implements Serializable
 	{
 		return new Vector2( upperX - lowerX, upperY - lowerY );
 	}
+
+
+	public Point2 getTopLeft()
+	{
+		return new Point2( lowerX, lowerY );
+	}
+
+	public Point2 getTopRight()
+	{
+		return new Point2( upperX, lowerY );
+	}
 	
-	
+	public Point2 getBottomLeft()
+	{
+		return new Point2( lowerX, upperY );
+	}
+
+	public Point2 getBottomRight()
+	{
+		return new Point2( upperX, upperY );
+	}
+
+
+	public Point2[] getLeftEdge()
+	{
+		return new Point2[] { getTopLeft(), getBottomLeft() };
+	}
+
+	public Point2[] getRightEdge()
+	{
+		return new Point2[] { getTopRight(), getBottomRight() };
+	}
+
+	public Point2[] getTopEdge()
+	{
+		return new Point2[] { getTopLeft(), getTopRight() };
+	}
+
+	public Point2[] getBottomEdge()
+	{
+		return new Point2[] { getBottomLeft(), getBottomRight() };
+	}
+
+
 	public double getLowerX()
 	{
 		return lowerX;

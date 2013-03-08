@@ -57,7 +57,7 @@ public class FlowGridTestPage extends TestPage
 		{
 			cells[i] = makeCell( String.valueOf( i ) );
 		}
-		return tableStyle.applyTo( new FlowGrid( cells ).alignHPack() );
+		return tableStyle.applyTo( highlightInsertionPoints( new FlowGrid( cells ) ).alignHPack() );
 	}
 	
 	private Pres makeFixedFlowGrid(int maxColumns, int numCells)
@@ -67,7 +67,7 @@ public class FlowGridTestPage extends TestPage
 		{
 			cells[i] = makeCell( String.valueOf( i ) );
 		}
-		return tableStyle.applyTo( new FlowGrid( maxColumns, cells ).alignHPack() );
+		return tableStyle.applyTo( highlightInsertionPoints( new FlowGrid( maxColumns, cells ) ).alignHPack() );
 	}
 	
 	

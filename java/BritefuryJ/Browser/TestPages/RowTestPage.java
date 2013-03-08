@@ -59,7 +59,7 @@ public class RowTestPage extends TestPage
 		children.add( makeText( "v_bottom", 18 ).alignVBottom() );
 		children.add( makeText( "v_expand", 18 ).alignVExpand() );
 		
-		return outlineBorder.surround( new Row( children ) );
+		return outlineBorder.surround( highlightInsertionPoints( new Row( children ) ) );
 	}
 
 	protected Pres createRow2()
@@ -71,7 +71,7 @@ public class RowTestPage extends TestPage
 		children.add( makeText( "h_right", 18 ).alignHRight() );
 		children.add( makeText( "h_expand", 18 ).alignHExpand() );
 		
-		return outlineBorder.surround( new Row( children ) ).pad( 10.0, 20.0 );
+		return outlineBorder.surround( highlightInsertionPoints( new Row( children ) ) ).pad( 10.0, 20.0 );
 	}
 
 	
