@@ -110,6 +110,9 @@ public class LSProxy extends LSContainerNonOverlayed
 	
 	
 		
+	// For most elements, this is the bounding box. For layout-less elements, it is their bounds within the closest
+	// non-layout-less parent
+	@Override
 	protected AABox2 getVisibleBoxInLocalSpace()
 	{
 		AABox2 boxes[] = computeBoundingBoxes();
@@ -139,20 +142,6 @@ public class LSProxy extends LSContainerNonOverlayed
 		}
 		return shapes;
 	}
-
-	// For most elements, this is the bounding box. For layout-less elements, it is their bounds within the closest
-	// non-layout-less parent
-	public AABox2 getVisibleSpaceBox()
-	{
-		AABox2 bounds[] = computeBoundingBoxes();
-		AABox2 box = new AABox2();
-		for (AABox2 b: bounds)
-		{
-			box.addBox( b );
-		}
-		return box;
-	}
-	
 
 	private AABox2[] computeBoundingBoxes()
 	{

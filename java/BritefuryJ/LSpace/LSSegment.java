@@ -206,6 +206,9 @@ public class LSSegment extends LSContainerNonOverlayed
 
 
 	
+	// For most elements, this is the bounding box. For layout-less elements, it is their bounds within the closest
+	// non-layout-less parent
+	@Override
 	protected AABox2 getVisibleBoxInLocalSpace()
 	{
 		AABox2 boxes[] = computeBoundingBoxes();

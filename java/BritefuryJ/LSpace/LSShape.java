@@ -90,6 +90,7 @@ public class LSShape extends LSBlank
 	}
 
 	
+	@Override
 	protected AABox2 getVisibleBoxInLocalSpace()
 	{
 		return bounds;

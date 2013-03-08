@@ -291,6 +291,13 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 	}
 
 
+	@Override
+	public InsertionPoint getInsertionPointClosestToLocalPoint(LSContainer withinBranch, Point2 localPos)
+	{
+		return getInsertionPointClosestToLocalPointVertical( withinBranch, localPos );
+	}
+
+
 	
 	
 	@Override

@@ -11,11 +11,7 @@ import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import BritefuryJ.LSpace.LSContainer;
-import BritefuryJ.LSpace.LSContentLeaf;
-import BritefuryJ.LSpace.LSContentLeafEditable;
-import BritefuryJ.LSpace.LSElement;
-import BritefuryJ.LSpace.ElementFilter;
+import BritefuryJ.LSpace.*;
 import BritefuryJ.LSpace.Layout.LAllocBoxInterface;
 import BritefuryJ.LSpace.Layout.LAllocV;
 import BritefuryJ.LSpace.Layout.LReqBoxInterface;
@@ -345,10 +341,116 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 		return null;
 	}
 
+
 	public abstract LSElement getChildLeafClosestToLocalPointWithinBranch(LSContainer withinBranch, Point2 localPos, ElementFilter filter);
 
 
-	
+
+	public abstract InsertionPoint getInsertionPointClosestToLocalPoint(LSContainer withinBranch, Point2 localPos);
+
+	public InsertionPoint getInsertionPointClosestToLocalPointHorizontal(LSContainer branch, Point2 localPos)
+	{
+		AABox2 branchBox = branch.getLocalAABox();
+
+		LSElement leaf = branch.getLeafClosestToLocalPoint( localPos, null );
+		if ( leaf != null )
+		{
+			// Walk back up until we have an element that is a direct child of @withinBranch
+			while ( leaf.getParent() != branch )
+			{
+				leaf = leaf.getParent();
+				if ( leaf == null )
+				{
+					throw new RuntimeException( "Could not trace back to branch" );
+				}
+			}
+
+			LSElement child = leaf;
+			double leftX = getFirstAABoxOfChild( child ).getLowerX();
+			double rightX = getLastAABoxOfChild( child ).getUpperX();
+
+			boolean left = Math.abs( localPos.x - leftX ) < Math.abs( localPos.x - rightX );
+
+			double x = left  ?  leftX  :  rightX;
+
+			int index = branch.getChildren().indexOf( child );
+			index = left  ?  index  :  index + 1;
+			return new InsertionPoint( index, new Point2( x, branchBox.getLowerY() ), new Point2( x, branchBox.getUpperY() ) );
+		}
+
+		return new InsertionPoint( 0, branchBox.getLeftEdge() );
+	}
+
+
+	public InsertionPoint getInsertionPointClosestToLocalPointVertical(LSContainer branch, Point2 localPos)
+	{
+		AABox2 branchBox = branch.getLocalAABox();
+
+		LSElement leaf = branch.getLeafClosestToLocalPoint( localPos, null );
+		if ( leaf != null )
+		{
+			// Walk back up until we have an element that is a direct child of @withinBranch
+			while ( leaf.getParent() != branch )
+			{
+				leaf = leaf.getParent();
+				if ( leaf == null )
+				{
+					throw new RuntimeException( "Could not trace back to branch" );
+				}
+			}
+
+			LSElement child = leaf;
+			double topY = getFirstAABoxOfChild( child ).getLowerY();
+			double bottomY = getLastAABoxOfChild( child ).getUpperY();
+
+			boolean top = Math.abs( localPos.y - topY ) < Math.abs( localPos.y - bottomY );
+
+			double y = top  ?  topY  :  bottomY;
+
+			int index = branch.getChildren().indexOf( child );
+			index = top  ?  index  :  index + 1;
+			return new InsertionPoint( index, new Point2( branchBox.getLowerX(), y ), new Point2( branchBox.getUpperX(), y ) );
+		}
+
+		return new InsertionPoint( 0, branchBox.getLeftEdge() );
+	}
+
+
+
+	protected AABox2 getFirstAABoxOfChild(LSElement child)
+	{
+		AABox2 box = null;
+		if ( child instanceof LSContainer  &&  child.getLayoutNode() == null )
+		{
+			// Collated branch
+			AABox2 bounds[] = computeBranchBoundsBoxes( (LSContainer)child );
+			if ( bounds.length > 0 )
+			{
+				return bounds[0];
+			}
+		}
+
+		return child.getLocalAABox();
+	}
+
+	protected AABox2 getLastAABoxOfChild(LSElement child)
+	{
+		AABox2 box = null;
+		if ( child instanceof LSContainer  &&  child.getLayoutNode() == null )
+		{
+			// Collated branch
+			AABox2 bounds[] = computeBranchBoundsBoxes( (LSContainer)child );
+			if ( bounds.length > 0 )
+			{
+				return bounds[bounds.length-1];
+			}
+		}
+
+		return child.getLocalAABox();
+	}
+
+
+
 	
 	protected abstract AABox2[] computeCollatedBranchBoundsBoxes(int rangeStart, int rangeEnd);
 
