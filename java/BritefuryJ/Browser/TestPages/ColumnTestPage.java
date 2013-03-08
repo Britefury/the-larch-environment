@@ -47,8 +47,12 @@ public class ColumnTestPage extends TestPage
 	
 	private Pres makeRefAlignedRow(int refPointIndex, String header)
 	{
-		Pres v = new Column( refPointIndex, new Pres[] { styleSheet.applyTo( new Label( "First item" ) ), styleSheet.applyTo( new Label( "Second item" ) ),
-						styleSheet.applyTo( new Label( "Third item" ) ), styleSheet.applyTo( new Label( "Fourth item item" ) ) } );
+		Pres v = highlightInsertionPoints(
+				new Column( refPointIndex, new Pres[] { styleSheet.applyTo( new Label( "First item" ) ),
+						styleSheet.applyTo( new Label( "Second item" ) ),
+						styleSheet.applyTo( new Label( "Third item" ) ),
+						styleSheet.applyTo( new Label( "Fourth item item" ) ) } ),
+				new Color( 0.4f, 0.0f, 0.8f ) );
 		v = styleSheet.withValues( Primitive.columnSpacing.as( 0.0 ) ).applyTo( v );
 		return new Row( new Pres[] { t18Style.applyTo( new Label( header ) ), v, t18Style.applyTo( new Label( "After" ) ) } );
 	}
@@ -57,25 +61,25 @@ public class ColumnTestPage extends TestPage
 
 	protected Pres createContents()
 	{
-		Pres columnTest = new Column( new Pres[] { t24Style.applyTo( new Label( "Column" ) ),
+		Pres columnTest = highlightInsertionPoints( new Column( new Pres[] { t24Style.applyTo( new Label( "Column" ) ),
 				t12Style.applyTo( new Label( "First item" ) ),
 				t12Style.applyTo( new Label( "Second item" ) ),
-				t12Style.applyTo( new Label( "Third item" ) ) } );
+				t12Style.applyTo( new Label( "Third item" ) ) } ) );
 		
-		Pres hAlignTest = styleSheet.withValues( Primitive.columnSpacing.as( 10.0 ) ).applyTo( new Column( new Pres[] {
+		Pres hAlignTest = styleSheet.withValues( Primitive.columnSpacing.as( 10.0 ) ).applyTo( highlightInsertionPoints( new Column( new Pres[] {
 				t24Style.applyTo( new Label( "Horizontal alignment" ) ),
 				textOnGreyStyle.applyTo( new Label( "Left" ) ).alignHLeft(),
 				textOnGreyStyle.applyTo( new Label( "Centre" ) ).alignHCentre(),
 				textOnGreyStyle.applyTo( new Label( "Right" ) ).alignHRight(),
-				textOnGreyStyle.applyTo( new Label( "Expand" ) ).alignHExpand() } ) );
+				textOnGreyStyle.applyTo( new Label( "Expand" ) ).alignHExpand() } ) ) );
 		
 		
-		Pres refPointAlignTest = styleSheet.withValues( Primitive.columnSpacing.as( 20.0 ) ).applyTo( new Column( new Pres[] {
+		Pres refPointAlignTest = styleSheet.withValues( Primitive.columnSpacing.as( 20.0 ) ).applyTo( highlightInsertionPoints( new Column( new Pres[] {
 				t24Style.applyTo( new Label( "Column reference point alignment" ) ),
 				makeRefAlignedRow( 0, "ALIGN_WITH_0" ),
 				makeRefAlignedRow( 1, "ALIGN_WITH_1" ),
 				makeRefAlignedRow( 2, "ALIGN_WITH_2" ),
-				makeRefAlignedRow( 3, "ALIGN_WITH_3" ) } ) );
+				makeRefAlignedRow( 3, "ALIGN_WITH_3" ) } ) ) );
 		
 		
 		return new Body( new Pres[] {
