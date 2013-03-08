@@ -45,7 +45,7 @@ public class ElementPreview
 	
 	public ElementPreview(LSElement element)
 	{
-		AABox2 visibleSpaceBox = element.getVisibleSpaceBox();
+		AABox2 visibleSpaceBox = element.getVisibleBoxInLocalSpace();
 		Xform2 elementToWindowXform = element.getLocalToRootXform();
 		
 		Point2 topLeft = visibleSpaceBox.getLower();

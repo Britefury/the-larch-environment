@@ -30,6 +30,8 @@ public class LSSpan extends LSContainerSequence
 	}
 
 
+	// For most elements, this is the bounding box. For layout-less elements, it is their bounds within the closest
+	// non-layout-less parent
 	@Override
 	protected AABox2 getVisibleBoxInLocalSpace()
 	{
@@ -49,6 +51,7 @@ public class LSSpan extends LSContainerSequence
 		}
 	}
 	
+	@Override
 	public Shape[] getShapes()
 	{
 		AABox2 bounds[] = computeBoundingBoxes();
@@ -61,21 +64,7 @@ public class LSSpan extends LSContainerSequence
 		return shapes;
 	}
 
-	// For most elements, this is the bounding box. For layout-less elements, it is their bounds within the closest
-	// non-layout-less parent
-	@Override
-	public AABox2 getVisibleSpaceBox()
-	{
-		AABox2 bounds[] = computeBoundingBoxes();
-		AABox2 box = new AABox2();
-		for (AABox2 b: bounds)
-		{
-			box.addBox( b );
-		}
-		return box;
-	}
 
-	
 
 	private AABox2[] computeBoundingBoxes()
 	{

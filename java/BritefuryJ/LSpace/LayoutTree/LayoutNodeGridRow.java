@@ -8,6 +8,7 @@ package BritefuryJ.LSpace.LayoutTree;
 
 import java.util.List;
 
+import BritefuryJ.LSpace.InsertionPoint;
 import BritefuryJ.LSpace.LSContainer;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.ElementFilter;
@@ -88,6 +89,13 @@ public class LayoutNodeGridRow extends ArrangedSequenceLayoutNode
 	public LSElement getChildLeafClosestToLocalPointWithinBranch(LSContainer withinBranch, Point2 localPos, ElementFilter filter)
 	{
 		return getChildLeafClosestToLocalPointHorizontal( getLeavesWithinBranch( withinBranch ), localPos, filter );
+	}
+
+
+	@Override
+	public InsertionPoint getInsertionPointClosestToLocalPoint(LSContainer withinBranch, Point2 localPos)
+	{
+		return getInsertionPointClosestToLocalPointHorizontal( withinBranch, localPos );
 	}
 
 

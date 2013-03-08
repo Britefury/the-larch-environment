@@ -261,6 +261,83 @@ public class LayoutNodeFlowGrid extends ArrangedSequenceLayoutNode
 
 
 
+	@Override
+	public InsertionPoint getInsertionPointClosestToLocalPoint(LSContainer withinBranch, Point2 localPos)
+	{
+		refreshSubtree();
+
+		int cellPos[] = getCellPositionUnder( localPos );
+		if ( cellPos != null )
+		{
+			int x = cellPos[0], y = cellPos[1];
+			int branchBounds[] = withinBranch == element  ?  new int[] { 0, leaves.length }  :  getBranchRange( withinBranch );
+
+			if ( branchBounds != null )
+			{
+				int cellIndex = y*columnBounds.getNumColumns()+x;
+				if ( cellIndex >= branchBounds[0]  && cellIndex < branchBounds[1] )
+				{
+					LSElement leaf = leaves[cellIndex];
+
+					// Walk back up until we have an element that is a direct child of @withinBranch
+					while ( leaf.getParent() != withinBranch )
+					{
+						leaf = leaf.getParent();
+						if ( leaf == null )
+						{
+							throw new RuntimeException( "Could not trace back to branch" );
+						}
+					}
+
+					LSElement child = leaf;
+					Point2 left[], right[];
+					int childBounds[];
+					if ( child instanceof LSContainer  &&  child.getLayoutNode() == null )
+					{
+						childBounds = getBranchRange( child );
+					}
+					else
+					{
+						int index = getLeaves().indexOf( child );
+						childBounds = new int[] { index, index + 1 };
+					}
+					int numColumns = columnBounds.getNumColumns();
+					double beginX = columnBounds.boundaryLineX( childBounds[0] % numColumns );
+					double endX = columnBounds.boundaryLineX( childBounds[1] % numColumns );
+					LAllocBox beginRow = rowAllocBoxes[childBounds[0] / numColumns];
+					LAllocBox endRow = rowAllocBoxes[childBounds[1] / numColumns];
+					double beginY0 = beginRow.getAllocPositionInParentSpaceY(),  beginY1 = beginY0 + beginRow.getAllocHeight();
+					double endY0 = endRow.getAllocPositionInParentSpaceY(),  endY1 = endY0 + endRow.getAllocHeight();
+					left = new Point2[] { new Point2( beginX, beginY0 ), new Point2( beginX, beginY1 ) };
+					right = new Point2[] { new Point2( endX, endY0 ), new Point2( endX, endY1 ) };
+					AABox2 leftBox = new AABox2( left[0], left[1] );
+					AABox2 rightBox = new AABox2( right[0], right[1] );
+
+					double leftSqrDist = leftBox.sqrDistanceTo( localPos );
+					double rightSqrDist = rightBox.sqrDistanceTo( localPos );
+					int index;
+					Point2 line[];
+					if ( leftSqrDist < rightSqrDist )
+					{
+						index = childBounds[0];
+						line = left;
+					}
+					else
+					{
+						index = childBounds[1];
+						line = right;
+					}
+
+					return new InsertionPoint( index, line );
+				}
+			}
+		}
+
+		AABox2 branchBox = withinBranch.getLocalAABox();
+		return new InsertionPoint( 0, branchBox.getLeftEdge() );
+	}
+
+
 
 	public int getNumColumns()
 	{
