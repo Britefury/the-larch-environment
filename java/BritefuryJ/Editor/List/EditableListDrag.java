@@ -20,7 +20,7 @@ public class EditableListDrag
 	}
 
 
-	public Object getController()
+	public EditableListController getController()
 	{
 		return controller;
 	}

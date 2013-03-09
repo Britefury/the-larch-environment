@@ -120,6 +120,12 @@ public class EditableListController
 
 
 
+	public boolean testController(EditableListController controller)
+	{
+		return controller == this;
+	}
+
+
 	public boolean canReorder(Object item, Object destList, int index)
 	{
 		return true;
@@ -272,23 +278,27 @@ public class EditableListController
 			if ( ins != null )
 			{
 				EditableListDrag drag = (EditableListDrag)data;
-				Object item = drag.getItem();
-				Object list = drag.getEditableList();
 
-				if ( action == ObjectDndHandler.MOVE )
+				if ( testController( drag.getController() ) )
 				{
-					if ( list == ls )
+					Object item = drag.getItem();
+					Object list = drag.getEditableList();
+
+					if ( action == ObjectDndHandler.MOVE )
 					{
-						return canReorder( item, list, ins.getIndex() );
+						if ( list == ls )
+						{
+							return canReorder( item, list, ins.getIndex() );
+						}
+						else
+						{
+							return canMove( item, list, ins.getIndex(), ls );
+						}
 					}
 					else
 					{
-						return canMove( item, list, ins.getIndex(), ls );
+						return canCopy( item, list, ins.getIndex(), ls );
 					}
-				}
-				else
-				{
-					return canCopy( item, list, ins.getIndex(), ls );
 				}
 			}
 		}
@@ -326,23 +336,26 @@ public class EditableListController
 			if ( ins != null )
 			{
 				EditableListDrag drag = (EditableListDrag)data;
-				Object item = drag.getItem();
-				Object list = drag.getEditableList();
-
-				if ( action == ObjectDndHandler.MOVE )
+				if ( testController( drag.getController() ) )
 				{
-					if ( list == ls )
+					Object item = drag.getItem();
+					Object list = drag.getEditableList();
+
+					if ( action == ObjectDndHandler.MOVE )
 					{
-						return reorder( item, list, ins.getIndex() );
+						if ( list == ls )
+						{
+							return reorder( item, list, ins.getIndex() );
+						}
+						else
+						{
+							return move( item, list, ins.getIndex(), ls );
+						}
 					}
 					else
 					{
-						return move( item, list, ins.getIndex(), ls );
+						return copy( item, list, ins.getIndex(), ls );
 					}
-				}
-				else
-				{
-					return copy( item, list, ins.getIndex(), ls );
 				}
 			}
 		}
