@@ -8,15 +8,22 @@ package BritefuryJ.Editor.List;
 
 public class EditableListDrag
 {
+	private EditableListController controller;
 	private Object editableList, item;
 
 
-	public EditableListDrag(Object editableList, Object item)
+	public EditableListDrag(EditableListController controller, Object editableList, Object item)
 	{
+		this.controller = controller;
 		this.editableList = editableList;
 		this.item = item;
 	}
 
+
+	public Object getController()
+	{
+		return controller;
+	}
 
 	public Object getEditableList()
 	{
