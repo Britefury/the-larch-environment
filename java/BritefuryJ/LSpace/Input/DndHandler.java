@@ -35,10 +35,25 @@ public abstract class DndHandler
 	public static final FilledOutlinePainter dndHighlightPainter = new FilledOutlinePainter( new Color( 1.0f, 0.8f, 0.0f, 0.2f ), new Color( 1.0f, 0.5f, 0.0f, 0.5f ) );
 	
 	
-	public static interface PotentialDrop
+	public static abstract class PotentialDrop
 	{
-		void draw(Graphics2D graphics);
-		void queueRedraw();
+		protected LSElement destElement;
+
+
+		public PotentialDrop(LSElement destElement)
+		{
+			this.destElement = destElement;
+		}
+
+
+		public abstract void draw(Graphics2D graphics);
+		public abstract void queueRedraw();
+
+
+		public LSElement getDestElement()
+		{
+			return destElement;
+		}
 	}
 
 	

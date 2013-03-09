@@ -22,7 +22,7 @@ import java.awt.geom.Rectangle2D;
 
 public class EditableListController
 {
-	public static class ItemPropertyKey
+	private static class ItemPropertyKey
 	{
 		private ItemPropertyKey()
 		{
@@ -32,17 +32,17 @@ public class EditableListController
 	}
 
 
-	public static class NestedListItemPropertyKey
+	private static class NestedListPropertyKey
 	{
-		private NestedListItemPropertyKey()
+		private NestedListPropertyKey()
 		{
 		}
 
-		public static final NestedListItemPropertyKey instance = new NestedListItemPropertyKey();
+		public static final NestedListPropertyKey instance = new NestedListPropertyKey();
 	}
 
 
-	public static class ListPropertyKey
+	private static class ListPropertyKey
 	{
 		private ListPropertyKey()
 		{
@@ -120,40 +120,96 @@ public class EditableListController
 
 
 
-	public boolean canInsert(Object item, Object fromList, int index, Object intoList, int action)
+	public boolean canReorder(Object item, Object destList, int index)
 	{
 		return true;
 	}
 
-	public boolean insert(Object item, Object fromList, int index, Object intoList, int action)
-	{
-		return false;
-	}
-
-
-	public boolean canAddtoNestedList(Object item, Object fromList, Object intoList, int action)
+	public boolean canMove(Object item, Object srcList, int index, Object destList)
 	{
 		return true;
 	}
 
-	public boolean addToNestedList(Object item, Object fromList, Object intoList, int action)
+	public boolean canCopy(Object item, Object srcList, int index, Object destList)
 	{
-		return false;
+		return true;
+	}
+
+
+	public boolean reorder(Object item, Object destList, int index)
+	{
+		return true;
+	}
+
+	public boolean move(Object item, Object srcList, int index, Object destList)
+	{
+		return true;
+	}
+
+	public boolean copy(Object item, Object srcList, int index, Object destList)
+	{
+		return true;
+	}
+
+
+
+	public boolean canReorderToEnd(Object item, Object destList)
+	{
+		return true;
+	}
+
+	public boolean canMoveToEnd(Object item, Object srcList, Object destList)
+	{
+		return true;
+	}
+
+	public boolean canCopyToEnd(Object item, Object srcList, Object destList)
+	{
+		return true;
+	}
+
+
+
+	public boolean reorderToEnd(Object item, Object destList)
+	{
+		return true;
+	}
+
+	public boolean moveToEnd(Object item, Object srcList, Object destList)
+	{
+		return true;
+	}
+
+	public boolean copyToEnd(Object item, Object srcList, Object destList)
+	{
+		return true;
 	}
 
 
 
 	public Pres item(Object item, Pres p)
 	{
+		if ( item == null )
+		{
+			throw new RuntimeException( "item cannot be null" );
+		}
 		p = p.withProperty( ItemPropertyKey.instance, item );
 		p = p.withDragSource( dragSource );
 		return p;
 	}
 
-	public Pres nestedListItem(Object item, Object subList, Pres p)
+	public Pres nestedListItem(Object item, Object nestedList, Pres p)
 	{
+		if ( item == null )
+		{
+			throw new RuntimeException( "item cannot be null" );
+		}
+		if ( nestedList == null )
+		{
+			throw new RuntimeException( "nestedList cannot be null" );
+		}
 		p = p.withProperty( ItemPropertyKey.instance, item );
-		p = p.withProperty( NestedListItemPropertyKey.instance, subList );
+		p = p.withProperty( NestedListPropertyKey.instance, nestedList );
 		p = p.withDropDest( nestedListItemDropDest );
 		p = p.withDragSource( dragSource );
 		return p;
@@ -161,6 +217,10 @@ public class EditableListController
 
 	public Pres editableList(Object list, Pres p)
 	{
+		if ( list == null )
+		{
+			throw new RuntimeException( "list cannot be null" );
+		}
 		p = p.withProperty( ListPropertyKey.instance, list );
 		p = p.withDropDest( dropDest );
 		return p;
@@ -168,13 +228,33 @@ public class EditableListController
 
 
 
+	public static Object getList(LSElement element)
+	{
+		LSElement.PropertyValue prop = element.findPropertyInAncestors( ListPropertyKey.instance );
+		return prop != null  ?  prop.getValue()  :  null;
+	}
+
+	public static Object getNestedList(LSElement element)
+	{
+		LSElement.PropertyValue prop = element.findPropertyInAncestors( NestedListPropertyKey.instance );
+		return prop != null  ?  prop.getValue()  :  null;
+	}
+
+	public static Object getItem(LSElement element)
+	{
+		LSElement.PropertyValue prop = element.findPropertyInAncestors( ItemPropertyKey.instance );
+		return prop != null  ?  prop.getValue()  :  null;
+	}
+
+
+
 	private Object createDragData(LSElement sourceElement, int aspect)
 	{
-		LSElement.PropertyValue ls = sourceElement.findPropertyInAncestors( ListPropertyKey.instance );
-		LSElement.PropertyValue it = sourceElement.findPropertyInAncestors( ItemPropertyKey.instance );
+		Object ls = getList( sourceElement );
+		Object it = getItem( sourceElement );
 		if ( ls != null  &&  it != null )
 		{
-			return new EditableListDrag( this, ls.getValue(), it.getValue() );
+			return new EditableListDrag( this, ls, it );
 		}
 		else
 		{
@@ -184,7 +264,7 @@ public class EditableListController
 
 	private boolean canDrop(LSElement destElement, Point2 targetPosition, Object data, int action)
 	{
-		LSElement.PropertyValue ls = destElement.findPropertyInAncestors( ListPropertyKey.instance );
+		Object ls = getList( destElement );
 
 		if ( ls != null  &&  destElement instanceof LSContainerSequence )
 		{
@@ -192,7 +272,24 @@ public class EditableListController
 			if ( ins != null )
 			{
 				EditableListDrag drag = (EditableListDrag)data;
-				return canInsert( drag.getItem(), drag.getEditableList(), ins.getIndex(), ls.getValue(), action );
+				Object item = drag.getItem();
+				Object list = drag.getEditableList();
+
+				if ( action == ObjectDndHandler.MOVE )
+				{
+					if ( list == ls )
+					{
+						return canReorder( item, list, ins.getIndex() );
+					}
+					else
+					{
+						return canMove( item, list, ins.getIndex(), ls );
+					}
+				}
+				else
+				{
+					return canCopy( item, list, ins.getIndex(), ls );
+				}
 			}
 		}
 		return false;
@@ -202,7 +299,7 @@ public class EditableListController
 	{
 		ObjectDndHandler.dndHighlightPainter.drawShapes( graphics, destElement.getShapes() );
 
-		LSElement.PropertyValue ls = destElement.findPropertyInAncestors( ListPropertyKey.instance );
+		Object ls = getList( destElement );
 
 		if ( ls != null  &&  destElement instanceof LSContainerSequence )
 		{
@@ -221,7 +318,7 @@ public class EditableListController
 
 	private boolean drop(LSElement destElement, Point2 targetPosition, Object data, int action)
 	{
-		LSElement.PropertyValue ls = destElement.findPropertyInAncestors( ListPropertyKey.instance );
+		Object ls = getList( destElement );
 
 		if ( ls != null  &&  destElement instanceof LSContainerSequence )
 		{
@@ -229,7 +326,24 @@ public class EditableListController
 			if ( ins != null )
 			{
 				EditableListDrag drag = (EditableListDrag)data;
-				return insert( drag.getItem(), drag.getEditableList(), ins.getIndex(), ls.getValue(), action );
+				Object item = drag.getItem();
+				Object list = drag.getEditableList();
+
+				if ( action == ObjectDndHandler.MOVE )
+				{
+					if ( list == ls )
+					{
+						return reorder( item, list, ins.getIndex() );
+					}
+					else
+					{
+						return move( item, list, ins.getIndex(), ls );
+					}
+				}
+				else
+				{
+					return copy( item, list, ins.getIndex(), ls );
+				}
 			}
 		}
 
@@ -241,7 +355,7 @@ public class EditableListController
 
 	private boolean canDropOntoNestedList(LSElement destElement, Point2 targetPosition, Object data, int action)
 	{
-		LSElement.PropertyValue nestedLs = destElement.findPropertyInAncestors( NestedListItemPropertyKey.instance );
+		Object nestedLs = getNestedList( destElement );
 
 		if ( nestedLs != null )
 		{
@@ -251,7 +365,25 @@ public class EditableListController
 			if ( offset.x >= w * 0.25  &&  offset.x <= w * 0.75  &&  offset.y >= h * 0.25  &&  offset.y <= h * 0.75 )
 			{
 				EditableListDrag drag = (EditableListDrag)data;
-				return canAddtoNestedList( drag.getItem(), drag.getEditableList(), nestedLs.getValue(), action );
+
+				Object item = drag.getItem();
+				Object list = drag.getEditableList();
+
+				if ( action == ObjectDndHandler.MOVE )
+				{
+					if ( list == nestedLs )
+					{
+						return canReorderToEnd(item, nestedLs);
+					}
+					else
+					{
+						return canMoveToEnd(item, list, nestedLs);
+					}
+				}
+				else
+				{
+					return canCopyToEnd(item, list, nestedLs);
+				}
 			}
 		}
 		return false;
@@ -259,7 +391,7 @@ public class EditableListController
 
 	private void drawNestedListHighlight(LSElement destElement, Graphics2D graphics, Point2 targetPosition, int action)
 	{
-		LSElement.PropertyValue nestedLs = destElement.findPropertyInAncestors( NestedListItemPropertyKey.instance );
+		Object nestedLs = getNestedList( destElement );
 
 		if ( nestedLs != null )
 		{
@@ -276,7 +408,7 @@ public class EditableListController
 
 	private boolean dropOntoNestedList(LSElement destElement, Point2 targetPosition, Object data, int action)
 	{
-		LSElement.PropertyValue nestedLs = destElement.findPropertyInAncestors( NestedListItemPropertyKey.instance );
+		Object nestedLs = getNestedList( destElement );
 
 		if ( nestedLs != null )
 		{
@@ -286,7 +418,25 @@ public class EditableListController
 			if ( offset.x >= w * 0.25  &&  offset.x <= w * 0.75  &&  offset.y >= h * 0.25  &&  offset.y <= h * 0.75 )
 			{
 				EditableListDrag drag = (EditableListDrag)data;
-				return addToNestedList( drag.getItem(), drag.getEditableList(), nestedLs.getValue(), action );
+
+				Object item = drag.getItem();
+				Object list = drag.getEditableList();
+
+				if ( action == ObjectDndHandler.MOVE )
+				{
+					if ( list == nestedLs )
+					{
+						return reorderToEnd(item, nestedLs);
+					}
+					else
+					{
+						return moveToEnd(item, list, nestedLs);
+					}
+				}
+				else
+				{
+					return copyToEnd(item, list, nestedLs);
+				}
 			}
 		}
 		return false;
