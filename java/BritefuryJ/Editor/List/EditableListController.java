@@ -6,19 +6,21 @@
 //##************************
 package BritefuryJ.Editor.List;
 
+import BritefuryJ.Graphics.FilledOutlinePainter;
 import BritefuryJ.LSpace.Input.ObjectDndHandler;
 import BritefuryJ.LSpace.InsertionPoint;
 import BritefuryJ.LSpace.LSContainerSequence;
 import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 import BritefuryJ.Pres.Pres;
 
 import java.awt.*;
-import java.awt.geom.Path2D;
+import java.awt.geom.Rectangle2D;
 
 
-public abstract class EditableListController
+public class EditableListController
 {
 	public static class ItemPropertyKey
 	{
@@ -27,6 +29,16 @@ public abstract class EditableListController
 		}
 
 		public static final ItemPropertyKey instance = new ItemPropertyKey();
+	}
+
+
+	public static class NestedListItemPropertyKey
+	{
+		private NestedListItemPropertyKey()
+		{
+		}
+
+		public static final NestedListItemPropertyKey instance = new NestedListItemPropertyKey();
 	}
 
 
@@ -41,8 +53,10 @@ public abstract class EditableListController
 
 
 
+	public static final FilledOutlinePainter nestedListItemDndHighlightPainter = new FilledOutlinePainter( new Color( 1.0f, 0.2f, 0.0f, 0.2f ), new Color( 1.0f, 0.4f, 0.0f, 0.5f ) );
+
 	private ObjectDndHandler.DragSource dragSource;
-	private ObjectDndHandler.DropDest dropDest;
+	private ObjectDndHandler.DropDest dropDest, nestedListItemDropDest;
 
 
 
@@ -79,6 +93,29 @@ public abstract class EditableListController
 						return EditableListController.this.drop( destElement, targetPosition, data, action );
 					}
 				} );
+
+		nestedListItemDropDest = new ObjectDndHandler.DropDest( EditableListDrag.class,
+				new ObjectDndHandler.CanDropFn()
+				{
+					public boolean canDrop(LSElement destElement, Point2 targetPosition, Object data, int action)
+					{
+						return EditableListController.this.canDropOntoNestedList( destElement, targetPosition, data, action );
+					}
+				},
+				new ObjectDndHandler.DropHighlightFn()
+				{
+					public void drawDrawHighlight(LSElement destElement, Graphics2D graphics, Point2 targetPosition, int action)
+					{
+						EditableListController.this.drawNestedListHighlight( destElement, graphics, targetPosition, action );
+					}
+				},
+				new ObjectDndHandler.DropFn()
+				{
+					public boolean acceptDrop(LSElement destElement, Point2 targetPosition, Object data, int action)
+					{
+						return EditableListController.this.dropOntoNestedList( destElement, targetPosition, data, action );
+					}
+				} );
 	}
 
 
@@ -88,14 +125,36 @@ public abstract class EditableListController
 		return true;
 	}
 
-	public abstract boolean insert(Object item, Object fromList, int index, Object intoList, int action);
+	public boolean insert(Object item, Object fromList, int index, Object intoList, int action)
+	{
+		return false;
+	}
 
+
+	public boolean canAddtoNestedList(Object item, Object fromList, Object intoList, int action)
+	{
+		return true;
+	}
+
+	public boolean addToNestedList(Object item, Object fromList, Object intoList, int action)
+	{
+		return false;
+	}
 
 
 
 	public Pres item(Object item, Pres p)
 	{
 		p = p.withProperty( ItemPropertyKey.instance, item );
+		p = p.withDragSource( dragSource );
+		return p;
+	}
+
+	public Pres nestedListItem(Object item, Object subList, Pres p)
+	{
+		p = p.withProperty( ItemPropertyKey.instance, item );
+		p = p.withProperty( NestedListItemPropertyKey.instance, subList );
+		p = p.withDropDest( nestedListItemDropDest );
 		p = p.withDragSource( dragSource );
 		return p;
 	}
@@ -115,7 +174,7 @@ public abstract class EditableListController
 		LSElement.PropertyValue it = sourceElement.findPropertyInAncestors( ItemPropertyKey.instance );
 		if ( ls != null  &&  it != null )
 		{
-			return new EditableListDrag( ls.getValue(), it.getValue() );
+			return new EditableListDrag( this, ls.getValue(), it.getValue() );
 		}
 		else
 		{
@@ -153,35 +212,7 @@ public abstract class EditableListController
 				Paint oldPaint = graphics.getPaint();
 				graphics.setPaint( new Color( 0.8f, 0.3f, 0.0f ) );
 
-				// Build the insertion shape
-				Point2 start = ins.getStartPoint();
-				Point2 end = ins.getEndPoint();
-				Vector2 u = end.sub( start ).getNormalised();
-				Vector2 v = u.rotated90CCW();
-
-				Point2 verts[] = new Point2[] {
-						start.add( v.mul( -4.0 ) ),
-						start.add( v.mul( 4.0 ) ),
-						start.add( v.mul( 1.0 ) ).add( u.mul( 8.0 ) ),
-						end.add( v.mul( 1.0 ) ).sub( u.mul( 8.0 ) ),
-						end.add( v.mul( 4.0 ) ),
-						end.add( v.mul( -4.0 ) ),
-						end.add( v.mul( -1.0 ) ).sub( u.mul( 8.0 ) ),
-						start.add( v.mul( -1.0 ) ).add( u.mul( 8.0 ) )
-				};
-
-				Path2D.Double path = new Path2D.Double();
-				Point2 first = verts[0];
-				path.moveTo( first.x, first.y );
-				for (int i = 1; i < verts.length; i++)
-				{
-					Point2 vtx = verts[i];
-					path.lineTo( vtx.x, vtx.y );
-				}
-
-				path.closePath();
-
-				graphics.fill( path );
+				ins.draw( graphics );
 
 				graphics.setPaint( oldPaint );
 			}
@@ -202,6 +233,62 @@ public abstract class EditableListController
 			}
 		}
 
+		return false;
+	}
+
+
+
+
+	private boolean canDropOntoNestedList(LSElement destElement, Point2 targetPosition, Object data, int action)
+	{
+		LSElement.PropertyValue nestedLs = destElement.findPropertyInAncestors( NestedListItemPropertyKey.instance );
+
+		if ( nestedLs != null )
+		{
+			AABox2 bounds = destElement.getLocalAABox();
+			Vector2 offset = targetPosition.sub( bounds.getLower() );
+			double w = bounds.getWidth(), h = bounds.getHeight();
+			if ( offset.x >= w * 0.25  &&  offset.x <= w * 0.75  &&  offset.y >= h * 0.25  &&  offset.y <= h * 0.75 )
+			{
+				EditableListDrag drag = (EditableListDrag)data;
+				return canAddtoNestedList( drag.getItem(), drag.getEditableList(), nestedLs.getValue(), action );
+			}
+		}
+		return false;
+	}
+
+	private void drawNestedListHighlight(LSElement destElement, Graphics2D graphics, Point2 targetPosition, int action)
+	{
+		LSElement.PropertyValue nestedLs = destElement.findPropertyInAncestors( NestedListItemPropertyKey.instance );
+
+		if ( nestedLs != null )
+		{
+			AABox2 bounds = destElement.getLocalAABox();
+			Vector2 offset = targetPosition.sub( bounds.getLower() );
+			double w = bounds.getWidth(), h = bounds.getHeight();
+			if ( offset.x >= w * 0.25  &&  offset.x <= w * 0.75  &&  offset.y >= h * 0.25  &&  offset.y <= h * 0.75 )
+			{
+				Rectangle2D.Double r = new Rectangle2D.Double( bounds.getLowerX() + w * 0.25, bounds.getLowerY() + h * 0.25, w * 0.5, h * 0.5 );
+				nestedListItemDndHighlightPainter.drawShape( graphics, r );
+			}
+		}
+	}
+
+	private boolean dropOntoNestedList(LSElement destElement, Point2 targetPosition, Object data, int action)
+	{
+		LSElement.PropertyValue nestedLs = destElement.findPropertyInAncestors( NestedListItemPropertyKey.instance );
+
+		if ( nestedLs != null )
+		{
+			AABox2 bounds = destElement.getLocalAABox();
+			Vector2 offset = targetPosition.sub( bounds.getLower() );
+			double w = bounds.getWidth(), h = bounds.getHeight();
+			if ( offset.x >= w * 0.25  &&  offset.x <= w * 0.75  &&  offset.y >= h * 0.25  &&  offset.y <= h * 0.75 )
+			{
+				EditableListDrag drag = (EditableListDrag)data;
+				return addToNestedList( drag.getItem(), drag.getEditableList(), nestedLs.getValue(), action );
+			}
+		}
 		return false;
 	}
 }
