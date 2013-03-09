@@ -3,7 +3,7 @@
 ##-* under the terms of the GNU General Public License version 2 as published by the
 ##-* Free Software Foundation. The full text of the GNU General Public License
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
-##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
+##-* program. This source code is (C)copyright Geoffrey French 1999-2013.
 ##-*************************
 import copy
 import os
@@ -45,6 +45,8 @@ from BritefuryJ.Util.Jython import JythonException
 
 from BritefuryJ.Projection import Perspective
 
+from BritefuryJ.Editor.List import EditableListController
+
 from Britefury import app_in_jar
 
 from LarchCore.MainApp import DocumentManagement
@@ -55,52 +57,6 @@ from LarchCore.Project.ProjectPage import ProjectPage
 from LarchCore.Project.ProjectNode import ProjectNode
 from LarchCore.Project import PageData
 
-
-
-class ProjectDrag (Object):
-	def __init__(self, source):
-		self.source = source
-
-
-def _getProjectModelOfElement(element):
-	ctx = element.fragmentContext
-	model = ctx.model
-	while not isinstance( model, ProjectNode ):
-		ctx = ctx.parent
-		model = ctx.model
-	return model
-
-
-def _getModelOfPackageOrPageNameElement(element):
-	model = _getProjectModelOfElement(element)
-	if not isinstance( model, ProjectPackage )  and  not isinstance( model, ProjectPage ):
-		raise TypeError, 'model is not a project package or a page, it is a %s' % type( model )
-	return model
-
-def _getModelOfProjectNameElement(element):
-	model = _getProjectModelOfElement(element)
-	if not isinstance( model, ProjectRoot ):
-		raise TypeError, 'model is not a project root, it is a %s' % type( model )
-	return model
-
-def _getSubjectOfPageNameElement(element):
-	model = _getProjectModelOfElement(element)
-	if not isinstance( model, ProjectPage ):
-		raise TypeError, 'model is not a project page, it is a %s' % type( model )
-	fragment = element.fragmentContext
-	pageSubject = fragment.subject._pageSubject( model )
-	return pageSubject
-
-
-def _dragSourceCreateSourceData(element, aspect):
-	return ProjectDrag( _getModelOfPackageOrPageNameElement( element ) )
-
-def _dragSourceCreateLink(element, aspect):
-	return LinkSubjectDrag( _getSubjectOfPageNameElement( element ) )
-
-
-_dragSource = ObjectDndHandler.DragSource( ProjectDrag, _dragSourceCreateSourceData )
-_linkDragSource = ObjectDndHandler.DragSource( LinkSubjectDrag, _dragSourceCreateLink )
 
 
 
@@ -115,129 +71,104 @@ def _isChildOf(node, package):
 	return False
 
 
-def _performDrop(data, action, newParent, index):
-	changeHistory = newParent.__change_history__
-	changeHistory.freeze()
-	item = copy.deepcopy( data.source )   if action == ObjectDndHandler.COPY   else data.source
+class _ProjectTreeController (EditableListController):
+	def canMove(self, item, source, index, dest):
+		return not _isChildOf( dest, item )
 
-	if action == ObjectDndHandler.MOVE:
-		# Remove from existing parent
-		itemToRemove = data.source
-		currentParent = itemToRemove.parent
-		indexOfItem = currentParent.indexOfById( itemToRemove )
-		del currentParent[indexOfItem]
-		if index is not None  and  newParent is currentParent  and  index > indexOfItem:
+
+	def reorder(self, item, dest, index):
+		changeHistory = dest.__change_history__
+		changeHistory.freeze()
+		srcIndex = dest.indexOfById( item )
+		if srcIndex < index:
 			index -= 1
-
-	if index is None:
-		newParent.append( item )
-	else:
-		newParent.insert( index, item )
-	changeHistory.thaw()
-
-
-
-
-def _canDropOntoPage(element, targetPos, data, action):
-	if action & ObjectDndHandler.COPY_OR_MOVE  !=  0:
-		model = _getModelOfPackageOrPageNameElement( element )
-		return model is not data.source
-	return False
-
-def _highlightDropOntoPage(element, graphics, targetPos, action):
-	if action & ObjectDndHandler.COPY_OR_MOVE  !=  0:
-		if targetPos.y > ( element.getActualHeight() * 0.5 ):
-			# Highlight lower part
-			shape = Rectangle2D.Double( 0.0, element.getActualHeight() * 0.75, element.getActualWidth(), element.getActualHeight() * 0.25 )
-		else:
-			# Highlight upper part
-			shape = Rectangle2D.Double( 0.0, 0.0, element.getActualWidth(), element.getActualHeight() * 0.25 )
-		ObjectDndHandler.dndHighlightPainter.drawShape( graphics, shape )
-
-def _dropOntoPage(element, targetPos, data, action):
-	if action & ObjectDndHandler.COPY_OR_MOVE  !=  0:
-		destPage = _getModelOfPackageOrPageNameElement( element )
-		parent = destPage.parent
-		index = parent.indexOfById( destPage )
-		if targetPos.y > ( element.getActualHeight() * 0.5 ):
-			index += 1
-
-		_performDrop( data, action, parent, index )
+		del dest[srcIndex]
+		dest.insert( index, item )
+		changeHistory.thaw()
 		return True
-	return False
 
 
-
-def _getDestPackageAndIndex(element, targetPos):
-	targetPackage = _getModelOfPackageOrPageNameElement( element )
-	assert isinstance( targetPackage, ProjectPackage )
-	if targetPos.x > ( element.getActualWidth() * 0.5 ):
-		# Drop as child of package
-		return targetPackage, len( targetPackage )
-	else:
-		# Drop as sibling of package
-		parent = targetPackage.parent
-		index = parent.indexOfById( targetPackage )
-		if targetPos.y > ( element.getActualHeight() * 0.5 ):
-			index += 1
-		return parent, index
-
-
-def _canDropOntoPackage(element, targetPos, data, action):
-	if action & ObjectDndHandler.COPY_OR_MOVE  !=  0:
-		destPackage, index = _getDestPackageAndIndex( element, targetPos )
-		if action == ObjectDndHandler.COPY  or  not _isChildOf( data.source, destPackage ):
-			return True
-	return False
-
-def _highlightDropOntoPackage(element, graphics, targetPos, action):
-	if action & ObjectDndHandler.COPY_OR_MOVE  !=  0:
-		if targetPos.x > ( element.getActualWidth() * 0.5 ):
-			# Highlight right part
-			shape = Rectangle2D.Double( element.getActualWidth() * 0.75, 0.0, element.getActualWidth() * 0.25, element.getActualHeight() )
-		else:
-			if targetPos.y > ( element.getActualHeight() * 0.5 ):
-				# Highlight lower part
-				shape = Rectangle2D.Double( 0.0, element.getActualHeight() * 0.75, element.getActualWidth(), element.getActualHeight() * 0.25 )
-			else:
-				# Highlight upper part
-				shape = Rectangle2D.Double( 0.0, 0.0, element.getActualWidth(), element.getActualHeight() * 0.25 )
-		ObjectDndHandler.dndHighlightPainter.drawShape( graphics, shape )
-
-def _dropOntoPackage(element, targetPos, data, action):
-	if action & ObjectDndHandler.COPY_OR_MOVE  !=  0:
-		destPackage, index = _getDestPackageAndIndex( element, targetPos )
-		if action == ObjectDndHandler.MOVE  and _isChildOf( data.source, destPackage ):
-			return False
-
-
-
-		targetPackage = _getModelOfPackageOrPageNameElement( element )
-		if targetPos.x > ( element.getActualWidth() * 0.5 ):
-			_performDrop( data, action, targetPackage, None )
-			return True
-		else:
-			parent = targetPackage.parent
-			index = parent.indexOfById( targetPackage )
-			if targetPos.y > ( element.getActualHeight() * 0.5 ):
-				index += 1
-
-			_performDrop( data, action, parent, index )
-			return True
-	return False
-
-
-def _projectIndexDrop(element, targetPos, data, action):
-	if action & ObjectDndHandler.COPY_OR_MOVE  !=  0:
-		project = _getModelOfProjectNameElement( element )
-		_performDrop( data, action, project, None )
+	def move(self, item, source, index, dest):
+		changeHistory = dest.__change_history__
+		changeHistory.freeze()
+		source.remove( item )
+		dest.insert( index, item )
+		changeHistory.thaw()
 		return True
-	return False
 
 
-_pageDropDest = ObjectDndHandler.DropDest( ProjectDrag, _canDropOntoPage, _highlightDropOntoPage, _dropOntoPage )
-_packageDropDest = ObjectDndHandler.DropDest( ProjectDrag, _canDropOntoPackage, _highlightDropOntoPackage, _dropOntoPackage )
-_projectIndexDropDest = ObjectDndHandler.DropDest( ProjectDrag, _projectIndexDrop )
+	def copy(self, item, source, index, dest):
+		changeHistory = dest.__change_history__
+		changeHistory.freeze()
+		dest.insert( index, copy.deepcopy( item ) )
+		changeHistory.thaw()
+		return True
+
+
+	def canMoveToEnd(self, item, source, dest):
+		return not _isChildOf( dest, item )
+
+
+	def reorderToEnd(self, item, dest):
+		changeHistory = dest.__change_history__
+		changeHistory.freeze()
+		dest.remove( item )
+		dest.append( item )
+		changeHistory.thaw()
+		return True
+
+	def moveToEnd(self, item, source, dest):
+		changeHistory = dest.__change_history__
+		changeHistory.freeze()
+		source.remove( item )
+		dest.append( item )
+		changeHistory.thaw()
+		return True
+
+	def copyToEnd(self, item, source, dest):
+		changeHistory = dest.__change_history__
+		changeHistory.freeze()
+		dest.append( copy.deepcopy( item ) )
+		changeHistory.thaw()
+		return True
+
+
+_ProjectTreeController.instance = _ProjectTreeController()
+
+
+
+
+
+def _getProjectModelOfElement(element):
+	ctx = element.fragmentContext
+	model = ctx.model
+	while not isinstance( model, ProjectNode ):
+		ctx = ctx.parent
+		model = ctx.model
+	return model
+
+
+def _getSubjectOfPageNameElement(element):
+	model = _getProjectModelOfElement(element)
+	if not isinstance( model, ProjectPage ):
+		raise TypeError, 'model is not a project page, it is a %s' % type( model )
+	fragment = element.fragmentContext
+	pageSubject = fragment.subject._pageSubject( model )
+	return pageSubject
+
+
+def _dragSourceCreateLink(element, aspect):
+	return LinkSubjectDrag( _getSubjectOfPageNameElement( element ) )
+
+
+_linkDragSource = ObjectDndHandler.DragSource( LinkSubjectDrag, _dragSourceCreateLink )
+
+
+
+
+
+
+
 
 
 
@@ -470,11 +401,12 @@ class ProjectView (MethodDispatchView):
 		nameElement = _projectIndexNameStyle.applyTo( Label( 'Project root' ) )
 		nameBox = _itemHoverHighlightStyle.applyTo( nameElement.alignVCentre() )
 		nameBox = nameBox.withContextMenuInteractor( _projectIndexContextMenuFactory )
-		nameBox = nameBox.withDropDest( _projectIndexDropDest )
+		nameBox = _ProjectTreeController.instance.item( project, nameBox )
 		nameBox = AttachTooltip( nameBox, 'Right click to access context menu, from which new pages and packages can be created.\n' + \
 			'A page called index at the root will appear instead of the project page. A page called __startup__ will be executed at start time.', False )
 
 		itemsBox = Column( project[:] ).alignHExpand()
+		itemsBox = _ProjectTreeController.instance.editableList( project, itemsBox )
 
 		contentsView = Column( [ nameBox.alignHExpand(), itemsBox.padX( _packageContentsIndentation, 0.0 ).alignHExpand() ] )
 
@@ -549,16 +481,15 @@ class ProjectView (MethodDispatchView):
 		# Set drop destination and place in box that is h-packed, otherwise attempting to drop items as children could require the user to
 		# drop somewhere off to the right of the package, since the h-expand applied further up the presentation tree will expand it beyond
 		# its visible bounds
-		nameBox = nameBox.withDropDest( _packageDropDest )
 		nameBox = Bin( nameBox ).alignHPack()
 
 		nameBox = nameBox.withContextMenuInteractor( _packageContextMenuFactory )
-		nameBox = nameBox.withDragSource( _dragSource )
+		nameBox = _ProjectTreeController.instance.nestedListItem( package, package, nameBox )
 		nameBox = AttachTooltip( nameBox, 'Right click to access context menu.', False )
 
 		nameLive = LiveValue( nameBox )
-
 		itemsBox = Column( package[:] )
+		itemsBox = _ProjectTreeController.instance.editableList( package, itemsBox )
 
 		return Column( [ nameLive, itemsBox.padX( _packageContentsIndentation, 0.0 ).alignHExpand() ] )
 
@@ -627,9 +558,8 @@ class ProjectView (MethodDispatchView):
 		link = Hyperlink( page.name, pageSubject )
 		link = link.withContextMenuInteractor( _pageContextMenuFactory )
 		nameBox = _itemHoverHighlightStyle.applyTo( Row( [ link ] ) )
-		nameBox = nameBox.withDragSource( _dragSource )
+		nameBox = _ProjectTreeController.instance.item( page, nameBox )
 		nameBox = nameBox.withDragSource( _linkDragSource )
-		nameBox = nameBox.withDropDest( _pageDropDest )
 		nameBox = AttachTooltip( nameBox, 'Click to enter page.\nRight click to access context menu.', False )
 
 		nameLive = LiveValue( nameBox )
