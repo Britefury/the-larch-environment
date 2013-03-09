@@ -341,15 +341,14 @@ public class ObjectDndHandler extends DndHandler
 	}
 	
 	
-	private static abstract class ObjectPotentialDrop  implements PotentialDrop
+	private static abstract class ObjectPotentialDrop extends PotentialDrop
 	{
-		protected LSElement destElement;
 		protected DndDropSwing drop;
 		
 
 		public ObjectPotentialDrop(LSElement destElement, DndDropSwing drop)
 		{
-			this.destElement = destElement;
+			super( destElement );
 			this.drop = drop;
 		}
 		

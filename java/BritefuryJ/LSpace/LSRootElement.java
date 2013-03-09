@@ -1193,6 +1193,7 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		Point2 rootPos = new Point2( windowPos.x, windowPos.y );
 
 		// Drop is finished
+		DndHandler.PotentialDrop potentialDrop = currentPotentialDrop;
 		setPotentialDrop( null );
 		
 		// Detach element preview
@@ -1201,7 +1202,7 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		List<DndTarget> targets = LSElement.getDndTargets( this, rootPos );
 		for (DndTarget target: targets)
 		{
-			if ( target.isDest() )
+			if ( target.isDest()  &&  target.getElement() == potentialDrop.getDestElement() )
 			{
 				LSElement targetElement = target.getElement();
 				Point2 targetPos = target.getElementSpacePos();
