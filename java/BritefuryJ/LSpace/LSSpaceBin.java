@@ -78,6 +78,19 @@ public class LSSpaceBin extends LSBin
 	}
 	
 	
+	public void setWidth(double width)
+	{
+		this.width = width;
+		queueResize();
+	}
+
+	public void setHeight(double height)
+	{
+		this.height = height;
+		queueResize();
+	}
+
+
 	public SizeConstraint getSizeConstraintX()
 	{
 		return flagToSizeConstraint( getFlagMaskValue( _FLAG_SIZE_CONSTRAINT_X_MASK )  /  _FLAG_SIZE_CONSTRAINT_X_START );
@@ -89,7 +102,20 @@ public class LSSpaceBin extends LSBin
 	}
 
 
-	
+	public void setSizeConstraintX(SizeConstraint constraintX)
+	{
+		setFlagMaskValue( _FLAG_SIZE_CONSTRAINT_X_MASK, sizeConstraintToFlag( constraintX ) * _FLAG_SIZE_CONSTRAINT_X_START );
+		queueResize();
+	}
+
+	public void setSizeConstraintY(SizeConstraint constraintY)
+	{
+		setFlagMaskValue( _FLAG_SIZE_CONSTRAINT_Y_MASK, sizeConstraintToFlag( constraintY ) * _FLAG_SIZE_CONSTRAINT_Y_START );
+		queueResize();
+	}
+
+
+
 	private static int sizeConstraintToFlag(SizeConstraint c)
 	{
 		if ( c == SizeConstraint.LARGER )
