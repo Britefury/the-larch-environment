@@ -111,11 +111,55 @@ public class Browser
 			return "Resolve error";
 		}
 	}
+
+
 	
 	
-	
-	
-	
+	private class Pane
+	{
+		private IncrementalView view;
+		private ScrolledViewport.ScrolledViewportControl viewport;
+
+
+		public Pane()
+		{
+			Pres childPres = new Blank();
+			ScrolledViewport vp = new ScrolledViewport( childPres, 0.0, 0.0, history.getCurrentState().getViewportState() );
+			viewport = (ScrolledViewport.ScrolledViewportControl)vp.createControl( PresentationContext.defaultCtx, StyleValues.getRootStyle().alignHExpand().alignVExpand() );
+		}
+
+		public Pane(Subject s, PersistentStateStore stateStore)
+		{
+			view = new IncrementalView( s, inspector, stateStore );
+			Pres childPres = Pres.coerce( view.getViewPres() );
+			ScrolledViewport vp = new ScrolledViewport( childPres, 0.0, 0.0, history.getCurrentState().getViewportState() );
+			viewport = (ScrolledViewport.ScrolledViewportControl)vp.createControl( PresentationContext.defaultCtx, StyleValues.getRootStyle().alignHExpand().alignVExpand() );
+		}
+
+
+		public LSElement getElement()
+		{
+			return viewport.getElement();
+		}
+
+
+		public void viewportReset()
+		{
+			viewport.getViewportElement().resetXform();
+		}
+
+		public void viewportOneToOne()
+		{
+			viewport.getViewportElement().oneToOne();
+		}
+
+		public PersistentStateStore storePersistentState()
+		{
+			return view != null  ?  view.storePersistentState()  :  null;
+		}
+	}
+
+
 	
 	private static final String COMMAND_BACK = "back";
 	private static final String COMMAND_FORWARD = "forward";
@@ -172,12 +216,11 @@ public class Browser
 
 	private RootPresentationComponent presComponent;
 	private CommandBar commandBar;
-	private ScrolledViewport.ScrolledViewportControl viewport;
 	private BrowserHistory history;
 	
 	private Subject rootSubject, subject;
 	private FragmentInspector inspector;
-	private IncrementalView view;
+	private Pane mainPane;
 	private BrowserListener listener;
 	
 	
@@ -189,12 +232,12 @@ public class Browser
 		this.subject = subject;
 		this.inspector = inspector;
 		history = new BrowserHistory( subject );
-		
-		viewport = makeViewport( new Blank(), history.getCurrentState().getViewportState() );
+
+		mainPane = new Pane();
 		
 		presComponent = new RootPresentationComponent();
 		presComponent.setPageController( pageController );
-		presComponent.getRootElement().setChild( viewport.getElement() );
+		presComponent.getRootElement().setChild( mainPane.getElement() );
 		
 		ActionMap actionMap = presComponent.getActionMap();
 		actionMap.put( TransferHandler.getCutAction().getValue( Action.NAME ), TransferHandler.getCutAction() );
@@ -302,12 +345,12 @@ public class Browser
 	
 	public void viewportReset()
 	{
-		viewport.getViewportElement().resetXform();
+		mainPane.viewportReset();
 	}
 
 	public void viewportOneToOne()
 	{
-		viewport.getViewportElement().oneToOne();
+		mainPane.viewportOneToOne();
 	}
 
 	
@@ -349,9 +392,10 @@ public class Browser
 		ScrolledViewport vp = new ScrolledViewport( childPres, 0.0, 0.0, state );
 		return (ScrolledViewport.ScrolledViewportControl)vp.createControl( PresentationContext.defaultCtx, StyleValues.getRootStyle().alignHExpand().alignVExpand() );
 	}
-	
 
-	
+
+
+
 	private void resolvePath()
 	{
 		// Get the path to resolve
@@ -374,12 +418,11 @@ public class Browser
 	{
 		BrowserState state = history.getCurrentState();
 		PersistentStateStore stateStore = state.getPagePersistentState();
-		
-		view = new IncrementalView( s, inspector, stateStore );
 
-		viewport = makeViewport( view.getViewPres(), history.getCurrentState().getViewportState() );
+		mainPane = new Pane( s, stateStore );
+
 		commandBar.pageChanged( s );
-		presComponent.getRootElement().setChild( viewport.getElement() );
+		presComponent.getRootElement().setChild( mainPane.getElement() );
 		
 		trail.setTrail( s.getTrail() );
 
@@ -394,11 +437,11 @@ public class Browser
 			}
 		}
 	}
-	
-	
+
+
 	private void onPreHistoryChange()
 	{
-		PersistentStateStore store = view.storePersistentState();
+		PersistentStateStore store = mainPane.storePersistentState();
 		history.getCurrentState().setPagePersistentState( store );
 	}
 	
