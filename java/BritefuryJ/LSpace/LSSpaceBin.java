@@ -15,35 +15,47 @@ public class LSSpaceBin extends LSBin
 	{
 		LARGER,
 		SMALLER,
-		FIXED
+		FIXED,
+		NONE
 	}
 	
 	
 	protected final static int FLAGS_SPACEBIN_START = FLAGS_BIN_END;
 	
-	protected final static int _FLAG_SIZE_CONSTRAINT_START = FLAGS_SPACEBIN_START * 0x1;
-	protected final static int FLAG_SIZE_CONSTRAINT_LARGER = _FLAG_SIZE_CONSTRAINT_START * 0x00;
-	protected final static int FLAG_SIZE_CONSTRAINT_SMALLER = _FLAG_SIZE_CONSTRAINT_START * 0x01;
-	protected final static int FLAG_SIZE_CONSTRAINT_FIXED = _FLAG_SIZE_CONSTRAINT_START * 0x02;
-	protected final static int _FLAG_SIZE_CONSTRAINT_END = _FLAG_SIZE_CONSTRAINT_START << 2;
-	protected final static int _FLAG_SIZE_CONSTRAINT_MASK = _FLAG_SIZE_CONSTRAINT_START * 0x03;
+
+	protected final static int CONSTRAINT_FLAG_VALUE_LARGER = 0x00;
+	protected final static int CONSTRAINT_FLAG_VALUE_SMALLER = 0x01;
+	protected final static int CONSTRAINT_FLAG_VALUE_FIXED = 0x02;
+	protected final static int CONSTRAINT_FLAG_VALUE_NONE = 0x03;
+
+
+
+	protected final static int _FLAG_SIZE_CONSTRAINT_X_START = FLAGS_SPACEBIN_START * 0x1;
+	protected final static int _FLAG_SIZE_CONSTRAINT_X_END = _FLAG_SIZE_CONSTRAINT_X_START << 2;
+	protected final static int _FLAG_SIZE_CONSTRAINT_X_MASK = _FLAG_SIZE_CONSTRAINT_X_START * 0x03;
 	
-	protected final static int FLAGS_SPACEBIN_END = _FLAG_SIZE_CONSTRAINT_END << 0;
+	protected final static int _FLAG_SIZE_CONSTRAINT_Y_START = _FLAG_SIZE_CONSTRAINT_X_END * 0x1;
+	protected final static int _FLAG_SIZE_CONSTRAINT_Y_END = _FLAG_SIZE_CONSTRAINT_Y_START << 2;
+	protected final static int _FLAG_SIZE_CONSTRAINT_Y_MASK = _FLAG_SIZE_CONSTRAINT_Y_START * 0x03;
+
+	protected final static int FLAGS_SPACEBIN_END = _FLAG_SIZE_CONSTRAINT_Y_END << 0;
 	
 
 	
 	private double width, height;
 	
 	
-	public LSSpaceBin(ContainerStyleParams styleParams, double width, double height, SizeConstraint sizeConstraint, LSElement child)
+	public LSSpaceBin(ContainerStyleParams styleParams, double width, double height,
+			  SizeConstraint sizeConstraintX, SizeConstraint sizeConstraintY, LSElement child)
 	{
 		super( styleParams, child );
 		
 		this.width = width;
 		this.height = height;
 		
-		setFlagMaskValue( _FLAG_SIZE_CONSTRAINT_MASK, sizeConstraintToFlag( sizeConstraint ) );
-		
+		setFlagMaskValue( _FLAG_SIZE_CONSTRAINT_X_MASK, sizeConstraintToFlag( sizeConstraintX ) * _FLAG_SIZE_CONSTRAINT_X_START );
+		setFlagMaskValue( _FLAG_SIZE_CONSTRAINT_Y_MASK, sizeConstraintToFlag( sizeConstraintY ) * _FLAG_SIZE_CONSTRAINT_Y_START );
+
 		layoutNode = new LayoutNodeSpaceBin( this );
 	}
 	
@@ -66,26 +78,35 @@ public class LSSpaceBin extends LSBin
 	}
 	
 	
-	public SizeConstraint getSizeConstraint()
+	public SizeConstraint getSizeConstraintX()
 	{
-		return flagToSizeConstraint( getFlagMaskValue( _FLAG_SIZE_CONSTRAINT_MASK ) );
+		return flagToSizeConstraint( getFlagMaskValue( _FLAG_SIZE_CONSTRAINT_X_MASK )  /  _FLAG_SIZE_CONSTRAINT_X_START );
 	}
 	
-	
+	public SizeConstraint getSizeConstraintY()
+	{
+		return flagToSizeConstraint( getFlagMaskValue( _FLAG_SIZE_CONSTRAINT_Y_MASK )  /  _FLAG_SIZE_CONSTRAINT_Y_START );
+	}
+
+
 	
 	private static int sizeConstraintToFlag(SizeConstraint c)
 	{
 		if ( c == SizeConstraint.LARGER )
 		{
-			return FLAG_SIZE_CONSTRAINT_LARGER;
+			return CONSTRAINT_FLAG_VALUE_LARGER;
 		}
 		else if ( c == SizeConstraint.SMALLER )
 		{
-			return FLAG_SIZE_CONSTRAINT_SMALLER;
+			return CONSTRAINT_FLAG_VALUE_SMALLER;
 		}
 		else if ( c == SizeConstraint.FIXED )
 		{
-			return FLAG_SIZE_CONSTRAINT_FIXED;
+			return CONSTRAINT_FLAG_VALUE_FIXED;
+		}
+		else if ( c == SizeConstraint.NONE )
+		{
+			return CONSTRAINT_FLAG_VALUE_NONE;
 		}
 		else
 		{
@@ -95,17 +116,21 @@ public class LSSpaceBin extends LSBin
 	
 	private static SizeConstraint flagToSizeConstraint(int flag)
 	{
-		if ( flag == FLAG_SIZE_CONSTRAINT_LARGER )
+		if ( flag == CONSTRAINT_FLAG_VALUE_LARGER )
 		{
 			return SizeConstraint.LARGER;
 		}
-		else if ( flag == FLAG_SIZE_CONSTRAINT_SMALLER )
+		else if ( flag == CONSTRAINT_FLAG_VALUE_SMALLER )
 		{
 			return SizeConstraint.SMALLER;
 		}
-		else if ( flag == FLAG_SIZE_CONSTRAINT_FIXED )
+		else if ( flag == CONSTRAINT_FLAG_VALUE_FIXED )
 		{
 			return SizeConstraint.FIXED;
+		}
+		else if ( flag == CONSTRAINT_FLAG_VALUE_NONE )
+		{
+			return SizeConstraint.NONE;
 		}
 		else
 		{

@@ -52,6 +52,12 @@ public class SolidBorder extends AbstractBorder
 		this.highlightBorderPaint = highlightBorderPaint;
 		this.highlightBackgroundPaint = highlightBackgroundPaint;
 	}
+
+
+	public SolidBorder highlight(Paint highlightBorderPaint, Paint highlightBackgroundPaint)
+	{
+		return new SolidBorder( thickness, inset, roundingX, roundingY, borderPaint, backgroundPaint, highlightBorderPaint, highlightBackgroundPaint );
+	}
 	
 	
 
