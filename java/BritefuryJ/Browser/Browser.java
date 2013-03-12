@@ -51,6 +51,7 @@ import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.RichText.Page;
+import BritefuryJ.Projection.AbstractPerspective;
 import BritefuryJ.Projection.Subject;
 import BritefuryJ.Projection.SubjectPath;
 import BritefuryJ.Projection.TransientSubject;
@@ -111,6 +112,42 @@ public class Browser
 			return "Resolve error";
 		}
 	}
+
+
+
+	private class PaneSubject extends TransientSubject
+	{
+		private Object focus;
+		private AbstractPerspective perspective;
+
+
+		public PaneSubject(Object focus, AbstractPerspective perspective)
+		{
+			super( rootSubject );
+
+			this.focus = focus;
+			this.perspective = perspective;
+		}
+
+		@Override
+		public Object getFocus()
+		{
+			return focus;
+		}
+
+		@Override
+		public AbstractPerspective getPerspective()
+		{
+			return perspective;
+		}
+
+		@Override
+		public String getTitle()
+		{
+			return "Pane";
+		}
+	}
+
 
 
 	
@@ -220,10 +257,10 @@ public class Browser
 	
 	private Subject rootSubject, subject;
 	private FragmentInspector inspector;
-	private Pane mainPane;
 	private BrowserListener listener;
 	
-	
+	private Pane mainPane;
+
 	
 	
 	public Browser(Subject rootSubject, Subject subject, FragmentInspector inspector, PageController pageController, CommandConsoleFactory commandConsoleFactory)
