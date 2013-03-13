@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.LSpace;
 
+import BritefuryJ.Browser.PaneManager;
+
 import java.awt.Point;
 import java.awt.Window;
 import java.util.ArrayList;
@@ -19,6 +21,7 @@ public class RootPresentationComponent extends PresentationComponent
 	
 	private PresentationEventErrorLog eventErrorLog = new PresentationEventErrorLog();
 	private ArrayList<PopupChain> popupChains = new ArrayList<PopupChain>();
+	private PaneManager paneManager;
 
 
 	public RootPresentationComponent()
@@ -27,6 +30,26 @@ public class RootPresentationComponent extends PresentationComponent
 	}
 	
 	
+	//
+	//
+	// PANE MANAGEMENT
+	//
+	//
+
+	@Override
+	public PaneManager getPaneManager()
+	{
+		return paneManager;
+	}
+
+	public void setPaneManager(PaneManager m)
+	{
+		this.paneManager = m;
+	}
+
+
+
+
 	void notifyQueueReallocation()
 	{
 		if ( !isMinimumSizeSet()  ||  !isPreferredSizeSet()  ||  !isMaximumSizeSet() )
