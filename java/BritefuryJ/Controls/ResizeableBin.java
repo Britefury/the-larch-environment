@@ -140,8 +140,7 @@ public class ResizeableBin extends ControlPres
 		Arrow a1 = new Arrow( arrow1, arrowSize );
 		Arrow a2 = new Arrow( arrow2, arrowSize );
 		Pres arrows = axis == Axis.AXIS_X  ?  new Column( new Pres[] { a1, a2 } )  :  new Row( new Pres[] { a1, a2 } );
-		arrows = arrows.alignHCentre().alignVCentre();
-		arrows = arrowStyle.applyTo( arrows );
+		arrows = arrowStyle.applyTo( arrows ).alignHCentre().alignVCentre();
 		Pres dragBar = dragBarBorder.surround( arrows ).withElementInteractor( interactor );
 		dragBar = axis == Axis.AXIS_X  ?  dragBar.padX( dragBarPadding )  :  dragBar.padY(dragBarPadding);
 		return dragBar;
@@ -159,12 +158,12 @@ public class ResizeableBin extends ControlPres
 
 	private Pres topDragBar(LSSpaceBin spaceBin, double arrowSize, StyleSheet arrowStyle, AbstractBorder dragBarBorder, double dragBarPadding)
 	{
-		return dragBar( spaceBin, Axis.AXIS_Y, true, Arrow.Direction.UP, Arrow.Direction.DOWN, arrowSize, arrowStyle, dragBarBorder, dragBarPadding ).alignHPack().alignVExpand();
+		return dragBar( spaceBin, Axis.AXIS_Y, true, Arrow.Direction.UP, Arrow.Direction.DOWN, arrowSize, arrowStyle, dragBarBorder, dragBarPadding ).alignVRefY().alignHExpand();
 	}
 
 	private Pres bottomDragBar(LSSpaceBin spaceBin, double arrowSize, StyleSheet arrowStyle, AbstractBorder dragBarBorder, double dragBarPadding)
 	{
-		return dragBar( spaceBin, Axis.AXIS_Y, false, Arrow.Direction.DOWN, Arrow.Direction.UP, arrowSize, arrowStyle, dragBarBorder, dragBarPadding ).alignHPack().alignVExpand();
+		return dragBar( spaceBin, Axis.AXIS_Y, false, Arrow.Direction.DOWN, Arrow.Direction.UP, arrowSize, arrowStyle, dragBarBorder, dragBarPadding ).alignVRefY().alignHExpand();
 	}
 
 
