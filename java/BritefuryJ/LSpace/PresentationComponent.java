@@ -15,6 +15,7 @@ import java.util.Arrays;
 
 import javax.swing.*;
 
+import BritefuryJ.Browser.PaneManager;
 import org.python.core.Py;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
@@ -379,6 +380,19 @@ public abstract class PresentationComponent extends JComponent implements Compon
 	public PageController getPageController()
 	{
 		return rootElement.getPageController();
+	}
+
+
+
+	//
+	//
+	// PANE MANAGEMENT
+	//
+	//
+
+	public PaneManager getPaneManager()
+	{
+		return null;
 	}
 	
 

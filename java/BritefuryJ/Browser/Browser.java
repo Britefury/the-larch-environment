@@ -34,21 +34,19 @@ import BritefuryJ.Command.Command;
 import BritefuryJ.Command.CommandBar;
 import BritefuryJ.Command.CommandConsoleFactory;
 import BritefuryJ.Command.CommandSet;
+import BritefuryJ.Controls.ResizeableBin;
 import BritefuryJ.Controls.ScrolledViewport;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.IncrementalView.FragmentInspector;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.IncrementalView.IncrementalView;
-import BritefuryJ.LSpace.LSElement;
-import BritefuryJ.LSpace.PageController;
-import BritefuryJ.LSpace.RootPresentationComponent;
+import BritefuryJ.LSpace.*;
 import BritefuryJ.LSpace.PersistentState.PersistentState;
 import BritefuryJ.LSpace.PersistentState.PersistentStateStore;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.PresentElement;
 import BritefuryJ.Pres.PresentationContext;
-import BritefuryJ.Pres.Primitive.Blank;
-import BritefuryJ.Pres.Primitive.Label;
-import BritefuryJ.Pres.Primitive.Primitive;
+import BritefuryJ.Pres.Primitive.*;
 import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.RichText.Page;
 import BritefuryJ.Projection.AbstractPerspective;
@@ -58,7 +56,7 @@ import BritefuryJ.Projection.TransientSubject;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
 
-public class Browser
+public class Browser implements PaneManager
 {
 	protected static interface BrowserListener
 	{
@@ -260,6 +258,9 @@ public class Browser
 	private BrowserListener listener;
 	
 	private Pane mainPane;
+	private Pane leftPane, rightPane, topPane, bottomPane;
+	private LSRow horizontalSection;
+	private LSColumn verticalSection;
 
 	
 	
@@ -274,6 +275,7 @@ public class Browser
 		
 		presComponent = new RootPresentationComponent();
 		presComponent.setPageController( pageController );
+		presComponent.setPaneManager( this );
 		presComponent.getRootElement().setChild( mainPane.getElement() );
 		
 		ActionMap actionMap = presComponent.getActionMap();
@@ -390,11 +392,128 @@ public class Browser
 		mainPane.viewportOneToOne();
 	}
 
+
+
+	@Override
+	public void setLeftPaneContent(Object contents, AbstractPerspective perspective)
+	{
+		boolean wasSet = leftPane != null;
+		leftPane = createPaneFromContents( contents, perspective );
+		Pres r = new ResizeableBin( new PresentElement( leftPane.getElement() ) ).resizeRight( 100.0 );
+		LSElement elem = r.present( PresentationContext.defaultCtx, StyleValues.getRootStyle().alignVExpand() );
+		if ( wasSet )
+		{
+			horizontalSection.set( 0, elem );
+		}
+		else
+		{
+			horizontalSection.insert( 0, elem );
+		}
+	}
+
+	@Override
+	public void clearLeftPaneContent()
+	{
+		if ( leftPane != null )
+		{
+			horizontalSection.__delitem__( 0 );
+			leftPane = null;
+		}
+	}
+
+
+	@Override
+	public void setRightPaneContent(Object contents, AbstractPerspective perspective)
+	{
+		boolean wasSet = rightPane != null;
+		rightPane = createPaneFromContents( contents, perspective );
+		Pres r = new ResizeableBin( new PresentElement( rightPane.getElement() ) ).resizeLeft( 100.0 );
+		LSElement elem = r.present( PresentationContext.defaultCtx, StyleValues.getRootStyle().alignVExpand() );
+		if ( wasSet )
+		{
+			horizontalSection.__delitem__( horizontalSection.size() - 1 );
+		}
+		horizontalSection.append( elem );
+	}
+
+	@Override
+	public void clearRightPaneContent()
+	{
+		if ( rightPane != null )
+		{
+			horizontalSection.__delitem__( horizontalSection.size() - 1 );
+			rightPane = null;
+		}
+	}
+
+
+
+	@Override
+	public void setTopPaneContent(Object contents, AbstractPerspective perspective)
+	{
+		boolean wasSet = topPane != null;
+		topPane = createPaneFromContents( contents, perspective );
+		Pres r = new ResizeableBin( new PresentElement( topPane.getElement() ) ).resizeBottom( 100.0 );
+		LSElement elem = r.present( PresentationContext.defaultCtx, StyleValues.getRootStyle().alignHExpand() );
+		if ( wasSet )
+		{
+			verticalSection.set( 0, elem );
+		}
+		else
+		{
+			verticalSection.insert( 0, elem );
+		}
+	}
+
+	@Override
+	public void clearTopPaneContent()
+	{
+		if ( topPane != null )
+		{
+			verticalSection.__delitem__( 0 );
+			topPane = null;
+		}
+	}
+
+
+	@Override
+	public void setBottomPaneContent(Object contents, AbstractPerspective perspective)
+	{
+		boolean wasSet = bottomPane != null;
+		bottomPane = createPaneFromContents( contents, perspective );
+		Pres r = new ResizeableBin( new PresentElement( bottomPane.getElement() ) ).resizeTop( 100.0 );
+		LSElement elem = r.present( PresentationContext.defaultCtx, StyleValues.getRootStyle().alignHExpand() );
+		if ( wasSet )
+		{
+			verticalSection.__delitem__( verticalSection.size() - 1 );
+		}
+		verticalSection.append( elem );
+	}
+
+	@Override
+	public void clearBottomPaneContent()
+	{
+		if ( bottomPane != null )
+		{
+			verticalSection.__delitem__( verticalSection.size() - 1 );
+			bottomPane = null;
+		}
+	}
+
+
+
+
 	
 	
-	
-	
-	
+	private Pane createPaneFromContents(Object contents, AbstractPerspective perspective)
+	{
+		BrowserState state = history.getCurrentState();
+		PersistentStateStore stateStore = state.getPagePersistentState();
+		PaneSubject subject = new PaneSubject( contents, perspective );
+		return new Pane( subject, stateStore );
+	}
+
+
 	
 	protected void back()
 	{
@@ -423,15 +542,6 @@ public class Browser
 
 	
 	
-	private ScrolledViewport.ScrolledViewportControl makeViewport(Object child, PersistentState state)
-	{
-		Pres childPres = Pres.coerce( child );
-		ScrolledViewport vp = new ScrolledViewport( childPres, 0.0, 0.0, state );
-		return (ScrolledViewport.ScrolledViewportControl)vp.createControl( PresentationContext.defaultCtx, StyleValues.getRootStyle().alignHExpand().alignVExpand() );
-	}
-
-
-
 
 	private void resolvePath()
 	{
@@ -457,9 +567,13 @@ public class Browser
 		PersistentStateStore stateStore = state.getPagePersistentState();
 
 		mainPane = new Pane( s, stateStore );
+		leftPane = rightPane = topPane = bottomPane = null;
+
+		horizontalSection = (LSRow)new Row( new Pres[] { new PresentElement( mainPane.getElement() ) } ).present( PresentationContext.defaultCtx, StyleValues.getRootStyle().alignHExpand().alignVExpand() );
+		verticalSection = (LSColumn)new Column( new Pres[] { new PresentElement( horizontalSection ) } ).present( PresentationContext.defaultCtx, StyleValues.getRootStyle().alignHExpand().alignVExpand() );
 
 		commandBar.pageChanged( s );
-		presComponent.getRootElement().setChild( mainPane.getElement() );
+		presComponent.getRootElement().setChild( verticalSection );
 		
 		trail.setTrail( s.getTrail() );
 

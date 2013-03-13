@@ -32,6 +32,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.TransferHandler;
 
+import BritefuryJ.Browser.PaneManager;
 import BritefuryJ.LSpace.PresentationComponent.CannotGetGraphics2DException;
 import BritefuryJ.LSpace.PresentationComponent.TypesetProfile;
 import BritefuryJ.LSpace.PresentationComponent.TypesetProfileMeasurement;
@@ -188,6 +189,19 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	public ImageObserver getImageObserver()
 	{
 		return component;
+	}
+
+
+
+	//
+	//
+	// PANE MANAGEMENT
+	//
+	//
+
+	public PaneManager getPaneManager()
+	{
+		return component.getPaneManager();
 	}
 	
 	
