@@ -22,6 +22,9 @@ import BritefuryJ.Graphics.FilledOutlinePainter;
 import BritefuryJ.Graphics.OutlinePainter;
 import BritefuryJ.Graphics.Painter;
 import BritefuryJ.Graphics.SolidBorder;
+import BritefuryJ.LSpace.Layout.HAlignment;
+import BritefuryJ.LSpace.Layout.VAlignment;
+import BritefuryJ.LSpace.StyleParams.ElementStyleParams;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -172,8 +175,17 @@ public class Controls
 	
 	public static final InheritedAttributeNonNull tooltipBorder = new InheritedAttributeNonNull( controlsNamespace, "tooltipBorder", AbstractBorder.class,
 			new SolidBorder( 1.0, 2.0, 2.0, 2.0, Color.BLACK, new Color( 1.0f, 1.0f, 0.9f ) ) );
-	
-	
+
+
+
+	public static final InheritedAttributeNonNull resizeableArrowPainter = new InheritedAttributeNonNull( controlsNamespace, "resizeableArrowPainter", Painter.class,
+			new FillPainter( new Color( 0.25f, 0.3f, 0.35f ) ) );
+	public static final InheritedAttributeNonNull resizeableArrowSize = new InheritedAttributeNonNull( controlsNamespace, "resizeableArrowSize", Double.class, 7.0 );
+	public static final InheritedAttributeNonNull resizeableArrowSpacing = new InheritedAttributeNonNull( controlsNamespace, "resizeableArrowSpacing", Double.class, 8.0 );
+	public static final InheritedAttributeNonNull resizeableDragBarBorder = new InheritedAttributeNonNull( controlsNamespace, "resizeableDragBarBorder", AbstractBorder.class,
+			new SolidBorder( 1.0, 2.0, new Color( 0.625f, 0.65f, 0.675f ), new Color( 0.825f, 0.85f, 0.875f ) ).highlight( new Color( 0.525f, 0.55f, 0.575f ), new Color( 0.725f, 0.75f, 0.775f ) ) );
+	public static final InheritedAttributeNonNull resizeableDragBarPadding = new InheritedAttributeNonNull( controlsNamespace, "resizeableDragBarPadding", Double.class, 2.0 );
+
 	
 	
 	
@@ -288,5 +300,24 @@ public class Controls
 	public static StyleValues useTooltipAttrs(StyleValues style)
 	{
 		return style.useAttr( tooltipBorder );
+	}
+
+
+
+
+	protected static DerivedValueTable<StyleSheet> resizeableBinArrowStyle = new DerivedValueTable<StyleSheet>( controlsNamespace )
+	{
+		protected StyleSheet evaluate(AttributeTable attribs)
+		{
+			double spacing = attribs.get( resizeableArrowSpacing, Double.class );
+			return StyleSheet.style( Primitive.shapePainter.as( attribs.get( resizeableArrowPainter, Painter.class ) ), Primitive.rowSpacing.as( spacing ), Primitive.columnSpacing.as( spacing ) );
+		}
+	};
+
+
+
+	public static StyleValues useResizeableBinAttrs(StyleValues style)
+	{
+		return style.useAttr( resizeableArrowPainter ).useAttr( resizeableArrowSize ).useAttr( resizeableArrowSpacing ).useAttr( resizeableDragBarBorder ).useAttr( resizeableDragBarPadding );
 	}
 }
