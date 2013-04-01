@@ -41,7 +41,6 @@ import BritefuryJ.IncrementalView.FragmentInspector;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.IncrementalView.IncrementalView;
 import BritefuryJ.LSpace.*;
-import BritefuryJ.LSpace.PersistentState.PersistentState;
 import BritefuryJ.LSpace.PersistentState.PersistentStateStore;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentElement;
@@ -195,6 +194,44 @@ public class Browser implements PaneManager
 	}
 
 
+	private static abstract class BrowserEdgePane implements EdgePane
+	{
+		private Browser browser;
+		private Pane pane;
+		private LSBin container;
+		private boolean vertical;
+
+
+
+		private BrowserEdgePane(Browser browser, LSBin container, boolean vertical)
+		{
+			this.browser = browser;
+			this.container = container;
+			this.vertical = vertical;
+		}
+
+
+		@Override
+		public void setContent(Object contents, AbstractPerspective perspective)
+		{
+			StyleValues style = vertical  ?  StyleValues.getRootStyle().alignVExpand()  :  StyleValues.getRootStyle().alignHExpand();
+			pane = browser.createPaneFromContents( contents, perspective );
+			Pres r = resize( new ResizeableBin( new PresentElement( pane.getElement() ) ) );
+			LSElement elem = r.present( PresentationContext.defaultCtx, style );
+			container.setChild( elem );
+		}
+
+		@Override
+		public void clearContent()
+		{
+			container.setChild( null );
+		}
+
+		protected abstract ResizeableBin resize(ResizeableBin bin);
+	}
+
+
+
 	
 	private static final String COMMAND_BACK = "back";
 	private static final String COMMAND_FORWARD = "forward";
@@ -258,9 +295,7 @@ public class Browser implements PaneManager
 	private BrowserListener listener;
 	
 	private Pane mainPane;
-	private Pane leftPane, rightPane, topPane, bottomPane;
-	private LSRow horizontalSection;
-	private LSColumn verticalSection;
+	private BrowserEdgePane leftEdge, rightEdge, topEdge, bottomEdge;
 
 	
 	
@@ -395,112 +430,28 @@ public class Browser implements PaneManager
 
 
 	@Override
-	public void setLeftPaneContent(Object contents, AbstractPerspective perspective)
+	public EdgePane getLeftEdgePane()
 	{
-		boolean wasSet = leftPane != null;
-		leftPane = createPaneFromContents( contents, perspective );
-		Pres r = new ResizeableBin( new PresentElement( leftPane.getElement() ) ).resizeRight( 100.0 );
-		LSElement elem = r.present( PresentationContext.defaultCtx, StyleValues.getRootStyle().alignVExpand() );
-		if ( wasSet )
-		{
-			horizontalSection.set( 0, elem );
-		}
-		else
-		{
-			horizontalSection.insert( 0, elem );
-		}
+		return leftEdge;
 	}
 
 	@Override
-	public void clearLeftPaneContent()
+	public EdgePane getRightEdgePane()
 	{
-		if ( leftPane != null )
-		{
-			horizontalSection.__delitem__( 0 );
-			leftPane = null;
-		}
-	}
-
-
-	@Override
-	public void setRightPaneContent(Object contents, AbstractPerspective perspective)
-	{
-		boolean wasSet = rightPane != null;
-		rightPane = createPaneFromContents( contents, perspective );
-		Pres r = new ResizeableBin( new PresentElement( rightPane.getElement() ) ).resizeLeft( 100.0 );
-		LSElement elem = r.present( PresentationContext.defaultCtx, StyleValues.getRootStyle().alignVExpand() );
-		if ( wasSet )
-		{
-			horizontalSection.__delitem__( horizontalSection.size() - 1 );
-		}
-		horizontalSection.append( elem );
+		return rightEdge;
 	}
 
 	@Override
-	public void clearRightPaneContent()
+	public EdgePane getTopEdgePane()
 	{
-		if ( rightPane != null )
-		{
-			horizontalSection.__delitem__( horizontalSection.size() - 1 );
-			rightPane = null;
-		}
-	}
-
-
-
-	@Override
-	public void setTopPaneContent(Object contents, AbstractPerspective perspective)
-	{
-		boolean wasSet = topPane != null;
-		topPane = createPaneFromContents( contents, perspective );
-		Pres r = new ResizeableBin( new PresentElement( topPane.getElement() ) ).resizeBottom( 100.0 );
-		LSElement elem = r.present( PresentationContext.defaultCtx, StyleValues.getRootStyle().alignHExpand() );
-		if ( wasSet )
-		{
-			verticalSection.set( 0, elem );
-		}
-		else
-		{
-			verticalSection.insert( 0, elem );
-		}
+		return topEdge;
 	}
 
 	@Override
-	public void clearTopPaneContent()
+	public EdgePane getBottomEdgePane()
 	{
-		if ( topPane != null )
-		{
-			verticalSection.__delitem__( 0 );
-			topPane = null;
-		}
+		return bottomEdge;
 	}
-
-
-	@Override
-	public void setBottomPaneContent(Object contents, AbstractPerspective perspective)
-	{
-		boolean wasSet = bottomPane != null;
-		bottomPane = createPaneFromContents( contents, perspective );
-		Pres r = new ResizeableBin( new PresentElement( bottomPane.getElement() ) ).resizeTop( 100.0 );
-		LSElement elem = r.present( PresentationContext.defaultCtx, StyleValues.getRootStyle().alignHExpand() );
-		if ( wasSet )
-		{
-			verticalSection.__delitem__( verticalSection.size() - 1 );
-		}
-		verticalSection.append( elem );
-	}
-
-	@Override
-	public void clearBottomPaneContent()
-	{
-		if ( bottomPane != null )
-		{
-			verticalSection.__delitem__( verticalSection.size() - 1 );
-			bottomPane = null;
-		}
-	}
-
-
 
 
 	
@@ -567,10 +518,41 @@ public class Browser implements PaneManager
 		PersistentStateStore stateStore = state.getPagePersistentState();
 
 		mainPane = new Pane( s, stateStore );
-		leftPane = rightPane = topPane = bottomPane = null;
 
-		horizontalSection = (LSRow)new Row( new Pres[] { new PresentElement( mainPane.getElement() ) } ).present( PresentationContext.defaultCtx, StyleValues.getRootStyle().alignHExpand().alignVExpand() );
-		verticalSection = (LSColumn)new Column( new Pres[] { new PresentElement( horizontalSection ) } ).present( PresentationContext.defaultCtx, StyleValues.getRootStyle().alignHExpand().alignVExpand() );
+		LSBin leftContainer = (LSBin)new Bin().present( PresentationContext.defaultCtx, StyleValues.getRootStyle().alignVExpand() );
+		LSBin rightContainer = (LSBin)new Bin().present( PresentationContext.defaultCtx, StyleValues.getRootStyle().alignVExpand() );
+		LSBin topContainer = (LSBin)new Bin().present( PresentationContext.defaultCtx, StyleValues.getRootStyle().alignHExpand() );
+		LSBin bottomContainer = (LSBin)new Bin().present( PresentationContext.defaultCtx, StyleValues.getRootStyle().alignHExpand() );
+
+		LSRow horizontalSection = (LSRow)new Row( new Pres[] { new PresentElement( leftContainer ), new PresentElement( mainPane.getElement() ), new PresentElement( rightContainer ) } ).present(
+				PresentationContext.defaultCtx, StyleValues.getRootStyle().alignHExpand().alignVExpand() );
+		LSColumn verticalSection = (LSColumn)new Column( new Pres[] { new PresentElement( topContainer ), new PresentElement( horizontalSection ), new PresentElement( bottomContainer ) } ).present(
+				PresentationContext.defaultCtx, StyleValues.getRootStyle().alignHExpand().alignVExpand() );
+
+		leftEdge = new BrowserEdgePane( this, leftContainer, true ) {
+			protected ResizeableBin resize(ResizeableBin bin)
+			{
+				return bin.resizeRight( 100.0 );
+			}
+		};
+		rightEdge = new BrowserEdgePane( this, rightContainer, true ) {
+			protected ResizeableBin resize(ResizeableBin bin)
+			{
+				return bin.resizeLeft( 100.0 );
+			}
+		};
+		topEdge = new BrowserEdgePane( this, topContainer, false ) {
+			protected ResizeableBin resize(ResizeableBin bin)
+			{
+				return bin.resizeBottom( 100.0 );
+			}
+		};
+		bottomEdge = new BrowserEdgePane( this, bottomContainer, false ) {
+			protected ResizeableBin resize(ResizeableBin bin)
+			{
+				return bin.resizeTop( 100.0 );
+			}
+		};
 
 		commandBar.pageChanged( s );
 		presComponent.getRootElement().setChild( verticalSection );

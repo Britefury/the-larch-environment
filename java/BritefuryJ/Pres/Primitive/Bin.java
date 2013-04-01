@@ -19,13 +19,18 @@ public class Bin extends Pres
 	private Pres child;
 	
 	
+	public Bin()
+	{
+		this.child = null;
+	}
+
 	public Bin(Object child)
 	{
 		this.child = coerce( child );
 	}
-	
 
-	
+
+
 	@Override
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
