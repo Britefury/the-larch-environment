@@ -152,17 +152,43 @@ public class Browser implements PaneManager
 	private class Pane
 	{
 		private IncrementalView view;
-		private ScrolledViewport.ScrolledViewportControl viewport;
+		private LSElement element;
 
 
 		public Pane()
+		{
+			Pres childPres = new Blank();
+		}
+
+		public Pane(Subject s, PersistentStateStore stateStore)
+		{
+			view = new IncrementalView( s, inspector, stateStore );
+			Pres childPres = Pres.coerce( view.getViewPres() );
+			element = childPres.present( PresentationContext.defaultCtx, StyleValues.getRootStyle().alignHExpand().alignVExpand() );
+		}
+
+
+		public LSElement getElement()
+		{
+			return element;
+		}
+	}
+
+
+	private class ScrolledPane
+	{
+		private IncrementalView view;
+		private ScrolledViewport.ScrolledViewportControl viewport;
+
+
+		public ScrolledPane()
 		{
 			Pres childPres = new Blank();
 			ScrolledViewport vp = new ScrolledViewport( childPres, 0.0, 0.0, history.getCurrentState().getViewportState() );
 			viewport = (ScrolledViewport.ScrolledViewportControl)vp.createControl( PresentationContext.defaultCtx, StyleValues.getRootStyle().alignHExpand().alignVExpand() );
 		}
 
-		public Pane(Subject s, PersistentStateStore stateStore)
+		public ScrolledPane(Subject s, PersistentStateStore stateStore)
 		{
 			view = new IncrementalView( s, inspector, stateStore );
 			Pres childPres = Pres.coerce( view.getViewPres() );
@@ -212,11 +238,11 @@ public class Browser implements PaneManager
 
 
 		@Override
-		public void setContent(Object contents, AbstractPerspective perspective)
+		public void setContent(Object contents, AbstractPerspective perspective, double size)
 		{
 			StyleValues style = vertical  ?  StyleValues.getRootStyle().alignVExpand()  :  StyleValues.getRootStyle().alignHExpand();
 			pane = browser.createPaneFromContents( contents, perspective );
-			Pres r = resize( new ResizeableBin( new PresentElement( pane.getElement() ) ) );
+			Pres r = resize( new ResizeableBin( new PresentElement( pane.getElement() ) ), size);
 			LSElement elem = r.present( PresentationContext.defaultCtx, style );
 			container.setChild( elem );
 		}
@@ -227,7 +253,7 @@ public class Browser implements PaneManager
 			container.setChild( null );
 		}
 
-		protected abstract ResizeableBin resize(ResizeableBin bin);
+		protected abstract ResizeableBin resize(ResizeableBin bin, double size);
 	}
 
 
@@ -294,7 +320,7 @@ public class Browser implements PaneManager
 	private FragmentInspector inspector;
 	private BrowserListener listener;
 	
-	private Pane mainPane;
+	private ScrolledPane mainPane;
 	private BrowserEdgePane leftEdge, rightEdge, topEdge, bottomEdge;
 
 	
@@ -306,7 +332,7 @@ public class Browser implements PaneManager
 		this.inspector = inspector;
 		history = new BrowserHistory( subject );
 
-		mainPane = new Pane();
+		mainPane = new ScrolledPane();
 		
 		presComponent = new RootPresentationComponent();
 		presComponent.setPageController( pageController );
@@ -464,8 +490,16 @@ public class Browser implements PaneManager
 		return new Pane( subject, stateStore );
 	}
 
+	private ScrolledPane createScrolledPaneFromContents(Object contents, AbstractPerspective perspective)
+	{
+		BrowserState state = history.getCurrentState();
+		PersistentStateStore stateStore = state.getPagePersistentState();
+		PaneSubject subject = new PaneSubject( contents, perspective );
+		return new ScrolledPane( subject, stateStore );
+	}
 
-	
+
+
 	protected void back()
 	{
 		if ( history.canGoBack() )
@@ -517,7 +551,7 @@ public class Browser implements PaneManager
 		BrowserState state = history.getCurrentState();
 		PersistentStateStore stateStore = state.getPagePersistentState();
 
-		mainPane = new Pane( s, stateStore );
+		mainPane = new ScrolledPane( s, stateStore );
 
 		LSBin leftContainer = (LSBin)new Bin().present( PresentationContext.defaultCtx, StyleValues.getRootStyle().alignVExpand() );
 		LSBin rightContainer = (LSBin)new Bin().present( PresentationContext.defaultCtx, StyleValues.getRootStyle().alignVExpand() );
@@ -530,27 +564,27 @@ public class Browser implements PaneManager
 				PresentationContext.defaultCtx, StyleValues.getRootStyle().alignHExpand().alignVExpand() );
 
 		leftEdge = new BrowserEdgePane( this, leftContainer, true ) {
-			protected ResizeableBin resize(ResizeableBin bin)
+			protected ResizeableBin resize(ResizeableBin bin, double size)
 			{
-				return bin.resizeRight( 100.0 );
+				return bin.resizeRight( size );
 			}
 		};
 		rightEdge = new BrowserEdgePane( this, rightContainer, true ) {
-			protected ResizeableBin resize(ResizeableBin bin)
+			protected ResizeableBin resize(ResizeableBin bin, double size)
 			{
-				return bin.resizeLeft( 100.0 );
+				return bin.resizeLeft( size );
 			}
 		};
 		topEdge = new BrowserEdgePane( this, topContainer, false ) {
-			protected ResizeableBin resize(ResizeableBin bin)
+			protected ResizeableBin resize(ResizeableBin bin, double size)
 			{
-				return bin.resizeBottom( 100.0 );
+				return bin.resizeBottom( size );
 			}
 		};
 		bottomEdge = new BrowserEdgePane( this, bottomContainer, false ) {
-			protected ResizeableBin resize(ResizeableBin bin)
+			protected ResizeableBin resize(ResizeableBin bin, double size)
 			{
-				return bin.resizeTop( 100.0 );
+				return bin.resizeTop( size );
 			}
 		};
 

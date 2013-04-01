@@ -10,6 +10,6 @@ import BritefuryJ.Projection.AbstractPerspective;
 
 public interface EdgePane
 {
-	void setContent(Object contents, AbstractPerspective perspective);
+	void setContent(Object contents, AbstractPerspective perspective, double size);
 	void clearContent();
 }

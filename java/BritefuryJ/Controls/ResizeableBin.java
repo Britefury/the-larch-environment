@@ -20,6 +20,8 @@ import BritefuryJ.Pres.Primitive.*;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
 
+import java.awt.*;
+
 public class ResizeableBin extends ControlPres
 {
 	private static enum Axis
@@ -142,7 +144,7 @@ public class ResizeableBin extends ControlPres
 		Pres arrows = new Column( new Pres[] { a1, a2 } );
 		arrows = arrowStyle.applyTo( arrows ).pad( arrowPadding, arrowPadding ).alignHCentre().alignVCentre();
 		Pres dragBar = new Row( new Pres[] { new Box( dragBarEdgeThickness, dragBarEdgeThickness ), new Bin( arrows ) } ).alignVExpand();
-		dragBar = dragBarStyle.applyTo( dragBar ).withElementInteractor( interactor ).padX( 0.0, dragBarPadding );
+		dragBar = dragBarStyle.withValues( Primitive.cursor.as( new Cursor(Cursor.W_RESIZE_CURSOR ) ) ).applyTo( dragBar ).withElementInteractor( interactor ).padX( 0.0, dragBarPadding );
 		return dragBar;
 	}
 
@@ -154,7 +156,7 @@ public class ResizeableBin extends ControlPres
 		Pres arrows = new Column( new Pres[] { a1, a2 } );
 		arrows = arrowStyle.applyTo( arrows ).pad( arrowPadding, arrowPadding ).alignHCentre().alignVCentre();
 		Pres dragBar = new Row( new Pres[] { new Bin( arrows ), new Box( dragBarEdgeThickness, dragBarEdgeThickness ) } ).alignVExpand();
-		dragBar = dragBarStyle.applyTo( dragBar ).withElementInteractor( interactor ).padX( dragBarPadding, 0.0 );
+		dragBar = dragBarStyle.withValues( Primitive.cursor.as( new Cursor(Cursor.E_RESIZE_CURSOR ) ) ).applyTo( dragBar ).withElementInteractor( interactor ).padX( dragBarPadding, 0.0 );
 		return dragBar;
 	}
 
@@ -166,7 +168,7 @@ public class ResizeableBin extends ControlPres
 		Pres arrows = new Row( new Pres[] { a1, a2 } );
 		arrows = arrowStyle.applyTo( arrows ).pad( arrowPadding, arrowPadding ).alignHCentre().alignVCentre();
 		Pres dragBar = new Column( new Pres[] { new Box( dragBarEdgeThickness, dragBarEdgeThickness ), new Bin( arrows ) } ).alignHExpand();
-		dragBar = dragBarStyle.applyTo( dragBar ).withElementInteractor( interactor ).padY( 0.0, dragBarPadding );
+		dragBar = dragBarStyle.withValues( Primitive.cursor.as( new Cursor(Cursor.N_RESIZE_CURSOR ) ) ).applyTo( dragBar ).withElementInteractor( interactor ).padY( 0.0, dragBarPadding );
 		return dragBar;
 	}
 
@@ -178,7 +180,7 @@ public class ResizeableBin extends ControlPres
 		Pres arrows = new Row( new Pres[] { a1, a2 } );
 		arrows = arrowStyle.applyTo( arrows ).pad( arrowPadding, arrowPadding ).alignHCentre().alignVCentre();
 		Pres dragBar = new Column( new Pres[] { new Bin( arrows ), new Box( dragBarEdgeThickness, dragBarEdgeThickness ) } ).alignHExpand();
-		dragBar = dragBarStyle.applyTo( dragBar ).withElementInteractor( interactor ).padY( dragBarPadding, 0.0 );
+		dragBar = dragBarStyle.withValues( Primitive.cursor.as( new Cursor(Cursor.S_RESIZE_CURSOR ) ) ).applyTo( dragBar ).withElementInteractor( interactor ).padY( dragBarPadding, 0.0 );
 		return dragBar;
 	}
 

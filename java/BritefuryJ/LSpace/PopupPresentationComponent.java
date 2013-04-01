@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.LSpace;
 
+import BritefuryJ.Browser.PaneManager;
+
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Window;
@@ -25,10 +27,20 @@ public class PopupPresentationComponent extends PresentationComponent
 	{
 		super();
 		this.containingPopup = containingPopup;
-	}	
-	
-	
-	
+	}
+
+
+
+	@Override
+	public PaneManager getPaneManager()
+	{
+		return containingPopup.chain.owner.getPaneManager();
+	}
+
+
+
+
+
 	void notifyQueueReallocation()
 	{
 		Runnable r = new Runnable()
