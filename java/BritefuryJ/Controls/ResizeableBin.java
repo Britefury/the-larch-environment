@@ -134,36 +134,52 @@ public class ResizeableBin extends ControlPres
 
 
 
-	private Pres dragBar(LSSpaceBin spaceBin, Axis axis, boolean invert, Arrow.Direction arrow1, Arrow.Direction arrow2, double arrowSize, StyleSheet arrowStyle, AbstractBorder dragBarBorder, double dragBarPadding)
+	private Pres leftDragBar(LSSpaceBin spaceBin, double arrowSize, double arrowPadding, StyleSheet arrowStyle, StyleSheet dragBarStyle, double dragBarPadding, double dragBarEdgeThickness)
 	{
-		ResizeInteractor interactor = new ResizeInteractor( spaceBin, axis, invert );
-		Arrow a1 = new Arrow( arrow1, arrowSize );
-		Arrow a2 = new Arrow( arrow2, arrowSize );
-		Pres arrows = axis == Axis.AXIS_X  ?  new Column( new Pres[] { a1, a2 } )  :  new Row( new Pres[] { a1, a2 } );
-		arrows = arrowStyle.applyTo( arrows ).alignHCentre().alignVCentre();
-		Pres dragBar = dragBarBorder.surround( arrows ).withElementInteractor( interactor );
-		dragBar = axis == Axis.AXIS_X  ?  dragBar.padX( dragBarPadding )  :  dragBar.padY(dragBarPadding);
+		ResizeInteractor interactor = new ResizeInteractor( spaceBin, Axis.AXIS_X, true );
+		Arrow a1 = new Arrow( Arrow.Direction.LEFT, arrowSize );
+		Arrow a2 = new Arrow( Arrow.Direction.RIGHT, arrowSize );
+		Pres arrows = new Column( new Pres[] { a1, a2 } );
+		arrows = arrowStyle.applyTo( arrows ).pad( arrowPadding, arrowPadding ).alignHCentre().alignVCentre();
+		Pres dragBar = new Row( new Pres[] { new Box( dragBarEdgeThickness, dragBarEdgeThickness ), new Bin( arrows ) } ).alignVExpand();
+		dragBar = dragBarStyle.applyTo( dragBar ).withElementInteractor( interactor ).padX( 0.0, dragBarPadding );
 		return dragBar;
 	}
 
-	private Pres leftDragBar(LSSpaceBin spaceBin, double arrowSize, StyleSheet arrowStyle, AbstractBorder dragBarBorder, double dragBarPadding)
+	private Pres rightDragBar(LSSpaceBin spaceBin, double arrowSize, double arrowPadding, StyleSheet arrowStyle, StyleSheet dragBarStyle, double dragBarPadding, double dragBarEdgeThickness)
 	{
-		return dragBar( spaceBin, Axis.AXIS_X, true, Arrow.Direction.LEFT, Arrow.Direction.RIGHT, arrowSize, arrowStyle, dragBarBorder, dragBarPadding ).alignHPack().alignVExpand();
+		ResizeInteractor interactor = new ResizeInteractor( spaceBin, Axis.AXIS_X, false );
+		Arrow a1 = new Arrow( Arrow.Direction.RIGHT, arrowSize );
+		Arrow a2 = new Arrow( Arrow.Direction.LEFT, arrowSize );
+		Pres arrows = new Column( new Pres[] { a1, a2 } );
+		arrows = arrowStyle.applyTo( arrows ).pad( arrowPadding, arrowPadding ).alignHCentre().alignVCentre();
+		Pres dragBar = new Row( new Pres[] { new Bin( arrows ), new Box( dragBarEdgeThickness, dragBarEdgeThickness ) } ).alignVExpand();
+		dragBar = dragBarStyle.applyTo( dragBar ).withElementInteractor( interactor ).padX( dragBarPadding, 0.0 );
+		return dragBar;
 	}
 
-	private Pres rightDragBar(LSSpaceBin spaceBin, double arrowSize, StyleSheet arrowStyle, AbstractBorder dragBarBorder, double dragBarPadding)
+	private Pres topDragBar(LSSpaceBin spaceBin, double arrowSize, double arrowPadding, StyleSheet arrowStyle, StyleSheet dragBarStyle, double dragBarPadding, double dragBarEdgeThickness)
 	{
-		return dragBar( spaceBin, Axis.AXIS_X, false, Arrow.Direction.RIGHT, Arrow.Direction.LEFT, arrowSize, arrowStyle, dragBarBorder, dragBarPadding ).alignHPack().alignVExpand();
+		ResizeInteractor interactor = new ResizeInteractor( spaceBin, Axis.AXIS_Y, true );
+		Arrow a1 = new Arrow( Arrow.Direction.UP, arrowSize );
+		Arrow a2 = new Arrow( Arrow.Direction.DOWN, arrowSize );
+		Pres arrows = new Row( new Pres[] { a1, a2 } );
+		arrows = arrowStyle.applyTo( arrows ).pad( arrowPadding, arrowPadding ).alignHCentre().alignVCentre();
+		Pres dragBar = new Column( new Pres[] { new Box( dragBarEdgeThickness, dragBarEdgeThickness ), new Bin( arrows ) } ).alignHExpand();
+		dragBar = dragBarStyle.applyTo( dragBar ).withElementInteractor( interactor ).padY( 0.0, dragBarPadding );
+		return dragBar;
 	}
 
-	private Pres topDragBar(LSSpaceBin spaceBin, double arrowSize, StyleSheet arrowStyle, AbstractBorder dragBarBorder, double dragBarPadding)
+	private Pres bottomDragBar(LSSpaceBin spaceBin, double arrowSize, double arrowPadding, StyleSheet arrowStyle, StyleSheet dragBarStyle, double dragBarPadding, double dragBarEdgeThickness)
 	{
-		return dragBar( spaceBin, Axis.AXIS_Y, true, Arrow.Direction.UP, Arrow.Direction.DOWN, arrowSize, arrowStyle, dragBarBorder, dragBarPadding ).alignVRefY().alignHExpand();
-	}
-
-	private Pres bottomDragBar(LSSpaceBin spaceBin, double arrowSize, StyleSheet arrowStyle, AbstractBorder dragBarBorder, double dragBarPadding)
-	{
-		return dragBar( spaceBin, Axis.AXIS_Y, false, Arrow.Direction.DOWN, Arrow.Direction.UP, arrowSize, arrowStyle, dragBarBorder, dragBarPadding ).alignVRefY().alignHExpand();
+		ResizeInteractor interactor = new ResizeInteractor( spaceBin, Axis.AXIS_Y, false );
+		Arrow a1 = new Arrow( Arrow.Direction.DOWN, arrowSize );
+		Arrow a2 = new Arrow( Arrow.Direction.UP, arrowSize );
+		Pres arrows = new Row( new Pres[] { a1, a2 } );
+		arrows = arrowStyle.applyTo( arrows ).pad( arrowPadding, arrowPadding ).alignHCentre().alignVCentre();
+		Pres dragBar = new Column( new Pres[] { new Bin( arrows ), new Box( dragBarEdgeThickness, dragBarEdgeThickness ) } ).alignHExpand();
+		dragBar = dragBarStyle.applyTo( dragBar ).withElementInteractor( interactor ).padY( dragBarPadding, 0.0 );
+		return dragBar;
 	}
 
 
@@ -172,31 +188,33 @@ public class ResizeableBin extends ControlPres
 	{
 		double arrowSize = style.get( Controls.resizeableArrowSize, Double.class );
 		StyleSheet arrowStyle = Controls.resizeableBinArrowStyle.get( style );
-		AbstractBorder dragBarBorder = style.get( Controls.resizeableDragBarBorder, AbstractBorder.class );
+		double arrowPadding = style.get( Controls.resizeableArrowPadding, Double.class );
+		double dragBarEdgeThickness = style.get( Controls.resizeableDragBarEdgeThickness, Double.class );
 		double dragBarPadding = style.get( Controls.resizeableDragBarPadding, Double.class );
+		StyleSheet dragBarStyle = style.get( Controls.resizeableDragBarBodyStyle, StyleSheet.class );
 
-		LSSpaceBin.SizeConstraint constraintX = hDrag != DragBar.DRAGBAR_NONE  ?  LSSpaceBin.SizeConstraint.FIXED  :  LSSpaceBin.SizeConstraint.NONE;
-		LSSpaceBin.SizeConstraint constraintY = vDrag != DragBar.DRAGBAR_NONE  ?  LSSpaceBin.SizeConstraint.FIXED  :  LSSpaceBin.SizeConstraint.NONE;
+		LSSpaceBin.SizeConstraint constraintX = hDrag == DragBar.DRAGBAR_NONE  ?  LSSpaceBin.SizeConstraint.NONE  :  LSSpaceBin.SizeConstraint.FIXED;
+		LSSpaceBin.SizeConstraint constraintY = vDrag == DragBar.DRAGBAR_NONE  ?  LSSpaceBin.SizeConstraint.NONE  :  LSSpaceBin.SizeConstraint.FIXED;
 		Pres bin = new SpaceBin( width, height, constraintX, constraintY, child );
 		LSSpaceBin binElement = (LSSpaceBin)bin.present( ctx, Controls.useResizeableBinAttrs( style ) );
 
 		Pres hDragBar = null, vDragBar = null;
 		if ( hDrag == DragBar.DRAGBAR_LOWER )
 		{
-			hDragBar = leftDragBar( binElement, arrowSize, arrowStyle, dragBarBorder, dragBarPadding );
+			hDragBar = leftDragBar( binElement, arrowSize, arrowPadding, arrowStyle, dragBarStyle, dragBarPadding, dragBarEdgeThickness );
 		}
 		else if ( hDrag == DragBar.DRAGBAR_UPPER )
 		{
-			hDragBar = rightDragBar(binElement, arrowSize, arrowStyle, dragBarBorder, dragBarPadding);
+			hDragBar = rightDragBar( binElement, arrowSize, arrowPadding, arrowStyle, dragBarStyle, dragBarPadding, dragBarEdgeThickness );
 		}
 
 		if ( vDrag == DragBar.DRAGBAR_LOWER )
 		{
-			vDragBar = topDragBar(binElement, arrowSize, arrowStyle, dragBarBorder, dragBarPadding);
+			vDragBar = topDragBar( binElement, arrowSize, arrowPadding, arrowStyle, dragBarStyle, dragBarPadding, dragBarEdgeThickness );
 		}
 		else if ( vDrag == DragBar.DRAGBAR_UPPER )
 		{
-			vDragBar = bottomDragBar(binElement, arrowSize, arrowStyle, dragBarBorder, dragBarPadding);
+			vDragBar = bottomDragBar( binElement, arrowSize, arrowPadding, arrowStyle, dragBarStyle, dragBarPadding, dragBarEdgeThickness );
 		}
 
 		Pres contents = new PresentElement( binElement );
