@@ -145,7 +145,7 @@ public class ResizeableBin extends ControlPres
 		arrows = arrowStyle.applyTo( arrows ).pad( arrowPadding, arrowPadding ).alignHCentre().alignVCentre();
 		Pres dragBar = new Row( new Pres[] { new Box( dragBarEdgeThickness, dragBarEdgeThickness ), new Bin( arrows ) } ).alignVExpand();
 		dragBar = dragBarStyle.withValues( Primitive.cursor.as( new Cursor(Cursor.W_RESIZE_CURSOR ) ) ).applyTo( dragBar ).withElementInteractor( interactor ).padX( 0.0, dragBarPadding );
-		return dragBar;
+		return dragBar.alignHLeft();
 	}
 
 	private Pres rightDragBar(LSSpaceBin spaceBin, double arrowSize, double arrowPadding, StyleSheet arrowStyle, StyleSheet dragBarStyle, double dragBarPadding, double dragBarEdgeThickness)
@@ -157,7 +157,7 @@ public class ResizeableBin extends ControlPres
 		arrows = arrowStyle.applyTo( arrows ).pad( arrowPadding, arrowPadding ).alignHCentre().alignVCentre();
 		Pres dragBar = new Row( new Pres[] { new Bin( arrows ), new Box( dragBarEdgeThickness, dragBarEdgeThickness ) } ).alignVExpand();
 		dragBar = dragBarStyle.withValues( Primitive.cursor.as( new Cursor(Cursor.E_RESIZE_CURSOR ) ) ).applyTo( dragBar ).withElementInteractor( interactor ).padX( dragBarPadding, 0.0 );
-		return dragBar;
+		return dragBar.alignHRight();
 	}
 
 	private Pres topDragBar(LSSpaceBin spaceBin, double arrowSize, double arrowPadding, StyleSheet arrowStyle, StyleSheet dragBarStyle, double dragBarPadding, double dragBarEdgeThickness)
@@ -169,7 +169,7 @@ public class ResizeableBin extends ControlPres
 		arrows = arrowStyle.applyTo( arrows ).pad( arrowPadding, arrowPadding ).alignHCentre().alignVCentre();
 		Pres dragBar = new Column( new Pres[] { new Box( dragBarEdgeThickness, dragBarEdgeThickness ), new Bin( arrows ) } ).alignHExpand();
 		dragBar = dragBarStyle.withValues( Primitive.cursor.as( new Cursor(Cursor.N_RESIZE_CURSOR ) ) ).applyTo( dragBar ).withElementInteractor( interactor ).padY( 0.0, dragBarPadding );
-		return dragBar;
+		return dragBar.alignVTop();
 	}
 
 	private Pres bottomDragBar(LSSpaceBin spaceBin, double arrowSize, double arrowPadding, StyleSheet arrowStyle, StyleSheet dragBarStyle, double dragBarPadding, double dragBarEdgeThickness)
@@ -181,7 +181,7 @@ public class ResizeableBin extends ControlPres
 		arrows = arrowStyle.applyTo( arrows ).pad( arrowPadding, arrowPadding ).alignHCentre().alignVCentre();
 		Pres dragBar = new Column( new Pres[] { new Bin( arrows ), new Box( dragBarEdgeThickness, dragBarEdgeThickness ) } ).alignHExpand();
 		dragBar = dragBarStyle.withValues( Primitive.cursor.as( new Cursor(Cursor.S_RESIZE_CURSOR ) ) ).applyTo( dragBar ).withElementInteractor( interactor ).padY( dragBarPadding, 0.0 );
-		return dragBar;
+		return dragBar.alignVBottom();
 	}
 
 
@@ -244,7 +244,7 @@ public class ResizeableBin extends ControlPres
 				table.put( x, y + 1, vDragBar );
 			}
 			table.put( x, y, contents );
-			p = table;
+			p = table.alignHPack().alignVRefY();
 		}
 		else if ( hDrag != DragBar.DRAGBAR_NONE )
 		{
@@ -257,7 +257,7 @@ public class ResizeableBin extends ControlPres
 			{
 				items = new Pres[] { contents, hDragBar };
 			}
-			p = new Row( items );
+			p = new Row( items ).alignHPack();
 		}
 		else if ( vDrag != DragBar.DRAGBAR_NONE )
 		{
@@ -270,7 +270,7 @@ public class ResizeableBin extends ControlPres
 			{
 				items = new Pres[] { contents, vDragBar };
 			}
-			p = new Column( items );
+			p = new Column( items ).alignVRefY();
 		}
 
 		LSElement element = p.present( ctx, style );

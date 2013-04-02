@@ -20,7 +20,7 @@ public class Section extends CompositePres
 	
 	public Section(Object heading, Object contents)
 	{
-		this.heading = Pres.coerce( heading );
+		this.heading = Pres.coerce( heading ).alignVRefY();
 		this.contents = Pres.coerce( contents );
 	}
 
