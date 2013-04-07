@@ -6,30 +6,26 @@
 //##************************
 package BritefuryJ.Editor.List;
 
-public class EditableListDrag
+public class EditableListDrag extends AbstractEditableListDrag
 {
-	private EditableListController controller;
 	private Object editableList, item;
 
 
 	public EditableListDrag(EditableListController controller, Object editableList, Object item)
 	{
-		this.controller = controller;
+		super( controller );
 		this.editableList = editableList;
 		this.item = item;
 	}
 
 
-	public EditableListController getController()
-	{
-		return controller;
-	}
-
+	@Override
 	public Object getEditableList()
 	{
 		return editableList;
 	}
 
+	@Override
 	public Object getItem()
 	{
 		return item;

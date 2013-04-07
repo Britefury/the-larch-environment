@@ -62,7 +62,7 @@ public class EditableListController
 
 	public EditableListController()
 	{
-		dragSource = new ObjectDndHandler.DragSource( EditableListDrag.class,
+		dragSource = new ObjectDndHandler.DragSource( AbstractEditableListDrag.class,
 				new ObjectDndHandler.SourceDataFn()
 				{
 					public Object createSourceData(LSElement sourceElement, int aspect)
@@ -71,7 +71,7 @@ public class EditableListController
 					}
 				} );
 
-		dropDest = new ObjectDndHandler.DropDest( EditableListDrag.class,
+		dropDest = new ObjectDndHandler.DropDest( AbstractEditableListDrag.class,
 				new ObjectDndHandler.CanDropFn()
 				{
 					public boolean canDrop(LSElement destElement, Point2 targetPosition, Object data, int action)
@@ -94,7 +94,7 @@ public class EditableListController
 					}
 				} );
 
-		nestedListItemDropDest = new ObjectDndHandler.DropDest( EditableListDrag.class,
+		nestedListItemDropDest = new ObjectDndHandler.DropDest( AbstractEditableListDrag.class,
 				new ObjectDndHandler.CanDropFn()
 				{
 					public boolean canDrop(LSElement destElement, Point2 targetPosition, Object data, int action)
@@ -277,7 +277,7 @@ public class EditableListController
 			InsertionPoint ins = ((LSContainerSequence)destElement).getInsertionPointClosestToLocalPoint( targetPosition );
 			if ( ins != null )
 			{
-				EditableListDrag drag = (EditableListDrag)data;
+				AbstractEditableListDrag drag = (AbstractEditableListDrag)data;
 
 				if ( testController( drag.getController() ) )
 				{
@@ -335,7 +335,7 @@ public class EditableListController
 			InsertionPoint ins = ((LSContainerSequence)destElement).getInsertionPointClosestToLocalPoint( targetPosition );
 			if ( ins != null )
 			{
-				EditableListDrag drag = (EditableListDrag)data;
+				AbstractEditableListDrag drag = (AbstractEditableListDrag)data;
 				if ( testController( drag.getController() ) )
 				{
 					Object item = drag.getItem();
@@ -377,7 +377,7 @@ public class EditableListController
 			double w = bounds.getWidth(), h = bounds.getHeight();
 			if ( offset.x >= w * 0.25  &&  offset.x <= w * 0.75  &&  offset.y >= h * 0.25  &&  offset.y <= h * 0.75 )
 			{
-				EditableListDrag drag = (EditableListDrag)data;
+				AbstractEditableListDrag drag = (AbstractEditableListDrag)data;
 
 				Object item = drag.getItem();
 				Object list = drag.getEditableList();
@@ -430,7 +430,7 @@ public class EditableListController
 			double w = bounds.getWidth(), h = bounds.getHeight();
 			if ( offset.x >= w * 0.25  &&  offset.x <= w * 0.75  &&  offset.y >= h * 0.25  &&  offset.y <= h * 0.75 )
 			{
-				EditableListDrag drag = (EditableListDrag)data;
+				AbstractEditableListDrag drag = (AbstractEditableListDrag)data;
 
 				Object item = drag.getItem();
 				Object list = drag.getEditableList();

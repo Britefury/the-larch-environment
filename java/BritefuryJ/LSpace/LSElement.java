@@ -43,6 +43,7 @@ import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.DefaultPerspective;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.Graphics.FilledBorder;
+import BritefuryJ.Graphics.FilledOutlinePainter;
 import BritefuryJ.Graphics.Painter;
 import BritefuryJ.Graphics.SolidBorder;
 import BritefuryJ.IncrementalView.FragmentView;
@@ -3024,51 +3025,23 @@ abstract public class LSElement implements Presentable
 	protected static StyleSheet metaHeaderEmptyBorderStyle = StyleSheet.style( Primitive.border.as( new FilledBorder() ) );
 	private static SolidBorder inspectorBorder = new SolidBorder( 1.0, 1.0, new Color( 0.5f, 0.5f, 0.5f ), Color.WHITE );
 	
-	private static Color explorerHeadHoverFillPaint = new Color( 0.0f, 0.4f, 0.8f, 0.25f );
-	private static Color explorerHeadHoverOutlinePaint = new Color( 0.0f, 0.4f, 0.8f, 0.5f );
-	private static Stroke explorerHeadHoverStroke = new BasicStroke( 1.0f );
-	
-	private static ElementPainter explorerHeadHoverPainter = new ElementPainter()
-	{
-		public void drawBackground(LSElement element, Graphics2D graphics)
-		{
-		}
+	private static ElementHighlighter explorerHeadHoverHighlighter = new ElementHighlighter(
+			new FilledOutlinePainter( new Color( 0.0f, 0.4f, 0.8f, 0.25f ), new Color( 0.0f, 0.4f, 0.8f, 0.5f ), new BasicStroke( 1.0f ) ) );
 
-		public void draw(LSElement element, Graphics2D graphics)
-		{
-			Paint paint = graphics.getPaint();
-			Stroke stroke = graphics.getStroke();
 
-			graphics.setStroke( explorerHeadHoverStroke );
-			for (Shape shape: element.getShapes())
-			{
-				graphics.setPaint( explorerHeadHoverFillPaint );
-				graphics.fill( shape );
-				graphics.setPaint( explorerHeadHoverOutlinePaint );
-				graphics.draw( shape );
-			}
-			
-			graphics.setPaint( paint );
-			graphics.setStroke( stroke );
-		}
-	};
-	
-	
 	
 	private static void activateExplorerHighlight(LSElement explorerElement)
 	{
 		FragmentView fragment = (FragmentView)explorerElement.getFragmentContext();
 		LSElement model = (LSElement)fragment.getModel();
-		model.addPainter( explorerHeadHoverPainter );
-		model.queueFullRedraw();
+		explorerHeadHoverHighlighter.highlight( model );
 	}
 	
 	private static void deactivateExplorerHighlight(LSElement explorerElement)
 	{
 		FragmentView fragment = (FragmentView)explorerElement.getFragmentContext();
 		LSElement model = (LSElement)fragment.getModel();
-		model.removePainter( explorerHeadHoverPainter );
-		model.queueFullRedraw();
+		explorerHeadHoverHighlighter.unhighlight( model );
 	}
 	
 	

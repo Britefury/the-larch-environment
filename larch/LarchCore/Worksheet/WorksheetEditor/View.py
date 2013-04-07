@@ -207,7 +207,7 @@ def _worksheetContextMenuFactory(element, menu):
 	h5ParaStyle = Hyperlink( 'H5', makeParaStyleFn( 'h5' ) )
 	h6ParaStyle = Hyperlink( 'H6', makeParaStyleFn( 'h6' ) )
 	titleParaStyle = Hyperlink( 'Title', makeParaStyleFn( 'title' ) )
-	paraStyles = ControlsRow( [ normalParaStyle, h1ParaStyle, h2ParaStyle, h3ParaStyle, h4ParaStyle, h5ParaStyle, h6ParaStyle, titleParaStyle ] )
+	paraStyles = ControlsRow( [ normalParaStyle, h1ParaStyle, h2ParaStyle, h3ParaStyle, h4ParaStyle, h5ParaStyle, h6ParaStyle, titleParaStyle ] ).alignHPack()
 	menu.add( Section( SectionHeading2( 'Paragraph style' ), paraStyles ).alignHExpand() )
 	
 	
@@ -246,7 +246,7 @@ def _worksheetContextMenuFactory(element, menu):
 			WorksheetRichTextController.instance.insertInlineEmbedAtCaret( caret, _makeLink )
 
 	insertLink = Button.buttonWithLabel( 'Hyperlink', _onLink )
-	insert = ControlsRow( [ insertLink ] )
+	insert = ControlsRow( [ insertLink ] ).alignHPack()
 	menu.add( Section( SectionHeading2( 'Insert' ), insert ).alignHExpand() )
 
 
@@ -279,7 +279,7 @@ def _worksheetContextMenuFactory(element, menu):
 	model = element.getFragmentContext().getModel()
 
 	refreshButton = Button.buttonWithLabel( 'Refresh', _onRefresh )
-	worksheetControls = ControlsRow( [ refreshButton.alignHPack() ] )
+	worksheetControls = ControlsRow( [ refreshButton ] ).alignHPack()
 	menu.add( Section( SectionHeading2( 'Worksheet' ), worksheetControls ).alignHExpand() )
 	return True
 
