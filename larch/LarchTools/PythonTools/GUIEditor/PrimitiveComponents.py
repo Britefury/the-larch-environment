@@ -9,7 +9,7 @@ from BritefuryJ.Pres.Primitive import Label, Row, Column, Paragraph, FlowGrid, R
 
 from BritefuryJ.Live import LiveValue
 
-from LarchTools.PythonTools.GUIEditor.ComponentPalette import PaletteItemFactory, registerPaletteItemFactory
+from LarchTools.PythonTools.GUIEditor.ComponentPalette import paletteItem, registerPaletteSubsection
 
 from LarchTools.PythonTools.GUIEditor.LeafComponent import GUILeafComponent
 from LarchTools.PythonTools.GUIEditor.SequentialComponent import GUISequenceComponent
@@ -26,7 +26,7 @@ class GUILabel (GUILeafComponent):
 	def _presentItemContents(self, fragment, inheritedState):
 		return Label(self._text.getValue())
 
-registerPaletteItemFactory(PaletteItemFactory(Label('Label'), lambda: GUILabel('Label')))
+_labelItem = paletteItem(Label('Label'), lambda: GUILabel('Label'))
 
 
 
@@ -37,7 +37,7 @@ class GUIRow (GUISequenceComponent):
 	def _presentSequenceContents(self, contents, fragment, inheritedState):
 		return Row(contents)
 
-registerPaletteItemFactory(PaletteItemFactory(Label('Row'), lambda: GUIRow()))
+_rowItem = paletteItem(Label('Row'), lambda: GUIRow())
 
 
 
@@ -48,7 +48,7 @@ class GUIColumn (GUISequenceComponent):
 	def _presentSequenceContents(self, contents, fragment, inheritedState):
 		return Column(contents)
 
-registerPaletteItemFactory(PaletteItemFactory(Label('Column'), lambda: GUIColumn()))
+_columnItem = paletteItem(Label('Column'), lambda: GUIColumn())
 
 
 
@@ -59,7 +59,7 @@ class GUIParagraph (GUISequenceComponent):
 	def _presentSequenceContents(self, contents, fragment, inheritedState):
 		return Paragraph(contents)
 
-registerPaletteItemFactory(PaletteItemFactory(Label('Paragraph'), lambda: GUIParagraph()))
+_paraItem = paletteItem(Label('Paragraph'), lambda: GUIParagraph())
 
 
 
@@ -70,7 +70,7 @@ class GUIFlowGrid (GUISequenceComponent):
 	def _presentSequenceContents(self, contents, fragment, inheritedState):
 		return FlowGrid(contents)
 
-registerPaletteItemFactory(PaletteItemFactory(Label('Flow grid'), lambda: FlowGrid()))
+_flowGridItem = paletteItem(Label('Flow grid'), lambda: GUIFlowGrid())
 
 
 
@@ -80,7 +80,7 @@ class GUIRGrid (GUISequenceComponent):
 	def _presentSequenceContents(self, contents, fragment, inheritedState):
 		return RGrid(contents)
 
-registerPaletteItemFactory(PaletteItemFactory(Label('Grid'), lambda: RGrid()))
+_gridItem = paletteItem(Label('Grid'), lambda: GUIRGrid())
 
 
 
@@ -92,4 +92,9 @@ class GUIGridRow (GUISequenceComponent):
 	def _presentSequenceContents(self, contents, fragment, inheritedState):
 		return GridRow(contents)
 
-registerPaletteItemFactory(PaletteItemFactory(Label('Grid row'), lambda: GridRow()))
+_gridRowItem = paletteItem(Label('Grid row'), lambda: GridRow())
+
+
+
+registerPaletteSubsection('Basic', [_labelItem])
+registerPaletteSubsection('Containers', [_rowItem, _columnItem, _paraItem, _flowGridItem, _gridItem, _gridRowItem])
