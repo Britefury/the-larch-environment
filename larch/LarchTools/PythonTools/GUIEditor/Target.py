@@ -12,6 +12,8 @@ from BritefuryJ.LSpace.Interactor import ScrollElementInteractor, TargetElementI
 
 from BritefuryJ.LSpace.Focus import Target, SelectionPoint
 
+from LarchTools.PythonTools.GUIEditor.Properties import GUICProp
+
 
 #
 #Selection point and target:

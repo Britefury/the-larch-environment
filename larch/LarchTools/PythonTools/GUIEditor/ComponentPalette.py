@@ -12,7 +12,7 @@ from java.awt import Color
 from BritefuryJ.Graphics import SolidBorder, FilledOutlinePainter
 
 from BritefuryJ.Pres.Primitive import Primitive, Label, Row, Column, Paragraph, FlowGrid, Blank
-from BritefuryJ.Pres.UI import Section, SectionHeading1
+from BritefuryJ.Pres.UI import Section, SectionHeading1, SectionHeading2, SectionHeading3
 
 from BritefuryJ.StyleSheet import StyleSheet
 
@@ -53,31 +53,34 @@ class PaletteComponentDrag (Object):
 #
 #Control palette:
 _paletteItemStyle = StyleSheet.style(Primitive.fontSize(11), Primitive.foreground(Color(0.3, 0.3, 0.3)), Primitive.background(FilledOutlinePainter(Color.white, Color(0.8, 0.8, 0.8))))
-_paletteItemBorder = SolidBorder(1.0, 4.0, Color(0.7, 0.7, 0.7), None).highlight(Color(0.6, 0.6, 0.6), Color(0.9, 0.9, 0.9))
+_paletteItemBorder = SolidBorder(1.0, 2.0, Color(0.7, 0.7, 0.7), None).highlight(Color(0.6, 0.6, 0.6), Color(0.9, 0.9, 0.9))
 
 
 
-_itemFactories = []
+_paletteSections = []
 
 
 
-def _paletteItem(contents, factory):
+def paletteItem(contents, factoryCallable):
 	p = _paletteItemStyle(_paletteItemBorder.surround(contents)).alignHExpand().alignVRefYExpand()
-	p = p.withDragSource(PaletteComponentDrag, lambda element, aspect: PaletteComponentDrag(factory))
-	p = p.withDragSource(PaletteComponentIntoListDrag, lambda element, aspect: PaletteComponentIntoListDrag(GUIEditor.SequentialComponent.SequentialGUIController.instance, factory))
+	p = p.withDragSource(PaletteComponentDrag, lambda element, aspect: PaletteComponentDrag(factoryCallable))
+	p = p.withDragSource(PaletteComponentIntoListDrag, lambda element, aspect: PaletteComponentIntoListDrag(GUIEditor.SequentialComponent.SequentialGUIController.instance, factoryCallable))
 	return p
 
+
+
 def createPalette():
-	heading = SectionHeading1('Controls')
-	items = []
-	for fac in _itemFactories:
-		items.append(_paletteItem(fac.visual, fac.factoryCallable))
-	pal = FlowGrid(3, items)
-	return Section(heading, pal)
+	return Column(_paletteSections).alignVRefY()
 
 
-def registerPaletteItemFactory(fac):
-	_itemFactories.append(fac)
+
+def registerPaletteSubsection(title, items):
+	sec = Section( SectionHeading3( title ), FlowGrid( 4, items ) )
+	_paletteSections.append( sec )
+
+def registerPaletteSection(title, items):
+	sec = Section( SectionHeading2( title ), FlowGrid( 4, items ) )
+	_paletteSections.append( sec )
 
 
 

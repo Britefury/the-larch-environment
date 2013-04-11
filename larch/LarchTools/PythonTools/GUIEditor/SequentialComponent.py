@@ -76,7 +76,7 @@ SequentialGUIController.instance = SequentialGUIController()
 class GUISequenceComponent (GUIComponent):
 	componentName = 'Sequence'
 
-	def __init__(self, xs):
+	def __init__(self, xs=None):
 		self.xs = LiveList(xs)
 
 
