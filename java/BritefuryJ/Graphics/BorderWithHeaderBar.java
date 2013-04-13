@@ -37,12 +37,7 @@ public class BorderWithHeaderBar
 			double width = borderElement.getActualWidth();
 			double height = element.getActualHeight() + offset.y;
 			
-			Shape clipShape = border.getClipShape( graphics, -offset.x, -offset.y, width, borderElement.getActualHeight() );
-			
-			Shape prevClip = graphics.getClip();
 			Paint prevPaint = graphics.getPaint();
-			
-			graphics.clip( clipShape );
 			
 			Shape headerShape = new Rectangle2D.Double( -offset.x, -offset.y, width, height );
 			
@@ -50,7 +45,6 @@ public class BorderWithHeaderBar
 			graphics.fill( headerShape );
 			
 			graphics.setPaint( prevPaint );
-			graphics.setClip( prevClip );
 		}
 
 		@Override
@@ -75,6 +69,6 @@ public class BorderWithHeaderBar
 	{
 		Pres headerBin = new Bin( header ).withPainter( headerPainter );
 		Column contents = new Column( new Object[] { headerBin, body } );		
-		return border.surround( contents ).withProperty( borderKey, null );
+		return border.surroundAndClip( contents ).withProperty( borderKey, null );
 	}
 }

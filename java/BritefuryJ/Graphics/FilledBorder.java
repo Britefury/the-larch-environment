@@ -74,6 +74,13 @@ public class FilledBorder extends AbstractBorder
 		this.backgroundPaint = backgroundPaint;
 		this.highlightBackgroundPaint = highlightBackgroundPaint;
 	}
+
+
+	public FilledBorder highlight(Paint highlightBackgroundPaint)
+	{
+		return new FilledBorder( leftMargin, rightMargin, topMargin, bottomMargin, roundingX, roundingY, backgroundPaint, highlightBackgroundPaint );
+	}
+
 	
 	
 

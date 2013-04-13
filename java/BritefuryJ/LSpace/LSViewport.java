@@ -268,7 +268,8 @@ public class LSViewport extends LSContainerNonOverlayed implements FiniteViewpor
 	{
 		return viewportBehaviour.getWorldToViewXform();
 	}
-	
+
+	@Override
 	public AABox2 getLocalVisibleBoundsClipBox()
 	{
 		return getLocalAABox();
