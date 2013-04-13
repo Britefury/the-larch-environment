@@ -11,8 +11,10 @@ from BritefuryJ.Editor.List import EditableListController
 
 from Britefury.Util.LiveList import LiveList
 
+from LarchCore.Languages.Python2 import Schema as Py
+
 from LarchTools.PythonTools.GUIEditor.Component import GUIComponent
-from LarchTools.PythonTools.GUIEditor.BranchComponent import emptyLabel
+from LarchTools.PythonTools.GUIEditor.BranchComponent import emptyLabel, GUIBranchComponent
 
 
 
@@ -73,53 +75,56 @@ SequentialGUIController.instance = SequentialGUIController()
 
 
 
-class GUISequenceComponent (GUIComponent):
+class GUISequenceComponent (GUIBranchComponent):
 	componentName = 'Sequence'
 
 	def __init__(self, xs=None):
-		self.xs = LiveList(xs)
+		self._children = LiveList(xs)
 
 
 	def __iter__(self):
-		return iter(self.xs)
+		return iter(self._children)
 
 	def __len__(self):
-		return len(self.xs)
+		return len(self._children)
 
 	def index(self, x):
-		return self.xs.index(x)
+		return self._children.index(x)
 
 
 	def __getitem__(self, index):
-		return self.xs[index]
+		return self._children[index]
 
 	def __setitem__(self, index, x):
-		self.xs[index] = x
+		self._children[index] = x
 
 	def __delitem__(self, index):
-		del self.xs[index]
+		del self._children[index]
 
 
 	def append(self, x):
-		self.xs.append(x)
+		self._children.append(x)
 
 	def insert(self, index, x):
-		self.xs.insert(index, x)
+		self._children.insert(index, x)
 
 	def remove(self, x):
-		self.xs.remove(x)
+		self._children.remove(x)
 
 
 
 	def _lookFor(self, x):
-		for item in self.xs:
+		for item in self._children:
 			if item.lookFor(x):
 				return True
 		return False
 
 	def _presentContents(self, fragment, inheritedState):
-		contents = [emptyLabel]   if len(self.xs) == 0   else self.xs[:]
+		contents = [emptyLabel]   if len(self._children) == 0   else self._children[:]
 		p = self._presentSequenceContents(contents, fragment, inheritedState)
 		p = SequentialGUIController.instance.editableList(self, p)
 		return p
 
+
+	def _py_evalmodel_forChildren(self, codeGen):
+		return Py.ListLiteral( values=[ x.__py_evalmodel__( codeGen )   for x in self._children ] )

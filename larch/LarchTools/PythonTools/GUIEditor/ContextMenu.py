@@ -64,7 +64,7 @@ def _presentComponentsUnderPointer(elementUnderPointer, guiEditorRootElement):
 
 
 
-def componentContextMenu(element, menu):
+def _addPanelButtons(menu):
 	# Side panel
 	def _onShow(button, event):
 		showSidePanel(button.element)
@@ -76,6 +76,10 @@ def componentContextMenu(element, menu):
 	panelSection = Section(SectionHeading3('Side panel'), panelButtons)
 	menu.add(panelSection)
 
+
+def componentContextMenu(element, menu):
+	# Side panel
+	_addPanelButtons(menu)
 
 	# Components under pointer
 	guiEditorRootProp = element.findPropertyInAncestors(GUIEdProp.instance)
@@ -115,3 +119,10 @@ def componentContextMenu(element, menu):
 	return True
 
 
+
+def guiEditorContextMenu(element, menu):
+	# Side panel
+	_addPanelButtons(menu)
+
+
+	return True

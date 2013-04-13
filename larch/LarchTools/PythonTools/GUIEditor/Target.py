@@ -131,11 +131,9 @@ class _TargetListenerLifeTime (RealiseElementInteractor):
 		self.__rootElement = rootElement
 
 	def elementRealised(self, element):
-		print 'Realised'
 		self.__rootElement.addTargetListener( self.__targetListener )
 
 	def elementUnrealised(self, element):
-		print 'Unrealised'
 		self.__rootElement.removeTargetListener( self.__targetListener )
 
 
@@ -151,9 +149,7 @@ class GUITargetListener (TargetListener):
 
 	def targetSet(self, t):
 		if isinstance(t, GUIEditorTarget):
-			print 'Notifying of change, ', self.__componentChangedFn
 			self.__componentChangedFn(t.component)
-			print 'Notifying of change, ', self.__componentChangedFn
 
 
 	def tieToLifeTimeOf(self, p, rootElement):
