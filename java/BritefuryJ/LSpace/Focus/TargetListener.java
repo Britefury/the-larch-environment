@@ -10,5 +10,6 @@ package BritefuryJ.LSpace.Focus;
 
 public interface TargetListener
 {
-	public void targetChanged(Target t);
+	public void targetModified(Target t);
+	public void targetSet(Target t);
 }

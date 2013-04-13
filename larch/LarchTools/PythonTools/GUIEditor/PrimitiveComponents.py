@@ -6,6 +6,9 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2013.
 ##-*************************
 from BritefuryJ.Pres.Primitive import Label, Row, Column, Paragraph, FlowGrid, RGrid, GridRow
+from BritefuryJ.Pres.UI import Form
+
+from BritefuryJ.Controls import TextEntry
 
 from BritefuryJ.Live import LiveValue
 
@@ -25,6 +28,10 @@ class GUILabel (GUILeafComponent):
 
 	def _presentItemContents(self, fragment, inheritedState):
 		return Label(self._text.getValue())
+
+	def _editUI(self):
+		text = Form.Section('Text', None, TextEntry.textEntryCommitOnChange(self._text))
+		return Form(None, [text])
 
 _labelItem = paletteItem(Label('Label'), lambda: GUILabel('Label'))
 

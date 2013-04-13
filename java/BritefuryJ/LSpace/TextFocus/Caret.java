@@ -258,7 +258,7 @@ public class Caret extends Target implements MarkerListener
 	
 	protected void changed()
 	{
-		notifyListenersOfChange();
+		notifyModified();
 		
 		handleChange();
 	}

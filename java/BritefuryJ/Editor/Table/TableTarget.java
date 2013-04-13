@@ -81,7 +81,7 @@ public class TableTarget extends Target
 	
 	private void notifyMoved()
 	{
-		notifyListenersOfChange();
+		notifyModified();
 		((LSElement)table).queueFullRedraw();
 	}
 	
