@@ -19,17 +19,30 @@ public class Border extends Pres
 {
 	private Pres child;
 	private AbstractBorder border;
+	private boolean clip;
 	
 	
-	public Border(Object child, AbstractBorder border)
+	public Border(Object child, AbstractBorder border, boolean clip)
 	{
 		this.child = coerce( child );
 		this.border = border;
+		this.clip = clip;
 	}
-	
+
+	public Border(Object child, AbstractBorder border)
+	{
+		this( child, border, false );
+	}
+
 	public Border(Object child)
 	{
 		this( child, null );
+	}
+
+
+	public static Border clip(Object child, AbstractBorder border)
+	{
+		return new Border( child, border, true );
 	}
 	
 
@@ -37,17 +50,23 @@ public class Border extends Pres
 	@Override
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
+		LSBorder elem;
 		if ( border != null )
 		{
 			StyleValues childStyle = Primitive.useContainerParams.get( Primitive.useBorderParams.get( style ) );
 			LSElement childElem = child.present( ctx, childStyle ).layoutWrap( childStyle.get( Primitive.hAlign, HAlignment.class ), childStyle.get( Primitive.vAlign, VAlignment.class ) );
-			return new LSBorder( border, Primitive.containerParams.get( style ), childElem );
+			elem = new LSBorder( border, Primitive.containerParams.get( style ), childElem );
 		}
 		else
 		{
 			StyleValues childStyle = Primitive.useContainerParams.get( Primitive.useBorderParams.get( style ) );
 			LSElement childElem = child.present( ctx, childStyle ).layoutWrap( childStyle.get( Primitive.hAlign, HAlignment.class ), childStyle.get( Primitive.vAlign, VAlignment.class ) );
-			return new LSBorder( Primitive.getBorderParams( style ), Primitive.containerParams.get( style ), childElem );
+			elem =  new LSBorder( Primitive.getBorderParams( style ), Primitive.containerParams.get( style ), childElem );
 		}
+		if ( clip )
+		{
+			elem.enableClipping();
+		}
+		return elem;
 	}
 }

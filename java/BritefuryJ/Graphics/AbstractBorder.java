@@ -48,6 +48,11 @@ public abstract class AbstractBorder implements Presentable
 	{
 		return new Border( x, this );
 	}
+
+	public Pres surroundAndClip(Object x)
+	{
+		return new Border( x, this, true );
+	}
 	
 	public Pres __call__(Object x)
 	{
