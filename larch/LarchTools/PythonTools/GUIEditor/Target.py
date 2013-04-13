@@ -8,9 +8,11 @@
 from java.awt import Color, BasicStroke
 from java.awt.geom import Rectangle2D
 
-from BritefuryJ.LSpace.Interactor import ScrollElementInteractor, TargetElementInteractor
+from BritefuryJ.LSpace.Interactor import ScrollElementInteractor, TargetElementInteractor, RealiseElementInteractor
 
-from BritefuryJ.LSpace.Focus import Target, SelectionPoint
+from BritefuryJ.LSpace.Focus import Target, SelectionPoint, TargetListener
+
+from BritefuryJ.Pres import Pres
 
 from LarchTools.PythonTools.GUIEditor.Properties import GUICProp
 
@@ -62,6 +64,7 @@ class GUIEditorTarget (Target):
 		graphics.setPaint(prevPaint)
 		graphics.setStroke(prevStroke)
 		self.__element.popGraphicsTransform(graphics, current)
+
 
 
 
@@ -119,3 +122,39 @@ class GUIScrollInteractor (ScrollElementInteractor):
 			element.getRootElement().setTarget(target)
 		return True
 
+
+
+
+class _TargetListenerLifeTime (RealiseElementInteractor):
+	def __init__(self, targetListener, rootElement):
+		self.__targetListener = targetListener
+		self.__rootElement = rootElement
+
+	def elementRealised(self, element):
+		print 'Realised'
+		self.__rootElement.addTargetListener( self.__targetListener )
+
+	def elementUnrealised(self, element):
+		print 'Unrealised'
+		self.__rootElement.removeTargetListener( self.__targetListener )
+
+
+
+class GUITargetListener (TargetListener):
+	def __init__(self, componentChangedFn):
+		self.__componentChangedFn = componentChangedFn
+
+
+	def targetModified(self, t):
+		if isinstance(t, GUIEditorTarget):
+			self.__componentChangedFn(t.component)
+
+	def targetSet(self, t):
+		if isinstance(t, GUIEditorTarget):
+			print 'Notifying of change, ', self.__componentChangedFn
+			self.__componentChangedFn(t.component)
+			print 'Notifying of change, ', self.__componentChangedFn
+
+
+	def tieToLifeTimeOf(self, p, rootElement):
+		return Pres.coerce( p ).withElementInteractor( _TargetListenerLifeTime( self, rootElement ) )

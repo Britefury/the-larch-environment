@@ -33,13 +33,10 @@ import javax.swing.Timer;
 import javax.swing.TransferHandler;
 
 import BritefuryJ.Browser.PaneManager;
+import BritefuryJ.LSpace.Focus.*;
 import BritefuryJ.LSpace.PresentationComponent.CannotGetGraphics2DException;
 import BritefuryJ.LSpace.PresentationComponent.TypesetProfile;
 import BritefuryJ.LSpace.PresentationComponent.TypesetProfileMeasurement;
-import BritefuryJ.LSpace.Focus.Selection;
-import BritefuryJ.LSpace.Focus.SelectionListener;
-import BritefuryJ.LSpace.Focus.SelectionManager;
-import BritefuryJ.LSpace.Focus.Target;
 import BritefuryJ.LSpace.Input.DndController;
 import BritefuryJ.LSpace.Input.DndDragSwing;
 import BritefuryJ.LSpace.Input.DndDropSwing;
@@ -60,7 +57,7 @@ import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 import BritefuryJ.Util.WeakIdentityHashMap;
 
-public class LSRootElement extends LSBin implements SelectionListener, DndController
+public class LSRootElement extends LSBin implements SelectionListener, DndController, Target.TargetModificationListener
 {
 	private PresentationComponent component;
 	
@@ -85,7 +82,8 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	private Caret caret;
 	
 	private Target target;
-	
+	private ArrayList<TargetListener> targetListeners = new ArrayList<TargetListener>();
+
 	private SelectionManager selectionManager;
 	private Selection selection;
 	
@@ -226,8 +224,17 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		if ( t != target )
 		{
 			target.notifyDeactivate();
+			target.setModificationListener( null );
+
 			target = t;
+
+			target.setModificationListener( this );
 			target.notifyActivate();
+
+			for (TargetListener listener: targetListeners)
+			{
+				listener.targetSet( t );
+			}
 		}
 
 		queueFullRedraw();
@@ -236,6 +243,27 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	public void setCaretAsTarget()
 	{
 		setTarget( caret );
+	}
+
+
+	public void addTargetListener(TargetListener listener)
+	{
+		targetListeners.add( listener );
+	}
+
+	public void removeTargetListener(TargetListener listener)
+	{
+		targetListeners.remove( listener );
+	}
+
+
+	@Override
+	public void notifyTargetModified(Target t)
+	{
+		for (TargetListener listener: targetListeners)
+		{
+			listener.targetModified( t );
+		}
 	}
 	
 	

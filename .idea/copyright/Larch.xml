@@ -1,0 +1,9 @@
+<component name="CopyrightManager">
+  <copyright>
+    <option name="notice" value="##-*************************&#10;##-* This program is free software; you can use it, redistribute it and/or modify it&#10;##-* under the terms of the GNU General Public License version 2 as published by the&#10;##-* Free Software Foundation. The full text of the GNU General Public License&#10;##-* version 2 can be found in the file named 'COPYING' that accompanies this&#10;##-* program. This source code is (C)copyright Geoffrey French 1999-2013.&#10;##-*************************" />
+    <option name="keyword" value="Copyright" />
+    <option name="allowReplaceKeyword" value="" />
+    <option name="myName" value="Larch" />
+    <option name="myLocal" value="true" />
+  </copyright>
+</component>

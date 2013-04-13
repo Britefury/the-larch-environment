@@ -15,7 +15,12 @@ import BritefuryJ.LSpace.LSRegion;
 
 public abstract class Target
 {
-	private ArrayList<TargetListener> listeners = new ArrayList<TargetListener>();
+	public interface TargetModificationListener
+	{
+		public void notifyTargetModified(Target t);
+	}
+
+	protected TargetModificationListener modificationListener;
 	protected boolean active = false;
 
 
@@ -117,25 +122,21 @@ public abstract class Target
 	{
 	}
 
-	
-	
-	public void addTargetListener(TargetListener listener)
+
+
+	public void setModificationListener(TargetModificationListener modificationListener)
 	{
-		listeners.add( listener );
-	}
-	
-	public void removeTargetListener(TargetListener listener)
-	{
-		listeners.remove( listener );
+		this.modificationListener = modificationListener;
 	}
 
 
-
-	protected void notifyListenersOfChange()
+	
+	
+	protected void notifyModified()
 	{
-		for (TargetListener listener: listeners)
+		if ( modificationListener != null )
 		{
-			listener.targetChanged( this );
+			modificationListener.notifyTargetModified( this );
 		}
 	}
 }
