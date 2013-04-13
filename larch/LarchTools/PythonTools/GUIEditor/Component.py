@@ -42,6 +42,10 @@ class GUIComponent (object):
 		x = x.withProperty(GUICProp.instance, self)
 		return x
 
+	def __py_evalmodel__(self, codeGen):
+		raise NotImplementedError, 'abstract'
+
+
 
 
 
