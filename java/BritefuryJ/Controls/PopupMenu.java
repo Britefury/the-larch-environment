@@ -45,7 +45,10 @@ public abstract class PopupMenu extends Pres
 		items.add( coerce( item ) );
 		bEmpty = false;
 	}
-	
+
+
+	public abstract void addSeparator();
+
 	
 	//
 	// Popup methods

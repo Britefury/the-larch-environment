@@ -463,11 +463,8 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		handleDraw( graphics, new AABox2( topLeftRootSpace, bottomRightRootSpace) );
 		drawSelection( graphics );
 		//graphics.setTransform( transform );
-		if ( hasComponentFocus )
-		{
-			drawTarget( graphics );
-		}
-		
+		drawTarget( graphics, hasComponentFocus );
+
 		// Draw DnD highlight
 		drawDndHighlight( graphics );
 		
@@ -479,10 +476,10 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	}
 	
 	
-	private void drawTarget(Graphics2D graphics)
+	private void drawTarget(Graphics2D graphics, boolean componentHasFocus)
 	{
 		final Target t = getTarget();
-		if ( t != null  &&  t.isValid() )
+		if ( t != null  &&  t.isValid()  &&  ( componentHasFocus || t.drawWhenComponentNotFocused() ) )
 		{
 			t.draw( graphics );
 

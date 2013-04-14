@@ -42,7 +42,13 @@ public class Caret extends Target implements MarkerListener
 		marker = new Marker();
 		marker.addMarkerListener( this );
 	}
-	
+
+
+	@Override
+	public boolean drawWhenComponentNotFocused()
+	{
+		return false;
+	}
 	
 	@Override
 	public void draw(Graphics2D graphics)

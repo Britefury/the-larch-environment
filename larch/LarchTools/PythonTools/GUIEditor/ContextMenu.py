@@ -56,10 +56,12 @@ def _presentComponentsUnderPointer(elementUnderPointer, guiEditorRootElement):
 	# Components under pointer
 	components = []
 	for p in propValues:
-		interactor = ComponentHighlightInteractor(p.value, p.element)
-		c = componentUnderPointerBorder.surround(Label(p.value.componentName).pad(4.0, 2.0)).alignHExpand()
-		c = c.withElementInteractor(interactor)
-		components.append(c)
+		component = p.value
+		if component.componentName is not None:
+			interactor = ComponentHighlightInteractor(p.value, p.element)
+			c = componentUnderPointerBorder.surround(Label(component.componentName).pad(4.0, 2.0)).alignHExpand()
+			c = c.withElementInteractor(interactor)
+			components.append(c)
 	return FlowGrid(3, components)
 
 
@@ -78,9 +80,6 @@ def _addPanelButtons(menu):
 
 
 def componentContextMenu(element, menu):
-	# Side panel
-	_addPanelButtons(menu)
-
 	# Components under pointer
 	guiEditorRootProp = element.findPropertyInAncestors(GUIEdProp.instance)
 	guiEditorRootElement = guiEditorRootProp.element
@@ -116,6 +115,9 @@ def componentContextMenu(element, menu):
 	menu.add(componentUI)
 
 
+	# Side panel
+	_addPanelButtons(menu)
+
 	return True
 
 
@@ -124,5 +126,6 @@ def guiEditorContextMenu(element, menu):
 	# Side panel
 	_addPanelButtons(menu)
 
+	menu.addSeparator()
 
-	return True
+	return False

@@ -5,10 +5,16 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2013.
 ##-*************************
-from BritefuryJ.Pres.Primitive import Label, StaticText, Text, Spacer, Row, Column, Paragraph, FlowGrid, RGrid, GridRow
+from java.awt import Color
+
+from BritefuryJ.Graphics import FillPainter
+
+from BritefuryJ.Pres.Primitive import Primitive, Label, StaticText, Text, Arrow, Spacer, Row, Column, Paragraph, FlowGrid, RGrid, GridRow
 from BritefuryJ.Pres.UI import Form
 
-from BritefuryJ.Controls import TextEntry, RealSpinEntry
+from BritefuryJ.StyleSheet import StyleSheet
+
+from BritefuryJ.Controls import TextEntry, RealSpinEntry, SwitchButton
 
 from BritefuryJ.Live import LiveValue
 
@@ -17,8 +23,7 @@ from LarchCore.Languages.Python2 import Schema as Py
 from LarchTools.PythonTools.GUIEditor.ComponentPalette import paletteItem, registerPaletteSubsection
 
 from LarchTools.PythonTools.GUIEditor.LeafComponent import GUILeafComponent
-from LarchTools.PythonTools.GUIEditor.SequentialComponent import GUISequenceComponent
-from LarchTools.PythonTools.GUIEditor.BranchComponent import GUIBranchComponent
+from LarchTools.PythonTools.GUIEditor.BranchComponent import GUIBranchComponent, GUISequenceComponent
 
 
 
@@ -29,11 +34,11 @@ class GUILabel (GUILeafComponent):
 		super(GUILabel, self).__init__()
 		self._text = LiveValue(text)
 
-	def _presentItemContents(self, fragment, inheritedState):
+	def _presentLeafContents(self, fragment, inheritedState):
 		return Label(self._text.getValue())
 
 	def _editUI(self):
-		text = Form.Section('Text', None, TextEntry.textEntryCommitOnChange(self._text))
+		text = Form.SmallSection('Text', None, TextEntry.textEntryCommitOnChange(self._text))
 		return Form(None, [text])
 
 	def __py_evalmodel__(self, codeGen):
@@ -41,6 +46,52 @@ class GUILabel (GUILeafComponent):
 		return Py.Call( target=label, args=[ Py.strToStrLiteral( self._text.getValue() ) ] )
 
 _labelItem = paletteItem(Label('Label'), lambda: GUILabel('Label'))
+
+
+
+
+class GUIStaticText (GUILeafComponent):
+	componentName = 'Static text'
+
+	def __init__(self, text):
+		super(GUIStaticText, self).__init__()
+		self._text = LiveValue(text)
+
+	def _presentLeafContents(self, fragment, inheritedState):
+		return StaticText(self._text.getValue())
+
+	def _editUI(self):
+		text = Form.SmallSection('Text', None, TextEntry.textEntryCommitOnChange(self._text))
+		return Form(None, [text])
+
+	def __py_evalmodel__(self, codeGen):
+		staticText = codeGen.embeddedValue(StaticText)
+		return Py.Call( target=staticText, args=[ Py.strToStrLiteral( self._text.getValue() ) ] )
+
+_staticTextItem = paletteItem(Label('Static text'), lambda: GUIStaticText('Text'))
+
+
+
+
+class GUIText (GUILeafComponent):
+	componentName = 'Text'
+
+	def __init__(self, text):
+		super(GUIText, self).__init__()
+		self._text = LiveValue(text)
+
+	def _presentLeafContents(self, fragment, inheritedState):
+		return Text(self._text.getValue())
+
+	def _editUI(self):
+		text = Form.SmallSection('Text', None, TextEntry.textEntryCommitOnChange(self._text))
+		return Form(None, [text])
+
+	def __py_evalmodel__(self, codeGen):
+		textPresClass = codeGen.embeddedValue(Text)
+		return Py.Call( target=textPresClass, args=[ Py.strToStrLiteral( self._text.getValue() ) ] )
+
+_textItem = paletteItem(Label('Text'), lambda: GUIText('Text'))
 
 
 
@@ -53,12 +104,12 @@ class GUISpacer (GUILeafComponent):
 		self._width = LiveValue(width)
 		self._height = LiveValue(height)
 
-	def _presentItemContents(self, fragment, inheritedState):
+	def _presentLeafContents(self, fragment, inheritedState):
 		return Spacer(self._width.getValue(), self._height.getValue())
 
 	def _editUI(self):
-		width = Form.Section('Width', None, RealSpinEntry(self._width, 0.0, 1048576.0, 1.0, 10.0))
-		height = Form.Section('Height', None, RealSpinEntry(self._height, 0.0, 1048576.0, 1.0, 10.0))
+		width = Form.SmallSection('Width', None, RealSpinEntry(self._width, 0.0, 1048576.0, 1.0, 10.0))
+		height = Form.SmallSection('Height', None, RealSpinEntry(self._height, 0.0, 1048576.0, 1.0, 10.0))
 		return Form(None, [width, height])
 
 	def __py_evalmodel__(self, codeGen):
@@ -67,6 +118,42 @@ class GUISpacer (GUILeafComponent):
 					 Py.FloatLiteral( value=repr(self._height.getValue() ) ) ] )
 
 _spacerItem = paletteItem(Label('Spacer'), lambda: GUISpacer(10.0, 10.0))
+
+
+
+
+class GUIArrow (GUILeafComponent):
+	componentName = 'Arrow'
+
+	_arrowDirections = [Arrow.Direction.LEFT, Arrow.Direction.RIGHT, Arrow.Direction.UP, Arrow.Direction.DOWN]
+	_directionToIndex = {d:i   for i, d in enumerate(_arrowDirections)}
+
+	def __init__(self, direction, size):
+		super(GUIArrow, self).__init__()
+		self._directionIndex = LiveValue(self._directionToIndex[direction])
+		self._size = LiveValue(size)
+
+	def _presentLeafContents(self, fragment, inheritedState):
+		direction = self._arrowDirections[self._directionIndex.getValue()]
+		return Arrow(direction, self._size.getValue())
+
+	_offStyle = StyleSheet.style(Primitive.shapePainter(FillPainter(Color(0.4, 0.4, 0.4))))
+	_onStyle = StyleSheet.style(Primitive.shapePainter(FillPainter(Color(0.2, 0.2, 0.2))))
+
+	def _editUI(self):
+		offOptions = [self._offStyle(Arrow(dir, 14.0).alignVCentre())   for dir in self._arrowDirections]
+		onOptions = [self._onStyle(Arrow(dir, 14.0).alignVCentre())   for dir in self._arrowDirections]
+		direction = Form.SmallSection('Direction', None, SwitchButton(offOptions, onOptions, SwitchButton.Orientation.HORIZONTAL, self._directionIndex))
+		size = Form.SmallSection('Size', None, RealSpinEntry(self._size, 0.0, 1048576.0, 1.0, 10.0))
+		return Form(None, [direction, size])
+
+	def __py_evalmodel__(self, codeGen):
+		arrow = codeGen.embeddedValue(Arrow)
+		direction = codeGen.embeddedValue(self._arrowDirections[self._directionIndex.getValue()])
+		size = Py.FloatLiteral(value=repr(self._size.getValue()))
+		return Py.Call(target=arrow, args=[direction, size])
+
+_arrowItem = paletteItem(Label('Arrow'), lambda: GUIArrow(Arrow.Direction.DOWN, 12.0))
 
 
 
@@ -165,9 +252,9 @@ class GUIGridRow (GUISequenceComponent):
 		gridRow = codeGen.embeddedValue(GridRow)
 		return Py.Call( target=gridRow, args=[ self._py_evalmodel_forChildren( codeGen ) ] )
 
-_gridRowItem = paletteItem(Label('Grid row'), lambda: GridRow())
+_gridRowItem = paletteItem(Label('Grid row'), lambda: GUIGridRow())
 
 
 
-registerPaletteSubsection('Basic', [_labelItem])
+registerPaletteSubsection('Basic', [_labelItem, _staticTextItem, _textItem, _spacerItem, _arrowItem])
 registerPaletteSubsection('Containers', [_rowItem, _columnItem, _paraItem, _flowGridItem, _gridItem, _gridRowItem])

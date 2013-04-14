@@ -8,6 +8,8 @@ package BritefuryJ.Controls;
 
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Column;
+import BritefuryJ.Pres.RichText.Rule;
+
 
 public class VPopupMenu extends PopupMenu
 {
@@ -20,6 +22,13 @@ public class VPopupMenu extends PopupMenu
 	{
 		super( items );
 	}
+
+
+	public void addSeparator()
+	{
+		add( Rule.hrule() );
+	}
+
 
 	@Override
 	protected Pres createMenuBox(Pres boxItems[])

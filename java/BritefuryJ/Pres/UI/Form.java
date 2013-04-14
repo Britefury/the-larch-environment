@@ -20,18 +20,11 @@ import BritefuryJ.StyleSheet.StyleValues;
 
 public class Form extends Pres
 {
-	public static class Section extends Pres
+	private static abstract class AbstractSection extends Pres
 	{
-		private Pres title, notes, contents;
-		
-		public Section(String title, String notes, Object contents)
-		{
-			this.title = new SectionHeading2( title );
-			this.notes = notes != null  ?  new NotesText( notes )  :  null;
-			this.contents = Pres.coerce( contents );
-		}
-		
-		
+		protected Pres title, notes, contents;
+
+
 		@Override
 		public LSElement present(PresentationContext ctx, StyleValues style)
 		{
@@ -48,11 +41,28 @@ public class Form extends Pres
 			}
 			return new GridRow( new Pres[] { column0.alignHPack(), contents } ).alignHExpand().present( ctx, childStyle );
 		}
-		
+	}
+
+	public static class Section extends AbstractSection
+	{
+		public Section(String title, String notes, Object contents)
+		{
+			this.title = new SectionHeading2( title );
+			this.notes = notes != null  ?  new NotesText( notes )  :  null;
+			this.contents = Pres.coerce( contents );
+		}
 	}
 	
-	
-	
+	public static class SmallSection extends AbstractSection
+	{
+		public SmallSection(String title, String notes, Object contents)
+		{
+			this.title = new SectionHeading3( title );
+			this.notes = notes != null  ?  new NotesText( notes )  :  null;
+			this.contents = Pres.coerce( contents );
+		}
+	}
+
 	private Pres title, sections[];
 	
 	public Form(String title, Object sections[])
