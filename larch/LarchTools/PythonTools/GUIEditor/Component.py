@@ -19,9 +19,27 @@ from LarchTools.PythonTools.GUIEditor.ContextMenu import componentContextMenu
 
 componentBorder = SolidBorder(1.0, 2.0, Color(0.8, 0.8, 0.8), None)
 
+exprBorder = SolidBorder( 1.0, 2.0, 5.0, 5.0, Color( 0.0, 0.25, 0.75 ), None )
+
+
+
 
 class GUIComponent (object):
-	componentName = 'Component'
+	isRootGUIEditorComponent = False
+	componentName = None
+
+	def __init__(self):
+		self._parent = None
+
+
+	@property
+	def parent(self):
+		return self._parent
+
+	@property
+	def guiEditor(self):
+		return self._parent.guiEditor   if self._parent is not None   else None
+
 
 	def _presentContents(self, fragment, inheritedState):
 		raise NotImplementedError, 'abstract'
@@ -34,13 +52,13 @@ class GUIComponent (object):
 		return Blank()
 
 	def __present__(self, fragment, inheritedState):
-		x = self._presentContents(fragment, inheritedState)
-		x = componentBorder.surround(x)
-		x = x.withContextMenuInteractor(componentContextMenu)
-		x = x.withElementInteractor(GUITargetInteractor())
-		x = x.withElementInteractor(GUIScrollInteractor())
-		x = x.withProperty(GUICProp.instance, self)
-		return x
+		p = self._presentContents(fragment, inheritedState)
+		p = componentBorder.surround(p)
+		p = p.withContextMenuInteractor(componentContextMenu)
+		p = p.withElementInteractor(GUITargetInteractor())
+		p = p.withElementInteractor(GUIScrollInteractor())
+		p = p.withProperty(GUICProp.instance, self)
+		return p
 
 	def __py_evalmodel__(self, codeGen):
 		raise NotImplementedError, 'abstract'

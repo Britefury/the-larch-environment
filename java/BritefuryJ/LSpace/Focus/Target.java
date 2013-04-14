@@ -24,6 +24,11 @@ public abstract class Target
 	protected boolean active = false;
 
 
+	public boolean drawWhenComponentNotFocused()
+	{
+		return true;
+	}
+
 	public abstract void draw(Graphics2D graphics);
 	
 	public boolean isAnimated()

@@ -7,13 +7,17 @@
 ##-*************************
 
 from LarchTools.PythonTools.GUIEditor.Component import GUIComponent
-from LarchTools.PythonTools.GUIEditor.SequentialComponent import SequentialGUIController
+from LarchTools.PythonTools.GUIEditor.BranchComponent import SequentialGUIController
 
 
 
 
 class GUILeafComponent (GUIComponent):
+	def _presentLeafContents(self, fragment, inheritedState):
+		raise NotImplementedError, 'abstract'
+
+
 	def _presentContents(self, fragment, inheritedState):
-		p = self._presentItemContents(fragment, inheritedState)
+		p = self._presentLeafContents(fragment, inheritedState)
 		p = SequentialGUIController.instance.item(self, p)
 		return p

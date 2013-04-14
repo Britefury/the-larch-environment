@@ -40,7 +40,7 @@ def _createSidePanel():
 
 def showSidePanel(sourceElement):
 	pm = sourceElement.rootElement.paneManager
-	pm.rightEdgePane.setContent(_createSidePanel(), None, 200.0)
+	pm.rightEdgePane.setContent(_createSidePanel(), None, 250.0)
 
 def hideSidePanel(sourceElement):
 	pm = sourceElement.rootElement.paneManager

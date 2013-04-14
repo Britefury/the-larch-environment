@@ -7,10 +7,11 @@
 ##-*************************
 from java.awt import Color, BasicStroke
 from java.awt.geom import Rectangle2D
+from java.awt.event import KeyEvent
 
 from BritefuryJ.LSpace.Interactor import ScrollElementInteractor, TargetElementInteractor, RealiseElementInteractor
 
-from BritefuryJ.LSpace.Focus import Target, SelectionPoint, TargetListener
+from BritefuryJ.LSpace.Focus import Target, SelectionPoint, TargetListener, Selection
 
 from BritefuryJ.Pres import Pres
 
@@ -35,6 +36,9 @@ class GUIEditorTarget (Target):
 	def __init__(self, component, element):
 		self.__component = component
 		self.__element = element
+
+	def isValid(self):
+		return self.__element.isRealised()  and  self.__component is not None  and  self.__component.parent is not None
 
 	@property
 	def component(self):
@@ -64,6 +68,22 @@ class GUIEditorTarget (Target):
 		graphics.setPaint(prevPaint)
 		graphics.setStroke(prevStroke)
 		self.__element.popGraphicsTransform(graphics, current)
+
+
+	def moveLeft(self):
+		pass
+
+	def moveRight(self):
+		pass
+
+
+	def onContentKeyPress(self, event):
+		if event.keyCode == KeyEvent.VK_DELETE:
+			parent = self.__component._parent
+			if parent is not None:
+				parent.removeChild(self.__component)
+				self.moveRight()
+			return True
 
 
 
@@ -96,10 +116,11 @@ class GUIScrollInteractor (ScrollElementInteractor):
 		prevTarget = element.getRootElement().getTarget()
 		model = element.fragmentContext.model
 
-		if isinstance(prevTarget, GUIEditorTarget):
+		if isinstance(prevTarget, GUIEditorTarget)  and  prevTarget.isValid()  and  prevTarget.component.guiEditor is model.guiEditor:
 			current = prevTarget.component
 			y = event.scrollY
 			if y < 0:
+				# Move inwards towards leaves
 				if element.isInSubtreeRootedAt(prevTarget.element):
 					prev = None
 					val = element.findPropertyInAncestors(GUICProp.instance)
@@ -113,8 +134,9 @@ class GUIScrollInteractor (ScrollElementInteractor):
 					target = GUIEditorTarget(model, element)
 					element.getRootElement().setTarget(target)
 			elif y > 0:
+				# Move upwards through branches
 				val = prevTarget.element.parent.findPropertyInAncestors(GUICProp.instance)
-				if val is not None:
+				if val is not None  and  not val.value.isRootGUIEditorComponent:
 					target = GUIEditorTarget(val.value, val.element)
 					element.getRootElement().setTarget(target)
 		else:
