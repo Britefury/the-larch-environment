@@ -13,12 +13,15 @@ from BritefuryJ.Pres.UI import Form
 from LarchCore.Languages.Python2 import Schema as Py
 from LarchCore.Languages.Python2.Embedded import EmbeddedPython2Expr
 
-from LarchTools.PythonTools.GUIEditor.Component import exprBorder
+from LarchTools.PythonTools.GUIEditor.ComponentFields import exprBorder
+from LarchTools.PythonTools.GUIEditor.Component import blankCallModel
 from LarchTools.PythonTools.GUIEditor.BranchComponent import GUIUnaryBranchComponent, emptyLabel
 from LarchTools.PythonTools.GUIEditor.ComponentPalette import paletteItem, registerPaletteSubsection
 
 
 class GUIButton (GUIUnaryBranchComponent):
+	componentName = 'Button'
+
 	def __init__(self, child=None, onClick=None):
 		super(GUIButton, self).__init__(child)
 		if onClick is None:
@@ -32,18 +35,18 @@ class GUIButton (GUIUnaryBranchComponent):
 
 
 	def _presentBranchContents(self, fragment, inheritedState):
-		child = self.child
-		return Button(child   if child is not None   else emptyLabel, None)
+		child = self._presentChild()
+		return Button(child, None)
 
 	def _editUI(self):
-		onClick = Form.SmallSection('On click', None, exprBorder.surround( self._expr ))
+		onClick = Form.SmallSection('On click', None, exprBorder.surround( self._onClick ))
 		return Form(None, [onClick])
 
 	def __py_evalmodel__(self, codeGen):
 		onClick = self._onClick.model
 		button = codeGen.embeddedValue(Button)
 		child = self.child
-		childArg = child.__py_evalmodel__(codeGen)   if child is not None   else codeGen.embeddedValue(emptyLabel)
+		childArg = child.__py_evalmodel__(codeGen)   if child is not None   else blankCallModel(codeGen)
 		return Py.Call(target=button, args=[childArg, onClick])
 
 _buttonItem = paletteItem(Label('Button'), lambda: GUIButton())

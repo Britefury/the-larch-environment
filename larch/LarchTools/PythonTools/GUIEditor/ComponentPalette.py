@@ -64,7 +64,7 @@ _paletteSections = []
 def paletteItem(contents, factoryCallable):
 	p = _paletteItemStyle(_paletteItemBorder.surround(contents)).alignHExpand().alignVRefYExpand()
 	p = p.withDragSource(PaletteComponentDrag, lambda element, aspect: PaletteComponentDrag(factoryCallable))
-	p = p.withDragSource(PaletteComponentIntoListDrag, lambda element, aspect: PaletteComponentIntoListDrag(GUIEditor.SequentialComponent.SequentialGUIController.instance, factoryCallable))
+	p = p.withDragSource(PaletteComponentIntoListDrag, lambda element, aspect: PaletteComponentIntoListDrag(GUIEditor.BranchComponent.SequentialGUIController.instance, factoryCallable))
 	return p
 
 
