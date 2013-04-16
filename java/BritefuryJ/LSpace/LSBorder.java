@@ -108,7 +108,7 @@ public class LSBorder extends LSBin
 		if ( isClippingEnabled() )
 		{
 			Shape clipShape = graphics.getClip();
-			graphics.setClip( borderClip );
+			graphics.clip( borderClip );
 			super.handleDrawBackground( graphics, areaBox );
 			graphics.setClip( clipShape );
 		}
@@ -124,7 +124,7 @@ public class LSBorder extends LSBin
 		if ( isClippingEnabled() )
 		{
 			Shape clipShape = graphics.getClip();
-			graphics.setClip( borderClip );
+			graphics.clip( borderClip );
 			super.handleDraw( graphics, areaBox );
 			graphics.setClip( clipShape );
 		}

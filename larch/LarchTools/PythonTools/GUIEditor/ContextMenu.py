@@ -57,7 +57,7 @@ def _presentComponentsUnderPointer(elementUnderPointer, guiEditorRootElement):
 	components = []
 	for p in propValues:
 		component = p.value
-		if component.componentName is not None:
+		if not component.isRootGUIEditorComponent:
 			interactor = ComponentHighlightInteractor(p.value, p.element)
 			c = componentUnderPointerBorder.surround(Label(component.componentName).pad(4.0, 2.0)).alignHExpand()
 			c = c.withElementInteractor(interactor)

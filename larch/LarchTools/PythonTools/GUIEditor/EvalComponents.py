@@ -21,7 +21,7 @@ from LarchCore.Languages.Python2.Embedded import EmbeddedPython2Expr
 
 from LarchTools.PythonTools.GUIEditor.LeafComponent import GUILeafComponent
 from LarchTools.PythonTools.GUIEditor.ComponentPalette import paletteItem, registerPaletteSubsection
-from LarchTools.PythonTools.GUIEditor.Component import exprBorder
+from LarchTools.PythonTools.GUIEditor.ComponentFields import exprBorder
 
 
 

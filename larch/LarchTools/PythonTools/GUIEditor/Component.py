@@ -11,6 +11,8 @@ from BritefuryJ.Graphics import SolidBorder
 
 from BritefuryJ.Pres.Primitive import Blank
 
+from LarchCore.Languages.Python2 import Schema as Py
+
 from LarchTools.PythonTools.GUIEditor.Properties import GUICProp
 from LarchTools.PythonTools.GUIEditor.Target import GUITargetInteractor, GUIScrollInteractor
 from LarchTools.PythonTools.GUIEditor.ContextMenu import componentContextMenu
@@ -19,14 +21,18 @@ from LarchTools.PythonTools.GUIEditor.ContextMenu import componentContextMenu
 
 componentBorder = SolidBorder(1.0, 2.0, Color(0.8, 0.8, 0.8), None)
 
-exprBorder = SolidBorder( 1.0, 2.0, 5.0, 5.0, Color( 0.0, 0.25, 0.75 ), None )
 
+
+
+def blankCallModel(codeGen):
+	blank = codeGen.embeddedValue(Blank)
+	return Py.Call(target=blank, args=[])
 
 
 
 class GUIComponent (object):
 	isRootGUIEditorComponent = False
-	componentName = None
+	componentName = '<abstract-Component>'
 
 	def __init__(self):
 		self._parent = None
