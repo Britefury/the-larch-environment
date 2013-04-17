@@ -35,6 +35,10 @@ class GUILabel (GUILeafComponent):
 		super(GUILabel, self).__init__()
 		self._text = ValueField(text, lambda live: TextEntry.textEntryCommitOnChange(live), lambda value, codeGen: Py.strToStrLiteral(value))
 
+	@property
+	def textLive(self):
+		return self._text.live   if self._text.isFixed()   else None
+
 	def _presentLeafContents(self, fragment, inheritedState):
 		return Label(self._text.getValueForEditor())
 

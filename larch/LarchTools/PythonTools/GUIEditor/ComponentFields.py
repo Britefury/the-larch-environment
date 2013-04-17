@@ -14,12 +14,14 @@ from BritefuryJ.Incremental import IncrementalValueMonitor
 from BritefuryJ.Live import TrackedLiveValue
 
 from BritefuryJ.Pres.Primitive import Primitive, Label, Spacer, Row, Column
+from BritefuryJ.Pres.UI import Form
 
-from BritefuryJ.Controls import Button
+from BritefuryJ.Controls import Button, TextEntry
 
 from BritefuryJ.StyleSheet import StyleSheet
 
 from LarchCore.Languages.Python2.Embedded import EmbeddedPython2Expr
+from LarchTools.PythonTools import GUIEditor
 
 
 
@@ -40,13 +42,21 @@ class ValueField (object):
 		self.__incr = IncrementalValueMonitor()
 
 
+	def isFixed(self):
+		return self.__expr is None
+
+	@property
+	def live(self):
+		return self.__value
+
+
 	def getValueForEditor(self):
 		return self.__value.getValue()
 
 
 	def __py_evalmodel__(self, codeGen):
 		if self.__expr is None:
-			return self.__valueToModelFn(self.__value.getValue())
+			return self.__valueToModelFn(self.__value.getValue(), codeGen)
 		else:
 			return self.__expr.model
 
@@ -80,3 +90,16 @@ class ValueField (object):
 
 	_addButtonContents = Row([_addStyle(Label('+ ')), _fStyle(Label('f')), _parenStyle(Label('()'))])
 	_removeButtonContents = Row([_removeStyle(Label('- ')), _fStyle(Label('f')), _parenStyle(Label('()'))])
+
+
+
+
+
+def unaryBranchChildEditUIFormSections(branch):
+	child = branch.child
+	if child is not None:
+		if isinstance(child, GUIEditor.PrimitiveComponents.GUILabel):
+			labelLive = child.textLive
+			if labelLive is not None:
+				return [Form.SmallSection('Label text', None, TextEntry.textEntryCommitOnChange(labelLive))]
+	return []

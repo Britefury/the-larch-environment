@@ -13,10 +13,11 @@ from BritefuryJ.Pres.UI import Form
 from LarchCore.Languages.Python2 import Schema as Py
 from LarchCore.Languages.Python2.Embedded import EmbeddedPython2Expr
 
-from LarchTools.PythonTools.GUIEditor.ComponentFields import exprBorder
+from LarchTools.PythonTools.GUIEditor.ComponentFields import exprBorder, unaryBranchChildEditUIFormSections
 from LarchTools.PythonTools.GUIEditor.Component import blankCallModel
 from LarchTools.PythonTools.GUIEditor.BranchComponent import GUIUnaryBranchComponent, emptyLabel
 from LarchTools.PythonTools.GUIEditor.ComponentPalette import paletteItem, registerPaletteSubsection
+from LarchTools.PythonTools.GUIEditor.PrimitiveComponents import GUILabel
 
 
 class GUIButton (GUIUnaryBranchComponent):
@@ -39,8 +40,10 @@ class GUIButton (GUIUnaryBranchComponent):
 		return Button(child, None)
 
 	def _editUI(self):
-		onClick = Form.SmallSection('On click', None, exprBorder.surround( self._onClick ))
-		return Form(None, [onClick])
+		sections = []
+		sections.extend( unaryBranchChildEditUIFormSections(self) )
+		sections.append(Form.SmallSection('On click', None, exprBorder.surround( self._onClick )))
+		return Form(None, sections)
 
 	def __py_evalmodel__(self, codeGen):
 		onClick = self._onClick.model
@@ -49,7 +52,7 @@ class GUIButton (GUIUnaryBranchComponent):
 		childArg = child.__py_evalmodel__(codeGen)   if child is not None   else blankCallModel(codeGen)
 		return Py.Call(target=button, args=[childArg, onClick])
 
-_buttonItem = paletteItem(Label('Button'), lambda: GUIButton())
+_buttonItem = paletteItem(Label('Button'), lambda: GUIButton(child=GUILabel('Button')))
 
 
 registerPaletteSubsection('Controls', [_buttonItem])
