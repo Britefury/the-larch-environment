@@ -11,12 +11,8 @@ from BritefuryJ.Command import Command
 
 from BritefuryJ.Graphics import SolidBorder
 
-from BritefuryJ.Incremental import IncrementalValueMonitor
-
 from BritefuryJ.Pres import Pres
 from BritefuryJ.Pres.Primitive import Blank, Spacer
-
-from BritefuryJ.Live import LiveValue
 
 from LarchCore.Languages.Python2 import Schema as Py
 from LarchCore.Languages.Python2.PythonCommands import pythonCommandSet, EmbeddedExpressionAtCaretAction

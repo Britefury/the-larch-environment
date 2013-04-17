@@ -84,7 +84,7 @@ def componentContextMenu(element, menu):
 	guiEditorRootProp = element.findPropertyInAncestors(GUIEdProp.instance)
 	guiEditorRootElement = guiEditorRootProp.element
 	target = element.rootElement.getTarget()
-	target = target   if isinstance(target, GUIEditorTarget)   else None
+	target = target   if target.isValid()  and  isinstance(target, GUIEditorTarget)   else None
 
 	# Components under pointer
 	menu.add(Section(SectionHeading3('Components under pointer'), _presentComponentsUnderPointer(element, guiEditorRootElement)))
