@@ -19,9 +19,9 @@ from BritefuryJ.StyleSheet import StyleSheet
 from LarchCore.Languages.Python2 import Schema as Py
 from LarchCore.Languages.Python2.Embedded import EmbeddedPython2Expr
 
+from LarchTools.PythonTools.GUIEditor.DataModel import ExprField
 from LarchTools.PythonTools.GUIEditor.LeafComponent import GUILeafComponent
 from LarchTools.PythonTools.GUIEditor.ComponentPalette import paletteItem, registerPaletteSubsection
-from LarchTools.PythonTools.GUIEditor.ComponentFields import exprBorder
 
 
 
@@ -39,27 +39,17 @@ _evalItemStyleParens = StyleSheet.style(Primitive.foreground(Color(0.4, 0.4, 0.4
 class GUIEval (GUILeafComponent):
 	componentName = 'Eval'
 
-	def __init__(self, expr=None):
-		super(GUIEval, self).__init__()
-		if expr is None:
-			expr = EmbeddedPython2Expr()
-		self._expr = expr
-
-
-	@property
-	def expr(self):
-		return self._expr
-
+	expr = ExprField()
 
 	def _presentLeafContents(self, fragment, inheritedState):
 		return _evalLabel
 
 	def _editUI(self):
-		expr = Form.SmallSection('Expression', None, exprBorder.surround( self._expr ))
+		expr = Form.SmallSection('Expression', None, self.expr.editUI())
 		return Form(None, [expr])
 
 	def __py_evalmodel__(self, codeGen):
-		return self._expr.model
+		return self.expr.expr.model
 
 _evalItem = paletteItem(_evalItemStyleF(Label('Eval')), lambda: GUIEval())
 
@@ -69,16 +59,12 @@ _evalItem = paletteItem(_evalItemStyleF(Label('Eval')), lambda: GUIEval())
 class GUILiveEval (GUIEval):
 	componentName = 'Live Eval'
 
-	def __init__(self, expr=None):
-		super(GUILiveEval, self).__init__(expr)
-
-
 	def _presentLeafContents(self, fragment, inheritedState):
 		return _liveEvalLabel
 
 	def __py_evalmodel__(self, codeGen):
 		liveFun = codeGen.embeddedValue(LiveFunction)
-		lmb = Py.LambdaExpr(params=[], expr=self._expr.model)
+		lmb = Py.LambdaExpr(params=[], expr=self.expr.expr.model)
 		live = Py.Call(target=liveFun, args=[lmb])
 		return live
 
