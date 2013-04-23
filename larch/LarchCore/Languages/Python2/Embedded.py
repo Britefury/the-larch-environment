@@ -100,6 +100,19 @@ class EmbeddedPython2Target (EmbeddedPython2):
 		super(EmbeddedPython2Target, self).__init__( model )
 
 
+	def __eq__(self, other):
+		if isinstance(other, EmbeddedPython2Target):
+			return self.model == other.model
+		else:
+			return False
+
+	def __ne__(self, other):
+		if isinstance(other, EmbeddedPython2Target):
+			return self.model != other.model
+		else:
+			return True
+
+
 	def __copy__(self):
 		return EmbeddedPython2Target( self.model )
 
@@ -143,6 +156,19 @@ class EmbeddedPython2Expr (EmbeddedPython2):
 			raise TypeError, 'Cannot construct EmbeddedPython2Expr from %s' % model
 
 		super(EmbeddedPython2Expr, self).__init__( model )
+
+
+	def __eq__(self, other):
+		if isinstance(other, EmbeddedPython2Expr):
+			return self.model == other.model
+		else:
+			return False
+
+	def __ne__(self, other):
+		if isinstance(other, EmbeddedPython2Expr):
+			return self.model != other.model
+		else:
+			return True
 
 
 	def __copy__(self):
@@ -253,6 +279,19 @@ class EmbeddedPython2Suite (EmbeddedPython2Executable):
 		super(EmbeddedPython2Suite, self).__init__( model )
 
 
+	def __eq__(self, other):
+		if isinstance(other, EmbeddedPython2Suite):
+			return self.model == other.model
+		else:
+			return False
+
+	def __ne__(self, other):
+		if isinstance(other, EmbeddedPython2Suite):
+			return self.model != other.model
+		else:
+			return True
+
+
 	def __copy__(self):
 		return EmbeddedPython2Suite( self.model )
 
@@ -308,6 +347,19 @@ class EmbeddedPython2Module (EmbeddedPython2Executable):
 			raise TypeError, 'Cannot construct EmbeddedPython2Module from %s' % model
 
 		super(EmbeddedPython2Module, self).__init__( model )
+
+
+	def __eq__(self, other):
+		if isinstance(other, EmbeddedPython2Module):
+			return self.model == other.model
+		else:
+			return False
+
+	def __ne__(self, other):
+		if isinstance(other, EmbeddedPython2Module):
+			return self.model != other.model
+		else:
+			return True
 
 
 	def __copy__(self):
