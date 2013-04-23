@@ -35,7 +35,7 @@ class GUIEditorRootComponent (GUIUnaryBranchComponent):
 
 
 	def __init__(self, guiEditor, contents=None):
-		super(GUIEditorRootComponent, self).__init__(contents)
+		super(GUIEditorRootComponent, self).__init__(child=contents)
 		self.__guiEditor = guiEditor
 
 
