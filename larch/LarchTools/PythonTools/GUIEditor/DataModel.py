@@ -237,6 +237,19 @@ class GUINode (object):
 		return self._parent
 
 
+
+	def _registerChild(self, childNode):
+		if childNode._parent is not None:
+			raise NodeAlreadyHasParentError, 'Node \'{0}\' already has a parent'.format(childNode)
+		childNode._parent = self
+
+	def _unregisterChild(self, childNode):
+		if childNode._parent is not self:
+			raise RuntimeError, 'Cannot unregister component that is not a child of this'
+		childNode._parent = None
+
+
+
 	def __getstate__(self):
 		return {name: field._getFieldState(self)   for name, field in self._gui_fields__.items()}
 
@@ -270,11 +283,9 @@ class ChildFieldInstance (FieldInstance):
 		def on_change(old_value, new_value):
 			if new_value is not old_value:
 				if old_value is not None:
-					old_value._parent = None
+					object_instance._unregisterChild(old_value)
 				if new_value is not None:
-					if new_value._parent is not None:
-						raise NodeAlreadyHasParentError, 'Node \'{0}\' already has a parent'.format(new_value)
-					new_value._parent = self
+					object_instance._registerChild(new_value)
 
 		self.__live = TrackedLiveValue(source_value)
 		self.__live.changeListener = on_change
@@ -326,13 +337,13 @@ class ChildListFieldInstance (FieldInstance):
 			removed = o - n
 			added = n - o
 			for n in removed:
-				n._parent = None
+				object_instance._unregisterChild(n)
 			for n in added:
-				if n._parent is not None:
-					raise NodeAlreadyHasParentError, 'Node \'{0}\' already has a parent'.format(n)
-				n._parent = self
+				object_instance._registerChild(n)
 
 		self.__live = LiveList(source_value)
+
+		self.__live.changeListener = on_change
 
 		if source_value is not None:
 			on_change([], source_value)
@@ -438,9 +449,7 @@ class _EvalFieldInstance (FieldInstance):
 				self.expr = oldExpr
 			self.__change_history__.addChange(setExpression, revertExpression, 'Set expression')
 			if exp is not None:
-				self.__change_history__.stopTracking(exp)
-
-
+				self.__change_history__.track(exp)
 
 		self.__incr.onChanged()
 
@@ -449,9 +458,6 @@ class _EvalFieldInstance (FieldInstance):
 
 	def _addTrackableContentsTo(self, contents):
 		contents.append(self)
-		contents.append(self.__live)
-		if self.__expr is not None:
-			contents.append(self.__expr)
 
 	def __field_getstate__(self):
 		return _EvalFieldState(self.__live.getValue(), self.__expr)
@@ -541,6 +547,17 @@ class _EvalField (Field):
 
 
 
+class IntEvalFieldInstance (_EvalFieldInstance):
+	def __fixedvalue_py_evalmodel__(self, value, codeGen):
+		return Py.IntLiteral(format='decimal', numType='int', value=repr(value))
+
+
+class IntEvalField (_EvalField):
+	__field_instance_class__ = IntEvalFieldInstance
+	__primitive_type__ = int
+
+
+
 class FloatEvalFieldInstance (_EvalFieldInstance):
 	def __fixedvalue_py_evalmodel__(self, value, codeGen):
 		return Py.FloatLiteral(value=repr(value))
@@ -549,6 +566,74 @@ class FloatEvalFieldInstance (_EvalFieldInstance):
 class FloatEvalField (_EvalField):
 	__field_instance_class__ = FloatEvalFieldInstance
 	__primitive_type__ = float
+
+
+
+class StringEvalFieldInstance (_EvalFieldInstance):
+	def __fixedvalue_py_evalmodel__(self, value, codeGen):
+		return Py.strToStrLiteral(value)
+
+
+class StringEvalField (_EvalField):
+	__field_instance_class__ = StringEvalFieldInstance
+	__primitive_type__ = str
+
+
+
+
+
+
+
+class ExprFieldInstance (FieldInstance):
+	"""
+	A field that contains an expression that generates the required value
+	"""
+	def __init__(self, field, object_instance, source_value):
+		super(ExprFieldInstance, self).__init__(field, object_instance, source_value)
+
+		if source_value is None:
+			source_value = EmbeddedPython2Expr()
+
+		self.__expr = source_value
+
+
+
+	@property
+	def expr(self):
+		return self.__expr
+
+
+
+
+	def _addTrackableContentsTo(self, contents):
+		contents.append(self.__expr)
+
+	def __field_getstate__(self):
+		return self.__expr
+
+
+	def getValueForEditor(self):
+		return None
+
+	def __py_evalmodel__(self, codeGen):
+		return self.__expr.model
+
+
+	def __fixedvalue_py_evalmodel__(self, value, codeGen):
+		raise NotImplementedError, 'abstract'
+
+
+
+	def editUI(self):
+		return exprBorder.surround(self.__expr)
+
+
+
+
+
+class ExprField (Field):
+	__field_instance_class__ = ExprFieldInstance
+
 
 
 
@@ -598,9 +683,17 @@ class TestCase_DataModel(unittest.TestCase):
 				y = self.y.__py_evalmodel__(codeGen)
 				return Py.Call(target=Py.Load(name='C'), args=[x, y])
 
+		class D (GUINode):
+			x = ExprField()
+
+			def __py_evalmodel__(self, codeGen):
+				x = self.x.__py_evalmodel__(codeGen)
+				return Py.Call(target=Py.Load(name='D'), args=[x])
+
 		cls.A = A
 		cls.B = B
 		cls.C = C
+		cls.D = D
 
 		test_module = imp.new_module('GUIEditor_DataModel_Tests')
 		sys.modules[test_module.__name__] = test_module
@@ -613,6 +706,7 @@ class TestCase_DataModel(unittest.TestCase):
 		moveClassToModule(test_module, A)
 		moveClassToModule(test_module, B)
 		moveClassToModule(test_module, C)
+		moveClassToModule(test_module, D)
 
 
 	@classmethod
@@ -620,6 +714,7 @@ class TestCase_DataModel(unittest.TestCase):
 		cls.A = None
 		cls.B = None
 		cls.C = None
+		cls.D = None
 		del sys.modules[cls.mod.__name__]
 		cls.mod = None
 
@@ -749,6 +844,27 @@ class TestCase_DataModel(unittest.TestCase):
 
 
 
+	def test_ChildField_parentage(self):
+		a1 = self.A(x=10, y=20)
+		a2 = self.A(x=3, y=4)
+		b = self.B()
+
+		self.assertIs(None, a1.parent)
+		self.assertIs(None, a2.parent)
+
+		b.p.node = a1
+
+		self.assertIs(b, a1.parent)
+		self.assertIs(None, a2.parent)
+
+		b.q.nodes.append(a2)
+
+		self.assertIs(b, a1.parent)
+		self.assertIs(b, a2.parent)
+
+
+
+
 	def test_ChildField_changeHistory(self):
 		b = self.B()
 		a1 = self.A()
@@ -852,8 +968,15 @@ class TestCase_DataModel(unittest.TestCase):
 
 		x_expr = EmbeddedPython2Expr.fromText('a+b')
 		y_expr = EmbeddedPython2Expr.fromText('c+d')
+
+		self.assertIs(ChangeHistory.getChangeHistoryFor(x_expr), None)
+		self.assertIs(ChangeHistory.getChangeHistoryFor(y_expr), None)
+
 		c.x.expr = x_expr
 		c.y.expr = y_expr
+
+		self.assertIs(ChangeHistory.getChangeHistoryFor(x_expr), self.ch)
+		self.assertIs(ChangeHistory.getChangeHistoryFor(y_expr), self.ch)
 
 		self.assertEqual(10.0, c.x.constantValue)
 		self.assertEqual(20.0, c.y.constantValue)
@@ -936,6 +1059,38 @@ class TestCase_DataModel(unittest.TestCase):
 
 		self.assertEqual(Py.Call(target=Py.Load(name='C'), args=[x_expr.model, y_expr.model]), c.__py_evalmodel__(codeGen))
 
+
+
+
+	def test_ExprField_changeHistory(self):
+		d = self.D()
+
+		self.assertEqual(0, self.ch.getNumUndoChanges())
+		self.assertEqual(0, self.ch.getNumRedoChanges())
+
+		self.ch.track(d)
+
+		self.assertIs(ChangeHistory.getChangeHistoryFor(d), self.ch)
+		self.assertIs(ChangeHistory.getChangeHistoryFor(d.x.expr), self.ch)
+
+
+
+	def test_ExprField_serialisation(self):
+		x_expr =EmbeddedPython2Expr.fromText('a+b')
+		d = self.D(x=x_expr)
+
+		d_io = pickle.loads(pickle.dumps(d))
+
+		self.assertEqual(x_expr, d_io.x.expr)
+
+
+	def test_ExprField_py_evalmodel(self):
+		x_expr =EmbeddedPython2Expr.fromText('a+b')
+		d = self.D(x=x_expr)
+
+		codeGen = Python2CodeGenerator('test')
+
+		self.assertEqual(Py.Call(target=Py.Load(name='D'), args=[x_expr.model]), d.__py_evalmodel__(codeGen))
 
 
 

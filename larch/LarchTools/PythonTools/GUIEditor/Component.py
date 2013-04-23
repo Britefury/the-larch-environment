@@ -13,6 +13,7 @@ from BritefuryJ.Pres.Primitive import Blank
 
 from LarchCore.Languages.Python2 import Schema as Py
 
+from LarchTools.PythonTools.GUIEditor.DataModel import GUINode
 from LarchTools.PythonTools.GUIEditor.Properties import GUICProp
 from LarchTools.PythonTools.GUIEditor.Target import GUITargetInteractor, GUIScrollInteractor
 from LarchTools.PythonTools.GUIEditor.ContextMenu import componentContextMenu
@@ -30,17 +31,13 @@ def blankCallModel(codeGen):
 
 
 
-class GUIComponent (object):
+class GUIComponent (GUINode):
 	isRootGUIEditorComponent = False
 	componentName = '<abstract-Component>'
 
-	def __init__(self):
-		self._parent = None
+	def __init__(self, **values):
+		super(GUIComponent, self).__init__(**values)
 
-
-	@property
-	def parent(self):
-		return self._parent
 
 	@property
 	def guiEditor(self):

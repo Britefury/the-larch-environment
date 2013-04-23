@@ -22,6 +22,7 @@ from Britefury.Util.LiveList import LiveList
 
 from LarchCore.Languages.Python2 import Schema as Py
 
+from LarchTools.PythonTools.GUIEditor.DataModel import ChildField, ChildListField
 from LarchTools.PythonTools.GUIEditor.Component import GUIComponent
 from LarchTools.PythonTools.GUIEditor.ComponentPalette import PaletteComponentDrag
 
@@ -43,28 +44,14 @@ class GUIBranchComponent (GUIComponent):
 
 
 
-	def _registerChild(self, childComponent):
-		childComponent._parent = self
-
-	def _unregisterChild(self, childComponent):
-		if childComponent._parent is not self:
-			raise RuntimeError, 'Cannot unregister component that is not a child of this'
-		childComponent._parent = None
-
-
-
 
 class GUIUnaryBranchComponent (GUIBranchComponent):
-	def __init__(self, child=None):
-		super(GUIBranchComponent, self).__init__()
-		self.__child = TrackedLiveValue(child)
-		if child is not None:
-			self._registerChild(child)
+	child = ChildField()
 
 
 	def removeChild(self, child):
-		assert child is self.child
-		self.child = None
+		assert child is self.child.node
+		self.child.node = None
 
 
 	def getNextSiblingOf(self, child):
@@ -74,32 +61,16 @@ class GUIUnaryBranchComponent (GUIBranchComponent):
 	def _presentChild(self):
 		def _onDropFromPalette(element, targetPos, data, action):
 			assert isinstance(data, PaletteComponentDrag)
-			self.child = data.getItem()
+			self.child.node = data.getItem()
 			return True
 
-		child = self.child
+		child = self.child.node
 		if child is None:
 			p = self._emptyPres
 			return p.withDropDest(PaletteComponentDrag, _onDropFromPalette)
 		else:
-			return Pres.coerce(self.child)
+			return Pres.coerce(child)
 
-
-
-	@property
-	def child(self):
-		return self.__child.getValue()
-
-	@child.setter
-	def child(self, c):
-		prevChild = self.__child.getStaticValue()
-		if prevChild is not None:
-			self._unregisterChild(prevChild)
-
-		self.__child.setLiteralValue(c)
-
-		if c is not None:
-			self._registerChild(c)
 
 
 	_emptyPres = emptyLabel
@@ -179,56 +150,51 @@ SequentialGUIController.instance = SequentialGUIController()
 class GUISequenceComponent (GUIBranchComponent):
 	componentName = 'Sequence'
 
-	def __init__(self, xs=None):
-		super(GUISequenceComponent, self).__init__()
-		self._children = LiveList(xs)
-		for child in self._children:
-			self._registerChild(child)
+
+	children = ChildListField()
 
 
 	def getNextSiblingOf(self, child):
+		nodes = self.children.nodes
 		try:
-			index = self._children.index(child) + 1
+			index = nodes.index(child) + 1
 		except ValueError:
 			return None
-		if index < len(self._children):
-			return self._children[index]
+		if index < len(nodes):
+			return nodes[index]
 		else:
 			return None
 
 
 
 	def __iter__(self):
-		return iter(self._children)
+		return iter(self.children.nodes)
 
 	def __len__(self):
-		return len(self._children)
+		return len(self.children.nodes)
 
 	def index(self, x):
-		return self._children.index(x)
+		return self.children.nodes.index(x)
 
 
 	def __getitem__(self, index):
-		return self._children[index]
+		return self.children.nodes[index]
 
 	def __setitem__(self, index, x):
-		self._children[index] = x
+		self.children.nodes[index] = x
 
 	def __delitem__(self, index):
-		del self._children[index]
+		del self.children.nodes[index]
 
 
 	def append(self, x):
-		self._children.append(x)
-		self._registerChild(x)
+		self.children.nodes.append(x)
 
 	def insert(self, index, x):
-		self._children.insert(index, x)
-		self._registerChild(x)
+		self.children.nodes.insert(index, x)
 
 	def remove(self, x):
-		self._children.remove(x)
-		self._unregisterChild(x)
+		self.children.nodes.remove(x)
 
 
 
@@ -237,17 +203,18 @@ class GUISequenceComponent (GUIBranchComponent):
 
 
 	def _lookFor(self, x):
-		for item in self._children:
+		for item in self.children.nodes:
 			if item.lookFor(x):
 				return True
 		return False
 
 	def _presentContents(self, fragment, inheritedState):
-		contents = [emptyLabel]   if len(self._children) == 0   else self._children[:]
+		children = self.children.nodes
+		contents = [emptyLabel]   if len(children) == 0   else children[:]
 		p = self._presentSequenceContents(contents, fragment, inheritedState)
 		p = SequentialGUIController.instance.editableList(self, p)
 		return p
 
 
 	def _py_evalmodel_forChildren(self, codeGen):
-		return Py.ListLiteral( values=[ x.__py_evalmodel__( codeGen )   for x in self._children ] )
+		return Py.ListLiteral( values=[ x.__py_evalmodel__( codeGen )   for x in self.children.nodes ] )
