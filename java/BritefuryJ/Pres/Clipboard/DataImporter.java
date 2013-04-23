@@ -53,12 +53,22 @@ public class DataImporter <TargetType extends Target> extends AbstractDataImport
 		this( localFlavorImportFn( type ), importDataFn, canImportFn );
 	}
 	
-	public DataImporter(Class<?> type, DataFlavor flavor, ImportDataFn<TargetType> importDataFn)
+	public DataImporter(Class<?> type, ImportDataFn<TargetType> importDataFn)
 	{
 		this( localFlavorImportFn( type ), importDataFn, null );
 	}
-	
-	
+
+	public DataImporter(DataFlavor flavor, ImportDataFn<TargetType> importDataFn, CanImportFn<TargetType> canImportFn)
+	{
+		this( flavorImportFn( flavor ), importDataFn, canImportFn );
+	}
+
+	public DataImporter(DataFlavor flavor, ImportDataFn<TargetType> importDataFn)
+	{
+		this( flavorImportFn( flavor ), importDataFn, null );
+	}
+
+
 	@Override
 	protected boolean canImportFlavor(DataFlavor flavor)
 	{
@@ -87,6 +97,16 @@ public class DataImporter <TargetType extends Target> extends AbstractDataImport
 			public boolean canImportFlavor(DataFlavor flavor)
 			{
 				return flavor.equals( localFlavor );
+			}
+		};
+		return test;
+	}
+
+	private static CanImportFlavorFn flavorImportFn(final DataFlavor requiredFlavor)
+	{
+		CanImportFlavorFn test = new CanImportFlavorFn() {
+			public boolean canImportFlavor(DataFlavor flavor) {
+				return flavor.equals(requiredFlavor);
 			}
 		};
 		return test;
