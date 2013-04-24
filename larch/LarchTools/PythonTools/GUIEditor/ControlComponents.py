@@ -11,9 +11,9 @@ from BritefuryJ.Pres.Primitive import Primitive, Label, Row
 from BritefuryJ.Pres.UI import Form
 
 from LarchCore.Languages.Python2 import Schema as Py
-from LarchCore.Languages.Python2.Embedded import EmbeddedPython2Expr
 
-from LarchTools.PythonTools.GUIEditor.ComponentFields import exprBorder, unaryBranchChildEditUIFormSections
+from LarchTools.PythonTools.GUIEditor.DataModel import ExprField, exprBorder
+from LarchTools.PythonTools.GUIEditor.ComponentFields import unaryBranchChildEditUIFormSections
 from LarchTools.PythonTools.GUIEditor.Component import blankCallModel
 from LarchTools.PythonTools.GUIEditor.BranchComponent import GUIUnaryBranchComponent, emptyLabel
 from LarchTools.PythonTools.GUIEditor.ComponentPalette import paletteItem, registerPaletteSubsection
@@ -23,16 +23,7 @@ from LarchTools.PythonTools.GUIEditor.PrimitiveComponents import GUILabel
 class GUIButton (GUIUnaryBranchComponent):
 	componentName = 'Button'
 
-	def __init__(self, child=None, onClick=None):
-		super(GUIButton, self).__init__(child)
-		if onClick is None:
-			onClick = EmbeddedPython2Expr.fromText('None')
-		self._onClick = onClick
-
-
-	@property
-	def onClick(self):
-		return self._onClick
+	onClick = ExprField()
 
 
 	def _presentBranchContents(self, fragment, inheritedState):
@@ -42,17 +33,17 @@ class GUIButton (GUIUnaryBranchComponent):
 	def _editUI(self):
 		sections = []
 		sections.extend( unaryBranchChildEditUIFormSections(self) )
-		sections.append(Form.SmallSection('On click', None, exprBorder.surround( self._onClick )))
+		sections.append(Form.SmallSection('On click', None, exprBorder.surround( self.onClick.editUI() )))
 		return Form(None, sections)
 
 	def __py_evalmodel__(self, codeGen):
-		onClick = self._onClick.model
+		onClick = self.onClick.__py_evalmodel__(codeGen)
 		button = codeGen.embeddedValue(Button)
 		child = self.child
 		childArg = child.__py_evalmodel__(codeGen)   if child is not None   else blankCallModel(codeGen)
 		return Py.Call(target=button, args=[childArg, onClick])
 
-_buttonItem = paletteItem(Label('Button'), lambda: GUIButton(child=GUILabel('Button')))
+_buttonItem = paletteItem(Label('Button'), lambda: GUIButton(child=GUILabel(text='Button')))
 
 
 registerPaletteSubsection('Controls', [_buttonItem])

@@ -25,7 +25,6 @@ from LarchTools.PythonTools.GUIEditor.ComponentPalette import paletteItem, regis
 from LarchTools.PythonTools.GUIEditor.DataModel import IntEvalField, FloatEvalField, StringEvalField
 from LarchTools.PythonTools.GUIEditor.LeafComponent import GUILeafComponent
 from LarchTools.PythonTools.GUIEditor.BranchComponent import GUIBranchComponent, GUISequenceComponent
-from LarchTools.PythonTools.GUIEditor.ComponentFields import ValueField
 
 
 

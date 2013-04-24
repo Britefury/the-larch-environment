@@ -874,18 +874,26 @@ class Python2CodeGenerator (object):
 	@DMObjectNodeDispatchMethod( Schema.PythonExpression )
 	def PythonExpression(self, node, expr):
 		if expr is None:
+			# No expression: None
 			return 'None'
 		else:
+			# If expression is an empty UNPARSED node: None
+			if expr.isInstanceOf(Schema.UNPARSED):
+				value = expr['value']
+				if len(value) == 0:
+					return 'None'
+				elif len(value) == 1:
+					x = value[0]
+					if isinstance(x, str)  or  isinstance(x, unicode):
+						if x.strip() == '':
+							return 'None'
 			return self( expr )
 
 	
 	# Target
 	@DMObjectNodeDispatchMethod( Schema.PythonTarget )
 	def PythonTarget(self, node, target):
-		if target is None:
-			return 'None'
-		else:
-			return self( target )
+		return self( target )
 
 		
 
