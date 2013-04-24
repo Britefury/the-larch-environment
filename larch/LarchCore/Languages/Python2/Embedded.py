@@ -30,7 +30,7 @@ def _py25NewSuite():
 	return Schema.PythonSuite( suite=[] )
 
 def _py25NewExpr():
-	return Schema.PythonExpression( expr=Schema.UNPARSED( value=[ '' ] ) )
+	return Schema.PythonExpression( expr=None )
 
 def _py25NewTarget():
 	return Schema.PythonTarget( target=Schema.UNPARSED( value=[ '' ] ) )
@@ -88,12 +88,13 @@ class EmbeddedPython2 (object):
 
 class EmbeddedPython2Target (EmbeddedPython2):
 	def __init__(self, model=None):
-		if isinstance( model, DMNode )  and  model.isInstanceOf( Schema.PythonTarget ):
-			pass
-		elif model is None:
+		if model is None:
 			model = _py25NewTarget()
 		elif isinstance( model, DMNode ):
-			model = Schema.PythonTarget( target=model )
+			if model.isInstanceOf( Schema.PythonTarget ):
+				pass
+			else:
+				model = Schema.PythonTarget( target=model )
 		else:
 			raise TypeError, 'Cannot construct EmbeddedPython2Target from %s' % model
 
@@ -139,19 +140,20 @@ class EmbeddedPython2Target (EmbeddedPython2):
 		if parseResult.isValid():
 			return EmbeddedPython2Target( Schema.PythonTarget( target=parseResult.getValue() ) )
 		else:
-			return EmbeddedPython2Target( Schema.PythonTarget( target=Schema.UNPARSED( value = [ text ] ) ) )
+			return EmbeddedPython2Target( Schema.PythonTarget( target=Schema.UNPARSED( value=[ text ] ) ) )
 
 
 
 
 class EmbeddedPython2Expr (EmbeddedPython2):
 	def __init__(self, model=None):
-		if isinstance( model, DMNode )  and  model.isInstanceOf( Schema.PythonExpression ):
-			pass
-		elif model is None:
+		if model is None:
 			model = _py25NewExpr()
 		elif isinstance( model, DMNode ):
-			model = Schema.PythonExpression( expr=model )
+			if model.isInstanceOf( Schema.PythonExpression ):
+				pass
+			else:
+				model = Schema.PythonExpression( expr=model )
 		else:
 			raise TypeError, 'Cannot construct EmbeddedPython2Expr from %s' % model
 
@@ -205,7 +207,7 @@ class EmbeddedPython2Expr (EmbeddedPython2):
 		if parseResult.isValid():
 			return EmbeddedPython2Expr( Schema.PythonExpression( expr=parseResult.getValue() ) )
 		else:
-			return EmbeddedPython2Expr( Schema.PythonExpression( expr=Schema.UNPARSED( value = [ text ] ) ) )
+			return EmbeddedPython2Expr( Schema.PythonExpression( expr=Schema.UNPARSED( value=[ text ] ) ) )
 
 
 

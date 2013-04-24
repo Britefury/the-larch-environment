@@ -32,9 +32,11 @@ def isEmptyTopLevel(x):
 		if x.isInstanceOf(Schema.PythonModule)  or  x.isInstanceOf(Schema.PythonSuite):
 			return x['suite'] == []
 		elif x.isInstanceOf(Schema.PythonExpression):
-			return x['expr'] == Schema.UNPARSED( value=[ '' ] )
+			expr = x['expr']
+			return expr is None  or  expr == Schema.UNPARSED( value=[ '' ] )
 		elif x.isInstanceOf(Schema.PythonTarget):
-			return x['target'] == Schema.UNPARSED( value=[ '' ] )
+			target = x['target']
+			return target == Schema.UNPARSED( value=[ '' ] )
 	return False
 
 
