@@ -71,7 +71,7 @@ class Field (object):
 		self._attrName = None
 
 
-	def _classInit(self, name):
+	def _classInit(self, containingClass, name):
 		self._name = name
 		self._attrName = intern('__gui_field_' + name)
 
@@ -184,6 +184,61 @@ class IntField (_PrimitiveField):
 
 
 
+
+
+class ListFieldInstance (FieldInstance):
+	def __init__(self, field, object_instance, source_value):
+		super(ListFieldInstance, self).__init__(field, object_instance, source_value)
+
+		def on_change(old_contents, new_contents):
+			if self._field._change_listener is not None:
+				self._field._change_listener(self._object_instance, self, old_contents, new_contents)
+
+		self.__live = LiveList(source_value)
+
+		self.__live.changeListener = on_change
+
+		if source_value is not None:
+			on_change([], source_value)
+
+
+
+	@property
+	def value(self):
+		return self.__live
+
+
+	def _addTrackableContentsTo(self, contents):
+		contents.append(self.__live)
+
+	def __field_getstate__(self):
+		return self.__live[:]
+
+	def getValueForEditor(self):
+		return self.__live[:]
+
+	def __py_evalmodel__(self, codeGen):
+		return Py.ListLiteral(values=[n.__py_evalmodel__(codeGen)   for n in self.__live])
+
+
+
+class ListField (Field):
+	__field_instance_class__ = ListFieldInstance
+
+
+
+	def __init__(self):
+		super(ListField, self).__init__()
+		self._change_listener = None
+
+
+	def on_change(self, method):
+		self._change_listener = method
+		return method
+
+
+
+
 #
 #
 # GUI Node class
@@ -195,9 +250,9 @@ class NodeAlreadyHasParentError (Exception):
 	pass
 
 
-class _NodeClass (type):
+class _GUIObjectClass (type):
 	def __init__(cls, name, bases, attrs):
-		super(_NodeClass, cls).__init__(name, bases, attrs)
+		super(_GUIObjectClass, cls).__init__(name, bases, attrs)
 		fields = {}
 
 		for base in bases:
@@ -210,15 +265,15 @@ class _NodeClass (type):
 
 		for name, value in attrs.items():
 			if isinstance(value, Field):
-				value._classInit(name)
+				value._classInit(cls, name)
 				fields[name] = value
 
 		cls._gui_fields__ = fields
 
 
 
-class GUINode (object):
-	__metaclass__ = _NodeClass
+class GUIObject (object):
+	__metaclass__ = _GUIObjectClass
 
 
 	def __init__(self, **values):
@@ -227,27 +282,8 @@ class GUINode (object):
 				raise TypeError, 'Class \'{0}\' does not have a field named \'{1}\''.format(type(self).__name__, name)
 
 		self.__change_history__ = None
-		self._parent = None
 		for field in self._gui_fields__.values():
 			field._instanceInit(self, values.get(field._name))
-
-
-	@property
-	def parent(self):
-		return self._parent
-
-
-
-	def _registerChild(self, childNode):
-		if childNode._parent is not None:
-			raise NodeAlreadyHasParentError, 'Node \'{0}\' already has a parent'.format(childNode)
-		childNode._parent = self
-
-	def _unregisterChild(self, childNode):
-		if childNode._parent is not self:
-			raise RuntimeError, 'Cannot unregister component that is not a child of this'
-		childNode._parent = None
-
 
 
 	def __getstate__(self):
@@ -266,6 +302,30 @@ class GUINode (object):
 		for field in self._gui_fields__.values():
 			field._getFieldInstance(self)._addTrackableContentsTo(contents)
 		return contents
+
+
+
+class GUINode (GUIObject):
+	def __init__(self, **values):
+		self._parent = None
+		super(GUINode, self).__init__(**values)
+
+
+	@property
+	def parent(self):
+		return self._parent
+
+
+
+	def _registerChild(self, childNode):
+		if childNode._parent is not None:
+			raise NodeAlreadyHasParentError, 'Node \'{0}\' already has a parent'.format(childNode)
+		childNode._parent = self
+
+	def _unregisterChild(self, childNode):
+		if childNode._parent is not self:
+			raise RuntimeError, 'Cannot unregister component that is not a child of this'
+		childNode._parent = None
 
 
 
@@ -324,6 +384,11 @@ class ChildFieldInstance (FieldInstance):
 class ChildField (Field):
 	__field_instance_class__ = ChildFieldInstance
 
+	def _classInit(self, containingClass, name):
+		if not issubclass(containingClass, GUINode):
+			raise TypeError, 'Only subclasses of GUINode may contain child fields'
+		super(ChildField, self)._classInit(containingClass, name)
+
 
 
 
@@ -371,6 +436,10 @@ class ChildListFieldInstance (FieldInstance):
 class ChildListField (Field):
 	__field_instance_class__ = ChildListFieldInstance
 
+	def _classInit(self, containingClass, name):
+		if not issubclass(containingClass, GUINode):
+			raise TypeError, 'Only subclasses of GUINode may contain child fields'
+		super(ChildListField, self)._classInit(containingClass, name)
 
 
 
@@ -656,7 +725,7 @@ import pickle
 class TestCase_DataModel(unittest.TestCase):
 	@classmethod
 	def setUpClass(cls):
-		class A (GUINode):
+		class PrimitiveFieldTest (GUINode):
 			x = IntField(0)
 			y = IntField(1)
 
@@ -665,7 +734,27 @@ class TestCase_DataModel(unittest.TestCase):
 				y = self.y.__py_evalmodel__(codeGen)
 				return Py.Call(target=Py.Load(name='A'), args=[x, y])
 
-		class B (GUINode):
+
+		class ListFieldTest (GUIObject):
+			x = ListField()
+
+			@x.on_change
+			def x_changed(self, field, old_contents, new_contents):
+				self.history.append(old_contents)
+
+
+			def __init__(self, **values):
+				self.history = []
+				super(ListFieldTest, self).__init__(**values)
+
+			def __setstate__(self, state):
+				self.history = []
+				super(ListFieldTest, self).__setstate__(state)
+
+
+
+
+		class ChildFieldTest (GUINode):
 			p = ChildField()
 			q = ChildListField()
 
@@ -674,7 +763,7 @@ class TestCase_DataModel(unittest.TestCase):
 				q = self.q.__py_evalmodel__(codeGen)
 				return Py.Call(target=Py.Load(name='B'), args=[p, q])
 
-		class C (GUINode):
+		class EvalFieldTest (GUIObject):
 			x = FloatEvalField(0.0, lambda live: Label('x'))
 			y = FloatEvalField(1.0, lambda live: Label('y'))
 
@@ -683,17 +772,18 @@ class TestCase_DataModel(unittest.TestCase):
 				y = self.y.__py_evalmodel__(codeGen)
 				return Py.Call(target=Py.Load(name='C'), args=[x, y])
 
-		class D (GUINode):
+		class ExprFieldTest (GUIObject):
 			x = ExprField()
 
 			def __py_evalmodel__(self, codeGen):
 				x = self.x.__py_evalmodel__(codeGen)
 				return Py.Call(target=Py.Load(name='D'), args=[x])
 
-		cls.A = A
-		cls.B = B
-		cls.C = C
-		cls.D = D
+		cls.PrimitiveFieldTest = PrimitiveFieldTest
+		cls.ListFieldTest = ListFieldTest
+		cls.ChildFieldTest = ChildFieldTest
+		cls.EvalFieldTEst = EvalFieldTest
+		cls.ExprFieldTest = ExprFieldTest
 
 		test_module = imp.new_module('GUIEditor_DataModel_Tests')
 		sys.modules[test_module.__name__] = test_module
@@ -703,18 +793,20 @@ class TestCase_DataModel(unittest.TestCase):
 			setattr(mod, x.__name__, x)
 			x.__module__ = mod.__name__
 
-		moveClassToModule(test_module, A)
-		moveClassToModule(test_module, B)
-		moveClassToModule(test_module, C)
-		moveClassToModule(test_module, D)
+		moveClassToModule(test_module, PrimitiveFieldTest)
+		moveClassToModule(test_module, ListFieldTest)
+		moveClassToModule(test_module, ChildFieldTest)
+		moveClassToModule(test_module, EvalFieldTest)
+		moveClassToModule(test_module, ExprFieldTest)
 
 
 	@classmethod
 	def tearDownClass(cls):
-		cls.A = None
-		cls.B = None
-		cls.C = None
-		cls.D = None
+		cls.PrimitiveFieldTest = None
+		cls.ListFieldTest = None
+		cls.ChildFieldTest = None
+		cls.EvalFieldTest = None
+		cls.ExprFieldTest = None
 		del sys.modules[cls.mod.__name__]
 		cls.mod = None
 
@@ -736,39 +828,39 @@ class TestCase_DataModel(unittest.TestCase):
 
 
 	def test_constructor(self):
-		a1 = self.A()
+		a1 = self.PrimitiveFieldTest()
 
 		self.assertEqual(0, a1.x.value)
 		self.assertEqual(1, a1.y.value)
 
-		a2 = self.A(x=10, y=20)
+		a2 = self.PrimitiveFieldTest(x=10, y=20)
 
 		self.assertEqual(10, a2.x.value)
 		self.assertEqual(20, a2.y.value)
 
-		self.assertRaises(TypeError, lambda: self.A(a=1, b=2))
+		self.assertRaises(TypeError, lambda: self.PrimitiveFieldTest(a=1, b=2))
 
 
-		b1 = self.B()
-		a2 = self.A()
+		b1 = self.ChildFieldTest()
+		a2 = self.PrimitiveFieldTest()
 
 		self.assertIs(None, b1.p.node)
 		self.assertEqual([], b1.q.nodes)
 
-		b2 = self.B(p=a1, q=[a2])
+		b2 = self.ChildFieldTest(p=a1, q=[a2])
 
 		self.assertIs(a1, b2.p.node)
 		self.assertEqual([a2], b2.q.nodes)
 
-		self.assertRaises(NodeAlreadyHasParentError, lambda: self.B(p=a1, q=[a2]))
+		self.assertRaises(NodeAlreadyHasParentError, lambda: self.ChildFieldTest(p=a1, q=[a2]))
 
 
-		c1 = self.C()
+		c1 = self.EvalFieldTEst()
 
 		self.assertEqual(0.0, c1.x.constantValue)
 		self.assertEqual(1.0, c1.y.constantValue)
 
-		c2 = self.C(x=10.0, y=20.0)
+		c2 = self.EvalFieldTEst(x=10.0, y=20.0)
 
 		self.assertEqual(10.0, c2.x.constantValue)
 		self.assertEqual(20.0, c2.y.constantValue)
@@ -778,7 +870,7 @@ class TestCase_DataModel(unittest.TestCase):
 
 
 	def test_PrimitiveField_changeHistory(self):
-		a = self.A()
+		a = self.PrimitiveFieldTest()
 
 		self.assertEqual(0, self.ch.getNumUndoChanges())
 		self.assertEqual(0, self.ch.getNumRedoChanges())
@@ -812,7 +904,7 @@ class TestCase_DataModel(unittest.TestCase):
 
 
 	def test_PrimitiveField_serialisation(self):
-		a = self.A(x=10, y=20)
+		a = self.PrimitiveFieldTest(x=10, y=20)
 
 		a_io = pickle.loads(pickle.dumps(a))
 
@@ -824,7 +916,7 @@ class TestCase_DataModel(unittest.TestCase):
 
 
 	def test_PrimitiveField_editor(self):
-		a = self.A(x=10, y=20)
+		a = self.PrimitiveFieldTest(x=10, y=20)
 
 		codeGen = Python2CodeGenerator('test')
 
@@ -842,12 +934,86 @@ class TestCase_DataModel(unittest.TestCase):
 
 
 
+	def test_ListField_constructor(self):
+		a1 = self.ListFieldTest()
+		a2 = self.ListFieldTest(x=range(5))
+
+		self.assertEqual([], a1.x.value)
+		self.assertEqual(range(5), a2.x.value)
+
+
+	def test_ListField_constructor(self):
+		a1 = self.ListFieldTest()
+
+		self.assertEqual([], a1.x.value)
+		self.assertEqual([], a1.history)
+
+		a1.x.value.append(10)
+
+		self.assertEqual([10], a1.x.value)
+		self.assertEqual([[]], a1.history)
+
+		a1.x.value.append(20)
+
+		self.assertEqual([10, 20], a1.x.value)
+		self.assertEqual([[], [10]], a1.history)
+
+
+	def test_ListField_changeHistory(self):
+		a = self.ListFieldTest()
+
+		self.assertEqual(0, self.ch.getNumUndoChanges())
+		self.assertEqual(0, self.ch.getNumRedoChanges())
+
+		self.ch.track(a)
+
+		self.assertIs(ChangeHistory.getChangeHistoryFor(a), self.ch)
+
+		self.assertEqual(0, self.ch.getNumUndoChanges())
+		self.assertEqual(0, self.ch.getNumRedoChanges())
+
+		a.x.value.append(10)
+		a.x.value.append(20)
+
+		self.assertEqual([10, 20], a.x.value)
+		self.assertEqual(2, self.ch.getNumUndoChanges())
+
+		self.ch.undo()
+
+		self.assertEqual([10], a.x.value)
+		self.assertEqual(1, self.ch.getNumUndoChanges())
+
+		self.ch.undo()
+
+		self.assertEqual([], a.x.value)
+		self.assertEqual(0, self.ch.getNumUndoChanges())
+
+
+	def test_ListField_serialisation(self):
+		a = self.ListFieldTest(x=range(5))
+
+		a_io = pickle.loads(pickle.dumps(a))
+
+		self.assertIsNot(a, a_io)
+
+		self.assertEqual(range(5), a_io.x.value)
+
+
+	def test_ListField_editor(self):
+		a = self.ListFieldTest(x=[1,2])
+
+		codeGen = Python2CodeGenerator('test')
+
+		self.assertEqual([1, 2], a.x.getValueForEditor())
+
+		self.fail('Test imcomplete; need to implement type-coercion based converter to transform Python objects into AST nodes that construct their literal values')
+
 
 
 	def test_ChildField_parentage(self):
-		a1 = self.A(x=10, y=20)
-		a2 = self.A(x=3, y=4)
-		b = self.B()
+		a1 = self.PrimitiveFieldTest(x=10, y=20)
+		a2 = self.PrimitiveFieldTest(x=3, y=4)
+		b = self.ChildFieldTest()
 
 		self.assertIs(None, a1.parent)
 		self.assertIs(None, a2.parent)
@@ -866,10 +1032,10 @@ class TestCase_DataModel(unittest.TestCase):
 
 
 	def test_ChildField_changeHistory(self):
-		b = self.B()
-		a1 = self.A()
-		a2 = self.A()
-		a3 = self.A()
+		b = self.ChildFieldTest()
+		a1 = self.PrimitiveFieldTest()
+		a2 = self.PrimitiveFieldTest()
+		a3 = self.PrimitiveFieldTest()
 
 		self.assertEqual(0, self.ch.getNumUndoChanges())
 		self.assertEqual(0, self.ch.getNumRedoChanges())
@@ -911,25 +1077,25 @@ class TestCase_DataModel(unittest.TestCase):
 
 
 	def test_ChildField_serialisation(self):
-		a1 = self.A(x=10, y=20)
-		a2 = self.A(x=3, y=4)
-		b = self.B(p=a1, q=[a2])
+		a1 = self.PrimitiveFieldTest(x=10, y=20)
+		a2 = self.PrimitiveFieldTest(x=3, y=4)
+		b = self.ChildFieldTest(p=a1, q=[a2])
 
 		b_io = pickle.loads(pickle.dumps(b))
 
 		self.assertIsNot(b, b_io)
 
-		self.assertIsInstance(b_io.p.node, self.A)
-		self.assertIsInstance(b_io.q.nodes[0], self.A)
+		self.assertIsInstance(b_io.p.node, self.PrimitiveFieldTest)
+		self.assertIsInstance(b_io.q.nodes[0], self.PrimitiveFieldTest)
 
 		self.assertEqual(10, b_io.p.node.x.value)
 		self.assertEqual(3, b_io.q.nodes[0].x.value)
 
 
 	def test_ChildField_editor(self):
-		a1 = self.A(x=10, y=20)
-		a2 = self.A(x=3, y=4)
-		b = self.B(p=a1, q=[a2])
+		a1 = self.PrimitiveFieldTest(x=10, y=20)
+		a2 = self.PrimitiveFieldTest(x=3, y=4)
+		b = self.ChildFieldTest(p=a1, q=[a2])
 
 		codeGen = Python2CodeGenerator('test')
 
@@ -945,7 +1111,7 @@ class TestCase_DataModel(unittest.TestCase):
 
 
 	def test_EvalField_changeHistory(self):
-		c = self.C()
+		c = self.EvalFieldTEst()
 
 		self.assertEqual(0, self.ch.getNumUndoChanges())
 		self.assertEqual(0, self.ch.getNumRedoChanges())
@@ -1019,7 +1185,7 @@ class TestCase_DataModel(unittest.TestCase):
 
 
 	def test_EvalField_serialisation(self):
-		c = self.C()
+		c = self.EvalFieldTEst()
 
 		c.x.constantValue = 10.0
 		c.y.constantValue = 20.0
@@ -1037,7 +1203,7 @@ class TestCase_DataModel(unittest.TestCase):
 
 
 	def test_EvalField_editor(self):
-		c = self.C()
+		c = self.EvalFieldTEst()
 
 		codeGen = Python2CodeGenerator('test')
 
@@ -1063,7 +1229,7 @@ class TestCase_DataModel(unittest.TestCase):
 
 
 	def test_ExprField_changeHistory(self):
-		d = self.D()
+		d = self.ExprFieldTest()
 
 		self.assertEqual(0, self.ch.getNumUndoChanges())
 		self.assertEqual(0, self.ch.getNumRedoChanges())
@@ -1077,7 +1243,7 @@ class TestCase_DataModel(unittest.TestCase):
 
 	def test_ExprField_serialisation(self):
 		x_expr =EmbeddedPython2Expr.fromText('a+b')
-		d = self.D(x=x_expr)
+		d = self.ExprFieldTest(x=x_expr)
 
 		d_io = pickle.loads(pickle.dumps(d))
 
@@ -1086,7 +1252,7 @@ class TestCase_DataModel(unittest.TestCase):
 
 	def test_ExprField_py_evalmodel(self):
 		x_expr =EmbeddedPython2Expr.fromText('a+b')
-		d = self.D(x=x_expr)
+		d = self.ExprFieldTest(x=x_expr)
 
 		codeGen = Python2CodeGenerator('test')
 
