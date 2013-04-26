@@ -321,7 +321,7 @@ public abstract class SequentialController
 		return true;
 	}
 
-	protected abstract Object textToSequentialForImport(String text);
+	public abstract Object textToSequentialForImport(String text);
 	protected abstract boolean canConvertSequentialToTextForExport(Object sequential);
 	protected abstract String sequentialToTextForExport(Object sequential);
 
