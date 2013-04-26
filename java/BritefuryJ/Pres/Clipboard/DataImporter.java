@@ -16,7 +16,7 @@ public class DataImporter <TargetType extends Target> extends AbstractDataImport
 {
 	public interface ImportDataFn <TargetType extends Target>
 	{
-		boolean importData(TargetType target, Selection selection, Object data);
+		Object importData(TargetType target, Selection selection, Object data);
 	}
 	
 	public interface CanImportFn <TargetType extends Target>
@@ -82,7 +82,7 @@ public class DataImporter <TargetType extends Target> extends AbstractDataImport
 	}
 
 	@Override
-	protected boolean importCheckedData(TargetType target, Selection selection, Object data)
+	protected Object importCheckedData(TargetType target, Selection selection, Object data)
 	{
 		return importDataFn.importData( target, selection, data );
 	}
