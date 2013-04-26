@@ -86,7 +86,7 @@ public class SequentialRichStringController extends SequentialController
 
 
 	
-	protected Object textToSequentialForImport(String text)
+	public Object textToSequentialForImport(String text)
 	{
 		return new RichString( text );
 	}

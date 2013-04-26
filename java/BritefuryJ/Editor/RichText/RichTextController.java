@@ -38,7 +38,6 @@ import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Proxy;
 import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Pres.Primitive.Segment;
-import BritefuryJ.Pres.Primitive.Text;
 import BritefuryJ.Pres.RichText.RichText;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.Util.RichString.RichString;
@@ -1014,7 +1013,7 @@ public abstract class RichTextController extends SequentialController
 
 	
 	@Override
-	protected Object textToSequentialForImport(String text)
+	public Object textToSequentialForImport(String text)
 	{
 		if ( text.contains( "\n" ) )
 		{
@@ -1026,6 +1025,17 @@ public abstract class RichTextController extends SequentialController
 			EdStyleSpan span = new EdStyleSpan( Arrays.asList( new Object[] { text } ), new HashMap<Object, Object>() );
 			return Arrays.asList( new EdNode[] { span } );
 		}
+	}
+
+	public Object modelParagraphListToSequentialForImport(List<Object> models)
+	{
+		ArrayList<Object> editorModels = new ArrayList<Object>();
+		editorModels.ensureCapacity(models.size());
+		for (Object m: models)
+		{
+			editorModels.add(modelToEditorModel(m));
+		}
+		return Flatten.flattenParagraphs(editorModels);
 	}
 
 	@Override
