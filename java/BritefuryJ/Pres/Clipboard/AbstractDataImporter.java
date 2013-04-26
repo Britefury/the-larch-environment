@@ -28,7 +28,7 @@ public abstract class AbstractDataImporter<TargetType extends Target> extends Da
 		return true;
 	}
 	
-	abstract protected boolean importCheckedData(TargetType target, Selection selection, Object data);
+	abstract protected Object importCheckedData(TargetType target, Selection selection, Object data);
 
 	
 	
@@ -45,7 +45,7 @@ public abstract class AbstractDataImporter<TargetType extends Target> extends Da
 	}
 
 	@Override
-	protected boolean importData(TargetType target, Selection selection, DataTransfer dataTransfer, DataFlavor flavor) throws UnsupportedFlavorException, IOException
+	protected Object importData(TargetType target, Selection selection, DataTransfer dataTransfer, DataFlavor flavor) throws UnsupportedFlavorException, IOException
 	{
 		if ( canImportFlavor( flavor ) )
 		{

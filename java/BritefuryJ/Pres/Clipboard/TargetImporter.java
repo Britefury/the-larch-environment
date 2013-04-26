@@ -18,13 +18,21 @@ import BritefuryJ.LSpace.Focus.Target;
 
 public class TargetImporter <TargetType extends Target>
 {
+	public interface ImportedDataInsertFn <TargetType extends Target>
+	{
+		boolean insertImportedData(TargetType target, Selection selection, Object importedData);
+	}
+
+
 	private Class<? extends Target> targetClass;
+	private ImportedDataInsertFn insertFn;
 	protected ArrayList<DataImporterInterface<TargetType>> importers = new ArrayList<DataImporterInterface<TargetType>>();
 
 	
-	public TargetImporter(Class<? extends Target> targetClass, List<? extends DataImporterInterface<TargetType>> importers)
+	public TargetImporter(Class<? extends Target> targetClass, ImportedDataInsertFn insertFn, List<? extends DataImporterInterface<TargetType>> importers)
 	{
 		this.targetClass = targetClass;
+		this.insertFn = insertFn;
 		this.importers.addAll( importers );
 	}
 
@@ -82,8 +90,10 @@ public class TargetImporter <TargetType extends Target>
 				{
 					try
 					{
-						if ( importer.importData( (TargetType)target, selection, dataTransfer, flavor ) )
+						Object importedData = importer.importData( (TargetType)target, selection, dataTransfer, flavor );
+						if ( importedData != null )
 						{
+							insertImportedData( (TargetType)target, selection, importedData );
 							return true;
 						}
 					}
@@ -98,5 +108,12 @@ public class TargetImporter <TargetType extends Target>
 		}
 		
 		return false;
+	}
+
+
+
+	private boolean insertImportedData(TargetType target, Selection selection, Object importedData)
+	{
+		return insertFn.insertImportedData( target, selection, importedData );
 	}
 }
