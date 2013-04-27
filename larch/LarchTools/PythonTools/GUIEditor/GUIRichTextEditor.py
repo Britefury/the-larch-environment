@@ -38,7 +38,7 @@ from LarchCore.Languages.Python2 import Schema as Py
 
 from LarchTools.PythonTools.GUIEditor.DataModel import GUIObject, ValueField, ListField, StringField, ChildListField
 from LarchTools.PythonTools.GUIEditor.Component import GUIComponent
-from LarchTools.PythonTools.GUIEditor.ComponentPalette import paletteItem, registerPaletteSubsection
+from LarchTools.PythonTools.GUIEditor.ComponentPalette import paletteItem, registerPaletteSubsection, PaletteComponentDrag
 
 
 
@@ -85,31 +85,31 @@ GUIRichTextController.instance = GUIRichTextController('GUI editor rich text edi
 class RTElem (GUIObject):
 	def __init__(self, **values):
 		self._editorModel = None
-		self.__parent = None
+		self.__parentElement = None
 		super(RTElem, self).__init__(**values)
 
 
 	@property
 	def parent(self):
-		return self.__parent
+		return self.__parentElement
 
 	@property
 	def document(self):
-		return self._parent.document
+		return self.__parentElement.document   if self.__parentElement is not None   else None
 
 
 	def _register(self, parent):
-		if self.__parent is not None:
+		if self.__parentElement is not None:
 			raise RuntimeError, 'Cannot register an element that already has a parent'
-		self.__parent = parent
+		self.__parentElement = parent
 		doc = parent.document
 		if doc is not None:
 			self._addedToDocument(doc)
 
 	def _unregister(self, prevParent):
-		if self.__parent is None:
+		if self.__parentElement is None:
 			raise RuntimeError, 'Cannot unregister an element that does not have a parent'
-		self.__parent = None
+		self.__parentElement = None
 		doc = prevParent.document
 		if doc is not None:
 			self._removedFromDocument(doc)
@@ -229,9 +229,6 @@ class Para (AbstractText):
 		x = combinatorClass(self._contents.value[:])
 		x = GUIRichTextController.instance.editableParagraph(self, x)
 		return x
-	
-	def __repr__(self):
-		return ''.join([str(x)   for x in self._contents.value])
 
 
 
@@ -276,9 +273,6 @@ class _TempBlankPara (RTElem):
 		x = NormalText('')
 		x = GUIRichTextController.instance.editableParagraph(self, x)
 		return x
-	
-	def __repr__(self):
-		return '<blank_para>'
 
 
 
@@ -337,11 +331,6 @@ class Style (AbstractText):
 			styleSheet = styleSheet.withAttr(attrib, value)
 		return styleSheet
 	
-	
-	
-	
-	def __repr__(self):
-		return '<' + ''.join([str(x)   for x in self._contents.value]) + '::' + str(self._styleAttrs) + '>'
 
 
 
@@ -508,7 +497,7 @@ class Block (RTElem):
 
 
 class GUIRichTextDocument (GUIComponent):
-	componentName = 'Label'
+	componentName = 'Document'
 
 
 	_contents = ValueField()
@@ -539,11 +528,11 @@ class GUIRichTextDocument (GUIComponent):
 
 
 	def _addChild(self, child):
-		raise NotImplementedError
+		self.children.nodes.append(child)
 
 
 	def _removeChild(self, child):
-		raise NotImplementedError
+		self.children.nodes.remove(child)
 
 
 
@@ -569,7 +558,7 @@ class GUIRichTextDocument (GUIComponent):
 
 	def _presentContents(self, fragment, inheritedState):
 		d = Pres.coerce(self._contents.value).withContextMenuInteractor(_documentContextMenuFactory)
-		d = d.withNonLocalDropDest(DataFlavor.javaFileListFlavor, _dndHighlight, _onDropImage)
+		d = d.withDropDest(PaletteComponentDrag, None, _dndHighlight, _onDropFromPalette)
 		d = GUIRichTextController.instance.region(d)
 		return d
 
@@ -585,23 +574,6 @@ registerPaletteSubsection('Rich text document', [_documentItem])
 
 
 
-
-def _img(img, maxwidth, maxheight):
-	scale = min(maxwidth / float(img.width), 1.0)
-	scale = min(maxheight / float(img.height), scale)
-	return Image(img, img.width * scale, img.height * scale)
-
-class _EmbeddedImage (object):
-	def __init__(self, imageFile):
-		self._image = ImageIO.read(imageFile)
-
-class _InlineImage (_EmbeddedImage):
-	def __present__(self, fragment, inheritedState):
-		return Border(_img(self._image, 128.0, 80.0))
-
-class _ParaImage (_EmbeddedImage):
-	def __present__(self, fragment, inherited_state):
-		return Border(_img(self._image, 640, 400.0))
 
 def _documentContextMenuFactory(element, menu):
 	region = element.getRegion()
@@ -619,17 +591,6 @@ def _documentContextMenuFactory(element, menu):
 					GUIRichTextController.instance.modifyParagraphAtMarker(caret.getMarker(), setParagraphStyle)
 		return _onLink
 	
-	def insertEmbedPara(link, event):
-		def _newEmbedPara():
-			img = _imageFileChooser(link.element, lambda f: _ParaImage(f))
-			return ParaEmbed(img)   if img is not None   else None
-		
-		caret = rootElement.getCaret()
-		if caret is not None and caret.isValid():
-			caretElement = caret.getElement()
-			if caretElement.getRegion() is region:
-				GUIRichTextController.instance.insertParagraphAtCaret(caret, _newEmbedPara)
-	
 	normalStyle = Hyperlink('Normal', makeParagraphStyleFn('normal'))
 	h1Style = Hyperlink('H1', makeParagraphStyleFn('h1'))
 	h2Style = Hyperlink('H2', makeParagraphStyleFn('h2'))
@@ -639,11 +600,8 @@ def _documentContextMenuFactory(element, menu):
 	h6Style = Hyperlink('H6', makeParagraphStyleFn('h6'))
 	titleStyle = Hyperlink('Title', makeParagraphStyleFn('title'))
 	paraStyles = ControlsRow([normalStyle, h1Style, h2Style, h3Style, h4Style, h5Style, h6Style, titleStyle])
-	embedPara = Hyperlink('Embed para', insertEmbedPara)
-	paraEmbeds = ControlsRow([embedPara])
 	menu.add(Section(SectionHeading2('Paragraph styles'), paraStyles))
-	menu.add(Section(SectionHeading2('Paragraph embeds'), paraEmbeds))
-	
+
 	
 	def makeStyleFn(attrName):
 		def computeStyleValues(styleAttrDicts):
@@ -660,25 +618,12 @@ def _documentContextMenuFactory(element, menu):
 					GUIRichTextController.instance.applyStyleToSelection(selection, computeStyleValues)
 		return onButton
 	
-	def _onInsertInlineEmbed(button, event):
-		def _newInlineEmbedValue():
-			return _imageFileChooser(button.element, lambda f: _InlineImage(f))
-		
-		caret = rootElement.getCaret()
-		if caret is not None and caret.isValid():
-			caretElement = caret.getElement()
-			if caretElement.getRegion() is region:
-				GUIRichTextController.instance.insertInlineEmbedAtMarker(caret.getMarker(), _newInlineEmbedValue)
-	
 	italicStyle = Button.buttonWithLabel('I', makeStyleFn('italic'))
 	boldStyle = Button.buttonWithLabel('B', makeStyleFn('bold'))
 	styles = ControlsRow([italicStyle, boldStyle]).alignHLeft()
-	insertInlineEmbed = Button.buttonWithLabel('Embed', _onInsertInlineEmbed)
-	inlineEmbeds = ControlsRow([insertInlineEmbed]).alignHLeft()
-	
+
 	menu.add(Section(SectionHeading2('Selection styles'), styles))
-	menu.add(Section(SectionHeading2('Inline embeds'), inlineEmbeds))
-	
+
 	
 	return True
 
@@ -688,35 +633,20 @@ def _dndHighlight(element, graphics, pos, action):
 	if marker is not None and marker.isValid():
 		DndHandler.drawCaretDndHighlight(graphics, element, marker)
 
-def _makeParaEmbeddedImageFactory(imageFile):
-	return lambda : ParaEmbed(_ParaImage(imageFile))
-
-def _makeInlineEmbeddedImageFactory(imageFile):
-	return lambda : InlineEmbed(_InlineImage(imageFile))
-
-def _onDropImage(element, pos, data, action):
+def _onDropFromPalette(element, pos, data, action):
 	marker = Marker.atPointIn(element, pos, True)
 	if marker is not None and marker.isValid():
 		def _onDropInline(control):
-			for f in list(data):
-				factory = _makeInlineEmbeddedImageFactory(f)
-				GUIRichTextController.instance.insertInlineEmbedAtMarker(marker, factory)
+			assert isinstance(data, PaletteComponentDrag)
+			def factory():
+				return data.getItem()
+			GUIRichTextController.instance.insertInlineEmbedAtMarker(marker, factory)
 		
 		def _onDropParagraph(control):
-			for f in list(data):
-				factory = _makeParaEmbeddedImageFactory(f)
-				GUIRichTextController.instance.insertParagraphAtMarker(marker, factory)
+			def factory():
+				return ParaEmbed(data.getItem())
+			GUIRichTextController.instance.insertParagraphAtMarker(marker, factory)
 		
 		menu = VPopupMenu([MenuItem.menuItemWithLabel('Inline', _onDropInline), MenuItem.menuItemWithLabel('As paragraph', _onDropParagraph)])
 		menu.popupMenuAtMousePosition(marker.getElement())
 	return True
-
-def _imageFileChooser(element, imageValueFn):
-	component = element.getRootElement().getComponent()
-	fileChooser = JFileChooser()
-	response = fileChooser.showDialog(component, 'Open')
-	if response == JFileChooser.APPROVE_OPTION:
-		sf = fileChooser.getSelectedFile()
-		if sf is not None:
-			return imageValueFn(sf)
-	return None
