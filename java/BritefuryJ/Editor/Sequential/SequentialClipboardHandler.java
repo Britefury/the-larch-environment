@@ -107,15 +107,15 @@ public class SequentialClipboardHandler extends ClipboardHandler
 		}
 
 		@Override
-		protected boolean importCheckedData(Caret caret, Selection selection, Object data)
+		protected Object importCheckedData(Caret caret, Selection selection, Object data)
 		{
 			SequentialBuffer buffer = (SequentialBuffer)data;
 			if ( !sequentialController.canImportFromSequentialEditor( buffer.clipboardHandler.sequentialController ) )
 			{
 				return false;
 			}
-			
-			return paste( caret, selection, buffer.sequential );
+
+			return buffer.sequential;
 		}
 	};
 	
@@ -128,21 +128,33 @@ public class SequentialClipboardHandler extends ClipboardHandler
 		}
 		
 		@Override
-		protected boolean importCheckedData(Caret caret, Selection selection, Object data)
+		protected Object importCheckedData(Caret caret, Selection selection, Object data)
 		{
 			if ( data instanceof String )
 			{
-				return paste( caret, selection, sequentialController.textToSequentialForImport( ((String)data) ) );
+				return sequentialController.textToSequentialForImport( ((String)data) );
 			}
 			return false;
 		}
 	};
-	
+
+
+
+	private final TargetImporter.ImportedDataInsertFn<Caret> insertImportedData = new TargetImporter.ImportedDataInsertFn<Caret>()
+	{
+		@Override
+		public boolean insertImportedData(Caret caret, Selection selection, Object importedData) {
+			paste(caret, selection, importedData);
+			return true;
+		}
+	};
+
+
 	
 	@SuppressWarnings("unchecked")
 	private List<? extends DataImporterInterface<Caret>> dataImporters = (List<? extends DataImporterInterface<Caret>>)
 			Arrays.asList( richStringImporter, stringImporter );
-	private TargetImporter<Caret> importer = new TargetImporter<Caret>( Caret.class, dataImporters );
+	private TargetImporter<Caret> importer = new TargetImporter<Caret>( Caret.class, insertImportedData, dataImporters );
 	
 	
 	
@@ -356,7 +368,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	}
 	
 	
-	protected boolean paste(Caret caret, Selection selection, Object data)
+	public boolean paste(Caret caret, Selection selection, Object data)
 	{
 		// Paste
 		if ( !( selection instanceof TextSelection ) )

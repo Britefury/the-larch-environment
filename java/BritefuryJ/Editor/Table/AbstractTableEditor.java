@@ -140,19 +140,16 @@ public abstract class AbstractTableEditor<ModelType>
 	private final DataImporter.ImportDataFn<TableTarget> importBufferData = new DataImporter.ImportDataFn<TableTarget>()
 	{
 		@SuppressWarnings("unchecked")
-		public boolean importData(TableTarget target, Selection selection, Object data)
+		public Object importData(TableTarget target, Selection selection, Object data)
 		{
 			TableBuffer buffer = (TableBuffer)data;
 
-			ModelType model = (ModelType)target.editorInstance.model;
 			Object[][] subtable = buffer.contents;
 			
 			// Copy the block of data to be pasted - a block may be pasted multiple times - each instance should get its own copy
 			subtable = copyBlock( subtable );
-			
-			putBlock( model, target.x, target.y, subtable, (AbstractTableEditorInstance<ModelType>)target.editorInstance );
 
-			return true;
+			return subtable;
 		}
 	};
 	
@@ -167,7 +164,7 @@ public abstract class AbstractTableEditor<ModelType>
 	private final DataImporter.ImportDataFn<TableTarget> importHtmlData = new DataImporter.ImportDataFn<TableTarget>()
 	{
 		@SuppressWarnings("unchecked")
-		public boolean importData(TableTarget target, Selection selection, Object data)
+		public Object importData(TableTarget target, Selection selection, Object data)
 		{
 			String htmlText = (String)data;
 			
@@ -213,19 +210,28 @@ public abstract class AbstractTableEditor<ModelType>
 
 			
 			
-				ModelType model = (ModelType)target.editorInstance.model;
 				Segment htmlBlock[][] = tableData.toArray( new Segment[tableData.size()][] );
 				
 				Object[][] subtable = importHTMLBlock( target.x, target.y, htmlBlock );
 				
-				putBlock( model, target.x, target.y, subtable, (AbstractTableEditorInstance<ModelType>)target.editorInstance );
-
-				return true;
+				return subtable;
 			}
 			else
 			{
-				return false;
+				return null;
 			}
+		}
+	};
+
+
+	private final TargetImporter.ImportedDataInsertFn<TableTarget> insertImportedData = new TargetImporter.ImportedDataInsertFn<TableTarget>()
+	{
+		@Override
+		public boolean insertImportedData(TableTarget target, Selection selection, Object importedData) {
+			Object [][] subtable = (Object[][])importedData;
+			ModelType model = (ModelType)target.editorInstance.model;
+			putBlock( model, target.x, target.y, subtable, (AbstractTableEditorInstance<ModelType>)target.editorInstance );
+			return true;
 		}
 	};
 	
@@ -277,7 +283,7 @@ public abstract class AbstractTableEditor<ModelType>
 		DataImporter<TableTarget> htmlImporter = new DataImporter<TableTarget>( canImportHtmlFlavor, importHtmlData );
 		@SuppressWarnings("unchecked")
 		DataImporterInterface<TableTarget> importers[] = new DataImporterInterface[] { bufferImporter, htmlImporter };
-		TargetImporter<TableTarget> targetImporter = new TargetImporter<TableTarget>( TableTarget.class, Arrays.asList( importers ) );
+		TargetImporter<TableTarget> targetImporter = new TargetImporter<TableTarget>( TableTarget.class, insertImportedData, Arrays.asList( importers ) );
 		TargetImporter<?> targetImporters[] = new TargetImporter[] { targetImporter };
 		
 		SelectionEditor<TableSelection> selectionEditor = new SelectionEditor<TableSelection>( TableSelection.class, null, deleteSelection );
