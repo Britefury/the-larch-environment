@@ -374,7 +374,9 @@ class Python2CodeGenerator (object):
 	
 	@DMObjectNodeDispatchMethod( Schema.Call )
 	def Call(self, node, target, args):
-		return self( target, Precedence.PRECEDENCE_CONTAINER_CALLTARGET ) + '(' + ', '.join( [ self( a, Precedence.PRECEDENCE_CONTAINER_CALLARG )   for a in args ] ) + ')'
+		targetSrc = self( target, Precedence.PRECEDENCE_CONTAINER_CALLTARGET )
+		argsSrc = ', '.join( [ self( a, Precedence.PRECEDENCE_CONTAINER_CALLARG )   for a in args ] )
+		return targetSrc + '(' + argsSrc + ')'
 	
 	
 	

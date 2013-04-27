@@ -826,7 +826,7 @@ public class ObjectDndHandler extends DndHandler
 		ArrayList<TransferMatch> matches = new ArrayList<TransferMatch>();
 		
 		ObjectDndHandler sourceHandler = transferData.sourceHandler;
-		if ( sourceHandler.sources != null )
+		if ( sourceHandler.sources != null  &&  typeToDest != null )
 		{
 			for (DragSource src: sourceHandler.sources)
 			{

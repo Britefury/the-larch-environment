@@ -337,14 +337,21 @@ def getEmbeddedObjectModelType(value):
 #
 #
 
-def coerceToModel(x, embedClass=EmbeddedObjectExpr):
-	# Literal values
+def coerceToModel(x, coerceObj=None):
+	# Primitive values
 	t = type(x)
 	handler = _primitiveToMethodTypeMap.get(t)
 	if handler is not None:
-		return handler(x, embedClass)
+		return handler(x, coerceObj)
 
-	return embedClass(embeddedValue=DMNode.embed(x))
+	# Object values
+	if coerceObj is None:
+		raise TypeError, 'Cannot coerce objects with an object coercion function or embedded object schema class'
+	elif coerceObj is EmbeddedObjectExpr  or  coerceObj is EmbeddedObjectLiteral  or  coerceObj is EmbeddedObjectStmt:
+		return coerceObj(embeddedValue=DMNode.embed(x))
+	else:
+		return coerceObj(x)
+
 
 
 
@@ -352,13 +359,13 @@ def coerceToModel(x, embedClass=EmbeddedObjectExpr):
 _primitiveToMethodTypeMap = {}
 
 
-def _handleNone(x, embedClass):
+def _handleNone(x, coerceObj):
 	return Load(name='None')
 
 _primitiveToMethodTypeMap[types.NoneType] = _handleNone
 
 
-def _handleBool(x, embedClass):
+def _handleBool(x, coerceObj):
 	if x:
 		return Load(name='True')
 	else:
@@ -367,31 +374,31 @@ def _handleBool(x, embedClass):
 _primitiveToMethodTypeMap[bool] = _handleBool
 
 
-def _handleInt(x, embedClass):
+def _handleInt(x, coerceObj):
 	return IntLiteral(format='decimal', numType='int', value=repr(x))
 
 _primitiveToMethodTypeMap[int] = _handleInt
 
 
-def _handleLong(x, embedClass):
+def _handleLong(x, coerceObj):
 	return IntLiteral(format='decimal', numType='long', value=repr(x)[:-1])
 
 _primitiveToMethodTypeMap[long] = _handleLong
 
 
-def _handleFloat(x, embedClass):
+def _handleFloat(x, coerceObj):
 	return FloatLiteral(value=repr(x))
 
 _primitiveToMethodTypeMap[float] = _handleFloat
 
 
-def _handleComplex(x, embedClass):
+def _handleComplex(x, coerceObj):
 	return Add(x=FloatLiteral(value=repr(x.real)), y=ImaginaryLiteral(value=repr(x.imag)+'j'))
 
 _primitiveToMethodTypeMap[complex] = _handleComplex
 
 
-def _handleStrOrUnicode(x, embedClass):
+def _handleStrOrUnicode(x, coerceObj):
 	return strToStrLiteral(x)
 
 _primitiveToMethodTypeMap[str] = _handleStrOrUnicode
@@ -399,26 +406,26 @@ _primitiveToMethodTypeMap[unicode] = _handleStrOrUnicode
 
 
 
-def _handleTuple(x, embedClass):
-	return TupleLiteral(values=[coerceToModel(a, embedClass)   for a in x])
+def _handleTuple(x, coerceObj):
+	return TupleLiteral(values=[coerceToModel(a, coerceObj)   for a in x])
 
 _primitiveToMethodTypeMap[tuple] = _handleTuple
 
 
-def _handleList(x, embedClass):
-	return ListLiteral(values=[coerceToModel(a, embedClass)   for a in x])
+def _handleList(x, coerceObj):
+	return ListLiteral(values=[coerceToModel(a, coerceObj)   for a in x])
 
 _primitiveToMethodTypeMap[list] = _handleList
 
 
-def _handleSet(x, embedClass):
-	return SetLiteral(values=[coerceToModel(a, embedClass)   for a in x])
+def _handleSet(x, coerceObj):
+	return SetLiteral(values=[coerceToModel(a, coerceObj)   for a in x])
 
 _primitiveToMethodTypeMap[set] = _handleSet
 
 
-def _handleDict(x, embedClass):
-	return DictLiteral(values=[DictKeyValuePair(key=coerceToModel(k, embedClass), value=coerceToModel(v, embedClass))    for k, v in x.items()])
+def _handleDict(x, coerceObj):
+	return DictLiteral(values=[DictKeyValuePair(key=coerceToModel(k, coerceObj), value=coerceToModel(v, coerceObj))    for k, v in x.items()])
 
 _primitiveToMethodTypeMap[dict] = _handleDict
 
@@ -549,8 +556,8 @@ import unittest
 
 
 class TestCase_coercion (unittest.TestCase):
-	def _testCoerce(self, valueToCoerce, expectedModel, embedClass=EmbeddedObjectExpr):
-		result = coerceToModel(valueToCoerce, embedClass)
+	def _testCoerce(self, valueToCoerce, expectedModel, coerceObj=EmbeddedObjectExpr):
+		result = coerceToModel(valueToCoerce, coerceObj)
 
 		if result != expectedModel:
 			print 'UNEXPECTED RESULT'
