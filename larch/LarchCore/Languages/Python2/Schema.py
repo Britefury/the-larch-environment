@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
+import types
+
 from BritefuryJ.DocModel import DMSchema, DMObjectClass, DMNode
 
 
@@ -331,6 +333,102 @@ def getEmbeddedObjectModelType(value):
 
 #
 #
+# Python value coercion
+#
+#
+
+def coerceToModel(x, embedClass=EmbeddedObjectExpr):
+	# Literal values
+	t = type(x)
+	handler = _primitiveToMethodTypeMap.get(t)
+	if handler is not None:
+		return handler(x, embedClass)
+
+	return embedClass(embeddedValue=x)
+
+
+
+
+_primitiveToMethodTypeMap = {}
+
+
+def _handleNone(x, embedClass):
+	return Load(name='None')
+
+_primitiveToMethodTypeMap[types.NoneType] = _handleNone
+
+
+def _handleBool(x, embedClass):
+	if x:
+		return Load(name='True')
+	else:
+		return Load(name='False')
+
+_primitiveToMethodTypeMap[bool] = _handleBool
+
+
+def _handleInt(x, embedClass):
+	return IntLiteral(format='decimal', numType='int', value=repr(x))
+
+_primitiveToMethodTypeMap[int] = _handleInt
+
+
+def _handleLong(x, embedClass):
+	return IntLiteral(format='decimal', numType='long', value=repr(x)[:-1])
+
+_primitiveToMethodTypeMap[long] = _handleLong
+
+
+def _handleFloat(x, embedClass):
+	return FloatLiteral(value=repr(x))
+
+_primitiveToMethodTypeMap[float] = _handleFloat
+
+
+def _handleComplex(x, embedClass):
+	return Add(x=FloatLiteral(value=repr(x.real)), y=ImaginaryLiteral(value=repr(x.imag)+'j'))
+
+_primitiveToMethodTypeMap[complex] = _handleComplex
+
+
+def _handleStrOrUnicode(x, embedClass):
+	return strToStrLiteral(x)
+
+_primitiveToMethodTypeMap[str] = _handleStrOrUnicode
+_primitiveToMethodTypeMap[unicode] = _handleStrOrUnicode
+
+
+
+def _handleTuple(x, embedClass):
+	return TupleLiteral(values=[coerceToModel(a, embedClass)   for a in x])
+
+_primitiveToMethodTypeMap[tuple] = _handleTuple
+
+
+def _handleList(x, embedClass):
+	return ListLiteral(values=[coerceToModel(a, embedClass)   for a in x])
+
+_primitiveToMethodTypeMap[list] = _handleList
+
+
+def _handleSet(x, embedClass):
+	return SetLiteral(values=[coerceToModel(a, embedClass)   for a in x])
+
+_primitiveToMethodTypeMap[set] = _handleSet
+
+
+def _handleDict(x, embedClass):
+	return DictLiteral(values=[DictKeyValuePair(key=coerceToModel(k, embedClass), value=coerceToModel(v, embedClass))    for k, v in x.items()])
+
+_primitiveToMethodTypeMap[dict] = _handleDict
+
+
+
+
+
+
+#
+#
 # Version 1 backwards compatibility
 #
 #
@@ -438,3 +536,50 @@ def _readEmbeddedObjectExpr_v6(fieldValues):
 
 schema.registerReader( '_temp_SpecialFormStmtWrapper', 6, _read_temp_SpecialFormStmtWrapper_v6 )
 schema.registerReader( 'EmbeddedObjectExpr', 6, _readEmbeddedObjectExpr_v6 )
+
+
+
+
+
+
+# Test coercion
+
+import unittest
+
+
+
+class TestCase_coercion (unittest.TestCase):
+	def _testCoerce(self, valueToCoerce, expectedModel, embedClass=EmbeddedObjectExpr):
+		result = coerceToModel(valueToCoerce, embedClass)
+
+		if result != expectedModel:
+			print 'UNEXPECTED RESULT'
+			print 'INPUT:'
+			print valueToCoerce
+			print 'EXPECTED:'
+			print expectedModel
+			print 'RESULT:'
+			print result
+
+		self.assert_( result == expectedModel )
+
+
+	def test_coercion(self):
+		self._testCoerce(None, Load(name='None'))
+		self._testCoerce(False, Load(name='False'))
+		self._testCoerce(True, Load(name='True'))
+		self._testCoerce(1, IntLiteral(format='decimal', numType='int', value='1'))
+		self._testCoerce(1L, IntLiteral(format='decimal', numType='long', value='1'))
+		self._testCoerce(1.0, FloatLiteral(value='1.0'))
+		self._testCoerce(1.0+2.0j, Add(x=FloatLiteral(value='1.0'), y=ImaginaryLiteral(value='2.0j')))
+		self._testCoerce('x', StringLiteral(format='ascii', quotation='single', value='x'))
+		self._testCoerce(u'x', StringLiteral(format='unicode', quotation='single', value='x'))
+
+		self._testCoerce((1.0, 2.0, (3.0, 4.0)), TupleLiteral(values=[FloatLiteral(value='1.0'), FloatLiteral(value='2.0'), TupleLiteral(values=[FloatLiteral(value='3.0'), FloatLiteral(value='4.0')])]))
+		self._testCoerce([1.0, 2.0, (3.0, 4.0), [5.0, 6.0]], ListLiteral(values=[FloatLiteral(value='1.0'), FloatLiteral(value='2.0'), TupleLiteral(values=[FloatLiteral(value='3.0'), FloatLiteral(value='4.0')]), ListLiteral(values=[FloatLiteral(value='5.0'), FloatLiteral(value='6.0')])]))
+		self._testCoerce({1.0, 2.0, (3.0, 4.0)}, SetLiteral(values=[FloatLiteral(value='2.0'), TupleLiteral(values=[FloatLiteral(value='3.0'), FloatLiteral(value='4.0')]), FloatLiteral(value='1.0')]))
+		self._testCoerce({1.0:2.0, 3.0:(3.0, 4.0), (5.0, 6.0): 7.0}, DictLiteral(values=[
+			DictKeyValuePair(key=TupleLiteral(values=[FloatLiteral(value='5.0'), FloatLiteral(value='6.0')]), value=FloatLiteral(value='7.0')),
+			DictKeyValuePair(key=FloatLiteral(value='3.0'), value=TupleLiteral(values=[FloatLiteral(value='3.0'), FloatLiteral(value='4.0')])),
+			DictKeyValuePair(key=FloatLiteral(value='1.0'), value=FloatLiteral(value='2.0')),
+		]))

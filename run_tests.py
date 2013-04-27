@@ -21,6 +21,7 @@ import Britefury.Tests.Britefury.Dispatch.TestMethodDispatch
 import Britefury.Tests.Britefury.Util.Test_TrackedList
 import Britefury.Tests.Britefury.Util.Test_LiveList
 #import Britefury.Tests.Britefury.AttributeVisitor.TestAttributeVisitor
+import LarchCore.Languages.Python2.Schema
 import LarchCore.Languages.Python2.CodeGenerator
 import LarchCore.Languages.Python2.ASTGenerator
 import LarchCore.Languages.Python2.Builder
@@ -39,6 +40,7 @@ testModules = [ Britefury.Tests.BritefuryJ.Parser.Utils.Operators,
 		Britefury.Tests.Britefury.Util.Test_TrackedList,
 		Britefury.Tests.Britefury.Util.Test_LiveList,
 		#Britefury.Tests.Britefury.AttributeVisitor.TestAttributeVisitor,
+		LarchCore.Languages.Python2.Schema,
 		LarchCore.Languages.Python2.CodeGenerator,
 		LarchCore.Languages.Python2.ASTGenerator,
 		LarchCore.Languages.Python2.Builder,
