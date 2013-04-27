@@ -18,5 +18,5 @@ public abstract class DataImporterInterface <TargetType extends Target>
 {
 	abstract protected boolean canImportFlavor(DataFlavor flavor);
 	abstract protected boolean canImport(TargetType target, Selection selection, DataTransfer dataTransfer, DataFlavor flavor) throws UnsupportedFlavorException, IOException;
-	abstract protected boolean importData(TargetType target, Selection selection, DataTransfer dataTransfer, DataFlavor flavor) throws UnsupportedFlavorException, IOException;
+	abstract protected Object importData(TargetType target, Selection selection, DataTransfer dataTransfer, DataFlavor flavor) throws UnsupportedFlavorException, IOException;
 }
