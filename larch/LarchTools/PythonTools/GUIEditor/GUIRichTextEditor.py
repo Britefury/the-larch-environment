@@ -34,7 +34,9 @@ from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from BritefuryJ.Editor.RichText import RichTextController
 
-from LarchTools.PythonTools.GUIEditor.DataModel import GUIObject, ValueField, ListField, StringField
+from LarchCore.Languages.Python2 import Schema as Py
+
+from LarchTools.PythonTools.GUIEditor.DataModel import GUIObject, ValueField, ListField, StringField, ChildListField
 from LarchTools.PythonTools.GUIEditor.Component import GUIComponent
 from LarchTools.PythonTools.GUIEditor.ComponentPalette import paletteItem, registerPaletteSubsection
 
@@ -83,7 +85,47 @@ GUIRichTextController.instance = GUIRichTextController('GUI editor rich text edi
 class RTElem (GUIObject):
 	def __init__(self, **values):
 		self._editorModel = None
+		self.__parent = None
 		super(RTElem, self).__init__(**values)
+
+
+	@property
+	def parent(self):
+		return self.__parent
+
+	@property
+	def document(self):
+		return self._parent.document
+
+
+	def _register(self, parent):
+		if self.__parent is not None:
+			raise RuntimeError, 'Cannot register an element that already has a parent'
+		self.__parent = parent
+		doc = parent.document
+		if doc is not None:
+			self._addedToDocument(doc)
+
+	def _unregister(self, prevParent):
+		if self.__parent is None:
+			raise RuntimeError, 'Cannot unregister an element that does not have a parent'
+		self.__parent = None
+		doc = prevParent.document
+		if doc is not None:
+			self._removedFromDocument(doc)
+
+
+	def _addedToDocument(self, document):
+		pass
+
+	def _removedFromDocument(self, document):
+		pass
+
+
+
+	def __py_evalmodel__(self, codeGen):
+		raise NotImplementedError, 'abstract'
+
 
 
 class AbstractText (RTElem):
@@ -91,9 +133,20 @@ class AbstractText (RTElem):
 
 
 	@_contents.on_change
-	def _contents_changed(self, field, old_contents, new_contents):
+	def _contents_changed(self, field, oldContents, newContents):
 		if self._editorModel is not None:
-			self._editorModel.setModelContents(GUIRichTextController.instance, new_contents)
+			self._editorModel.setModelContents(GUIRichTextController.instance, newContents)
+
+		o = set(oldContents)
+		n = set(newContents)
+		added = n - o
+		removed = o - n
+		for x in removed:
+			if isinstance(x, RTElem):
+				x._unregister(self)
+		for x in added:
+			if isinstance(x, RTElem):
+				x._register(self)
 
 
 	def __init__(self, contents):
@@ -115,6 +168,23 @@ class AbstractText (RTElem):
 		self._contents.value = xs
 
 
+	def _addedToDocument(self, document):
+		for x in self._contents.value:
+			if isinstance(x, RTElem):
+				x._addedToDocument(document)
+
+	def _removedFromDocument(self, document):
+		for x in self._contents.value:
+			if isinstance(x, RTElem):
+				x._removedFromDocument(document)
+
+
+	def _contents_py_evalmodel_(self, codeGen):
+		coerceObj = lambda x: x.__py_evalmodel__(codeGen)
+		return Py.coerceToModel(self._contents.value[:], coerceObj=coerceObj)
+
+
+
 
 
 
@@ -124,8 +194,8 @@ class Para (AbstractText):
 
 
 	@_style.on_change
-	def _style_changed(self, field, old_value, new_value):
-		self._editorModel.setStyleAttrs({'style':new_value})
+	def _style_changed(self, field, oldValue, newValue):
+		self._editorModel.setStyleAttrs({'style':newValue})
 
 
 
@@ -147,6 +217,13 @@ class Para (AbstractText):
 	
 	_styleMap = {'normal':NormalText, 'h1':Heading1, 'h2':Heading2, 'h3':Heading3, 'h4':Heading4, 'h5':Heading5, 'h6':Heading6, 'title':Title}
 	
+
+	def __py_evalmodel__(self, codeGen):
+		combinatorClass = self._styleMap[self._style.value]
+		py_combinatorClass = codeGen.embeddedValue(combinatorClass)
+		return Py.Call(target=py_combinatorClass, args=[self._contents_py_evalmodel_(codeGen)])
+
+
 	def __present__(self, fragment, inheritedState):
 		combinatorClass = self._styleMap[self._style.value]
 		x = combinatorClass(self._contents.value[:])
@@ -234,6 +311,14 @@ class Style (AbstractText):
 		self._styleAttrs.value = s
 	
 
+	def __py_evalmodel__(self, codeGen):
+		py_richSpanClass = codeGen.embeddedValue(RichSpan)
+		richSpan = Py.Call(target=py_richSpanClass, args=[self._contents_py_evalmodel_(codeGen)])
+
+		py_styleSheet = codeGen.embeddedValue(self._styleSheet)
+		return Py.Call(target=Py.AttributeRef(target=py_styleSheet, name='applyTo'), args=[richSpan])
+
+
 	def __present__(self, fragment, inheritedState):
 		x = self._styleSheet.applyTo(RichSpan(self._contents.value[:]))
 		x = GUIRichTextController.instance.editableSpan(self, x)
@@ -270,12 +355,25 @@ class _Embed (RTElem):
 			self._editorModel.setValue(newValue)
 
 
+	def _addedToDocument(self, document):
+		value = self._value.value
+		document._addChild(value)
+
+	def _removedFromDocument(self, document):
+		value = self._value.value
+		document._removeChild(value)
+
+
+	def __py_evalmodel__(self, codeGen):
+		return self._value.value.__py_evalmodel__(codeGen)
+
+
 
 class InlineEmbed (_Embed):
 	def __init__(self, value):
 		super(InlineEmbed, self).__init__(_value=value)
 		self._editorModel = GUIRichTextController.instance.editorModelInlineEmbed(value)
-	
+
 	def __present__(self, fragment, inheritedState):
 		x = Pres.coerce(self._value.value).withContextMenuInteractor(_inlineEmbedContextMenuFactory)
 		x = GUIRichTextController.instance.editableInlineEmbed(self, x)
@@ -330,11 +428,30 @@ class Block (RTElem):
 		if self._editorModel is not None:
 			self._editorModel.setModelContents(GUIRichTextController.instance, newContents)
 
+		o = set(oldContents)
+		n = set(newContents)
+		added = n - o
+		removed = o - n
+		for x in removed:
+			if isinstance(x, RTElem):
+				x._unregister(self)
+		for x in added:
+			if isinstance(x, RTElem):
+				x._register(self)
 
 
-	def __init__(self, contents):
+
+	def __init__(self, contents, document):
+		self.__document = document
 		super(Block, self).__init__(_contents=contents)
 		self._editorModel = GUIRichTextController.instance.editorModelBlock(contents)
+
+
+	@property
+	def document(self):
+		return self.__document
+
+
 
 	def _filterContents(self, xs):
 		return [x   for x in xs   if not isinstance(x, _TempBlankPara)]
@@ -373,6 +490,12 @@ class Block (RTElem):
 			raise ValueError, 'could not find para'
 	
 	
+	def __py_evalmodel__(self, codeGen):
+		py_body = codeGen.embeddedValue(Body)
+		coerceObj = lambda x: x.__py_evalmodel__(codeGen)
+		return Py.Call(target=py_body, args=[Py.coerceToModel(self._contents.value[:], coerceObj=coerceObj)])
+
+
 	def __present__(self, fragment, inheritedState):
 		xs = self._contents.value
 		xs = xs[:]   if len(xs) > 0   else [_TempBlankPara(self)]
@@ -389,18 +512,71 @@ class GUIRichTextDocument (GUIComponent):
 
 
 	_contents = ValueField()
+	children = ChildListField()
 
 
 	def __init__(self):
-		super(GUIRichTextDocument, self).__init__(_contents=Block([]))
+		super(GUIRichTextDocument, self).__init__(_contents=Block([], self))
 		self._editorModel = None
 
 	
+
+
+	def removeChild(self, child):
+		self._removeChild(child)
+
+	def getNextSiblingOf(self, child):
+		nodes = self.children.nodes
+		try:
+			index = nodes.index(child) + 1
+		except ValueError:
+			return None
+		if index < len(nodes):
+			return nodes[index]
+		else:
+			return None
+
+
+
+	def _addChild(self, child):
+		raise NotImplementedError
+
+
+	def _removeChild(self, child):
+		raise NotImplementedError
+
+
+
+	def __iter__(self):
+		return iter(self.children.nodes)
+
+	def __len__(self):
+		return len(self.children.nodes)
+
+
+
+
+	def _lookFor(self, x):
+		for item in self.children.nodes:
+			if item.lookFor(x):
+				return True
+		return False
+
+
+	def __py_evalmodel__(self, codeGen):
+		return self._contents.value.__py_evalmodel__(codeGen)
+
+
 	def _presentContents(self, fragment, inheritedState):
 		d = Pres.coerce(self._contents.value).withContextMenuInteractor(_documentContextMenuFactory)
 		d = d.withNonLocalDropDest(DataFlavor.javaFileListFlavor, _dndHighlight, _onDropImage)
 		d = GUIRichTextController.instance.region(d)
 		return d
+
+
+
+
+
 
 _documentItem = paletteItem(Label('Document'), lambda: GUIRichTextDocument())
 
