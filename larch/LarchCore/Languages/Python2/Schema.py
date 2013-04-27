@@ -344,7 +344,7 @@ def coerceToModel(x, embedClass=EmbeddedObjectExpr):
 	if handler is not None:
 		return handler(x, embedClass)
 
-	return embedClass(embeddedValue=x)
+	return embedClass(embeddedValue=DMNode.embed(x))
 
 
 
@@ -564,7 +564,7 @@ class TestCase_coercion (unittest.TestCase):
 		self.assert_( result == expectedModel )
 
 
-	def test_coercion(self):
+	def test_coercion_primitives(self):
 		self._testCoerce(None, Load(name='None'))
 		self._testCoerce(False, Load(name='False'))
 		self._testCoerce(True, Load(name='True'))
@@ -582,4 +582,16 @@ class TestCase_coercion (unittest.TestCase):
 			DictKeyValuePair(key=TupleLiteral(values=[FloatLiteral(value='5.0'), FloatLiteral(value='6.0')]), value=FloatLiteral(value='7.0')),
 			DictKeyValuePair(key=FloatLiteral(value='3.0'), value=TupleLiteral(values=[FloatLiteral(value='3.0'), FloatLiteral(value='4.0')])),
 			DictKeyValuePair(key=FloatLiteral(value='1.0'), value=FloatLiteral(value='2.0')),
+		]))
+
+	def test_coercion_objects(self):
+		class MyObject (object):
+			def __init__(self):
+				pass
+
+
+		q = MyObject()
+
+		self._testCoerce({1.0: q}, DictLiteral(values=[
+			DictKeyValuePair(key=FloatLiteral(value='1.0'), value=EmbeddedObjectExpr(embeddedValue=DMNode.embed(q)))
 		]))
