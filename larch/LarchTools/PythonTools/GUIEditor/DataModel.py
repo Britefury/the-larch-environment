@@ -117,6 +117,10 @@ class Field (object):
 
 
 
+
+
+
+
 #
 # PRIMITIVE FIELDS
 #
@@ -125,7 +129,13 @@ class _PrimitiveFieldInstance (FieldInstance):
 	def __init__(self, field, object_instance, source_value):
 		super(_PrimitiveFieldInstance, self).__init__(field, object_instance, source_value)
 		value = source_value   if source_value is not None   else field._defaultValue
+
+		def on_change(old_value, new_value):
+			if self._field._change_listener is not None:
+				self._field._change_listener(self._object_instance, self, old_value, new_value)
+
 		self.__live = TrackedLiveValue(value)
+		self.__live.changeListener = on_change
 
 
 
@@ -168,6 +178,34 @@ class _PrimitiveField (Field):
 				raise TypeError, 'Default value is not an instance of \'{0}\''.format(self.__primitive_type__.__name__)
 		super(_PrimitiveField, self).__init__()
 		self._defaultValue = defaultValue
+		self._change_listener = None
+
+
+	def on_change(self, method):
+		self._change_listener = method
+		return method
+
+
+
+
+class ValueFieldInstance (_PrimitiveFieldInstance):
+	def __py_evalmodel__(self, codeGen):
+		raise NotImplementedError, 'Type coercion for converting values to code must be implemented first'
+
+
+class ValueField (Field):
+	__field_instance_class__ = ValueFieldInstance
+
+
+	def __init__(self, defaultValue=None):
+		super(ValueField, self).__init__()
+		self._change_listener = None
+		self._defaultValue = defaultValue
+
+
+	def on_change(self, method):
+		self._change_listener = method
+		return method
 
 
 
@@ -179,6 +217,26 @@ class IntFieldInstance (_PrimitiveFieldInstance):
 class IntField (_PrimitiveField):
 	__field_instance_class__ = IntFieldInstance
 	__primitive_type__ = int
+
+
+
+class FloatFieldInstance (_PrimitiveFieldInstance):
+	def __py_evalmodel__(self, codeGen):
+		return Py.FloatLiteral(value=repr(self.value))
+
+class FloatField (_PrimitiveField):
+	__field_instance_class__ = FloatFieldInstance
+	__primitive_type__ = float
+
+
+
+class StringFieldInstance (_PrimitiveFieldInstance):
+	def __py_evalmodel__(self, codeGen):
+		return Py.strToStrLiteral(self.value)
+
+class StringField (_PrimitiveField):
+	__field_instance_class__ = StringFieldInstance
+	__primitive_type__ = str
 
 
 
@@ -206,6 +264,10 @@ class ListFieldInstance (FieldInstance):
 	@property
 	def value(self):
 		return self.__live
+
+	@value.setter
+	def value(self, xs):
+		self.__live[:] = xs
 
 
 	def _addTrackableContentsTo(self, contents):
@@ -729,6 +791,14 @@ class TestCase_DataModel(unittest.TestCase):
 			x = IntField(0)
 			y = IntField(1)
 
+			@x.on_change
+			def x_changed(self, field, old_value, new_value):
+				self.x_history.append(old_value)
+
+			def __init__(self, **values):
+				self.x_history = []
+				super(PrimitiveFieldTest, self).__init__(**values)
+
 			def __py_evalmodel__(self, codeGen):
 				x = self.x.__py_evalmodel__(codeGen)
 				y = self.y.__py_evalmodel__(codeGen)
@@ -827,7 +897,7 @@ class TestCase_DataModel(unittest.TestCase):
 
 
 
-	def test_constructor(self):
+	def test_PrimitiveField_constructor(self):
 		a1 = self.PrimitiveFieldTest()
 
 		self.assertEqual(0, a1.x.value)
@@ -841,31 +911,27 @@ class TestCase_DataModel(unittest.TestCase):
 		self.assertRaises(TypeError, lambda: self.PrimitiveFieldTest(a=1, b=2))
 
 
-		b1 = self.ChildFieldTest()
-		a2 = self.PrimitiveFieldTest()
 
-		self.assertIs(None, b1.p.node)
-		self.assertEqual([], b1.q.nodes)
+	def test_PrimitiveField_change_listener(self):
+		a = self.PrimitiveFieldTest()
 
-		b2 = self.ChildFieldTest(p=a1, q=[a2])
+		self.assertEqual(0, a.x.value)
+		self.assertEqual(1, a.y.value)
+		self.assertEqual([], a.x_history)
 
-		self.assertIs(a1, b2.p.node)
-		self.assertEqual([a2], b2.q.nodes)
+		a.x.value = 10
+		a.y.value = 20
 
-		self.assertRaises(NodeAlreadyHasParentError, lambda: self.ChildFieldTest(p=a1, q=[a2]))
+		self.assertEqual(10, a.x.value)
+		self.assertEqual(20, a.y.value)
+		self.assertEqual([0], a.x_history)
 
+		a.x.value = 5
+		a.y.value = 6
 
-		c1 = self.EvalFieldTEst()
-
-		self.assertEqual(0.0, c1.x.constantValue)
-		self.assertEqual(1.0, c1.y.constantValue)
-
-		c2 = self.EvalFieldTEst(x=10.0, y=20.0)
-
-		self.assertEqual(10.0, c2.x.constantValue)
-		self.assertEqual(20.0, c2.y.constantValue)
-
-
+		self.assertEqual(5, a.x.value)
+		self.assertEqual(6, a.y.value)
+		self.assertEqual([0, 10], a.x_history)
 
 
 
@@ -942,7 +1008,8 @@ class TestCase_DataModel(unittest.TestCase):
 		self.assertEqual(range(5), a2.x.value)
 
 
-	def test_ListField_constructor(self):
+
+	def test_ListField_change_listener(self):
 		a1 = self.ListFieldTest()
 
 		self.assertEqual([], a1.x.value)
@@ -957,6 +1024,7 @@ class TestCase_DataModel(unittest.TestCase):
 
 		self.assertEqual([10, 20], a1.x.value)
 		self.assertEqual([[], [10]], a1.history)
+
 
 
 	def test_ListField_changeHistory(self):
@@ -989,6 +1057,7 @@ class TestCase_DataModel(unittest.TestCase):
 		self.assertEqual(0, self.ch.getNumUndoChanges())
 
 
+
 	def test_ListField_serialisation(self):
 		a = self.ListFieldTest(x=range(5))
 
@@ -999,6 +1068,7 @@ class TestCase_DataModel(unittest.TestCase):
 		self.assertEqual(range(5), a_io.x.value)
 
 
+
 	def test_ListField_editor(self):
 		a = self.ListFieldTest(x=[1,2])
 
@@ -1007,6 +1077,24 @@ class TestCase_DataModel(unittest.TestCase):
 		self.assertEqual([1, 2], a.x.getValueForEditor())
 
 		self.fail('Test imcomplete; need to implement type-coercion based converter to transform Python objects into AST nodes that construct their literal values')
+
+
+
+
+	def test_ChildField_constructor(self):
+		b1 = self.ChildFieldTest()
+		a1 = self.PrimitiveFieldTest()
+		a2 = self.PrimitiveFieldTest()
+
+		self.assertIs(None, b1.p.node)
+		self.assertEqual([], b1.q.nodes)
+
+		b2 = self.ChildFieldTest(p=a1, q=[a2])
+
+		self.assertIs(a1, b2.p.node)
+		self.assertEqual([a2], b2.q.nodes)
+
+		self.assertRaises(NodeAlreadyHasParentError, lambda: self.ChildFieldTest(p=a1, q=[a2]))
 
 
 
@@ -1027,7 +1115,6 @@ class TestCase_DataModel(unittest.TestCase):
 
 		self.assertIs(b, a1.parent)
 		self.assertIs(b, a2.parent)
-
 
 
 
@@ -1092,6 +1179,7 @@ class TestCase_DataModel(unittest.TestCase):
 		self.assertEqual(3, b_io.q.nodes[0].x.value)
 
 
+
 	def test_ChildField_editor(self):
 		a1 = self.PrimitiveFieldTest(x=10, y=20)
 		a2 = self.PrimitiveFieldTest(x=3, y=4)
@@ -1107,6 +1195,20 @@ class TestCase_DataModel(unittest.TestCase):
 			Py.ListLiteral(values=[Py.Call(target=Py.Load(name='A'), args=[Py.IntLiteral(format='decimal', numType='int', value='3'), Py.IntLiteral(format='decimal', numType='int', value='4')])])
 		]),  b.__py_evalmodel__(codeGen))
 
+
+
+
+
+	def test_EvalField_constructor(self):
+		c1 = self.EvalFieldTEst()
+
+		self.assertEqual(0.0, c1.x.constantValue)
+		self.assertEqual(1.0, c1.y.constantValue)
+
+		c2 = self.EvalFieldTEst(x=10.0, y=20.0)
+
+		self.assertEqual(10.0, c2.x.constantValue)
+		self.assertEqual(20.0, c2.y.constantValue)
 
 
 
@@ -1202,6 +1304,7 @@ class TestCase_DataModel(unittest.TestCase):
 		self.assertEqual(y_expr, c_io.y.expr)
 
 
+
 	def test_EvalField_editor(self):
 		c = self.EvalFieldTEst()
 
@@ -1248,6 +1351,7 @@ class TestCase_DataModel(unittest.TestCase):
 		d_io = pickle.loads(pickle.dumps(d))
 
 		self.assertEqual(x_expr, d_io.x.expr)
+
 
 
 	def test_ExprField_py_evalmodel(self):
