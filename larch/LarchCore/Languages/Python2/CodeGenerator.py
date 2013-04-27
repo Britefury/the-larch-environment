@@ -143,7 +143,7 @@ class Python2CodeGenerator (object):
 			if prec != -1  and  outerPrec != -1  and  prec > outerPrec:
 				s = '(' + s + ')'
 		return s
-		
+
 
 	
 	def _tupleElements(self, xs):
@@ -1261,6 +1261,42 @@ class TestCase_Python2CodeGenerator (unittest.TestCase):
 		self.assert_( result == expected )
 
 
+	def _testCoerce(self, value, expectedSrc):
+		gen = Python2CodeGenerator( '<test>' )
+		node = Schema.coerceToModel(value)
+		result = str( gen( node ) )
+
+		if result != expectedSrc:
+			print 'UNEXPECTED RESULT'
+			print 'INPUT:'
+			print value
+			print 'EXPECTED:'
+			print expectedSrc.replace( '\n', '\\n' ) + '<<'
+			print 'RESULT:'
+			print result.replace( '\n', '\\n' ) + '<<'
+
+		self.assert_( result == expectedSrc )
+
+
+
+	def _testCoerceEval(self, value, expectedEvalResult):
+		gen = Python2CodeGenerator( '<test>' )
+		node = Schema.coerceToModel(value)
+		src = str( gen( node ) )
+		result = eval(src)
+
+		if result != expectedEvalResult:
+			print 'UNEXPECTED RESULT'
+			print 'INPUT:'
+			print value
+			print 'EXPECTED:'
+			print expectedEvalResult.replace( '\n', '\\n' ) + '<<'
+			print 'RESULT:'
+			print result.replace( '\n', '\\n' ) + '<<'
+
+		self.assert_( result == expectedEvalResult )
+
+
 
 	def _binOpTest(self, sxOp, expectedOp):
 		self._testSX( '(py %s x=(py Load name=a) y=(py Load name=b))'  %  sxOp,  'a %s b'  %  expectedOp )
@@ -1641,6 +1677,26 @@ class TestCase_Python2CodeGenerator (unittest.TestCase):
 
 	def test_CommentStmt(self):
 		self._testSX( '(py CommentStmt comment=HelloWorld)', '#HelloWorld' )
-		
-		
-		
+
+
+
+	def test_value_coercion(self):
+		# Basic types
+		self._testCoerce(None, 'None')
+		self._testCoerce(False, 'False')
+		self._testCoerce(True, 'True')
+		self._testCoerce(0, '0')
+		self._testCoerce(0L, '0L')
+		self._testCoerce(0.0, '0.0')
+		self._testCoerce(1.0 + 2.0j, '1.0 + 2.0j')
+		self._testCoerce('a', "'a'")
+		self._testCoerce(u'a', "u'a'")
+
+		# Collections
+		self._testCoerceEval((1, 2, (3, 4)), (1, 2, (3, 4,),))
+		self._testCoerceEval([1, 2, (3, 4), [5, 6]], [1, 2, (3, 4,), [5, 6]])
+		self._testCoerceEval({1, 2, (3, 4)}, {1, 2, (3, 4,)})
+		self._testCoerceEval({1:2, 3:4, 5:(6, 7), (8, 9):10}, {1:2, 3:4, 5:(6, 7), (8,9):10})
+
+
+
