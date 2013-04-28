@@ -7,13 +7,16 @@
 ##-*************************
 from java.awt import Color
 
+from BritefuryJ.LSpace.Layout import HAlignment, VAlignment
+
 from BritefuryJ.Graphics import SolidBorder
 
 from BritefuryJ.Pres.Primitive import Blank
+from BritefuryJ.Pres.UI import Form
 
 from LarchCore.Languages.Python2 import Schema as Py
 
-from LarchTools.PythonTools.GUIEditor.DataModel import GUINode
+from LarchTools.PythonTools.GUIEditor.DataModel import GUINode, EnumEvalField
 from LarchTools.PythonTools.GUIEditor.Properties import GUICProp
 from LarchTools.PythonTools.GUIEditor.Target import GUITargetInteractor, GUIScrollInteractor
 from LarchTools.PythonTools.GUIEditor.ContextMenu import componentContextMenu
@@ -35,6 +38,10 @@ class GUIComponent (GUINode):
 	isRootGUIEditorComponent = False
 	componentName = '<abstract-Component>'
 
+
+	hAlignment = EnumEvalField()
+
+
 	def __init__(self, **values):
 		super(GUIComponent, self).__init__(**values)
 
@@ -52,7 +59,18 @@ class GUIComponent (GUINode):
 
 
 	def _editUI(self):
-		return Blank()
+		return self._editUIForm()
+
+	def _editUIForm(self):
+		sections = self._editUIFormSections()
+		if len(sections) > 0:
+			return Form(None, sections)
+		else:
+			return Blank()
+
+	def _editUIFormSections(self):
+
+		return []
 
 	def __present__(self, fragment, inheritedState):
 		p = self._presentContents(fragment, inheritedState)
