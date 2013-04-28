@@ -552,7 +552,7 @@ class GUIRichTextDocument (GUIComponent):
 		return False
 
 
-	def __py_evalmodel__(self, codeGen):
+	def __component_py_evalmodel__(self, codeGen):
 		return self._contents.value.__py_evalmodel__(codeGen)
 
 

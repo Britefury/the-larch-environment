@@ -44,7 +44,7 @@ class GUIEditorRootComponent (GUIUnaryBranchComponent):
 		return self.__guiEditor
 
 
-	def __py_evalmodel__(self, codeGen):
+	def __component_py_evalmodel__(self, codeGen):
 		child = self.child
 		if child is not None:
 			return child.__py_evalmodel__(codeGen)

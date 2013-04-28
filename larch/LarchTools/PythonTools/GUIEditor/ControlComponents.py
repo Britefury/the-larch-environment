@@ -33,11 +33,12 @@ class GUIButton (GUIUnaryBranchComponent):
 	def _editUIFormSections(self):
 		sections = []
 		sections.extend( unaryBranchChildEditUIFormSections(self) )
-		print 'GUIButton._editUIFormSections: sections={0}'.format(len(sections))
 		sections.append(Form.SmallSection('On click', None, exprBorder.surround( self.onClick.editUI() )))
-		return sections
 
-	def __py_evalmodel__(self, codeGen):
+		superSections = super(GUIButton, self)._editUIFormSections()
+		return sections + superSections
+
+	def __component_py_evalmodel__(self, codeGen):
 		onClick = self.onClick.__py_evalmodel__(codeGen)
 		button = codeGen.embeddedValue(Button)
 		child = self.child
