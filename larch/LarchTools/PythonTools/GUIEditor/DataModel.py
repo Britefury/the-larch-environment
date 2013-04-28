@@ -8,6 +8,7 @@
 import copy
 
 from java.awt import Color
+import java.lang.Enum
 
 from BritefuryJ.Graphics import SolidBorder
 
@@ -38,7 +39,7 @@ from LarchCore.Languages.Python2.CodeGenerator import Python2CodeGenerator
 #
 
 class FieldInstance (object):
-	def __init__(self, field, object_instance, source_value):
+	def __init__(self, field, object_instance, wrapped_source_value):
 		self._field = field
 		self._object_instance = object_instance
 
@@ -76,15 +77,12 @@ class Field (object):
 		self._attrName = intern('__gui_field_' + name)
 
 
-	def _instanceInit(self, object_instance, source_value):
+	def _instanceInit(self, object_instance, wrapped_source_value):
 		if self._name is None:
 			raise TypeError, 'Field not initialised'
 		if self.__field_instance_class__ is None:
 			raise NotImplementedError, 'Field class \'{0}\' is abstract; __field_instance_class__ not defined'.format(type(self).__name__)
-		if isinstance(source_value, self.__field_instance_class__):
-			fieldInstance = source_value
-		else:
-			fieldInstance = self.__field_instance_class__(self, object_instance, source_value)
+		fieldInstance = self.__field_instance_class__(self, object_instance, wrapped_source_value)
 		setattr(object_instance, self._attrName, fieldInstance)
 
 
@@ -96,6 +94,10 @@ class Field (object):
 
 	def _getFieldState(self, object_instance):
 		return self._getFieldInstance(object_instance).__field_getstate__()
+
+	def _convertValueFromState(self, object_instance, stateValue):
+		return stateValue
+
 
 
 
@@ -126,9 +128,9 @@ class Field (object):
 #
 
 class _PrimitiveFieldInstance (FieldInstance):
-	def __init__(self, field, object_instance, source_value):
-		super(_PrimitiveFieldInstance, self).__init__(field, object_instance, source_value)
-		value = source_value   if source_value is not None   else field._defaultValue
+	def __init__(self, field, object_instance, wrapped_source_value):
+		super(_PrimitiveFieldInstance, self).__init__(field, object_instance, wrapped_source_value)
+		value = wrapped_source_value[0]   if wrapped_source_value is not None   else field._defaultValue
 
 		def on_change(old_value, new_value):
 			if self._field._change_listener is not None:
@@ -243,21 +245,61 @@ class StringField (_PrimitiveField):
 
 
 
+class EnumFieldInstance (_PrimitiveFieldInstance):
+	def __field_getstate__(self):
+		return str(self.value)
+
+
+	def __py_evalmodel__(self, codeGen):
+		return codeGen.embeddedValue(self.value)
+
+
+class EnumField (Field):
+	__field_instance_class__ = EnumFieldInstance
+
+
+	def __init__(self, enumType, defaultValue):
+		if not issubclass(enumType, java.lang.Enum):
+			raise TypeError, 'enumType must be a sublcass of java.lang.Enum'
+		if defaultValue is None:
+			values = enumType.values()
+			defaultValue = values[0]   if len(values) > 0   else None
+		else:
+			if not isinstance(defaultValue, enumType):
+				raise TypeError, 'Default value is not an instance of \'{0}\''.format(enumType.__name__)
+		super(EnumField, self).__init__()
+		self._defaultValue = defaultValue
+		self.__enumType = enumType
+		self._change_listener = None
+
+
+	def on_change(self, method):
+		self._change_listener = method
+		return method
+
+
+	def _convertValueFromState(self, object_instance, stateValue):
+		return self.__enumType.valueOf(stateValue)
+
+
+
+
+
 
 class ListFieldInstance (FieldInstance):
-	def __init__(self, field, object_instance, source_value):
-		super(ListFieldInstance, self).__init__(field, object_instance, source_value)
+	def __init__(self, field, object_instance, wrapped_source_value):
+		super(ListFieldInstance, self).__init__(field, object_instance, wrapped_source_value)
 
 		def on_change(old_contents, new_contents):
 			if self._field._change_listener is not None:
 				self._field._change_listener(self._object_instance, self, old_contents, new_contents)
 
-		self.__live = LiveList(source_value)
+		self.__live = LiveList(wrapped_source_value[0]   if wrapped_source_value is not None   else None)
 
 		self.__live.changeListener = on_change
 
-		if source_value is not None:
-			on_change([], source_value)
+		if wrapped_source_value is not None:
+			on_change([], wrapped_source_value)
 
 
 
@@ -345,7 +387,8 @@ class GUIObject (object):
 
 		self.__change_history__ = None
 		for field in self._gui_fields__.values():
-			field._instanceInit(self, values.get(field._name))
+			value = (values[field._name],)   if field._name in values   else None
+			field._instanceInit(self, value)
 
 
 	def __getstate__(self):
@@ -356,7 +399,8 @@ class GUIObject (object):
 		self.__change_history__ = None
 		self._parent = None
 		for field in self._gui_fields__.values():
-			field._instanceInit(self, state.get(field._name))
+			value = (field._convertValueFromState(self, state[field._name]),)   if field._name in state   else None
+			field._instanceInit(self, value)
 
 
 	def __get_trackable_contents__(self):
@@ -399,8 +443,8 @@ class GUINode (GUIObject):
 #
 
 class ChildFieldInstance (FieldInstance):
-	def __init__(self, field, object_instance, source_value):
-		super(ChildFieldInstance, self).__init__(field, object_instance, source_value)
+	def __init__(self, field, object_instance, wrapped_source_value):
+		super(ChildFieldInstance, self).__init__(field, object_instance, wrapped_source_value)
 
 		def on_change(old_value, new_value):
 			if new_value is not old_value:
@@ -409,10 +453,11 @@ class ChildFieldInstance (FieldInstance):
 				if new_value is not None:
 					object_instance._registerChild(new_value)
 
+		source_value = wrapped_source_value[0]   if wrapped_source_value is not None   else None
 		self.__live = TrackedLiveValue(source_value)
 		self.__live.changeListener = on_change
 
-		if source_value is not None:
+		if wrapped_source_value is not None:
 			on_change(None, source_value)
 
 
@@ -455,8 +500,8 @@ class ChildField (Field):
 
 
 class ChildListFieldInstance (FieldInstance):
-	def __init__(self, field, object_instance, source_value):
-		super(ChildListFieldInstance, self).__init__(field, object_instance, source_value)
+	def __init__(self, field, object_instance, wrapped_source_value):
+		super(ChildListFieldInstance, self).__init__(field, object_instance, wrapped_source_value)
 
 		def on_change(old_contents, new_contents):
 			o = set(old_contents)
@@ -468,11 +513,12 @@ class ChildListFieldInstance (FieldInstance):
 			for n in added:
 				object_instance._registerChild(n)
 
+		source_value = wrapped_source_value[0]   if wrapped_source_value is not None   else None
 		self.__live = LiveList(source_value)
 
 		self.__live.changeListener = on_change
 
-		if source_value is not None:
+		if wrapped_source_value is not None:
 			on_change([], source_value)
 
 
@@ -517,16 +563,37 @@ class _EvalFieldState (object):
 		self.constantValue = constantValue
 		self.expr = expr
 
+
+
+	def __eq__(self, other):
+		if isinstance(other, _EvalFieldState):
+			return self.constantValue == other.constantValue  and  self.expr == other.expr
+		else:
+			return False
+
+	def __ne__(self, other):
+		if isinstance(other, _EvalFieldState):
+			return self.constantValue != other.constantValue  or  self.expr != other.expr
+		else:
+			return True
+
+
+	def __hash__(self):
+		return hash((self.constantValue, self.expr))
+
+
+
 class _EvalFieldInstance (FieldInstance):
 	"""
 	A field that contains a value, which can alternatively have an expression that generates the required value
 	"""
-	def __init__(self, field, object_instance, source_value):
-		super(_EvalFieldInstance, self).__init__(field, object_instance, source_value)
+	def __init__(self, field, object_instance, wrapped_source_value):
+		super(_EvalFieldInstance, self).__init__(field, object_instance, wrapped_source_value)
 
 		self.__change_history__ = None
 
-		if source_value is not None:
+		if wrapped_source_value is not None:
+			source_value = wrapped_source_value[0]
 			if isinstance(source_value, _EvalFieldState):
 				constantValue = source_value.constantValue
 				expr = source_value.expr
@@ -537,39 +604,39 @@ class _EvalFieldInstance (FieldInstance):
 			constantValue = field._defaultValue
 			expr = None
 
-		self.__live = TrackedLiveValue(constantValue)
-		self.__expr = expr
+		self._live = TrackedLiveValue(constantValue)
+		self._expr = expr
 		self.__incr = IncrementalValueMonitor()
 
 
 
 	def isConstant(self):
-		return self.__expr is None
+		return self._expr is None
 
 
 	@property
 	def constantValue(self):
-		return self.__live.getValue()
+		return self._live.getValue()
 
 	@constantValue.setter
 	def constantValue(self, x):
-		self.__live.setLiteralValue(x)
+		self._live.setLiteralValue(x)
 
 
 
 	@property
 	def constantValueLive(self):
-		return self.__live
+		return self._live
 
 
 	@property
 	def expr(self):
-		return self.__expr
+		return self._expr
 
 	@expr.setter
 	def expr(self, exp):
-		oldExpr = self.__expr
-		self.__expr = exp
+		oldExpr = self._expr
+		self._expr = exp
 
 		if self.__change_history__ is not None:
 			if oldExpr is not None:
@@ -591,18 +658,18 @@ class _EvalFieldInstance (FieldInstance):
 		contents.append(self)
 
 	def __field_getstate__(self):
-		return _EvalFieldState(self.__live.getValue(), self.__expr)
+		return _EvalFieldState(self._live.getValue(), self._expr)
 
 
 	def getValueForEditor(self):
-		return self.__live.getValue()
+		return self._live.getValue()
 
 	def __py_evalmodel__(self, codeGen):
 		self.__incr.onAccess()
-		if self.__expr is None:
-			return self.__fixedvalue_py_evalmodel__(self.__live.getValue(), codeGen)
+		if self._expr is None:
+			return self.__fixedvalue_py_evalmodel__(self._live.getValue(), codeGen)
 		else:
-			return self.__expr.model
+			return self._expr.model
 
 
 	def __fixedvalue_py_evalmodel__(self, value, codeGen):
@@ -610,18 +677,18 @@ class _EvalFieldInstance (FieldInstance):
 
 
 	def __get_trackable_contents__(self):
-		if self.__expr is not None:
-			return [self.__live, self.__expr]
+		if self._expr is not None:
+			return [self._live, self._expr]
 		else:
-			return [self.__live]
+			return [self._live]
 
 
 
 	def editUI(self):
 		self.__incr.onAccess()
-		valueControl = self._field.__edit_ui_make_control__(self.__live)
+		valueControl = self._field.__edit_ui_make_control__(self._live)
 
-		if self.__expr is None:
+		if self._expr is None:
 			def _onAdd(button, event):
 				self.expr = EmbeddedPython2Expr()
 
@@ -634,7 +701,7 @@ class _EvalFieldInstance (FieldInstance):
 
 			removeButton = Button(self._removeButtonContents, _onRemove)
 
-			return Column([valueControl, Row([removeButton, Spacer(10.0, 0.0), exprBorder.surround(self.__expr)])])
+			return Column([valueControl, Row([removeButton, Spacer(10.0, 0.0), exprBorder.surround(self._expr)])])
 
 
 	_addStyle = StyleSheet.style(Primitive.foreground(Color(0.0, 0.5, 0.0)), Primitive.fontBold(True), Primitive.fontSize(11))
@@ -714,16 +781,52 @@ class StringEvalField (_EvalField):
 
 
 
+class EnumEvalFieldInstance (_EvalFieldInstance):
+	def __field_getstate__(self):
+		return _EvalFieldState(str(self._live.getValue()), self._expr)
+
+	def __fixedvalue_py_evalmodel__(self, value, codeGen):
+		return codeGen.embeddedValue(value)
+
+
+class EnumEvalField (Field):
+	__field_instance_class__ = EnumEvalFieldInstance
+
+
+	def __init__(self, enumType, defaultValue, controlFactoryFn):
+		if not issubclass(enumType, java.lang.Enum):
+			raise TypeError, 'enumType must be a sublcass of java.lang.Enum'
+		if defaultValue is None:
+			values = enumType.values()
+			defaultValue = values[0]   if len(values) > 0   else None
+		else:
+			if not isinstance(defaultValue, enumType):
+				raise TypeError, 'Default value is not an instance of \'{0}\''.format(enumType.__name__)
+
+		super(EnumEvalField, self).__init__()
+		self._defaultValue = defaultValue
+		self.__enumType = enumType
+		self.__controlFactoryFn = controlFactoryFn
+
+
+	def __edit_ui_make_control__(self, live):
+		return self.__controlFactoryFn(live)
+
+
+
+
 
 class ExprFieldInstance (FieldInstance):
 	"""
 	A field that contains an expression that generates the required value
 	"""
-	def __init__(self, field, object_instance, source_value):
-		super(ExprFieldInstance, self).__init__(field, object_instance, source_value)
+	def __init__(self, field, object_instance, wrapped_source_value):
+		super(ExprFieldInstance, self).__init__(field, object_instance, wrapped_source_value)
 
-		if source_value is None:
+		if wrapped_source_value is None:
 			source_value = EmbeddedPython2Expr()
+		else:
+			source_value = wrapped_source_value[0]
 
 		self.__expr = source_value
 
@@ -784,6 +887,8 @@ import imp
 import pickle
 
 
+
+
 class TestCase_DataModel(unittest.TestCase):
 	@classmethod
 	def setUpClass(cls):
@@ -803,6 +908,13 @@ class TestCase_DataModel(unittest.TestCase):
 				x = self.x.__py_evalmodel__(codeGen)
 				y = self.y.__py_evalmodel__(codeGen)
 				return Py.Call(target=Py.Load(name='A'), args=[x, y])
+
+
+		from BritefuryJ.LSpace.Layout import HAlignment
+
+
+		class EnumFieldTest (GUIObject):
+			x = EnumField(HAlignment, HAlignment.PACK)
 
 
 		class ListFieldTest (GUIObject):
@@ -842,6 +954,10 @@ class TestCase_DataModel(unittest.TestCase):
 				y = self.y.__py_evalmodel__(codeGen)
 				return Py.Call(target=Py.Load(name='C'), args=[x, y])
 
+		class EnumEvalFieldTest (GUIObject):
+			x = EnumEvalField(HAlignment, HAlignment.PACK, lambda live: Label('x'))
+
+
 		class ExprFieldTest (GUIObject):
 			x = ExprField()
 
@@ -850,9 +966,11 @@ class TestCase_DataModel(unittest.TestCase):
 				return Py.Call(target=Py.Load(name='D'), args=[x])
 
 		cls.PrimitiveFieldTest = PrimitiveFieldTest
+		cls.EnumFieldTest = EnumFieldTest
 		cls.ListFieldTest = ListFieldTest
 		cls.ChildFieldTest = ChildFieldTest
-		cls.EvalFieldTEst = EvalFieldTest
+		cls.EvalFieldTest = EvalFieldTest
+		cls.EnumEvalFieldTest = EnumEvalFieldTest
 		cls.ExprFieldTest = ExprFieldTest
 
 		test_module = imp.new_module('GUIEditor_DataModel_Tests')
@@ -864,18 +982,22 @@ class TestCase_DataModel(unittest.TestCase):
 			x.__module__ = mod.__name__
 
 		moveClassToModule(test_module, PrimitiveFieldTest)
+		moveClassToModule(test_module, EnumFieldTest)
 		moveClassToModule(test_module, ListFieldTest)
 		moveClassToModule(test_module, ChildFieldTest)
 		moveClassToModule(test_module, EvalFieldTest)
+		moveClassToModule(test_module, EnumEvalFieldTest)
 		moveClassToModule(test_module, ExprFieldTest)
 
 
 	@classmethod
 	def tearDownClass(cls):
 		cls.PrimitiveFieldTest = None
+		cls.EnumFieldTest = None
 		cls.ListFieldTest = None
 		cls.ChildFieldTest = None
 		cls.EvalFieldTest = None
+		cls.EnumEvalFieldTest = None
 		cls.ExprFieldTest = None
 		del sys.modules[cls.mod.__name__]
 		cls.mod = None
@@ -996,6 +1118,22 @@ class TestCase_DataModel(unittest.TestCase):
 			Py.IntLiteral(format='decimal', numType='int', value='10'),
 			Py.IntLiteral(format='decimal', numType='int', value='20')
 		]), a.__py_evalmodel__(codeGen))
+
+
+
+
+	def test_EnumField_constructor(self):
+		from BritefuryJ.LSpace.Layout import HAlignment
+
+		a1 = self.EnumFieldTest()
+		a2 = self.EnumFieldTest(x=HAlignment.RIGHT)
+
+		self.assertEqual(HAlignment.PACK, a1.x.value)
+		self.assertEqual(HAlignment.RIGHT, a2.x.value)
+
+		self.assertEqual({'x': 'PACK'}, a1.__getstate__())
+		self.assertEqual({'x': 'RIGHT'}, a2.__getstate__())
+
 
 
 
@@ -1200,12 +1338,12 @@ class TestCase_DataModel(unittest.TestCase):
 
 
 	def test_EvalField_constructor(self):
-		c1 = self.EvalFieldTEst()
+		c1 = self.EvalFieldTest()
 
 		self.assertEqual(0.0, c1.x.constantValue)
 		self.assertEqual(1.0, c1.y.constantValue)
 
-		c2 = self.EvalFieldTEst(x=10.0, y=20.0)
+		c2 = self.EvalFieldTest(x=10.0, y=20.0)
 
 		self.assertEqual(10.0, c2.x.constantValue)
 		self.assertEqual(20.0, c2.y.constantValue)
@@ -1213,7 +1351,7 @@ class TestCase_DataModel(unittest.TestCase):
 
 
 	def test_EvalField_changeHistory(self):
-		c = self.EvalFieldTEst()
+		c = self.EvalFieldTest()
 
 		self.assertEqual(0, self.ch.getNumUndoChanges())
 		self.assertEqual(0, self.ch.getNumRedoChanges())
@@ -1287,7 +1425,7 @@ class TestCase_DataModel(unittest.TestCase):
 
 
 	def test_EvalField_serialisation(self):
-		c = self.EvalFieldTEst()
+		c = self.EvalFieldTest()
 
 		c.x.constantValue = 10.0
 		c.y.constantValue = 20.0
@@ -1306,7 +1444,7 @@ class TestCase_DataModel(unittest.TestCase):
 
 
 	def test_EvalField_editor(self):
-		c = self.EvalFieldTEst()
+		c = self.EvalFieldTest()
 
 		codeGen = Python2CodeGenerator('test')
 
@@ -1328,6 +1466,20 @@ class TestCase_DataModel(unittest.TestCase):
 
 		self.assertEqual(Py.Call(target=Py.Load(name='C'), args=[x_expr.model, y_expr.model]), c.__py_evalmodel__(codeGen))
 
+
+
+
+	def test_EnumEvalField_constructor(self):
+		from BritefuryJ.LSpace.Layout import HAlignment
+
+		c1 = self.EnumEvalFieldTest()
+		c2 = self.EnumEvalFieldTest(x=HAlignment.RIGHT)
+
+		self.assertEqual(HAlignment.PACK, c1.x.constantValue)
+		self.assertEqual(HAlignment.RIGHT, c2.x.constantValue)
+
+		self.assertEqual({'x': _EvalFieldState('PACK', None)}, c1.__getstate__())
+		self.assertEqual({'x': _EvalFieldState('RIGHT', None)}, c2.__getstate__())
 
 
 
