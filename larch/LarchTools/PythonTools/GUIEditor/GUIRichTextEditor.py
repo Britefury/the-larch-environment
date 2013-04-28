@@ -36,7 +36,7 @@ from BritefuryJ.Editor.RichText import RichTextController
 
 from LarchCore.Languages.Python2 import Schema as Py
 
-from LarchTools.PythonTools.GUIEditor.DataModel import GUIObject, ValueField, ListField, StringField, ChildListField
+from LarchTools.PythonTools.GUIEditor.DataModel import GUIObject, ValueField, ListField, TypedField, ChildListField
 from LarchTools.PythonTools.GUIEditor.Component import GUIComponent
 from LarchTools.PythonTools.GUIEditor.ComponentPalette import paletteItem, registerPaletteSubsection, PaletteComponentDrag
 
@@ -190,7 +190,7 @@ class AbstractText (RTElem):
 
 
 class Para (AbstractText):
-	_style = StringField('normal')
+	_style = TypedField(str, 'normal')
 
 
 	@_style.on_change
@@ -233,7 +233,7 @@ class Para (AbstractText):
 
 
 class _TempBlankPara (RTElem):
-	_style = StringField('normal')
+	_style = TypedField(str, 'normal')
 
 
 

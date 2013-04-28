@@ -22,7 +22,7 @@ from LarchCore.Languages.Python2 import Schema as Py
 
 from LarchTools.PythonTools.GUIEditor.ComponentPalette import paletteItem, registerPaletteSubsection
 
-from LarchTools.PythonTools.GUIEditor.DataModel import IntEvalField, FloatEvalField, StringEvalField
+from LarchTools.PythonTools.GUIEditor.DataModel import TypedEvalField
 from LarchTools.PythonTools.GUIEditor.LeafComponent import GUILeafComponent
 from LarchTools.PythonTools.GUIEditor.BranchComponent import GUIBranchComponent, GUISequenceComponent
 
@@ -31,7 +31,7 @@ from LarchTools.PythonTools.GUIEditor.BranchComponent import GUIBranchComponent,
 class GUILabel (GUILeafComponent):
 	componentName = 'Label'
 
-	text = StringEvalField('Label', lambda live: TextEntry.textEntryCommitOnChange(live))
+	text = TypedEvalField(str, 'Label', lambda live: TextEntry.textEntryCommitOnChange(live))
 
 	def _presentLeafContents(self, fragment, inheritedState):
 		return Label(self.text.getValueForEditor())
@@ -52,7 +52,7 @@ _labelItem = paletteItem(Label('Label'), lambda: GUILabel(text='Label'))
 class GUIStaticText (GUILeafComponent):
 	componentName = 'Static text'
 
-	text = StringEvalField('Label', lambda live: TextEntry.textEntryCommitOnChange(live))
+	text = TypedEvalField(str, 'Label', lambda live: TextEntry.textEntryCommitOnChange(live))
 
 	def _presentLeafContents(self, fragment, inheritedState):
 		return StaticText(self.text.getValueForEditor())
@@ -73,7 +73,7 @@ _staticTextItem = paletteItem(Label('Static text'), lambda: GUIStaticText(text='
 class GUIText (GUILeafComponent):
 	componentName = 'Text'
 
-	text = StringEvalField('Label', lambda live: TextEntry.textEntryCommitOnChange(live))
+	text = TypedEvalField(str, 'Label', lambda live: TextEntry.textEntryCommitOnChange(live))
 
 	def _presentLeafContents(self, fragment, inheritedState):
 		return Text(self.text.getValueForEditor())
@@ -94,8 +94,8 @@ _textItem = paletteItem(Label('Text'), lambda: GUIText('Text'))
 class GUISpacer (GUILeafComponent):
 	componentName = 'Spacer'
 
-	width = FloatEvalField(10.0, lambda live: RealSpinEntry(live, 0.0, 1048576.0, 1.0, 10.0))
-	height = FloatEvalField(10.0, lambda live: RealSpinEntry(live, 0.0, 1048576.0, 1.0, 10.0))
+	width = TypedEvalField(float, 10.0, lambda live: RealSpinEntry(live, 0.0, 1048576.0, 1.0, 10.0))
+	height = TypedEvalField(float, 10.0, lambda live: RealSpinEntry(live, 0.0, 1048576.0, 1.0, 10.0))
 
 	def _presentLeafContents(self, fragment, inheritedState):
 		return Spacer(self.width.getValueForEditor(), self.height.getValueForEditor())
@@ -118,7 +118,7 @@ _spacerItem = paletteItem(Label('Spacer'), lambda: GUISpacer(width=10.0, height=
 class GUIArrow (GUILeafComponent):
 	componentName = 'Arrow'
 
-	size = FloatEvalField(12.0, lambda live: RealSpinEntry(live, 0.0, 1048576.0, 1.0, 10.0))
+	size = TypedEvalField(float, 12.0, lambda live: RealSpinEntry(live, 0.0, 1048576.0, 1.0, 10.0))
 
 	_arrowDirections = [Arrow.Direction.LEFT, Arrow.Direction.RIGHT, Arrow.Direction.UP, Arrow.Direction.DOWN]
 	_directionToIndex = {d:i   for i, d in enumerate(_arrowDirections)}
