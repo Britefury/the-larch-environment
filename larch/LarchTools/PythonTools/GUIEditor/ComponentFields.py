@@ -31,7 +31,7 @@ exprBorder = SolidBorder( 1.0, 2.0, 5.0, 5.0, Color( 0.0, 0.25, 0.75 ), None )
 
 
 def unaryBranchChildEditUIFormSections(branch):
-	child = branch.child
+	child = branch.child.node
 	if child is not None:
 		if isinstance(child, GUIEditor.PrimitiveComponents.GUILabel):
 			textField = child.text

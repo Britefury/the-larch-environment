@@ -36,9 +36,9 @@ class GUILabel (GUILeafComponent):
 	def _presentLeafContents(self, fragment, inheritedState):
 		return Label(self.text.getValueForEditor())
 
-	def _editUI(self):
+	def _editUIFormSections(self):
 		text = Form.SmallSection('Text', None, self.text.editUI())
-		return Form(None, [text])
+		return [text]
 
 	def __py_evalmodel__(self, codeGen):
 		label = codeGen.embeddedValue(Label)
@@ -57,9 +57,9 @@ class GUIStaticText (GUILeafComponent):
 	def _presentLeafContents(self, fragment, inheritedState):
 		return StaticText(self.text.getValueForEditor())
 
-	def _editUI(self):
+	def _editUIFormSections(self):
 		text = Form.SmallSection('Text', None, self.text.editUI())
-		return Form(None, [text])
+		return [text]
 
 	def __py_evalmodel__(self, codeGen):
 		staticText = codeGen.embeddedValue(StaticText)
@@ -78,9 +78,9 @@ class GUIText (GUILeafComponent):
 	def _presentLeafContents(self, fragment, inheritedState):
 		return Text(self.text.getValueForEditor())
 
-	def _editUI(self):
+	def _editUIFormSections(self):
 		text = Form.SmallSection('Text', None, self.text.editUI())
-		return Form(None, [text])
+		return [text]
 
 	def __py_evalmodel__(self, codeGen):
 		textPresClass = codeGen.embeddedValue(Text)
@@ -100,10 +100,10 @@ class GUISpacer (GUILeafComponent):
 	def _presentLeafContents(self, fragment, inheritedState):
 		return Spacer(self.width.getValueForEditor(), self.height.getValueForEditor())
 
-	def _editUI(self):
+	def _editUIFormSections(self):
 		width = Form.SmallSection('Width', None, self.width.editUI())
 		height = Form.SmallSection('Height', None, self.height.editUI())
-		return Form(None, [width, height])
+		return [width, height]
 
 	def __py_evalmodel__(self, codeGen):
 		spacer = codeGen.embeddedValue(Spacer)
@@ -134,12 +134,12 @@ class GUIArrow (GUILeafComponent):
 	_offStyle = StyleSheet.style(Primitive.shapePainter(FillPainter(Color(0.4, 0.4, 0.4))))
 	_onStyle = StyleSheet.style(Primitive.shapePainter(FillPainter(Color(0.2, 0.2, 0.2))))
 
-	def _editUI(self):
+	def _editUIFormSections(self):
 		offOptions = [self._offStyle(Arrow(dir, 14.0).alignVCentre())   for dir in self._arrowDirections]
 		onOptions = [self._onStyle(Arrow(dir, 14.0).alignVCentre())   for dir in self._arrowDirections]
 		direction = Form.SmallSection('Direction', None, SwitchButton(offOptions, onOptions, SwitchButton.Orientation.HORIZONTAL, self._directionIndex))
 		size = Form.SmallSection('Size', None, self.size.editUI())
-		return Form(None, [direction, size])
+		return [direction, size]
 
 	def __py_evalmodel__(self, codeGen):
 		arrow = codeGen.embeddedValue(Arrow)

@@ -44,9 +44,9 @@ class GUIEval (GUILeafComponent):
 	def _presentLeafContents(self, fragment, inheritedState):
 		return _evalLabel
 
-	def _editUI(self):
+	def _editUIFormSections(self):
 		expr = Form.SmallSection('Expression', None, self.expr.editUI())
-		return Form(None, [expr])
+		return [expr]
 
 	def __py_evalmodel__(self, codeGen):
 		return self.expr.expr.model
