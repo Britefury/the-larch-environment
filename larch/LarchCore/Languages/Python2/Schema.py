@@ -337,7 +337,7 @@ def getEmbeddedObjectModelType(value):
 #
 #
 
-def coerceToModel(x, coerceObj=None):
+def coerceToModel(x, coerceObj=EmbeddedObjectExpr):
 	# Primitive values
 	t = type(x)
 	handler = _primitiveToMethodTypeMap.get(t)
@@ -348,7 +348,7 @@ def coerceToModel(x, coerceObj=None):
 	if coerceObj is None:
 		raise TypeError, 'Cannot coerce objects with an object coercion function or embedded object schema class'
 	elif coerceObj is EmbeddedObjectExpr  or  coerceObj is EmbeddedObjectLiteral  or  coerceObj is EmbeddedObjectStmt:
-		return coerceObj(embeddedValue=DMNode.embed(x))
+		return coerceObj(embeddedValue=DMNode.embedIsolated(x))
 	else:
 		return coerceObj(x)
 

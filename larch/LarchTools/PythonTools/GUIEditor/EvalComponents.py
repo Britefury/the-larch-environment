@@ -46,9 +46,10 @@ class GUIEval (GUILeafComponent):
 
 	def _editUIFormSections(self):
 		expr = Form.SmallSection('Expression', None, self.expr.editUI())
-		return [expr]
+		superSections = super(GUIEval, self)._editUIFormSections()
+		return [expr] + superSections
 
-	def __py_evalmodel__(self, codeGen):
+	def __component_py_evalmodel__(self, codeGen):
 		return self.expr.expr.model
 
 _evalItem = paletteItem(_evalItemStyleF(Label('Eval')), lambda: GUIEval())
@@ -62,7 +63,7 @@ class GUILiveEval (GUIEval):
 	def _presentLeafContents(self, fragment, inheritedState):
 		return _liveEvalLabel
 
-	def __py_evalmodel__(self, codeGen):
+	def __component_py_evalmodel__(self, codeGen):
 		liveFun = codeGen.embeddedValue(LiveFunction)
 		lmb = Py.LambdaExpr(params=[], expr=self.expr.expr.model)
 		live = Py.Call(target=liveFun, args=[lmb])

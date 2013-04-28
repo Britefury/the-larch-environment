@@ -38,9 +38,10 @@ class GUILabel (GUILeafComponent):
 
 	def _editUIFormSections(self):
 		text = Form.SmallSection('Text', None, self.text.editUI())
-		return [text]
+		superSections = super(GUILabel, self)._editUIFormSections()
+		return [text] + superSections
 
-	def __py_evalmodel__(self, codeGen):
+	def __component_py_evalmodel__(self, codeGen):
 		label = codeGen.embeddedValue(Label)
 		return Py.Call( target=label, args=[ self.text.__py_evalmodel__(codeGen) ] )
 
@@ -59,9 +60,10 @@ class GUIStaticText (GUILeafComponent):
 
 	def _editUIFormSections(self):
 		text = Form.SmallSection('Text', None, self.text.editUI())
-		return [text]
+		superSections = super(GUIStaticText, self)._editUIFormSections()
+		return [text] + superSections
 
-	def __py_evalmodel__(self, codeGen):
+	def __component_py_evalmodel__(self, codeGen):
 		staticText = codeGen.embeddedValue(StaticText)
 		return Py.Call( target=staticText, args=[ self.text.__py_evalmodel__(codeGen) ] )
 
@@ -80,9 +82,10 @@ class GUIText (GUILeafComponent):
 
 	def _editUIFormSections(self):
 		text = Form.SmallSection('Text', None, self.text.editUI())
-		return [text]
+		superSections = super(GUIText, self)._editUIFormSections()
+		return [text] + superSections
 
-	def __py_evalmodel__(self, codeGen):
+	def __component_py_evalmodel__(self, codeGen):
 		textPresClass = codeGen.embeddedValue(Text)
 		return Py.Call( target=textPresClass, args=[ self.text.__py_evalmodel__(codeGen) ] )
 
@@ -103,9 +106,10 @@ class GUISpacer (GUILeafComponent):
 	def _editUIFormSections(self):
 		width = Form.SmallSection('Width', None, self.width.editUI())
 		height = Form.SmallSection('Height', None, self.height.editUI())
-		return [width, height]
+		superSections = super(GUISpacer, self)._editUIFormSections()
+		return [width, height] + superSections
 
-	def __py_evalmodel__(self, codeGen):
+	def __component_py_evalmodel__(self, codeGen):
 		spacer = codeGen.embeddedValue(Spacer)
 		return Py.Call( target=spacer, args=[ self.width.__py_evalmodel__(codeGen),
 						      self.height.__py_evalmodel__(codeGen) ] )
@@ -139,9 +143,10 @@ class GUIArrow (GUILeafComponent):
 		onOptions = [self._onStyle(Arrow(dir, 14.0).alignVCentre())   for dir in self._arrowDirections]
 		direction = Form.SmallSection('Direction', None, SwitchButton(offOptions, onOptions, SwitchButton.Orientation.HORIZONTAL, self._directionIndex))
 		size = Form.SmallSection('Size', None, self.size.editUI())
-		return [direction, size]
+		superSections = super(GUIArrow, self)._editUIFormSections()
+		return [direction, size] + superSections
 
-	def __py_evalmodel__(self, codeGen):
+	def __component_py_evalmodel__(self, codeGen):
 		arrow = codeGen.embeddedValue(Arrow)
 		direction = codeGen.embeddedValue(self._arrowDirections[self._directionIndex.getValue()])
 		size = self.size.__py_evalmodel__(codeGen)
@@ -158,7 +163,7 @@ class GUIRow (GUISequenceComponent):
 	def _presentSequenceContents(self, contents, fragment, inheritedState):
 		return Row(contents)
 
-	def __py_evalmodel__(self, codeGen):
+	def __component_py_evalmodel__(self, codeGen):
 		row = codeGen.embeddedValue(Row)
 		return Py.Call( target=row, args=[ self._py_evalmodel_forChildren( codeGen ) ] )
 
@@ -173,7 +178,7 @@ class GUIColumn (GUISequenceComponent):
 	def _presentSequenceContents(self, contents, fragment, inheritedState):
 		return Column(contents)
 
-	def __py_evalmodel__(self, codeGen):
+	def __component_py_evalmodel__(self, codeGen):
 		column = codeGen.embeddedValue(Column)
 		return Py.Call( target=column, args=[ self._py_evalmodel_forChildren( codeGen ) ] )
 
@@ -188,7 +193,7 @@ class GUIParagraph (GUISequenceComponent):
 	def _presentSequenceContents(self, contents, fragment, inheritedState):
 		return Paragraph(contents)
 
-	def __py_evalmodel__(self, codeGen):
+	def __component_py_evalmodel__(self, codeGen):
 		paragraph = codeGen.embeddedValue(Paragraph)
 		return Py.Call( target=paragraph, args=[ self._py_evalmodel_forChildren( codeGen ) ] )
 
@@ -209,7 +214,7 @@ class GUIFlowGrid (GUISequenceComponent):
 	def _presentSequenceContents(self, contents, fragment, inheritedState):
 		return FlowGrid(contents)
 
-	def __py_evalmodel__(self, codeGen):
+	def __component_py_evalmodel__(self, codeGen):
 		flowGrid = codeGen.embeddedValue(FlowGrid)
 		targetNumColumns = self._targetNumColumns.getValue()
 		args = []
@@ -228,7 +233,7 @@ class GUIRGrid (GUISequenceComponent):
 	def _presentSequenceContents(self, contents, fragment, inheritedState):
 		return RGrid(contents)
 
-	def __py_evalmodel__(self, codeGen):
+	def __component_py_evalmodel__(self, codeGen):
 		rGrid = codeGen.embeddedValue(RGrid)
 		return Py.Call( target=rGrid, args=[ self._py_evalmodel_forChildren( codeGen ) ] )
 
@@ -244,7 +249,7 @@ class GUIGridRow (GUISequenceComponent):
 	def _presentSequenceContents(self, contents, fragment, inheritedState):
 		return GridRow(contents)
 
-	def __py_evalmodel__(self, codeGen):
+	def __component_py_evalmodel__(self, codeGen):
 		gridRow = codeGen.embeddedValue(GridRow)
 		return Py.Call( target=gridRow, args=[ self._py_evalmodel_forChildren( codeGen ) ] )
 

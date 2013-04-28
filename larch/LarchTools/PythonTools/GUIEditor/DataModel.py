@@ -700,14 +700,14 @@ class EvalFieldInstance (FieldInstance):
 			def _onAdd(button, event):
 				self.expr = EmbeddedPython2Expr()
 
-			addButton = Button(self._addButtonContents, _onAdd)
+			addButton = Button(self._addButtonContents, _onAdd).alignHPack()
 
 			return Row([valueControl, Spacer(10.0, 0.0), addButton])
 		else:
 			def _onRemove(button, event):
 				self.expr = None
 
-			removeButton = Button(self._removeButtonContents, _onRemove)
+			removeButton = Button(self._removeButtonContents, _onRemove).alignHPack()
 
 			return Column([valueControl, Row([removeButton, Spacer(10.0, 0.0), exprBorder.surround(self._expr)])])
 

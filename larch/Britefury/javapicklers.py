@@ -8,6 +8,7 @@
 """
 Monkeypatch pickelrs for various Java objects.
 """
+from java.lang import Enum
 from java.awt import Color
 
 
@@ -33,6 +34,12 @@ def _install_immutable_getstate_and_factory(cls, getstate, factory):
 
 
 
+def _Enum__getstate__(self):
+	return (type(self), str(self))
+
+def _Enum_factory(enumClass, asString):
+	return enumClass.valueOf(asString)
+
 def _Color__getstate__(self):
 	return self.red, self.green, self.blue
 
@@ -42,3 +49,4 @@ def _Color_factory(r, g, b):
 
 def install_java_picklers():
 	_install_immutable_getstate_and_factory( Color, _Color__getstate__, _Color_factory )
+	_install_immutable_getstate_and_factory( Enum, _Enum__getstate__, _Enum_factory )
