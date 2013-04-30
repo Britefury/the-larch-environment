@@ -692,9 +692,9 @@ class EvalFieldInstance (FieldInstance):
 
 
 
-	def editUI(self):
+	def editUI(self, controlFactoryFn):
 		self.__incr.onAccess()
-		valueControl = self._field.__edit_ui_make_control__(self._live)
+		valueControl = controlFactoryFn(self._live)
 
 		if self._expr is None:
 			def _onAdd(button, event):
@@ -734,15 +734,10 @@ class TypedEvalField (Field):
 	__primitive_type__ = None
 
 
-	def __init__(self, valueType, defaultValue, controlFactoryFn):
+	def __init__(self, valueType, defaultValue):
 		_checkValueType(defaultValue, valueType, 'default value')
 		super(TypedEvalField, self).__init__()
 		self._defaultValue = defaultValue
-		self.__controlFactoryFn = controlFactoryFn
-
-
-	def __edit_ui_make_control__(self, live):
-		return self.__controlFactoryFn(live)
 
 
 
@@ -763,7 +758,7 @@ class EnumEvalField (Field):
 	__field_instance_class__ = EnumEvalFieldInstance
 
 
-	def __init__(self, enumType, defaultValue, controlFactoryFn):
+	def __init__(self, enumType, defaultValue):
 		if not issubclass(enumType, java.lang.Enum):
 			raise TypeError, 'enumType must be a sublcass of java.lang.Enum'
 		if defaultValue is None:
@@ -776,11 +771,6 @@ class EnumEvalField (Field):
 		super(EnumEvalField, self).__init__()
 		self._defaultValue = defaultValue
 		self.__enumType = enumType
-		self.__controlFactoryFn = controlFactoryFn
-
-
-	def __edit_ui_make_control__(self, live):
-		return self.__controlFactoryFn(live)
 
 
 
@@ -917,8 +907,8 @@ class TestCase_DataModel(unittest.TestCase):
 				return Py.Call(target=Py.Load(name='B'), args=[p, q])
 
 		class EvalFieldTest (GUIObject):
-			x = TypedEvalField(float, 0.0, lambda live: Label('x'))
-			y = TypedEvalField(float, 1.0, lambda live: Label('y'))
+			x = TypedEvalField(float, 0.0)
+			y = TypedEvalField(float, 1.0)
 
 			def __py_evalmodel__(self, codeGen):
 				x = self.x.__py_evalmodel__(codeGen)
@@ -926,7 +916,7 @@ class TestCase_DataModel(unittest.TestCase):
 				return Py.Call(target=Py.Load(name='C'), args=[x, y])
 
 		class EnumEvalFieldTest (GUIObject):
-			x = EnumEvalField(HAlignment, HAlignment.PACK, lambda live: Label('x'))
+			x = EnumEvalField(HAlignment, HAlignment.PACK)
 
 
 		class ExprFieldTest (GUIObject):

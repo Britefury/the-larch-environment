@@ -6,7 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
 """
-Monkeypatch pickelrs for various Java objects.
+Monkeypatch picklers for various Java objects.
 """
 from java.lang import Enum
 from java.awt import Color

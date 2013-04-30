@@ -31,13 +31,13 @@ from LarchTools.PythonTools.GUIEditor.BranchComponent import GUIBranchComponent,
 class GUILabel (GUILeafComponent):
 	componentName = 'Label'
 
-	text = TypedEvalField(str, 'Label', lambda live: TextEntry.textEntryCommitOnChange(live))
+	text = TypedEvalField(str, 'Label')
 
 	def _presentLeafContents(self, fragment, inheritedState):
 		return Label(self.text.getValueForEditor())
 
 	def _editUIFormSections(self):
-		text = Form.SmallSection('Text', None, self.text.editUI())
+		text = Form.SmallSection('Text', None, self.text.editUI(lambda live: TextEntry.textEntryCommitOnChange(live)))
 		superSections = super(GUILabel, self)._editUIFormSections()
 		return [text] + superSections
 
@@ -53,13 +53,13 @@ _labelItem = paletteItem(Label('Label'), lambda: GUILabel(text='Label'))
 class GUIStaticText (GUILeafComponent):
 	componentName = 'Static text'
 
-	text = TypedEvalField(str, 'Label', lambda live: TextEntry.textEntryCommitOnChange(live))
+	text = TypedEvalField(str, 'Label')
 
 	def _presentLeafContents(self, fragment, inheritedState):
 		return StaticText(self.text.getValueForEditor())
 
 	def _editUIFormSections(self):
-		text = Form.SmallSection('Text', None, self.text.editUI())
+		text = Form.SmallSection('Text', None, self.text.editUI(lambda live: TextEntry.textEntryCommitOnChange(live)))
 		superSections = super(GUIStaticText, self)._editUIFormSections()
 		return [text] + superSections
 
@@ -75,13 +75,13 @@ _staticTextItem = paletteItem(Label('Static text'), lambda: GUIStaticText(text='
 class GUIText (GUILeafComponent):
 	componentName = 'Text'
 
-	text = TypedEvalField(str, 'Label', lambda live: TextEntry.textEntryCommitOnChange(live))
+	text = TypedEvalField(str, 'Label')
 
 	def _presentLeafContents(self, fragment, inheritedState):
 		return Text(self.text.getValueForEditor())
 
 	def _editUIFormSections(self):
-		text = Form.SmallSection('Text', None, self.text.editUI())
+		text = Form.SmallSection('Text', None, self.text.editUI(lambda live: TextEntry.textEntryCommitOnChange(live)))
 		superSections = super(GUIText, self)._editUIFormSections()
 		return [text] + superSections
 
@@ -97,15 +97,15 @@ _textItem = paletteItem(Label('Text'), lambda: GUIText('Text'))
 class GUISpacer (GUILeafComponent):
 	componentName = 'Spacer'
 
-	width = TypedEvalField(float, 10.0, lambda live: RealSpinEntry(live, 0.0, 1048576.0, 1.0, 10.0))
-	height = TypedEvalField(float, 10.0, lambda live: RealSpinEntry(live, 0.0, 1048576.0, 1.0, 10.0))
+	width = TypedEvalField(float, 10.0)
+	height = TypedEvalField(float, 10.0)
 
 	def _presentLeafContents(self, fragment, inheritedState):
 		return Spacer(self.width.getValueForEditor(), self.height.getValueForEditor())
 
 	def _editUIFormSections(self):
-		width = Form.SmallSection('Width', None, self.width.editUI())
-		height = Form.SmallSection('Height', None, self.height.editUI())
+		width = Form.SmallSection('Width', None, self.width.editUI(lambda live: RealSpinEntry(live, 0.0, 1048576.0, 1.0, 10.0)))
+		height = Form.SmallSection('Height', None, self.height.editUI(lambda live: RealSpinEntry(live, 0.0, 1048576.0, 1.0, 10.0)))
 		superSections = super(GUISpacer, self)._editUIFormSections()
 		return [width, height] + superSections
 
@@ -122,7 +122,7 @@ _spacerItem = paletteItem(Label('Spacer'), lambda: GUISpacer(width=10.0, height=
 class GUIArrow (GUILeafComponent):
 	componentName = 'Arrow'
 
-	size = TypedEvalField(float, 12.0, lambda live: RealSpinEntry(live, 0.0, 1048576.0, 1.0, 10.0))
+	size = TypedEvalField(float, 12.0)
 
 	_arrowDirections = [Arrow.Direction.LEFT, Arrow.Direction.RIGHT, Arrow.Direction.UP, Arrow.Direction.DOWN]
 	_directionToIndex = {d:i   for i, d in enumerate(_arrowDirections)}
@@ -142,7 +142,7 @@ class GUIArrow (GUILeafComponent):
 		offOptions = [self._offStyle(Arrow(dir, 14.0).alignVCentre())   for dir in self._arrowDirections]
 		onOptions = [self._onStyle(Arrow(dir, 14.0).alignVCentre())   for dir in self._arrowDirections]
 		direction = Form.SmallSection('Direction', None, SwitchButton(offOptions, onOptions, SwitchButton.Orientation.HORIZONTAL, self._directionIndex))
-		size = Form.SmallSection('Size', None, self.size.editUI())
+		size = Form.SmallSection('Size', None, self.size.editUI(lambda live: RealSpinEntry(live, 0.0, 1048576.0, 1.0, 10.0)))
 		superSections = super(GUIArrow, self)._editUIFormSections()
 		return [direction, size] + superSections
 
