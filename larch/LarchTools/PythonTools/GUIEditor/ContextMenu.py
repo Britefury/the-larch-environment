@@ -12,16 +12,15 @@ from BritefuryJ.LSpace.Interactor import HoverElementInteractor, ClickElementInt
 
 from BritefuryJ.Graphics import SolidBorder, FilledOutlinePainter
 
-from BritefuryJ.Live import LiveValue, LiveFunction
-
-from BritefuryJ.Pres.Primitive import Primitive, Label, Row, Column, Paragraph, FlowGrid, Blank, Proxy
-from BritefuryJ.Pres.UI import Section, SectionHeading1, SectionHeading2, SectionHeading3, ControlsRow
+from BritefuryJ.Pres.Primitive import Label, FlowGrid
+from BritefuryJ.Pres.UI import Section, SectionHeading3, ControlsRow
 
 from BritefuryJ.Controls import Button
 
 from LarchTools.PythonTools.GUIEditor.Properties import GUICProp, GUIEdProp
 from LarchTools.PythonTools.GUIEditor.SidePanel import showSidePanel, hideSidePanel
 from LarchTools.PythonTools.GUIEditor.Target import GUIEditorTarget, GUITargetListener
+from LarchTools.PythonTools.GUIEditor.CurrentComponentEditor import currentComponentEditor
 
 
 componentHighlighter = ElementHighlighter(FilledOutlinePainter(Color(0.0, 0.8, 0.0, 0.125), Color(0.0, 0.8, 0.0, 0.25), BasicStroke(1.0)))
@@ -66,13 +65,13 @@ def _presentComponentsUnderPointer(elementUnderPointer, guiEditorRootElement):
 
 
 
-def _addPanelButtons(menu):
+def _addPanelButtons(sourceElement, menu):
 	# Side panel
 	def _onShow(button, event):
-		showSidePanel(button.element)
+		showSidePanel(sourceElement.rootElement)
 
 	def _onHide(button, event):
-		hideSidePanel(button.element)
+		hideSidePanel(sourceElement.rootElement)
 
 	panelButtons = ControlsRow([Button.buttonWithLabel('Show', _onShow), Button.buttonWithLabel('Hide', _onHide)])
 	panelSection = Section(SectionHeading3('Side panel'), panelButtons)
@@ -83,40 +82,16 @@ def componentContextMenu(element, menu):
 	# Components under pointer
 	guiEditorRootProp = element.findPropertyInAncestors(GUIEdProp.instance)
 	guiEditorRootElement = guiEditorRootProp.element
-	target = element.rootElement.getTarget()
-	target = target   if target.isValid()  and  isinstance(target, GUIEditorTarget)   else None
 
 	# Components under pointer
 	menu.add(Section(SectionHeading3('Components under pointer'), _presentComponentsUnderPointer(element, guiEditorRootElement)))
 
-
-	currentComponent = LiveValue()
-
-	# Component UI
-	def refreshComponent(component):
-		currentComponent.setLiteralValue(component)
-
-	targetListener = GUITargetListener(refreshComponent)
-
-	refreshComponent(target.component   if target is not None   else None)
-
-
-	@LiveFunction
-	def currentComponentUI():
-		component = currentComponent.getValue()
-		if component is not None:
-			editUI = component._editUI()
-			return Section(SectionHeading3(component.componentName), editUI)
-		else:
-			return Blank()
-
-
-	componentUI = targetListener.tieToLifeTimeOf(currentComponentUI, element.rootElement)
-	menu.add(componentUI)
+	current = currentComponentEditor(element.rootElement)
+	menu.add(current)
 
 
 	# Side panel
-	_addPanelButtons(menu)
+	_addPanelButtons(element, menu)
 
 	return True
 
