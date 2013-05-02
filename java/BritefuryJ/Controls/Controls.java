@@ -35,9 +35,9 @@ public class Controls
 	
 	
 	public static final InheritedAttributeNonNull buttonBorder = new InheritedAttributeNonNull( controlsNamespace, "buttonBorder", AbstractBorder.class,
-			new SolidBorder( 1.0, 2.0, new Color( 0.7f, 0.7f, 0.7f ), new Color( 0.925f, 0.925f, 0.925f  ), new Color( 0.6f, 0.6f, 0.6f ), new Color( 0.875f, 0.875f, 0.875f ) ) );
+			new SolidBorder( 1.0, 3.0, new Color( 0.7f, 0.7f, 0.7f ), new Color( 0.925f, 0.925f, 0.925f  ), new Color( 0.6f, 0.6f, 0.6f ), new Color( 0.875f, 0.875f, 0.875f ) ) );
 	public static final InheritedAttributeNonNull buttonAttrs = new InheritedAttributeNonNull( controlsNamespace, "buttonAttrs", StyleSheet.class,
-			    StyleSheet.style( Primitive.foreground.as( new Color( 0, 111, 128 ) ) ) );
+			    StyleSheet.style( Primitive.foreground.as( new Color( 0.1f, 0.225f, 0.35f ) ), Primitive.fontSize.as( 12 ) ) );
 	
 	
 //	public static final InheritedAttributeNonNull hyperlinkAttrs = new InheritedAttributeNonNull( controlsNamespace, "hyperlinkAttrs", StyleSheet.class,
