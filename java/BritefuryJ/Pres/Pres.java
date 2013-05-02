@@ -413,7 +413,8 @@ public abstract class Pres
 			presCtx = fragCtx.createPresentationContext();
 			if ( style == null )
 			{
-				style = fragCtx.getStyleValues();
+				//style = fragCtx.getStyleValues();
+				style = StyleValues.getRootStyle();
 			}
 			
 			if ( fragCtx instanceof FragmentView )
