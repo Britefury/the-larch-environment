@@ -34,14 +34,14 @@ class GUIEditorRootComponent (GUIUnaryBranchComponent):
 	isRootGUIEditorComponent = True
 
 
-	def __init__(self, guiEditor, contents=None):
+	def __init__(self, contents=None):
 		super(GUIEditorRootComponent, self).__init__(child=contents)
-		self.__guiEditor = guiEditor
+		self._guiEditor = None
 
 
 	@property
 	def guiEditor(self):
-		return self.__guiEditor
+		return self._guiEditor
 
 
 	def __component_py_evalmodel__(self, codeGen):
@@ -68,7 +68,16 @@ class GUIEditorRootComponent (GUIUnaryBranchComponent):
 
 class GUIEditor (object):
 	def __init__(self, contents=None):
-		self.__root = GUIEditorRootComponent(self, contents)
+		self.__root = GUIEditorRootComponent(contents)
+		self.__root._guiEditor = self
+
+
+	def __getstate__(self):
+		return {'root': self.__root}
+
+	def __setstate__(self, state):
+		self.__root = state.get('root')  or  state.get('_GUIEditor__root')
+		self.__root._guiEditor = self
 
 
 	def __py_evalmodel__(self, codeGen):

@@ -201,6 +201,8 @@ public class Controls
 	public static final InheritedAttributeNonNull switchButtonBackgroundNotSelected = new InheritedAttributeNonNull( controlsNamespace, "switchButtonBackgroundNotSelected", Paint.class, new Color( 0.95f, 0.95f, 0.975f  ) );
 	public static final InheritedAttributeNonNull switchButtonBackgroundSelected = new InheritedAttributeNonNull( controlsNamespace, "switchButtonBackgroundSelected", Paint.class, new Color( 0.825f, 0.825f, 0.85f  ) );
 	public static final InheritedAttributeNonNull switchButtonBackgroundHover = new InheritedAttributeNonNull( controlsNamespace, "switchButtonBackgroundHover", Paint.class, new Color( 0.9f, 0.9f, 0.925f  ) );
+	public static final InheritedAttributeNonNull switchButtonInternalStyle = new InheritedAttributeNonNull( controlsNamespace, "switchButtonInternalStyle", StyleSheet.class,
+			StyleSheet.style( Primitive.foreground.as( new Color( 0.1f, 0.225f, 0.35f ) ), Primitive.fontSize.as( 11 ) ) );
 
 
 
@@ -359,6 +361,7 @@ public class Controls
 	{
 		return style.useAttr( switchButtonOutlineThickness ).useAttr( switchButtonOutlineRounding ).useAttr( switchButtonOutlinePaint )
 				.useAttr( switchButtonInset ).useAttr( switchButtonSpacing ).useAttr( switchButtonSeparatorPaint ).useAttr( switchButtonSeparatorThickness )
-				.useAttr( switchButtonBackgroundNotSelected ).useAttr( switchButtonBackgroundSelected ).useAttr( switchButtonBackgroundHover );
+				.useAttr( switchButtonBackgroundNotSelected ).useAttr( switchButtonBackgroundSelected ).useAttr( switchButtonBackgroundHover )
+				.useAttr( switchButtonInternalStyle );
 	}
 }

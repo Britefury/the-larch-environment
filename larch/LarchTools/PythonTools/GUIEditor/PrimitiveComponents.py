@@ -9,14 +9,16 @@ from java.awt import Color
 
 from BritefuryJ.Graphics import FillPainter
 
-from BritefuryJ.Pres.Primitive import Primitive, Label, StaticText, Text, Arrow, Spacer, Row, Column, Paragraph, FlowGrid, RGrid, GridRow
+from BritefuryJ.LSpace import LSSpaceBin
+
+from BritefuryJ.Pres.Primitive import Primitive, Label, StaticText, Text, Arrow, Spacer, Bin, SpaceBin, Row, Column, Paragraph, FlowGrid, RGrid, GridRow
 from BritefuryJ.Pres.UI import Form
 
 from BritefuryJ.StyleSheet import StyleSheet
 
 from BritefuryJ.Controls import TextEntry, RealSpinEntry, SwitchButton
 
-from BritefuryJ.Live import LiveValue
+from BritefuryJ.Live import LiveValue, LiveFunction
 
 from LarchCore.Languages.Python2 import Schema as Py
 
@@ -24,7 +26,7 @@ from LarchTools.PythonTools.GUIEditor.ComponentPalette import paletteItem, regis
 
 from LarchTools.PythonTools.GUIEditor.DataModel import TypedEvalField
 from LarchTools.PythonTools.GUIEditor.LeafComponent import GUILeafComponent
-from LarchTools.PythonTools.GUIEditor.BranchComponent import GUIBranchComponent, GUISequenceComponent
+from LarchTools.PythonTools.GUIEditor.BranchComponent import GUIUnaryBranchComponent, GUISequenceComponent
 
 
 
@@ -123,36 +125,103 @@ class GUIArrow (GUILeafComponent):
 	componentName = 'Arrow'
 
 	size = TypedEvalField(float, 12.0)
-
-	_arrowDirections = [Arrow.Direction.LEFT, Arrow.Direction.RIGHT, Arrow.Direction.UP, Arrow.Direction.DOWN]
-	_directionToIndex = {d:i   for i, d in enumerate(_arrowDirections)}
-
-	def __init__(self, direction, size):
-		super(GUIArrow, self).__init__(size=size)
-		self._directionIndex = LiveValue(self._directionToIndex[direction])
+	direction = TypedEvalField(Arrow.Direction, Arrow.Direction.RIGHT)
 
 	def _presentLeafContents(self, fragment, inheritedState):
-		direction = self._arrowDirections[self._directionIndex.getValue()]
-		return Arrow(direction, self.size.getValueForEditor())
+		return Arrow(self.direction.getValueForEditor(), self.size.getValueForEditor())
 
 	_offStyle = StyleSheet.style(Primitive.shapePainter(FillPainter(Color(0.4, 0.4, 0.4))))
 	_onStyle = StyleSheet.style(Primitive.shapePainter(FillPainter(Color(0.2, 0.2, 0.2))))
 
+	@staticmethod
+	def _arrowDirectionEditor(live):
+		@LiveFunction
+		def displayLive():
+			return live.getValue().ordinal()
+
+		offOptions = [GUIArrow._offStyle(Arrow(dir, 14.0).alignVCentre())   for dir in Arrow.Direction.values()]
+		onOptions = [GUIArrow._onStyle(Arrow(dir, 14.0).alignVCentre())   for dir in Arrow.Direction.values()]
+
+		def _onChoice(control, prevChoice, choice):
+			live.setLiteralValue(Arrow.Direction.values()[choice])
+
+		return SwitchButton(offOptions, onOptions, SwitchButton.Orientation.HORIZONTAL, displayLive, _onChoice)
+
+
 	def _editUIFormSections(self):
-		offOptions = [self._offStyle(Arrow(dir, 14.0).alignVCentre())   for dir in self._arrowDirections]
-		onOptions = [self._onStyle(Arrow(dir, 14.0).alignVCentre())   for dir in self._arrowDirections]
-		direction = Form.SmallSection('Direction', None, SwitchButton(offOptions, onOptions, SwitchButton.Orientation.HORIZONTAL, self._directionIndex))
+		direction = Form.SmallSection('Direction', None, self.direction.editUI(self._arrowDirectionEditor))
 		size = Form.SmallSection('Size', None, self.size.editUI(lambda live: RealSpinEntry(live, 0.0, 1048576.0, 1.0, 10.0)))
 		superSections = super(GUIArrow, self)._editUIFormSections()
 		return [direction, size] + superSections
 
 	def __component_py_evalmodel__(self, codeGen):
 		arrow = codeGen.embeddedValue(Arrow)
-		direction = codeGen.embeddedValue(self._arrowDirections[self._directionIndex.getValue()])
+		direction = self.direction.__py_evalmodel__(codeGen)
 		size = self.size.__py_evalmodel__(codeGen)
 		return Py.Call(target=arrow, args=[direction, size])
 
-_arrowItem = paletteItem(Label('Arrow'), lambda: GUIArrow(Arrow.Direction.DOWN, 12.0))
+_arrowItem = paletteItem(Label('Arrow'), lambda: GUIArrow(direction=Arrow.Direction.DOWN, size=12.0))
+
+
+
+
+class GUIBin (GUIUnaryBranchComponent):
+	componentName = 'Bin'
+
+	def _presentBranchContents(self, child, fragment, inheritedState):
+		return Bin(child)
+
+	def __component_py_evalmodel__(self, codeGen):
+		py_bin = codeGen.embeddedValue(Bin)
+		return Py.Call( target=py_bin, args=[ self.child.node.__py_evalmodel__(codeGen) ] )
+
+_binItem = paletteItem(Label('Bin'), lambda: GUIBin())
+
+
+
+
+def _sizeConstraintEditor(live):
+	@LiveFunction
+	def displayLive():
+		return live.getValue().ordinal()
+
+	def _onChoice(control, prevChoice, choice):
+		live.setLiteralValue(LSSpaceBin.SizeConstraint.values()[choice])
+
+	options = [Label(t)   for t in ['Larger', 'Smaller', 'Fixed', 'None']]
+
+	return SwitchButton(options, options, SwitchButton.Orientation.HORIZONTAL, displayLive, _onChoice)
+
+
+
+class GUISpaceBin (GUIUnaryBranchComponent):
+	componentName = 'Space bin'
+
+	width = TypedEvalField(float, 100.0)
+	height = TypedEvalField(float, 100.0)
+	sizeConstraintX = TypedEvalField(LSSpaceBin.SizeConstraint, LSSpaceBin.SizeConstraint.LARGER)
+	sizeConstraintY = TypedEvalField(LSSpaceBin.SizeConstraint, LSSpaceBin.SizeConstraint.LARGER)
+
+	def _presentBranchContents(self, child, fragment, inheritedState):
+		return SpaceBin(self.width.getValueForEditor(), self.height.getValueForEditor(), self.sizeConstraintX.getValueForEditor(), self.sizeConstraintY.getValueForEditor(), child)
+
+	def _editUIFormSections(self):
+		width = Form.SmallSection('Width', None, self.width.editUI(lambda live: RealSpinEntry(live, 0.0, 1048576.0, 1.0, 10.0)))
+		height = Form.SmallSection('Height', None, self.height.editUI(lambda live: RealSpinEntry(live, 0.0, 1048576.0, 1.0, 10.0)))
+		sizeConstraintX = Form.SmallSection('Constraint-X', None, self.sizeConstraintX.editUI(_sizeConstraintEditor))
+		sizeConstraintY = Form.SmallSection('Constraint-Y', None, self.sizeConstraintY.editUI(_sizeConstraintEditor))
+		superSections = super(GUISpaceBin, self)._editUIFormSections()
+		return [width, height, sizeConstraintX, sizeConstraintY] + superSections
+
+	def __component_py_evalmodel__(self, codeGen):
+		py_spaceBin = codeGen.embeddedValue(SpaceBin)
+		width = self.width.__py_evalmodel__(codeGen)
+		height = self.height.__py_evalmodel__(codeGen)
+		sizeConstraintX = self.sizeConstraintX.__py_evalmodel__(codeGen)
+		sizeConstraintY = self.sizeConstraintY.__py_evalmodel__(codeGen)
+		return Py.Call( target=py_spaceBin, args=[ width, height, sizeConstraintX, sizeConstraintY, self.child.node.__py_evalmodel__(codeGen) ] )
+
+_spaceBinItem = paletteItem(Label('SpaceBin'), lambda: GUISpaceBin())
 
 
 
@@ -258,4 +327,4 @@ _gridRowItem = paletteItem(Label('Grid row'), lambda: GUIGridRow())
 
 
 registerPaletteSubsection('Basic', [_labelItem, _staticTextItem, _textItem, _spacerItem, _arrowItem])
-registerPaletteSubsection('Containers', [_rowItem, _columnItem, _paraItem, _flowGridItem, _gridItem, _gridRowItem])
+registerPaletteSubsection('Containers', [_binItem, _spaceBinItem, _rowItem, _columnItem, _paraItem, _flowGridItem, _gridItem, _gridRowItem])

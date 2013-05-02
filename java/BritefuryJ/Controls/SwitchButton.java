@@ -22,6 +22,7 @@ import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentElement;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.*;
+import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
 
 import java.awt.*;
@@ -340,6 +341,8 @@ public class SwitchButton extends ControlPres
 		Paint backgNotSelected = style.get( Controls.switchButtonBackgroundNotSelected, Paint.class );
 		Paint backgSelected = style.get( Controls.switchButtonBackgroundSelected, Paint.class );
 		Paint backgHover = style.get( Controls.switchButtonBackgroundHover, Paint.class );
+		StyleSheet internalStyleSheet = style.get( Controls.switchButtonInternalStyle, StyleSheet.class );
+		StyleValues internalStyle = usedStyle.withAttrs( internalStyleSheet );
 
 
 		final LiveInterface value = valueSource.getLive();
@@ -430,12 +433,12 @@ public class SwitchButton extends ControlPres
 
 		switchSequencePres = switchSequencePres.withPainter( new SwitchButtonPainter( sepThickness, sepPaint, orientation ) );
 
-		LSAbstractBox switchSequenceElement = (LSAbstractBox)switchSequencePres.present( ctx, style );
+		LSAbstractBox switchSequenceElement = (LSAbstractBox)switchSequencePres.present( ctx, internalStyle );
 
 		Pres switchButtonPres = border.surround( new PresentElement( switchSequenceElement ) );
 
 		LSElement switchButtonElement = switchButtonPres.present( ctx, style );
 
-		return new SwitchButtonControl( ctx, style, switchButtonElement, switchSequenceElement, offPres, onPres, value, listener );
+		return new SwitchButtonControl( ctx, internalStyle, switchButtonElement, switchSequenceElement, offPres, onPres, value, listener );
 	}
 }

@@ -15,7 +15,7 @@ from BritefuryJ.Graphics import SolidBorder
 
 from BritefuryJ.Pres import Pres
 from BritefuryJ.Pres.Primitive import Primitive, Blank, Label, Spacer, Row, Column
-from BritefuryJ.Pres.UI import Form
+from BritefuryJ.Pres.UI import Form, ControlsRow
 
 from BritefuryJ.StyleSheet import StyleSheet
 
@@ -45,7 +45,6 @@ def blankCallModel(codeGen):
 
 
 _noAlignmentStyle = StyleSheet.style(Primitive.foreground(Color(0.4, 0.4, 0.4)), Primitive.fontSize(11))
-_alignmentStyle = StyleSheet.style(Primitive.foreground(Color(0.2, 0.25, 0.3)), Primitive.fontSize(11))
 
 def _hAlignmentEditor(live):
 	@LiveFunction
@@ -56,7 +55,7 @@ def _hAlignmentEditor(live):
 		else:
 			return x.ordinal() + 1
 
-	options = [_noAlignmentStyle(Label('None')), _alignmentStyle(Label('Pack')), _alignmentStyle(Label('Left')), _alignmentStyle(Label('Centre')), _alignmentStyle(Label('Right')), _alignmentStyle(Label('Expand'))]
+	options = [_noAlignmentStyle(Label('None')), Label('Pack'), Label('Left'), Label('Centre'), Label('Right'), Label('Expand')]
 
 	def _onChoice(control, prevChoice, choice):
 		if choice == 0:
@@ -76,7 +75,7 @@ def _vAlignmentEditor(live):
 		else:
 			return x.ordinal() + 1
 
-	options = [_noAlignmentStyle(Label('None')), _alignmentStyle(Label('Ref-Y')), _alignmentStyle(Label('Ref-Y Exp')), _alignmentStyle(Label('Top')), _alignmentStyle(Label('Centre')), _alignmentStyle(Label('Bottom')), _alignmentStyle(Label('Expand'))]
+	options = [_noAlignmentStyle(Label('None')), Label('Ref-Y'), Label('Ref-Y Exp'), Label('Top'), Label('Centre'), Label('Bottom'), Label('Expand')]
 
 	def _onChoice(control, prevChoice, choice):
 		if choice == 0:
@@ -139,7 +138,7 @@ class GUIComponent (GUINode):
 				def onPadNonUniform(button, event):
 					self.padding.value = NonUniformPadding()
 
-				return Row([Button.buttonWithLabel('Uniform', onPadUniform), Spacer(15.0, 0.0), Button.buttonWithLabel('Non-uniform', onPadNonUniform)])
+				return ControlsRow([Button.buttonWithLabel('Uniform', onPadUniform), Button.buttonWithLabel('Non-uniform', onPadNonUniform)]).alignHPack()
 			else:
 				def onRemove(button, event):
 					self.padding.value = None
@@ -147,7 +146,7 @@ class GUIComponent (GUINode):
 				def setPadding(padding):
 					self.padding.value = padding
 
-				removeButton = Button.buttonWithLabel('Remove padding', onRemove)
+				removeButton = Button.buttonWithLabel('Remove padding', onRemove).alignHPack()
 
 				return Column([removeButton.alignHPack(), Spacer(0.0, 5.0), padding.editUI(setPadding)])
 

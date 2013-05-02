@@ -26,8 +26,7 @@ class GUIButton (GUIUnaryBranchComponent):
 	onClick = ExprField()
 
 
-	def _presentBranchContents(self, fragment, inheritedState):
-		child = self._presentChild()
+	def _presentBranchContents(self, child, fragment, inheritedState):
 		return Button(child, None)
 
 	def _editUIFormSections(self):
