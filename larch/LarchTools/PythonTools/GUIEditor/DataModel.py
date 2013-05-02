@@ -17,7 +17,7 @@ from BritefuryJ.Incremental import IncrementalValueMonitor
 from BritefuryJ.Live import TrackedLiveValue
 from BritefuryJ.ChangeHistory import ChangeHistory
 
-from BritefuryJ.Pres.Primitive import Primitive, Label, Spacer, Row, Column
+from BritefuryJ.Pres.Primitive import Primitive, Label, Spacer, SpaceBin, Row, Column
 from BritefuryJ.Pres.UI import Form
 
 from BritefuryJ.Controls import Button, TextEntry
@@ -819,7 +819,7 @@ class ExprFieldInstance (FieldInstance):
 
 
 	def editUI(self):
-		return exprBorder.surround(self.__expr)
+		return SpaceBin( 15.0, 0.0, exprBorder.surround(self.__expr).alignHExpand() )
 
 
 
