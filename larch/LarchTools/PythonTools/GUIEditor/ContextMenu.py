@@ -99,7 +99,7 @@ def componentContextMenu(element, menu):
 
 def guiEditorContextMenu(element, menu):
 	# Side panel
-	_addPanelButtons(menu)
+	_addPanelButtons(element, menu)
 
 	menu.addSeparator()
 

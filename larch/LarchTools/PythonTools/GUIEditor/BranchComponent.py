@@ -76,12 +76,12 @@ class GUIUnaryBranchComponent (GUIBranchComponent):
 	_emptyPres = emptyLabel
 
 
-	def _presentBranchContents(self, fragment, inheritedState):
+	def _presentBranchContents(self, child,fragment, inheritedState):
 		raise NotImplementedError, 'abstract'
 
 
 	def _presentContents(self, fragment, inheritedState):
-		p = self._presentBranchContents(fragment, inheritedState)
+		p = self._presentBranchContents(self._presentChild(), fragment, inheritedState)
 		p = SequentialGUIController.instance.item(self, p)
 		return p
 
@@ -214,6 +214,9 @@ class GUISequenceComponent (GUIBranchComponent):
 		p = self._presentSequenceContents(contents, fragment, inheritedState)
 		p = SequentialGUIController.instance.editableList(self, p)
 		return p
+
+	def _presentSequenceContents(self, contents, fragment, inheritedState):
+		raise NotImplementedError, 'abstract'
 
 
 	def _py_evalmodel_forChildren(self, codeGen):
