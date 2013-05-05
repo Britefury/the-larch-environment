@@ -27,6 +27,7 @@ from LarchTools.PythonTools.GUIEditor.ComponentPalette import paletteItem, regis
 from LarchTools.PythonTools.GUIEditor.DataModel import TypedEvalField
 from LarchTools.PythonTools.GUIEditor.LeafComponent import GUILeafComponent
 from LarchTools.PythonTools.GUIEditor.BranchComponent import GUIUnaryBranchComponent, GUISequenceComponent
+from LarchTools.PythonTools.GUIEditor.FieldEditor import enumSwitchButtonEditor, enumSwitchButtonEditorWithLabels
 
 
 
@@ -135,17 +136,10 @@ class GUIArrow (GUILeafComponent):
 
 	@staticmethod
 	def _arrowDirectionEditor(live):
-		@LiveFunction
-		def displayLive():
-			return live.getValue().ordinal()
-
 		offOptions = [GUIArrow._offStyle(Arrow(dir, 14.0).alignVCentre())   for dir in Arrow.Direction.values()]
 		onOptions = [GUIArrow._onStyle(Arrow(dir, 14.0).alignVCentre())   for dir in Arrow.Direction.values()]
 
-		def _onChoice(control, prevChoice, choice):
-			live.setLiteralValue(Arrow.Direction.values()[choice])
-
-		return SwitchButton(offOptions, onOptions, SwitchButton.Orientation.HORIZONTAL, displayLive, _onChoice)
+		return enumSwitchButtonEditor(live, Arrow.Direction, offOptions, onOptions)
 
 
 	def _editUIFormSections(self):
@@ -171,6 +165,9 @@ class GUIBin (GUIUnaryBranchComponent):
 	def _presentBranchContents(self, child, fragment, inheritedState):
 		return Bin(child)
 
+	def _presentEditableBranchContents(self, child,fragment, inheritedState):
+		return Bin(child)
+
 	def __component_py_evalmodel__(self, codeGen):
 		py_bin = codeGen.embeddedValue(Bin)
 		return Py.Call( target=py_bin, args=[ self.child.node.__py_evalmodel__(codeGen) ] )
@@ -181,17 +178,7 @@ _binItem = paletteItem(Label('Bin'), lambda: GUIBin())
 
 
 def _sizeConstraintEditor(live):
-	@LiveFunction
-	def displayLive():
-		return live.getValue().ordinal()
-
-	def _onChoice(control, prevChoice, choice):
-		live.setLiteralValue(LSSpaceBin.SizeConstraint.values()[choice])
-
-	options = [Label(t)   for t in ['Larger', 'Smaller', 'Fixed', 'None']]
-
-	return SwitchButton(options, options, SwitchButton.Orientation.HORIZONTAL, displayLive, _onChoice)
-
+	return enumSwitchButtonEditorWithLabels(live, LSSpaceBin.SizeConstraint, ['Larger', 'Smaller', 'Fixed', 'None'])
 
 
 class GUISpaceBin (GUIUnaryBranchComponent):
@@ -203,6 +190,9 @@ class GUISpaceBin (GUIUnaryBranchComponent):
 	sizeConstraintY = TypedEvalField(LSSpaceBin.SizeConstraint, LSSpaceBin.SizeConstraint.LARGER)
 
 	def _presentBranchContents(self, child, fragment, inheritedState):
+		return SpaceBin(self.width.getValueForEditor(), self.height.getValueForEditor(), self.sizeConstraintX.getValueForEditor(), self.sizeConstraintY.getValueForEditor(), child)
+
+	def _presentEditableBranchContents(self, child,fragment, inheritedState):
 		return SpaceBin(self.width.getValueForEditor(), self.height.getValueForEditor(), self.sizeConstraintX.getValueForEditor(), self.sizeConstraintY.getValueForEditor(), child)
 
 	def _editUIFormSections(self):
