@@ -59,7 +59,8 @@ class LiveList (object):
 		self._items = state['items']
 		self.__change_history__ = None
 		self._incr = IncrementalValueMonitor()
-	
+		self.__changeListener = None
+
 	def __copy__(self):
 		self._incr.onAccess()
 		t = type( self )
