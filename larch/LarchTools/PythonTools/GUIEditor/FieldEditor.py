@@ -7,13 +7,18 @@
 ##-*************************
 from java.awt import Color
 
+from BritefuryJ.Graphics import SolidBorder
+
 from BritefuryJ.Live import LiveValue, LiveFunction
 
-from BritefuryJ.Controls import SwitchButton, Button
+from BritefuryJ.Controls import SwitchButton, Button, TextEntry
 
 from BritefuryJ.Pres.Primitive import Primitive, Label, Image, Spacer, Row
+from BritefuryJ.Pres.UI import Form
 
 from BritefuryJ.StyleSheet import StyleSheet
+
+from LarchTools.PythonTools import GUIEditor
 
 
 
@@ -59,13 +64,34 @@ def optionalTypedEditor(live, initialValue, editorFn):
 		if x is None:
 			def on_add(button, event):
 				live.setLiteralValue(initialValue)
-			return Button(_plusStyle(Label('+')), on_add)
+			return Button(_plusStyle(Label('+')), on_add).alignHPack()
 		else:
 			def on_delete(button, event):
 				live.setLiteralValue(None)
 
 			deleteButton = Button(Image.systemIcon('delete'), on_delete)
 
-			return Row([deleteButton, Spacer(5.0, 0.0), valueEditor])
+			return Row([deleteButton.alignHPack(), Spacer(5.0, 0.0).alignHPack(), valueEditor])
 
 	return editor
+
+
+
+
+
+
+exprBorder = SolidBorder( 1.0, 2.0, 5.0, 5.0, Color( 0.0, 0.25, 0.75 ), None )
+
+
+
+
+def unaryBranchChildEditUIFormSections(branch):
+	child = branch.child.node
+	if child is not None:
+		if isinstance(child, GUIEditor.PrimitiveComponents.GUILabel):
+			textField = child.text
+			if textField.isConstant():
+				textLive = textField.constantValueLive
+				return [Form.SmallSection('Label text', None, TextEntry.textEntryCommitOnChange(textLive))]
+	return []
+

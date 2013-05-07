@@ -24,10 +24,11 @@ from LarchCore.Languages.Python2 import Schema as Py
 
 from LarchTools.PythonTools.GUIEditor.ComponentPalette import paletteItem, registerPaletteSubsection
 
-from LarchTools.PythonTools.GUIEditor.DataModel import TypedEvalField
+from LarchTools.PythonTools.GUIEditor.DataModel import TypedEvalField, TypedField
 from LarchTools.PythonTools.GUIEditor.LeafComponent import GUILeafComponent
 from LarchTools.PythonTools.GUIEditor.BranchComponent import GUIUnaryBranchComponent, GUISequenceComponent
 from LarchTools.PythonTools.GUIEditor.FieldEditor import enumSwitchButtonEditor, enumSwitchButtonEditorWithLabels
+from LarchTools.PythonTools.GUIEditor.Borders import AbstractGUIBorder, SolidGUIBorder
 
 
 
@@ -216,6 +217,31 @@ _spaceBinItem = paletteItem(Label('SpaceBin'), lambda: GUISpaceBin())
 
 
 
+class GUIBorder (GUIUnaryBranchComponent):
+	componentName = 'Border'
+
+	border = TypedField(AbstractGUIBorder).defaultValueFactory(lambda: SolidGUIBorder())
+
+	def _presentBranchContents(self, child, fragment, inheritedState):
+		return self.border.value.makeBorder().surround(child)
+
+	def _presentEditableBranchContents(self, child,fragment, inheritedState):
+		return self.border.value.makeBorder().surround(child)
+
+	def _editUIFormSections(self):
+		borderSections = self.border.value.formSections()
+		superSections = super(GUIBorder, self)._editUIFormSections()
+		return borderSections + superSections
+
+	def __component_py_evalmodel__(self, codeGen):
+		py_child = self.child.node.__py_evalmodel__(codeGen)
+		return self.border.value.__apply_py_evalmodel__(codeGen, py_child)
+
+_borderItem = paletteItem(Label('Border'), lambda: GUIBorder())
+
+
+
+
 class GUIRow (GUISequenceComponent):
 	componentName = 'Row'
 
@@ -317,4 +343,4 @@ _gridRowItem = paletteItem(Label('Grid row'), lambda: GUIGridRow())
 
 
 registerPaletteSubsection('Basic', [_labelItem, _staticTextItem, _textItem, _spacerItem, _arrowItem])
-registerPaletteSubsection('Containers', [_binItem, _spaceBinItem, _rowItem, _columnItem, _paraItem, _flowGridItem, _gridItem, _gridRowItem])
+registerPaletteSubsection('Containers', [_binItem, _spaceBinItem, _borderItem, _rowItem, _columnItem, _paraItem, _flowGridItem, _gridItem, _gridRowItem])

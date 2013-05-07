@@ -12,6 +12,7 @@ import java.awt.Cursor;
 import javax.swing.JColorChooser;
 
 import BritefuryJ.Graphics.FillPainter;
+import BritefuryJ.Graphics.SolidBorder;
 import BritefuryJ.LSpace.Event.AbstractPointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
 import BritefuryJ.LSpace.Interactor.ClickElementInteractor;
@@ -144,7 +145,9 @@ public class ColourPicker extends ControlPres
 				
 				StyleSheet swatchStyle = StyleSheet.style( Primitive.shapePainter.as( new FillPainter( colour ) ), Primitive.cursor.as( new Cursor( Cursor.HAND_CURSOR ) ) );
 				Pres swatch = swatchStyle.applyTo( new Box( 30.0, 20.0 ) );
-				return swatch.withElementInteractor( swatchInteractor );
+				swatch = swatch.withElementInteractor( swatchInteractor );
+				swatch = swatchBorder.surround(swatch);
+				return swatch;
 			}
 		};
 		
@@ -154,4 +157,7 @@ public class ColourPicker extends ControlPres
 		
 		return ctl;
 	}
+
+
+	private static final SolidBorder swatchBorder = new SolidBorder(1.0, 1.0, 0.0, 0.0, new Color(0.2f, 0.2f, 0.2f), null);
 }

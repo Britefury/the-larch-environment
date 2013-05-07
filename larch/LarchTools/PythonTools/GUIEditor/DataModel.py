@@ -8,7 +8,6 @@
 import copy
 
 from java.awt import Color
-import java.lang.Enum
 
 from BritefuryJ.Graphics import SolidBorder
 
@@ -31,6 +30,13 @@ from LarchCore.Languages.Python2.Embedded import EmbeddedPython2Expr
 from LarchCore.Languages.Python2.CodeGenerator import Python2CodeGenerator
 
 
+
+
+
+class _NoDefaultValue (object):
+	pass
+
+_NoDefaultValue.instance = _NoDefaultValue()
 
 
 
@@ -119,18 +125,58 @@ class Field (object):
 
 
 
+class FieldWithDefaultValue (Field):
+	__MODE_VALUE = 'value'
+	__MODE_FACTORY = 'factory'
+	__MODE_DEFAULT_CONSTRUCTOR = 'default-constructor'
+
+	def __init__(self, defaultValue=_NoDefaultValue.instance):
+		super(FieldWithDefaultValue, self).__init__()
+		self.__defaultValue = defaultValue
+		self.__defaultValueMode = self.__MODE_VALUE   if defaultValue is not _NoDefaultValue.instance   else self.__MODE_DEFAULT_CONSTRUCTOR
+
+
+	def defaultValue(self, value):
+		self.__defaultValue = value
+		self.__defaultValueMode = self.__MODE_VALUE
+		return self
+
+
+	def defaultValueFactory(self, factory):
+		self.__defaultValue = factory
+		self.__defaultValueMode = self.__MODE_FACTORY
+		return self
+
+
+	def _createDefaultValueFallback(self):
+		raise TypeError, 'Cannot create default value'
+
+
+	def _getDefaultValue(self):
+		if self.__defaultValueMode is self.__MODE_VALUE:
+			return self.__defaultValue
+		elif self.__defaultValueMode is self.__MODE_FACTORY:
+			return self.__defaultValue()
+		elif self.__defaultValueMode is self.__MODE_DEFAULT_CONSTRUCTOR:
+			return self._createDefaultValueFallback()
+		else:
+			raise RuntimeError, 'Invalid mode'
+
+
+
 
 
 
 def _checkValueType(value, valueType, valueName):
-	if isinstance(valueType, type):
-		if not isinstance(value, valueType):
-			raise TypeError, '{0} is not an instance of \'{1}\''.format(valueName, valueType.__name__)
-	else:
-		for t in valueType:
-			if isinstance(value, t):
-				return
-		raise TypeError, '{0} is not an instance of \'{1}\''.format(valueName, ', or '.join([t.__name__   for t in valueType]))
+	if value is not _NoDefaultValue.instance:
+		if isinstance(valueType, type):
+			if not isinstance(value, valueType):
+				raise TypeError, '{0} is not an instance of \'{1}\''.format(valueName, valueType.__name__)
+		else:
+			for t in valueType:
+				if isinstance(value, t):
+					return
+			raise TypeError, '{0} is not an instance of \'{1}\''.format(valueName, ', or '.join([t.__name__   for t in valueType]))
 
 
 
@@ -144,7 +190,7 @@ def _checkValueType(value, valueType, valueName):
 class ValueFieldInstance (FieldInstance):
 	def __init__(self, field, object_instance, wrapped_source_value):
 		super(ValueFieldInstance, self).__init__(field, object_instance, wrapped_source_value)
-		value = wrapped_source_value[0]   if wrapped_source_value is not None   else field._defaultValue
+		value = wrapped_source_value[0]   if wrapped_source_value is not None   else field._getDefaultValue()
 
 		def on_change(old_value, new_value):
 			if self._field._change_listener is not None:
@@ -186,14 +232,18 @@ class ValueFieldInstance (FieldInstance):
 
 
 
-class TypedField (Field):
+class TypedField (FieldWithDefaultValue):
 	__field_instance_class__ = ValueFieldInstance
 
-	def __init__(self, valueType, defaultValue):
+	def __init__(self, valueType, defaultValue=_NoDefaultValue.instance):
 		_checkValueType(defaultValue, valueType, 'default value')
-		super(TypedField, self).__init__()
-		self._defaultValue = defaultValue
+		super(TypedField, self).__init__(defaultValue)
 		self._change_listener = None
+		self.__valueType = valueType
+
+
+	def _createDefaultValueFallback(self):
+		return self.__valueType()
 
 
 	def on_change(self, method):
@@ -203,14 +253,17 @@ class TypedField (Field):
 
 
 
-class ValueField (Field):
+class ValueField (FieldWithDefaultValue):
 	__field_instance_class__ = ValueFieldInstance
 
 
-	def __init__(self, defaultValue=None):
-		super(ValueField, self).__init__()
+	def __init__(self, defaultValue=_NoDefaultValue.instance):
+		super(ValueField, self).__init__(defaultValue)
 		self._change_listener = None
-		self._defaultValue = defaultValue
+
+
+	def _createDefaultValueFallback(self):
+		return None
 
 
 	def on_change(self, method):
@@ -247,47 +300,6 @@ class StringFieldInstance (ValueFieldInstance):
 class StringField (TypedField):
 	__field_instance_class__ = StringFieldInstance
 	__primitive_type__ = str
-
-
-
-
-
-
-class EnumFieldInstance (ValueFieldInstance):
-	def __field_getstate__(self):
-		return str(self.value)
-
-
-	def __py_evalmodel__(self, codeGen):
-		return codeGen.embeddedValue(self.value)
-
-
-class EnumField (Field):
-	__field_instance_class__ = EnumFieldInstance
-
-
-	def __init__(self, enumType, defaultValue):
-		if not issubclass(enumType, java.lang.Enum):
-			raise TypeError, 'enumType must be a sublcass of java.lang.Enum'
-		if defaultValue is None:
-			values = enumType.values()
-			defaultValue = values[0]   if len(values) > 0   else None
-		else:
-			if not isinstance(defaultValue, enumType):
-				raise TypeError, 'Default value is not an instance of \'{0}\''.format(enumType.__name__)
-		super(EnumField, self).__init__()
-		self._defaultValue = defaultValue
-		self.__enumType = enumType
-		self._change_listener = None
-
-
-	def on_change(self, method):
-		self._change_listener = method
-		return method
-
-
-	def _convertValueFromState(self, object_instance, stateValue):
-		return self.__enumType.valueOf(stateValue)
 
 
 
@@ -609,7 +621,7 @@ class EvalFieldInstance (FieldInstance):
 				constantValue = source_value
 				expr = None
 		else:
-			constantValue = field._defaultValue
+			constantValue = field._getDefaultValue()
 			expr = None
 
 		self._live = TrackedLiveValue(constantValue)
@@ -729,48 +741,21 @@ class EvalFieldInstance (FieldInstance):
 
 
 
-class TypedEvalField (Field):
+class TypedEvalField (FieldWithDefaultValue):
 	__field_instance_class__ = EvalFieldInstance
 	__primitive_type__ = None
 
 
-	def __init__(self, valueType, defaultValue):
+	def __init__(self, valueType, defaultValue=_NoDefaultValue.instance):
 		_checkValueType(defaultValue, valueType, 'default value')
-		super(TypedEvalField, self).__init__()
-		self._defaultValue = defaultValue
+		super(TypedEvalField, self).__init__(defaultValue)
+		self.__valueType = valueType
 
 
 
+	def _createDefaultValueFallback(self):
+		return self.__valueType()
 
-
-
-
-
-class EnumEvalFieldInstance (EvalFieldInstance):
-	def __field_getstate__(self):
-		return _EvalFieldState(str(self._live.getValue()), self._expr)
-
-	def __fixedvalue_py_evalmodel__(self, value, codeGen):
-		return codeGen.embeddedValue(value)
-
-
-class EnumEvalField (Field):
-	__field_instance_class__ = EnumEvalFieldInstance
-
-
-	def __init__(self, enumType, defaultValue):
-		if not issubclass(enumType, java.lang.Enum):
-			raise TypeError, 'enumType must be a sublcass of java.lang.Enum'
-		if defaultValue is None:
-			values = enumType.values()
-			defaultValue = values[0]   if len(values) > 0   else None
-		else:
-			if not isinstance(defaultValue, enumType):
-				raise TypeError, 'Default value is not an instance of \'{0}\''.format(enumType.__name__)
-
-		super(EnumEvalField, self).__init__()
-		self._defaultValue = defaultValue
-		self.__enumType = enumType
 
 
 
@@ -856,6 +841,7 @@ class TestCase_DataModel(unittest.TestCase):
 			x = TypedField(int, 0)
 			y = TypedField(int, 1)
 			z = TypedField([int, type(None)], None)
+			w = TypedField(int).defaultValueFactory(lambda: 2)
 
 			@x.on_change
 			def x_changed(self, field, old_value, new_value):
@@ -872,10 +858,6 @@ class TestCase_DataModel(unittest.TestCase):
 
 
 		from BritefuryJ.LSpace.Layout import HAlignment
-
-
-		class EnumFieldTest (GUIObject):
-			x = EnumField(HAlignment, HAlignment.PACK)
 
 
 		class ListFieldTest (GUIObject):
@@ -909,15 +891,12 @@ class TestCase_DataModel(unittest.TestCase):
 		class EvalFieldTest (GUIObject):
 			x = TypedEvalField(float, 0.0)
 			y = TypedEvalField(float, 1.0)
+			z = TypedEvalField(float).defaultValueFactory(lambda: 2.0)
 
 			def __py_evalmodel__(self, codeGen):
 				x = self.x.__py_evalmodel__(codeGen)
 				y = self.y.__py_evalmodel__(codeGen)
 				return Py.Call(target=Py.Load(name='C'), args=[x, y])
-
-		class EnumEvalFieldTest (GUIObject):
-			x = EnumEvalField(HAlignment, HAlignment.PACK)
-
 
 		class ExprFieldTest (GUIObject):
 			x = ExprField()
@@ -927,11 +906,9 @@ class TestCase_DataModel(unittest.TestCase):
 				return Py.Call(target=Py.Load(name='D'), args=[x])
 
 		cls.TypedFieldTest = TypedFieldTest
-		cls.EnumFieldTest = EnumFieldTest
 		cls.ListFieldTest = ListFieldTest
 		cls.ChildFieldTest = ChildFieldTest
 		cls.EvalFieldTest = EvalFieldTest
-		cls.EnumEvalFieldTest = EnumEvalFieldTest
 		cls.ExprFieldTest = ExprFieldTest
 
 		test_module = imp.new_module('GUIEditor_DataModel_Tests')
@@ -943,22 +920,18 @@ class TestCase_DataModel(unittest.TestCase):
 			x.__module__ = mod.__name__
 
 		moveClassToModule(test_module, TypedFieldTest)
-		moveClassToModule(test_module, EnumFieldTest)
 		moveClassToModule(test_module, ListFieldTest)
 		moveClassToModule(test_module, ChildFieldTest)
 		moveClassToModule(test_module, EvalFieldTest)
-		moveClassToModule(test_module, EnumEvalFieldTest)
 		moveClassToModule(test_module, ExprFieldTest)
 
 
 	@classmethod
 	def tearDownClass(cls):
 		cls.TypedFieldTest = None
-		cls.EnumFieldTest = None
 		cls.ListFieldTest = None
 		cls.ChildFieldTest = None
 		cls.EvalFieldTest = None
-		cls.EnumEvalFieldTest = None
 		cls.ExprFieldTest = None
 		del sys.modules[cls.mod.__name__]
 		cls.mod = None
@@ -986,6 +959,7 @@ class TestCase_DataModel(unittest.TestCase):
 		self.assertEqual(0, a1.x.value)
 		self.assertEqual(1, a1.y.value)
 		self.assertEqual(None, a1.z.value)
+		self.assertEqual(2, a1.w.value)
 
 		a2 = self.TypedFieldTest(x=10, y=20)
 
@@ -1080,22 +1054,6 @@ class TestCase_DataModel(unittest.TestCase):
 			Py.IntLiteral(format='decimal', numType='int', value='10'),
 			Py.IntLiteral(format='decimal', numType='int', value='20')
 		]), a.__py_evalmodel__(codeGen))
-
-
-
-
-	def test_EnumField_constructor(self):
-		from BritefuryJ.LSpace.Layout import HAlignment
-
-		a1 = self.EnumFieldTest()
-		a2 = self.EnumFieldTest(x=HAlignment.RIGHT)
-
-		self.assertEqual(HAlignment.PACK, a1.x.value)
-		self.assertEqual(HAlignment.RIGHT, a2.x.value)
-
-		self.assertEqual({'x': 'PACK'}, a1.__getstate__())
-		self.assertEqual({'x': 'RIGHT'}, a2.__getstate__())
-
 
 
 
@@ -1304,6 +1262,7 @@ class TestCase_DataModel(unittest.TestCase):
 
 		self.assertEqual(0.0, c1.x.constantValue)
 		self.assertEqual(1.0, c1.y.constantValue)
+		self.assertEqual(2.0, c1.z.constantValue)
 
 		c2 = self.EvalFieldTest(x=10.0, y=20.0)
 
@@ -1428,20 +1387,6 @@ class TestCase_DataModel(unittest.TestCase):
 
 		self.assertEqual(Py.Call(target=Py.Load(name='C'), args=[x_expr.model, y_expr.model]), c.__py_evalmodel__(codeGen))
 
-
-
-
-	def test_EnumEvalField_constructor(self):
-		from BritefuryJ.LSpace.Layout import HAlignment
-
-		c1 = self.EnumEvalFieldTest()
-		c2 = self.EnumEvalFieldTest(x=HAlignment.RIGHT)
-
-		self.assertEqual(HAlignment.PACK, c1.x.constantValue)
-		self.assertEqual(HAlignment.RIGHT, c2.x.constantValue)
-
-		self.assertEqual({'x': _EvalFieldState('PACK', None)}, c1.__getstate__())
-		self.assertEqual({'x': _EvalFieldState('RIGHT', None)}, c2.__getstate__())
 
 
 
