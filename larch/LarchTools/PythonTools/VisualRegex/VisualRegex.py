@@ -71,6 +71,10 @@ class VisualPythonRegex (object):
 		return Py.strToStrLiteral( s )
 
 
+	def __clipboard_copy__(self, memo):
+		return VisualPythonRegex(memo.copy(self.regex))
+
+
 	def asString(self):
 		return self._codeGen( self.regex )
 

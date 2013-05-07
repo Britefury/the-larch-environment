@@ -10,6 +10,8 @@ import java.awt.Color;
 import java.util.Arrays;
 import java.util.List;
 
+import BritefuryJ.ClipboardFilter.ClipboardCopierMemo;
+import BritefuryJ.ClipboardFilter.ClipboardCopyable;
 import org.python.core.Py;
 import org.python.core.PyInteger;
 import org.python.core.PyObject;
@@ -25,7 +27,7 @@ import BritefuryJ.Pres.ObjectPres.ObjectBox;
 import BritefuryJ.Pres.ObjectPres.ObjectPresStyle;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class IsolationBarrier <ValueType> implements Presentable, Trackable
+public class IsolationBarrier <ValueType> implements Presentable, Trackable, ClipboardCopyable
 {
 	protected static IsolationPicklerState isolationPicklerState;
 	protected static IsolationUnpicklerState isolationUnpicklerState;
@@ -175,5 +177,14 @@ public class IsolationBarrier <ValueType> implements Presentable, Trackable
 	}
 
 
+	@Override
+	public Object clipboardCopy(ClipboardCopierMemo memo) {
+		Object val = getValue();
+		Object copiedValue = memo.copy(val);
+		return new IsolationBarrier<ValueType>((ValueType)copiedValue);
+	}
+
+
 	private static final StyleSheet style = StyleSheet.style( ObjectPresStyle.objectBorderPaint.as( new Color( 0.25f, 0.0f, 0.5f ) ) );
+
 }
