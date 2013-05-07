@@ -56,6 +56,9 @@ class FieldInstance (object):
 	def __field_getstate__(self):
 		raise NotImplementedError, 'abstract'
 
+	def __field_getstate_for_clipboard_copy__(self, memo):
+		raise NotImplementedError, 'abstract'
+
 
 	def getValueForEditor(self):
 		raise NotImplementedError, 'abstract'
@@ -100,6 +103,9 @@ class Field (object):
 
 	def _getFieldState(self, object_instance):
 		return self._getFieldInstance(object_instance).__field_getstate__()
+
+	def _getFieldStateForClipboardCopy(self, object_instance, memo):
+		return self._getFieldInstance(object_instance).__field_getstate_for_clipboard_copy__(memo)
 
 	def _convertValueFromState(self, object_instance, stateValue):
 		return stateValue
@@ -222,6 +228,9 @@ class ValueFieldInstance (FieldInstance):
 	def __field_getstate__(self):
 		return self.__live.getValue()
 
+	def __field_getstate_for_clipboard_copy__(self, memo):
+		return memo.copy(self.__live.getValue())
+
 	def getValueForEditor(self):
 		return self.value
 
@@ -338,6 +347,9 @@ class ListFieldInstance (FieldInstance):
 	def __field_getstate__(self):
 		return self.__live[:]
 
+	def __field_getstate_for_clipboard_copy__(self, memo):
+		return [memo.copy(x)   for x in self.__live]
+
 	def getValueForEditor(self):
 		return self.__live[:]
 
@@ -417,10 +429,14 @@ class GUIObject (object):
 
 	def __setstate__(self, state):
 		self.__change_history__ = None
-		self._parent = None
 		for field in self._gui_fields__.values():
 			value = (field._convertValueFromState(self, state[field._name]),)   if field._name in state   else None
 			field._instanceInit(self, value)
+
+
+	def __getstate_for_clipboardCopy(self, memo):
+		return {name: memo.copy(field._getFieldStateForClipboardCopy(self, memo))   for name, field in self._gui_fields__.items()}
+
 
 
 	def __get_trackable_contents__(self):
@@ -430,11 +446,26 @@ class GUIObject (object):
 		return contents
 
 
+	def __clipboard_copy__(self, memo):
+		t = type(self)
+		instance = t.__new__(t)
+		state = self.__getstate_for_clipboardCopy(memo)
+		instance.__setstate__(state)
+		return instance
+
+
+
+
 
 class GUINode (GUIObject):
 	def __init__(self, **values):
 		self._parent = None
 		super(GUINode, self).__init__(**values)
+
+
+	def __setstate__(self, state):
+		self._parent = None
+		super(GUINode, self).__setstate__(state)
 
 
 	@property
@@ -497,6 +528,9 @@ class ChildFieldInstance (FieldInstance):
 	def __field_getstate__(self):
 		return self.__live.getValue()
 
+	def __field_getstate_for_clipboard_copy__(self, memo):
+		return memo.copy(self.__live.getValue())
+
 	def getValueForEditor(self):
 		return self.__live.getValue()
 
@@ -553,6 +587,9 @@ class ChildListFieldInstance (FieldInstance):
 
 	def __field_getstate__(self):
 		return self.__live[:]
+
+	def __field_getstate_for_clipboard_copy__(self, memo):
+		return [memo.copy(x)   for x in self.__live]
 
 	def getValueForEditor(self):
 		return self.__live[:]
@@ -680,6 +717,8 @@ class EvalFieldInstance (FieldInstance):
 	def __field_getstate__(self):
 		return _EvalFieldState(self._live.getValue(), self._expr)
 
+	def __field_getstate_for_clipboard_copy__(self, memo):
+		return _EvalFieldState(memo.copy(self._live.getValue()), memo.copy(self._expr))
 
 	def getValueForEditor(self):
 		return self._live.getValue()
@@ -790,6 +829,9 @@ class ExprFieldInstance (FieldInstance):
 	def __field_getstate__(self):
 		return self.__expr
 
+	def __field_getstate_for_clipboard_copy__(self, memo):
+		return memo.copy(self.__expr)
+
 
 	def getValueForEditor(self):
 		return None
@@ -830,6 +872,8 @@ import unittest
 import sys
 import imp
 import pickle
+
+from BritefuryJ.ClipboardFilter import ClipboardCopier
 
 
 
@@ -1038,6 +1082,17 @@ class TestCase_DataModel(unittest.TestCase):
 		self.assertEqual(20, a_io.y.value)
 
 
+	def test_TypedField_clipboardCopy(self):
+		a = self.TypedFieldTest(x=10, y=20)
+
+		a_io = ClipboardCopier.instance.copy(a)
+
+		self.assertIsNot(a, a_io)
+
+		self.assertEqual(10, a_io.x.value)
+		self.assertEqual(20, a_io.y.value)
+
+
 
 	def test_TypedField_editor(self):
 		a = self.TypedFieldTest(x=10, y=20)
@@ -1120,6 +1175,17 @@ class TestCase_DataModel(unittest.TestCase):
 		a = self.ListFieldTest(x=range(5))
 
 		a_io = pickle.loads(pickle.dumps(a))
+
+		self.assertIsNot(a, a_io)
+
+		self.assertEqual(range(5), a_io.x.value)
+
+
+
+	def test_ListField_clipboardCopy(self):
+		a = self.ListFieldTest(x=range(5))
+
+		a_io = ClipboardCopier.instance.copy(a)
 
 		self.assertIsNot(a, a_io)
 
@@ -1227,6 +1293,23 @@ class TestCase_DataModel(unittest.TestCase):
 		b = self.ChildFieldTest(p=a1, q=[a2])
 
 		b_io = pickle.loads(pickle.dumps(b))
+
+		self.assertIsNot(b, b_io)
+
+		self.assertIsInstance(b_io.p.node, self.TypedFieldTest)
+		self.assertIsInstance(b_io.q.nodes[0], self.TypedFieldTest)
+
+		self.assertEqual(10, b_io.p.node.x.value)
+		self.assertEqual(3, b_io.q.nodes[0].x.value)
+
+
+
+	def test_ChildField_clipboardCopy(self):
+		a1 = self.TypedFieldTest(x=10, y=20)
+		a2 = self.TypedFieldTest(x=3, y=4)
+		b = self.ChildFieldTest(p=a1, q=[a2])
+
+		b_io = ClipboardCopier.instance.copy(b)
 
 		self.assertIsNot(b, b_io)
 
@@ -1357,6 +1440,27 @@ class TestCase_DataModel(unittest.TestCase):
 
 		c_io = pickle.loads(pickle.dumps(c))
 
+		self.assertEqual(10.0, c_io.x.constantValue)
+		self.assertEqual(20.0, c_io.y.constantValue)
+		self.assertEqual(x_expr, c_io.x.expr)
+		self.assertEqual(y_expr, c_io.y.expr)
+
+
+
+	def test_EvalField_clipboardCopy(self):
+		c = self.EvalFieldTest()
+
+		c.x.constantValue = 10.0
+		c.y.constantValue = 20.0
+		x_expr = EmbeddedPython2Expr.fromText('a+b')
+		y_expr = EmbeddedPython2Expr.fromText('c+d')
+		c.x.expr = x_expr
+		c.y.expr = y_expr
+
+		c_io = ClipboardCopier.instance.copy(c)
+
+		self.assertIsNot(c.x.expr, c_io.x.expr)
+		self.assertIsNot(c.y.expr, c_io.y.expr)
 		self.assertEqual(10.0, c_io.x.constantValue)
 		self.assertEqual(20.0, c_io.y.constantValue)
 		self.assertEqual(x_expr, c_io.x.expr)

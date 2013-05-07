@@ -68,6 +68,7 @@ class GUIEditorRootComponent (GUIUnaryBranchComponent):
 
 class GUIEditor (object):
 	def __init__(self, contents=None):
+		self.__change_history__ = None
 		self.__root = GUIEditorRootComponent(contents)
 		self.__root._guiEditor = self
 
@@ -76,8 +77,21 @@ class GUIEditor (object):
 		return {'root': self.__root}
 
 	def __setstate__(self, state):
+		self.__change_history__ = None
 		self.__root = state.get('root')  or  state.get('_GUIEditor__root')
 		self.__root._guiEditor = self
+
+
+	def __get_trackable_contents__(self):
+		return [self.__root]
+
+
+	def __clipboard_copy__(self, memo):
+		instance = GUIEditor.__new__(GUIEditor)
+		instance.__change_history__ = None
+		instance.__root = memo.copy(self.__root)
+		instance.__root._guiEditor = self
+		return instance
 
 
 	def __py_evalmodel__(self, codeGen):
