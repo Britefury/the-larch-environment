@@ -13,7 +13,7 @@ from BritefuryJ.Pres.UI import Form
 from LarchCore.Languages.Python2 import Schema as Py
 
 from LarchTools.PythonTools.GUIEditor.DataModel import ExprField, exprBorder
-from LarchTools.PythonTools.GUIEditor.ComponentFields import unaryBranchChildEditUIFormSections
+from LarchTools.PythonTools.GUIEditor.FieldEditor import unaryBranchChildEditUIFormSections
 from LarchTools.PythonTools.GUIEditor.Component import blankCallModel
 from LarchTools.PythonTools.GUIEditor.BranchComponent import GUIUnaryBranchComponent, emptyLabel
 from LarchTools.PythonTools.GUIEditor.ComponentPalette import paletteItem, registerPaletteSubsection
