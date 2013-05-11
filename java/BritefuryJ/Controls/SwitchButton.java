@@ -331,14 +331,12 @@ public class SwitchButton extends ControlPres
 	{
 		final StyleValues usedStyle = Controls.useSwitchButtonAttrs( style );
 
-		AbstractBorder border = Controls.switchButtonBorder.get( style );
-
 		// Get style values
+		AbstractBorder border = style.get( Controls.switchButtonBorder, AbstractBorder.class );
 		double inset = style.get( Controls.switchButtonInset, Double.class );
 		double spacing = style.get( Controls.switchButtonSpacing, Double.class );
 		Paint sepPaint = style.get( Controls.switchButtonSeparatorPaint, Paint.class );
 		float sepThickness = style.get( Controls.switchButtonSeparatorThickness, Float.class );
-		Paint backgNotSelected = style.get( Controls.switchButtonBackgroundNotSelected, Paint.class );
 		Paint backgSelected = style.get( Controls.switchButtonBackgroundSelected, Paint.class );
 		Paint backgHover = style.get( Controls.switchButtonBackgroundHover, Paint.class );
 		StyleSheet internalStyleSheet = style.get( Controls.switchButtonInternalStyle, StyleSheet.class );
@@ -354,18 +352,18 @@ public class SwitchButton extends ControlPres
 
 		if ( orientation == Orientation.HORIZONTAL )
 		{
-			startBorderNotSelected = new FilledBorder( inset, spacing * 0.5, inset, inset, backgNotSelected ).highlight( backgHover );
-			bodyBorderNotSelected = new FilledBorder( spacing * 0.5, spacing * 0.5, inset, inset, backgNotSelected ).highlight( backgHover );
-			endBorderNotSelected = new FilledBorder( spacing * 0.5, inset, inset, inset, backgNotSelected ).highlight( backgHover );
+			startBorderNotSelected = new FilledBorder( inset, spacing * 0.5, inset, inset, null ).highlight( backgHover );
+			bodyBorderNotSelected = new FilledBorder( spacing * 0.5, spacing * 0.5, inset, inset, null ).highlight( backgHover );
+			endBorderNotSelected = new FilledBorder( spacing * 0.5, inset, inset, inset, null ).highlight( backgHover );
 			startBorderSelected = new FilledBorder( inset, spacing * 0.5, inset, inset, backgSelected );
 			bodyBorderSelected = new FilledBorder( spacing * 0.5, spacing * 0.5, inset, inset, backgSelected );
 			endBorderSelected = new FilledBorder( spacing * 0.5, inset, inset, inset, backgSelected );
 		}
 		else if ( orientation == Orientation.VERTICAL )
 		{
-			startBorderNotSelected = new FilledBorder( inset, inset, inset, spacing * 0.5, backgNotSelected ).highlight( backgHover );
-			bodyBorderNotSelected = new FilledBorder( inset, inset, spacing * 0.5, spacing * 0.5, backgNotSelected ).highlight( backgHover );
-			endBorderNotSelected = new FilledBorder( inset, inset, spacing * 0.5, inset, backgNotSelected ).highlight( backgHover );
+			startBorderNotSelected = new FilledBorder( inset, inset, inset, spacing * 0.5, null ).highlight( backgHover );
+			bodyBorderNotSelected = new FilledBorder( inset, inset, spacing * 0.5, spacing * 0.5, null ).highlight( backgHover );
+			endBorderNotSelected = new FilledBorder( inset, inset, spacing * 0.5, inset, null ).highlight( backgHover );
 			startBorderSelected = new FilledBorder( inset, inset, inset, spacing * 0.5, backgSelected );
 			bodyBorderSelected = new FilledBorder( inset, inset, spacing * 0.5, spacing * 0.5, backgSelected );
 			endBorderSelected = new FilledBorder( inset, inset, spacing * 0.5, inset, backgSelected );
