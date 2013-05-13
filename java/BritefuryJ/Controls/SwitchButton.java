@@ -429,7 +429,10 @@ public class SwitchButton extends ControlPres
 			throw new RuntimeException( "Invalid orientation" );
 		}
 
-		switchSequencePres = switchSequencePres.withPainter( new SwitchButtonPainter( sepThickness, sepPaint, orientation ) );
+		if (sepPaint != null)
+		{
+			switchSequencePres = switchSequencePres.withPainter( new SwitchButtonPainter( sepThickness, sepPaint, orientation ) );
+		}
 
 		LSAbstractBox switchSequenceElement = (LSAbstractBox)switchSequencePres.present( ctx, internalStyle );
 
