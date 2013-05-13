@@ -16,12 +16,7 @@ import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.AttributeTable.DerivedValueTable;
 import BritefuryJ.AttributeTable.InheritedAttribute;
 import BritefuryJ.AttributeTable.InheritedAttributeNonNull;
-import BritefuryJ.Graphics.AbstractBorder;
-import BritefuryJ.Graphics.FillPainter;
-import BritefuryJ.Graphics.FilledOutlinePainter;
-import BritefuryJ.Graphics.OutlinePainter;
-import BritefuryJ.Graphics.Painter;
-import BritefuryJ.Graphics.SolidBorder;
+import BritefuryJ.Graphics.*;
 import BritefuryJ.LSpace.Layout.HAlignment;
 import BritefuryJ.LSpace.Layout.VAlignment;
 import BritefuryJ.LSpace.StyleParams.ElementStyleParams;
@@ -195,14 +190,12 @@ public class Controls
 			new SolidBorder( 1.0, 0.0, 5.0, 5.0, new Color( 0.65f, 0.65f, 0.65f ), new Color( 0.95f, 0.95f, 0.975f  ) ) );
 	public static final InheritedAttributeNonNull switchButtonInset = new InheritedAttributeNonNull( controlsNamespace, "switchButtonInset", Double.class, 4.0 );
 	public static final InheritedAttributeNonNull switchButtonSpacing = new InheritedAttributeNonNull( controlsNamespace, "switchButtonSpacing", Double.class, 10.0 );
-	public static final InheritedAttributeNonNull switchButtonSeparatorPaint = new InheritedAttributeNonNull( controlsNamespace, "switchButtonSeparatorPaint", Paint.class, new Color( 0.5f, 0.5f, 0.5f, 0.4f ) );
+	public static final InheritedAttribute switchButtonSeparatorPaint = new InheritedAttribute( controlsNamespace, "switchButtonSeparatorPaint", Paint.class, new Color( 0.5f, 0.5f, 0.5f, 0.4f ) );
 	public static final InheritedAttributeNonNull switchButtonSeparatorThickness = new InheritedAttributeNonNull( controlsNamespace, "switchButtonSeparatorThickness", Float.class, 1.0f );
 	public static final InheritedAttributeNonNull switchButtonBackgroundSelected = new InheritedAttributeNonNull( controlsNamespace, "switchButtonBackgroundSelected", Paint.class, new Color( 0.825f, 0.825f, 0.85f  ) );
 	public static final InheritedAttributeNonNull switchButtonBackgroundHover = new InheritedAttributeNonNull( controlsNamespace, "switchButtonBackgroundHover", Paint.class, new Color( 0.9f, 0.9f, 0.925f  ) );
 	public static final InheritedAttributeNonNull switchButtonInternalStyle = new InheritedAttributeNonNull( controlsNamespace, "switchButtonInternalStyle", StyleSheet.class,
 			StyleSheet.style( Primitive.foreground.as( new Color( 0.1f, 0.225f, 0.35f ) ), Primitive.fontSize.as( 11 ) ) );
-
-
 
 
 	
