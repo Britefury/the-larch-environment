@@ -158,15 +158,22 @@ public class TextEntry extends ControlPres
 				}
 				else if ( event.getKeyCode() == KeyEvent.VK_ESCAPE )
 				{
-					cancel();
-					return true;
+					return cancel();
 				}
 				return false;
 			}
 	
 			public boolean keyTyped(LSElement element, KeyEvent event)
 			{
-				return event.getKeyChar() == KeyEvent.VK_ENTER  ||  event.getKeyChar() == KeyEvent.VK_ESCAPE;
+				if ( event.getKeyChar() == KeyEvent.VK_ENTER)
+				{
+					return true;
+				}
+				else if (event.getKeyChar() == KeyEvent.VK_ESCAPE)
+				{
+					return hasChanged();
+				}
+				return false;
 			}
 			
 			
@@ -393,13 +400,24 @@ public class TextEntry extends ControlPres
 			listener.onAccept( this, t );
 		}
 	
-		public void cancel()
+		public boolean cancel()
 		{
 			ungrabCaret();
-			listener.onCancel( this );
+			if (hasChanged())
+			{
+				listener.onCancel( this );
+				return true;
+			}
+			return false;
 		}
-		
-		
+
+
+		public boolean hasChanged()
+		{
+			return changed;
+		}
+
+
 		private void validate(String t)
 		{
 			textIsValid = validator == null || validator.validateText( this, t );

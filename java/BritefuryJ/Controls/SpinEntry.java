@@ -197,7 +197,7 @@ public abstract class SpinEntry extends ControlPres
 		LSElement upArrowElement = arrowStyle.applyTo( upArrow ).present( ctx, style );
 		Pres downArrow = new Arrow( Arrow.Direction.DOWN, arrowSize ).alignVTop();
 		LSElement downArrowElement = arrowStyle.applyTo( downArrow ).present( ctx, style );
-		Pres arrowsBox = arrowStyle.applyTo( new Column( new Object[] { upArrowElement, downArrowElement } ).alignVCentre() );
+		Pres arrowsBox = arrowStyle.applyTo( new Column( new Object[] { upArrowElement, downArrowElement } ).alignHPack().alignVCentre() );
 		
 		SpinEntryControl.SpinEntryTextListener textListener = new SpinEntryControl.SpinEntryTextListener();
 		
