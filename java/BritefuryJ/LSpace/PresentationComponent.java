@@ -317,7 +317,7 @@ public abstract class PresentationComponent extends JComponent implements Compon
 	
 	
 	public LSRootElement rootElement;
-	private boolean realised, configured, closed;
+	private boolean realised, configured;
 	private Window window;
 	
 	
@@ -331,8 +331,7 @@ public abstract class PresentationComponent extends JComponent implements Compon
 		
 		realised = false;
 		configured = false;
-		closed = false;
-		
+
 		addComponentListener( this );
 		addMouseListener( this );
 		addMouseMotionListener( this );
@@ -610,7 +609,7 @@ public abstract class PresentationComponent extends JComponent implements Compon
 	{
 		Window w = SwingUtilities.getWindowAncestor( this );
 
-		if ( !closed  ||  isHierarchyVisible()  &&  w != null )
+		if ( isHierarchyVisible()  &&  w != null )
 		{
 			sendRealiseEvents();
 		}
