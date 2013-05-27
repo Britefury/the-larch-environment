@@ -16,12 +16,7 @@ import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.AttributeTable.DerivedValueTable;
 import BritefuryJ.AttributeTable.InheritedAttribute;
 import BritefuryJ.AttributeTable.InheritedAttributeNonNull;
-import BritefuryJ.Graphics.AbstractBorder;
-import BritefuryJ.Graphics.FillPainter;
-import BritefuryJ.Graphics.FilledOutlinePainter;
-import BritefuryJ.Graphics.OutlinePainter;
-import BritefuryJ.Graphics.Painter;
-import BritefuryJ.Graphics.SolidBorder;
+import BritefuryJ.Graphics.*;
 import BritefuryJ.LSpace.Layout.HAlignment;
 import BritefuryJ.LSpace.Layout.VAlignment;
 import BritefuryJ.LSpace.StyleParams.ElementStyleParams;
@@ -191,20 +186,16 @@ public class Controls
 	public static final InheritedAttributeNonNull resizeableDragBarPadding = new InheritedAttributeNonNull( controlsNamespace, "resizeableDragBarPadding", Double.class, 2.0 );
 
 
-	public static final InheritedAttributeNonNull switchButtonOutlineThickness = new InheritedAttributeNonNull( controlsNamespace, "switchButtonOutlineThickness", Double.class, 1.0 );
-	public static final InheritedAttributeNonNull switchButtonOutlineRounding = new InheritedAttributeNonNull( controlsNamespace, "switchButtonOutlineRounding", Double.class, 5.0 );
-	public static final InheritedAttributeNonNull switchButtonOutlinePaint = new InheritedAttributeNonNull( controlsNamespace, "switchButtonOutlinePaint", Paint.class, new Color( 0.65f, 0.65f, 0.65f ) );
+	public static final InheritedAttributeNonNull switchButtonBorder = new InheritedAttributeNonNull( controlsNamespace, "switchButtonBorder", AbstractBorder.class,
+			new SolidBorder( 1.0, 0.0, 5.0, 5.0, new Color( 0.65f, 0.65f, 0.65f ), new Color( 0.95f, 0.95f, 0.975f  ) ) );
 	public static final InheritedAttributeNonNull switchButtonInset = new InheritedAttributeNonNull( controlsNamespace, "switchButtonInset", Double.class, 4.0 );
 	public static final InheritedAttributeNonNull switchButtonSpacing = new InheritedAttributeNonNull( controlsNamespace, "switchButtonSpacing", Double.class, 10.0 );
-	public static final InheritedAttributeNonNull switchButtonSeparatorPaint = new InheritedAttributeNonNull( controlsNamespace, "switchButtonSeparatorPaint", Paint.class, new Color( 0.5f, 0.5f, 0.5f, 0.4f ) );
+	public static final InheritedAttribute switchButtonSeparatorPaint = new InheritedAttribute( controlsNamespace, "switchButtonSeparatorPaint", Paint.class, new Color( 0.5f, 0.5f, 0.5f, 0.4f ) );
 	public static final InheritedAttributeNonNull switchButtonSeparatorThickness = new InheritedAttributeNonNull( controlsNamespace, "switchButtonSeparatorThickness", Float.class, 1.0f );
-	public static final InheritedAttributeNonNull switchButtonBackgroundNotSelected = new InheritedAttributeNonNull( controlsNamespace, "switchButtonBackgroundNotSelected", Paint.class, new Color( 0.95f, 0.95f, 0.975f  ) );
 	public static final InheritedAttributeNonNull switchButtonBackgroundSelected = new InheritedAttributeNonNull( controlsNamespace, "switchButtonBackgroundSelected", Paint.class, new Color( 0.825f, 0.825f, 0.85f  ) );
 	public static final InheritedAttributeNonNull switchButtonBackgroundHover = new InheritedAttributeNonNull( controlsNamespace, "switchButtonBackgroundHover", Paint.class, new Color( 0.9f, 0.9f, 0.925f  ) );
 	public static final InheritedAttributeNonNull switchButtonInternalStyle = new InheritedAttributeNonNull( controlsNamespace, "switchButtonInternalStyle", StyleSheet.class,
 			StyleSheet.style( Primitive.foreground.as( new Color( 0.1f, 0.225f, 0.35f ) ), Primitive.fontSize.as( 11 ) ) );
-
-
 
 
 	
@@ -346,22 +337,11 @@ public class Controls
 
 
 
-	public static DerivedValueTable<AbstractBorder> switchButtonBorder = new DerivedValueTable<AbstractBorder>( controlsNamespace )
-	{
-		protected AbstractBorder evaluate(AttributeTable attribs)
-		{
-			double thickness = attribs.get( switchButtonOutlineThickness, Double.class );
-			double rounding = attribs.get( switchButtonOutlineRounding, Double.class );
-			Paint paint = attribs.get( switchButtonOutlinePaint, Paint.class );
-			return new SolidBorder( thickness, 0.0, rounding, rounding, paint, null );
-		}
-	};
-
 	public static StyleValues useSwitchButtonAttrs(StyleValues style)
 	{
-		return style.useAttr( switchButtonOutlineThickness ).useAttr( switchButtonOutlineRounding ).useAttr( switchButtonOutlinePaint )
+		return style.useAttr( switchButtonBorder )
 				.useAttr( switchButtonInset ).useAttr( switchButtonSpacing ).useAttr( switchButtonSeparatorPaint ).useAttr( switchButtonSeparatorThickness )
-				.useAttr( switchButtonBackgroundNotSelected ).useAttr( switchButtonBackgroundSelected ).useAttr( switchButtonBackgroundHover )
+				.useAttr( switchButtonBackgroundSelected ).useAttr( switchButtonBackgroundHover )
 				.useAttr( switchButtonInternalStyle );
 	}
 }
