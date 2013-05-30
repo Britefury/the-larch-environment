@@ -8,10 +8,7 @@ package BritefuryJ.Command;
 
 import java.awt.event.KeyEvent;
 
-import BritefuryJ.LSpace.Anchor;
-import BritefuryJ.LSpace.PageController;
-import BritefuryJ.LSpace.PresentationComponent;
-import BritefuryJ.LSpace.PresentationPopupWindow;
+import BritefuryJ.LSpace.*;
 import BritefuryJ.LSpace.Input.Keyboard.Keyboard;
 import BritefuryJ.LSpace.Input.Keyboard.KeyboardInteractor;
 import BritefuryJ.Pres.Pres;
@@ -35,8 +32,9 @@ public class CommandBar
 			{
 				if ( popup == null )
 				{
-					Pres space = new SpaceBin( presentation.getRootElement().getAllocWidth(), -1.0, console  ).alignHExpand();
-					popup = space.popup( presentation.getRootElement(), Anchor.TOP, Anchor.TOP, false, true );
+					double width = presentation.getRootElement().getAllocWidth();
+					Pres space = new SpaceBin( width, 1.0, LSSpaceBin.SizeConstraint.FIXED, LSSpaceBin.SizeConstraint.LARGER, console ).alignHExpand();
+					popup = space.popup( presentation.getRootElement(), Anchor.TOP_LEFT, Anchor.TOP_LEFT, false, true );
 					commandBarSwitchInteractor.addToKeyboard( popup.getPresentationComponent().getRootElement().getKeyboard() );
 					popup.getPresentationComponent().grabFocus();
 				}

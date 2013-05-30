@@ -65,4 +65,10 @@ public class Anchor
 	{
 		return box.getLower().add( new Vector2( box.getWidth() * propX, box.getHeight() * propY ) );
 	}
+
+
+	public String toString()
+	{
+		return "Anchor(propX=" + propX + ", propY=" + propY + ")";
+	}
 }
