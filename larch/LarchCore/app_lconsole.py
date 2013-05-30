@@ -22,8 +22,8 @@ from LarchCore.Languages.Python2.Python2Importer import importPy2File
 
 def start_lconsole():
 	UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() )
-	app.appInit()
 
+	app.appInit()
 	world = World()
 	world.enableImportHooks()
 	console = Console.Console( 'Console' )

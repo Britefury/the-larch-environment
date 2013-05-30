@@ -35,7 +35,7 @@ public class UI
 
 
 	public static final InheritedAttributeNonNull uiTextAttrs = new InheritedAttributeNonNull( uiNamespace, "uiTextAttrs", StyleSheet.class,
-			StyleSheet.style( Primitive.editable.as( false ), Primitive.selectable.as( false ), Primitive.fontFace.as( Primitive.lightFontName ) ) );
+			StyleSheet.style( Primitive.editable.as( false ), Primitive.selectable.as( false ), Primitive.fontFace.as( Primitive.lightFontName) ) );
 
 	public static final InheritedAttributeNonNull normalTextAttrs = new InheritedAttributeNonNull( uiNamespace, "normalTextAttrs", StyleSheet.class,
 			StyleSheet.style( Primitive.foreground.as( Color.BLACK )) );

@@ -9,10 +9,13 @@ from BritefuryJ.GraphViz import GraphViz
 
 from Britefury.Config import PathsConfigPage, GraphVizConfigPage, FontConfigPage, TipBoxConfig
 
+from Britefury.app_fonts import loadFonts
+
 
 _shutdownListeners = []
 
 def appInit():
+	loadFonts()
 	PathsConfigPage.initPathsConfig()
 	GraphVizConfigPage.initGraphVizConfig()
 	FontConfigPage.initFontConfig()

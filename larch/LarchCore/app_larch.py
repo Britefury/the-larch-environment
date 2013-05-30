@@ -23,7 +23,6 @@ def start_larch():
 	global world
 
 	UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() )
-	app.appInit()
 
 
 
@@ -49,6 +48,7 @@ def start_larch():
 		app_in_jar.scanLarchJar()
 
 
+	app.appInit()
 	world = World()
 	world.enableImportHooks()
 

@@ -13,28 +13,11 @@ import java.util.HashMap;
 
 public class FontMap
 {
-	private static ArrayList<String> allFontNames = new ArrayList<String>();
-	private static HashMap<String, String> fontNameToAvailableFontName = new HashMap<String, String>();
+	private static ArrayList<String> allFontNames = null;
+	private static HashMap<String, String> fontNameToAvailableFontName = null;
 	
 	
-	static
-	{
-		GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
-		Font[] allFonts = env.getAllFonts();
-		
-		allFontNames.ensureCapacity( allFonts.length + 5 );
-		allFontNames.add( Font.DIALOG.toLowerCase() );
-		allFontNames.add( Font.DIALOG_INPUT.toLowerCase() );
-		allFontNames.add( Font.MONOSPACED.toLowerCase() );
-		allFontNames.add( Font.SANS_SERIF.toLowerCase() );
-		allFontNames.add( Font.SERIF.toLowerCase() );
-		for (Font font: allFonts)
-		{
-			allFontNames.add( font.getName().toLowerCase() );
-		}
-	}
-	
-	
+
 	public static Iterable<String> getAvailableFontNames()
 	{
 		return allFontNames;
@@ -43,6 +26,8 @@ public class FontMap
 	
 	public static String getAvailableFontName(String name)
 	{
+		refreshFontMap();
+
 		String availableName = fontNameToAvailableFontName.get( name );
 		
 		if ( availableName == null )
@@ -57,6 +42,8 @@ public class FontMap
 
 	private static String findAvailableFont(String name)
 	{
+		refreshFontMap();
+
 		String[] choices = name.split( ";" );
 		
 		for (String choice: choices)
@@ -75,4 +62,31 @@ public class FontMap
 		
 		return Font.SANS_SERIF;
 	}
+
+
+
+	private static void refreshFontMap()
+	{
+		GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		Font[] allFonts = env.getAllFonts();
+		int numFontNames = allFonts.length + 5;
+
+		if (allFontNames == null  ||  allFontNames.size() != numFontNames)
+		{
+			allFontNames = new ArrayList<String>();
+			allFontNames.ensureCapacity( numFontNames );
+			allFontNames.add( Font.DIALOG.toLowerCase() );
+			allFontNames.add( Font.DIALOG_INPUT.toLowerCase() );
+			allFontNames.add( Font.MONOSPACED.toLowerCase() );
+			allFontNames.add( Font.SANS_SERIF.toLowerCase() );
+			allFontNames.add( Font.SERIF.toLowerCase() );
+			for (Font font: allFonts)
+			{
+				allFontNames.add( font.getName().toLowerCase() );
+			}
+
+			fontNameToAvailableFontName = new HashMap<String, String>();
+		}
+	}
+
 }

@@ -90,7 +90,7 @@ def _collapsibleFontChooser(title, choiceValue, sampleFn):
 
 
 class FontConfiguration (object):
-	def __init__(self, generic='SansSerif', normal='SansSerif', heading='Serif', title='Serif', uiHeading='SansSerif'):
+	def __init__(self, generic=Primitive.genericFontName, normal=Primitive.normalTextFontName, heading=Primitive.headingFontName, title=Primitive.titleFontName, uiHeading=Primitive.lightFontName):
 		self._generic = LiveValue( generic )
 		self._normal = LiveValue( normal )
 		self._heading = LiveValue( heading )
@@ -203,7 +203,8 @@ class FontConfiguration (object):
 
 
 
-_basicFontConfig = FontConfiguration()
+_builtInFontConfig = FontConfiguration()
+_basicFontConfig = FontConfiguration(generic='SansSerif', normal='SansSerif', heading='Serif', title='Serif', uiHeading='SansSerif')
 _windowsFontConfig = FontConfiguration( generic='DejaVu Sans; SansSerif', normal='DejaVu Sans; SansSerif', heading='Perpetua; Serif', title='Lucida Bright; Serif', uiHeading='Dotum; Gulim; SansSerif' )
 _linuxFontConfig = FontConfiguration( generic='SansSerif', normal='SansSerif', heading='Un Batang; Serif', title='Norasi; Bitstream Charter; Serif', uiHeading='DejaVu Sans ExtraLight; Sawasdee; SansSerif' )
 _macFontConfig = FontConfiguration( generic='Geneva; SansSerif', normal='Geneva; SansSerif', heading='Perpetua; Serif', title='CalistoMT; Serif', uiHeading='Gulim; SansSerif' )
@@ -211,38 +212,26 @@ _macFontConfig = FontConfiguration( generic='Geneva; SansSerif', normal='Geneva;
 
 
 
-_platformNameBasic = 'basic'
 _platformNameWindows = 'windows'
 _platformNameLinux = 'linux'
 _platformNameMac = 'mac'
+_platformNameBasic = 'basic'
 
 _configByPlatform = {
-	_platformNameBasic : _basicFontConfig,
 	_platformNameWindows : _windowsFontConfig,
 	_platformNameLinux : _linuxFontConfig,
-	_platformNameMac : _macFontConfig }
+	_platformNameMac : _macFontConfig,
+	_platformNameBasic : _basicFontConfig,
+}
 
 
 _fontConfigChoices = [
-	( None, 'Platform default' ),
+	( None, 'Built in' ),
 	( _platformNameWindows, 'Windows' ),
 	( _platformNameLinux, 'Linux' ),
 	( _platformNameMac, 'Mac' ),
 	( _platformNameBasic, 'Basic' )
 ]
-
-
-
-def _getCurrentPlatformName():
-	osName = sys.registry['os.name']
-	if osName.startswith( 'Windows' ):
-		return _platformNameWindows
-	elif osName.startswith( 'Linux' ):
-		return _platformNameLinux
-	elif osName.startswith( 'Mac' ):
-		return _platformNameMac
-	else:
-		return _platformNameBasic
 
 
 
@@ -253,8 +242,7 @@ def _fontConfigForName(config):
 		# config is a name
 		return _configByPlatform.get( config, _basicFontConfig )
 	elif config is None:
-		name = _getCurrentPlatformName()
-		return _configByPlatform.get( name, _basicFontConfig )
+		return _builtInFontConfig
 	else:
 		raise TypeError, 'invalid config type'
 
