@@ -32,6 +32,7 @@ dirsForSource = [
 
 	( 'java', '*.java' ),
 	( 'extlibs', '*.jar' ),
+	( 'fonts', '*.*' ),
 ]
 
 dirsForBin = [
@@ -40,6 +41,7 @@ dirsForBin = [
 	( larchDir( 'LarchTools' ), '*.png' ),
 	( larchDir( 'images' ), '*.png' ),
 	( 'extlibs', '*.jar' ),
+	( 'fonts', '*.*' ),
 	]
 
 dirsForBinCompile = [ larchDir( 'Britefury' ), larchDir( 'LarchCore' ), larchDir( 'LarchTools' ) ]
