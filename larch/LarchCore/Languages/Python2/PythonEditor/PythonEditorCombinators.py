@@ -28,7 +28,7 @@ from BritefuryJ.Editor.SyntaxRecognizing.Precedence import PrecedenceBrackets
 class PythonEditorStyle (object):
 	pythonEditor = AttributeNamespace( 'pythonEditor' )
 
-	_pythonCodeFont = 'Trebuchet MS; SansSerif'
+	_pythonCodeFont = 'Noto Sans; SansSerif'
 
 	#keywordStyle = InheritedAttributeNonNull( pythonEditor, 'keywordStyle', StyleSheet,
 							#StyleSheet.style( Primitive.fontFace( _pythonCodeFont ), Primitive.fontSize( 14 ), Primitive.fontBold( True ),

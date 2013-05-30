@@ -7,7 +7,7 @@
 ##-*************************
 from java.net import URI
 
-from BritefuryJ.Pres.Primitive import Primitive, Image, Column, Row
+from BritefuryJ.Pres.Primitive import Primitive, Image, Column, Row, Spacer
 
 from BritefuryJ.Controls import Hyperlink
 
@@ -30,14 +30,27 @@ class AboutPage (object):
 		jythonLink = Hyperlink( 'Jython', URI( 'http://www.jython.org/' ) )
 		jerichoLink = Hyperlink( 'Jericho HTML parser', URI( 'http://jericho.htmlparser.net' ) )
 		salamanderLink = Hyperlink( 'SVG Salamander', URI( 'http://svgsalamander.java.net/' ) )
-		notes = NormalText( [ 'This program makes use of ', jythonLink, ', the ', jerichoLink, ', and ', salamanderLink ] )
+		googleFontsLink = Hyperlink('Google Fonts', URI('http://www.google.com/fonts'))
+
+		jythonAcks = NormalText(['The Larch Environment incorporates the ', jythonLink, ' interpreter.'])
+		libraryAcks = NormalText(['Larch incorporates the ', jerichoLink, ', and ', salamanderLink, ' libraries.'])
+		fontAcks = NormalText(['Larch incorporates the following fonts (found at ', googleFontsLink, '): ',
+				       'Arimo (by Steve Matteson), Lora (by Cyreal), Nobile (by Vernon Adams), Noto Sans (by Google), ',
+				       'Open Sans (by Steve Matteson), PT Serif (by ParaType), and Source Sans Pro (by Paul D. Hunt)'])
 
 		copyright = NormalText( '(C) copyright Geoffrey French 2008-2013' )
 
 		homePage = Hyperlink( 'The Larch Environment website', URI( 'http://www.larchenvironment.com' ) )
 
 		head = Head( [ linkHeader, title ] )
-		body = Body( [ splash.padY( 20.0 ).alignHCentre(), desc.padY( 10.0 ).alignHCentre(), notes.padY( 20.0 ).alignHCentre(), Row( [ copyright.alignHLeft(), homePage.alignHRight() ] ).pad( 10.0, 10.0 ).alignHExpand() ] )
+		body = Body( [ splash.padY( 20.0 ).alignHCentre(),
+			       desc.padY( 10.0 ).alignHCentre(),
+			       Spacer(0.0, 10.0),
+			       jythonAcks.pad( 25.0, 5.0 ).alignHLeft(),
+			       libraryAcks.pad( 25.0, 5.0 ).alignHLeft(),
+			       fontAcks.pad(25.0,  5.0 ).alignHLeft(),
+			       Spacer(0.0, 10.0),
+			       Row( [ copyright.alignHLeft(), homePage.alignHRight() ] ).pad( 10.0, 10.0 ).alignHExpand() ] )
 		return StyleSheet.style( Primitive.editable( False ) ).applyTo( Page( [ head, body ] ) )
 
 

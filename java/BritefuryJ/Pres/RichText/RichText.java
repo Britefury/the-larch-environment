@@ -67,21 +67,22 @@ public class RichText
 	public static final InheritedAttributeNonNull linkHeaderPadding = new InheritedAttributeNonNull( richTextNamespace, "linkHeaderPadding", Double.class, 5.0 );
 
 	public static final InheritedAttributeNonNull titleTextAttrs = new InheritedAttributeNonNull( richTextNamespace, "titleTextAttrs", StyleSheet.class,
-		    StyleSheet.style( Primitive.fontFace.as( Primitive.titleFontName ), Primitive.fontSize.as( 36 ) ) );
+		    StyleSheet.style( Primitive.fontFace.as( Primitive.titleFontName), Primitive.fontSize.as( 36 ) ) );
 	public static final InheritedAttributeNonNull titlePadding = new InheritedAttributeNonNull( richTextNamespace, "titlePadding", Double.class, 5.0 );
 	public static final InheritedAttributeNonNull titleBackground = new InheritedAttributeNonNull( richTextNamespace, "titleBackground", Paint.class, new Color( 232, 232, 232 ) );
 	public static final InheritedAttributeNonNull titleBorderWidth = new InheritedAttributeNonNull( richTextNamespace, "titleBorderWidth", Double.class, 10.0 );
 
 	public static final InheritedAttributeNonNull subtitleTextAttrs = new InheritedAttributeNonNull( richTextNamespace, "subtitleTextAttrs", StyleSheet.class,
-		    StyleSheet.style( Primitive.fontFace.as( Primitive.sansSerifFontName ), Primitive.fontSize.as( 14 ), Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.05f ) ) ) );
+		    StyleSheet.style( Primitive.fontFace.as( Primitive.genericFontName), Primitive.fontSize.as( 14 ), Primitive.foreground.as( new Color( 0.0f, 0.5f, 0.05f ) ) ) );
 
-	public static final InheritedAttributeNonNull normalTextAttrs = new InheritedAttributeNonNull( richTextNamespace, "normalTextAttrs", StyleSheet.class, StyleSheet.instance );
+	public static final InheritedAttributeNonNull normalTextAttrs = new InheritedAttributeNonNull( richTextNamespace, "normalTextAttrs", StyleSheet.class,
+			StyleSheet.style( Primitive.fontFace.as( Primitive.normalTextFontName) ) );
 
 	public static final InheritedAttributeNonNull captionTextAttrs = new InheritedAttributeNonNull( richTextNamespace, "captionTextAttrs", StyleSheet.class,
 		    StyleSheet.style( Primitive.fontSize.as( 10 ), Primitive.fontBold.as( true ), Primitive.foreground.as( new Color( 0.25f, 0.5f, 0.75f ) ) ) );
 
 	public static final InheritedAttributeNonNull headingTextAttrs = new InheritedAttributeNonNull( richTextNamespace, "headingTextAttrs", StyleSheet.class,
-		    StyleSheet.style( Primitive.fontFace.as( Primitive.serifFontName ) ) );
+		    StyleSheet.style( Primitive.fontFace.as( Primitive.headingFontName) ) );
 	public static final InheritedAttributeNonNull h1TextAttrs = new InheritedAttributeNonNull( richTextNamespace, "h1TextAttrs", StyleSheet.class,
 		    StyleSheet.style( Primitive.fontSize.as( 28 ), Primitive.fontBold.as( true ), Primitive.foreground.as( blueH1Colour ) ) );
 	public static final InheritedAttributeNonNull h2TextAttrs = new InheritedAttributeNonNull( richTextNamespace, "h2TextAttrs", StyleSheet.class,
