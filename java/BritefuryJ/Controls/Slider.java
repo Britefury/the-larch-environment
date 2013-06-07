@@ -181,6 +181,8 @@ public abstract class Slider extends ControlPres
 			super( ctx, style );
 			
 			this.value = value;
+			this.value.addListener(this);
+
 			this.element = element;
 			this.backgroundPainter = backgroundPainter;
 			this.backgroundHoverPainter = backgroundHoverPainter;
@@ -235,10 +237,12 @@ public abstract class Slider extends ControlPres
 	
 	
 	private LiveSource valueSource;
+    private double width;
 	
-	public Slider(LiveSource valueSource)
+	public Slider(LiveSource valueSource, double width)
 	{
 		this.valueSource = valueSource;
+        this.width = width;
 	}
 
 
@@ -255,8 +259,9 @@ public abstract class Slider extends ControlPres
 		double rounding = style.get( Controls.sliderRounding, Double.class );
 		double size = style.get( Controls.sliderSize, Double.class ); 
 		
-		
-		Pres slider = boxStyle.applyTo( new Spacer( 0.0, size ).alignHExpand() );
+		double w = width > 0.0  ?  width  :  size;
+
+		Pres slider = boxStyle.applyTo( new Spacer( w, size ).alignHExpand().alignVExpand() );
 		
 		
 		LSElement element = slider.present( ctx, style );
