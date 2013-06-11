@@ -69,7 +69,7 @@ public abstract class SpinEntry extends ControlPres
 					{
 						if ( ( event.getPointer().getModifiers() & Modifier.CTRL ) != 0 )
 						{
-							onPage( bUp );
+							onJump(bUp);
 						}
 						else
 						{
@@ -79,7 +79,7 @@ public abstract class SpinEntry extends ControlPres
 					}
 					else if ( event.getButton() == 2 )
 					{
-						onPage( bUp );
+						onJump(bUp);
 						return true;
 					}
 					
@@ -136,7 +136,7 @@ public abstract class SpinEntry extends ControlPres
 		
 		protected abstract void onTextChanged(String text);
 		protected abstract void onStep(boolean bUp);
-		protected abstract void onPage(boolean bUp);
+		protected abstract void onJump(boolean bUp);
 		protected abstract void onDrag(Object startValue, double delta);
 		protected abstract Object storeValue();
 		

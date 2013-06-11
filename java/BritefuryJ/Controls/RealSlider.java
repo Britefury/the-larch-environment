@@ -102,28 +102,28 @@ public class RealSlider extends Slider
 	private RealSliderListener listener;
 	
 	
-	private RealSlider(LiveSource valueSource, double min, double max, double pivot, RealSliderListener listener)
+	private RealSlider(LiveSource valueSource, double min, double max, double pivot, double width, RealSliderListener listener)
 	{
-		super( valueSource );
+		super( valueSource, width );
 		this.min = min;
 		this.max = max;
 		this.pivot = pivot;
 		this.listener = listener;
 	}
 	
-	public RealSlider(double initialValue, double min, double max, double pivot, RealSliderListener listener)
+	public RealSlider(double initialValue, double min, double max, double pivot, double width, RealSliderListener listener)
 	{
-		this( new LiveSourceValue( initialValue ), min, max, pivot, listener );
+		this( new LiveSourceValue( initialValue ), min, max, pivot, width, listener );
 	}
 	
-	public RealSlider(LiveInterface value, double min, double max, double pivot, RealSliderListener listener)
+	public RealSlider(LiveInterface value, double min, double max, double pivot, double width, RealSliderListener listener)
 	{
-		this( new LiveSourceRef( value ), min, max, pivot, listener );
+		this( new LiveSourceRef( value ), min, max, pivot, width, listener );
 	}
 	
-	public RealSlider(LiveValue value, double min, double max, double pivot)
+	public RealSlider(LiveValue value, double min, double max, double pivot, double width)
 	{
-		this( new LiveSourceRef( value ), min, max, pivot, new CommitListener( value ) );
+		this( new LiveSourceRef( value ), min, max, pivot, width, new CommitListener( value ) );
 	}
 	
 	

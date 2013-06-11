@@ -23,20 +23,20 @@ public class RealSpinEntry extends SpinEntry
 
 	public static class RealSpinEntryControl extends SpinEntryControl
 	{
-		private double min, max, stepSize, pageSize;
+		private double min, max, stepSize, jumpSize;
 		private RealSpinEntryListener listener;
 		
 	
 		protected RealSpinEntryControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element, TextEntry.TextEntryControl textEntry,
 				LSElement upSpinButton, LSElement downSpinButton, SpinEntryTextListener textListener,
-				double min, double max, double stepSize, double pageSize, RealSpinEntryListener listener)
+				double min, double max, double stepSize, double jumpSize, RealSpinEntryListener listener)
 		{
 			super( ctx, style, value, element, textEntry, upSpinButton, downSpinButton, textListener );
 			
 			this.min = min;
 			this.max = max;
 			this.stepSize = stepSize;
-			this.pageSize = pageSize;
+			this.jumpSize = jumpSize;
 			this.listener = listener;
 	
 			element.setFixedValue( value.elementValueFunction() );
@@ -84,9 +84,9 @@ public class RealSpinEntry extends SpinEntry
 			changeValue( getValue()   +   ( bUp  ?  stepSize  :  -stepSize ) ); 
 		}
 		
-		protected void onPage(boolean bUp)
+		protected void onJump(boolean bUp)
 		{
-			changeValue( getValue()   +   ( bUp  ?  pageSize  :  -pageSize ) ); 
+			changeValue( getValue()   +   ( bUp  ? jumpSize :  -jumpSize) );
 		}
 		
 		protected void onDrag(Object startValue, double delta)
@@ -120,33 +120,33 @@ public class RealSpinEntry extends SpinEntry
 
 
 	
-	private double min, max, stepSize, pageSize;
+	private double min, max, stepSize, jumpSize;
 	private RealSpinEntryListener listener;
 	
 	
-	private RealSpinEntry(LiveSource valueSource, double min, double max, double stepSize, double pageSize, RealSpinEntryListener listener)
+	private RealSpinEntry(LiveSource valueSource, double min, double max, double stepSize, double jumpSize, RealSpinEntryListener listener)
 	{
 		super( valueSource );
 		this.min = min;
 		this.max = max;
 		this.stepSize = stepSize;
-		this.pageSize = pageSize;
+		this.jumpSize = jumpSize;
 		this.listener = listener;
 	}
 	
-	public RealSpinEntry(double initialValue, double min, double max, double stepSize, double pageSize, RealSpinEntryListener listener)
+	public RealSpinEntry(double initialValue, double min, double max, double stepSize, double jumpSize, RealSpinEntryListener listener)
 	{
-		this( new LiveSourceValue( initialValue ), min, max, stepSize, pageSize, listener );
+		this( new LiveSourceValue( initialValue ), min, max, stepSize, jumpSize, listener );
 	}
 	
-	public RealSpinEntry(LiveInterface value, double min, double max, double stepSize, double pageSize, RealSpinEntryListener listener)
+	public RealSpinEntry(LiveInterface value, double min, double max, double stepSize, double jumpSize, RealSpinEntryListener listener)
 	{
-		this( new LiveSourceRef( value ), min, max, stepSize, pageSize, listener );
+		this( new LiveSourceRef( value ), min, max, stepSize, jumpSize, listener );
 	}
 	
-	public RealSpinEntry(LiveValue value, double min, double max, double stepSize, double pageSize)
+	public RealSpinEntry(LiveValue value, double min, double max, double stepSize, double jumpSize)
 	{
-		this( new LiveSourceRef( value ), min, max, stepSize, pageSize, new CommitListener( value ) );
+		this( new LiveSourceRef( value ), min, max, stepSize, jumpSize, new CommitListener( value ) );
 	}
 	
 	
@@ -166,6 +166,6 @@ public class RealSpinEntry extends SpinEntry
 	protected SpinEntryControl createSpinEntryControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element, TextEntry.TextEntryControl entryControl, LSElement upArrow,
 			LSElement downArrow, SpinEntryControl.SpinEntryTextListener textListener)
 	{
-		return new RealSpinEntryControl( ctx, style, value, element, entryControl, upArrow, downArrow, textListener, min, max, stepSize, pageSize, listener );
+		return new RealSpinEntryControl( ctx, style, value, element, entryControl, upArrow, downArrow, textListener, min, max, stepSize, jumpSize, listener );
 	}
 }
