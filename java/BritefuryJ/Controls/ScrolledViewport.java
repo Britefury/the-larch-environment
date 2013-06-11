@@ -15,36 +15,37 @@ import BritefuryJ.Pres.Primitive.SpaceBin;
 public class ScrolledViewport extends AbstractScrolledViewport
 {
 	private double width, height;
-	private LSSpaceBin.SizeConstraint sizeConstraint;
+	private LSSpaceBin.SizeConstraint sizeConstraintX, sizeConstraintY;
 	
 	
-	public ScrolledViewport(Object child, double width, double height, LSSpaceBin.SizeConstraint sizeConstraint, boolean scrollX, boolean scrollY, PersistentState state)
+	public ScrolledViewport(Object child, double width, double height, LSSpaceBin.SizeConstraint sizeConstraintX,  LSSpaceBin.SizeConstraint sizeConstraintY, boolean scrollX, boolean scrollY, PersistentState state)
 	{
 		super( child, scrollX, scrollY, state );
 		this.width = width;
 		this.height = height;
-		this.sizeConstraint = sizeConstraint;
+		this.sizeConstraintX = sizeConstraintX;
+		this.sizeConstraintY = sizeConstraintY;
 	}
 	
-	public ScrolledViewport(Object child, double width, double height, LSSpaceBin.SizeConstraint sizeConstraint, PersistentState state)
+	public ScrolledViewport(Object child, double width, double height, LSSpaceBin.SizeConstraint sizeConstraintX,  LSSpaceBin.SizeConstraint sizeConstraintY, PersistentState state)
 	{
-		this( child, width, height, sizeConstraint, true, true, state );
+		this( child, width, height, sizeConstraintX, sizeConstraintY, true, true, state );
 	}
 	
 	public ScrolledViewport(Object child, double width, double height, boolean scrollX, boolean scrollY, PersistentState state)
 	{
-		this( child, width, height, LSSpaceBin.SizeConstraint.LARGER, scrollX, scrollY, state );
+		this( child, width, height, LSSpaceBin.SizeConstraint.LARGER, LSSpaceBin.SizeConstraint.LARGER, scrollX, scrollY, state );
 	}
 	
 	public ScrolledViewport(Object child, double width, double height, PersistentState state)
 	{
-		this( child, width, height, LSSpaceBin.SizeConstraint.LARGER, true, true, state );
+		this( child, width, height, LSSpaceBin.SizeConstraint.LARGER, LSSpaceBin.SizeConstraint.LARGER, true, true, state );
 	}
 
 	
 	@Override
 	protected Pres createViewportBin(LSElement viewport)
 	{
-		return new SpaceBin( width, height, sizeConstraint, viewport );
+		return new SpaceBin( width, height, sizeConstraintX, sizeConstraintY, viewport );
 	}
 }
