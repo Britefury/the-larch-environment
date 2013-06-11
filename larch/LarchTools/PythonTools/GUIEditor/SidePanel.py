@@ -34,8 +34,8 @@ def _createBottomPane(rootElement):
 def _createSidePanel(rootElement):
 	palette = createPalette()
 	bottomPane = _createBottomPane(rootElement)
-	palette = ScrolledViewport(palette.alignVTop().alignHPack(), 150.0, 150.0, SizeConstraint.LARGER, None).alignHExpand().alignVExpand()
-	bottomPane = ScrolledViewport(bottomPane.alignVTop().alignHPack(), 150.0, 150.0, SizeConstraint.LARGER, None).alignHExpand().alignVExpand()
+	palette = ScrolledViewport(palette.alignVTop().alignHPack(), 150.0, 150.0, None).alignHExpand().alignVExpand()
+	bottomPane = ScrolledViewport(bottomPane.alignVTop().alignHPack(), 150.0, 150.0, None).alignHExpand().alignVExpand()
 	bottomPane = ResizeableBin(bottomPane).resizeTop(350.0)
 	return Column([palette.alignHExpand().alignVExpand(), bottomPane.alignHExpand().alignVExpand()])
 
