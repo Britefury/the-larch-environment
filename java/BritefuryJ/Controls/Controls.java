@@ -33,8 +33,14 @@ public class Controls
 			new SolidBorder( 1.0, 3.0, new Color( 0.7f, 0.7f, 0.7f ), new Color( 0.925f, 0.925f, 0.925f  ), new Color( 0.6f, 0.6f, 0.6f ), new Color( 0.875f, 0.875f, 0.875f ) ) );
 	public static final InheritedAttributeNonNull buttonAttrs = new InheritedAttributeNonNull( controlsNamespace, "buttonAttrs", StyleSheet.class,
 			    StyleSheet.style( Primitive.foreground.as( new Color( 0.1f, 0.225f, 0.35f ) ), Primitive.fontSize.as( 12 ) ) );
-	
-	
+
+
+	public static final InheritedAttributeNonNull toggleButtonInactiveBorder = new InheritedAttributeNonNull( controlsNamespace, "toggleButtonInactiveBorder", AbstractBorder.class,
+			new SolidBorder( 1.0, 3.0, new Color( 0.65f, 0.65f, 0.65f ), new Color( 0.95f, 0.95f, 0.95f  ), new Color( 0.65f, 0.65f, 0.65f ), new Color( 0.9f, 0.9f, 0.9f ) ) );
+	public static final InheritedAttributeNonNull toggleButtonActiveBorder = new InheritedAttributeNonNull( controlsNamespace, "toggleButtonActiveBorder", AbstractBorder.class,
+			new SolidBorder( 1.0, 3.0, new Color( 0.6f, 0.6f, 0.6f ), new Color( 0.825f, 0.825f, 0.825f  ), new Color( 0.6f, 0.6f, 0.6f ), new Color( 0.775f, 0.775f, 0.775f ) ) );
+
+
 //	public static final InheritedAttributeNonNull hyperlinkAttrs = new InheritedAttributeNonNull( controlsNamespace, "hyperlinkAttrs", StyleSheet.class,
 //		    StyleSheet.style( Primitive.editable.as( false ), Primitive.foreground.as( new Color( 222, 92, 66 ) ), Primitive.hoverForeground.as( Color.red ), Primitive.cursor.as( new Cursor( Cursor.HAND_CURSOR ) ) ) );
 
