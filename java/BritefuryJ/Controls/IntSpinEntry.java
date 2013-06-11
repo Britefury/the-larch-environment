@@ -25,20 +25,20 @@ public class IntSpinEntry extends SpinEntry
 	
 	public static class IntSpinEntryControl extends SpinEntryControl
 	{
-		private int min, max, stepSize, pageSize;
+		private int min, max, stepSize, jumpSize;
 		private IntSpinEntryListener listener;
 		
 	
 		protected IntSpinEntryControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element, TextEntry.TextEntryControl textEntry,
 				LSElement upSpinButton, LSElement downSpinButton, SpinEntryTextListener textListener,
-				int min, int max, int stepSize, int pageSize, IntSpinEntryListener listener)
+				int min, int max, int stepSize, int jumpSize, IntSpinEntryListener listener)
 		{
 			super( ctx, style, value, element, textEntry, upSpinButton, downSpinButton, textListener );
 			
 			this.min = min;
 			this.max = max;
 			this.stepSize = stepSize;
-			this.pageSize = pageSize;
+			this.jumpSize = jumpSize;
 			this.listener = listener;
 			
 			element.setFixedValue( value.elementValueFunction() );
@@ -84,9 +84,9 @@ public class IntSpinEntry extends SpinEntry
 			changeValue( getValue()   +   ( bUp  ?  stepSize  :  -stepSize ) ); 
 		}
 		
-		protected void onPage(boolean bUp)
+		protected void onJump(boolean bUp)
 		{
-			changeValue( getValue()   +   ( bUp  ?  pageSize  :  -pageSize ) ); 
+			changeValue( getValue()   +   ( bUp  ? jumpSize :  -jumpSize) );
 		}
 		
 		protected void onDrag(Object startValue, double delta)
@@ -120,33 +120,33 @@ public class IntSpinEntry extends SpinEntry
 
 
 	
-	private int min, max, stepSize, pageSize;
+	private int min, max, stepSize, jumpSize;
 	private IntSpinEntryListener listener;
 	
 	
-	private IntSpinEntry(LiveSource valueSource, int min, int max, int stepSize, int pageSize, IntSpinEntryListener listener)
+	private IntSpinEntry(LiveSource valueSource, int min, int max, int stepSize, int jumpSize, IntSpinEntryListener listener)
 	{
 		super( valueSource );
 		this.min = min;
 		this.max = max;
 		this.stepSize = stepSize;
-		this.pageSize = pageSize;
+		this.jumpSize = jumpSize;
 		this.listener = listener;
 	}
 	
-	public IntSpinEntry(int initialValue, int min, int max, int stepSize, int pageSize, IntSpinEntryListener listener)
+	public IntSpinEntry(int initialValue, int min, int max, int stepSize, int jumpSize, IntSpinEntryListener listener)
 	{
-		this( new LiveSourceValue( initialValue ), min, max, stepSize, pageSize, listener );
+		this( new LiveSourceValue( initialValue ), min, max, stepSize, jumpSize, listener );
 	}
 	
-	public IntSpinEntry(LiveInterface value, int min, int max, int stepSize, int pageSize, IntSpinEntryListener listener)
+	public IntSpinEntry(LiveInterface value, int min, int max, int stepSize, int jumpSize, IntSpinEntryListener listener)
 	{
-		this( new LiveSourceRef( value ), min, max, stepSize, pageSize, listener );
+		this( new LiveSourceRef( value ), min, max, stepSize, jumpSize, listener );
 	}
 	
-	public IntSpinEntry(LiveValue value, int min, int max, int stepSize, int pageSize)
+	public IntSpinEntry(LiveValue value, int min, int max, int stepSize, int jumpSize)
 	{
-		this( new LiveSourceRef( value ), min, max, stepSize, pageSize, new CommitListener( value ) );
+		this( new LiveSourceRef( value ), min, max, stepSize, jumpSize, new CommitListener( value ) );
 	}
 	
 	
@@ -166,6 +166,6 @@ public class IntSpinEntry extends SpinEntry
 	protected SpinEntryControl createSpinEntryControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element, TextEntry.TextEntryControl entryControl, LSElement upArrow,
 			LSElement downArrow, SpinEntryControl.SpinEntryTextListener textListener)
 	{
-		return new IntSpinEntryControl( ctx, style, value, element, entryControl, upArrow, downArrow, textListener, min, max, stepSize, pageSize, listener );
+		return new IntSpinEntryControl( ctx, style, value, element, entryControl, upArrow, downArrow, textListener, min, max, stepSize, jumpSize, listener );
 	}
 }

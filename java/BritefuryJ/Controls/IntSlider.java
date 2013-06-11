@@ -71,7 +71,7 @@ public class IntSlider extends Slider
 			int val = Math.min( Math.max( (int)( newValue + 0.5 ), min ), max );
 			if ( val != currentValue )
 			{
-				value.setLiteralValue( val );
+				//value.setLiteralValue( val );
 				if ( listener != null )
 				{
 					listener.onSliderValueChanged( this, val );
@@ -103,28 +103,28 @@ public class IntSlider extends Slider
 	private IntSliderListener listener;
 	
 	
-	private IntSlider(LiveSource valueSource, int min, int max, int pivot, IntSliderListener listener)
+	private IntSlider(LiveSource valueSource, int min, int max, int pivot, double width, IntSliderListener listener)
 	{
-		super( valueSource );
+		super( valueSource, width );
 		this.min = min;
 		this.max = max;
 		this.pivot = pivot;
 		this.listener = listener;
 	}
 	
-	public IntSlider(double initialValue, int min, int max, int pivot, IntSliderListener listener)
+	public IntSlider(int initialValue, int min, int max, int pivot, double width, IntSliderListener listener)
 	{
-		this( new LiveSourceValue( initialValue ), min, max, pivot, listener );
+		this( new LiveSourceValue( initialValue ), min, max, pivot, width, listener );
 	}
 	
-	public IntSlider(LiveInterface value, int min, int max, int pivot, IntSliderListener listener)
+	public IntSlider(LiveInterface value, int min, int max, int pivot, double width, IntSliderListener listener)
 	{
-		this( new LiveSourceRef( value ), min, max, pivot, listener );
+		this( new LiveSourceRef( value ), min, max, pivot, width, listener );
 	}
 	
-	public IntSlider(LiveValue value, int min, int max, int pivot)
+	public IntSlider(LiveValue value, int min, int max, int pivot, double width)
 	{
-		this( new LiveSourceRef( value ), min, max, pivot, new CommitListener( value ) );
+		this( new LiveSourceRef( value ), min, max, pivot, width, new CommitListener( value ) );
 	}
 	
 	
