@@ -52,7 +52,7 @@ public class Checkbox extends ControlPres
 			this.state = state;
 			this.state.addListener( this );
 			this.listener = listener;
-			element.setFixedValue( state );
+			element.setFixedValue( state.elementValueFunction() );
 		}
 		
 		

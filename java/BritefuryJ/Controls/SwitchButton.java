@@ -99,6 +99,7 @@ public class SwitchButton extends ControlPres
 			}
 
 			currentChoice.addListener( this );
+			element.setFixedValue( currentChoice.elementValueFunction() );
 		}
 
 

@@ -66,7 +66,8 @@ public class ToggleButton extends ControlPres{
 			this.state = state;
 			this.state.addListener( this );
 			this.listener = listener;
-			this.currentState = (Boolean)state.getValue();
+			this.currentState = (Boolean)state.getStaticValue();
+			element.setFixedValue( state.elementValueFunction() );
 		}
 
 
