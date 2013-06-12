@@ -194,7 +194,7 @@ public abstract class Slider extends ControlPres
 			element.addElementInteractor( sliderInteractor );
 			element.addPainter( sliderInteractor );
 			
-			element.setFixedValue( value.getStaticValue() );
+			element.setFixedValue( value.elementValueFunction() );
 		}
 		
 		
