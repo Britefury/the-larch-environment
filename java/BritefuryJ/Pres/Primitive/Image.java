@@ -361,55 +361,140 @@ public class Image extends Pres
 	}
 	
 	
-	public static Image systemIcon(String iconName)
-	{
-		return systemImage( iconName + ".png" );
-	}
 
-	public static Image systemImage(String filename)
+	public static Image localImage(String filename)
 	{
-		URL u = Image.class.getResource( "/images/" + filename );
-		
+		URL u = Image.class.getResource( "/" + filename );
+
 		if ( u != null )
 		{
 			return new Image( u );
 		}
 		else
 		{
-			return new Image( "images/" + filename );
+			return new Image( filename );
 		}
 	}
 
-	public static Image systemImage(String filename, double width)
+	public static Image localImage(String filename, double width)
 	{
-		URL u = Image.class.getResource( "/images/" + filename );
-		
+		URL u = Image.class.getResource( "/" + filename );
+
 		if ( u != null )
 		{
 			return new Image( u, null, width );
 		}
 		else
 		{
-			return new Image( "images/" + filename, null, width );
+			return new Image( filename, null, width );
 		}
 	}
 
-	public static Image systemImage(String filename, double width, double height)
+	public static Image localImage(String filename, double width, double height)
 	{
-		URL u = Image.class.getResource( "/images/" + filename );
-		
+		URL u = Image.class.getResource( "/" + filename );
+
 		if ( u != null )
 		{
 			return new Image( u, null, width, height );
 		}
 		else
 		{
-			return new Image( "images/" + filename, null, width, height );
+			return new Image( filename, null, width, height );
 		}
 	}
 
 
-	
+
+	public static Image localImage(String filename, String hoverFilename)
+	{
+		URL u = Image.class.getResource( "/" + filename );
+		URL uHover = Image.class.getResource( "/" + hoverFilename );
+
+		if ( u != null  &&  uHover != null )
+		{
+			return new Image( u, uHover );
+		}
+		else if ( u == null  &&  uHover == null )
+		{
+			return new Image( filename, hoverFilename );
+		}
+		else
+		{
+			String found = u != null  ?  filename  :  hoverFilename;
+			String notFound = u != null  ?  hoverFilename  :  filename;
+			throw new RuntimeException( "Able to find resource URL for one image (" + found + ") but not the other (" + notFound + ")" );
+		}
+	}
+
+	public static Image localImage(String filename, String hoverFilename, double width)
+	{
+		URL u = Image.class.getResource( "/" + filename );
+		URL uHover = Image.class.getResource( "/" + hoverFilename );
+
+		if ( u != null  &&  uHover != null )
+		{
+			return new Image( u, uHover, width );
+		}
+		else if ( u == null  &&  uHover == null )
+		{
+			return new Image( filename, hoverFilename, width );
+		}
+		else
+		{
+			String found = u != null  ?  filename  :  hoverFilename;
+			String notFound = u != null  ?  hoverFilename  :  filename;
+			throw new RuntimeException( "Able to find resource URL for one image (" + found + ") but not the other (" + notFound + ")" );
+		}
+	}
+
+	public static Image localImage(String filename, String hoverFilename, double width, double height)
+	{
+		URL u = Image.class.getResource( "/" + filename );
+		URL uHover = Image.class.getResource( "/" + hoverFilename );
+
+		if ( u != null  &&  uHover != null )
+		{
+			return new Image( u, uHover, width, height );
+		}
+		else if ( u == null  &&  uHover == null )
+		{
+			return new Image( filename, hoverFilename, width, height );
+		}
+		else
+		{
+			String found = u != null  ?  filename  :  hoverFilename;
+			String notFound = u != null  ?  hoverFilename  :  filename;
+			throw new RuntimeException( "Able to find resource URL for one image (" + found + ") but not the other (" + notFound + ")" );
+		}
+	}
+
+
+	public static Image systemImage(String filename)
+	{
+		return localImage( "images/" + filename );
+	}
+
+	public static Image systemImage(String filename, double width)
+	{
+		return localImage( "images/" + filename, width );
+	}
+
+	public static Image systemImage(String filename, double width, double height)
+	{
+		return localImage( "images/" + filename, width, height );
+	}
+
+
+
+	public static Image systemIcon(String iconName)
+	{
+		return systemImage( iconName + ".png" );
+	}
+
+
+
+
 	public static Image svgFromSource(final String image, final double imageWidth, final double imageHeight)
 	{
 		return new Image( srcToSVG( image ), imageWidth, imageHeight );
