@@ -115,6 +115,11 @@ public class Marker implements Comparable<Marker>
 	
 	public int getPositionInSubtree(LSElement subtreeRoot) throws IsNotInSubtreeException
 	{
+		return getPositionInSubtree(subtreeRoot, element.getRootElement().getDefaultTextRepresentationManager());
+	}
+
+	public int getPositionInSubtree(LSElement subtreeRoot, AbstractTextRepresentationManager textRepresentationManager) throws IsNotInSubtreeException
+	{
 		if ( subtreeRoot == element )
 		{
 			return getPosition();
@@ -126,7 +131,8 @@ public class Marker implements Comparable<Marker>
 				LSContainer b = (LSContainer)subtreeRoot;
 				if ( element != null  &&  element.isInSubtreeRootedAt( b ) )
 				{
-					return getPosition() + element.getTextRepresentationOffsetInSubtree( b );
+					int elementOffset = textRepresentationManager.getPositionOfElementInSubtree( (LSContainer)subtreeRoot, element );
+					return getPosition() + elementOffset;
 				}
 				else
 				{
@@ -135,14 +141,7 @@ public class Marker implements Comparable<Marker>
 			}
 			else if ( subtreeRoot instanceof LSContentLeaf )
 			{
-				if ( element != null  &&  element == subtreeRoot )
-				{
-					return getPosition();
-				}
-				else
-				{
-					throw new LSElement.IsNotInSubtreeException();
-				}
+				throw new LSElement.IsNotInSubtreeException();
 			}
 			else
 			{

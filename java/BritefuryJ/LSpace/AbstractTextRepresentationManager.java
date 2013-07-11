@@ -410,7 +410,7 @@ public abstract class AbstractTextRepresentationManager
 		
 		return position;
 	}
-	
+
 	
 	
 
@@ -453,8 +453,8 @@ public abstract class AbstractTextRepresentationManager
 
 	protected int getElementContentLength(LSElement e)
 	{
-		String prefix = getElementContent( e );
-		return prefix != null  ?  prefix.length()  :  -1;
+		String text = getElementContent( e );
+		return text != null  ?  text.length()  :  -1;
 	}
 	
 	protected int getPartialEditableLeafContentLength(LSContentLeafEditable e, int startIndex, int endIndex)
