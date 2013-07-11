@@ -6,15 +6,11 @@
 //##************************
 package BritefuryJ.Controls;
 
-import java.util.HashMap;
-import java.util.regex.Pattern;
-
-import BritefuryJ.Controls.TextEntry.TextEntryControl;
-import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerMotionEvent;
 import BritefuryJ.LSpace.Input.PointerInterface;
 import BritefuryJ.LSpace.Interactor.DragElementInteractor;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Live.LiveFunction;
 import BritefuryJ.Live.LiveInterface;
 import BritefuryJ.Live.LiveValue;
@@ -24,6 +20,9 @@ import BritefuryJ.Pres.Primitive.Blank;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Proxy;
 import BritefuryJ.StyleSheet.StyleValues;
+
+import java.util.HashMap;
+import java.util.regex.Pattern;
 
 public abstract class NumericLabel extends ControlPres
 {
@@ -79,7 +78,8 @@ public abstract class NumericLabel extends ControlPres
 		
 		private TextEntry.TextEntryListener entryListener = new TextEntry.TextEntryListener()
 		{
-			public void onAccept(TextEntryControl textEntry, String text)
+			@Override
+			public void onAccept(TextEntry.TextEntryControl textEntry, String text)
 			{
 				NumericLabelControl.this.onTextChanged( text );
 				showLabel();
