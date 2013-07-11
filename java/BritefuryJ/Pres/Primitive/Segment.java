@@ -15,19 +15,25 @@ import BritefuryJ.StyleSheet.StyleValues;
 public class Segment extends Pres
 {
 	private Pres child;
-	private boolean bGuardBegin, bGuardEnd;
-	
-	
-	public Segment(boolean bGuardBegin, boolean bGuardEnd, Object child)
+	private boolean bGuardBegin, bGuardEnd, caretBoundary;
+
+
+	public Segment(boolean bGuardBegin, boolean bGuardEnd, boolean caretBoundary, Object child)
 	{
 		this.child = coerce( child );
 		this.bGuardBegin = bGuardBegin;
 		this.bGuardEnd = bGuardEnd;
+		this.caretBoundary = caretBoundary;
+	}
+
+	public Segment(boolean bGuardBegin, boolean bGuardEnd, Object child)
+	{
+		this( bGuardBegin, bGuardEnd, false, child );
 	}
 	
 	public Segment(Object child)
 	{
-		this( true, true, child );
+		this( true, true, false, child );
 	}
 	
 
@@ -36,7 +42,7 @@ public class Segment extends Pres
 	public LSElement present(PresentationContext ctx, StyleValues style)
 	{
 		LSElement childElement = child.present( ctx, Primitive.useContainerParams.get( style ) );
-		return new LSSegment( Primitive.containerParams.get( style ), Primitive.caretSlotParams.get( style ), bGuardBegin, bGuardEnd, childElement );
+		return new LSSegment( Primitive.containerParams.get( style ), Primitive.caretSlotParams.get( style ), bGuardBegin, bGuardEnd, caretBoundary, childElement );
 	}
 
 }

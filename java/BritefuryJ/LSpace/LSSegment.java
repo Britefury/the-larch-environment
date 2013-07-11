@@ -20,6 +20,7 @@ public class LSSegment extends LSContainerNonOverlayed
 	protected final static int FLAGS_SEGMENT_BEGIN = FLAGS_CONTAINERNONOVERLAYED_END;
 	protected final static int FLAG_GUARD_BEGIN = FLAGS_SEGMENT_BEGIN * 0x1;
 	protected final static int FLAG_GUARD_END = FLAGS_SEGMENT_BEGIN * 0x2;
+	protected final static int FLAG_CARET_BOUNDARY = FLAGS_SEGMENT_BEGIN * 0x4;
 
 	
 	protected CaretSlotStyleParams caretSlotStyleParams;
@@ -31,17 +32,20 @@ public class LSSegment extends LSContainerNonOverlayed
 	// Constructor
 	//
 	
-	public LSSegment(ContainerStyleParams styleParams, CaretSlotStyleParams caretSlotStyleParams, boolean bGuardBegin, boolean bGuardEnd)
+	public LSSegment(ContainerStyleParams styleParams, CaretSlotStyleParams caretSlotStyleParams, boolean bGuardBegin, boolean bGuardEnd,
+			 boolean caretBoundary)
 	{
-		this( styleParams, caretSlotStyleParams, bGuardBegin, bGuardEnd, null );
+		this( styleParams, caretSlotStyleParams, bGuardBegin, bGuardEnd, caretBoundary, null );
 	}
 	
-	public LSSegment(ContainerStyleParams styleParams, CaretSlotStyleParams caretSlotStyleParams, boolean bGuardBegin, boolean bGuardEnd, LSElement child)
+	public LSSegment(ContainerStyleParams styleParams, CaretSlotStyleParams caretSlotStyleParams, boolean bGuardBegin, boolean bGuardEnd,
+			 boolean caretBoundary, LSElement child)
 	{
 		super( styleParams );
 		this.caretSlotStyleParams = caretSlotStyleParams;
 		setFlagValue( FLAG_GUARD_BEGIN, bGuardBegin );
 		setFlagValue( FLAG_GUARD_END, bGuardEnd );
+		setFlagValue( FLAG_CARET_BOUNDARY, caretBoundary );
 
 		if ( child != null )
 		{
@@ -64,7 +68,16 @@ public class LSSegment extends LSContainerNonOverlayed
 			refreshGuards();
 		}
 	}
-	
+
+
+
+	//
+	// Caret boundary
+	//
+
+	public boolean isCaretBoundary() {
+		return testFlag(FLAG_CARET_BOUNDARY);
+	}
 	
 	
 	//
