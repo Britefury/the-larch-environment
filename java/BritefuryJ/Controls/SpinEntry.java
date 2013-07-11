@@ -9,7 +9,6 @@ package BritefuryJ.Controls;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
-import BritefuryJ.Controls.TextEntry.TextEntryControl;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerMotionEvent;
@@ -202,7 +201,7 @@ public abstract class SpinEntry extends ControlPres
 		SpinEntryControl.SpinEntryTextListener textListener = new SpinEntryControl.SpinEntryTextListener();
 		
 		TextEntry entry = new TextEntry( text, textListener ).regexValidated( getValidationPattern(), getValidationFailMessage() );
-		TextEntry.TextEntryControl entryControl = (TextEntryControl)entry.createControl( ctx, style.alignHExpand().alignVRefY() );
+		TextEntry.TextEntryControl entryControl = (TextEntry.TextEntryControl)entry.createControl( ctx, style.alignHExpand().alignVRefY() );
 		
 		Pres row = StyleSheet.style( Primitive.rowSpacing.as( hspacing ) ).applyTo( new Row( new Object[] { entryControl.getElement(), arrowsBox } ) );
 		LSElement element = row.present( ctx, style );

@@ -9,10 +9,7 @@ package BritefuryJ.IncrementalView;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 
-import BritefuryJ.LSpace.AbstractTextRepresentationManager;
-import BritefuryJ.LSpace.ElementFilter;
-import BritefuryJ.LSpace.LSContentLeafEditable;
-import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.*;
 import BritefuryJ.LSpace.Focus.Selection;
 import BritefuryJ.LSpace.Marker.Marker;
 import BritefuryJ.LSpace.Marker.Marker.Bias;
@@ -24,8 +21,36 @@ import BritefuryJ.Util.StringDiff;
 public class NodeElementChangeListenerDiff implements IncrementalView.NodeElementChangeListener
 {
 	private static final int DIFF_THRESHHOLD = 65536;
-	
-	
+
+	private static final String SEGMENT_PREFIX = "\ue137";
+	private static final String SEGMENT_SUFFIX = "\ue138";
+
+
+
+	class CaretDiffTextRepresentationManager extends AbstractTextRepresentationManager {
+		@Override
+		protected String getElementContent(LSElement e)
+		{
+			return e.getLeafTextRepresentation();
+		}
+
+		protected String getElementPrefix(LSElement e, boolean complete) {
+			if (complete  &&  e instanceof LSSegment  &&  ((LSSegment) e).isCaretBoundary()) {
+				return SEGMENT_PREFIX;
+			}
+			return null;
+		}
+
+		protected String getElementSuffix(LSElement e, boolean complete) {
+			if (complete  &&  e instanceof LSSegment  &&  ((LSSegment) e).isCaretBoundary()) {
+				return SEGMENT_SUFFIX;
+			}
+			return null;
+		}
+
+	}
+
+
 	
 	public class MonitoredMarker
 	{
@@ -51,7 +76,7 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 		{
 			if ( canReposition() )
 			{
-				return state.markerAtNewPosition( view.getPresentationRootElement().getDefaultTextRepresentationManager(), leafFilter );
+				return state.markerAtNewPosition( getCaretTextManager(), leafFilter );
 			}
 			else
 			{
@@ -97,7 +122,7 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 	}
 	
 	
-	private static class NodeState
+	private class NodeState
 	{
 		private FragmentView node;
 		private String textRepresentation;
@@ -108,7 +133,7 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 		public NodeState(FragmentView node)
 		{
 			this.node = node;
-			textRepresentation = node.getFragmentContentElement().getTextRepresentation();
+			textRepresentation = getCaretTextManager().getTextRepresentationOf(node.getFragmentContentElement());
 		}
 		
 		
@@ -138,7 +163,7 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 			// Ensure that only the inner-most recursion level handles the caret
 			if ( nodeElement != null  &&  !markerStates.isEmpty() )
 			{
-				String newTextRepresentation = nodeElement.getTextRepresentation();
+				String newTextRepresentation = getCaretTextManager().getTextRepresentationOf(nodeElement);
 				
 				for (MarkerState state: markerStates)
 				{
@@ -322,6 +347,7 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 	
 	private MonitoredMarker caretMon, selStartMon, selEndMon;
 	private IncrementalView view;
+	private AbstractTextRepresentationManager caretTextManager = null;
 	
 	
 	public NodeElementChangeListenerDiff(IncrementalView view)
@@ -405,7 +431,7 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 				LSElement nodeElement = node.getFragmentContentElement();
 				try
 				{
-					int posInSubtree = marker.getPositionInSubtree( nodeElement );
+					int posInSubtree = marker.getPositionInSubtree( nodeElement, getCaretTextManager() );
 					
 					NodeState nodeState = validNodeStateFor( node );
 					MarkerState state = nodeState.addMarkerStateFor( marker, posInSubtree );
@@ -427,5 +453,15 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 		{
 			nodeState.handleModification();
 		}
+	}
+
+
+	private AbstractTextRepresentationManager getCaretTextManager()
+	{
+		if (caretTextManager == null) {
+			caretTextManager = new CaretDiffTextRepresentationManager();
+		}
+		return caretTextManager;
+		//return view.getPresentationRootElement().getDefaultTextRepresentationManager();
 	}
 }
