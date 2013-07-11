@@ -42,6 +42,10 @@ import BritefuryJ.StyleSheet.StyleValues;
 
 public class TextEntry extends ControlPres
 {
+	/*
+	Text entry listener
+	Inherit and override methods
+	 */
 	public static class TextEntryListener
 	{
 		public void onAccept(TextEntryControl textEntry, String text)
@@ -69,7 +73,10 @@ public class TextEntry extends ControlPres
 		}
 	}
 	
-	
+
+	/*
+	Change listener; applies changes to a LiveValue
+	 */
 	private static class ChangeListener extends TextEntryListener
 	{
 		private LiveValue value;
@@ -97,7 +104,14 @@ public class TextEntry extends ControlPres
 	}
 	
 	
-	
+
+	/*
+	Validator
+
+	Override validateText; return true if text passes validation rules
+
+	Optionally, override validationMessage; return message to display to user in tooltip to guide them
+	 */
 	public static abstract class TextEntryValidator
 	{
 		public abstract boolean validateText(TextEntryControl textEntry, String text);
@@ -107,7 +121,10 @@ public class TextEntry extends ControlPres
 			return null;
 		}
 	}
-	
+
+	/*
+	Regular expression validator
+	 */
 	public static class RegexTextEntryValidator extends TextEntryValidator
 	{
 		private Pattern pattern;
@@ -132,23 +149,40 @@ public class TextEntry extends ControlPres
 			return failMessage;
 		}
 	}
-	
 
-	
-	public static class TextEntryControl extends Control implements IncrementalMonitorListener
+
+
+	/*
+	Abstract text entry control
+
+	Defines basic behaviour of text entry control
+	 */
+	public abstract static class TextEntryControl extends Control implements IncrementalMonitorListener
 	{
-		private class TextEntryInteractor implements KeyElementInteractor, RealiseElementInteractor
+		private static class TextEntryRootPropertyKey
+		{
+			private static final TextEntryRootPropertyKey instance = new TextEntryRootPropertyKey();
+		}
+
+		/*
+		Interactor
+
+		Responds to presses of enter and escape keys
+
+		Responds to a realise event by grabbing the caret or selecting the text if the grab or select flags are set
+		 */
+		protected class TextEntryInteractor implements KeyElementInteractor, RealiseElementInteractor
 		{
 			private TextEntryInteractor()
 			{
 			}
-			
-			
+
+
 			public boolean keyPressed(LSElement element, KeyEvent event)
 			{
 				return event.getKeyCode() == KeyEvent.VK_ENTER  ||  event.getKeyCode() == KeyEvent.VK_ESCAPE;
 			}
-	
+
 			public boolean keyReleased(LSElement element, KeyEvent event)
 			{
 				if ( event.getKeyCode() == KeyEvent.VK_ENTER )
@@ -162,7 +196,7 @@ public class TextEntry extends ControlPres
 				}
 				return false;
 			}
-	
+
 			public boolean keyTyped(LSElement element, KeyEvent event)
 			{
 				if ( event.getKeyChar() == KeyEvent.VK_ENTER)
@@ -171,12 +205,12 @@ public class TextEntry extends ControlPres
 				}
 				else if (event.getKeyChar() == KeyEvent.VK_ESCAPE)
 				{
-					return hasChanged();
+					return hasUncommittedChange();
 				}
 				return false;
 			}
-			
-			
+
+
 			public void elementRealised(LSElement element)
 			{
 				if ( grabCaretOnRealise )
@@ -196,20 +230,27 @@ public class TextEntry extends ControlPres
 			{
 			}
 		}
-		
-		
-		private class TextEntryTreeEventListener implements TreeEventListener
+
+
+
+		/*
+		Tree event listener
+
+		Responds to edit events by performing validation and sending events to the text entry listener
+		 */
+		protected class TextEntryTreeEventListener implements TreeEventListener
 		{
 			public boolean onTreeEvent(LSElement element, LSElement sourceElement, Object event)
 			{
 				if ( event instanceof TextEditEventInsert )
 				{
 					TextEditEventInsert insert = (TextEditEventInsert)event;
-					notifyChanged();
+					notifyUncommittedChange();
 					validate( getDisplayedText() );
 					if ( listener != null )
 					{
-						listener.onTextInserted( TextEntryControl.this, insert.getPosition(), insert.getTextInserted() );
+						int offset = sourceElement.getTextRepresentationOffsetInSubtree( outerElement );
+						listener.onTextInserted( TextEntryControl.this, offset + insert.getPosition(), insert.getTextInserted() );
 						listener.onTextChanged( TextEntryControl.this );
 					}
 					return true;
@@ -217,11 +258,12 @@ public class TextEntry extends ControlPres
 				else if ( event instanceof TextEditEventRemove )
 				{
 					TextEditEventRemove remove = (TextEditEventRemove)event;
-					notifyChanged();
+					notifyUncommittedChange();
 					validate( getDisplayedText() );
 					if ( listener != null )
 					{
-						listener.onTextRemoved( TextEntryControl.this, remove.getPosition(), remove.getLength() );
+						int offset = sourceElement.getTextRepresentationOffsetInSubtree( outerElement );
+						listener.onTextRemoved( TextEntryControl.this, offset + remove.getPosition(), remove.getLength() );
 						listener.onTextChanged( TextEntryControl.this );
 					}
 					return true;
@@ -229,11 +271,12 @@ public class TextEntry extends ControlPres
 				else if ( event instanceof TextEditEventReplace )
 				{
 					TextEditEventReplace replace = (TextEditEventReplace)event;
-					notifyChanged();
+					notifyUncommittedChange();
 					validate( getDisplayedText() );
 					if ( listener != null )
 					{
-						listener.onTextReplaced( TextEntryControl.this, replace.getPosition(), replace.getLength(), replace.getReplacement() );
+						int offset = sourceElement.getTextRepresentationOffsetInSubtree( outerElement );
+						listener.onTextReplaced( TextEntryControl.this, offset + replace.getPosition(), replace.getLength(), replace.getReplacement() );
 						listener.onTextChanged( TextEntryControl.this );
 					}
 					return true;
@@ -241,8 +284,264 @@ public class TextEntry extends ControlPres
 				return false;
 			}
 		}
-		
-		
+
+
+
+
+
+		protected LSBorder outerElement;
+		protected TextEntryListener listener;
+		protected TextEntryValidator validator;
+		protected boolean grabCaretOnRealise, selectAllOnRealise, setTextInProgress, uncommittedChanges, textIsValid;
+		private BritefuryJ.Graphics.AbstractBorder validBorder, invalidBorder, changedBorder;
+		private LiveInterface text;
+
+
+		protected TextEntryControl(PresentationContext ctx, StyleValues style, LiveInterface text, LSBorder outerElement, TextEntryListener listener, TextEntryValidator validator,
+					   BritefuryJ.Graphics.AbstractBorder validBorder, BritefuryJ.Graphics.AbstractBorder invalidBorder, BritefuryJ.Graphics.AbstractBorder changedBorder)
+		{
+			super( ctx, style );
+
+			this.text = text;
+			text.addListener( this );
+
+
+			this.outerElement = outerElement;
+
+			this.listener = listener;
+			this.validator = validator;
+
+			this.validBorder = validBorder;
+			this.invalidBorder = invalidBorder;
+			this.changedBorder = changedBorder;
+
+			requestRefresh();
+
+			uncommittedChanges = false;
+		}
+
+
+		@Override
+		public LSElement getElement()
+		{
+			return outerElement;
+		}
+
+
+		//
+		// Value getters an setters
+		//
+
+		/*
+		Get the text represented by the text entry.
+		Acquires the value from the live value; does not return the text displayed; the live value and the displayed text may be out of sync
+		 */
+		public String getTextValue()
+		{
+			return (String)text.getStaticValue();
+		}
+
+		/*
+		Get the displayed text
+		 */
+		public abstract String getDisplayedText();
+
+		/*
+		Override in subclasses
+		Sets the text that is displayed
+		 */
+		protected abstract void setDisplayedTextContent(String x);
+
+		/*
+		Set the text displayed
+		 */
+		private void setDisplayedText(String x)
+		{
+			setTextInProgress = true;
+			setDisplayedTextContent(x);
+			setTextInProgress = false;
+			validate( x );
+		}
+
+
+
+		/*
+		Grab the caret
+		 */
+		public abstract void grabCaret();
+
+		/*
+		Ungrab the caret
+		 */
+		public abstract void ungrabCaret();
+
+		/*
+		Enable grab caret on realise
+		 */
+		public void grabCaretOnRealise()
+		{
+			grabCaretOnRealise = true;
+		}
+
+
+
+		/*
+		Select all the text in the control
+		 */
+		public abstract void selectAll();
+
+		/*
+		Enable selecting all text in the control
+		 */
+		public void selectAllOnRealise()
+		{
+			selectAllOnRealise = true;
+		}
+
+
+
+
+		/*
+		Determine if there are uncommitted changes (if the displayed text and the text contained in the live value are out of sync)
+		 */
+		public boolean hasUncommittedChange()
+		{
+			return uncommittedChanges;
+		}
+
+
+		/*
+		Change notification
+		 */
+		private void notifyUncommittedChange()
+		{
+			if (!uncommittedChanges)
+			{
+				uncommittedChanges = true;
+				updateBorder();
+			}
+		}
+
+
+
+		/*
+		Determine if displayed text is valid (passes validation rules)
+		 */
+		public boolean isDisplayedTextValid()
+		{
+			return textIsValid;
+		}
+
+		/*
+		Get validation message for text @t
+		 */
+		private String getValidationMessage(String t)
+		{
+			if ( validator != null )
+			{
+				return validator.validationMessage( this, t );
+			}
+			else
+			{
+				return null;
+			}
+		}
+
+		/*
+		Validate the supplied text and set the textIsValid flag accordingly
+		 */
+		private void validate(String t)
+		{
+			textIsValid = validator == null || validator.validateText( this, t );
+			updateBorder();
+		}
+
+		/*
+		Accept the dusplayed text
+		 */
+		public void accept()
+		{
+			String t = getDisplayedText();
+			validate( t );
+			if ( !textIsValid )
+			{
+				String failMessage = getValidationMessage( t );
+				if ( failMessage != null )
+				{
+					TimedTip tooltip = new TimedTip( failMessage, 5.0 );
+					tooltip.popup( outerElement, Anchor.TOP_LEFT, Anchor.BOTTOM_LEFT, ctx, style );
+				}
+				return;
+			}
+
+			ungrabCaret();
+			uncommittedChanges = false;
+			updateBorder();
+			listener.onAccept( this, t );
+		}
+
+		/*
+		Cancel
+		 */
+		public boolean cancel()
+		{
+			ungrabCaret();
+			if (hasUncommittedChange())
+			{
+				listener.onCancel( this );
+				return true;
+			}
+			return false;
+		}
+
+
+		/*
+		Update the border, which informs the user of the state of the text entry
+		 */
+		private void updateBorder()
+		{
+			AbstractBorder c = changedBorder != null  ?  changedBorder  :  validBorder;
+			AbstractBorder b = uncommittedChanges ?  c  :  validBorder;
+			outerElement.setBorder( textIsValid  ?  b  :  invalidBorder );
+		}
+
+
+
+
+		protected LSElement getTextEntryRootElement(LSElement element)
+		{
+			LSElement.PropertyValue value = element.findPropertyInAncestors(TextEntryRootPropertyKey.instance);
+			return value != null  ?  value.getElement()  :  null;
+		}
+
+
+		@Override
+		public void onIncrementalMonitorChanged(IncrementalMonitor inc)
+		{
+			requestRefresh();
+		}
+
+		protected void requestRefresh()
+		{
+			Runnable refresh = new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					String t = (String)text.getValue();
+					t = t != null  ?  t  :  "";
+					setDisplayedText( t );
+					uncommittedChanges = false;
+					updateBorder();
+				}
+			};
+			outerElement.queueImmediateEvent( refresh );
+		}
+	}
+
+	
+	public static class TextEntryControlText extends TextEntryControl
+	{
 		private class TextEntryClipboardHandler extends TextClipboardHandler
 		{
 			@Override
@@ -271,35 +570,19 @@ public class TextEntry extends ControlPres
 		}
 		
 		
-		private LSBorder outerElement;
 		private LSText textElement;
-		private BritefuryJ.Graphics.AbstractBorder validBorder, invalidBorder, changedBorder;
-		private TextEntryListener listener;
-		private TextEntryValidator validator;
-		private LiveInterface text;
-		private boolean grabCaretOnRealise, selectAllOnRealise, setTextInProgress, changed, textIsValid;
-	
+
 	
 		
-		protected TextEntryControl(PresentationContext ctx, StyleValues style, LiveInterface text,
-				LSBorder outerElement, LSRegion region, LSText textElement,
-				TextEntryListener listener, TextEntryValidator validator,
-				BritefuryJ.Graphics.AbstractBorder validBorder, BritefuryJ.Graphics.AbstractBorder invalidBorder, BritefuryJ.Graphics.AbstractBorder changedBorder)
+		protected TextEntryControlText(PresentationContext ctx, StyleValues style, LiveInterface text,
+					       LSBorder outerElement, LSRegion region, LSText textElement,
+					       TextEntryListener listener, TextEntryValidator validator,
+					       BritefuryJ.Graphics.AbstractBorder validBorder, BritefuryJ.Graphics.AbstractBorder invalidBorder, BritefuryJ.Graphics.AbstractBorder changedBorder)
 		{
-			super( ctx, style );
-			
-			this.text = text;
-			text.addListener( this );
-			
-			this.outerElement = outerElement;
+			super( ctx, style, text, outerElement, listener, validator, validBorder, invalidBorder, changedBorder );
+
 			this.textElement = textElement;
-			this.listener = listener;
-			this.validator = validator;
-			
-			this.validBorder = validBorder;
-			this.invalidBorder = invalidBorder;
-			this.changedBorder = changedBorder;
-	
+
 			this.textElement.addElementInteractor( new TextEntryInteractor() );
 			this.textElement.addTreeEventListener( new TextEntryTreeEventListener() );
 			
@@ -307,43 +590,38 @@ public class TextEntry extends ControlPres
 			
 			region.setClipboardHandler( new TextEntryClipboardHandler() );
 			
-			requestRefresh();
-			
-			changed = false;
 		}
 		
 		
-		public LSElement getElement()
-		{
-			return outerElement;
-		}
-		
-	
-		public String getTextValue()
-		{
-			return (String)text.getStaticValue();
-		}
-		
+		@Override
 		public String getDisplayedText()
 		{
 			return textElement.getText();
 		}
-		
-		private void setDisplayedText(String x)
+
+		@Override
+		protected void setDisplayedTextContent(String x)
 		{
-			setTextInProgress = true;
-			textElement.setText( x );
-			setTextInProgress = false;
-			validate( x );
+			textElement.setText(x);
 		}
 		
-		
-		public boolean isDisplayedTextValid()
+
+
+		@Override
+		public void grabCaret()
 		{
-			return textIsValid;
+			textElement.grabCaret();
 		}
-		
-		
+
+		@Override
+		public void ungrabCaret()
+		{
+			textElement.ungrabCaret();
+		}
+
+
+
+
 		public void selectAll()
 		{
 			LSRootElement root = textElement.getRootElement();
@@ -356,131 +634,106 @@ public class TextEntry extends ControlPres
 				throw new RuntimeException( "Could not get root element - text element is not realised" );
 			}
 		}
-		
-		public void selectAllOnRealise()
+	}
+
+
+	public static class TextEntryControlParagraph extends TextEntryControl
+	{
+		private class TextEntryClipboardHandler extends TextClipboardHandler
 		{
-			selectAllOnRealise = true;
-		}
-		
-		
-		public void grabCaret()
-		{
-			textElement.grabCaret();
-		}
-		
-		public void grabCaretOnRealise()
-		{
-			grabCaretOnRealise = true;
-		}
-		
-		public void ungrabCaret()
-		{
-			textElement.ungrabCaret();
-		}
-	
-		
-		public void accept()
-		{
-			String t = getDisplayedText();
-			validate( t );
-			if ( !textIsValid )
+			@Override
+			protected void deleteText(TextSelection selection, Caret caret)
 			{
-				String failMessage = getValidationMessage( t );
-				if ( failMessage != null )
-				{
-					TimedTip tooltip = new TimedTip( failMessage, 5.0 );
-					tooltip.popup( outerElement, Anchor.TOP_LEFT, Anchor.BOTTOM_LEFT, ctx, style );
-				}
-				return;
+				textElement.removeText( selection.getStartMarker(), selection.getEndMarker() );
 			}
-			
-			ungrabCaret();
-			changed = false;
-			updateBorder();
-			listener.onAccept( this, t );
-		}
-	
-		public boolean cancel()
-		{
-			ungrabCaret();
-			if (hasChanged())
+
+			@Override
+			protected void insertText(Marker marker, String text)
 			{
-				listener.onCancel( this );
-				return true;
+				textElement.insertText( marker, text );
 			}
-			return false;
+
+			@Override
+			protected void replaceText(TextSelection selection, Caret caret, String replacement)
+			{
+				textElement.replaceText( selection.getStartMarker(), selection.getEndMarker(), replacement );
+			}
+
+			@Override
+			protected String getText(TextSelection selection)
+			{
+				return textElement.getRootElement().getTextRepresentationInSelection( selection );
+			}
 		}
 
 
-		public boolean hasChanged()
-		{
-			return changed;
-		}
+		private LSText textElement;
 
 
-		private void validate(String t)
+
+		protected TextEntryControlParagraph(PresentationContext ctx, StyleValues style, LiveInterface text,
+					       LSBorder outerElement, LSRegion region, LSText textElement,
+					       TextEntryListener listener, TextEntryValidator validator,
+					       BritefuryJ.Graphics.AbstractBorder validBorder, BritefuryJ.Graphics.AbstractBorder invalidBorder, BritefuryJ.Graphics.AbstractBorder changedBorder)
 		{
-			textIsValid = validator == null || validator.validateText( this, t );
-			updateBorder();
-		}
-		
-		private String getValidationMessage(String t)
-		{
-			if ( validator != null )
-			{
-				return validator.validationMessage( this, t );
-			}
-			else
-			{
-				return null;
-			}
-		}
-		
-		
-		private void notifyChanged()
-		{
-			boolean stateChanged = changed == false;
-			changed = true;
-			if ( stateChanged )
-			{
-				updateBorder();
-			}
-		}
-		
-		
-		private void updateBorder()
-		{
-			AbstractBorder c = changedBorder != null  ?  changedBorder  :  validBorder;
-			AbstractBorder b = changed  ?  c  :  validBorder;
-			outerElement.setBorder( textIsValid  ?  b  :  invalidBorder );
+			super( ctx, style, text, outerElement, listener, validator, validBorder, invalidBorder, changedBorder );
+
+			this.textElement = textElement;
+
+			this.textElement.addElementInteractor( new TextEntryInteractor() );
+			this.textElement.addTreeEventListener( new TextEntryTreeEventListener() );
+
+			outerElement.setValueFunction( text.elementValueFunction() );
+
+			region.setClipboardHandler( new TextEntryClipboardHandler() );
+
 		}
 
 
 		@Override
-		public void onIncrementalMonitorChanged(IncrementalMonitor inc)
+		public String getDisplayedText()
 		{
-			requestRefresh();
+			return textElement.getText();
 		}
-		
-		private void requestRefresh()
+
+		@Override
+		protected void setDisplayedTextContent(String x)
 		{
-			Runnable refresh = new Runnable()
+			textElement.setText(x);
+		}
+
+
+
+		@Override
+		public void grabCaret()
+		{
+			textElement.grabCaret();
+		}
+
+		@Override
+		public void ungrabCaret()
+		{
+			textElement.ungrabCaret();
+		}
+
+
+
+
+		public void selectAll()
+		{
+			LSRootElement root = textElement.getRootElement();
+			if ( root != null )
 			{
-				@Override
-				public void run()
-				{
-					String t = (String)text.getValue();
-					t = t != null  ?  t  :  "";
-					setDisplayedText( t );
-					changed = false;
-					updateBorder();
-				}
-			};
-			outerElement.queueImmediateEvent( refresh );
+				root.setSelection( new TextSelection( textElement, Marker.atStartOfLeaf( textElement ), Marker.atEndOfLeaf( textElement ) ) );
+			}
+			else
+			{
+				throw new RuntimeException( "Could not get root element - text element is not realised" );
+			}
 		}
 	}
-	
-	
+
+
 	private static class CommitListener extends TextEntryListener
 	{
 		private LiveValue value;
@@ -490,7 +743,7 @@ public class TextEntry extends ControlPres
 			this.value = value;
 		}
 		
-		public void onAccept(TextEntryControl textEntry, String text)
+		public void onAccept(TextEntryControlText textEntry, String text)
 		{
 			value.setLiteralValue( text );
 		}
@@ -574,7 +827,7 @@ public class TextEntry extends ControlPres
 		Pres outer = new Border( regionElement ).alignVRefY();
 		LSBorder outerElement = (LSBorder)outer.present( ctx, style );
 		
-		TextEntryControl control = new TextEntryControl( ctx, style, value, outerElement, regionElement, textElement, listener, validator,
+		TextEntryControlText control = new TextEntryControlText( ctx, style, value, outerElement, regionElement, textElement, listener, validator,
 				validBorder, invalidBorder, changedBorder );
 		if ( bSelectAllOnRealise )
 		{
