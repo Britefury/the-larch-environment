@@ -8,7 +8,6 @@ package BritefuryJ.Controls;
 
 import java.util.regex.Pattern;
 
-import BritefuryJ.Controls.TextEntry.TextEntryControl;
 import BritefuryJ.Controls.TextEntry.TextEntryValidator;
 import BritefuryJ.DefaultPerspective.DefaultPerspective;
 import BritefuryJ.Incremental.IncrementalMonitor;
@@ -17,8 +16,6 @@ import BritefuryJ.LSpace.Event.AbstractPointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
 import BritefuryJ.LSpace.Interactor.ClickElementInteractor;
 import BritefuryJ.LSpace.LSElement;
-import BritefuryJ.LSpace.Event.PointerButtonEvent;
-import BritefuryJ.LSpace.Interactor.PushElementInteractor;
 import BritefuryJ.Live.LiveInterface;
 import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.Pres;
@@ -56,7 +53,8 @@ public class EditableLabel extends ControlPres
 		
 		private TextEntry.TextEntryListener entryListener = new TextEntry.TextEntryListener()
 		{
-			public void onAccept(TextEntryControl textEntry, String text)
+			@Override
+			public void onAccept(TextEntry.TextEntryControl textEntry, String text)
 			{
 				if ( listener != null )
 				{

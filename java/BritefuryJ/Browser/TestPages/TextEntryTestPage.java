@@ -65,27 +65,32 @@ public class TextEntryTestPage extends TestPage
 			
 			TextEntry.TextEntryListener listener = new TextEntry.TextEntryListener()
 			{
+				@Override
 				public void onAccept(TextEntry.TextEntryControl textEntry, String text)
 				{
 					value.setLiteralValue( text );
 					message.setLiteralValue( new Label( "Accepted" ) );
 				}
-	
+
+				@Override
 				public void onCancel(TextEntry.TextEntryControl textEntry)
 				{
 					message.setLiteralValue( new Label( "Cancelled" ) );
 				}
-				
+
+				@Override
 				public void onTextInserted(TextEntry.TextEntryControl textEntry, int position, String textInserted)
 				{
 					message.setLiteralValue( new Label( "INSERTED @" + position + " :" +  textInserted ) );
 				}
-	
+
+				@Override
 				public void onTextRemoved(TextEntry.TextEntryControl textEntry, int position, int length)
 				{
 					message.setLiteralValue( new Label( "REMOVED " + position + " to " + ( position + length ) ) );
 				}
-				
+
+				@Override
 				public void onTextReplaced(TextEntry.TextEntryControl textEntry, int position, int length, String replacementText)
 				{
 					message.setLiteralValue( new Label( "REPLACED " + position + " to " + ( position + length ) + " with: " + replacementText ) );
