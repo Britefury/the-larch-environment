@@ -95,6 +95,7 @@ public class Controls
 			new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.6f, 0.0f, 0.0f ), new Color( 1.0f, 0.85f, 0.85f ) ) );
 	public static final InheritedAttribute textEntryChangedBorder = new InheritedAttribute( controlsNamespace, "textEntryChangedBorder", AbstractBorder.class,
 			new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.5f, 0.4f, 0.5f ), new Color( 0.95f, 0.9f, 0.95f  ) ) );
+	public static final InheritedAttribute textEntryWordWrap = new InheritedAttribute( controlsNamespace, "textEntryWordWrap", Boolean.class, false );
 
 	
 	public static final InheritedAttributeNonNull textAreaAttrs = new InheritedAttributeNonNull( controlsNamespace, "textAreaAttrs", StyleSheet.class,

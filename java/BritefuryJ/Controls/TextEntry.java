@@ -12,22 +12,14 @@ import java.util.regex.Pattern;
 import BritefuryJ.Graphics.AbstractBorder;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
-import BritefuryJ.LSpace.Anchor;
-import BritefuryJ.LSpace.LSBorder;
-import BritefuryJ.LSpace.LSElement;
-import BritefuryJ.LSpace.LSRegion;
-import BritefuryJ.LSpace.LSRootElement;
-import BritefuryJ.LSpace.LSText;
-import BritefuryJ.LSpace.TextEditEventInsert;
-import BritefuryJ.LSpace.TextEditEventRemove;
-import BritefuryJ.LSpace.TextEditEventReplace;
-import BritefuryJ.LSpace.TreeEventListener;
+import BritefuryJ.LSpace.*;
 import BritefuryJ.LSpace.Clipboard.TextClipboardHandler;
 import BritefuryJ.LSpace.Interactor.KeyElementInteractor;
 import BritefuryJ.LSpace.Interactor.RealiseElementInteractor;
 import BritefuryJ.LSpace.Marker.Marker;
 import BritefuryJ.LSpace.TextFocus.Caret;
 import BritefuryJ.LSpace.TextFocus.TextSelection;
+import BritefuryJ.Live.LiveFunction;
 import BritefuryJ.Live.LiveInterface;
 import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.Pres;
@@ -38,6 +30,7 @@ import BritefuryJ.Pres.Primitive.Region;
 import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Pres.Primitive.Segment;
 import BritefuryJ.Pres.Primitive.Text;
+import BritefuryJ.Pres.RichText.NormalText;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class TextEntry extends ControlPres
@@ -82,15 +75,12 @@ public class TextEntry extends ControlPres
 		@Override
 		public void onTextChanged(TextEntryControl textEntry)
 		{
-			if ( !textEntry.setTextInProgress )
+			if ( textEntry.isDisplayedTextValid() )
 			{
-				if ( textEntry.isDisplayedTextValid() )
+				String text = textEntry.getDisplayedText();
+				if ( !text.equals( value.getStaticValue() ) )
 				{
-					String text = textEntry.getDisplayedText();
-					if ( !text.equals( value.getStaticValue() ) )
-					{
-						value.setLiteralValue( text );
-					}
+					value.setLiteralValue( text );
 				}
 			}
 		}
@@ -171,7 +161,7 @@ public class TextEntry extends ControlPres
 				}
 				else if (event.getKeyChar() == KeyEvent.VK_ESCAPE)
 				{
-					return hasChanged();
+					return hasUncommittedChanges();
 				}
 				return false;
 			}
@@ -202,38 +192,29 @@ public class TextEntry extends ControlPres
 		{
 			public boolean onTreeEvent(LSElement element, LSElement sourceElement, Object event)
 			{
-				if ( event instanceof TextEditEventInsert )
-				{
-					TextEditEventInsert insert = (TextEditEventInsert)event;
-					notifyChanged();
-					validate( getDisplayedText() );
-					if ( listener != null )
-					{
-						listener.onTextInserted( TextEntryControl.this, insert.getPosition(), insert.getTextInserted() );
-						listener.onTextChanged( TextEntryControl.this );
-					}
-					return true;
-				}
-				else if ( event instanceof TextEditEventRemove )
-				{
-					TextEditEventRemove remove = (TextEditEventRemove)event;
-					notifyChanged();
-					validate( getDisplayedText() );
-					if ( listener != null )
-					{
-						listener.onTextRemoved( TextEntryControl.this, remove.getPosition(), remove.getLength() );
-						listener.onTextChanged( TextEntryControl.this );
-					}
-					return true;
-				}
-				else if ( event instanceof TextEditEventReplace )
-				{
-					TextEditEventReplace replace = (TextEditEventReplace)event;
-					notifyChanged();
-					validate( getDisplayedText() );
-					if ( listener != null )
-					{
-						listener.onTextReplaced( TextEntryControl.this, replace.getPosition(), replace.getLength(), replace.getReplacement() );
+				if (event instanceof TextEditEvent) {
+					String text = outerElement.getTextRepresentation();
+					displayedText.setLiteralValue(text);
+
+					validate( text );
+
+					if (listener != null) {
+						int offset = sourceElement.getTextRepresentationOffsetInSubtree( outerElement );
+						if ( event instanceof TextEditEventInsert )
+						{
+							TextEditEventInsert insert = (TextEditEventInsert)event;
+							listener.onTextInserted(TextEntryControl.this, offset + insert.getPosition(), insert.getTextInserted());
+						}
+						else if ( event instanceof TextEditEventRemove )
+						{
+							TextEditEventRemove remove = (TextEditEventRemove)event;
+							listener.onTextRemoved(TextEntryControl.this, offset + remove.getPosition(), remove.getLength());
+						}
+						else if ( event instanceof TextEditEventReplace )
+						{
+							TextEditEventReplace replace = (TextEditEventReplace)event;
+							listener.onTextReplaced(TextEntryControl.this, offset + replace.getPosition(), replace.getLength(), replace.getReplacement());
+						}
 						listener.onTextChanged( TextEntryControl.this );
 					}
 					return true;
@@ -248,51 +229,73 @@ public class TextEntry extends ControlPres
 			@Override
 			protected void deleteText(TextSelection selection, Caret caret)
 			{
-				textElement.removeText( selection.getStartMarker(), selection.getEndMarker() );
+				int startPosition = selection.getStartMarker().getClampedIndexInSubtree( outerElement );
+				int endPosition = selection.getEndMarker().getClampedIndexInSubtree( outerElement );
+
+				String newText = outerElement.getTextRepresentationFromStartToMarker( selection.getStartMarker() )  +  outerElement.getTextRepresentationFromMarkerToEnd( selection.getEndMarker() );
+				displayedText.setLiteralValue(newText);
+
+				if ( listener != null )
+				{
+					listener.onTextRemoved( TextEntryControl.this, startPosition, endPosition - startPosition );
+					listener.onTextChanged( TextEntryControl.this );
+				}
 			}
 	
 			@Override
 			protected void insertText(Marker marker, String text)
 			{
-				textElement.insertText( marker, text );
+				marker.getElement().insertText(marker, text);
+
+				// Don't inform the listener - the text edit event will take care of that
 			}
 			
 			@Override
 			protected void replaceText(TextSelection selection, Caret caret, String replacement)
 			{
-				textElement.replaceText( selection.getStartMarker(), selection.getEndMarker(), replacement );
+				int startPosition = selection.getStartMarker().getClampedIndexInSubtree( outerElement );
+				int endPosition = selection.getEndMarker().getClampedIndexInSubtree( outerElement );
+
+				String newText = outerElement.getTextRepresentationFromStartToMarker( selection.getStartMarker() )  +  replacement  +  outerElement.getTextRepresentationFromMarkerToEnd( selection.getEndMarker() );
+				displayedText.setLiteralValue(newText);
+
+				if ( listener != null )
+				{
+					listener.onTextReplaced( TextEntryControl.this, startPosition, endPosition - startPosition, replacement );
+					listener.onTextChanged( TextEntryControl.this );
+				}
 			}
 			
 			@Override
 			protected String getText(TextSelection selection)
 			{
-				return textElement.getRootElement().getTextRepresentationInSelection( selection );
+				return outerElement.getRootElement().getTextRepresentationInSelection( selection );
 			}
 		}
 		
 		
 		private LSBorder outerElement;
-		private LSText textElement;
+		private LiveInterface text;
+		private LiveValue displayedText;
 		private BritefuryJ.Graphics.AbstractBorder validBorder, invalidBorder, changedBorder;
 		private TextEntryListener listener;
 		private TextEntryValidator validator;
-		private LiveInterface text;
-		private boolean grabCaretOnRealise, selectAllOnRealise, setTextInProgress, changed, textIsValid;
+		private boolean grabCaretOnRealise, selectAllOnRealise, textIsValid;
 	
 	
 		
-		protected TextEntryControl(PresentationContext ctx, StyleValues style, LiveInterface text,
-				LSBorder outerElement, LSRegion region, LSText textElement,
+		protected TextEntryControl(PresentationContext ctx, StyleValues style, LiveInterface text, LiveValue displayedText,
+				LSBorder outerElement, LSRegion region,
 				TextEntryListener listener, TextEntryValidator validator,
 				BritefuryJ.Graphics.AbstractBorder validBorder, BritefuryJ.Graphics.AbstractBorder invalidBorder, BritefuryJ.Graphics.AbstractBorder changedBorder)
 		{
 			super( ctx, style );
 			
 			this.text = text;
+			this.displayedText = displayedText;
 			text.addListener( this );
 			
 			this.outerElement = outerElement;
-			this.textElement = textElement;
 			this.listener = listener;
 			this.validator = validator;
 			
@@ -300,16 +303,14 @@ public class TextEntry extends ControlPres
 			this.invalidBorder = invalidBorder;
 			this.changedBorder = changedBorder;
 	
-			this.textElement.addElementInteractor( new TextEntryInteractor() );
-			this.textElement.addTreeEventListener( new TextEntryTreeEventListener() );
+			this.outerElement.addElementInteractor( new TextEntryInteractor() );
+			this.outerElement.addTreeEventListener( new TextEntryTreeEventListener() );
 			
 			outerElement.setValueFunction( text.elementValueFunction() );
 			
 			region.setClipboardHandler( new TextEntryClipboardHandler() );
 			
 			requestRefresh();
-			
-			changed = false;
 		}
 		
 		
@@ -326,14 +327,12 @@ public class TextEntry extends ControlPres
 		
 		public String getDisplayedText()
 		{
-			return textElement.getText();
+			return (String)displayedText.getStaticValue();
 		}
 		
 		private void setDisplayedText(String x)
 		{
-			setTextInProgress = true;
-			textElement.setText( x );
-			setTextInProgress = false;
+			displayedText.setLiteralValue(x);
 			validate( x );
 		}
 		
@@ -346,10 +345,19 @@ public class TextEntry extends ControlPres
 		
 		public void selectAll()
 		{
-			LSRootElement root = textElement.getRootElement();
+			LSRootElement root = outerElement.getRootElement();
 			if ( root != null )
 			{
-				root.setSelection( new TextSelection( textElement, Marker.atStartOfLeaf( textElement ), Marker.atEndOfLeaf( textElement ) ) );
+				Marker startMarker = Marker.atStartOf(outerElement, true);
+				Marker endMarker = Marker.atEndOf(outerElement, true);
+				if (startMarker != null  &&  startMarker.isValid()  &&  endMarker != null  &&  endMarker.isValid())
+				{
+					root.setSelection( new TextSelection( startMarker.getElement(), startMarker, endMarker ) );
+				}
+				else
+				{
+					root.setSelection(null);
+				}
 			}
 			else
 			{
@@ -365,7 +373,7 @@ public class TextEntry extends ControlPres
 		
 		public void grabCaret()
 		{
-			textElement.grabCaret();
+			outerElement.grabCaret();
 		}
 		
 		public void grabCaretOnRealise()
@@ -375,7 +383,7 @@ public class TextEntry extends ControlPres
 		
 		public void ungrabCaret()
 		{
-			textElement.ungrabCaret();
+			outerElement.ungrabCaret();
 		}
 	
 		
@@ -395,7 +403,6 @@ public class TextEntry extends ControlPres
 			}
 			
 			ungrabCaret();
-			changed = false;
 			updateBorder();
 			listener.onAccept( this, t );
 		}
@@ -403,18 +410,20 @@ public class TextEntry extends ControlPres
 		public boolean cancel()
 		{
 			ungrabCaret();
-			if (hasChanged())
+			if (hasUncommittedChanges())
 			{
+				displayedText.setLiteralValue(text.getStaticValue());
 				listener.onCancel( this );
+				updateBorder();
 				return true;
 			}
 			return false;
 		}
 
 
-		public boolean hasChanged()
+		public boolean hasUncommittedChanges()
 		{
-			return changed;
+			return !text.getStaticValue().equals(displayedText.getStaticValue());
 		}
 
 
@@ -437,21 +446,10 @@ public class TextEntry extends ControlPres
 		}
 		
 		
-		private void notifyChanged()
-		{
-			boolean stateChanged = changed == false;
-			changed = true;
-			if ( stateChanged )
-			{
-				updateBorder();
-			}
-		}
-		
-		
 		private void updateBorder()
 		{
 			AbstractBorder c = changedBorder != null  ?  changedBorder  :  validBorder;
-			AbstractBorder b = changed  ?  c  :  validBorder;
+			AbstractBorder b = hasUncommittedChanges() ?  c  :  validBorder;
 			outerElement.setBorder( textIsValid  ?  b  :  invalidBorder );
 		}
 
@@ -472,7 +470,6 @@ public class TextEntry extends ControlPres
 					String t = (String)text.getValue();
 					t = t != null  ?  t  :  "";
 					setDisplayedText( t );
-					changed = false;
 					updateBorder();
 				}
 			};
@@ -565,16 +562,38 @@ public class TextEntry extends ControlPres
 		BritefuryJ.Graphics.AbstractBorder validBorder = style.get( Controls.textEntryBorder, BritefuryJ.Graphics.AbstractBorder.class ); 
 		BritefuryJ.Graphics.AbstractBorder invalidBorder = style.get( Controls.textEntryInvalidBorder, BritefuryJ.Graphics.AbstractBorder.class );
 		BritefuryJ.Graphics.AbstractBorder changedBorder = style.get( Controls.textEntryChangedBorder, BritefuryJ.Graphics.AbstractBorder.class );
-		
+		boolean wordWrap = style.get( Controls.textEntryWordWrap, Boolean.class );
+
 		LiveInterface value = valueSource.getLive();
-		LSText textElement = (LSText)new Text( "" ).present( ctx, style );
-		Pres line = new Row( new Pres[] { new Segment( false, false, textElement ) } );
+
+		final LiveValue displayedText = new LiveValue(value.getStaticValue());
+
+		LiveFunction.Function function = null;
+
+		if (wordWrap) {
+			function = new LiveFunction.Function() {
+				public Object evaluate() {
+					return new NormalText((String)displayedText.getValue());
+				}
+			};
+		}
+		else {
+			function = new LiveFunction.Function() {
+				public Object evaluate() {
+					return new Text((String)displayedText.getValue());
+				}
+			};
+		}
+
+		LiveFunction visual = new LiveFunction(function);
+
+		Pres line = new Row( new Pres[] { new Segment( false, false, visual ) } );
 		Pres region = new Region( line );
 		LSRegion regionElement = (LSRegion)region.present( ctx, style );
 		Pres outer = new Border( regionElement ).alignVRefY();
 		LSBorder outerElement = (LSBorder)outer.present( ctx, style );
 		
-		TextEntryControl control = new TextEntryControl( ctx, style, value, outerElement, regionElement, textElement, listener, validator,
+		TextEntryControl control = new TextEntryControl( ctx, style, value, displayedText, outerElement, regionElement, listener, validator,
 				validBorder, invalidBorder, changedBorder );
 		if ( bSelectAllOnRealise )
 		{
