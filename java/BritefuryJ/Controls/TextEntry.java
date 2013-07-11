@@ -587,7 +587,7 @@ public class TextEntry extends ControlPres
 
 		LiveFunction visual = new LiveFunction(function);
 
-		Pres line = new Row( new Pres[] { new Segment( false, false, visual ) } );
+		Pres line = new Row( new Pres[] { new Segment( false, false, true, visual ) } );
 		Pres region = new Region( line );
 		LSRegion regionElement = (LSRegion)region.present( ctx, style );
 		Pres outer = new Border( regionElement ).alignVRefY();
