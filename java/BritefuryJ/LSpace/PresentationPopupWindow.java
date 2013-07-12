@@ -6,10 +6,7 @@
 //##************************
 package BritefuryJ.LSpace;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.awt.Window;
+import java.awt.*;
 
 import javax.swing.JWindow;
 
@@ -26,8 +23,8 @@ public class PresentationPopupWindow
 	protected PopupChain chain;
 	private boolean chainStart;
 	protected boolean closeAutomatically;
-	private Point2 screenPosition;
-	private Vector2 screenSize;
+	private Point2 screenAnchorPoint;
+	private Anchor popupAnchor;
 	
 	protected PresentationPopupWindow(PopupChain popupChain, Window ownerWindow, PresentationComponent parentComponent, LSElement popupContents, int screenX, int screenY,
 			Anchor popupAnchor, boolean closeAutomatically, boolean requestFocus, boolean chainStart)
@@ -36,6 +33,7 @@ public class PresentationPopupWindow
 		chain.addPopup( this, requestFocus );
 		this.chainStart = chainStart;
 		this.closeAutomatically = closeAutomatically;
+		this.popupAnchor = popupAnchor;
 
 		// Create the popup window
 		popupWindow = new JWindow( ownerWindow );
@@ -57,25 +55,10 @@ public class PresentationPopupWindow
 		
 		popupWindow.pack();
 		Dimension sz = popupWindow.getSize();
-		Point2 windowAnchor = new Point2( sz.getWidth() * popupAnchor.getPropX(), sz.getHeight() * popupAnchor.getPropY() );
-		screenX -= (int)( windowAnchor.x + 0.5 );
-		screenY -= (int)( windowAnchor.y + 0.5 );
-		
-		// Ensure >= 0
-		screenX = Math.max( screenX, 0 );
-		screenY = Math.max( screenY, 0 );
-		
-		// Ensure that it is not offscreen due to width/height
-		Dimension screenSz = Toolkit.getDefaultToolkit().getScreenSize();
-		screenX = Math.min( screenX, (int)( screenSz.getWidth() - sz.getWidth() ) );
-		screenY = Math.min( screenY, (int)( screenSz.getHeight() - sz.getHeight() ) );
+		screenAnchorPoint = new Point2(screenX, screenY);
 
-		popupWindow.setLocation( screenX, screenY );
-		
-		screenPosition = new Point2( screenX, screenY );
-		screenSize = new Vector2( sz.getWidth(), sz.getHeight() );
+		reposition(sz);
 
-		
 		popupWindow.setVisible( true );
 		if ( requestFocus )
 		{
@@ -109,12 +92,14 @@ public class PresentationPopupWindow
 	
 	public Point2 getPositionOnScreen()
 	{
-		return screenPosition;
+		Point loc = popupWindow.getLocation();
+		return new Point2(loc.x, loc.y);
 	}
 
 	public Vector2 getSizeOnScreen()
 	{
-		return screenSize;
+		Dimension sz = popupWindow.getSize();
+		return new Vector2(sz.width, sz.height);
 	}
 	
 	
@@ -128,5 +113,24 @@ public class PresentationPopupWindow
 	protected void autoClosePopupChildren()
 	{
 		chain.autoCloseChildrenOf( this );
+	}
+
+	protected void reposition(Dimension size)
+	{
+		Point2 windowAnchor = new Point2( size.getWidth() * popupAnchor.getPropX(), size.getHeight() * popupAnchor.getPropY() );
+
+		int posX = (int)( screenAnchorPoint.x - windowAnchor.x + 0.5);
+		int posY = (int)( screenAnchorPoint.y - windowAnchor.y + 0.5);
+
+		// Ensure >= 0
+		posX = Math.max( posX, 0 );
+		posY = Math.max( posY, 0 );
+
+		// Ensure that it is not offscreen due to width/height
+		Dimension screenSz = Toolkit.getDefaultToolkit().getScreenSize();
+		posX = Math.min( posX, (int)( screenSz.getWidth() - size.getWidth() ) );
+		posY = Math.min( posY, (int)( screenSz.getHeight() - size.getHeight() ) );
+
+		popupWindow.setLocation( posX, posY );
 	}
 }

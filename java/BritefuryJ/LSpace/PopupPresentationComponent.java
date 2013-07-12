@@ -50,6 +50,7 @@ public class PopupPresentationComponent extends PresentationComponent
 			{
 				Dimension s = clampSize( rootElement.allocateAndGetPreferredSize() );
 				containingPopup.popupWindow.setSize( s );
+				containingPopup.reposition( s );
 			}
 		};
 		
