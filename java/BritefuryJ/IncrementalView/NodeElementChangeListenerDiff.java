@@ -22,32 +22,21 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 {
 	private static final int DIFF_THRESHHOLD = 65536;
 
-	private static final String SEGMENT_PREFIX = "\ue137";
-	private static final String SEGMENT_SUFFIX = "\ue138";
+	private static final String CARET_BOUNDARY = "\ue137";
 
 
 
-	class CaretDiffTextRepresentationManager extends AbstractTextRepresentationManager {
+	public static class CaretDiffTextRepresentationManager extends AbstractTextRepresentationManager {
 		@Override
 		protected String getElementContent(LSElement e)
 		{
-			return e.getLeafTextRepresentation();
-		}
-
-		protected String getElementPrefix(LSElement e, boolean complete) {
-			if (complete  &&  e instanceof LSSegment  &&  ((LSSegment) e).isCaretBoundary()) {
-				return SEGMENT_PREFIX;
+			if (e instanceof LSCaretBoundary) {
+				return CARET_BOUNDARY;
 			}
-			return null;
-		}
-
-		protected String getElementSuffix(LSElement e, boolean complete) {
-			if (complete  &&  e instanceof LSSegment  &&  ((LSSegment) e).isCaretBoundary()) {
-				return SEGMENT_SUFFIX;
+			else {
+				return e.getLeafTextRepresentation();
 			}
-			return null;
 		}
-
 	}
 
 
@@ -169,7 +158,7 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 				{
 					state.setSubtreeElement( nodeElement );
 				}
-				
+
 				if ( !newTextRepresentation.equals( textRepresentation ) )
 				{
 					// Compute the difference between the old content and the new content in order to update the cursor position
@@ -195,7 +184,7 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 					int newChangeRegionLength = newTextRepresentation.length() - prefixLen - suffixLen;
 					
 					//int oldIndex = position  +  ( bias == Marker.Bias.END  ?  1  :  0 );
-					
+
 					if ( origChangeRegionLength <= 0  ||  newChangeRegionLength <= 0 )
 					{
 						for (MarkerState state: markerStates)

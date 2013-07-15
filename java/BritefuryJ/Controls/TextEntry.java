@@ -24,12 +24,7 @@ import BritefuryJ.Live.LiveInterface;
 import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
-import BritefuryJ.Pres.Primitive.Border;
-import BritefuryJ.Pres.Primitive.Primitive;
-import BritefuryJ.Pres.Primitive.Region;
-import BritefuryJ.Pres.Primitive.Row;
-import BritefuryJ.Pres.Primitive.Segment;
-import BritefuryJ.Pres.Primitive.Text;
+import BritefuryJ.Pres.Primitive.*;
 import BritefuryJ.Pres.RichText.NormalText;
 import BritefuryJ.StyleSheet.StyleValues;
 
@@ -204,9 +199,7 @@ public class TextEntry extends ControlPres
 			{
 				if (event instanceof TextEditEvent) {
 					String text = outerElement.getTextRepresentation();
-					displayedText.setLiteralValue(text);
-
-					validate( text );
+					updateDisplayedText(text);
 
 					if (listener != null) {
 						int offset = sourceElement.getTextRepresentationOffsetInSubtree( outerElement );
@@ -227,6 +220,9 @@ public class TextEntry extends ControlPres
 						}
 						listener.onTextChanged( TextEntryControl.this );
 					}
+
+					validate( text );
+
 					return true;
 				}
 				return false;
@@ -243,7 +239,7 @@ public class TextEntry extends ControlPres
 				int endPosition = selection.getEndMarker().getClampedIndexInSubtree( outerElement );
 
 				String newText = outerElement.getTextRepresentationFromStartToMarker( selection.getStartMarker() )  +  outerElement.getTextRepresentationFromMarkerToEnd( selection.getEndMarker() );
-				displayedText.setLiteralValue(newText);
+				updateDisplayedText(newText);
 
 				if ( listener != null )
 				{
@@ -267,7 +263,7 @@ public class TextEntry extends ControlPres
 				int endPosition = selection.getEndMarker().getClampedIndexInSubtree( outerElement );
 
 				String newText = outerElement.getTextRepresentationFromStartToMarker( selection.getStartMarker() )  +  replacement  +  outerElement.getTextRepresentationFromMarkerToEnd( selection.getEndMarker() );
-				displayedText.setLiteralValue(newText);
+				updateDisplayedText(newText);
 
 				if ( listener != null )
 				{
@@ -339,11 +335,17 @@ public class TextEntry extends ControlPres
 		{
 			return (String)displayedText.getStaticValue();
 		}
+
+		private void updateDisplayedText(String x) {
+			if (!x.equals(displayedText.getStaticValue())) {
+				displayedText.setLiteralValue(x);
+			}
+		}
 		
 		private void setDisplayedText(String x)
 		{
-			displayedText.setLiteralValue(x);
-			validate( x );
+			updateDisplayedText(x);;
+			validate(x);
 		}
 		
 		
@@ -423,7 +425,7 @@ public class TextEntry extends ControlPres
 			if (hasUncommittedChanges())
 			{
 				String current = (String)text.getStaticValue();
-				displayedText.setLiteralValue(current != null  ?  current  :  "");
+				updateDisplayedText(current != null ? current : "");
 				listener.onCancel( this );
 				updateBorder();
 				return true;
@@ -588,21 +590,24 @@ public class TextEntry extends ControlPres
 		if (wordWrap) {
 			function = new LiveFunction.Function() {
 				public Object evaluate() {
-					return new NormalText((String)displayedText.getValue());
+					Pres p = new NormalText((String)displayedText.getValue());
+					return p;
 				}
 			};
 		}
 		else {
 			function = new LiveFunction.Function() {
 				public Object evaluate() {
-					return new Text((String)displayedText.getValue());
+					Pres p = new Text((String)displayedText.getValue());
+					//return new Row( new Pres[] { new CaretBoundary(), p } );
+					return p;
 				}
 			};
 		}
 
 		LiveFunction visual = new LiveFunction(function);
 
-		Pres line = new Row( new Pres[] { new Segment( false, false, true, visual ) } );
+		Pres line = new Row( new Pres[] { new CaretBoundary(), new Segment( false, false, visual ), new CaretBoundary() } );
 		Pres region = new Region( line );
 		LSRegion regionElement = (LSRegion)region.present( ctx, style );
 		Pres outer = new Border( regionElement ).alignVRefY();
