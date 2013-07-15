@@ -33,6 +33,8 @@ import BritefuryJ.Pres.Primitive.Text;
 import BritefuryJ.Pres.RichText.NormalText;
 import BritefuryJ.StyleSheet.StyleValues;
 
+import javax.swing.*;
+
 public class TextEntry extends ControlPres
 {
 	public static class TextEntryListener
@@ -169,16 +171,24 @@ public class TextEntry extends ControlPres
 			
 			public void elementRealised(LSElement element)
 			{
-				if ( grabCaretOnRealise )
-				{
-					grabCaret();
-					grabCaretOnRealise = false;
-				}
+				Runnable realiseTask = new Runnable() {
+					public void run() {
+						if ( grabCaretOnRealise )
+						{
+							grabCaret();
+							grabCaretOnRealise = false;
+						}
 
-				if ( selectAllOnRealise )
-				{
-					selectAll();
-					selectAllOnRealise = false;
+						if ( selectAllOnRealise )
+						{
+							selectAll();
+							selectAllOnRealise = false;
+						}
+					}
+				};
+
+				if (grabCaretOnRealise || selectAllOnRealise) {
+					SwingUtilities.invokeLater(realiseTask);
 				}
 			}
 
@@ -412,7 +422,8 @@ public class TextEntry extends ControlPres
 			ungrabCaret();
 			if (hasUncommittedChanges())
 			{
-				displayedText.setLiteralValue(text.getStaticValue());
+				String current = (String)text.getStaticValue();
+				displayedText.setLiteralValue(current != null  ?  current  :  "");
 				listener.onCancel( this );
 				updateBorder();
 				return true;
@@ -423,7 +434,9 @@ public class TextEntry extends ControlPres
 
 		public boolean hasUncommittedChanges()
 		{
-			return !text.getStaticValue().equals(displayedText.getStaticValue());
+			String current = (String)text.getStaticValue();
+			current = current != null  ?  current  :  "";
+			return !current.equals(displayedText.getStaticValue());
 		}
 
 
@@ -566,7 +579,9 @@ public class TextEntry extends ControlPres
 
 		LiveInterface value = valueSource.getLive();
 
-		final LiveValue displayedText = new LiveValue(value.getStaticValue());
+		String current = (String)value.getStaticValue();
+		current = current != null  ?  current  :  "";
+		final LiveValue displayedText = new LiveValue(current);
 
 		LiveFunction.Function function = null;
 

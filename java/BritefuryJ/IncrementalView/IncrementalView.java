@@ -7,11 +7,8 @@
 package BritefuryJ.IncrementalView;
 
 import java.awt.Color;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.ListIterator;
+import java.lang.ref.WeakReference;
+import java.util.*;
 
 import org.python.core.Py;
 
@@ -115,7 +112,7 @@ public class IncrementalView
 	{
 		protected AbstractPerspective perspective;
 		protected StyleValues style;
-		protected SimpleAttributeTable inheritedState;
+		protected SimpleAttributeTable inheritedState;		// Accessed by FragmentView.getInheritedState()
 		protected int hash;
 		
 		public FragmentFactory(IncrementalView view, AbstractPerspective perspective, StyleValues style, SimpleAttributeTable inheritedState)
@@ -296,7 +293,7 @@ public class IncrementalView
 	
 	
 	
-	private HashMap<FragmentFactory, FragmentFactory> uniqueFragmentFactories = new HashMap<FragmentFactory, FragmentFactory>();
+	private WeakHashMap<FragmentFactory, WeakReference<FragmentFactory>> uniqueFragmentFactories = new WeakHashMap<FragmentFactory, WeakReference<FragmentFactory>>();
 	
 	
 	
@@ -307,7 +304,7 @@ public class IncrementalView
 		this.inspector = inspector;
 
 		this.modelRootNode = subject.getFocus();
-		
+
 		this.rootPerspective = subject.getPerspective();
 		if ( this.rootPerspective == null )
 		{
@@ -647,11 +644,12 @@ public class IncrementalView
 	{
 		FragmentFactory factory = new FragmentFactory( this, perspective, style, inheritedState );
 		
-		FragmentFactory uniqueFactory = uniqueFragmentFactories.get( factory );
+		WeakReference<FragmentFactory> uniqueFactoryRef = uniqueFragmentFactories.get( factory );
+		FragmentFactory uniqueFactory = uniqueFactoryRef != null  ?  uniqueFactoryRef.get()  :  null;
 		
 		if ( uniqueFactory == null )
 		{
-			uniqueFragmentFactories.put( factory, factory );
+			uniqueFragmentFactories.put( factory, new WeakReference<FragmentFactory>(factory) );
 			uniqueFactory = factory;
 		}
 		

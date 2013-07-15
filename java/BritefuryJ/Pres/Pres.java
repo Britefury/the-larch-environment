@@ -7,6 +7,8 @@
 package BritefuryJ.Pres;
 
 import java.awt.datatransfer.DataFlavor;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import BritefuryJ.AttributeTable.AttributeBase;
@@ -185,9 +187,27 @@ public abstract class Pres
 	{
 		return pad( 0.0, 0.0, topPad, bottomPad );
 	}
-	
-	
-	
+
+
+
+	//
+	// Inherited state
+	//
+
+	public Pres withInheritedStateAttr(String fieldName, Object value) {
+		HashMap<String, Object> changed = new HashMap<String, Object>();
+		changed.put(fieldName, value);
+		return new ApplyInheritedStateAttrs(changed, null, this);
+	}
+
+	public Pres withoutInheritedStateAttr(String fieldName) {
+		HashSet<String> removed = new HashSet<String>();
+		removed.add(fieldName);
+		return new ApplyInheritedStateAttrs(null, removed, this);
+	}
+
+
+
 	//
 	// Element reference
 	//
