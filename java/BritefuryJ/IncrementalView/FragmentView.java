@@ -701,27 +701,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 	// Inner fragment presentation
 	//
 	
-	public LSElement presentInnerFragment(Object x, AbstractPerspective perspective, StyleValues style, SimpleAttributeTable inheritedState)
-	{
-		IncrementalView.FragmentFactory factory = getFragmentFactory();
-		LSElement e = presentInnerFragmentRaw( x, perspective, style, inheritedState );
-		if ( perspective != factory.perspective )
-		{
-			e = perspectiveFragmentRegion( e, perspective );
-		}
-		return e;
-	}
-	
-	
-	
-	protected static LSElement perspectiveFragmentRegion(LSElement fragmentContents, AbstractPerspective perspective)
-	{
-		return new Region( fragmentContents, perspective.getClipboardHandler() ).present();
-	}
-	
-
-
-	private LSElement presentInnerFragmentRaw(Object model, AbstractPerspective perspective, StyleValues style, SimpleAttributeTable inheritedState)
+	public LSElement presentInnerFragment(Object model, AbstractPerspective perspective, StyleValues style, SimpleAttributeTable inheritedState)
 	{
 		if ( model == null )
 		{

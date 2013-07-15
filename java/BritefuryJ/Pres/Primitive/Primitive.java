@@ -380,7 +380,8 @@ public class Primitive
 
 	
 	
-	protected static DerivedValueTable<RegionStyleParams> regionParams = new DerivedValueTable<RegionStyleParams>( primitiveNamespace )
+	// public since it must be accessible from ApplyPerspective
+	public static DerivedValueTable<RegionStyleParams> regionParams = new DerivedValueTable<RegionStyleParams>( primitiveNamespace )
 	{
 		protected RegionStyleParams evaluate(AttributeTable attribs)
 		{
