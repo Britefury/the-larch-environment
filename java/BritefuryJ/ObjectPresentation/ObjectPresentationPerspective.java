@@ -27,21 +27,25 @@ public abstract class ObjectPresentationPerspective extends AbstractPerspective
 	private class ObjectPresentationSubject extends TransientSubject
 	{
 		private Object focus;
-		private String title;
+		private String title, trailText;
 		
 		
-		public ObjectPresentationSubject(Object focus, String title)
+		public ObjectPresentationSubject(Object focus, String title, String trailText)
 		{
 			super( null );
 			this.focus = focus;
 			this.title = title;
+			this.trailText = trailText;
 		}
-		
+
+		public ObjectPresentationSubject(Object focus, String title)
+		{
+			this(focus, title, title);
+		}
+
 		public ObjectPresentationSubject(Object focus)
 		{
-			super( null );
-			this.focus = focus;
-			this.title = focus != null  ?  focus.getClass().getName()  :  "<null>";
+			this(focus, focus != null  ?  focus.getClass().getName()  :  "<null>");
 		}
 		
 
@@ -61,6 +65,12 @@ public abstract class ObjectPresentationPerspective extends AbstractPerspective
 		public String getTitle()
 		{
 			return title;
+		}
+
+		@Override
+		public String getTrailLinkText()
+		{
+			return trailText;
 		}
 	}
 	
@@ -94,9 +104,14 @@ public abstract class ObjectPresentationPerspective extends AbstractPerspective
 		return new ObjectPresentationSubject( o, title );
 	}
 
-	
+	public Subject objectSubject(Object o, String title, String trailText)
+	{
+		return new ObjectPresentationSubject( o, title, trailText );
+	}
 
-	
+
+
+
 	protected abstract Pres presentWithJavaInterface(Object x, FragmentView fragment, SimpleAttributeTable inheritedState);
 	protected abstract Pres presentJavaArray(Object x, FragmentView fragment, SimpleAttributeTable inheritedState);
 	
