@@ -53,7 +53,7 @@ public class LSScript extends LSContainerNonOverlayed
 			LSElement child = childElements[slot];
 			if ( child != null )
 			{
-				LSSegment seg = new LSSegment( (ContainerStyleParams)getStyleParams(), segmentCaretSlotStyleParams, isBeginGuardRequired( slot ), isEndGuardRequired( slot ), false, child );
+				LSSegment seg = new LSSegment( (ContainerStyleParams)getStyleParams(), segmentCaretSlotStyleParams, isBeginGuardRequired( slot ), isEndGuardRequired( slot ), child );
 				segs[slot] = seg;
 				LSParagraph para = new LSParagraph( new LSElement[] { seg } );
 				paras[slot] = para;
@@ -100,7 +100,7 @@ public class LSScript extends LSContainerNonOverlayed
 
 			if ( bSegmentRequired  &&  !bSegmentPresent )
 			{
-				LSSegment seg = new LSSegment( (ContainerStyleParams)getStyleParams(), segmentCaretSlotStyleParams,isBeginGuardRequired( slot ), isEndGuardRequired( slot ), false, child );
+				LSSegment seg = new LSSegment( (ContainerStyleParams)getStyleParams(), segmentCaretSlotStyleParams,isBeginGuardRequired( slot ), isEndGuardRequired( slot ), child );
 				segs[slot] = seg;
 				LSParagraph para = new LSParagraph( new LSElement[] { seg } );
 				paras[slot] = para;

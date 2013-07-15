@@ -16,6 +16,7 @@ public abstract class AbstractTextRepresentationManager
 	protected class BuilderVisitor extends ElementTreeVisitor
 	{
 		private StringBuilder builder = new StringBuilder();
+		// Stack consists of pairs of elements
 		private int stack[] = new int[4*2];
 		private int stackIndex = 0;
 		private int elementCount = 0;
@@ -39,6 +40,7 @@ public abstract class AbstractTextRepresentationManager
 		
 		private void push(int elementCount, int position)
 		{
+			// Stack consists of pairs of elements, so its acual capacity is half its length
 			if ( stackIndex*2 == stack.length )
 			{
 				int newStack[] = new int[stack.length * 2];
@@ -196,8 +198,11 @@ public abstract class AbstractTextRepresentationManager
 		{
 			if ( complete )
 			{
-				// Perform in-order visit as a first step of the post-order, otherwise we muck up the position,
-				// preventing shouldVisitChildrenOfElement() from working properly
+				// Perform in-order visit as a first step of the post-order.
+				// If we perform within the inOrderCompletelyVisitElement() method,
+				// that is called *before* the shouldVisitChildrenOfElement() method, we modiy
+				// @position, whose value is required by shouldVisitChildrenOfElement() to
+				// point at the start of the element, not at the end, so we must offset position here instead.
 				int length = getElementContentLength( e );
 				if ( length != -1 )
 				{
@@ -376,13 +381,20 @@ public abstract class AbstractTextRepresentationManager
 		{
 			System.out.println( "getLeafAtPositionInSubtree: NULL, position=" + position + ", length=" + getTextRepresentationOf( subtreeRoot ).length() );
 		}
+
 		return leaf;
 	}
 	
 	public int getPositionOfElementInSubtree(LSContainer subtreeRoot, LSElement e)
 	{
+		int prefixLen;
 		int position = 0;
-		
+
+		prefixLen = getElementPrefixLength( e, true );
+		if ( prefixLen != -1 ) {
+			position += prefixLen;
+		}
+
 		while ( e != subtreeRoot )
 		{
 			LSContainer parent = e.getParent();
@@ -404,7 +416,12 @@ public abstract class AbstractTextRepresentationManager
 			{
 				position += getTextRepresentationOf( children.get( i ) ).length();
 			}
-			
+
+			prefixLen = getElementPrefixLength( parent, true );
+			if ( prefixLen != -1 ) {
+				position += prefixLen;
+			}
+
 			e = parent;
 		}
 		

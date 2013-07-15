@@ -196,7 +196,7 @@ public class LSFraction extends LSContainerNonOverlayed
 		
 		if ( numerator != null )
 		{
-			LSSegment seg = new LSSegment( (ContainerStyleParams)getStyleParams(), segmentCaretSlotStyleParams, true, true, false, numerator );
+			LSSegment seg = new LSSegment( (ContainerStyleParams)getStyleParams(), segmentCaretSlotStyleParams, true, true, numerator );
 			segs[NUMERATOR] = seg;
 			LSParagraph para = new LSParagraph( new LSElement[] { seg } );
 			paras[NUMERATOR] = para;
@@ -217,7 +217,7 @@ public class LSFraction extends LSContainerNonOverlayed
 
 		if ( denominator != null )
 		{
-			LSSegment seg = new LSSegment( (ContainerStyleParams)getStyleParams(), segmentCaretSlotStyleParams, true, true, false, denominator );
+			LSSegment seg = new LSSegment( (ContainerStyleParams)getStyleParams(), segmentCaretSlotStyleParams, true, true, denominator );
 			segs[DENOMINATOR] = seg;
 			LSParagraph para = new LSParagraph( new LSElement[] { seg } );
 			paras[DENOMINATOR] = para;
@@ -276,7 +276,7 @@ public class LSFraction extends LSContainerNonOverlayed
 
 				if ( bSegmentRequired  &&  !bSegmentPresent )
 				{
-					LSSegment seg = new LSSegment( (ContainerStyleParams)getStyleParams(), segmentCaretSlotStyleParams, true, true, false, child );
+					LSSegment seg = new LSSegment( (ContainerStyleParams)getStyleParams(), segmentCaretSlotStyleParams, true, true, child );
 					segs[slot] = seg;
 					LSParagraph para = new LSParagraph( new LSElement[] { seg } );
 					paras[slot] = para;
