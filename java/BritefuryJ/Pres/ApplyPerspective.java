@@ -7,7 +7,10 @@
 package BritefuryJ.Pres;
 
 import BritefuryJ.DefaultPerspective.DefaultPerspective;
+import BritefuryJ.LSpace.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.LSpace.LSElement;
+import BritefuryJ.LSpace.LSRegion;
+import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Projection.AbstractPerspective;
 import BritefuryJ.StyleSheet.StyleValues;
 
@@ -39,6 +42,20 @@ public class ApplyPerspective extends Pres
 			p = DefaultPerspective.instance;
 		}
 		
-		return child.present( new PresentationContext( ctx.getFragment(), p, ctx.getInheritedState() ), style );
+		LSElement childElement = child.present( new PresentationContext( ctx.getFragment(), p, ctx.getInheritedState() ), style );
+
+		// If we are changing perspective, wrap in a region element to ensure that the clipboard handler gets changed
+		if (p != ctx.getPerspective()) {
+			LSRegion regionElement = new LSRegion( Primitive.regionParams.get( style ), childElement );
+			ClipboardHandlerInterface clipboardHandler = p.getClipboardHandler();
+			if ( clipboardHandler != null )
+			{
+				regionElement.setClipboardHandler(clipboardHandler);
+			}
+			return regionElement;
+		}
+		else {
+			return childElement;
+		}
 	}
 }
