@@ -69,14 +69,7 @@ public class PopupPresentationComponent extends PresentationComponent
 	
 	public void closeContainingPopupChain()
 	{
-		if ( isPopup() )
-		{
-			containingPopup.chain.closeChain();
-		}
-		else
-		{
-			throw new RuntimeException( "This presentation component is not contained within a popup" );
-		}
+		containingPopup.chain.closeChain();
 	}
 	
 

@@ -50,10 +50,6 @@ public class Button extends ControlPres
 					{
 						listener.onButtonClicked( ButtonControl.this, event );
 					}
-					if ( bClosePopupOnActivate )
-					{
-						element.closeContainingPopupChain();
-					}
 					return true;
 				}
 
@@ -65,11 +61,10 @@ public class Button extends ControlPres
 		
 		private LSElement buttonElement;
 		private ButtonListener listener;
-		private boolean bClosePopupOnActivate;
-	
+
 	
 		
-		protected ButtonControl(PresentationContext ctx, StyleValues style, LSElement buttonElement, ButtonListener listener, boolean bClosePopupOnActivate)
+		protected ButtonControl(PresentationContext ctx, StyleValues style, LSElement buttonElement, ButtonListener listener)
 		{
 			super( ctx, style );
 			this.buttonElement = buttonElement;
@@ -114,6 +109,6 @@ public class Button extends ControlPres
 		Pres childElement = presentAsCombinator( ctx, Controls.useButtonAttrs( style.withAttrs( style.get( Controls.buttonAttrs, StyleSheet.class ) ) ), child );
 		LSElement borderElement = border.surround( childElement.alignHCentre() ).present( ctx, style );
 		
-		return new ButtonControl( ctx, style, borderElement, listener, bClosePopupOnActivate );
+		return new ButtonControl( ctx, style, borderElement, listener );
 	}
 }
