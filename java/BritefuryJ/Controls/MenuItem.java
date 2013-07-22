@@ -41,10 +41,10 @@ public class MenuItem extends ControlPres
 	{
 		private class SubMenuItemListener implements MenuItemListener
 		{
-			private PopupMenu subMenu;
+			private Pres subMenu;
 			private SubmenuPopupDirection direction;
 			
-			public SubMenuItemListener(PopupMenu subMenu, SubmenuPopupDirection direction)
+			public SubMenuItemListener(Pres subMenu, SubmenuPopupDirection direction)
 			{
 				this.subMenu = subMenu;
 				this.direction = direction;
@@ -56,11 +56,11 @@ public class MenuItem extends ControlPres
 			{
 				if ( direction == SubmenuPopupDirection.RIGHT )
 				{
-					subMenu.popupMenu( menuItem.getElement(), style, Anchor.TOP_RIGHT, Anchor.TOP_LEFT );
+					subMenu.chainPopup( menuItem.getElement(), style, Anchor.TOP_RIGHT, Anchor.TOP_LEFT, true, true );
 				}
 				else
 				{
-					subMenu.popupMenu( menuItem.getElement(), style, Anchor.BOTTOM_LEFT, Anchor.TOP_LEFT );
+					subMenu.chainPopup( menuItem.getElement(), style, Anchor.BOTTOM_LEFT, Anchor.TOP_LEFT, true, true );
 				}
 			}
 		}
@@ -111,7 +111,7 @@ public class MenuItem extends ControlPres
 			this.bClosePopupOnActivate = bClosePopupOnActivate;
 		}
 		
-		protected MenuItemControl(PresentationContext ctx, StyleValues style, LSBin element, PopupMenu subMenu, SubmenuPopupDirection direction, boolean bClosePopupOnActivate)
+		protected MenuItemControl(PresentationContext ctx, StyleValues style, LSBin element, Pres subMenu, SubmenuPopupDirection direction, boolean bClosePopupOnActivate)
 		{
 			super( ctx, style );
 			this.element = element;
@@ -129,7 +129,7 @@ public class MenuItem extends ControlPres
 
 	private Pres child;
 	private MenuItemListener listener;
-	private PopupMenu subMenu;
+	private Pres subMenu;
 	private SubmenuPopupDirection direction;
 	
 	
@@ -139,10 +139,10 @@ public class MenuItem extends ControlPres
 		this.listener = listener;
 	}
 	
-	public MenuItem(Object child, PopupMenu subMenu, SubmenuPopupDirection direction)
+	public MenuItem(Object child, Object subMenu, SubmenuPopupDirection direction)
 	{
 		this.child = coerce( child );
-		this.subMenu = subMenu;
+		this.subMenu = Pres.coerce(subMenu);
 		this.direction = direction;
 	}
 	
@@ -152,7 +152,7 @@ public class MenuItem extends ControlPres
 		return new MenuItem( new Label( labelText ), listener );
 	}
 	
-	public static MenuItem menuItemWithLabel(String labelText, PopupMenu subMenu, SubmenuPopupDirection direction)
+	public static MenuItem menuItemWithLabel(String labelText, Object subMenu, SubmenuPopupDirection direction)
 	{
 		return new MenuItem( new Label( labelText ), subMenu, direction );
 	}
