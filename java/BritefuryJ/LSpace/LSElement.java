@@ -20,25 +20,6 @@ package BritefuryJ.LSpace;
  * Child local space to local space - the concatenation of child local space to allocation space, and allocation space to local space
  */
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Shape;
-import java.awt.Stroke;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.WeakHashMap;
-
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.DefaultPerspective;
 import BritefuryJ.DefaultPerspective.Presentable;
@@ -48,12 +29,11 @@ import BritefuryJ.Graphics.Painter;
 import BritefuryJ.Graphics.SolidBorder;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.IncrementalView.ViewFragmentFunction;
-import BritefuryJ.LSpace.Event.*;
-import BritefuryJ.LSpace.Input.DndHandler;
-import BritefuryJ.LSpace.Input.DndTarget;
-import BritefuryJ.LSpace.Input.Modifier;
-import BritefuryJ.LSpace.Input.ObjectDndHandler;
-import BritefuryJ.LSpace.Input.PointerInterface;
+import BritefuryJ.LSpace.Event.AbstractPointerButtonEvent;
+import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
+import BritefuryJ.LSpace.Event.PointerEvent;
+import BritefuryJ.LSpace.Event.PointerMotionEvent;
+import BritefuryJ.LSpace.Input.*;
 import BritefuryJ.LSpace.Interactor.*;
 import BritefuryJ.LSpace.Layout.ElementAlignment;
 import BritefuryJ.LSpace.Layout.HAlignment;
@@ -70,15 +50,11 @@ import BritefuryJ.Math.Vector2;
 import BritefuryJ.Math.Xform2;
 import BritefuryJ.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.Pres.InnerFragment;
-import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.ObjectPres.HorizontalField;
 import BritefuryJ.Pres.ObjectPres.ObjectBoxWithFields;
-import BritefuryJ.Pres.Primitive.Border;
-import BritefuryJ.Pres.Primitive.Column;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.*;
 import BritefuryJ.Pres.Primitive.Label;
-import BritefuryJ.Pres.Primitive.Primitive;
-import BritefuryJ.Pres.Primitive.Row;
-import BritefuryJ.Pres.Primitive.Spacer;
 import BritefuryJ.Projection.Perspective;
 import BritefuryJ.Shortcut.Shortcut;
 import BritefuryJ.Shortcut.ShortcutElementAction;
@@ -86,8 +62,12 @@ import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.Util.RichString.RichString;
 import BritefuryJ.Util.RichString.RichStringBuilder;
 
-
-
+import java.awt.*;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
+import java.util.*;
+import java.util.List;
 
 
 abstract public class LSElement implements Presentable
@@ -2979,10 +2959,11 @@ abstract public class LSElement implements Presentable
 		
 		return null;
 	}
-	
-	
-	
-	
+
+
+
+
+
 	//
 	//
 	// DEBUG NAME METHODS

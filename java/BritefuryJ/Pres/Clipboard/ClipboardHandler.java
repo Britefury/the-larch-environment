@@ -106,8 +106,14 @@ public class ClipboardHandler extends ClipboardHandlerInterface
 	public boolean deleteSelection(Selection selection, Target target)
 	{
 		SelectionEditorInterface selectionEditor = getSelectionEditorForSelection( selection );
-		
-		return selectionEditor != null && selectionEditor.deleteSelection( selection, target );
+
+		try {
+			return selectionEditor != null && selectionEditor.deleteSelection( selection, target );
+		}
+		catch (Throwable t) {
+			target.getElement().getRootElement().notifyExceptionDuringClipboardOperation(target.getRegion(), selectionEditor, "SelectionEditorInterface.deleteSelection", t);
+			return false;
+		}
 	}
 
 	@Override
@@ -115,7 +121,13 @@ public class ClipboardHandler extends ClipboardHandlerInterface
 	{
 		SelectionEditorInterface selectionEditor = getSelectionEditorForSelection( selection );
 		
-		return selectionEditor != null && selectionEditor.replaceSelectionWithText( selection, target, replacement );
+		try {
+			return selectionEditor != null && selectionEditor.replaceSelectionWithText( selection, target, replacement );
+		}
+		catch (Throwable t) {
+			target.getElement().getRootElement().notifyExceptionDuringClipboardOperation(target.getRegion(), selectionEditor, "SelectionEditorInterface.replaceSelectionWithText", t);
+			return false;
+		}
 	}
 
 	@Override
@@ -123,7 +135,13 @@ public class ClipboardHandler extends ClipboardHandlerInterface
 	{
 		AbstractSelectionExporter<?,?> exporter = getExporterForSelection( selection );
 		
-		return exporter != null  ?  exporter.getActions()  :  0;
+		try {
+			return exporter != null  ?  exporter.getActions()  :  0;
+		}
+		catch (Throwable t) {
+			selection.getRootElement().notifyExceptionDuringClipboardOperation(selection.getRegion(), exporter, "AbstractSelectionExporter.getActions", t);
+			return 0;
+		}
 	}
 
 	@Override
@@ -133,7 +151,13 @@ public class ClipboardHandler extends ClipboardHandlerInterface
 		
 		if ( exporter != null )
 		{
-			return exporter.createExportTransferable( selection );
+			try {
+				return exporter.createExportTransferable( selection );
+			}
+			catch (Throwable t) {
+				selection.getRootElement().notifyExceptionDuringClipboardOperation(selection.getRegion(), exporter, "AbstractSelectionExporter.createExportTransferable", t);
+				return null;
+			}
 		}
 		else
 		{
@@ -148,7 +172,12 @@ public class ClipboardHandler extends ClipboardHandlerInterface
 		
 		if ( exporter != null )
 		{
-			exporter.exportTransferableDone( selection, target, transferable, action );
+			try {
+				exporter.exportTransferableDone( selection, target, transferable, action );
+			}
+			catch (Throwable t) {
+				target.getElement().getRootElement().notifyExceptionDuringClipboardOperation(target.getRegion(), exporter, "AbstractSelectionExporter.exportTransferableDone", t);
+			}
 		}
 	}
 
@@ -159,7 +188,13 @@ public class ClipboardHandler extends ClipboardHandlerInterface
 		
 		if ( importer != null )
 		{
-			return importer.canImport( target, selection, dataTransfer );
+			try {
+				return importer.canImport( target, selection, dataTransfer );
+			}
+			catch (Throwable t) {
+				target.getElement().getRootElement().notifyExceptionDuringClipboardOperation(target.getRegion(), importer, "TargetImporter.canImport", t);
+				return false;
+			}
 		}
 		else
 		{
@@ -174,7 +209,13 @@ public class ClipboardHandler extends ClipboardHandlerInterface
 		
 		if ( importer != null )
 		{
-			return importer.importData( target, selection, dataTransfer );
+			try {
+				return importer.importData( target, selection, dataTransfer );
+			}
+			catch (Throwable t) {
+				target.getElement().getRootElement().notifyExceptionDuringClipboardOperation(target.getRegion(), importer, "TargetImporter.importData", t);
+				return false;
+			}
 		}
 		else
 		{
