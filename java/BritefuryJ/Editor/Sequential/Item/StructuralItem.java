@@ -23,7 +23,7 @@ public class StructuralItem extends Pres
 	{
 		this.controller = controller;
 		this.model = model;
-		this.child = coerceNonNull( child );
+		this.child = coercePresentingNull(child);
 	}
 
 

@@ -100,12 +100,12 @@ public class TableStyleParams extends ContainerStyleParams
 	protected void buildFieldList(List<Object> fields)
 	{
 		super.buildFieldList( fields );
-		fields.add( new HorizontalField( "Column spacing", Pres.coerceNonNull( columnSpacing ) ) );
-		fields.add( new HorizontalField( "Column expand", Pres.coerceNonNull( columnExpand ) ) );
-		fields.add( new HorizontalField( "Row spacing", Pres.coerceNonNull( rowSpacing ) ) );
-		fields.add( new HorizontalField( "Row expand", Pres.coerceNonNull( rowExpand ) ) );
-		fields.add( new HorizontalField( "Cell boundary stroke", Pres.coerceNonNull( cellBoundaryStroke ) ) );
-		fields.add( new HorizontalField( "Cell boundary paint", Pres.coerceNonNull( cellBoundaryPaint ) ) );
-		fields.add( new HorizontalField( "Table background painter", Pres.coerceNonNull( tableBackgroundPainter ) ) );
+		fields.add( new HorizontalField( "Column spacing", Pres.coercePresentingNull(columnSpacing) ) );
+		fields.add( new HorizontalField( "Column expand", Pres.coercePresentingNull(columnExpand) ) );
+		fields.add( new HorizontalField( "Row spacing", Pres.coercePresentingNull(rowSpacing) ) );
+		fields.add( new HorizontalField( "Row expand", Pres.coercePresentingNull(rowExpand) ) );
+		fields.add( new HorizontalField( "Cell boundary stroke", Pres.coercePresentingNull(cellBoundaryStroke) ) );
+		fields.add( new HorizontalField( "Cell boundary paint", Pres.coercePresentingNull(cellBoundaryPaint) ) );
+		fields.add( new HorizontalField( "Table background painter", Pres.coercePresentingNull(tableBackgroundPainter) ) );
 	}
 }

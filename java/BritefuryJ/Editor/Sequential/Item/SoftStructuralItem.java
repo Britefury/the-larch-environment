@@ -27,7 +27,7 @@ public class SoftStructuralItem extends Pres
 	{
 		this.controller = controller;
 		this.editListeners = new TreeEventListener[] {};
-		this.child = coerceNonNull( child );
+		this.child = coercePresentingNull(child);
 		this.model = model;
 	}
 
@@ -35,7 +35,7 @@ public class SoftStructuralItem extends Pres
 	{
 		this.controller = controller;
 		this.editListeners = new TreeEventListener[] { editListener };
-		this.child = coerceNonNull( child );
+		this.child = coercePresentingNull(child);
 		this.model = model;
 	}
 
@@ -44,7 +44,7 @@ public class SoftStructuralItem extends Pres
 		this.controller = controller;
 		this.editListeners = editListeners.toArray( new TreeEventListener[editListeners.size()] );
 		this.model = model;
-		this.child = coerceNonNull( child );
+		this.child = coercePresentingNull(child);
 	}
 
 

@@ -37,7 +37,7 @@ public class JavaInspectorPerspective extends AbstractPerspective
 			{
 				Class<?> comp = cls.getComponentType();
 				Object arr[] = (Object[])x;
-				result = new ObjectBox( comp.getName() + "[]", new Column( Pres.mapCoerceNonNull( arr ) ) );
+				result = new ObjectBox( comp.getName() + "[]", new Column( Pres.mapCoercePresentingNull(arr) ) );
 			}
 			else
 			{

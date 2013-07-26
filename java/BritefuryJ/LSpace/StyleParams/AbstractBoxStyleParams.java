@@ -43,6 +43,6 @@ public class AbstractBoxStyleParams extends ContainerStyleParams
 	protected void buildFieldList(List<Object> fields)
 	{
 		super.buildFieldList( fields );
-		fields.add( new HorizontalField( "Spacing", Pres.coerceNonNull( spacing ) ) );
+		fields.add( new HorizontalField( "Spacing", Pres.coercePresentingNull(spacing) ) );
 	}
 }

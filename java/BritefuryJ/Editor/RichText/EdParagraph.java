@@ -123,7 +123,7 @@ public class EdParagraph extends EdAbstractText
 	@Override
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		Pres attrs = new Paragraph( new Object[] { Pres.coerceNonNull( this.styleAttrs ) } );
+		Pres attrs = new Paragraph( new Object[] { Pres.coercePresentingNull(this.styleAttrs) } );
 		return paraStyle.applyTo( new Border( new Column( new Object[] { presentContents(), new Box( 1.0, 1.0 ).pad( 1.0, 1.0 ).alignHExpand(), attrs } ) ) );
 	}
 

@@ -23,7 +23,7 @@ public class ApplyPerspective extends Pres
 	public ApplyPerspective(AbstractPerspective perspective, Object child)
 	{
 		this.perspective = perspective;
-		this.child = coerceNonNull( child );
+		this.child = coercePresentingNull(child);
 	}
 	
 	

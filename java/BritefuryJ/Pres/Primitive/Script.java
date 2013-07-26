@@ -19,10 +19,10 @@ public class Script extends Pres
 	public Script(Object main, Object leftSuper, Object leftSub, Object rightSuper, Object rightSub)
 	{
 		this.main = coerce( main );
-		this.leftSuper = coerce( leftSuper );
-		this.leftSub = coerce( leftSub );
-		this.rightSuper = coerce( rightSuper );
-		this.rightSub = coerce( rightSub );
+		this.leftSuper = coerceNullable( leftSuper );
+		this.leftSub = coerceNullable( leftSub );
+		this.rightSuper = coerceNullable( rightSuper );
+		this.rightSub = coerceNullable( rightSub );
 	}
 	
 	

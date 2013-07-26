@@ -56,6 +56,6 @@ public class CaretSlotStyleParams extends ContentLeafEditableStyleParams
 	protected void buildFieldList(List<Object> fields)
 	{
 		super.buildFieldList( fields );
-		fields.add( new HorizontalField( "Font", Pres.coerceNonNull( font ) ) );
+		fields.add( new HorizontalField( "Font", Pres.coercePresentingNull(font) ) );
 	}
 }

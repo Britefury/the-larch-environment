@@ -73,9 +73,9 @@ public class ElementStyleParams implements Presentable
 	{
 		fields.add( new HorizontalField( "H-Align", new Label( hAlign.toString() ) ) );
 		fields.add( new HorizontalField( "V-Align", new Label( vAlign.toString() ) ) );
-		fields.add( new HorizontalField( "Background", Pres.coerceNonNull( background ) ) );
-		fields.add( new HorizontalField( "Hover background", Pres.coerceNonNull( hoverBackground ) ) );
-		fields.add( new HorizontalField( "Cursor", Pres.coerceNonNull( cursor ) ) );
+		fields.add( new HorizontalField( "Background", Pres.coercePresentingNull(background) ) );
+		fields.add( new HorizontalField( "Hover background", Pres.coercePresentingNull(hoverBackground) ) );
+		fields.add( new HorizontalField( "Cursor", Pres.coercePresentingNull(cursor) ) );
 	}
 
 

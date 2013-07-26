@@ -79,7 +79,7 @@ public class Browser implements PaneManager
 			StyleSheet titleStyle = StyleSheet.style( Primitive.fontSize.as( 24 ) );
 			
 			Pres errorTitle = titleStyle.applyTo( new Label( "Could not resolve" ) );
-			Pres exc = Pres.coerceNonNull( exception );
+			Pres exc = Pres.coercePresentingNull(exception);
 			Pres body = new Body( new Pres[] { errorTitle.alignHCentre(), exc.alignHCentre() } );
 			return new Page( new Pres[] { body } );
 		}

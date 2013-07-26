@@ -49,7 +49,7 @@ def _textLines(text, textStyleAttribute):
 
 def _richStringItem(item, textStyleAttribute, bUseDefaultPerspectiveForResult):
 	if item.isStructural():
-		resultView = Pres.coerceNonNull( item.getValue() )
+		resultView = Pres.coercePresentingNull( item.getValue() )
 		if bUseDefaultPerspectiveForResult:
 			resultView = ApplyPerspective.defaultPerspective( resultView )
 		return resultView
@@ -91,7 +91,7 @@ def executionResultBox(streams, exception, resultInTuple, bUseDefaultPerspecitve
 			exceptionView = ApplyPerspective.defaultPerspective( exceptionView )
 		boxContents.append( execException( exceptionView ) )
 	if resultInTuple is not None:
-		resultView = Pres.coerceNonNull( resultInTuple[0] ).alignHPack()
+		resultView = Pres.coercePresentingNull( resultInTuple[0] ).alignHPack()
 		if bUseDefaultPerspectiveForResult:
 			resultView = ApplyPerspective.defaultPerspective( resultView )
 		boxContents.append( execResult( resultView ) )
@@ -107,7 +107,7 @@ def minimalExecutionResultBox(streams, exception, resultInTuple, bUseDefaultPers
 		if resultInTuple is None:
 			return None
 		else:
-			resultView = Pres.coerceNonNull( resultInTuple[0] ).alignHPack()
+			resultView = Pres.coercePresentingNull( resultInTuple[0] ).alignHPack()
 			if bUseDefaultPerspectiveForResult:
 				resultView = ApplyPerspective.defaultPerspective( resultView )
 			return Paragraph( [ resultView ] ).alignHExpand()
@@ -126,7 +126,7 @@ def minimalExecutionResultBox(streams, exception, resultInTuple, bUseDefaultPers
 				exceptionView = ApplyPerspective.defaultPerspective( exceptionView )
 			boxContents.append( execException( exceptionView ) )
 		if resultInTuple is not None:
-			resultView = Pres.coerceNonNull( resultInTuple[0] ).alignHPack()
+			resultView = Pres.coercePresentingNull( resultInTuple[0] ).alignHPack()
 			if bUseDefaultPerspectiveForResult:
 				resultView = ApplyPerspective.defaultPerspective( resultView )
 			boxContents.append( execResult( resultView ) )

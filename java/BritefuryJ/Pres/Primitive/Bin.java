@@ -26,7 +26,7 @@ public class Bin extends Pres
 
 	public Bin(Object child)
 	{
-		this.child = coerce( child );
+		this.child = coerceNullable( child );
 	}
 
 

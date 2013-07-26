@@ -56,8 +56,8 @@ public class ContentLeafEditableStyleParams extends ContentLeafStyleParams
 	protected void buildFieldList(List<Object> fields)
 	{
 		super.buildFieldList( fields );
-		fields.add( new HorizontalField( "Caret colour", Pres.coerceNonNull( caretColour ) ) );
-		fields.add( new HorizontalField( "Editable", Pres.coerceNonNull( bEditable ) ) );
-		fields.add( new HorizontalField( "Selectable", Pres.coerceNonNull( bSelectable ) ) );
+		fields.add( new HorizontalField( "Caret colour", Pres.coercePresentingNull(caretColour) ) );
+		fields.add( new HorizontalField( "Editable", Pres.coercePresentingNull(bEditable) ) );
+		fields.add( new HorizontalField( "Selectable", Pres.coercePresentingNull(bSelectable) ) );
 	}
 }

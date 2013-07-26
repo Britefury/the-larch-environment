@@ -572,6 +572,26 @@ public abstract class Pres
 	{
 		if ( x == null )
 		{
+			throw new IllegalArgumentException("Cannot convert null to a presentable value");
+		}
+		else if ( x instanceof Pres )
+		{
+			return (Pres)x;
+		}
+		else if ( x instanceof LSElement )
+		{
+			return new PresentElement( (LSElement)x );
+		}
+		else
+		{
+			return new InnerFragment( x );
+		}
+	}
+
+	public static Pres coerceNullable(Object x)
+	{
+		if ( x == null )
+		{
 			return null;
 		}
 		else if ( x instanceof Pres )
@@ -588,7 +608,7 @@ public abstract class Pres
 		}
 	}
 
-	public static Pres coerceNonNull(Object x)
+	public static Pres coercePresentingNull(Object x)
 	{
 		if ( x == null )
 		{
@@ -613,6 +633,7 @@ public abstract class Pres
 		return new PresentElement( e );
 	}
 
+
 	public static Pres[] mapCoerce(Object children[])
 	{
 		Pres result[] = new Pres[children.length];
@@ -623,7 +644,6 @@ public abstract class Pres
 		return result;
 	}
 	
-
 	public static Pres[] mapCoerce(List<?> children)
 	{
 		Pres result[] = new Pres[children.size()];
@@ -634,23 +654,45 @@ public abstract class Pres
 		return result;
 	}
 
-	public static Pres[] mapCoerceNonNull(Object children[])
+
+	public static Pres[] mapCoerceNullable(Object children[])
 	{
 		Pres result[] = new Pres[children.length];
 		for (int i = 0; i < children.length; i++)
 		{
-			result[i] = coerceNonNull( children[i] );
+			result[i] = coerceNullable( children[i] );
+		}
+		return result;
+	}
+
+	public static Pres[] mapCoerceNullable(List<?> children)
+	{
+		Pres result[] = new Pres[children.size()];
+		for (int i = 0; i < children.size(); i++)
+		{
+			result[i] = coerceNullable( children.get( i ) );
+		}
+		return result;
+	}
+
+
+	public static Pres[] mapCoercePresentingNull(Object children[])
+	{
+		Pres result[] = new Pres[children.length];
+		for (int i = 0; i < children.length; i++)
+		{
+			result[i] = coercePresentingNull(children[i]);
 		}
 		return result;
 	}
 	
 
-	public static Pres[] mapCoerceNonNull(List<?> children)
+	public static Pres[] mapCoercePresentingNull(List<?> children)
 	{
 		Pres result[] = new Pres[children.size()];
 		for (int i = 0; i < children.size(); i++)
 		{
-			result[i] = coerceNonNull( children.get( i ) );
+			result[i] = coercePresentingNull(children.get(i));
 		}
 		return result;
 	}
