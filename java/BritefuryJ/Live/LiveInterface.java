@@ -77,14 +77,7 @@ public abstract class LiveInterface extends CompositePres
 				return new ErrorBox( "UnitInterface.ValuePres presentation error - exception during live evaluation", exceptionView ).present( ctx, style );
 			}
 
-			if ( value != null )
-			{
-				return Pres.coerce( value ).present( ctx, style );
-			}
-			else
-			{
-				return PrimitivePresenter.presentNull().present( ctx, style );
-			}
+			return Pres.coercePresentingNull(value).present(ctx, style);
 		}
 	}
 	

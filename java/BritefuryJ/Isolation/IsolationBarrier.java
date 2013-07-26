@@ -150,7 +150,7 @@ public class IsolationBarrier <ValueType> implements Presentable, Trackable, Cli
 	
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return style.applyTo( new ObjectBox( "ISOLATION BARRIER", Pres.coerceNonNull( getValue() ) ) );
+		return style.applyTo( new ObjectBox( "ISOLATION BARRIER", Pres.coercePresentingNull(getValue()) ) );
 	}
 
 

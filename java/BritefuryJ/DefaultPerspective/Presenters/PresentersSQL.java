@@ -60,7 +60,7 @@ public class PresentersSQL extends ObjectPresenterRegistry
 				}
 				catch (SQLException e)
 				{
-					tablesPres = Pres.coerceNonNull( e );
+					tablesPres = Pres.coercePresentingNull(e);
 				}
 				Pres tables = new DropDownExpander( new SectionHeading3( "Tables" ), tablesPres );
 				
@@ -68,7 +68,7 @@ public class PresentersSQL extends ObjectPresenterRegistry
 			}
 			catch (SQLException e)
 			{
-				return new ErrorBox( "SQL: Error presenting ResultSet", Pres.coerceNonNull( e ) );
+				return new ErrorBox( "SQL: Error presenting ResultSet", Pres.coercePresentingNull(e) );
 			}
 		}
 	};
@@ -118,7 +118,7 @@ public class PresentersSQL extends ObjectPresenterRegistry
 			}
 			catch (SQLException e)
 			{
-				return new ErrorBox( "SQL: Error presenting ResultSet", Pres.coerceNonNull( e ) );
+				return new ErrorBox( "SQL: Error presenting ResultSet", Pres.coercePresentingNull(e) );
 			}
 		}
 	};

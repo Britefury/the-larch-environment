@@ -91,12 +91,12 @@ public class LabelStyleParams extends ElementStyleParams
 	protected void buildFieldList(List<Object> fields)
 	{
 		super.buildFieldList( fields );
-		fields.add( new HorizontalField( "Font", Pres.coerceNonNull( font ) ) );
-		fields.add( new HorizontalField( "Text paint", Pres.coerceNonNull( textPaint ) ) );
-		fields.add( new HorizontalField( "Hover text paint", Pres.coerceNonNull( hoverTextPaint ) ) );
-		fields.add( new HorizontalField( "Squiggle underline paint", Pres.coerceNonNull( squiggleUnderlinePaint ) ) );
-		fields.add( new HorizontalField( "Underline", Pres.coerceNonNull( bUnderline ) ) );
-		fields.add( new HorizontalField( "Strikethrough", Pres.coerceNonNull( bStrikethrough ) ) );
-		fields.add( new HorizontalField( "Mixed size caps", Pres.coerceNonNull( bMixedSizeCaps ) ) );
+		fields.add( new HorizontalField( "Font", Pres.coercePresentingNull(font) ) );
+		fields.add( new HorizontalField( "Text paint", Pres.coercePresentingNull(textPaint) ) );
+		fields.add( new HorizontalField( "Hover text paint", Pres.coercePresentingNull(hoverTextPaint) ) );
+		fields.add( new HorizontalField( "Squiggle underline paint", Pres.coercePresentingNull(squiggleUnderlinePaint) ) );
+		fields.add( new HorizontalField( "Underline", Pres.coercePresentingNull(bUnderline) ) );
+		fields.add( new HorizontalField( "Strikethrough", Pres.coercePresentingNull(bStrikethrough) ) );
+		fields.add( new HorizontalField( "Mixed size caps", Pres.coercePresentingNull(bMixedSizeCaps) ) );
 	}
 }

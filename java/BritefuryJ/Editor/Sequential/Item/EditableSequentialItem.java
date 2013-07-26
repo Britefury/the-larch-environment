@@ -26,14 +26,14 @@ public class EditableSequentialItem extends Pres
 	{
 		this.controller = controller;
 		this.editListeners = new TreeEventListener[] { editListener };
-		this.child = coerceNonNull( child );
+		this.child = coercePresentingNull(child);
 	}
 
 	public EditableSequentialItem(SequentialController controller, List<TreeEventListener> editListeners, Object child)
 	{
 		this.controller = controller;
 		this.editListeners = editListeners.toArray( new TreeEventListener[editListeners.size()] );
-		this.child = coerceNonNull( child );
+		this.child = coercePresentingNull(child);
 	}
 
 

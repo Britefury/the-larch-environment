@@ -55,8 +55,8 @@ public class ParagraphStyleParams extends ContainerStyleParams
 	protected void buildFieldList(List<Object> fields)
 	{
 		super.buildFieldList( fields );
-		fields.add( new HorizontalField( "Spacing", Pres.coerceNonNull( spacing ) ) );
-		fields.add( new HorizontalField( "Line spacing", Pres.coerceNonNull( lineSpacing ) ) );
-		fields.add( new HorizontalField( "Indentation", Pres.coerceNonNull( indentation ) ) );
+		fields.add( new HorizontalField( "Spacing", Pres.coercePresentingNull(spacing) ) );
+		fields.add( new HorizontalField( "Line spacing", Pres.coercePresentingNull(lineSpacing) ) );
+		fields.add( new HorizontalField( "Indentation", Pres.coercePresentingNull(indentation) ) );
 	}
 }

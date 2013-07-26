@@ -112,12 +112,12 @@ public class MathRootStyleParams extends ContainerStyleParams
 	protected void buildFieldList(List<Object> fields)
 	{
 		super.buildFieldList( fields );
-		fields.add( new HorizontalField( "Font", Pres.coerceNonNull( font ) ) );
-		fields.add( new HorizontalField( "Symbol paint", Pres.coerceNonNull( symbolPaint ) ) );
-		fields.add( new HorizontalField( "Hover symbol paint", Pres.coerceNonNull( hoverSymbolPaint ) ) );
-		fields.add( new HorizontalField( "Thickness", Pres.coerceNonNull( getThickness() ) ) );
-		fields.add( new HorizontalField( "Bar spacing", Pres.coerceNonNull( getBarSpacing() ) ) );
-		fields.add( new HorizontalField( "Glyph width", Pres.coerceNonNull( getGlyphWidth() ) ) );
-		fields.add( new HorizontalField( "Glyph line widths", Pres.coerceNonNull( getGlyphLineWidths() ) ) );
+		fields.add( new HorizontalField( "Font", Pres.coercePresentingNull(font) ) );
+		fields.add( new HorizontalField( "Symbol paint", Pres.coercePresentingNull(symbolPaint) ) );
+		fields.add( new HorizontalField( "Hover symbol paint", Pres.coercePresentingNull(hoverSymbolPaint) ) );
+		fields.add( new HorizontalField( "Thickness", Pres.coercePresentingNull(getThickness()) ) );
+		fields.add( new HorizontalField( "Bar spacing", Pres.coercePresentingNull(getBarSpacing()) ) );
+		fields.add( new HorizontalField( "Glyph width", Pres.coercePresentingNull(getGlyphWidth()) ) );
+		fields.add( new HorizontalField( "Glyph line widths", Pres.coercePresentingNull(getGlyphLineWidths()) ) );
 	}
 }

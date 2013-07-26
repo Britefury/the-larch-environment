@@ -40,7 +40,7 @@ class TagSStart extends TagStart
 			xs.add( new Label( " " ) );
 			xs.add( Pres.coerce( entry.getKey() ) );
 			xs.add( new Label( "=" ) );
-			xs.add( Pres.coerceNonNull( entry.getValue() ) );
+			xs.add( Pres.coercePresentingNull(entry.getValue()) );
 		}
 		return new Row( xs );
 	}

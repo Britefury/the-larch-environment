@@ -32,7 +32,7 @@ class TagPStart extends TagStart
 	@Override
 	protected Pres presentTagContents()
 	{
-		return new Row( new Object[] { new Label( " " ), Pres.coerceNonNull( styleAttrs ) } );
+		return new Row( new Object[] { new Label( " " ), Pres.coercePresentingNull(styleAttrs) } );
 	}
 
 

@@ -155,38 +155,38 @@ public class IncrementalView
 
 		
 		
-		public LSElement createFragmentContentElement(IncrementalView view, FragmentView fragmentView, Object model)
+		public LSElement createFragmentContentElement(IncrementalView view, FragmentView fragmentView)
 		{
 			view.profile_startPresBuild();
 
 			// Create the view fragment
-			Pres fragment;
+			Pres presentation;
 			try
 			{
-				fragment = perspective.presentObject( model, fragmentView, inheritedState );
+				presentation = perspective.presentObject( fragmentView.getModel(), fragmentView, inheritedState );
 			}
 			catch (Throwable t)
 			{
 				try
 				{
 					Pres exceptionView = DefaultPerspective.instance.presentObject( t, fragmentView, inheritedState );
-					fragment = new ErrorBox( "Presentation error - exception during presentation", exceptionView );
+					presentation = new ErrorBox( "Presentation error - exception during presentation", exceptionView );
 					view.profile_stopPresBuild();
 					view.profile_startPresToElements();
-					LSElement element = fragment.present( new PresentationContext( fragmentView, DefaultPerspective.instance, inheritedState ), style );
+					LSElement element = presentation.present( new PresentationContext( fragmentView, DefaultPerspective.instance, inheritedState ), style );
 					view.profile_stopPresToElements();
 					return element;
 				}
 				catch (Exception e2)
 				{
-					fragment = new ErrorBox( "DOUBLE EXCEPTION!", new Column( new Pres[] {
+					presentation = new ErrorBox( "DOUBLE EXCEPTION!", new Column( new Pres[] {
 							labelStyle.applyTo( new Label( "Got exception:" ) ),
 							exceptionStyle.applyTo( new StaticText( e2.toString() ) ).padX( 15.0, 0.0 ),
 							labelStyle.applyTo( new Label( "While trying to display exception:" ) ),
 							exceptionStyle.applyTo( new StaticText( t.toString() ) ).padX( 15.0, 0.0 )   } ) );
 					view.profile_stopPresBuild();
 					view.profile_startPresToElements();
-					LSElement element = fragment.present( new PresentationContext( fragmentView, DefaultPerspective.instance, inheritedState ), style );
+					LSElement element = presentation.present( new PresentationContext( fragmentView, DefaultPerspective.instance, inheritedState ), style );
 					view.profile_stopPresToElements();
 					return element;
 				}
@@ -198,24 +198,24 @@ public class IncrementalView
 			
 			try
 			{
-				element = presToElements( fragment, fragmentView );
+				element = presToElements( presentation, fragmentView );
 			}
 			catch (Throwable t)
 			{
 				try
 				{
 					Pres exceptionView = DefaultPerspective.instance.presentObject( t, fragmentView, inheritedState );
-					fragment = new ErrorBox( "Presentation realisation error - exception during presentation realisation", exceptionView );
-					return fragment.present( new PresentationContext( fragmentView, DefaultPerspective.instance, inheritedState ), style );
+					presentation = new ErrorBox( "Presentation realisation error - exception during presentation realisation", exceptionView );
+					return presentation.present( new PresentationContext( fragmentView, DefaultPerspective.instance, inheritedState ), style );
 				}
 				catch (Exception e2)
 				{
-					fragment = new ErrorBox( "DOUBLE EXCEPTION!", new Column( new Pres[] {
+					presentation = new ErrorBox( "DOUBLE EXCEPTION!", new Column( new Pres[] {
 							labelStyle.applyTo( new Label( "Got exception:" ) ),
 							exceptionStyle.applyTo( new StaticText( e2.toString() ) ).padX( 15.0, 0.0 ),
 							labelStyle.applyTo( new Label( "While trying to display exception:" ) ),
 							exceptionStyle.applyTo( new StaticText( t.toString() ) ).padX( 15.0, 0.0 )   } ) );
-					return fragment.present( new PresentationContext( fragmentView, DefaultPerspective.instance, inheritedState ), style );
+					return presentation.present( new PresentationContext( fragmentView, DefaultPerspective.instance, inheritedState ), style );
 				}
 			}
 			

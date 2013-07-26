@@ -47,7 +47,7 @@ public class ShapeStyleParams extends ElementStyleParams
 	protected void buildFieldList(List<Object> fields)
 	{
 		super.buildFieldList( fields );
-		fields.add( new HorizontalField( "Painter", Pres.coerceNonNull( painter ) ) );
-		fields.add( new HorizontalField( "Hover painter", Pres.coerceNonNull( hoverPainter ) ) );
+		fields.add( new HorizontalField( "Painter", Pres.coercePresentingNull(painter) ) );
+		fields.add( new HorizontalField( "Hover painter", Pres.coercePresentingNull(hoverPainter) ) );
 	}
 }

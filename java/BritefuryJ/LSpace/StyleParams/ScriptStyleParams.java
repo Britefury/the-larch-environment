@@ -49,7 +49,7 @@ public class ScriptStyleParams extends ContainerStyleParams
 	protected void buildFieldList(List<Object> fields)
 	{
 		super.buildFieldList( fields );
-		fields.add( new HorizontalField( "Column spacing", Pres.coerceNonNull( columnSpacing ) ) );
-		fields.add( new HorizontalField( "Row spacing", Pres.coerceNonNull( rowSpacing ) ) );
+		fields.add( new HorizontalField( "Column spacing", Pres.coercePresentingNull(columnSpacing) ) );
+		fields.add( new HorizontalField( "Row spacing", Pres.coercePresentingNull(rowSpacing) ) );
 	}
 }

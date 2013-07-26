@@ -52,8 +52,8 @@ public class FractionStyleParams extends ContainerStyleParams
 		protected void buildFieldList(List<Object> fields)
 		{
 			super.buildFieldList( fields );
-			fields.add( new HorizontalField( "Bar paint", Pres.coerceNonNull( barPaint ) ) );
-			fields.add( new HorizontalField( "Hover bar paint", Pres.coerceNonNull( hoverBarPaint ) ) );
+			fields.add( new HorizontalField( "Bar paint", Pres.coercePresentingNull(barPaint) ) );
+			fields.add( new HorizontalField( "Hover bar paint", Pres.coercePresentingNull(hoverBarPaint) ) );
 		}
 	}
 
@@ -105,8 +105,8 @@ public class FractionStyleParams extends ContainerStyleParams
 	protected void buildFieldList(List<Object> fields)
 	{
 		super.buildFieldList( fields );
-		fields.add( new HorizontalField( "Vertical spacing", Pres.coerceNonNull( vspacing ) ) );
-		fields.add( new HorizontalField( "Horizontal padding", Pres.coerceNonNull( hpadding ) ) );
-		fields.add( new HorizontalField( "Y-offset", Pres.coerceNonNull( yOffset ) ) );
+		fields.add( new HorizontalField( "Vertical spacing", Pres.coercePresentingNull(vspacing) ) );
+		fields.add( new HorizontalField( "Horizontal padding", Pres.coercePresentingNull(hpadding) ) );
+		fields.add( new HorizontalField( "Y-offset", Pres.coercePresentingNull(yOffset) ) );
 	}
 }

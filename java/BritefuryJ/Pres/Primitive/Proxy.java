@@ -24,7 +24,7 @@ public class Proxy extends Pres
 	
 	public Proxy(Object child)
 	{
-		this.child = coerce( child );
+		this.child = coerceNullable( child );
 	}
 	
 

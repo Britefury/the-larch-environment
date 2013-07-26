@@ -542,7 +542,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 		if ( fragmentFactory != null )
 		{
 			clearFlag( FLAG_DISABLE_INSPECTOR );
-			LSElement r = fragmentFactory.createFragmentContentElement( incView, this, model );
+			LSElement r = fragmentFactory.createFragmentContentElement( incView, this );
 			
 			onComputeFragmentElementEnd();
 			incView.profile_stopModelViewMapping();
