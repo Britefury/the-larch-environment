@@ -33,6 +33,7 @@ import javax.swing.Timer;
 import javax.swing.TransferHandler;
 
 import BritefuryJ.Browser.PaneManager;
+import BritefuryJ.LSpace.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.LSpace.Focus.*;
 import BritefuryJ.LSpace.PresentationComponent.CannotGetGraphics2DException;
 import BritefuryJ.LSpace.PresentationComponent.TypesetProfile;
@@ -55,6 +56,7 @@ import BritefuryJ.LSpace.TextFocus.TextSelection;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
+import BritefuryJ.Util.PresentationErrorHandler;
 import BritefuryJ.Util.WeakIdentityHashMap;
 
 public class LSRootElement extends LSBin implements SelectionListener, DndController, Target.TargetModificationListener
@@ -1377,9 +1379,33 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	{
 		return defaultTextRepresentationManager;
 	}
-	
-	
-	
+
+
+
+	//
+	//
+	// SwingUtilities.invokeLater wrapper
+	//
+	//
+
+	public void invokeLater(final Runnable runnable) {
+		Runnable invoker = new Runnable() {
+			public void run() {
+				try {
+					runnable.run();
+				}
+				catch (Throwable t) {
+					notifyExceptionDuringInvokeLater(t);
+				}
+			}
+		};
+
+		SwingUtilities.invokeLater(invoker);
+	}
+
+
+
+
 	//
 	//
 	// Error notification methods
@@ -1399,6 +1425,26 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	protected void notifyExceptionDuringElementInteractor(LSElement element, Object interactor, String event, Throwable error)
 	{
 		getEventErrorLog().exceptionDuringElementInteractor( element, interactor, event, error );
+
+		if (PresentationErrorHandler.hasErrorHandler()) {
+			PresentationErrorHandler.getErrorHandler().notifyExceptionDuringElementInteractor(element, interactor, event, error);
+		}
+	}
+
+	public void notifyExceptionDuringClipboardOperation(LSRegion region, Object handler, String event, Throwable error) {
+		getEventErrorLog().exceptionDuringClipboardOperation(region, handler, event, error);
+
+		if (PresentationErrorHandler.hasErrorHandler()) {
+			PresentationErrorHandler.getErrorHandler().notifyExceptionDuringClipboardOperation(region, handler, event, error);
+		}
+	}
+
+	protected void notifyExceptionDuringInvokeLater(Throwable error) {
+		getEventErrorLog().exceptionDuringInvokeLater(error);
+
+		if (PresentationErrorHandler.hasErrorHandler()) {
+			PresentationErrorHandler.getErrorHandler().notifyExceptionDuringInvokeLater(error);
+		}
 	}
 	
 	

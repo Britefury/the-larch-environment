@@ -25,9 +25,11 @@ import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Spacer;
 import BritefuryJ.Pres.RichText.NormalText;
+import BritefuryJ.Pres.RichText.RichSpan;
 import BritefuryJ.Pres.UI.Section;
 import BritefuryJ.Pres.UI.SectionHeading1;
 import BritefuryJ.StyleSheet.StyleSheet;
+import BritefuryJ.Util.TypeUtils;
 
 public class PresentationEventErrorLog implements Presentable
 {
@@ -58,13 +60,11 @@ public class PresentationEventErrorLog implements Presentable
 	
 	public static abstract class Entry implements Presentable
 	{
-		protected String event;
 		protected Throwable error;
 		
 		
-		public Entry(String event, Throwable error)
+		public Entry(Throwable error)
 		{
-			this.event = event;
 			this.error = error;
 		}
 		
@@ -75,9 +75,12 @@ public class PresentationEventErrorLog implements Presentable
 	
 	private static class PresentationEventEntry extends Entry
 	{
+		protected String event;
+
 		public PresentationEventEntry(String event, Throwable error)
 		{
-			super( event, error );
+			super( error );
+			this.event = event;
 		}
 
 		@Override
@@ -87,29 +90,21 @@ public class PresentationEventErrorLog implements Presentable
 			return entryBorder.surround( new Column( new Object[] { header, new Spacer( 0.0, 5.0 ), error } ) );
 		}
 	}
-	
-	
-	private static class ElementInteractorEventEntry extends Entry
-	{
+
+
+	private static abstract class ElementEntry extends Entry {
 		private LSElement element;
-		private Object interactor;
 		private ElementHoverHighlighter hoverHighlighter;
-		
-		public ElementInteractorEventEntry(LSElement element, Object interactor, String event, Throwable error)
+
+		public ElementEntry(LSElement element, Throwable error)
 		{
-			super( event, error );
-			
+			super( error );
+
 			this.element = element;
-			this.interactor = interactor;
 			hoverHighlighter = new ElementHoverHighlighter( element );
 		}
 
-		
-		protected Pres interactorPres()
-		{
-			return interactorNameStyle.applyTo( new Label( interactor.getClass().getName() ) );
-		}
-		
+
 		protected Pres elementPres()
 		{
 			String elementName = element.getClass().getName();
@@ -118,15 +113,56 @@ public class PresentationEventErrorLog implements Presentable
 			{
 				elementName = elementName.substring( dot + 1 );
 			}
-			return elementNameBorder.surround( elementNameStyle.applyTo( new Label( elementName ) ) ).withElementInteractor( hoverHighlighter );
+
+			String typeName = TypeUtils.nameOfTypeOf(((FragmentView) element.getFragmentContext()).getModel());
+			dot = elementName.lastIndexOf( '.' );
+			if ( dot != -1 )
+			{
+				typeName = typeName.substring( dot + 1 );
+			}
+
+			Pres elementP = elementNameBorder.surround( elementNameStyle.applyTo( new Label( elementName ) ) ).withElementInteractor( hoverHighlighter );
+			Pres modelP = modelTypeNameBorder.surround(modelTypeNameStyle.applyTo(new Label(typeName)));
+			return new RichSpan(new Object[] { elementP, " (within fragment for a ", modelP, ")"});
+		}
+
+
+		protected static final StyleSheet elementNameStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.2f, 0.5f, 0.2f ) ) );
+		protected static final AbstractBorder elementNameBorder = new SolidBorder( 1.0, 1.0, 3.0, 3.0,
+				new Color( 0.2f, 0.5f, 0.2f ), new Color( 0.95f, 1.0f, 0.95f ),
+				new Color( 0.05f, 0.25f, 0.05f ), new Color( 0.8f, 1.0f, 0.8f ));
+		protected static final StyleSheet modelTypeNameStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.2f, 0.2f, 0.5f ) ) );
+		protected static final AbstractBorder modelTypeNameBorder = new SolidBorder( 1.0, 1.0, 3.0, 3.0,
+				new Color( 0.2f, 0.2f, 0.5f ), new Color( 0.95f, 0.95f, 1.0f ),
+				new Color( 0.05f, 0.05f, 0.25f ), new Color( 0.8f, 0.8f, 1.0f ));
+	}
+
+
+	private static class ElementInteractorEventEntry extends ElementEntry
+	{
+		protected String event;
+		private Object interactor;
+
+		public ElementInteractorEventEntry(LSElement element, Object interactor, String event, Throwable error)
+		{
+			super( element, error );
+			
+			this.event = event;
+			this.interactor = interactor;
+		}
+
+		
+		protected Pres interactorPres()
+		{
+			return interactorNameStyle.applyTo(new Label(interactor.getClass().getName()));
 		}
 		
-		
+
 		@Override
 		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			Pres header = new NormalText( new Object[] { "Exception during event ", eventPres( event ),
-					" handled by interactor ", interactorPres(), " at element ", elementPres() } ).alignVRefY();
+					" handled by interactor ", interactorPres(), " at region ", elementPres() } ).alignVRefY();
 			return entryBorder.surround( new Column( new Object[] { header, new Spacer( 0.0, 5.0 ), error } ) );
 		}
 
@@ -137,9 +173,45 @@ public class PresentationEventErrorLog implements Presentable
 				new Color( 0.2f, 0.5f, 0.2f ), new Color( 0.95f, 1.0f, 0.95f ),
 				new Color( 0.05f, 0.25f, 0.05f ), new Color( 0.8f, 1.0f, 0.8f ));
 	}
-	
-	
-	
+
+
+
+
+
+	private static class ClipboardEventEntry extends ElementEntry
+	{
+		protected String event;
+		private Object handler;
+
+		public ClipboardEventEntry(LSRegion region, Object handler, String event, Throwable error)
+		{
+			super( region, error );
+
+			this.event = event;
+			this.handler = handler;
+		}
+
+
+		protected Pres handlerPres()
+		{
+			return handlerTypeNameStyle.applyTo(new Label(handler.getClass().getName()));
+		}
+
+
+		@Override
+		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
+		{
+			Pres header = new NormalText( new Object[] { "Exception during clipboard event ", eventPres( event ),
+					" handled by ", handlerPres(), " at region ", elementPres() } ).alignVRefY();
+			return entryBorder.surround( new Column( new Object[] { header, new Spacer( 0.0, 5.0 ), error } ) );
+		}
+
+
+		protected static final StyleSheet handlerTypeNameStyle = StyleSheet.style( Primitive.foreground.as( new Color( 0.2f, 0.2f, 0.5f ) ) );
+	}
+
+
+
 	private IncrementalValueMonitor incr = new IncrementalValueMonitor();
 	private ArrayList<Entry> entries = new ArrayList<Entry>();
 	
@@ -161,7 +233,19 @@ public class PresentationEventErrorLog implements Presentable
 		entries.add( new ElementInteractorEventEntry( element, interactor, event, error ) );
 		incr.onChanged();
 	}
-	
+
+	protected void exceptionDuringClipboardOperation(LSRegion region, Object handler, String event, Throwable error)
+	{
+		entries.add( new ClipboardEventEntry( region, handler, event, error ) );
+		incr.onChanged();
+	}
+
+	protected void exceptionDuringInvokeLater(Throwable error)
+	{
+		entries.add( new PresentationEventEntry( "invoke later", error ) );
+		incr.onChanged();
+	}
+
 	
 
 	protected static Pres eventPres(String event)

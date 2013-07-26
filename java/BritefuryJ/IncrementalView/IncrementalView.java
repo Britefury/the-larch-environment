@@ -10,6 +10,7 @@ import java.awt.Color;
 import java.lang.ref.WeakReference;
 import java.util.*;
 
+import BritefuryJ.Util.PresentationErrorHandler;
 import org.python.core.Py;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
@@ -171,6 +172,9 @@ public class IncrementalView
 				{
 					Pres exceptionView = DefaultPerspective.instance.presentObject( t, fragmentView, inheritedState );
 					presentation = new ErrorBox( "Presentation error - exception during presentation", exceptionView );
+					if (PresentationErrorHandler.hasErrorHandler()) {
+						PresentationErrorHandler.getErrorHandler().handlePresentationError(view, fragmentView, t, presentation);
+					}
 					view.profile_stopPresBuild();
 					view.profile_startPresToElements();
 					LSElement element = presentation.present( new PresentationContext( fragmentView, DefaultPerspective.instance, inheritedState ), style );
@@ -206,6 +210,9 @@ public class IncrementalView
 				{
 					Pres exceptionView = DefaultPerspective.instance.presentObject( t, fragmentView, inheritedState );
 					presentation = new ErrorBox( "Presentation realisation error - exception during presentation realisation", exceptionView );
+					if (PresentationErrorHandler.hasErrorHandler()) {
+						PresentationErrorHandler.getErrorHandler().handlePresentationRealisationError(view, fragmentView, t, presentation);
+					}
 					return presentation.present( new PresentationContext( fragmentView, DefaultPerspective.instance, inheritedState ), style );
 				}
 				catch (Exception e2)

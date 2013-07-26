@@ -79,8 +79,14 @@ public abstract class PresentationComponent extends JComponent implements Compon
 				{
 					ClipboardHandlerInterface clipboardHandler = region.getClipboardHandler();
 					if ( clipboardHandler != null )
-					{	
-						return clipboardHandler.getExportActions( rootElement.getSelection() );
+					{
+						try {
+							return clipboardHandler.getExportActions( rootElement.getSelection() );
+						}
+						catch (Throwable t) {
+							rootElement.notifyExceptionDuringClipboardOperation(region, clipboardHandler, "getExportActions", t);
+							return NONE;
+						}
 					}
 				}
 				return NONE;
@@ -103,7 +109,13 @@ public abstract class PresentationComponent extends JComponent implements Compon
 					ClipboardHandlerInterface clipboardHandler = region.getClipboardHandler();
 					if ( clipboardHandler != null )
 					{
-						return clipboardHandler.createExportTransferable( rootElement.getSelection() );
+						try {
+							return clipboardHandler.createExportTransferable( rootElement.getSelection() );
+						}
+						catch (Throwable t) {
+							rootElement.notifyExceptionDuringClipboardOperation(region, clipboardHandler, "createExportTransferable", t);
+							return null;
+						}
 					}
 				}
 				return null;
@@ -130,7 +142,12 @@ public abstract class PresentationComponent extends JComponent implements Compon
 					ClipboardHandlerInterface clipboardHandler = region.getClipboardHandler();
 					if ( clipboardHandler != null )
 					{
-						clipboardHandler.exportDone( rootElement.getSelection(), rootElement.getTarget(), data, action );
+						try {
+							clipboardHandler.exportDone( rootElement.getSelection(), rootElement.getTarget(), data, action );
+						}
+						catch (Throwable t) {
+							rootElement.notifyExceptionDuringClipboardOperation(region, clipboardHandler, "exportDone", t);
+						}
 					}
 				}
 			}
@@ -157,7 +174,12 @@ public abstract class PresentationComponent extends JComponent implements Compon
 						ClipboardHandlerInterface clipboardHandler = region.getClipboardHandler();
 						if ( clipboardHandler != null )
 						{
-							return clipboardHandler.canImport( rootElement.getTarget(), rootElement.getSelection(), new DataTransfer( transfer ) );
+							try {
+								return clipboardHandler.canImport( rootElement.getTarget(), rootElement.getSelection(), new DataTransfer( transfer ) );
+							}
+							catch (Throwable t) {
+								rootElement.notifyExceptionDuringClipboardOperation(region, clipboardHandler, "canImport", t);
+							}
 						}
 					}
 					return false;
@@ -188,7 +210,12 @@ public abstract class PresentationComponent extends JComponent implements Compon
 						ClipboardHandlerInterface clipboardHandler = region.getClipboardHandler();
 						if ( clipboardHandler != null )
 						{
-							return clipboardHandler.importData( rootElement.getTarget(), rootElement.getSelection(), new DataTransfer( transfer ) );
+							try {
+								return clipboardHandler.importData( rootElement.getTarget(), rootElement.getSelection(), new DataTransfer( transfer ) );
+							}
+							catch (Throwable t) {
+								rootElement.notifyExceptionDuringClipboardOperation(region, clipboardHandler, "importData", t);
+							}
 						}
 					}
 					return false;
