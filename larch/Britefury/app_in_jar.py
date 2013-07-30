@@ -37,15 +37,31 @@ def registerJarEntryHandler(name_test_fn, handle_fn):
 
 
 def setLarchJarURL(jarURL):
+	"""
+	Set the global JAR url from which Larch was started
+
+	:param jarURL: the URL
+	:return: None
+	"""
 	global _larchJarURL
 	_larchJarURL = jarURL
 
 
 
 def getLarchJarURL():
+	"""
+	Get the global JAR url from which Larch was started
+
+	:return: the URL or None if Larch was not started from a JAR
+	"""
 	return _larchJarURL
 
 def startedFromJar():
+	"""
+	Determine if Larch was started from a JAR
+
+	:return: True if started from a JAR, False if started from the filesystem
+	"""
 	return _larchJarURL is not None
 
 
@@ -79,7 +95,15 @@ def scanLarchJar():
 
 
 
-def buildLarchJar(outputStream, additionalNameBytesPairs, filterFn=None, larchJarURL=None):
+def buildLarchJar(outputStream, additionalFilesAsNameBytesPairs, filterFn=None, larchJarURL=None):
+	"""
+	Build a JAR from an existing Larch JAR, along with additional files to make a packaged program
+
+	:param outputStream: The output stream to which the JAR is to be written
+	:param additionalFilesAsNameBytesPairs: Additional files in the form of a sequence of tuples consisting of (path, bytes)
+	:param filterFn: (optional) A filter function that can be used to exclude files from the existing Larch JAR; takes the form of function(name) -> boolean, should return True if file should be included
+	:param larchJarURL: (optional) A URL at which the existing Larch JAR can be obtained. If None, it will use the JAR from which Larch was started. Raises an error if no URL provided and Larch was not started from a JAR
+	"""
 	if larchJarURL is None:
 		larchJarURL = _larchJarURL
 
@@ -116,7 +140,7 @@ def buildLarchJar(outputStream, additionalNameBytesPairs, filterFn=None, larchJa
 
 		entryIn = jarIn.getNextJarEntry()
 
-	for name, bytes in additionalNameBytesPairs:
+	for name, bytes in additionalFilesAsNameBytesPairs:
 		size = len( bytes )
 		entryOut = ZipEntry( name )
 		entryOut.setSize( size )
