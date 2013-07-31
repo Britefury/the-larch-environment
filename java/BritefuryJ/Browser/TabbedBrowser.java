@@ -19,6 +19,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
@@ -246,6 +247,12 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	public Browser getCurrentBrowser()
 	{
 		return currentBrowser;
+	}
+
+	public List<Browser> getBrowsers() {
+		ArrayList<Browser> b = new ArrayList<Browser>();
+		b.addAll(browsers);
+		return b;
 	}
 	
 	

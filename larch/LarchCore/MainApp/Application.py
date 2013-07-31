@@ -95,13 +95,62 @@ class AppState (object):
 		return False
 
 
+
+	#
+	#
+	# LARCH HOOKS
+	#
+	#
+
+	def onAppInit(self, windowManager):
+		"""
+		Larch Hook: onAppInit
+
+		Invoked when the application starts up
+		:param windowManager: the Larch window manager
+		:return: None
+		"""
+		pass
+
+
+	def getLarchWindowTitle(self):
+		"""
+		Larch Hook: getWindow title
+
+		:return: The title
+		"""
+		return 'The Larch'
+
+
 	def onCloseRequest(self, windowManager, window):
+		"""
+		Larch Hook: onCloseRequest
+
+		Invoked when the user attempts to close the last remaining window.
+		:param windowManager: The window manager
+		:param window: the last window
+		:return: True if the window should be allowed to close
+		"""
 		if self.hasUnsavedData():
 			response = JOptionPane.showOptionDialog( window.frame,
 				'You have not saved your work. Close anyway?', 'Unsaved data', JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, None, [ 'Close', 'Cancel' ], 'Cancel' )
 			return response == JOptionPane.YES_OPTION
 		else:
 			return True
+
+
+	def onCloseApp(self, windowManager):
+		"""
+		Larch Hook: onCloseApp
+
+		Invoked as the application closes.
+		:param windowManager: the Larch window manager
+		:return: None
+		"""
+		pass
+
+
+
 
 
 
