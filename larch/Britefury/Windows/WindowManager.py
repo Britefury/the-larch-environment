@@ -29,12 +29,30 @@ class WindowManager (object):
 		self.__openWindows = { self.__rootWindow }
 		
 		self.onCloseLastWindow = None
+
+		# Invoke the Larch Hook onAppInit
+		try:
+			onAppInit = self.__appState.onAppInit
+		except AttributeError:
+			pass
+		else:
+			onAppInit(self)
 		
 
 		
 	@property
 	def world(self):
 		return self.__world
+
+
+	@property
+	def windows(self):
+		return self.__openWindows.copy()
+
+
+	@property
+	def rootWindow(self):
+		return self.__rootWindow
 
 
 	def showRootWindow(self):
@@ -61,7 +79,7 @@ class WindowManager (object):
 		if len( self.__openWindows ) == 1:
 			# Only one window open
 
-			# Invoke the application state's onCloseRequest method to determine if closing
+			# Invoke the Larch Hook onCloseRequest method to determine if closing
 			# is allowed
 			try:
 				onCloseRequestFn = self.__appState.onCloseRequest
@@ -83,6 +101,8 @@ class WindowManager (object):
 		if len( self.__openWindows ) == 0:
 			if self.onCloseLastWindow is not None:
 				self.onCloseLastWindow( self )
+
+			# Invoke the Larch Hook onCloseApp to inform the application that it is closing
 			try:
 				onCloseAppFn = self.__appState.onCloseApp
 			except AttributeError:

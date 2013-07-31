@@ -205,7 +205,17 @@ class Window (object):
 				pass
 
 
-		self.__frame = JFrame( 'Larch' )
+		# Invoke the Larch Hook getLarchWindowTitle to get the application's window title
+		windowTitle = 'Larch'
+		try:
+			getLarchWindowTitle = subject.getFocus().getLarchWindowTitle
+		except AttributeError:
+			pass
+		else:
+			windowTitle = getLarchWindowTitle()
+
+
+		self.__frame = JFrame( windowTitle )
 
 		self.__frame.setJMenuBar( menuBar )
 
