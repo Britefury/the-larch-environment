@@ -24,7 +24,18 @@ class WindowManager (object):
 		
 		self.__appState = world.rootSubject.getFocus()
 
-		self.__rootWindow = Window( self, createCommandConsole, world.rootSubject )
+
+		# Invoke the Larch Hook getLarchWindowTitle to get the application's window title
+		self.__windowTitle = 'Larch'
+		try:
+			getLarchWindowTitle = self.__appState.getLarchWindowTitle
+		except AttributeError:
+			pass
+		else:
+			self.__windowTitle = getLarchWindowTitle()
+
+
+		self.__rootWindow = Window( self, createCommandConsole, world.rootSubject, self.__windowTitle )
 		self.__rootWindow.onCloseRequestListener = self.__onWindowCloseRequest
 		self.__openWindows = { self.__rootWindow }
 		
@@ -37,6 +48,9 @@ class WindowManager (object):
 			pass
 		else:
 			onAppInit(self)
+
+
+
 		
 
 		
@@ -69,7 +83,7 @@ class WindowManager (object):
 
 		
 	def _createNewWindow(self, subject):
-		newWindow = Window( self, self.__createCommandConsole, subject )
+		newWindow = Window( self, self.__createCommandConsole, subject, self.__windowTitle )
 		newWindow.onCloseRequestListener = self.__onWindowCloseRequest
 		newWindow.show()
 		self.__openWindows.add( newWindow )
