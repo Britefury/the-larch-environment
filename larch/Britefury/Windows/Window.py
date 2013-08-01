@@ -54,7 +54,7 @@ class _TransferActionListener (ActionListener):
 
 		
 class Window (object):
-	def __init__(self, windowManager, commandConsoleFactory, subject):
+	def __init__(self, windowManager, commandConsoleFactory, subject, windowTitle):
 		self._windowManager = windowManager
 
 
@@ -203,16 +203,6 @@ class Window (object):
 
 			def windowOpened(listenerSelf, event):
 				pass
-
-
-		# Invoke the Larch Hook getLarchWindowTitle to get the application's window title
-		windowTitle = 'Larch'
-		try:
-			getLarchWindowTitle = subject.getFocus().getLarchWindowTitle
-		except AttributeError:
-			pass
-		else:
-			windowTitle = getLarchWindowTitle()
 
 
 		self.__frame = JFrame( windowTitle )
