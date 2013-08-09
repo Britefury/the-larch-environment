@@ -384,6 +384,15 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 			openSubjectInNewTab( subject );
 		}
 	}
+
+
+	public void closeTab(Browser browser) {
+		int index = browsers.indexOf(browser);
+		if (index != -1) {
+			tabs.remove(index);
+			browsers.remove(index);
+		}
+	}
 	
 	
 	
