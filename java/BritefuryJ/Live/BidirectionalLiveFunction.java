@@ -44,7 +44,7 @@ public class BidirectionalLiveFunction extends LiveInterface
 		return fn;
 	}
 
-	public Function getInvertseFunction()
+	public Function getInverseFunction()
 	{
 		return inverseFn;
 	}
