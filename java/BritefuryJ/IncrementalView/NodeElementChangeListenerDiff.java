@@ -20,7 +20,7 @@ import BritefuryJ.Util.StringDiff;
 
 public class NodeElementChangeListenerDiff implements IncrementalView.NodeElementChangeListener
 {
-	private static final int DIFF_THRESHHOLD = 65536;
+	private static final long DIFF_THRESHHOLD = 65536L;
 
 	private static final String CARET_BOUNDARY = "\ue137";
 
@@ -221,7 +221,7 @@ public class NodeElementChangeListenerDiff implements IncrementalView.NodeElemen
 							state.reposition( newPosition, newBias );
 						}
 					}
-					else if ( ( origChangeRegionLength * newChangeRegionLength)  >  DIFF_THRESHHOLD )
+					else if ( ( (long)origChangeRegionLength * (long)newChangeRegionLength)  >  DIFF_THRESHHOLD )		// Important that we cast to longs to avoid overflows, that can EASILY happen otherwise
 					{
 						// If the m*n > DIFF_THRESHOLD, use a simpler method; this prevents slow downs
 
