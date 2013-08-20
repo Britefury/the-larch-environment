@@ -113,17 +113,22 @@ public class PresentationEventErrorLog implements Presentable
 			{
 				elementName = elementName.substring( dot + 1 );
 			}
-
-			String typeName = TypeUtils.nameOfTypeOf(((FragmentView) element.getFragmentContext()).getModel());
-			dot = elementName.lastIndexOf( '.' );
-			if ( dot != -1 )
-			{
-				typeName = typeName.substring( dot + 1 );
-			}
-
 			Pres elementP = elementNameBorder.surround( elementNameStyle.applyTo( new Label( elementName ) ) ).withElementInteractor( hoverHighlighter );
-			Pres modelP = modelTypeNameBorder.surround(modelTypeNameStyle.applyTo(new Label(typeName)));
-			return new RichSpan(new Object[] { elementP, " (within fragment for a ", modelP, ")"});
+
+			if (element.getFragmentContext() != null) {
+				String typeName = TypeUtils.nameOfTypeOf(((FragmentView) element.getFragmentContext()).getModel());
+				dot = typeName.lastIndexOf( '.' );
+				if ( dot != -1 )
+				{
+					typeName = typeName.substring( dot + 1 );
+				}
+
+				Pres modelP = modelTypeNameBorder.surround(modelTypeNameStyle.applyTo(new Label(typeName)));
+				return new RichSpan(new Object[] { elementP, " (within fragment for a ", modelP, ")"});
+			}
+			else {
+				return new RichSpan(new Object[] { elementP });
+			}
 		}
 
 

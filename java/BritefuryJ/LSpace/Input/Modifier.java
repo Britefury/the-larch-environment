@@ -17,6 +17,7 @@ public class Modifier
 	public static final int SHIFT = 0x2;
 	public static final int ALT = 0x4;
 	public static final int ALT_GRAPH = 0x8;
+	public static final int META = 0x10;
 	public static final int BUTTON1 = 0x0100;
 	public static final int BUTTON2 = 0x0200;
 	public static final int BUTTON3 = 0x0400;
@@ -26,7 +27,7 @@ public class Modifier
 	public static final int BUTTON7 = 0x4000;
 	public static final int BUTTON8 = 0x8000;
 	
-	public static final int KEYS_MASK = CTRL | SHIFT | ALT | ALT_GRAPH;
+	public static final int KEYS_MASK = CTRL | SHIFT | ALT | ALT_GRAPH | META;
 	
 	public static final int _BUTTONS_SHIFT = 8;
 	public static final int BUTTONS_MASK = 0xff00;
@@ -123,6 +124,11 @@ public class Modifier
 		if ( e.isAltGraphDown() )
 		{
 			modifiers |= ALT_GRAPH;
+		}
+
+		if ( e.isMetaDown() )
+		{
+			modifiers |= META;
 		}
 		
 		return modifiers;

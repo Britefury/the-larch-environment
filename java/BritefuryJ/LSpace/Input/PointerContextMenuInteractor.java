@@ -21,7 +21,8 @@ public class PointerContextMenuInteractor extends PointerInteractor
 {
 	public boolean buttonDown(Pointer pointer, PointerButtonEvent event)
 	{
-		if ( event.getButton() == 3  &&  ( pointer.getModifiers() & Modifier.KEYS_MASK  ) ==  0 )
+		if ( event.getButton() == 3  &&  ( pointer.getModifiers() & Modifier.KEYS_MASK  ) == 0  ||
+				event.getButton() == 1  &&  ( pointer.getModifiers() & Modifier.KEYS_MASK ) == Modifier.META )
 		{
 			VPopupMenu menu = new VPopupMenu();
 			
