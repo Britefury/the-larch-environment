@@ -27,7 +27,8 @@ public class Modifier
 	public static final int BUTTON7 = 0x4000;
 	public static final int BUTTON8 = 0x8000;
 	
-	public static final int KEYS_MASK = CTRL | SHIFT | ALT | ALT_GRAPH | META;
+	// Don't include the META key in the KEYS_MASK, as Windows seems to report meta as being pressed when the right button is clicked, even though there is no meta key...
+	public static final int KEYS_MASK = CTRL | SHIFT | ALT | ALT_GRAPH;
 	
 	public static final int _BUTTONS_SHIFT = 8;
 	public static final int BUTTONS_MASK = 0xff00;
