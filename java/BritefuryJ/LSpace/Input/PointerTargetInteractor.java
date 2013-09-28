@@ -141,9 +141,11 @@ public class PointerTargetInteractor
 		{
 			if ( targetDragElement != null )
 			{
+				PointerInterface pointer = event.getPointer();
+				LSElement elementUnderPointer = pointer.concretePointer().getLastElementUnderPoint(pointer.getLocalPos());
 				try
 				{
-					targetDragInteractor.targetDragEnd( targetDragElement, (PointerButtonEvent)event.transformed( targetDragElementRootToLocalXform ), dragStartPos.transform( targetDragElementRootToLocalXform ), dragButton );
+					targetDragInteractor.targetDragEnd( targetDragElement, elementUnderPointer, (PointerButtonEvent)event.transformed( targetDragElementRootToLocalXform ), dragStartPos.transform( targetDragElementRootToLocalXform ), dragButton );
 				}
 				catch (Throwable e)
 				{
@@ -164,9 +166,11 @@ public class PointerTargetInteractor
 			
 			if ( targetDragElement != null )
 			{
+				PointerInterface pointer = event.getPointer();
+				LSElement elementUnderPointer = pointer.concretePointer().getLastElementUnderPoint(pointer.getLocalPos());
 				try
 				{
-					selCurrent = targetDragInteractor.targetDragMotion( targetDragElement, (PointerMotionEvent)event.transformed( targetDragElementRootToLocalXform ), dragStartPos.transform( targetDragElementRootToLocalXform ), dragButton );
+					selCurrent = targetDragInteractor.targetDragMotion( targetDragElement, elementUnderPointer, (PointerMotionEvent)event.transformed( targetDragElementRootToLocalXform ), dragStartPos.transform( targetDragElementRootToLocalXform ), dragButton );
 				}
 				catch (Throwable e)
 				{

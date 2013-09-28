@@ -359,14 +359,19 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 		LSElement leaf = getChildClosestToLocalPointHorizontal( children, localPos, childIndex );
 		if ( leaf != null )
 		{
-			// Walk back up until we have an element that is a direct child of @withinBranch
+			// Walk back up until we have an element that is a direct child of @branch
+			boolean leafChanged = false;
 			while ( leaf.getParent() != branch )
 			{
 				leaf = leaf.getParent();
+				leafChanged = true;
 				if ( leaf == null )
 				{
 					throw new RuntimeException( "Could not trace back to branch" );
 				}
+			}
+			if (leafChanged) {
+				childIndex[0] = branch.getChildren().indexOf(leaf);
 			}
 
 			LSElement child = leaf;
@@ -396,13 +401,18 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 		if ( leaf != null )
 		{
 			// Walk back up until we have an element that is a direct child of @withinBranch
+			boolean leafChanged = false;
 			while ( leaf.getParent() != branch )
 			{
 				leaf = leaf.getParent();
+				leafChanged = true;
 				if ( leaf == null )
 				{
 					throw new RuntimeException( "Could not trace back to branch" );
 				}
+			}
+			if (leafChanged) {
+				childIndex[0] = branch.getChildren().indexOf(leaf);
 			}
 
 			LSElement child = leaf;

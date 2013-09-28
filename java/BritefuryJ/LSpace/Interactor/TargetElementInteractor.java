@@ -15,6 +15,6 @@ import BritefuryJ.Math.Point2;
 public interface TargetElementInteractor extends AbstractElementInteractor
 {
 	public SelectionPoint targetDragBegin(LSElement element, PointerButtonEvent event);
-	public void targetDragEnd(LSElement element, PointerButtonEvent event, Point2 dragStartPos, int dragButton);
-	public SelectionPoint targetDragMotion(LSElement element, PointerMotionEvent event, Point2 dragStartPos, int dragButton);
+	public void targetDragEnd(LSElement startElement, LSElement elementBeneathPointer, PointerButtonEvent event, Point2 dragStartPos, int dragButton);
+	public SelectionPoint targetDragMotion(LSElement startElement, LSElement elementBeneathPointer, PointerMotionEvent event, Point2 dragStartPos, int dragButton);
 }

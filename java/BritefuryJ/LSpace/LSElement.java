@@ -2960,6 +2960,52 @@ abstract public class LSElement implements Presentable
 		return null;
 	}
 
+	public List<PropertyValue> gatherPropertyInSubtree(Object key, boolean descendToLeaves)
+	{
+		GatherPropertyVisitor v = new GatherPropertyVisitor(key, descendToLeaves);
+		v.visitSubtree(this);
+		return v.values;
+	}
+
+
+	private static class GatherPropertyVisitor extends ElementTreeVisitor {
+		private Object key;
+		private boolean descendToLeaves;
+		private ArrayList<PropertyValue> values = new ArrayList<PropertyValue>();
+
+		public GatherPropertyVisitor(Object key, boolean descendToLeaves) {
+			this.key = key;
+			this.descendToLeaves = descendToLeaves;
+		}
+
+		protected void preOrderVisitElement(LSElement e, boolean complete) {
+			if (complete) {
+				PropertyValue val = e.getProperty(key);
+				if (val != null) {
+					values.add(val);
+				}
+			}
+		}
+
+		protected void inOrderCompletelyVisitElement(LSElement e) {
+		}
+
+		protected void postOrderVisitElement(LSElement e, boolean complete) {
+		}
+
+		protected void inOrderVisitPartialContentLeafEditable(LSContentLeafEditable e, int startIndex, int endIndex) {
+		}
+
+		protected boolean shouldVisitChildrenOfElement(LSElement e, boolean completeVisit) {
+			if (completeVisit) {
+				return e.getProperty(key) == null || descendToLeaves;
+			}
+			else {
+				return false;
+			}
+		}
+	}
+
 
 
 

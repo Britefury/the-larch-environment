@@ -78,15 +78,15 @@ public abstract class AbstractTableEditorInstance <ModelType>
 		}
 
 		@Override
-		public void targetDragEnd(LSElement element, PointerButtonEvent event, Point2 dragStartPos, int dragButton)
+		public void targetDragEnd(LSElement startElement, LSElement elementUnderPointer, PointerButtonEvent event, Point2 dragStartPos, int dragButton)
 		{
 		}
 
 		@Override
-		public SelectionPoint targetDragMotion(LSElement element, PointerMotionEvent event, Point2 dragStartPos, int dragButton)
+		public SelectionPoint targetDragMotion(LSElement startElement, LSElement elementUnderPointer, PointerMotionEvent event, Point2 dragStartPos, int dragButton)
 		{
 			Point2 p = event.getLocalPointerPos();
-			TableElement table = (TableElement)element;
+			TableElement table = (TableElement) startElement;
 			int pos[] = table.getCellPositionUnder( p );
 			pos = table.getPositionOfChildCoveringCell( pos[0], pos[1] );
 			
