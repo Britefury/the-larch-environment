@@ -32,7 +32,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicButtonUI;
 
+import BritefuryJ.ChangeHistory.AbstractChangeHistory;
 import BritefuryJ.ChangeHistory.ChangeHistory;
+import BritefuryJ.ChangeHistory.ChangeHistoryProxy;
 import BritefuryJ.Command.CommandConsoleFactory;
 import BritefuryJ.IncrementalView.FragmentInspector;
 import BritefuryJ.LSpace.PageController;
@@ -215,6 +217,8 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	
 	private ArrayList<Browser> browsers;
 	private Browser currentBrowser;
+
+	private ChangeHistoryProxy changeHistoryProxy;
 	
 	private CommandConsoleFactory commandConsoleFactory;
 	
@@ -231,6 +235,8 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 
 		tabs = new JTabbedPane();
 		tabs.addChangeListener( this );
+
+		changeHistoryProxy = new ChangeHistoryProxy(null);
 		
 		Browser browser = addNewBrowser( subject );
 		setCurrentBrowser( browser );
@@ -256,9 +262,9 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	}
 	
 	
-	public ChangeHistory getChangeHistory()
+	public AbstractChangeHistory getChangeHistory()
 	{
-		return currentBrowser.getChangeHistory();
+		return changeHistoryProxy;
 	}
 	
 
@@ -289,6 +295,7 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 		if ( browser != currentBrowser )
 		{
 			currentBrowser = browser;
+			changeHistoryProxy.setChangeHistory(currentBrowser.getChangeHistory());
 			
 			if ( listener != null )
 			{

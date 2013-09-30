@@ -59,12 +59,6 @@ class Window (object):
 
 
 
-		def onChangeHistoryChanged(history):
-			self.__refreshChangeHistoryControls( history )
-
-		self.__prevChangeHistory = None
-		self.__changeHistoryListener = onChangeHistoryChanged
-
 
 
 		self.onCloseRequestListener = None
@@ -156,15 +150,21 @@ class Window (object):
 				self._onOpenNewWindow( subject )
 
 			def onTabbledBrowserChangePage(_self, browser):
-				self._onChangePage( browser )
+				pass
 
 
 		def inspectFragment(fragment, sourceElement, triggeringEvent):
 			return self._windowManager.world.inspectFragment( fragment, sourceElement, triggeringEvent )
 
 
+
+		def onChangeHistoryChanged(history):
+			self.__refreshChangeHistoryControls( history )
+
 		self._browser = TabbedBrowser( self._windowManager.world.rootSubject, subject, inspectFragment, _BrowserListener(), commandConsoleFactory )
 		self._browser.getComponent().setPreferredSize( Dimension( 800, 600 ) )
+		changeHistory = self._browser.getChangeHistory()
+		self._browser.getChangeHistory().addChangeHistoryListener(onChangeHistoryChanged)
 
 
 
@@ -247,21 +247,6 @@ class Window (object):
 
 
 
-	def _onChangePage(self, browser):
-		changeHistory = browser.getChangeHistory()
-
-		if changeHistory is not self.__prevChangeHistory:
-			if self.__prevChangeHistory is not None:
-				self.__prevChangeHistory.removeChangeHistoryListener( self.__changeHistoryListener )
-
-			if changeHistory is not None:
-				changeHistory.addChangeHistoryListener( self.__changeHistoryListener )
-
-			self.__prevChangeHistory = changeHistory
-
-			self.__refreshChangeHistoryControls( changeHistory )
-
-
 	def __refreshChangeHistoryControls(self, changeHistory):
 		if changeHistory is not None:
 			self.__editUndoItem.setEnabled( changeHistory.canUndo() )
@@ -285,18 +270,18 @@ class Window (object):
 	def __onUndo(self):
 		changeHistory = self._browser.getChangeHistory()
 		if changeHistory.canUndo():
-			changeHistory.undo()
+			changeHistory.concreteChangeHistory().undo()
 
 	def __onRedo(self):
 		changeHistory = self._browser.getChangeHistory()
 		if changeHistory.canRedo():
-			changeHistory.redo()
+			changeHistory.concreteChangeHistory().redo()
 
 
 		
 
 	def __onShowUndoHistory(self):
-		changeHistory = self._browser.getChangeHistory()
+		changeHistory = self._browser.getChangeHistory().concreteChangeHistory()
 		if changeHistory is not None:
 			subject = DefaultPerspective.instance.objectSubject( changeHistory )
 			self._browser.openSubjectInNewWindow( subject )

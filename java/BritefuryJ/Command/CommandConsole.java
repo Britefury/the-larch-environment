@@ -13,7 +13,7 @@ import java.util.List;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Browser.Browser;
-import BritefuryJ.ChangeHistory.ChangeHistory;
+import BritefuryJ.ChangeHistory.AbstractChangeHistory;
 import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.Graphics.AbstractBorder;
@@ -114,7 +114,7 @@ public class CommandConsole extends AbstractCommandConsole
 			return "Command console";
 		}
 
-		public ChangeHistory getChangeHistory()
+		public AbstractChangeHistory getChangeHistory()
 		{
 			return null;
 		}

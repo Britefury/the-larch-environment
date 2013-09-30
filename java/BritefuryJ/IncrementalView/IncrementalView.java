@@ -10,6 +10,7 @@ import java.awt.Color;
 import java.lang.ref.WeakReference;
 import java.util.*;
 
+import BritefuryJ.ChangeHistory.AbstractChangeHistory;
 import BritefuryJ.Util.PresentationErrorHandler;
 import org.python.core.Py;
 
@@ -279,7 +280,7 @@ public class IncrementalView
 	
 	private StateStore stateStoreToLoad;
 	
-	private ChangeHistory changeHistory;
+	private AbstractChangeHistory changeHistory;
 
 	private Pres viewPres;
 	private LSElement rootElement;
@@ -400,7 +401,7 @@ public class IncrementalView
 	// Contexts, logs, etc
 	//
 	
-	public ChangeHistory getChangeHistory()
+	public AbstractChangeHistory getChangeHistory()
 	{
 		return changeHistory;
 	}

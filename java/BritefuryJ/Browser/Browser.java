@@ -27,7 +27,9 @@ import javax.swing.JToolBar;
 import javax.swing.TransferHandler;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.ChangeHistory.AbstractChangeHistory;
 import BritefuryJ.ChangeHistory.ChangeHistory;
+import BritefuryJ.ChangeHistory.ChangeHistoryProxy;
 import BritefuryJ.Command.AbstractCommandConsole;
 import BritefuryJ.Command.BoundCommandSet;
 import BritefuryJ.Command.Command;
@@ -319,6 +321,8 @@ public class Browser implements PaneManager
 	private Subject rootSubject, subject;
 	private FragmentInspector inspector;
 	private BrowserListener listener;
+
+	private ChangeHistoryProxy changeHistoryProxy;
 	
 	private ScrolledPane mainPane;
 	private BrowserEdgePane leftEdge, rightEdge, topEdge, bottomEdge;
@@ -331,6 +335,7 @@ public class Browser implements PaneManager
 		this.subject = subject;
 		this.inspector = inspector;
 		history = new BrowserHistory( subject );
+		this.changeHistoryProxy = new ChangeHistoryProxy(subject.getChangeHistory());
 
 		mainPane = new ScrolledPane();
 		
@@ -420,16 +425,9 @@ public class Browser implements PaneManager
 	
 	
 	
-	public ChangeHistory getChangeHistory()
+	public AbstractChangeHistory getChangeHistory()
 	{
-		if ( subject != null )
-		{
-			return subject.getChangeHistory();
-		}
-		else
-		{
-			return null;
-		}
+		return changeHistoryProxy;
 	}
 	
 
@@ -597,6 +595,7 @@ public class Browser implements PaneManager
 		if ( s != subject )
 		{
 			subject = s;
+			changeHistoryProxy.setChangeHistory(subject.getChangeHistory());
 			
 			if ( listener != null )
 			{
