@@ -9,6 +9,7 @@ package BritefuryJ.Projection;
 import java.util.ArrayList;
 import java.util.List;
 
+import BritefuryJ.ChangeHistory.AbstractChangeHistory;
 import org.python.core.*;
 
 import BritefuryJ.ChangeHistory.ChangeHistory;
@@ -51,7 +52,7 @@ public abstract class Subject
 	public abstract String getTitle();
 
 	
-	public ChangeHistory getChangeHistory()
+	public AbstractChangeHistory getChangeHistory()
 	{
 		if ( enclosingSubject != null )
 		{

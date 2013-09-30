@@ -236,7 +236,6 @@ public class ChangeHistory extends AbstractChangeHistory implements Presentable
 	private ArrayList<Entry> past, future;
 	private boolean changesBlocked, bFrozen;
 	private int freezeCount;
-	private ArrayList<ChangeHistoryListener> listeners;
 	private PresentationStateListenerList presStateListeners = null;
 	
 	
@@ -254,7 +253,6 @@ public class ChangeHistory extends AbstractChangeHistory implements Presentable
 		changesBlocked = false;
 		bFrozen = false;
 		freezeCount = 0;
-		listeners = new ArrayList<ChangeHistoryListener>();
 	}
 
 
@@ -262,19 +260,6 @@ public class ChangeHistory extends AbstractChangeHistory implements Presentable
 		return this;
 	}
 
-	
-	public void addChangeHistoryListener(ChangeHistoryListener listener)
-	{
-		listeners.add( listener );
-	}
-	
-	public void removeChangeHistoryListener(ChangeHistoryListener listener)
-	{
-		listeners.remove( listener );
-	}
-	
-	
-	
 	
 	public void addChange(Change change)
 	{

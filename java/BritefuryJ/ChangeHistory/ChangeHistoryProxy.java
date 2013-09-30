@@ -7,49 +7,56 @@
 package BritefuryJ.ChangeHistory;
 
 public class ChangeHistoryProxy extends AbstractChangeHistory implements ChangeHistoryListener {
-	private AbstractChangeHistory ch;
+	private AbstractChangeHistory underlyingChangeHistory;
 
 
 	public ChangeHistoryProxy(AbstractChangeHistory ch) {
-		this.ch = null;
+		this.underlyingChangeHistory = null;
 
 		setChangeHistory(ch);
 	}
 
 
 	public void setChangeHistory(AbstractChangeHistory ch) {
-		if (this.ch != null) {
-			this.ch.removeChangeHistoryListener(this);
+		if (this.underlyingChangeHistory != null) {
+			this.underlyingChangeHistory.removeChangeHistoryListener(this);
 		}
-		this.ch = ch;
-		if (this.ch != null) {
-			this.ch.addChangeHistoryListener(this);
+		this.underlyingChangeHistory = ch;
+		if (this.underlyingChangeHistory != null) {
+			this.underlyingChangeHistory.addChangeHistoryListener(this);
 		}
+		onModified();
 	}
 
 
 	public ChangeHistory concreteChangeHistory() {
-		return ch.concreteChangeHistory();
+		return underlyingChangeHistory != null  ?  underlyingChangeHistory.concreteChangeHistory()  :  null;
 	}
 
 	public boolean canUndo() {
-		return ch.canUndo();
+		return underlyingChangeHistory != null && underlyingChangeHistory.canUndo();
 	}
 
 	public boolean canRedo() {
-		return ch.canRedo();
+		return underlyingChangeHistory != null && underlyingChangeHistory.canRedo();
 	}
 
 	public int getNumUndoChanges() {
-		return ch.getNumUndoChanges();
+		return underlyingChangeHistory != null  ?  underlyingChangeHistory.getNumUndoChanges()  :  0;
 	}
 
 	public int getNumRedoChanges() {
-		return ch.getNumRedoChanges();
+		return underlyingChangeHistory != null  ?  underlyingChangeHistory.getNumRedoChanges()  :  0;
 	}
 
 
 	public void onChangeHistoryChanged(AbstractChangeHistory history) {
 		onModified();
+	}
+
+
+	@Override
+	public String toString() {
+		return "ChangeHistoryProxy<" + System.identityHashCode(this) + ">(" + underlyingChangeHistory + ")";
 	}
 }
