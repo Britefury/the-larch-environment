@@ -8,5 +8,5 @@ package BritefuryJ.ChangeHistory;
 
 public interface ChangeHistoryListener
 {
-	public void onChangeHistoryChanged(ChangeHistoryController history);
+	public void onChangeHistoryChanged(AbstractChangeHistory history);
 }

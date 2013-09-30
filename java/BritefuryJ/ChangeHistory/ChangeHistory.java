@@ -31,7 +31,7 @@ import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class ChangeHistory implements ChangeHistoryController, Presentable
+public class ChangeHistory extends AbstractChangeHistory implements Presentable
 {
 	public interface ChangeAction
 	{
@@ -256,8 +256,12 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 		freezeCount = 0;
 		listeners = new ArrayList<ChangeHistoryListener>();
 	}
-	
-	
+
+
+	public ChangeHistory concreteChangeHistory() {
+		return this;
+	}
+
 	
 	public void addChangeHistoryListener(ChangeHistoryListener listener)
 	{
@@ -516,13 +520,11 @@ public class ChangeHistory implements ChangeHistoryController, Presentable
 	}
 	
 	
-	private void onModified()
+	@Override
+	protected void onModified()
 	{
-		for (ChangeHistoryListener listener: listeners)
-		{
-			listener.onChangeHistoryChanged( this );
-		}
-		
+		super.onModified();
+
 		presStateListeners = PresentationStateListenerList.onPresentationStateChanged( presStateListeners, this );
 	}
 	
