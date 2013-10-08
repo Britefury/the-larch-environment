@@ -40,7 +40,7 @@ class ProjectContainer (ProjectNode):
 	def __setstate__(self, state):
 		super( ProjectContainer, self ).__setstate__( state )
 		self._contents_ = state['contents']
-		self._prevContents = []
+		self._prevContents = self._contents[:]
 		self._contentsMapLive = LiveFunction( self._computeContentsMap )
 
 		for x in self._contents_:

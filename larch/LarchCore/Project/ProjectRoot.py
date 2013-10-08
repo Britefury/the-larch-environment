@@ -7,6 +7,7 @@
 ##-*************************
 from copy import deepcopy
 import os
+import uuid
 
 from BritefuryJ.ChangeHistory import Trackable
 from BritefuryJ.Incremental import IncrementalValueMonitor
@@ -25,7 +26,6 @@ class ProjectRoot (ProjectContainer):
 		self.__startupPageId = None
 
 		self.__idToPage = {}
-		self.__pageIdCounter = 0
 
 		self._startupExecuted = False
 
@@ -52,7 +52,6 @@ class ProjectRoot (ProjectContainer):
 	
 	def __setstate__(self, state):
 		self.__idToPage = {}
-		self.__pageIdCounter = 0
 		self._startupExecuted = False
 
 		# Need to initialise the ID table before loading contents
@@ -139,6 +138,8 @@ class ProjectRoot (ProjectContainer):
 	def _registerPage(self, page, takePriority):
 		pageId = page._id
 
+		# Although we are using random UUIDs as page IDs, there is the possibility of collision,
+		# as pages can be duplicated. Handle these cases by generating new IDs.
 		if pageId is not None  and  pageId in self.__idToPage  and  takePriority:
 			# page ID already in use
 			# Take it, and make a new one for the page that is currently using it
@@ -147,9 +148,7 @@ class ProjectRoot (ProjectContainer):
 			otherPage = self.__idToPage[pageId]
 
 			# Make new page ID
-			self.__pageIdCounter = max( self.__pageIdCounter, len( self.__idToPage) )
-			otherPageId = self.__pageIdCounter
-			self.__pageIdCounter += 1
+			otherPageId = self.__newPageId()
 
 			# Re-assign
 			self.__idToPage[pageId] = page
@@ -159,9 +158,7 @@ class ProjectRoot (ProjectContainer):
 		elif pageId is None  or  ( pageId in self.__idToPage  and  not takePriority ):
 			# Either, no page ID or page ID already in use and not taking priority
 			# Create a new one
-			self.__pageIdCounter = max( self.__pageIdCounter, len( self.__idToPage) )
-			pageId = self.__pageIdCounter
-			self.__pageIdCounter += 1
+			pageId = self.__newPageId()
 			page._id = pageId
 
 		self.__idToPage[pageId] = page
@@ -169,6 +166,12 @@ class ProjectRoot (ProjectContainer):
 	def _unregisterPage(self, node):
 		nodeId = node._id
 		del self.__idToPage[nodeId]
+
+
+	def __newPageId(self):
+		return str(uuid.uuid4())
+
+
 
 
 	def getPageById(self, nodeId):
@@ -203,5 +206,8 @@ class ProjectRoot (ProjectContainer):
 	def startupPage(self, page):
 		self.__startupPageId = page._id   if page is not None   else None
 		self._incr.onChanged()
+
+
+
 
 
