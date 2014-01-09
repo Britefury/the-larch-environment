@@ -257,7 +257,7 @@ public class Marker implements Comparable<Marker>
 	
 	public void moveToPointInLeaf(LSContentLeafEditable leaf, Point2 localPos)
 	{
-		int markerPos = leaf.getMarkerPositonForPoint( localPos );
+		int markerPos = leaf.getMarkerPositionForPoint(localPos);
 		moveTo( leaf, markerPos, Marker.Bias.START );
 	}
 	

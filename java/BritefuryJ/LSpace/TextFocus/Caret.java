@@ -505,7 +505,7 @@ public class Caret extends Target implements MarkerListener
 		if ( above != null  &&  isElementWithinGrabSubtree( above ) )
 		{
 			Point2 cursorPosInAbove = leaf.getLocalPointRelativeTo( above, cursorPos );
-			int contentPos = above.getMarkerPositonForPoint( cursorPosInAbove );
+			int contentPos = above.getMarkerPositionForPoint(cursorPosInAbove);
 			marker.moveTo( above, contentPos, Marker.Bias.START );
 		}
 	}
@@ -520,7 +520,7 @@ public class Caret extends Target implements MarkerListener
 		if ( below != null  &&  isElementWithinGrabSubtree( below ) )
 		{
 			Point2 cursorPosInBelow = leaf.getLocalPointRelativeTo( below, cursorPos );
-			int contentPos = below.getMarkerPositonForPoint( cursorPosInBelow );
+			int contentPos = below.getMarkerPositionForPoint(cursorPosInBelow);
 			marker.moveTo( below, contentPos, Marker.Bias.START );
 		}
 	}

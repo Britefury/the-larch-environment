@@ -136,7 +136,7 @@ public class LSFraction extends LSContainerNonOverlayed
 			return textRepresentation.length();
 		}
 
-		public int getMarkerPositonForPoint(Point2 localPos)
+		public int getMarkerPositionForPoint(Point2 localPos)
 		{
 			double width = getActualWidth();
 			if ( localPos.x >= width * 0.5 )

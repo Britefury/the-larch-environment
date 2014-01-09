@@ -119,18 +119,22 @@ public class PresentationPopupWindow
 	{
 		Point2 windowAnchor = new Point2( size.getWidth() * popupAnchor.getPropX(), size.getHeight() * popupAnchor.getPropY() );
 
-		int posX = (int)( screenAnchorPoint.x - windowAnchor.x + 0.5);
-		int posY = (int)( screenAnchorPoint.y - windowAnchor.y + 0.5);
+		double posX = screenAnchorPoint.x - windowAnchor.x;
+		double posY = screenAnchorPoint.y - windowAnchor.y;
 
-		// Ensure >= 0
-		posX = Math.max( posX, 0 );
-		posY = Math.max( posY, 0 );
+		// Get the bounds in which the popup can be displayed
+		Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+		double boundsRight = bounds.x + bounds.width;
+		double boundsBottom = bounds.y + bounds.height;
 
-		// Ensure that it is not offscreen due to width/height
-		Dimension screenSz = Toolkit.getDefaultToolkit().getScreenSize();
-		posX = Math.min( posX, (int)( screenSz.getWidth() - size.getWidth() ) );
-		posY = Math.min( posY, (int)( screenSz.getHeight() - size.getHeight() ) );
+		// Ensure to right of and below the top left corner
+		posX = Math.max( posX, bounds.x );
+		posY = Math.max( posY, bounds.y );
 
-		popupWindow.setLocation( posX, posY );
+		// Ensure that it does not extend beyond the right and bottom bounds
+		posX = Math.min( posX,  boundsRight - size.getWidth() );
+		posY = Math.min( posY,  boundsBottom - size.getHeight() );
+
+		popupWindow.setLocation( (int)(posX + 0.5), (int)(posY + 0.5) );
 	}
 }

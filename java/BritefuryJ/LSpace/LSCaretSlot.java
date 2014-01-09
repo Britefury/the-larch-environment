@@ -99,7 +99,8 @@ public class LSCaretSlot extends LSContentLeafEditable
 		return textRepresentation.length();
 	}
 
-	public int getMarkerPositonForPoint(Point2 localPos)
+	@Override
+	public int getMarkerPositionForPoint(Point2 localPos)
 	{
 		return 0;
 	}

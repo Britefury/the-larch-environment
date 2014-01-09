@@ -91,11 +91,28 @@ abstract public class LSElement implements Presentable
 		{
 			this.subtreeRoot = subtreeRoot;
 		}
-		
-		
+
+
+		@Override
 		public boolean testElement(LSElement element)
 		{
 			return element.isInSubtreeRootedAt( subtreeRoot );
+		}
+	}
+
+	public static class PropertyElementFilter implements ElementFilter {
+		private Object propertyKey;
+
+
+		public PropertyElementFilter(Object propertyKey) {
+			this.propertyKey = propertyKey;
+		}
+
+
+		@Override
+		public boolean testElement(LSElement element)
+		{
+			return element.getProperty(propertyKey) != null;
 		}
 	}
 	
@@ -115,11 +132,20 @@ abstract public class LSElement implements Presentable
 			return element.getInternalChildren();
 		}
 	};
-	
-	
-	
-	
-	
+
+	public static final TreeTraversal.BranchChildrenFn branchChildrenFn = new TreeTraversal.BranchChildrenFn()
+	{
+		@Override
+		public List<LSElement> getChildrenOf(LSContainer element)
+		{
+			return element.getChildren();
+		}
+	};
+
+
+
+
+
 	//
 	//
 	// PRESENTABLE
