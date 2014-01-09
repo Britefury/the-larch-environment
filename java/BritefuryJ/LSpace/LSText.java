@@ -228,7 +228,7 @@ public class LSText extends LSContentLeafEditable
 		return textRepresentation.length();
 	}
 
-	public int getMarkerPositonForPoint(Point2 localPos)
+	public int getMarkerPositionForPoint(Point2 localPos)
 	{
 		TextHitInfo info = hitTest( localPos );
 		if ( info != null )

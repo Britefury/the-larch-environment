@@ -6,14 +6,7 @@
 //##************************
 package BritefuryJ.LSpace;
 
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
@@ -551,11 +544,11 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 		if ( bAllocationRequired )
 		{
 			long t1 = System.nanoTime();
-			
-			Dimension screenSize = null;
+
+			Rectangle windowBounds = null;
 			if ( windowSize == null )
 			{
-				screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+				windowBounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
 			}
 			
 			LayoutNodeRootElement rootLayout = (LayoutNodeRootElement)getLayoutNode();
@@ -565,7 +558,7 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 			
 			// Allocate X
 			double prevWidth = rootLayout.getAllocWidth();
-			double windowWidth = windowSize != null  ?  windowSize.x  :  Math.min( reqX.getReqPrefWidth(), screenSize.getWidth() );
+			double windowWidth = windowSize != null  ?  windowSize.x  :  Math.min( reqX.getReqPrefWidth(), windowBounds.getWidth() );
 			rootLayout.allocateX( reqX, 0.0, windowWidth );
 			rootLayout.refreshAllocationX( prevWidth );
 			
@@ -574,7 +567,7 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 			
 			// Allocate Y
 			LAllocV prevAllocV = rootLayout.getAllocV();
-			double windowHeight = windowSize != null  ?  windowSize.y  :  Math.min( reqX.getReqHeight(), screenSize.getHeight() );
+			double windowHeight = windowSize != null  ?  windowSize.y  :  Math.min( reqX.getReqHeight(), windowBounds.getHeight() );
 			//rootLayout.allocateY( reqY, 0.0, reqY.getReqHeight() );
 			rootLayout.allocateY( reqY, 0.0, windowHeight );
 			rootLayout.refreshAllocationY( prevAllocV );

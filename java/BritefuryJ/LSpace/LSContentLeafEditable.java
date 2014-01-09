@@ -128,7 +128,7 @@ public abstract class LSContentLeafEditable extends LSContentLeaf
 	
 	public abstract int getMarkerRange();
 	
-	public abstract int getMarkerPositonForPoint(Point2 localPos);
+	public abstract int getMarkerPositionForPoint(Point2 localPos);
 	
 	
 	

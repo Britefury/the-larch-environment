@@ -546,9 +546,9 @@ public abstract class PresentationComponent extends JComponent implements Compon
 	
 	protected Dimension clampSize(Dimension contentSize)
 	{
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		Rectangle windowBounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
 		Dimension d = new Dimension();
-		d.setSize( Math.min( contentSize.getWidth(), screenSize.getWidth() ), Math.min( contentSize.getHeight(), screenSize.getHeight() ) );
+		d.setSize( Math.min( contentSize.getWidth(), windowBounds.width ), Math.min( contentSize.getHeight(), windowBounds.height ) );
 		return d;
 	}
 	
@@ -777,9 +777,9 @@ public abstract class PresentationComponent extends JComponent implements Compon
 			int width = getWidth(), height = getHeight();
 			if ( width == 0  &&  height == 0 )
 			{
-				Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-				width = screenSize.width;
-				height = screenSize.height;
+				Rectangle windowBounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+				width = windowBounds.width;
+				height = windowBounds.height;
 			}
 			rootElement.configureEvent( new Vector2( (double)width, (double)height ) );
 			configured = true;
