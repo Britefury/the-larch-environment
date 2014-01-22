@@ -112,7 +112,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 			SequentialBuffer buffer = (SequentialBuffer)data;
 			if ( !sequentialController.canImportFromSequentialEditor( buffer.clipboardHandler.sequentialController ) )
 			{
-				return false;
+				return null;
 			}
 
 			return buffer.sequential;
