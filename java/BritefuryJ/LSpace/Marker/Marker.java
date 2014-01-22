@@ -581,9 +581,9 @@ public class Marker implements Comparable<Marker>
 				// The leaf is not a LSContentLeafEditable, or it fails the filter test. We must choose a nearby leaf that satisfies the requirements
 				
 				// Get a leaf before and after @leaf
-				LSElement prev = TreeTraversal.previousElement( leaf, null, LSElement.internalBranchChildrenFn, leafFilter );
-				LSElement next = TreeTraversal.nextElement( leaf, null, LSElement.internalBranchChildrenFn, leafFilter );
-				
+				LSElement prev = TreeTraversal.previousElement( leaf, (LSContainer)subtree, LSElement.internalBranchChildrenFn, leafFilter );
+				LSElement next = TreeTraversal.nextElement( leaf, (LSContainer)subtree, LSElement.internalBranchChildrenFn, leafFilter );
+
 				// Get the distance from the edge of each to the desired position
 				if ( prev != null )
 				{
