@@ -16,15 +16,8 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.Action;
-import javax.swing.ActionMap;
+import javax.swing.*;
 import javax.swing.Box;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JToolBar;
-import javax.swing.TransferHandler;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.ChangeHistory.AbstractChangeHistory;
@@ -354,17 +347,22 @@ public class Browser implements PaneManager
 		toolbar.setFloatable(false);
 		toolbar.setRollover(true);
 		initialiseToolbar(toolbar);
-		
-		toolbar.add( Box.createHorizontalStrut( 10 ) );
-		
+
 		trail = new BrowserTrail();
 		trail.setPageController( pageController );
 		trail.setMaximumSize( new Dimension( Integer.MAX_VALUE, Integer.MAX_VALUE ) );
-		toolbar.add( trail );
-		
-		
+
+
+		JPanel toolbarContainer = new JPanel( new BorderLayout() );
+		toolbarContainer.setLayout(new BoxLayout(toolbarContainer, BoxLayout.X_AXIS));
+
+		toolbarContainer.add(toolbar);
+		toolbarContainer.add( Box.createHorizontalStrut( 10 ) );
+		toolbarContainer.add(trail);
+
+
 		JPanel header = new JPanel( new BorderLayout() );
-		header.add(toolbar, BorderLayout.PAGE_START );
+		header.add(toolbarContainer, BorderLayout.PAGE_START );
 		
 		
 		panel = new JPanel( new BorderLayout() );

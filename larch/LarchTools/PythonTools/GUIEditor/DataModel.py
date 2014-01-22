@@ -323,12 +323,13 @@ class ListFieldInstance (FieldInstance):
 			if self._field._change_listener is not None:
 				self._field._change_listener(self._object_instance, self, old_contents, new_contents)
 
-		self.__live = LiveList(wrapped_source_value[0]   if wrapped_source_value is not None   else None)
+		source_value = wrapped_source_value[0]   if wrapped_source_value is not None   else []
+		self.__live = LiveList(source_value)
 
 		self.__live.changeListener = on_change
 
 		if wrapped_source_value is not None:
-			on_change([], wrapped_source_value)
+			on_change([], source_value)
 
 
 
