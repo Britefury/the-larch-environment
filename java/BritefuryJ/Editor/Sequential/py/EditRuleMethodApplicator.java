@@ -17,7 +17,7 @@ import BritefuryJ.Util.Jython.DescriptorBase;
 
 public class EditRuleMethodApplicator extends DescriptorBase
 {
-	// Has to extend DescriptorBase to work around that prevents Java objects from acting as descriptors by defining descriptor methods, if they directly derive from Object.
+	// Has to extend DescriptorBase to work around issue that prevents Java objects from acting as descriptors by defining descriptor methods, if they directly derive from Object.
 	
 
 	public static class RuleApplicator
