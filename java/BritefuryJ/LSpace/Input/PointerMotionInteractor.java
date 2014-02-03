@@ -120,7 +120,7 @@ public class PointerMotionInteractor extends PointerInteractor implements Pointe
 			while ( elementsUnderPointer.size() > index )
 			{
 				LSElement element = elementsUnderPointer.pop();
-				pointer.addUnrealiseListener( element, this );
+				pointer.removeUnrealiseListener( element, this );
 				event = events.pop();
 				
 				sendLeaveEvent( element, event );
