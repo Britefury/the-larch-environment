@@ -118,7 +118,7 @@ class BlankParagraphEditor (AbstractViewSchema.NodeAbstractView):
 	def __init__(self, worksheet, blockEditor):
 		super( BlankParagraphEditor, self ).__init__( worksheet, None )
 		self._style = 'normal'
-		self._editorModel = WSEditor.RichTextController.WorksheetRichTextController.instance.editorModelParagraph( [ '' ], { 'style' : self._style } )
+		self._editorModel = WSEditor.RichTextController.WorksheetRichTextController.instance.editorModelParagraph( None, [ '' ], { 'style' : self._style } )
 		self._incr = IncrementalValueMonitor()
 		self._blockEditor = blockEditor
 
@@ -157,7 +157,7 @@ class ParagraphEditor (AbstractViewSchema.ParagraphAbstractView):
 		super( ParagraphEditor, self ).__init__( worksheet, model )
 		if projectedContents is None:
 			projectedContents = self._computeText()
-		self._editorModel = WSEditor.RichTextController.WorksheetRichTextController.instance.editorModelParagraph( projectedContents, { 'style' : model['style'] } )
+		self._editorModel = WSEditor.RichTextController.WorksheetRichTextController.instance.editorModelParagraph( self, projectedContents, { 'style' : model['style'] } )
 	
 
 	def setContents(self, contents):
@@ -292,7 +292,7 @@ class LinkEditor (AbstractViewSchema.LinkAbstractView):
 class PythonCodeEditor (AbstractViewSchema.PythonCodeAbstractView):
 	def __init__(self, worksheet, model):
 		super( PythonCodeEditor, self ).__init__( worksheet, model )
-		self._editorModel = WSEditor.RichTextController.WorksheetRichTextController.instance.editorModelParagraphEmbed( self )
+		self._editorModel = WSEditor.RichTextController.WorksheetRichTextController.instance.editorModelParagraphEmbed( self, self )
 
 		
 	def setCode(self, code):
@@ -395,7 +395,7 @@ class InlineEmbeddedObjectEditor (AbstractViewSchema.InlineEmbeddedObjectAbstrac
 class ParagraphEmbeddedObjectEditor (AbstractViewSchema.ParagraphEmbeddedObjectAbstractView):
 	def __init__(self, worksheet, model):
 		super( ParagraphEmbeddedObjectEditor, self ).__init__( worksheet, model )
-		self._editorModel = WSEditor.RichTextController.WorksheetRichTextController.instance.editorModelParagraphEmbed( self )
+		self._editorModel = WSEditor.RichTextController.WorksheetRichTextController.instance.editorModelParagraphEmbed( self, self )
 
 
 	def copy(self, worksheet=None):

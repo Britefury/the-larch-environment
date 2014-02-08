@@ -27,15 +27,17 @@ public class EdParagraph extends EdAbstractText
 {
 	private Map<Object, Object> styleAttrs = new HashMap<Object, Object>();
 	private boolean isNewlineSuppressed = false;
+	private Object model;
 	
 	
-	protected EdParagraph(List<Object> contents, Map<Object, Object> styleAttrs)
+	protected EdParagraph(Object model, List<Object> contents, Map<Object, Object> styleAttrs)
 	{
 		super( contents );
 		if ( styleAttrs != null )
 		{
 			this.styleAttrs.putAll( styleAttrs );
 		}
+		this.model = model;
 	}
 	
 	
@@ -94,14 +96,21 @@ public class EdParagraph extends EdAbstractText
 	@Override
 	public Object clipboardCopy(ClipboardCopierMemo memo)
 	{
-		return new EdParagraph( copyContents( memo ), styleAttrs );
+		return new EdParagraph( null, copyContents( memo ), styleAttrs );
 	}
 
 
 	@Override
 	protected Object buildModel(RichTextController controller)
 	{
-		return controller.buildParagraph( controller.editorModelListToModelList( contents ), styleAttrs );
+		if (model != null)
+		{
+			return model;
+		}
+		else
+		{
+			return controller.buildParagraph( controller.editorModelListToModelList( contents ), styleAttrs );
+		}
 	}
 
 
@@ -111,13 +120,6 @@ public class EdParagraph extends EdAbstractText
 		return true;
 	}
 
-
-	@Override
-	protected EdNode withContents(List<Object> contents)
-	{
-		return new EdParagraph( contents, styleAttrs );
-	}
-	
 	
 	
 	@Override

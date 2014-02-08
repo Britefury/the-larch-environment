@@ -11,7 +11,10 @@ import BritefuryJ.ClipboardFilter.ClipboardCopierMemo;
 
 public class EdParagraphEmbed extends EdEmbed
 {
-	protected EdParagraphEmbed(Object value)
+	private Object model;
+
+
+	protected EdParagraphEmbed(Object model, Object value)
 	{
 		super( value );
 	}
@@ -20,14 +23,21 @@ public class EdParagraphEmbed extends EdEmbed
 	@Override
 	public Object clipboardCopy(ClipboardCopierMemo memo)
 	{
-		return new EdParagraphEmbed( memo.copy( value ) );
+		return new EdParagraphEmbed( null, memo.copy( value ) );
 	}
 
 
 	@Override
 	protected Object buildModel(RichTextController controller)
 	{
-		return controller.buildParagraphEmbed( value );
+		if (model != null)
+		{
+			return model;
+		}
+		else
+		{
+			return controller.buildParagraphEmbed( value );
+		}
 	}
 
 

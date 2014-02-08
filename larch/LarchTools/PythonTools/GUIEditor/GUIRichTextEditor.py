@@ -202,7 +202,7 @@ class Para (AbstractText):
 	def __init__(self, contents, style=None):
 		super(Para, self).__init__(contents)
 		style = style   if style is not None   else 'normal'
-		self._editorModel = GUIRichTextController.instance.editorModelParagraph(contents, {'style':style})
+		self._editorModel = GUIRichTextController.instance.editorModelParagraph(self, contents, {'style':style})
 		self._style.value = style
 
 
@@ -241,7 +241,7 @@ class _TempBlankPara (RTElem):
 		super(_TempBlankPara, self).__init__()
 		
 		self._block = block
-		self._editorModel = GUIRichTextController.instance.editorModelParagraph([], {'style':'normal'})
+		self._editorModel = GUIRichTextController.instance.editorModelParagraph(None, [], {'style':'normal'})
 		
 
 	@property
@@ -373,7 +373,7 @@ class InlineEmbed (_Embed):
 class ParaEmbed (_Embed):
 	def __init__(self, value):
 		super(ParaEmbed, self).__init__(_value=value)
-		self._editorModel = GUIRichTextController.instance.editorModelParagraphEmbed(value)
+		self._editorModel = GUIRichTextController.instance.editorModelParagraphEmbed(self, value)
 	
 	def __present__(self, fragment, inheritedState):
 		x = Border(self._value.value).withContextMenuInteractor(_paraEmbedContextMenuFactory)

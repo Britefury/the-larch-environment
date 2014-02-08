@@ -456,9 +456,9 @@ public abstract class RichTextController extends SequentialController
 	// Editor model node construction methods
 	//
 	
-	public EdParagraph editorModelParagraph(List<Object> modelContents, Map<Object, Object> styleAttrs)
+	public EdParagraph editorModelParagraph(Object model, List<Object> modelContents, Map<Object, Object> styleAttrs)
 	{
-		return new EdParagraph( convertModelListToEditorModelList( modelContents ), styleAttrs );
+		return new EdParagraph( model, convertModelListToEditorModelList( modelContents ), styleAttrs );
 	}
 	
 	public EdStyleSpan editorModelSpan(List<Object> modelContents, Map<Object, Object> styleAttrs)
@@ -471,9 +471,9 @@ public abstract class RichTextController extends SequentialController
 		return new EdInlineEmbed( value );
 	}
 	
-	public EdParagraphEmbed editorModelParagraphEmbed(Object value)
+	public EdParagraphEmbed editorModelParagraphEmbed(Object model, Object value)
 	{
-		return new EdParagraphEmbed( value );
+		return new EdParagraphEmbed( model, value );
 	}
 	
 	public EdBlock editorModelBlock(List<Object> modelContents)

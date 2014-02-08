@@ -276,7 +276,7 @@ class Merge
 		{
 			if ( bHasContent )
 			{
-				paragraphs.add( new EdParagraph( mergeSpans( spans ), attrs ) );
+				paragraphs.add( new EdParagraph( null, mergeSpans( spans ), attrs ) );
 			}
 			spans.clear();
 		}
