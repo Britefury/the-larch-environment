@@ -45,12 +45,12 @@ public class SupportForUnitTests
 
 	public static Object p(Object contents[], Map<Object, Object> styleAttrs)
 	{
-		return new EdParagraph( Arrays.asList( contents ), new HashMap<Object, Object>() );
+		return new EdParagraph( null, Arrays.asList( contents ), new HashMap<Object, Object>() );
 	}
 
 	public static Object pembed(Object value)
 	{
-		return new EdParagraphEmbed( value );
+		return new EdParagraphEmbed( null, value );
 	}
 
 

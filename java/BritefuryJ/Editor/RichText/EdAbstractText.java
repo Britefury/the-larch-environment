@@ -101,7 +101,4 @@ public abstract class EdAbstractText extends EdNode
 		}
 		return contentsCopy;
 	}
-	
-	
-	protected abstract EdNode withContents(List<Object> contents);
 }

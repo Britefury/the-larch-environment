@@ -102,12 +102,6 @@ public class EdStyleSpan extends EdAbstractText
 		return controller.buildSpan( controller.editorModelListToModelList( contents ), styleAttrs );
 	}
 
-	@Override
-	protected EdNode withContents(List<Object> contents)
-	{
-		return new EdStyleSpan( contents, styleAttrs );
-	}
-	
 	
 	protected static Pres presentStyleAttrs(HashMap<Object, Object> styleAttrs)
 	{
