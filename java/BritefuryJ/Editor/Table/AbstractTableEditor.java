@@ -191,7 +191,7 @@ public abstract class AbstractTableEditor<ModelType>
 						rowData.add(td);
 
 						td = td.nextElementSibling();
-						if (!td.tagName().equals("td")) {
+						if (td != null  &&  !td.tagName().equals("td")) {
 							td = null;
 						}
 					}
@@ -200,7 +200,7 @@ public abstract class AbstractTableEditor<ModelType>
 					tableData.add(rowData.toArray(new Element[rowData.size()]));
 
 					tr = tr.nextElementSibling();
-					if (!tr.tagName().equals("tr")) {
+					if (tr != null  &&  !tr.tagName().equals("tr")) {
 						tr = null;
 					}
 				}
