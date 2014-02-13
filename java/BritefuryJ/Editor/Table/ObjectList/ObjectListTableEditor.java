@@ -9,8 +9,7 @@ package BritefuryJ.Editor.Table.ObjectList;
 import java.lang.reflect.Constructor;
 import java.util.List;
 
-import net.htmlparser.jericho.Segment;
-
+import org.jsoup.nodes.Element;
 import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyObject;
@@ -382,18 +381,18 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 
 
 	@Override
-	protected Object[][] importHTMLBlock(int posX, int posY, Segment[][] htmlBlock)
+	protected Object[][] importHTMLBlock(int posX, int posY, Element[][] htmlBlock)
 	{
 		Object destBlock[][] = new Object[htmlBlock.length][];
 		for (int b = 0; b < htmlBlock.length; b++)
 		{
-			Segment[] srcRow = htmlBlock[b];
+			Element[] srcRow = htmlBlock[b];
 			Object[] destRow = new Object[srcRow.length];
 			destBlock[b] = destRow;
 			
 			for (int a = 0, i = posX; a < srcRow.length; a++, i++)
 			{
-				Segment cellHtml = srcRow[a];
+				Element cellHtml = srcRow[a];
 				Object x;
 				if ( i < columns.length )
 				{
@@ -401,7 +400,7 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 				}
 				else
 				{
-					x = cellHtml.getTextExtractor().toString();
+					x = cellHtml.text();
 				}
 				destRow[a] = x;
 			}

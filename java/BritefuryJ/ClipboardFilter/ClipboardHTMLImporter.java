@@ -6,12 +6,12 @@
 //##************************
 package BritefuryJ.ClipboardFilter;
 
-import net.htmlparser.jericho.Segment;
-
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 
-public class ClipboardHTMLImporter extends ClipboardImporter<Segment>
+public class ClipboardHTMLImporter extends ClipboardImporter<Element>
 {
 	public ClipboardHTMLImporter()
 	{
@@ -20,7 +20,7 @@ public class ClipboardHTMLImporter extends ClipboardImporter<Segment>
 	
 
 	@Override
-	protected Object defaultImportJava(Class<?> cls, Segment importData)
+	protected Object defaultImportJava(Class<?> cls, Element importData)
 	{
 		return null;
 	}
