@@ -11,9 +11,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import net.htmlparser.jericho.Element;
-import net.htmlparser.jericho.Segment;
-import net.htmlparser.jericho.Source;
 import BritefuryJ.ClipboardFilter.ClipboardCopier;
 import BritefuryJ.ClipboardFilter.ClipboardCopierMemo;
 import BritefuryJ.LSpace.LSElement;
@@ -37,6 +34,9 @@ import BritefuryJ.Pres.Clipboard.TargetImporter;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 public abstract class AbstractTableEditor<ModelType>
 {
@@ -167,50 +167,47 @@ public abstract class AbstractTableEditor<ModelType>
 		public Object importData(TableTarget target, Selection selection, Object data)
 		{
 			String htmlText = (String)data;
-			
-			Source html = new Source( htmlText );
-			
-			Element table = html.getFirstElement( "table" );
+
+			Document html = Jsoup.parse(htmlText);
+
+			Element table = html.getElementsByTag("table").first();
 			
 			if ( table != null )
 			{
-				ArrayList<Segment[]> tableData = new ArrayList<Segment[]>();
+				ArrayList<Element[]> tableData = new ArrayList<Element[]>();
 				
-				List<Element> trs = table.getAllElements( "tr" );
+				Element tr = table.getElementsByTag("tr").first();
 				
-				int rowPos = table.getBegin();
-				for (Element tr: trs)
+				while (tr != null)
 				{
-					if ( tr.getBegin() > rowPos )
-					{
-						// We have found a non-nested TR
-						ArrayList<Segment> rowData = new ArrayList<Segment>();
-						
-						// Read TD elements
-						List<Element> tds = tr.getAllElements( "td" );
-						
-						int cellPos = tr.getBegin();
-						for (Element td: tds)
-						{
-							if ( td.getBegin() > cellPos )
-							{
-								// We have found a non-nested TD
-								rowData.add( td.getContent() );
-								
-								cellPos = td.getEnd();
-							}
-						}
-						// Done reading TD elements
-						
-						tableData.add( rowData.toArray( new Segment[rowData.size()] ) );
+					ArrayList<Element> rowData = new ArrayList<Element>();
 
-						rowPos = tr.getEnd();
+					// Read TD elements
+					Element td = tr.getElementsByTag("td").first();
+
+					while (td != null)
+					{
+						// We have found a non-nested TD
+						rowData.add(td);
+
+						td = td.nextElementSibling();
+						if (!td.tagName().equals("td")) {
+							td = null;
+						}
+					}
+					// Done reading TD elements
+
+					tableData.add(rowData.toArray(new Element[rowData.size()]));
+
+					tr = tr.nextElementSibling();
+					if (!tr.tagName().equals("tr")) {
+						tr = null;
 					}
 				}
 
 			
 			
-				Segment htmlBlock[][] = tableData.toArray( new Segment[tableData.size()][] );
+				Element htmlBlock[][] = tableData.toArray(new Element[tableData.size()][]);
 				
 				Object[][] subtable = importHTMLBlock( target.x, target.y, htmlBlock );
 				
@@ -338,18 +335,18 @@ public abstract class AbstractTableEditor<ModelType>
 	protected abstract void putBlock(ModelType model, int x, int y, Object[][] data, AbstractTableEditorInstance<ModelType> editorInstance);
 	protected abstract void deleteBlock(ModelType model, int x, int y, int w, int h, AbstractTableEditorInstance<ModelType> editorInstance);
 
-	protected Object[][] importHTMLBlock(int posX, int posY, Segment[][] htmlBlock)
+	protected Object[][] importHTMLBlock(int posX, int posY, Element[][] htmlBlock)
 	{
 		String[][] textBlock = new String[htmlBlock.length][];
 		
 		for (int rowIndex = 0; rowIndex < htmlBlock.length; rowIndex++)
 		{
-			Segment[] htmlRow = htmlBlock[rowIndex];
+			Element[] htmlRow = htmlBlock[rowIndex];
 			String[] textRow = new String[htmlRow.length];
 
 			for (int colIndex = 0; colIndex < htmlRow.length; colIndex++)
 			{
-				textRow[colIndex] = htmlRow[colIndex].getTextExtractor().toString();
+				textRow[colIndex] = htmlRow[colIndex].text();
 			}
 
 			textBlock[rowIndex] = textRow;

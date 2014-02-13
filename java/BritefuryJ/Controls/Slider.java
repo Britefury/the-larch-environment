@@ -237,12 +237,12 @@ public abstract class Slider extends ControlPres
 	
 	
 	private LiveSource valueSource;
-    private double width;
+	private double width;
 	
 	public Slider(LiveSource valueSource, double width)
 	{
 		this.valueSource = valueSource;
-        this.width = width;
+		this.width = width;
 	}
 
 

@@ -6,8 +6,7 @@
 //##************************
 package BritefuryJ.Editor.Table.ObjectList;
 
-import net.htmlparser.jericho.Segment;
-
+import org.jsoup.nodes.Element;
 import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyJavaType;
@@ -152,7 +151,7 @@ public class AttributeColumn extends AbstractColumn
 	}
 
 	@Override
-	public Object importHTML(Segment importData)
+	public Object importHTML(Element importData)
 	{
 		Object x = null;
 		if ( cls != null )
@@ -171,7 +170,7 @@ public class AttributeColumn extends AbstractColumn
 		
 		if ( x == null )
 		{
-			return importPlainText( importData.getTextExtractor().toString() );
+			return importPlainText( importData.text() );
 		}
 		else
 		{
