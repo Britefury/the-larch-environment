@@ -6,8 +6,7 @@
 //##************************
 package BritefuryJ.Editor.Table.ObjectList;
 
-import net.htmlparser.jericho.Segment;
-
+import org.jsoup.nodes.Element;
 import org.python.core.Py;
 
 import BritefuryJ.Util.UnaryFn;
@@ -20,9 +19,9 @@ public abstract class AbstractColumn
 	
 	public abstract Object defaultValue();
 	
-	public Object importHTML(Segment importData)
+	public Object importHTML(Element importData)
 	{
-		return importPlainText( importData.getTextExtractor().toString() );
+		return importPlainText( importData.text() );
 	}
 	
 	public abstract Object importPlainText(String importData);
