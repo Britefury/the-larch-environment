@@ -1,11 +1,11 @@
 The Larch Environment is licensed under the GNU GPL (General Public License) v2, the full text
 of which can be found in the file 'COPYING'.
 
-The Jericho HTML parsing library (extlibs/jericho-html-3.2.jar - or other
-version) is licensed under the lesser GNU GPL v2.1, the full text of which can be
-found in the file 'COPYING-Jericho.txt'. The JAR distributed with this software
+The Jsoup HTML parsing library (extlibs/jsoup-1.7.3.jar - or other
+version) is licensed under the lesser MIT license, the full text of which can be
+found in the file 'COPYING-Jsoup.txt'. The JAR distributed with this software
 is the original JAR supplied by the authors, and is available
-from http://jericho.htmlparser.net
+from http://jsoup.org
 
 The Salamander SVG rendering libary (extlibs/svgSalamander.jar) is licensed
 under the lesser GNU GPL v3, the full text of which can be
