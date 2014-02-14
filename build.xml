@@ -24,7 +24,7 @@
             <fileset dir="./larch"/>
             <fileset dir="./" includes="fonts/**"/>
             <zipfileset excludes="META-INF/*.SF" src="${jython.path}"/>
-            <zipfileset excludes="META-INF/*.SF" src="./extlibs/jericho-html-3.2.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="./extlibs/jsoup-1.7.3.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="./extlibs/svgSalamander.jar"/>
         </jar>
     </target>

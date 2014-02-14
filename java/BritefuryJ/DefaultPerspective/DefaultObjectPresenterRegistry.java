@@ -7,9 +7,6 @@
 package BritefuryJ.DefaultPerspective;
 
 import java.awt.Color;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -22,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import BritefuryJ.DefaultPerspective.Presenters.*;
 import BritefuryJ.Pres.UI.SectionHeading3;
 import org.python.core.Py;
 import org.python.core.PyBaseException;
@@ -43,11 +41,6 @@ import org.python.core.PyType;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Controls.DropDownExpander;
-import BritefuryJ.DefaultPerspective.Presenters.PresentersAWT;
-import BritefuryJ.DefaultPerspective.Presenters.PresentersConcurrency;
-import BritefuryJ.DefaultPerspective.Presenters.PresentersJericho;
-import BritefuryJ.DefaultPerspective.Presenters.PresentersSQL;
-import BritefuryJ.DefaultPerspective.Presenters.PresentersSVG;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Inspect.Inspector;
 import BritefuryJ.ObjectPresentation.ObjectPresentationPerspective;
@@ -83,8 +76,8 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 	private PresentersSVG svg = new PresentersSVG();
 	private PresentersSQL sql = new PresentersSQL();
 	private PresentersConcurrency concurrency = new PresentersConcurrency();
-	private PresentersJericho jericho = new PresentersJericho();
-	
+	private PresentersJsoup jsoup = new PresentersJsoup();
+
 	private DefaultObjectPresenterRegistry()
 	{
 		registerJavaObjectPresenter( Character.class, presenter_Character );
@@ -132,7 +125,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 		svg.registerPerspective( perspective );
 		sql.registerPerspective( perspective );
 		concurrency.registerPerspective( perspective );
-		jericho.registerPerspective( perspective );
+		jsoup.registerPerspective( perspective );
 	}
 	
 	public static final ObjectPresenter presenter_Boolean = new ObjectPresenter()

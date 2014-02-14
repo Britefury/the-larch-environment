@@ -13,7 +13,6 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import net.htmlparser.jericho.Source;
 import BritefuryJ.Controls.DropDownExpander;
 import BritefuryJ.Controls.TextArea;
 import BritefuryJ.DefaultPerspective.DefaultPerspective;
@@ -39,6 +38,8 @@ import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.RichText.Heading5;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 public class ClipboardTestPage extends TestPage
 {
@@ -196,7 +197,7 @@ public class ClipboardTestPage extends TestPage
 					{
 						if ( flavor.getRepresentationClass() == String.class )
 						{
-							Source html = new Source( (String)transfer.getTransferData( flavor ) );
+							Document html = Jsoup.parse((String) transfer.getTransferData(flavor));
 							return DefaultPerspective.instance.applyTo( html );
 						}
 						else
