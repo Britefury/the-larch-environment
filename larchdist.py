@@ -53,7 +53,7 @@ rootFiles = [
 	'BUGS',
 	'build.xml',
 	'COPYING',
-	'COPYING-Jericho.txt',
+	'COPYING-Jsoup.txt',
 	'COPYING-svgSalamander.txt',
 	'larchdist.py',
 	'lconsole',
