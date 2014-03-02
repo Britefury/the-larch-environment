@@ -72,6 +72,9 @@ def start_larch():
 			# Load a document
 			filename = sys.argv[1]
 			document = Document.readFile( world, filename )
+			if document is None:
+				print 'Could not load {0}'.format(filename)
+				sys.exit()
 			subject = document.newSubject( world.worldSubject, None, filename )
 			world.setRootSubject( subject )
 	else:

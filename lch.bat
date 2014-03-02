@@ -1,3 +1,3 @@
 @echo off
 
-call jython lch.py %1
+call jython lch.py %*
