@@ -18,11 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import org.python.core.Py;
-import org.python.core.PyException;
-import org.python.core.PyObject;
-import org.python.core.__builtin__;
-import org.python.core.imp;
+import org.python.core.*;
 import org.python.util.PythonInterpreter;
 
 public class Main
@@ -31,7 +27,11 @@ public class Main
 	{
 		try
 		{
-			PythonInterpreter interp = new PythonInterpreter();
+			PySystemState systemState = Py.getSystemState();
+			for (String arg: args) {
+				systemState.argv.append(Py.newString(arg));
+			}
+			PythonInterpreter interp = new PythonInterpreter(null, systemState);
 			URL startURL = Main.class.getResource( "Main.class" );
 			String larchClassPath = null;
 			
