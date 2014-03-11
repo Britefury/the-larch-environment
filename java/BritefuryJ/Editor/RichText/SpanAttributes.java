@@ -1,160 +1,14 @@
 package BritefuryJ.Editor.RichText;
 
 
+import BritefuryJ.Editor.RichText.SpanAttrs.AttrValue;
+import BritefuryJ.Editor.RichText.SpanAttrs.Intersection;
+import BritefuryJ.Editor.RichText.SpanAttrs.SingleValue;
+import BritefuryJ.Editor.RichText.SpanAttrs.ValueStack;
+
 import java.util.*;
 
-public class SpanAttributes {
-	public static class Intersection <T> {
-		public T intersection, dIntersectionA, dIntersectionB;
-
-		public Intersection(T intersection, T dIntersectionA, T dIntersectionB) {
-			this.intersection = intersection;
-			this.dIntersectionA = dIntersectionA;
-			this.dIntersectionB = dIntersectionB;
-		}
-
-
-		@Override
-		public boolean equals(Object other) {
-			if (other instanceof Intersection) {
-				Intersection<T> i = (Intersection<T>)other;
-
-				if (intersection == null  &&  i.intersection == null  ||
-						intersection != null && i.intersection != null && intersection.equals(i.intersection)) {
-					if (dIntersectionA == null  &&  i.dIntersectionA == null  ||
-							dIntersectionA != null && i.dIntersectionA != null && dIntersectionA.equals(i.dIntersectionA)) {
-						if (dIntersectionB == null  &&  i.dIntersectionB == null  ||
-								dIntersectionB != null && i.dIntersectionB != null && dIntersectionB.equals(i.dIntersectionB)) {
-							return true;
-						}
-					}
-				}
-			}
-			return false;
-		}
-	}
-
-
-	public static abstract class AttrValue {
-		public abstract Intersection<? extends AttrValue> intersect(AttrValue v);
-	}
-
-
-	public static class SingleValue extends AttrValue {
-		private Object value;
-
-		public SingleValue(Object value) {
-			this.value = value;
-		}
-
-
-		@Override
-		public boolean equals(Object other) {
-			if (other instanceof SingleValue) {
-				SingleValue s = (SingleValue)other;
-				if (value == null  &&  s.value == null  ||
-						value != null && s.value != null && value.equals(s.value)) {
-					return true;
-				}
-			}
-			return false;
-		}
-
-
-		public Intersection<? extends AttrValue> intersect(AttrValue v) {
-			if (v instanceof SingleValue) {
-				SingleValue s = (SingleValue)v;
-
-				if (value.equals(s.value)) {
-					return new Intersection<SingleValue>(this, null, null);
-				}
-				else {
-					return null;
-				}
-			}
-			else {
-				throw new RuntimeException("SingleValues can only be intersected with SingleValues");
-			}
-
-		}
-	}
-
-
-	public static class ValueStack extends AttrValue {
-		private ArrayList<Object> stack = new ArrayList<Object>();
-
-		public ValueStack() {
-		}
-
-		public ValueStack(List<Object> values) {
-			stack.addAll(values);
-		}
-
-		public List<Object> getValues() {
-			return stack;
-		}
-
-
-		@Override
-		public boolean equals(Object other) {
-			if (other instanceof ValueStack) {
-				ValueStack s = (ValueStack)other;
-				if (stack == null  &&  s.stack == null  ||
-						stack != null && s.stack != null && stack.equals(s.stack)) {
-					return true;
-				}
-			}
-			return false;
-		}
-
-
-		public Intersection<? extends AttrValue> intersect(AttrValue v) {
-			if (v instanceof ValueStack) {
-				ValueStack s = (ValueStack)v;
-
-				if (stack.size() == 0  ||  s.stack.size() == 0) {
-					// One or both empty; no intersection
-					return null;
-				}
-				else {
-					int top = Math.min(stack.size(), s.stack.size());
-					int lastEqual = -1;
-					for (int i = 0; i < top; i++) {
-						if (!stack.get(i).equals(s.stack.get(i))) {
-							lastEqual = i;
-						}
-					}
-					int firstDifferent = lastEqual + 1;
-
-
-					if (firstDifferent > 0) {
-						Intersection<ValueStack> inter = new Intersection<ValueStack>(new ValueStack(stack.subList(0, firstDifferent)), null, null);
-
-						if (firstDifferent < stack.size()) {
-							inter.dIntersectionA = new ValueStack(stack.subList(firstDifferent, stack.size()));
-						}
-
-						if (firstDifferent < s.stack.size()) {
-							inter.dIntersectionB = new ValueStack(stack.subList(firstDifferent, s.stack.size()));
-						}
-
-						return inter;
-					}
-					else
-					{
-						return null;
-					}
-				}
-			}
-			else {
-				throw new RuntimeException("ValueStack can only be intersected with ValueStack");
-			}
-
-		}
-	}
-
-
-
+public class SpanAttributes implements Map<Object, AttrValue> {
 	private HashMap<Object, AttrValue> table ;
 
 
@@ -164,6 +18,84 @@ public class SpanAttributes {
 
 	public SpanAttributes(HashMap<Object, AttrValue> values) {
 		this.table = values;
+	}
+
+
+
+	@Override
+	public boolean equals(Object other) {
+		if (other instanceof SpanAttributes) {
+			SpanAttributes sa = (SpanAttributes)other;
+			return table.equals(sa.table);
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return table.hashCode();
+	}
+
+
+
+	@Override
+	public int size() {
+		return table.size();
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return table.isEmpty();
+	}
+
+	@Override
+	public boolean containsKey(Object key) {
+		return table.containsKey(key);
+	}
+
+	@Override
+	public boolean containsValue(Object value) {
+		return table.containsValue(value);
+	}
+
+	@Override
+	public AttrValue get(Object key) {
+		return table.get(key);
+	}
+
+	@Override
+	public AttrValue put(Object key, AttrValue value) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public AttrValue remove(Object key) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void putAll(Map<?, ? extends AttrValue> m) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void clear() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Set<Object> keySet() {
+		return table.keySet();
+	}
+
+	@Override
+	public Collection<AttrValue> values() {
+		return table.values();
+	}
+
+	@Override
+	public Set<Entry<Object, AttrValue>> entrySet() {
+		return table.entrySet();
 	}
 
 
@@ -183,13 +115,11 @@ public class SpanAttributes {
 			values.put(key, stack);
 		}
 		else {
-			ValueStack s2 = new ValueStack(stack.getValues());
-			s2.getValues().add(value);
-			values.put(key, stack);
+			ValueStack s2 = stack.withValue(value);
+			values.put(key, s2);
 		}
 		return new SpanAttributes(values);
 	}
-
 
 
 	public Intersection<SpanAttributes> intersect(SpanAttributes other) {
