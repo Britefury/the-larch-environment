@@ -1,38 +1,39 @@
 package tests.Editor.RichText;
 
-import BritefuryJ.Editor.RichText.SpanAttributes;
+import BritefuryJ.Editor.RichText.SpanAttrs.Intersection;
+import BritefuryJ.Editor.RichText.SpanAttrs.ValueStack;
 import junit.framework.TestCase;
 
 import java.util.Arrays;
 
 public class SpanAttributes_StackValueTest extends TestCase {
-	protected SpanAttributes.ValueStack stack(Object ... values) {
-		return new SpanAttributes.ValueStack(Arrays.asList(values));
+	protected ValueStack stack(Object ... values) {
+		return new ValueStack(Arrays.asList(values));
 	}
 
-	protected SpanAttributes.Intersection<SpanAttributes.ValueStack> intersection(Object inter[], Object da[], Object db[]) {
-		return new SpanAttributes.Intersection<SpanAttributes.ValueStack>(
-				inter != null  ?  new SpanAttributes.ValueStack(Arrays.asList(inter))  :  null,
-				da != null  ?  new SpanAttributes.ValueStack(Arrays.asList(da))  :  null,
-				db != null  ?  new SpanAttributes.ValueStack(Arrays.asList(db))  :  null
+	protected Intersection<ValueStack> intersection(Object inter[], Object da[], Object db[]) {
+		return new Intersection<ValueStack>(
+				inter != null  ?  new ValueStack(Arrays.asList(inter))  :  null,
+				da != null  ?  new ValueStack(Arrays.asList(da))  :  null,
+				db != null  ?  new ValueStack(Arrays.asList(db))  :  null
 		);
 	}
 
 
 	public void testEquals() {
-		SpanAttributes.ValueStack a = stack("a");
-		SpanAttributes.ValueStack b = stack("a");
-		SpanAttributes.ValueStack c = stack("c");
+		ValueStack a = stack("a");
+		ValueStack b = stack("a");
+		ValueStack c = stack("c");
 
 		assertEquals(a, b);
 		assertFalse(a.equals(c));
 	}
 
 	public void testIntersection() {
-		SpanAttributes.ValueStack a = stack("a");
-		SpanAttributes.ValueStack b = stack("a", "b", "c");
-		SpanAttributes.ValueStack c = stack("a", "b", "d", "e");
-		SpanAttributes.ValueStack d = stack("d");
+		ValueStack a = stack("a");
+		ValueStack b = stack("a", "b", "c");
+		ValueStack c = stack("a", "b", "d", "e");
+		ValueStack d = stack("d");
 
 		assertNull(a.intersect(d));
 		assertNull(d.intersect(a));
