@@ -6,6 +6,7 @@
 //##************************
 package tests.Editor.RichText;
 
+import BritefuryJ.Editor.RichText.SpanAttributes;
 import BritefuryJ.Editor.RichText.SupportForUnitTests;
 import junit.framework.TestCase;
 
@@ -69,7 +70,7 @@ public class FlattenTest extends TestCase
 
 	private static Object sstart(Map<Object, Object> attrs)
 	{
-		return SupportForUnitTests.tagSStart( attrs );
+		return SupportForUnitTests.tagSStart(SpanAttributes.fromValues(attrs));
 	}
 
 	private static Object send()
@@ -80,7 +81,7 @@ public class FlattenTest extends TestCase
 
 	private static Object span(Object ...in)
 	{
-		return SupportForUnitTests.span( in, new HashMap<Object, Object>() );
+		return SupportForUnitTests.span( in, new SpanAttributes() );
 	}
 
 	private static Object iembed(Object value)

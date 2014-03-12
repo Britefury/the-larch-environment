@@ -10,22 +10,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import BritefuryJ.Editor.RichText.SpanAttrs.AttrValue;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Row;
 
 class TagSStart extends TagStart
 {
-	private HashMap<Object, Object> styleAttrs = new HashMap<Object, Object>();
+	private SpanAttributes styleAttrs = new SpanAttributes();
 	
 	
-	public TagSStart(Map<Object, Object> styleAttrs)
+	public TagSStart(SpanAttributes styleAttrs)
 	{
 		this.styleAttrs.putAll( styleAttrs );
 	}
 	
 	
-	public Map<Object, Object> getStyleAttrs()
+	public SpanAttributes getStyleAttrs()
 	{
 		return styleAttrs;
 	}
@@ -35,7 +36,7 @@ class TagSStart extends TagStart
 	protected Pres presentTagContents()
 	{
 		ArrayList<Object> xs = new ArrayList<Object>();
-		for (Map.Entry<Object, Object> entry: styleAttrs.entrySet())
+		for (Map.Entry<Object, AttrValue> entry: styleAttrs.entrySet())
 		{
 			xs.add( new Label( " " ) );
 			xs.add( Pres.coerce( entry.getKey() ) );

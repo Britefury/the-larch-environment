@@ -210,7 +210,7 @@ public abstract class RichTextController extends SequentialController
 	
 	public interface ComputeSpanStylesFn
 	{
-		public Map<Object, Object> invoke(List<Map<Object, Object>> stylesOfSpans);
+		public SpanAttributes invoke(List<SpanAttributes> stylesOfSpans);
 	}
 	
 	public interface ModifyParagraphFn
@@ -461,7 +461,7 @@ public abstract class RichTextController extends SequentialController
 		return new EdParagraph( model, convertModelListToEditorModelList( modelContents ), styleAttrs );
 	}
 	
-	public EdStyleSpan editorModelSpan(List<Object> modelContents, Map<Object, Object> styleAttrs)
+	public EdStyleSpan editorModelSpan(List<Object> modelContents, SpanAttributes styleAttrs)
 	{
 		return new EdStyleSpan( convertModelListToEditorModelList( modelContents ), styleAttrs );
 	}
@@ -779,7 +779,7 @@ public abstract class RichTextController extends SequentialController
 	protected abstract Object buildInlineEmbed(Object value);
 	protected abstract Object buildParagraphEmbed(Object value);
 	protected abstract Object buildParagraph(List<Object> contents, Map<Object, Object> styleAttrs);
-	protected abstract Object buildSpan(List<Object> contents, Map<Object, Object> styleAttrs);
+	protected abstract Object buildSpan(List<Object> contents, SpanAttributes styleAttrs);
 
 	
 	private Object buildModelForEditorModel(EdNode editorModel)
@@ -1022,7 +1022,7 @@ public abstract class RichTextController extends SequentialController
 		}
 		else
 		{
-			EdStyleSpan span = new EdStyleSpan( Arrays.asList( new Object[] { text } ), new HashMap<Object, Object>() );
+			EdStyleSpan span = new EdStyleSpan( Arrays.asList( new Object[] { text } ), new SpanAttributes() );
 			return Arrays.asList( new EdNode[] { span } );
 		}
 	}
@@ -1187,7 +1187,7 @@ public abstract class RichTextController extends SequentialController
 		List<Object> selected = getFlattenedContentInSelection( selectionVisitor, editFragment, selection );
 		
 		// Extract style dictionaries
-		ArrayList< Map<Object, Object> > styles = new ArrayList< Map<Object, Object> >();
+		ArrayList<SpanAttributes> styles = new ArrayList<SpanAttributes>();
 		for (Object x: selected)
 		{
 			if ( x instanceof EdStyleSpan )
@@ -1197,14 +1197,14 @@ public abstract class RichTextController extends SequentialController
 		}
 		
 		// Compute the style values to apply
-		Map<Object, Object> values = null;
+		SpanAttributes values = null;
 		if ( styles.size() > 0 )
 		{
 			values = computeStylesFn.invoke( styles );
 		}
 		else
 		{
-			values = new HashMap<Object, Object>();
+			values = new SpanAttributes();
 		}
 		
 		// Apply them
