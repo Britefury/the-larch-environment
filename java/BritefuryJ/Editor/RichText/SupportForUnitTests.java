@@ -22,7 +22,7 @@ public class SupportForUnitTests
 		return new TagPStart( styleAttrs );
 	}
 
-	public static Object tagSStart(Map<Object, Object> styleAttrs)
+	public static Object tagSStart(SpanAttributes styleAttrs)
 	{
 		return new TagSStart( styleAttrs );
 	}
@@ -33,9 +33,9 @@ public class SupportForUnitTests
 	}
 
 
-	public static Object span(Object contents[], Map<Object, Object> styleAttrs)
+	public static Object span(Object contents[], SpanAttributes styleAttrs)
 	{
-		return new EdStyleSpan( Arrays.asList( contents ), new HashMap<Object, Object>() );
+		return new EdStyleSpan( Arrays.asList( contents ), styleAttrs );
 	}
 
 	public static Object iembed(Object value)

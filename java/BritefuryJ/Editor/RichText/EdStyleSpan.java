@@ -14,6 +14,7 @@ import java.util.Map;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.ClipboardFilter.ClipboardCopierMemo;
+import BritefuryJ.Editor.RichText.SpanAttrs.AttrValue;
 import BritefuryJ.Graphics.FillPainter;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
@@ -25,28 +26,28 @@ import BritefuryJ.StyleSheet.StyleSheet;
 
 public class EdStyleSpan extends EdAbstractText
 {
-	private HashMap<Object, Object> styleAttrs = new HashMap<Object, Object>();
+	private SpanAttributes styleAttrs = new SpanAttributes();
+
 	
-	
-	protected EdStyleSpan(List<Object> contents, Map<Object, Object> styleAttrs)
+	protected EdStyleSpan(List<Object> contents, SpanAttributes styleAttrs)
 	{
 		super( contents );
 		this.styleAttrs.putAll( styleAttrs );
 	}
 	
-	protected EdStyleSpan(Map<Object, Object> styleAttrs)
+	protected EdStyleSpan(SpanAttributes styleAttrs)
 	{
 		super();
 		this.styleAttrs.putAll( styleAttrs );
 	}
 	
 	
-	public HashMap<Object, Object> getStyleAttrs()
+	public SpanAttributes getStyleAttrs()
 	{
 		return styleAttrs;
 	}
 	
-	public void setStyleAttrs(Map<Object, Object> styleAttrs)
+	public void setStyleAttrs(SpanAttributes styleAttrs)
 	{
 		this.styleAttrs.clear();
 		this.styleAttrs.putAll( styleAttrs );
@@ -103,10 +104,10 @@ public class EdStyleSpan extends EdAbstractText
 	}
 
 	
-	protected static Pres presentStyleAttrs(HashMap<Object, Object> styleAttrs)
+	protected static Pres presentStyleAttrs(SpanAttributes styleAttrs)
 	{
 		ArrayList<Pres[]> tableContents = new ArrayList<Pres[]>();
-		for (Map.Entry<Object, Object> e: styleAttrs.entrySet())
+		for (Map.Entry<Object, AttrValue> e: styleAttrs.entrySet())
 		{
 			tableContents.add( new Pres[] { Pres.coerce( e.getKey() ), Pres.coerce( e.getValue() ) } );
 		}

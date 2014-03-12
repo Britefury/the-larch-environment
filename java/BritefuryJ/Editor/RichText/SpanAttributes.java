@@ -1,10 +1,10 @@
 package BritefuryJ.Editor.RichText;
 
 
+import BritefuryJ.Editor.RichText.SpanAttrs.AttrValCumulative;
+import BritefuryJ.Editor.RichText.SpanAttrs.AttrValOverride;
 import BritefuryJ.Editor.RichText.SpanAttrs.AttrValue;
 import BritefuryJ.Editor.RichText.SpanAttrs.Intersection;
-import BritefuryJ.Editor.RichText.SpanAttrs.SingleValue;
-import BritefuryJ.Editor.RichText.SpanAttrs.ValueStack;
 
 import java.util.*;
 
@@ -65,22 +65,26 @@ public class SpanAttributes implements Map<Object, AttrValue> {
 
 	@Override
 	public AttrValue put(Object key, AttrValue value) {
-		throw new UnsupportedOperationException();
+		return table.put(key, value);
 	}
 
 	@Override
 	public AttrValue remove(Object key) {
-		throw new UnsupportedOperationException();
+		return table.remove(key);
 	}
 
 	@Override
 	public void putAll(Map<?, ? extends AttrValue> m) {
-		throw new UnsupportedOperationException();
+		table.putAll(m);
+	}
+
+	public void putAll(SpanAttributes attrs) {
+		table.putAll(attrs.table);
 	}
 
 	@Override
 	public void clear() {
-		throw new UnsupportedOperationException();
+		table.clear();
 	}
 
 	@Override
@@ -102,21 +106,26 @@ public class SpanAttributes implements Map<Object, AttrValue> {
 	public SpanAttributes withAttr(Object key, Object value) {
 		HashMap<Object, AttrValue> values = new HashMap<Object, AttrValue>();
 		values.putAll(table);
-		values.put(key, new SingleValue(value));
+		values.put(key, new AttrValOverride(value));
 		return new SpanAttributes(values);
 	}
 
 	public SpanAttributes withAppend(Object key, Object value) {
 		HashMap<Object, AttrValue> values = new HashMap<Object, AttrValue>();
 		values.putAll(table);
-		ValueStack stack = (ValueStack)values.get(key);
-		if (stack == null) {
-			stack = new ValueStack(Arrays.asList(new Object[] {value}));
-			values.put(key, stack);
+		AttrValue attrVal = values.get(key);
+		if (attrVal == null) {
+			attrVal = new AttrValCumulative(Arrays.asList(new Object[] {value}));
+			values.put(key, attrVal);
 		}
 		else {
-			ValueStack s2 = stack.withValue(value);
-			values.put(key, s2);
+			if (attrVal instanceof AttrValCumulative) {
+				AttrValCumulative s2 = ((AttrValCumulative)attrVal).withValue(value);
+				values.put(key, s2);
+			}
+			else {
+				throw new RuntimeException("withAppend: existing value for key " + key + " is not a stack value");
+			}
 		}
 		return new SpanAttributes(values);
 	}
@@ -132,16 +141,22 @@ public class SpanAttributes implements Map<Object, AttrValue> {
 				// Key common to both
 				Intersection<? extends AttrValue> valueIntersection = e_a.getValue().intersect(b);
 
-				if (valueIntersection.intersection != null) {
-					i.table.put(e_a.getKey(), valueIntersection.intersection);
+				if (valueIntersection == null) {
+					da.table.put(e_a.getKey(), e_a.getValue());
+					db.table.put(e_a.getKey(), b);
 				}
+				else {
+					if (valueIntersection.intersection != null) {
+						i.table.put(e_a.getKey(), valueIntersection.intersection);
+					}
 
-				if (valueIntersection.dIntersectionA != null) {
-					da.table.put(e_a.getKey(), valueIntersection.dIntersectionA);
-				}
+					if (valueIntersection.dIntersectionA != null) {
+						da.table.put(e_a.getKey(), valueIntersection.dIntersectionA);
+					}
 
-				if (valueIntersection.dIntersectionB != null) {
-					db.table.put(e_a.getKey(), valueIntersection.dIntersectionB);
+					if (valueIntersection.dIntersectionB != null) {
+						db.table.put(e_a.getKey(), valueIntersection.dIntersectionB);
+					}
 				}
 			}
 			else {
@@ -205,12 +220,31 @@ public class SpanAttributes implements Map<Object, AttrValue> {
 
 
 
+	public SpanAttributes concatenate(SpanAttributes other) {
+		SpanAttributes cat = new SpanAttributes(this.table);
+
+		for (Map.Entry<Object, AttrValue> e: other.table.entrySet()) {
+			AttrValue existing = cat.table.get(e.getKey());
+			if (existing == null) {
+				// No existing value; just insert
+				cat.table.put(e.getKey(), e.getValue());
+			}
+			else {
+				cat.table.put(e.getKey(), existing.concatenate(e.getValue()));
+			}
+		}
+
+		return cat;
+	}
+
+
+
 
 
 	public static SpanAttributes fromValues(Map<Object, Object> values) {
 		HashMap<Object, AttrValue> table = new HashMap<Object, AttrValue>();
 		for (Map.Entry<Object, Object> e: values.entrySet()) {
-			table.put(e.getKey(), new SingleValue(e.getValue()));
+			table.put(e.getKey(), new AttrValOverride(e.getValue()));
 		}
 		return new SpanAttributes(table);
 	}

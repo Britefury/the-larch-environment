@@ -195,10 +195,10 @@ public class Flatten
 	// Strings are wrapped in EdStyleSpan objects, with styles determined by the style span start and end tags (TagSStart and TagSEnd)
 	// Paragraphs (editor model paragraphs) that have not been 'flattened out' but remain as structural items are left as is.
 	// SHOULD IMPLEMENT AS ITERATOR, BUT I'M BUGGERED IF I AM GOING TO SPEND TIME CONVERTING A NICE PYTHON GENERATOR TO A JAVA ITERATOR......
-	private static void flatten(ArrayList<Object> result, FlattenInput xs, HashMap<Object, Object> currentStyleAttrs)
+	private static void flatten(ArrayList<Object> result, FlattenInput xs, SpanAttributes currentStyleAttrs)
 	{
-		Stack<HashMap<Object, Object>> styleStack = new Stack<HashMap<Object, Object>>();
-		styleStack.add( new HashMap<Object, Object>() );
+		Stack<SpanAttributes> styleStack = new Stack<SpanAttributes>();
+		styleStack.add( new SpanAttributes() );
 		Object prevElement = null;
 
 		// There are 9 possible types of element encountered in xs:
@@ -321,7 +321,7 @@ public class Flatten
 				// Span start tag; put attributes onto stack
 				TagSStart tag = (TagSStart)xs.consume();
 				// Update the style stack
-				HashMap<Object, Object> attrs = new HashMap<Object, Object>();
+				SpanAttributes attrs = new SpanAttributes();
 				attrs.putAll( currentStyleAttrs );
 				attrs.putAll( tag.getStyleAttrs() );
 				currentStyleAttrs = attrs;
@@ -355,7 +355,7 @@ public class Flatten
 			{
 				// Style span; process recursively
 				EdStyleSpan span = (EdStyleSpan)xs.consume();
-				HashMap<Object, Object> attrs = new HashMap<Object, Object>();
+				SpanAttributes attrs = new SpanAttributes();
 				attrs.putAll( currentStyleAttrs );
 				attrs.putAll( span.getStyleAttrs() );
 				flatten( result, new FlattenInput( span.getContents() ), attrs );
@@ -388,7 +388,7 @@ public class Flatten
 	private static ArrayList<Object> flatten(List<Object> xs)
 	{
 		ArrayList<Object> result = new ArrayList<Object>();
-		HashMap<Object, Object> currentStyleAttrs = new HashMap<Object, Object>();
+		SpanAttributes currentStyleAttrs = new SpanAttributes();
 		flatten( result, new FlattenInput( xs ), currentStyleAttrs );
 		return result;
 	}
