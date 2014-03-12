@@ -26,19 +26,19 @@ import BritefuryJ.StyleSheet.StyleSheet;
 
 public class EdStyleSpan extends EdAbstractText
 {
-	private SpanAttributes styleAttrs = new SpanAttributes();
+	private SpanAttributes styleAttrs;
 
 	
 	protected EdStyleSpan(List<Object> contents, SpanAttributes styleAttrs)
 	{
 		super( contents );
-		this.styleAttrs.putAll( styleAttrs );
+		this.styleAttrs = styleAttrs.copy();
 	}
 	
 	protected EdStyleSpan(SpanAttributes styleAttrs)
 	{
 		super();
-		this.styleAttrs.putAll( styleAttrs );
+		this.styleAttrs = styleAttrs.copy();
 	}
 	
 	
@@ -49,8 +49,7 @@ public class EdStyleSpan extends EdAbstractText
 	
 	public void setStyleAttrs(SpanAttributes styleAttrs)
 	{
-		this.styleAttrs.clear();
-		this.styleAttrs.putAll( styleAttrs );
+		this.styleAttrs.replaceContentsWith(styleAttrs);
 	}
 	
 	

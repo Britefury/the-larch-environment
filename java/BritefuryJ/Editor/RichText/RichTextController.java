@@ -1212,7 +1212,7 @@ public abstract class RichTextController extends SequentialController
 		{
 			if ( x instanceof EdStyleSpan )
 			{
-				( (EdStyleSpan)x ).getStyleAttrs().putAll( values );
+				( (EdStyleSpan)x ).getStyleAttrs().replaceContentsWith( values );
 			}
 		}
 		
