@@ -321,9 +321,7 @@ public class Flatten
 				// Span start tag; put attributes onto stack
 				TagSStart tag = (TagSStart)xs.consume();
 				// Update the style stack
-				SpanAttributes attrs = new SpanAttributes();
-				attrs.putAll( currentStyleAttrs );
-				attrs.putAll( tag.getStyleAttrs() );
+				SpanAttributes attrs = currentStyleAttrs.concatenate(tag.getStyleAttrs());
 				currentStyleAttrs = attrs;
 				styleStack.add( attrs );
 
@@ -355,9 +353,7 @@ public class Flatten
 			{
 				// Style span; process recursively
 				EdStyleSpan span = (EdStyleSpan)xs.consume();
-				SpanAttributes attrs = new SpanAttributes();
-				attrs.putAll( currentStyleAttrs );
-				attrs.putAll( span.getStyleAttrs() );
+				SpanAttributes attrs = currentStyleAttrs.concatenate(span.getStyleAttrs());
 				flatten( result, new FlattenInput( span.getContents() ), attrs );
 
 				// Text content followed by paragraph start, with no newline in between

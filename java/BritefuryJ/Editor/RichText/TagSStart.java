@@ -17,12 +17,12 @@ import BritefuryJ.Pres.Primitive.Row;
 
 class TagSStart extends TagStart
 {
-	private SpanAttributes styleAttrs = new SpanAttributes();
+	private SpanAttributes styleAttrs;
 	
 	
 	public TagSStart(SpanAttributes styleAttrs)
 	{
-		this.styleAttrs.putAll( styleAttrs );
+		this.styleAttrs = styleAttrs;
 	}
 	
 	

@@ -8,8 +8,8 @@ import BritefuryJ.Editor.RichText.SpanAttrs.Intersection;
 
 import java.util.*;
 
-public class SpanAttributes implements Map<Object, AttrValue> {
-	private HashMap<Object, AttrValue> table ;
+public class SpanAttributes {
+	private HashMap<Object, AttrValue> table;
 
 
 	public SpanAttributes() {
@@ -18,6 +18,18 @@ public class SpanAttributes implements Map<Object, AttrValue> {
 
 	public SpanAttributes(HashMap<Object, AttrValue> values) {
 		this.table = values;
+	}
+
+
+	public SpanAttributes copy() {
+		HashMap<Object, AttrValue> table = new HashMap<Object, AttrValue>();
+		table.putAll(this.table);
+		return new SpanAttributes(table);
+	}
+
+	public void replaceContentsWith(SpanAttributes attrs) {
+		table.clear();
+		table.putAll(attrs.table);
 	}
 
 
@@ -38,67 +50,62 @@ public class SpanAttributes implements Map<Object, AttrValue> {
 
 
 
-	@Override
 	public int size() {
 		return table.size();
 	}
 
-	@Override
 	public boolean isEmpty() {
 		return table.isEmpty();
 	}
 
-	@Override
 	public boolean containsKey(Object key) {
 		return table.containsKey(key);
 	}
 
-	@Override
-	public boolean containsValue(Object value) {
-		return table.containsValue(value);
-	}
-
-	@Override
 	public AttrValue get(Object key) {
 		return table.get(key);
 	}
 
-	@Override
-	public AttrValue put(Object key, AttrValue value) {
-		return table.put(key, value);
+	public void putOverride(Object key, Object value) {
+		AttrValue existing = table.get(key);
+		if (existing != null  &&  !(existing instanceof AttrValOverride)) {
+			throw new RuntimeException("Attempting to override non-overrideable value (not an instance of AttrValOverride)");
+		}
+		table.put(key, new AttrValOverride(value));
 	}
 
-	@Override
+	public void putCumulative(Object key, Object value) {
+		AttrValCumulative cumulative = null;
+		AttrValue existing = table.get(key);
+		if (existing != null) {
+			if (existing instanceof AttrValCumulative) {
+				cumulative = (AttrValCumulative)existing;
+				cumulative = cumulative.withValue(value);
+			}
+			else {
+				throw new RuntimeException("Attempting to accumulate into non-cumulative value (not an instance of AttrValCumulative)");
+			}
+		}
+		else {
+			cumulative = new AttrValCumulative(new Object[] {value});
+		}
+		table.put(key, cumulative);
+	}
+
 	public AttrValue remove(Object key) {
 		return table.remove(key);
 	}
 
-	@Override
-	public void putAll(Map<?, ? extends AttrValue> m) {
-		table.putAll(m);
-	}
 
-	public void putAll(SpanAttributes attrs) {
-		table.putAll(attrs.table);
-	}
-
-	@Override
 	public void clear() {
 		table.clear();
 	}
 
-	@Override
 	public Set<Object> keySet() {
 		return table.keySet();
 	}
 
-	@Override
-	public Collection<AttrValue> values() {
-		return table.values();
-	}
-
-	@Override
-	public Set<Entry<Object, AttrValue>> entrySet() {
+	public Set<Map.Entry<Object, AttrValue>> entrySet() {
 		return table.entrySet();
 	}
 

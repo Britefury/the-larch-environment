@@ -10,6 +10,7 @@ import BritefuryJ.StyleSheet.StyleSheet;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -21,6 +22,10 @@ public class AttrValCumulative extends AttrValue {
 
 	public AttrValCumulative(List<Object> values) {
 		stack.addAll(values);
+	}
+
+	public AttrValCumulative(Object values[]) {
+		stack.addAll(Arrays.asList(values));
 	}
 
 
