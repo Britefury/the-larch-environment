@@ -5,6 +5,7 @@ import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 public class AttrValOverride extends AttrValue {
@@ -122,5 +123,12 @@ public class AttrValOverride extends AttrValue {
 	@Override
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState) {
 		return Pres.coerce(value);
+	}
+
+
+
+	@Override
+	public String toString() {
+		return String.valueOf(value);
 	}
 }

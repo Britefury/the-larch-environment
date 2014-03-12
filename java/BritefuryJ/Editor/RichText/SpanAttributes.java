@@ -16,7 +16,7 @@ public class SpanAttributes {
 		table = new HashMap<Object, AttrValue>();
 	}
 
-	public SpanAttributes(HashMap<Object, AttrValue> values) {
+	private SpanAttributes(HashMap<Object, AttrValue> values) {
 		this.table = values;
 	}
 
@@ -228,31 +228,64 @@ public class SpanAttributes {
 
 
 	public SpanAttributes concatenate(SpanAttributes other) {
-		SpanAttributes cat = new SpanAttributes(this.table);
+		HashMap<Object, AttrValue> map = new HashMap<Object, AttrValue>();
+		map.putAll(this.table);
 
 		for (Map.Entry<Object, AttrValue> e: other.table.entrySet()) {
-			AttrValue existing = cat.table.get(e.getKey());
+			AttrValue existing = map.get(e.getKey());
 			if (existing == null) {
 				// No existing value; just insert
-				cat.table.put(e.getKey(), e.getValue());
+				map.put(e.getKey(), e.getValue());
 			}
 			else {
-				cat.table.put(e.getKey(), existing.concatenate(e.getValue()));
+				map.put(e.getKey(), existing.concatenate(e.getValue()));
 			}
 		}
 
-		return cat;
+		return new SpanAttributes(map);
 	}
 
 
 
 
 
-	public static SpanAttributes fromValues(Map<Object, Object> values) {
+	public static SpanAttributes fromValues(Map<Object, Object> overrideValues, Map<Object, List<Object>> cumulativeValues) {
 		HashMap<Object, AttrValue> table = new HashMap<Object, AttrValue>();
-		for (Map.Entry<Object, Object> e: values.entrySet()) {
-			table.put(e.getKey(), new AttrValOverride(e.getValue()));
+
+		if (overrideValues != null) {
+			for (Map.Entry<Object, Object> e: overrideValues.entrySet()) {
+				table.put(e.getKey(), new AttrValOverride(e.getValue()));
+			}
 		}
+
+		if (cumulativeValues != null) {
+			for (Map.Entry<Object, List<Object>> e: cumulativeValues.entrySet()) {
+				table.put(e.getKey(), new AttrValCumulative(e.getValue()));
+			}
+		}
+
 		return new SpanAttributes(table);
+	}
+
+
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder("{");
+		boolean first = true;
+		for (Map.Entry<Object, AttrValue> e: table.entrySet()) {
+			if (!first) {
+				builder.append(", ");
+			}
+
+			builder.append(e.getKey());
+			builder.append("=");
+			builder.append(e.getValue());
+
+			first = false;
+		}
+		builder.append("}");
+
+		return builder.toString();
 	}
 }

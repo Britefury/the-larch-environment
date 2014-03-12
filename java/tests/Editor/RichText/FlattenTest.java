@@ -70,7 +70,7 @@ public class FlattenTest extends TestCase
 
 	private static Object sstart(Map<Object, Object> attrs)
 	{
-		return SupportForUnitTests.tagSStart(SpanAttributes.fromValues(attrs));
+		return SupportForUnitTests.tagSStart(SpanAttributes.fromValues(attrs, null));
 	}
 
 	private static Object send()

@@ -11,6 +11,8 @@ from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from BritefuryJ.Projection import SubjectPath
 
+from BritefuryJ.Editor.RichText import SpanAttributes
+
 
 from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, methodDispatch
 
@@ -189,9 +191,9 @@ class ParagraphEditor (AbstractViewSchema.ParagraphAbstractView):
 class TextSpanEditor (AbstractViewSchema.TextSpanAbstractView):
 	def __init__(self, worksheet, model, projectedContents=None):
 		super( TextSpanEditor, self ).__init__( worksheet, model )
-		styleAttrs = {}
+		styleAttrs = SpanAttributes()
 		for a in model['styleAttrs']:
-			styleAttrs[a['name']] = a['value']
+			styleAttrs.putOverride(a['name'], a['value'])
 		if projectedContents is None:
 			projectedContents = self._computeText()
 		self._editorModel = WSEditor.RichTextController.WorksheetRichTextController.instance.editorModelSpan( projectedContents, styleAttrs )
@@ -204,11 +206,11 @@ class TextSpanEditor (AbstractViewSchema.TextSpanAbstractView):
 
 	
 	def setStyleAttrs(self, styleMap):
-		styleAttrs = dict( [ ( n, v )   for n, v in styleMap.items()   if v is not None ] )
-		modelAttrs = [ Schema.StyleAttr( name=n, value=v )   for n, v in styleAttrs.items() ]
+		spanAttrs = SpanAttributes.fromValues({n: v   for n, v in styleMap.items()}, None)
+		modelAttrs = [ Schema.StyleAttr( name=n, value=v )   for n, v in styleMap.items() ]
 
 		self._model['styleAttrs'] = modelAttrs
-		self._editorModel.setStyleAttrs( styleAttrs )
+		self._editorModel.setStyleAttrs( spanAttrs )
 
 
 	def __clipboard_copy__(self, memo):

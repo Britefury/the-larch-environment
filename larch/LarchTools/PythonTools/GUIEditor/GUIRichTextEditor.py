@@ -32,7 +32,7 @@ from BritefuryJ.StyleSheet import StyleSheet
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
-from BritefuryJ.Editor.RichText import RichTextController
+from BritefuryJ.Editor.RichText import RichTextController, SpanAttributes
 
 from LarchCore.Languages.Python2 import Schema as Py
 
@@ -61,8 +61,9 @@ class GUIRichTextController (RichTextController):
 	def buildParagraph(self, contents, styleAttrs):
 		return Para(contents, styleAttrs.get('style'))
 	
-	def buildSpan(self, contents, styleAttrs):
-		return Style(contents, dict(styleAttrs))
+	def buildSpan(self, contents, spanAttrs):
+		styleAttrs = {k: spanAttrs.get(k).get(0)   for k in spanAttrs.keySet()}
+		return Style(contents, styleAttrs)
 	
 	
 	def isDataModelObject(self, x):
@@ -285,14 +286,14 @@ class Style (AbstractText):
 	def _styleAttrsChanged(self, field, oldValue, newValue):
 		self._styleSheet = self._mapStyles(newValue)
 		if self._editorModel is not None:
-			self._editorModel.setStyleAttrs(newValue)
+			self._editorModel.setStyleAttrs(SpanAttributes.fromValues(newValue, None))
 
 
 	def __init__(self, contents, styleAttrs):
 		super(Style, self).__init__(contents)
 		self._styleSheet = None
 		self._styleAttrs.value = {}
-		self._editorModel = GUIRichTextController.instance.editorModelSpan(contents, styleAttrs)
+		self._editorModel = GUIRichTextController.instance.editorModelSpan(contents, SpanAttributes.fromValues(styleAttrs, None))
 		self.styleAttrs = styleAttrs
 
 
@@ -604,13 +605,14 @@ def _documentContextMenuFactory(element, menu):
 
 	
 	def makeStyleFn(attrName):
-		def computeStyleValues(styleAttrDicts):
-			value = dict(styleAttrDicts[0]).get(attrName, False)
+		def computeStyleValues(listOfSpanAttrs):
+			attrVal = listOfSpanAttrs[0].get(attrName)
+			value = bool(attrVal.get(0))   if attrVal is not None   else False
 			value = not value
-			attrs = {}
-			attrs[attrName] = value
+			attrs = SpanAttributes()
+			attrs.putOverride(attrName, '1'   if value   else None)
 			return attrs
-		
+
 		def onButton(button, event):
 			selection = rootElement.getSelection()
 			if isinstance(selection, TextSelection):

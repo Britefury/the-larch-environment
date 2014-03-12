@@ -1212,10 +1212,13 @@ public abstract class RichTextController extends SequentialController
 		{
 			if ( x instanceof EdStyleSpan )
 			{
-				( (EdStyleSpan)x ).getStyleAttrs().replaceContentsWith( values );
+				EdStyleSpan span = (EdStyleSpan)x;
+				SpanAttributes current = span.getStyleAttrs();
+				SpanAttributes cat = current.concatenate(values);
+				span.setStyleAttrs(cat);
 			}
 		}
-		
+
 		// Get surrounding content
 		Visitor v1 = new TagsVisitor( this );
 		v1.visitFromStartOfRootToMarker( selection.getStartMarker(), editFragmentElement );

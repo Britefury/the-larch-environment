@@ -178,4 +178,23 @@ public class AttrValCumulative extends AttrValue {
 
 	private static final SolidBorder stackBorder = new SolidBorder(1.0, 3.0, 4.0, 4.0, new Color(0.3f, 0.5f, 0.7f), null);
 	private static final Pres stackLabel = StyleSheet.style(Primitive.fontSize.as(10), Primitive.foreground.as(new Color(0.3f, 0.5f, 0.7f))).applyTo(new Label("Value stack"));
+
+
+
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder("cumulative[");
+		boolean first = true;
+		for (Object value: stack) {
+			if (!first) {
+				builder.append(", ");
+			}
+
+			builder.append(value);
+		}
+		builder.append("]");
+
+		return builder.toString();
+	}
 }
