@@ -174,6 +174,37 @@ public class SpanAttributes implements Map<Object, AttrValue> {
 
 
 
+	public SpanAttributes difference(SpanAttributes other) {
+		SpanAttributes diff = new SpanAttributes();
+
+		for (Map.Entry<Object, AttrValue> e_a: table.entrySet()) {
+			AttrValue b = other.table.get(e_a.getKey());
+
+			if (b != null) {
+				// Key common to both
+				AttrValue valueDiff = e_a.getValue().difference(b);
+
+				if (valueDiff != null) {
+					diff.table.put(e_a.getKey(), valueDiff);
+				}
+			}
+			else {
+				// Key only in A
+				diff.table.put(e_a.getKey(), e_a.getValue());
+			}
+		}
+
+		for (Map.Entry<Object, AttrValue> e_b: other.table.entrySet()) {
+			if (!table.containsKey(e_b.getKey())) {
+				throw new RuntimeException("difference: this must be a strict superset of other");
+			}
+		}
+
+		return diff;
+	}
+
+
+
 
 
 	public static SpanAttributes fromValues(Map<Object, Object> values) {

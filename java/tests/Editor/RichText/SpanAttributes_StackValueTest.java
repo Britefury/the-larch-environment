@@ -42,4 +42,14 @@ public class SpanAttributes_StackValueTest extends TestCase {
 		assertEquals(b.intersect(a), intersection(new Object[] {"a"}, new Object[] {"b", "c"}, null));
 		assertEquals(b.intersect(c), intersection(new Object[] {"a", "b"}, new Object[] {"c"}, new Object[] {"d", "e"}));
 	}
+
+	public void testDifference() {
+		ValueStack a = stack("a");
+		ValueStack abc = stack("a", "b", "c");
+		ValueStack bc = stack("b", "c");
+
+		assertNull(a.difference(a));
+
+		assertEquals(abc.difference(a), bc);
+	}
 }

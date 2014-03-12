@@ -29,4 +29,11 @@ public class SpanAttributes_SingleValueTest extends TestCase {
 		assertEquals(i.intersection, a);
 		assertEquals(i.intersection, b);
 	}
+
+	public void testDifference() {
+		SingleValue a = new SingleValue("hello");
+		SingleValue b = new SingleValue("hello");
+
+		assertNull(a.difference(b));
+	}
 }

@@ -88,4 +88,21 @@ public class SingleValue extends AttrValue {
 			throw new RuntimeException("SingleValues can only be intersected with SingleValues");
 		}
 	}
+
+	@Override
+	public AttrValue difference(AttrValue v) {
+		if (v instanceof SingleValue) {
+			SingleValue s = (SingleValue)v;
+
+			if (value.equals(s.value)) {
+				return null;
+			}
+			else {
+				throw new RuntimeException("this must be a strict superset of v");
+			}
+		}
+		else {
+			throw new RuntimeException("SingleValues can only be differenced with SingleValues");
+		}
+	}
 }
