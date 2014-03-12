@@ -1,14 +1,16 @@
 package BritefuryJ.Editor.RichText.SpanAttrs;
 
-import BritefuryJ.Editor.RichText.SpanAttributes;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.Pres.Pres;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class SingleValue extends AttrValue {
+public class AttrValOverride extends AttrValue {
 	private Object value;
 
-	public SingleValue(Object value) {
+	public AttrValOverride(Object value) {
 		this.value = value;
 	}
 
@@ -57,8 +59,8 @@ public class SingleValue extends AttrValue {
 
 	@Override
 	public boolean equals(Object other) {
-		if (other instanceof SingleValue) {
-			SingleValue s = (SingleValue)other;
+		if (other instanceof AttrValOverride) {
+			AttrValOverride s = (AttrValOverride)other;
 			if (value == null  &&  s.value == null  ||
 					value != null && s.value != null && value.equals(s.value)) {
 				return true;
@@ -74,11 +76,11 @@ public class SingleValue extends AttrValue {
 
 	@Override
 	public Intersection<? extends AttrValue> intersect(AttrValue v) {
-		if (v instanceof SingleValue) {
-			SingleValue s = (SingleValue)v;
+		if (v instanceof AttrValOverride) {
+			AttrValOverride s = (AttrValOverride)v;
 
 			if (value.equals(s.value)) {
-				return new Intersection<SingleValue>(this, null, null);
+				return new Intersection<AttrValOverride>(this, null, null);
 			}
 			else {
 				return null;
@@ -91,8 +93,8 @@ public class SingleValue extends AttrValue {
 
 	@Override
 	public AttrValue difference(AttrValue v) {
-		if (v instanceof SingleValue) {
-			SingleValue s = (SingleValue)v;
+		if (v instanceof AttrValOverride) {
+			AttrValOverride s = (AttrValOverride)v;
 
 			if (value.equals(s.value)) {
 				return null;
@@ -104,5 +106,21 @@ public class SingleValue extends AttrValue {
 		else {
 			throw new RuntimeException("SingleValues can only be differenced with SingleValues");
 		}
+	}
+
+	@Override
+	public AttrValue concatenate(AttrValue v) {
+		if (v instanceof AttrValOverride) {
+			// Override this
+			return v;
+		}
+		else {
+			throw new RuntimeException("SingleValues can only be accumulated with SingleValues");
+		}
+	}
+
+	@Override
+	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState) {
+		return Pres.coerce(value);
 	}
 }
