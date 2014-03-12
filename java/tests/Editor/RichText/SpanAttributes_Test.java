@@ -1,14 +1,14 @@
 package tests.Editor.RichText;
 
 import BritefuryJ.Editor.RichText.SpanAttributes;
+import BritefuryJ.Editor.RichText.SpanAttrs.AttrValCumulative;
+import BritefuryJ.Editor.RichText.SpanAttrs.AttrValOverride;
 import BritefuryJ.Editor.RichText.SpanAttrs.Intersection;
-import BritefuryJ.Editor.RichText.SpanAttrs.SingleValue;
-import BritefuryJ.Editor.RichText.SpanAttrs.ValueStack;
 import junit.framework.TestCase;
 
 import java.util.Arrays;
 
-public class SpanAttributesTest extends TestCase {
+public class SpanAttributes_Test extends TestCase {
 	protected Intersection<SpanAttributes> intersection(SpanAttributes inter, SpanAttributes da, SpanAttributes db) {
 		return new Intersection<SpanAttributes>(inter, da, db);
 	}
@@ -31,10 +31,10 @@ public class SpanAttributesTest extends TestCase {
 		SpanAttributes ab = new SpanAttributes().withAttr("a", 1).withAttr("b", 2);
 		SpanAttributes c0 = new SpanAttributes().withAppend("c", 3).withAppend("c", 4);
 
-		assertEquals(a.get("a"), new SingleValue(1));
-		assertEquals(ab.get("a"), new SingleValue(1));
-		assertEquals(ab.get("b"), new SingleValue(2));
-		assertEquals(c0.get("c"), new ValueStack(Arrays.asList(new Object[] {3, 4})));
+		assertEquals(a.get("a"), new AttrValOverride(1));
+		assertEquals(ab.get("a"), new AttrValOverride(1));
+		assertEquals(ab.get("b"), new AttrValOverride(2));
+		assertEquals(c0.get("c"), new AttrValCumulative(Arrays.asList(new Object[]{3, 4})));
 	}
 
 	public void testIntersection() {
@@ -45,6 +45,12 @@ public class SpanAttributesTest extends TestCase {
 		SpanAttributes ab = new SpanAttributes().withAttr("a", 1).withAttr("b", 2);
 		SpanAttributes cd = new SpanAttributes().withAttr("c", 3).withAttr("d", 4);
 		SpanAttributes ef = new SpanAttributes().withAttr("e", 5).withAttr("f", 6);
+
+		SpanAttributes i0j1 = new SpanAttributes().withAttr("i", 0).withAttr("j", 1);
+		SpanAttributes i0j2 = new SpanAttributes().withAttr("i", 0).withAttr("j", 2);
+		SpanAttributes i0 = new SpanAttributes().withAttr("i", 0);
+		SpanAttributes j1 = new SpanAttributes().withAttr("j", 1);
+		SpanAttributes j2 = new SpanAttributes().withAttr("j", 2);
 
 		SpanAttributes wxz = new SpanAttributes().withAttr("w", 0).withAttr("x", 1).withAppend("z", 3).withAppend("z", 4).withAppend("z", 5).withAppend("z", 10).withAppend("z", 15);
 		SpanAttributes wyz = new SpanAttributes().withAttr("w", 0).withAttr("y", 2).withAppend("z", 3).withAppend("z", 4).withAppend("z", 100).withAppend("z", 200);
@@ -59,8 +65,10 @@ public class SpanAttributesTest extends TestCase {
 		SpanAttributes wxz_wqz_db = new SpanAttributes().withAttr("q", -2).withAppend("z", 1000).withAppend("z", 5).withAppend("z", 10).withAppend("z", 15);
 
 
+		assertNull(a0.intersect(ef));
 		assertEquals(a0.intersect(a1), intersection(a0, null, null));
 		assertEquals(abcd.intersect(abef), intersection(ab, cd, ef));
+		assertEquals(i0j1.intersect(i0j2), intersection(i0, j1, j2));
 		assertEquals(wxz.intersect(wyz), intersection(wxz_wyz_int, wxz_wyz_da, wxz_wyz_db));
 		assertEquals(wxz.intersect(wqz), intersection(wxz_wqz_int, wxz_wqz_da, wxz_wqz_db));
 	}
@@ -79,5 +87,21 @@ public class SpanAttributesTest extends TestCase {
 		assertEquals(a.difference(a), empty);
 		assertEquals(abcd.difference(a), bcd);
 		assertEquals(wxz.difference(wz), xz);
+	}
+
+	public void testConcatenate() {
+		SpanAttributes empty = new SpanAttributes();
+		SpanAttributes a = new SpanAttributes().withAttr("a", 1);
+		SpanAttributes abcd = new SpanAttributes().withAttr("a", 1).withAttr("b", 2).withAttr("c", 3).withAttr("d", 4);
+		SpanAttributes bcd = new SpanAttributes().withAttr("b", 2).withAttr("c", 3).withAttr("d", 4);
+
+		SpanAttributes wxz = new SpanAttributes().withAttr("w", 0).withAttr("x", 1).withAppend("z", 3).withAppend("z", 4).withAppend("z", 5).withAppend("z", 10).withAppend("z", 15);
+		SpanAttributes wz = new SpanAttributes().withAttr("w", 0).withAppend("z", 3).withAppend("z", 4);
+		SpanAttributes xz = new SpanAttributes().withAttr("x", 1).withAppend("z", 5).withAppend("z", 10).withAppend("z", 15);
+
+
+		assertEquals(a.concatenate(empty), a);
+		assertEquals(a.concatenate(bcd), abcd);
+		assertEquals(wz.concatenate(xz), wxz);
 	}
 }
