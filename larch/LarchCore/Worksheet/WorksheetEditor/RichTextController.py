@@ -56,8 +56,9 @@ class WorksheetRichTextController (RichTextController):
 		style = styleAttrs.get( 'style', 'normal' )
 		return EditorSchema.ParagraphEditor.newParagraph( contents, style )
 
-	def buildSpan(self, contents, styleAttrs):
-		return EditorSchema.TextSpanEditor.newTextSpan( contents, dict( styleAttrs ) )
+	def buildSpan(self, contents, spanAttrs):
+		styleAttrs = {k: spanAttrs.get(k).get(0)   for k in spanAttrs.keySet()}
+		return EditorSchema.TextSpanEditor.newTextSpan( contents, styleAttrs )
 
 
 
