@@ -64,4 +64,20 @@ public class SpanAttributesTest extends TestCase {
 		assertEquals(wxz.intersect(wyz), intersection(wxz_wyz_int, wxz_wyz_da, wxz_wyz_db));
 		assertEquals(wxz.intersect(wqz), intersection(wxz_wqz_int, wxz_wqz_da, wxz_wqz_db));
 	}
+
+	public void testDifference() {
+		SpanAttributes empty = new SpanAttributes();
+		SpanAttributes a = new SpanAttributes().withAttr("a", 1);
+		SpanAttributes abcd = new SpanAttributes().withAttr("a", 1).withAttr("b", 2).withAttr("c", 3).withAttr("d", 4);
+		SpanAttributes bcd = new SpanAttributes().withAttr("b", 2).withAttr("c", 3).withAttr("d", 4);
+
+		SpanAttributes wxz = new SpanAttributes().withAttr("w", 0).withAttr("x", 1).withAppend("z", 3).withAppend("z", 4).withAppend("z", 5).withAppend("z", 10).withAppend("z", 15);
+		SpanAttributes wz = new SpanAttributes().withAttr("w", 0).withAppend("z", 3).withAppend("z", 4);
+		SpanAttributes xz = new SpanAttributes().withAttr("x", 1).withAppend("z", 5).withAppend("z", 10).withAppend("z", 15);
+
+
+		assertEquals(a.difference(a), empty);
+		assertEquals(abcd.difference(a), bcd);
+		assertEquals(wxz.difference(wz), xz);
+	}
 }

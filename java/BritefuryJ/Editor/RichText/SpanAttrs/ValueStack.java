@@ -60,11 +60,12 @@ public class ValueStack extends AttrValue {
 	}
 
 
+	@Override
 	public Intersection<? extends AttrValue> intersect(AttrValue v) {
 		if (v instanceof ValueStack) {
 			ValueStack s = (ValueStack)v;
 
-			if (stack.size() == 0  ||  s.stack.size() == 0) {
+			if (stack.isEmpty()  ||  s.stack.isEmpty()) {
 				// One or both empty; no intersection
 				return null;
 			}
@@ -101,6 +102,44 @@ public class ValueStack extends AttrValue {
 		else {
 			throw new RuntimeException("ValueStack can only be intersected with ValueStack");
 		}
+	}
 
+	@Override
+	public AttrValue difference(AttrValue v) {
+		if (v instanceof ValueStack) {
+			ValueStack s = (ValueStack)v;
+
+			if (s.stack.size() > stack.size()) {
+				throw new RuntimeException("The entries in other are not a prefix of this");
+			}
+			else if (s.stack.size() == stack.size()) {
+				if (s.stack.equals(stack)) {
+					// Same contents; empty difference
+					return null;
+				}
+				else {
+					throw new RuntimeException("The entries in other are not a prefix of this");
+				}
+			}
+			else {
+				// The stack in @s is shorter
+				if (s.stack.isEmpty()) {
+					return this;
+				}
+				else {
+					// Ensure that v is a prefix of this
+					if (!s.stack.equals(stack.subList(0, s.stack.size()))) {
+						throw new RuntimeException("The entries in other are not a prefix of this");
+					}
+
+					ValueStack diff = new ValueStack();
+					diff.stack.addAll(stack.subList(s.stack.size(), stack.size()));
+					return diff;
+				}
+			}
+		}
+		else {
+			throw new RuntimeException("ValueStack can only be differenced with ValueStack");
+		}
 	}
 }
