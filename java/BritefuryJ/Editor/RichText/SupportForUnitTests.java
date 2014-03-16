@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.Editor.RichText;
 
+import BritefuryJ.Editor.RichText.Attrs.RichTextAttributes;
+
 import java.util.*;
 
 
@@ -17,12 +19,12 @@ public class SupportForUnitTests
 	}
 
 
-	public static Object tagPStart(Map<Object, Object> styleAttrs)
+	public static Object tagPStart(RichTextAttributes styleAttrs)
 	{
 		return new TagPStart( styleAttrs );
 	}
 
-	public static Object tagSStart(SpanAttributes styleAttrs)
+	public static Object tagSStart(RichTextAttributes styleAttrs)
 	{
 		return new TagSStart( styleAttrs );
 	}
@@ -33,9 +35,9 @@ public class SupportForUnitTests
 	}
 
 
-	public static Object span(Object contents[], SpanAttributes styleAttrs)
+	public static Object span(Object contents[], RichTextAttributes spanAttrs)
 	{
-		return new EdStyleSpan( Arrays.asList( contents ), styleAttrs );
+		return new EdSpan( Arrays.asList( contents ), spanAttrs );
 	}
 
 	public static Object iembed(Object value)
@@ -43,9 +45,9 @@ public class SupportForUnitTests
 		return new EdInlineEmbed( value );
 	}
 
-	public static Object p(Object contents[], Map<Object, Object> styleAttrs)
+	public static Object p(Object contents[], RichTextAttributes paraAttrs)
 	{
-		return new EdParagraph( null, Arrays.asList( contents ), new HashMap<Object, Object>() );
+		return new EdParagraph( null, Arrays.asList( contents ), paraAttrs );
 	}
 
 	public static Object pembed(Object value)

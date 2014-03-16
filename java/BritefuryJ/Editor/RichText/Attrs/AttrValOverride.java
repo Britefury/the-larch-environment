@@ -1,11 +1,10 @@
-package BritefuryJ.Editor.RichText.SpanAttrs;
+package BritefuryJ.Editor.RichText.Attrs;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 
 import java.util.Iterator;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 public class AttrValOverride extends AttrValue {

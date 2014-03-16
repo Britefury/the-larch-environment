@@ -11,7 +11,7 @@ from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from BritefuryJ.Projection import SubjectPath
 
-from BritefuryJ.Editor.RichText import SpanAttributes
+from BritefuryJ.Editor.RichText.Attrs import RichTextAttributes
 
 
 from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, methodDispatch
@@ -120,7 +120,8 @@ class BlankParagraphEditor (AbstractViewSchema.NodeAbstractView):
 	def __init__(self, worksheet, blockEditor):
 		super( BlankParagraphEditor, self ).__init__( worksheet, None )
 		self._style = 'normal'
-		self._editorModel = WSEditor.RichTextController.WorksheetRichTextController.instance.editorModelParagraph( None, [ '' ], { 'style' : self._style } )
+		paraAttrs = RichTextAttributes.fromValues({ 'style' : self._style }, None)
+		self._editorModel = WSEditor.RichTextController.WorksheetRichTextController.instance.editorModelParagraph( None, [ '' ], paraAttrs )
 		self._incr = IncrementalValueMonitor()
 		self._blockEditor = blockEditor
 
@@ -159,7 +160,8 @@ class ParagraphEditor (AbstractViewSchema.ParagraphAbstractView):
 		super( ParagraphEditor, self ).__init__( worksheet, model )
 		if projectedContents is None:
 			projectedContents = self._computeText()
-		self._editorModel = WSEditor.RichTextController.WorksheetRichTextController.instance.editorModelParagraph( self, projectedContents, { 'style' : model['style'] } )
+		paraAttrs = RichTextAttributes.fromValues({'style': model['style']}, None)
+		self._editorModel = WSEditor.RichTextController.WorksheetRichTextController.instance.editorModelParagraph( self, projectedContents, paraAttrs )
 	
 
 	def setContents(self, contents):
@@ -170,7 +172,8 @@ class ParagraphEditor (AbstractViewSchema.ParagraphAbstractView):
 
 	def setStyle(self, style):
 		self._model['style'] = style
-		self._editorModel.setStyleAttrs( { 'style' : style } )
+		paraAttrs = RichTextAttributes.fromValues({'style': style}, None)
+		self._editorModel.setParaAttrs(paraAttrs)
 
 
 	def __clipboard_copy__(self, memo):
@@ -191,12 +194,12 @@ class ParagraphEditor (AbstractViewSchema.ParagraphAbstractView):
 class TextSpanEditor (AbstractViewSchema.TextSpanAbstractView):
 	def __init__(self, worksheet, model, projectedContents=None):
 		super( TextSpanEditor, self ).__init__( worksheet, model )
-		styleAttrs = SpanAttributes()
+		spanAttrs = RichTextAttributes()
 		for a in model['styleAttrs']:
-			styleAttrs.putOverride(a['name'], a['value'])
+			spanAttrs.putOverride(a['name'], a['value'])
 		if projectedContents is None:
 			projectedContents = self._computeText()
-		self._editorModel = WSEditor.RichTextController.WorksheetRichTextController.instance.editorModelSpan( projectedContents, styleAttrs )
+		self._editorModel = WSEditor.RichTextController.WorksheetRichTextController.instance.editorModelSpan( projectedContents, spanAttrs )
 
 		
 	def setContents(self, contents):
@@ -206,11 +209,11 @@ class TextSpanEditor (AbstractViewSchema.TextSpanAbstractView):
 
 	
 	def setStyleAttrs(self, styleMap):
-		spanAttrs = SpanAttributes.fromValues({n: v   for n, v in styleMap.items()}, None)
+		spanAttrs = RichTextAttributes.fromValues({n: v   for n, v in styleMap.items()}, None)
 		modelAttrs = [ Schema.StyleAttr( name=n, value=v )   for n, v in styleMap.items() ]
 
 		self._model['styleAttrs'] = modelAttrs
-		self._editorModel.setStyleAttrs( spanAttrs )
+		self._editorModel.setSpanAttrs( spanAttrs )
 
 
 	def __clipboard_copy__(self, memo):

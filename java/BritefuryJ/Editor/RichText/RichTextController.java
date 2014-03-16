@@ -8,12 +8,12 @@ package BritefuryJ.Editor.RichText;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import BritefuryJ.ClipboardFilter.ClipboardCopier;
 import BritefuryJ.ClipboardFilter.ClipboardCopierMemo;
+import BritefuryJ.Editor.RichText.Attrs.RichTextAttributes;
 import BritefuryJ.Editor.Sequential.EditFilter;
 import BritefuryJ.Editor.Sequential.EditFilter.HandleEditResult;
 import BritefuryJ.Editor.Sequential.RichStringEditFilter;
@@ -210,7 +210,7 @@ public abstract class RichTextController extends SequentialController
 	
 	public interface ComputeSpanStylesFn
 	{
-		public SpanAttributes invoke(List<SpanAttributes> stylesOfSpans);
+		public RichTextAttributes invoke(List<RichTextAttributes> stylesOfSpans);
 	}
 	
 	public interface ModifyParagraphFn
@@ -456,14 +456,14 @@ public abstract class RichTextController extends SequentialController
 	// Editor model node construction methods
 	//
 	
-	public EdParagraph editorModelParagraph(Object model, List<Object> modelContents, Map<Object, Object> styleAttrs)
+	public EdParagraph editorModelParagraph(Object model, List<Object> modelContents, RichTextAttributes styleAttrs)
 	{
 		return new EdParagraph( model, convertModelListToEditorModelList( modelContents ), styleAttrs );
 	}
 	
-	public EdStyleSpan editorModelSpan(List<Object> modelContents, SpanAttributes styleAttrs)
+	public EdSpan editorModelSpan(List<Object> modelContents, RichTextAttributes styleAttrs)
 	{
-		return new EdStyleSpan( convertModelListToEditorModelList( modelContents ), styleAttrs );
+		return new EdSpan( convertModelListToEditorModelList( modelContents ), styleAttrs );
 	}
 	
 	public EdInlineEmbed editorModelInlineEmbed(Object value)
@@ -778,8 +778,8 @@ public abstract class RichTextController extends SequentialController
 	
 	protected abstract Object buildInlineEmbed(Object value);
 	protected abstract Object buildParagraphEmbed(Object value);
-	protected abstract Object buildParagraph(List<Object> contents, Map<Object, Object> styleAttrs);
-	protected abstract Object buildSpan(List<Object> contents, SpanAttributes styleAttrs);
+	protected abstract Object buildParagraph(List<Object> contents, RichTextAttributes styleAttrs);
+	protected abstract Object buildSpan(List<Object> contents, RichTextAttributes styleAttrs);
 
 	
 	private Object buildModelForEditorModel(EdNode editorModel)
@@ -922,7 +922,7 @@ public abstract class RichTextController extends SequentialController
 	
 	private boolean isStyleSpan(Object model)
 	{
-		return modelToEditorModel( model ) instanceof EdStyleSpan;
+		return modelToEditorModel( model ) instanceof EdSpan;
 	}
 	
 	private boolean isParagraph(Object model)
@@ -1022,7 +1022,7 @@ public abstract class RichTextController extends SequentialController
 		}
 		else
 		{
-			EdStyleSpan span = new EdStyleSpan( Arrays.asList( new Object[] { text } ), new SpanAttributes() );
+			EdSpan span = new EdSpan( Arrays.asList( new Object[] { text } ), new RichTextAttributes() );
 			return Arrays.asList( new EdNode[] { span } );
 		}
 	}
@@ -1187,35 +1187,35 @@ public abstract class RichTextController extends SequentialController
 		List<Object> selected = getFlattenedContentInSelection( selectionVisitor, editFragment, selection );
 		
 		// Extract style dictionaries
-		ArrayList<SpanAttributes> styles = new ArrayList<SpanAttributes>();
+		ArrayList<RichTextAttributes> styles = new ArrayList<RichTextAttributes>();
 		for (Object x: selected)
 		{
-			if ( x instanceof EdStyleSpan )
+			if ( x instanceof EdSpan)
 			{
-				styles.add( ( (EdStyleSpan)x ).getStyleAttrs() );
+				styles.add( ( (EdSpan)x ).getSpanAttrs() );
 			}
 		}
 		
 		// Compute the style values to apply
-		SpanAttributes values = null;
+		RichTextAttributes values = null;
 		if ( styles.size() > 0 )
 		{
 			values = computeStylesFn.invoke( styles );
 		}
 		else
 		{
-			values = new SpanAttributes();
+			values = new RichTextAttributes();
 		}
 		
 		// Apply them
 		for (Object x: selected)
 		{
-			if ( x instanceof EdStyleSpan )
+			if ( x instanceof EdSpan)
 			{
-				EdStyleSpan span = (EdStyleSpan)x;
-				SpanAttributes current = span.getStyleAttrs();
-				SpanAttributes cat = current.concatenate(values);
-				span.setStyleAttrs(cat);
+				EdSpan span = (EdSpan)x;
+				RichTextAttributes current = span.getSpanAttrs();
+				RichTextAttributes cat = current.concatenate(values);
+				span.setSpanAttrs(cat);
 			}
 		}
 

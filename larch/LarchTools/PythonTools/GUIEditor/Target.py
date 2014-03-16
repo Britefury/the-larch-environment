@@ -105,7 +105,7 @@ class GUITargetInteractor (TargetElementInteractor):
 
 			return GUIEditorSelectionPoint(model, element)
 
-	def targetDragEnd(self, element, event, dragStartPos, dragButton):
+	def targetDragEnd(self, startElement, elementBeneathPointer, event, dragStartPos, dragButton):
 		pass
 
 	def targetDragMotion(self, element, event, dragStartPos, dragButton):

@@ -7,12 +7,11 @@
 package BritefuryJ.Editor.RichText;
 
 import java.awt.Color;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.ClipboardFilter.ClipboardCopierMemo;
+import BritefuryJ.Editor.RichText.Attrs.RichTextAttributes;
 import BritefuryJ.Graphics.SolidBorder;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
@@ -25,17 +24,17 @@ import BritefuryJ.StyleSheet.StyleSheet;
 
 public class EdParagraph extends EdAbstractText
 {
-	private Map<Object, Object> styleAttrs = new HashMap<Object, Object>();
+	private RichTextAttributes paraAttrs = new RichTextAttributes();
 	private boolean isNewlineSuppressed = false;
 	private Object model;
 	
 	
-	protected EdParagraph(Object model, List<Object> contents, Map<Object, Object> styleAttrs)
+	protected EdParagraph(Object model, List<Object> contents, RichTextAttributes paraAttrs)
 	{
 		super( contents );
-		if ( styleAttrs != null )
+		if ( paraAttrs != null )
 		{
-			this.styleAttrs.putAll( styleAttrs );
+			this.paraAttrs.replaceContentsWith(paraAttrs);
 		}
 		this.model = model;
 	}
@@ -47,15 +46,14 @@ public class EdParagraph extends EdAbstractText
 	}
 	
 	
-	public Map<Object, Object> getStyleAttrs()
+	public RichTextAttributes getParaAttrs()
 	{
-		return styleAttrs;
+		return paraAttrs;
 	}
 	
-	public void setStyleAttrs(Map<Object, Object> styleAttrs)
+	public void setParaAttrs(RichTextAttributes paraAttrs)
 	{
-		this.styleAttrs.clear();
-		this.styleAttrs.putAll( styleAttrs );
+		this.paraAttrs.replaceContentsWith(paraAttrs);
 	}
 	
 	
@@ -65,14 +63,14 @@ public class EdParagraph extends EdAbstractText
 	@Override
 	protected Tag prefixTag()
 	{
-		return new TagPStart( styleAttrs );
+		return new TagPStart(paraAttrs);
 	}
 
 
 	@Override
 	protected void buildTagList(List<Object> tags)
 	{
-		tags.add( new TagPStart( styleAttrs ) );
+		tags.add( new TagPStart(paraAttrs) );
 		for (Object x: contents)
 		{
 			if ( x instanceof EdAbstractText )
@@ -96,7 +94,7 @@ public class EdParagraph extends EdAbstractText
 	@Override
 	public Object clipboardCopy(ClipboardCopierMemo memo)
 	{
-		return new EdParagraph( null, copyContents( memo ), styleAttrs );
+		return new EdParagraph( null, copyContents( memo ), paraAttrs);
 	}
 
 
@@ -109,7 +107,7 @@ public class EdParagraph extends EdAbstractText
 		}
 		else
 		{
-			return controller.buildParagraph( controller.editorModelListToModelList( contents ), styleAttrs );
+			return controller.buildParagraph( controller.editorModelListToModelList( contents ), paraAttrs);
 		}
 	}
 
@@ -125,7 +123,7 @@ public class EdParagraph extends EdAbstractText
 	@Override
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		Pres attrs = new Paragraph( new Object[] { Pres.coercePresentingNull(this.styleAttrs) } );
+		Pres attrs = new Paragraph( new Object[] { Pres.coercePresentingNull(this.paraAttrs) } );
 		return paraStyle.applyTo( new Border( new Column( new Object[] { presentContents(), new Box( 1.0, 1.0 ).pad( 1.0, 1.0 ).alignHExpand(), attrs } ) ) );
 	}
 
@@ -136,7 +134,7 @@ public class EdParagraph extends EdAbstractText
 		if ( x instanceof EdParagraph )
 		{
 			EdParagraph e = (EdParagraph)x;
-			boolean s = styleAttrs == e.styleAttrs  ||  ( styleAttrs != null  &&  e.styleAttrs != null  &&  styleAttrs.equals( e.styleAttrs ) );
+			boolean s = paraAttrs == e.paraAttrs ||  ( paraAttrs != null  &&  e.paraAttrs != null  &&  paraAttrs.equals( e.paraAttrs) );
 			return contents.equals( e.contents )  &&  s;
 		}
 		else
@@ -149,7 +147,7 @@ public class EdParagraph extends EdAbstractText
 	@Override
 	public String toString()
 	{
-		return "<P " + styleAttrs + ">" + contents + "</P>";
+		return "<P " + paraAttrs + ">" + contents + "</P>";
 	}
 
 

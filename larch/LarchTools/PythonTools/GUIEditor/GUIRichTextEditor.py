@@ -32,7 +32,8 @@ from BritefuryJ.StyleSheet import StyleSheet
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
-from BritefuryJ.Editor.RichText import RichTextController, SpanAttributes
+from BritefuryJ.Editor.RichText import RichTextController
+from BritefuryJ.Editor.RichText.Attrs import RichTextAttributes
 
 from LarchCore.Languages.Python2 import Schema as Py
 
@@ -58,11 +59,11 @@ class GUIRichTextController (RichTextController):
 	def buildParagraphEmbed(self, value):
 		return ParaEmbed(value)
 	
-	def buildParagraph(self, contents, styleAttrs):
-		return Para(contents, styleAttrs.get('style'))
+	def buildParagraph(self, contents, paraAttrs):
+		return Para(contents, paraAttrs.getValue('style', 0))
 	
 	def buildSpan(self, contents, spanAttrs):
-		styleAttrs = {k: spanAttrs.get(k).get(0)   for k in spanAttrs.keySet()}
+		styleAttrs = {k: spanAttrs.getValue(k, 0)   for k in spanAttrs.keySet()}
 		return Style(contents, styleAttrs)
 	
 	
@@ -196,14 +197,16 @@ class Para (AbstractText):
 
 	@_style.on_change
 	def _style_changed(self, field, oldValue, newValue):
-		self._editorModel.setStyleAttrs({'style':newValue})
+		paraAttrs = RichTextAttributes.fromValues({'style':newValue}, None)
+		self._editorModel.setParaAttrs(paraAttrs)
 
 
 
 	def __init__(self, contents, style=None):
 		super(Para, self).__init__(contents)
 		style = style   if style is not None   else 'normal'
-		self._editorModel = GUIRichTextController.instance.editorModelParagraph(self, contents, {'style':style})
+		paraAttrs = RichTextAttributes.fromValues({'style':style}, None)
+		self._editorModel = GUIRichTextController.instance.editorModelParagraph(self, contents, paraAttrs)
 		self._style.value = style
 
 
@@ -242,7 +245,8 @@ class _TempBlankPara (RTElem):
 		super(_TempBlankPara, self).__init__()
 		
 		self._block = block
-		self._editorModel = GUIRichTextController.instance.editorModelParagraph(None, [], {'style':'normal'})
+		paraAttrs = RichTextAttributes.fromValues({'style':'normal'}, None)
+		self._editorModel = GUIRichTextController.instance.editorModelParagraph(None, [], paraAttrs)
 		
 
 	@property
@@ -286,14 +290,14 @@ class Style (AbstractText):
 	def _styleAttrsChanged(self, field, oldValue, newValue):
 		self._styleSheet = self._mapStyles(newValue)
 		if self._editorModel is not None:
-			self._editorModel.setStyleAttrs(SpanAttributes.fromValues(newValue, None))
+			self._editorModel.setSpanAttrs(RichTextAttributes.fromValues(newValue, None))
 
 
 	def __init__(self, contents, styleAttrs):
 		super(Style, self).__init__(contents)
 		self._styleSheet = None
 		self._styleAttrs.value = {}
-		self._editorModel = GUIRichTextController.instance.editorModelSpan(contents, SpanAttributes.fromValues(styleAttrs, None))
+		self._editorModel = GUIRichTextController.instance.editorModelSpan(contents, RichTextAttributes.fromValues(styleAttrs, None))
 		self.styleAttrs = styleAttrs
 
 
@@ -606,10 +610,9 @@ def _documentContextMenuFactory(element, menu):
 	
 	def makeStyleFn(attrName):
 		def computeStyleValues(listOfSpanAttrs):
-			attrVal = listOfSpanAttrs[0].get(attrName)
-			value = bool(attrVal.get(0))   if attrVal is not None   else False
+			value = bool(listOfSpanAttrs[0].getValue(attrName, 0))
 			value = not value
-			attrs = SpanAttributes()
+			attrs = RichTextAttributes()
 			attrs.putOverride(attrName, '1'   if value   else None)
 			return attrs
 

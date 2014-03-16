@@ -1,4 +1,4 @@
-package BritefuryJ.Editor.RichText.SpanAttrs;
+package BritefuryJ.Editor.RichText.Attrs;
 
 import BritefuryJ.DefaultPerspective.Presentable;
 

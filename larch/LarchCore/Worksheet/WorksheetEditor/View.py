@@ -38,7 +38,7 @@ from BritefuryJ.EditPerspective import EditPerspective
 from BritefuryJ.IncrementalView import FragmentData
 
 from BritefuryJ.Editor.Sequential import SequentialEditorPerspective
-from BritefuryJ.Editor.RichText import SpanAttributes
+from BritefuryJ.Editor.RichText.Attrs import RichTextAttributes
 
 from LarchCore.Languages.Python2 import Python2
 
@@ -214,10 +214,9 @@ def _worksheetContextMenuFactory(element, menu):
 	
 	def makeToggleStyleFn(attrName):
 		def computeStyleValues(listOfSpanAttrs):
-			attrVal = listOfSpanAttrs[0].get(attrName)
-			value = bool(attrVal.get(0))   if attrVal is not None   else False
+			value = bool(listOfSpanAttrs[0].getValue(attrName, 0))
 			value = not value
-			attrs = SpanAttributes()
+			attrs = RichTextAttributes()
 			attrs.putOverride(attrName, '1'   if value   else None)
 			return attrs
 
