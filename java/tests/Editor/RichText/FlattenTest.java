@@ -6,7 +6,7 @@
 //##************************
 package tests.Editor.RichText;
 
-import BritefuryJ.Editor.RichText.SpanAttributes;
+import BritefuryJ.Editor.RichText.Attrs.RichTextAttributes;
 import BritefuryJ.Editor.RichText.SupportForUnitTests;
 import junit.framework.TestCase;
 
@@ -58,7 +58,7 @@ public class FlattenTest extends TestCase
 		return new Tester( in );
 	}
 
-	private static Object pstart(Map<Object, Object> attrs)
+	private static Object pstart(RichTextAttributes attrs)
 	{
 		return SupportForUnitTests.tagPStart( attrs );
 	}
@@ -70,7 +70,7 @@ public class FlattenTest extends TestCase
 
 	private static Object sstart(Map<Object, Object> attrs)
 	{
-		return SupportForUnitTests.tagSStart(SpanAttributes.fromValues(attrs, null));
+		return SupportForUnitTests.tagSStart(RichTextAttributes.fromValues(attrs, null));
 	}
 
 	private static Object send()
@@ -81,7 +81,7 @@ public class FlattenTest extends TestCase
 
 	private static Object span(Object ...in)
 	{
-		return SupportForUnitTests.span( in, new SpanAttributes() );
+		return SupportForUnitTests.span( in, new RichTextAttributes() );
 	}
 
 	private static Object iembed(Object value)
@@ -91,7 +91,7 @@ public class FlattenTest extends TestCase
 
 	private static Object p(Object ...in)
 	{
-		return SupportForUnitTests.p( in, new HashMap<Object, Object>() );
+		return SupportForUnitTests.p( in, new RichTextAttributes() );
 	}
 
 	private static Object pembed(Object value)

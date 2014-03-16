@@ -1,12 +1,12 @@
 package tests.Editor.RichText;
 
-import BritefuryJ.Editor.RichText.SpanAttrs.AttrValCumulative;
-import BritefuryJ.Editor.RichText.SpanAttrs.Intersection;
+import BritefuryJ.Editor.RichText.Attrs.AttrValCumulative;
+import BritefuryJ.Editor.RichText.Attrs.Intersection;
 import junit.framework.TestCase;
 
 import java.util.Arrays;
 
-public class SpanAttributes_AttrValCumulative_Test extends TestCase {
+public class RichTextAttributes_AttrValCumulative_Test extends TestCase {
 	protected AttrValCumulative stack(Object ... values) {
 		return new AttrValCumulative(Arrays.asList(values));
 	}

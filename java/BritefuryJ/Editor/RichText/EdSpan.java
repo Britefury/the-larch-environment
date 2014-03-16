@@ -8,13 +8,13 @@ package BritefuryJ.Editor.RichText;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.ClipboardFilter.ClipboardCopierMemo;
-import BritefuryJ.Editor.RichText.SpanAttrs.AttrValue;
+import BritefuryJ.Editor.RichText.Attrs.AttrValue;
+import BritefuryJ.Editor.RichText.Attrs.RichTextAttributes;
 import BritefuryJ.Graphics.FillPainter;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
@@ -24,32 +24,32 @@ import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Table;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class EdStyleSpan extends EdAbstractText
+public class EdSpan extends EdAbstractText
 {
-	private SpanAttributes styleAttrs;
+	private RichTextAttributes spanAttrs;
 
 	
-	protected EdStyleSpan(List<Object> contents, SpanAttributes styleAttrs)
+	protected EdSpan(List<Object> contents, RichTextAttributes spanAttrs)
 	{
 		super( contents );
-		this.styleAttrs = styleAttrs.copy();
+		this.spanAttrs = spanAttrs.copy();
 	}
 	
-	protected EdStyleSpan(SpanAttributes styleAttrs)
+	protected EdSpan(RichTextAttributes spanAttrs)
 	{
 		super();
-		this.styleAttrs = styleAttrs.copy();
+		this.spanAttrs = spanAttrs.copy();
 	}
 	
 	
-	public SpanAttributes getStyleAttrs()
+	public RichTextAttributes getSpanAttrs()
 	{
-		return styleAttrs;
+		return spanAttrs;
 	}
 	
-	public void setStyleAttrs(SpanAttributes styleAttrs)
+	public void setSpanAttrs(RichTextAttributes spanAttrs)
 	{
-		this.styleAttrs.replaceContentsWith(styleAttrs);
+		this.spanAttrs.replaceContentsWith(spanAttrs);
 	}
 	
 	
@@ -59,7 +59,7 @@ public class EdStyleSpan extends EdAbstractText
 	@Override
 	protected Tag containingPrefixTag()
 	{
-		return new TagSStart( styleAttrs );
+		return new TagSStart(spanAttrs);
 	}
 
 	@Override
@@ -72,7 +72,7 @@ public class EdStyleSpan extends EdAbstractText
 	@Override
 	protected void buildTagList(List<Object> tags)
 	{
-		tags.add( new TagSStart( styleAttrs ) );
+		tags.add( new TagSStart(spanAttrs) );
 		for (Object x: contents)
 		{
 			if ( x instanceof EdAbstractText )
@@ -92,18 +92,18 @@ public class EdStyleSpan extends EdAbstractText
 	@Override
 	public Object clipboardCopy(ClipboardCopierMemo memo)
 	{
-		return new EdStyleSpan( copyContents( memo ), styleAttrs );
+		return new EdSpan( copyContents( memo ), spanAttrs);
 	}
 
 
 	@Override
 	protected Object buildModel(RichTextController controller)
 	{
-		return controller.buildSpan( controller.editorModelListToModelList( contents ), styleAttrs );
+		return controller.buildSpan( controller.editorModelListToModelList( contents ), spanAttrs);
 	}
 
 	
-	protected static Pres presentStyleAttrs(SpanAttributes styleAttrs)
+	protected static Pres presentStyleAttrs(RichTextAttributes styleAttrs)
 	{
 		ArrayList<Pres[]> tableContents = new ArrayList<Pres[]>();
 		for (Map.Entry<Object, AttrValue> e: styleAttrs.entrySet())
@@ -118,17 +118,17 @@ public class EdStyleSpan extends EdAbstractText
 	@Override
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return new Border( new Column( new Object[] { presentContents(), presentStyleAttrs( styleAttrs ) } ) );
+		return new Border( new Column( new Object[] { presentContents(), presentStyleAttrs(spanAttrs) } ) );
 	}
 
 
 	@Override
 	public boolean equals(Object x)
 	{
-		if ( x instanceof EdStyleSpan )
+		if ( x instanceof EdSpan)
 		{
-			EdStyleSpan e = (EdStyleSpan)x;
-			boolean s = styleAttrs == e.styleAttrs  ||  ( styleAttrs != null  &&  e.styleAttrs != null  &&  styleAttrs.equals( e.styleAttrs ) );
+			EdSpan e = (EdSpan)x;
+			boolean s = spanAttrs == e.spanAttrs ||  ( spanAttrs != null  &&  e.spanAttrs != null  &&  spanAttrs.equals( e.spanAttrs) );
 			return contents.equals( e.contents )  &&  s;
 		}
 		else
@@ -140,7 +140,7 @@ public class EdStyleSpan extends EdAbstractText
 	@Override
 	public String toString()
 	{
-		return "<SPAN " + styleAttrs + ">" + contents + "</SPAN>";
+		return "<SPAN " + spanAttrs + ">" + contents + "</SPAN>";
 	}
 
 

@@ -6,28 +6,26 @@
 //##************************
 package BritefuryJ.Editor.RichText;
 
-import BritefuryJ.Editor.RichText.SpanAttrs.Intersection;
+import BritefuryJ.Editor.RichText.Attrs.Intersection;
+import BritefuryJ.Editor.RichText.Attrs.RichTextAttributes;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 
 class Merge
 {
-	private static boolean isIdentity(List<Object> xs, SpanAttributes styles)
+	private static boolean isIdentity(List<Object> xs, RichTextAttributes styles)
 	{
 		return xs.isEmpty()  ||  styles.isEmpty();
 	}
 	
 	
-	private static void appendSpan(List<Object> xs, EdStyleSpan b)
+	private static void appendSpan(List<Object> xs, EdSpan b)
 	{
 		Object last = xs.isEmpty()  ?  null  :  xs.get( xs.size() -1 );
-		if ( xs.isEmpty()  ||  !( last instanceof EdStyleSpan ) )
+		if ( xs.isEmpty()  ||  !( last instanceof EdSpan) )
 		{
 			// @xs is empty,
 			// OR:
@@ -35,7 +33,7 @@ class Merge
 			// OR:
 			// @xs is the contents of a style span itself, the last item is not a style span - it may be a string
 			
-			if ( b.getStyleAttrs().isEmpty() )
+			if ( b.getSpanAttrs().isEmpty() )
 			{
 				List<Object> bContents = b.getContents();
 				Object bFirst = bContents.isEmpty()  ?  null  :  bContents.get( bContents.size() - 1 );
@@ -58,15 +56,15 @@ class Merge
 				xs.add( b );
 			}
 		}
-		else if ( b.getStyleAttrs().isEmpty() )
+		else if ( b.getSpanAttrs().isEmpty() )
 		{
 			xs.addAll( b.getContents() );
 		}
 		else
 		{
-			EdStyleSpan a = (EdStyleSpan)last;
-			SpanAttributes aAttrs = a.getStyleAttrs();
-			SpanAttributes bAttrs = b.getStyleAttrs();
+			EdSpan a = (EdSpan)last;
+			RichTextAttributes aAttrs = a.getSpanAttrs();
+			RichTextAttributes bAttrs = b.getSpanAttrs();
 
 			if (aAttrs.isEmpty()  &&  bAttrs.isEmpty()) {
 				// Handle the case where no style attributes are present on either @a or @b
@@ -74,7 +72,7 @@ class Merge
 				appendSpan( a.getContents(), b );
 			}
 			else {
-				Intersection<SpanAttributes> intersection = aAttrs.intersect(bAttrs);
+				Intersection<RichTextAttributes> intersection = aAttrs.intersect(bAttrs);
 
 				if (intersection == null) {
 					// No attributes in common - just append @b to the list
@@ -88,56 +86,56 @@ class Merge
 						// Append @b to the contents of @a
 
 						// Note that this also handles the case where we have two adjacent spans with identical style attributes
-						// The new EdStyleSpan created for the appendSpan() call will create a style span with no attributes
+						// The new EdSpan created for the appendSpan() call will create a style span with no attributes
 						// which will be handled by the first clause in appendSpan()
-						SpanAttributes bMap = intersection.dIntersectionB;
+						RichTextAttributes bMap = intersection.dIntersectionB;
 						if (bMap == null) {
-							bMap = new SpanAttributes();
+							bMap = new RichTextAttributes();
 						}
-						appendSpan( a.getContents(), new EdStyleSpan( b.getContents(), bMap ) );
+						appendSpan( a.getContents(), new EdSpan( b.getContents(), bMap ) );
 					}
 					else if (intersection.dIntersectionB == null)
 					{
 						// The style attributes in @a are a superset of those in @b
 						// Therefore @a can be contained with @b, with the addition of the relevant attrs
 						// Replace @a with @b, with @a prepended
-						SpanAttributes aMap = intersection.dIntersectionA;
-						b.getContents().add( 0, new EdStyleSpan( a.getContents(), aMap ) );
+						RichTextAttributes aMap = intersection.dIntersectionA;
+						b.getContents().add( 0, new EdSpan( a.getContents(), aMap ) );
 						xs.set( xs.size() - 1, b );
 					}
 					else
 					{
-						SpanAttributes aMap = intersection.dIntersectionA;
-						SpanAttributes bMap = intersection.dIntersectionB;
-						SpanAttributes commonMap = intersection.intersection;
+						RichTextAttributes aMap = intersection.dIntersectionA;
+						RichTextAttributes bMap = intersection.dIntersectionB;
+						RichTextAttributes commonMap = intersection.intersection;
 						List<Object> aContents = a.getContents();
-						if ( aContents.get( aContents.size() - 1)  instanceof  EdStyleSpan )
+						if ( aContents.get( aContents.size() - 1)  instanceof EdSpan)
 						{
 							// The last item in @a is a span
 							// We have factored out the attributes common to @a and @b
 							// We should attempt to join @b to the end of @a
-							EdStyleSpan s = new EdStyleSpan( commonMap );
+							EdSpan s = new EdSpan( commonMap );
 							if ( !isIdentity( a.getContents(), aMap ) )
 							{
-								s.getContents().add( new EdStyleSpan( a.getContents(), aMap ) );
+								s.getContents().add( new EdSpan( a.getContents(), aMap ) );
 							}
 							if ( !isIdentity( b.getContents(), bMap ) )
 							{
-								appendSpan( s.getContents(), new EdStyleSpan( b.getContents(), bMap ) );
+								appendSpan( s.getContents(), new EdSpan( b.getContents(), bMap ) );
 							}
 							xs.set( xs.size() - 1, s );
 						}
 						else
 						{
 							// Replace the last element with a span that contains it, along with b
-							EdStyleSpan s = new EdStyleSpan( commonMap );
+							EdSpan s = new EdSpan( commonMap );
 							if ( !isIdentity( a.getContents(), aMap ) )
 							{
-								s.getContents().add( new EdStyleSpan( a.getContents(), aMap ) );
+								s.getContents().add( new EdSpan( a.getContents(), aMap ) );
 							}
 							if ( !isIdentity( b.getContents(), bMap ) )
 							{
-								s.getContents().add( new EdStyleSpan( b.getContents(), bMap ) );
+								s.getContents().add( new EdSpan( b.getContents(), bMap ) );
 							}
 							xs.set( xs.size() - 1, s );
 						}
@@ -162,13 +160,13 @@ class Merge
 			{
 				s.add( x );
 			}
-			else if ( x instanceof EdStyleSpan )
+			else if ( x instanceof EdSpan)
 			{
-				appendSpan( s, (EdStyleSpan)x );
+				appendSpan( s, (EdSpan)x );
 			}
 			else
 			{
-				throw new RuntimeException( "mergeSpans() can only handle EdInlineEmbeds and EdStyleSpan items" );
+				throw new RuntimeException( "mergeSpans() can only handle EdInlineEmbeds and EdSpan items" );
 			}
 		}
 		
@@ -180,7 +178,7 @@ class Merge
 	{
 		private ArrayList<Object> paragraphs = new ArrayList<Object>();
 		private ArrayList<Object> spans = new ArrayList<Object>();
-		private Map<Object, Object> attrs = null;
+		private RichTextAttributes attrs = null;
 		private boolean bHasContent = false;
 		
 		

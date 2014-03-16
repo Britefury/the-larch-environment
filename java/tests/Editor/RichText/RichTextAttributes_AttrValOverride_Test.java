@@ -1,10 +1,10 @@
 package tests.Editor.RichText;
 
-import BritefuryJ.Editor.RichText.SpanAttrs.AttrValOverride;
-import BritefuryJ.Editor.RichText.SpanAttrs.Intersection;
+import BritefuryJ.Editor.RichText.Attrs.AttrValOverride;
+import BritefuryJ.Editor.RichText.Attrs.Intersection;
 import junit.framework.TestCase;
 
-public class SpanAttributes_AttrValOverride_Test extends TestCase {
+public class RichTextAttributes_AttrValOverride_Test extends TestCase {
 	public void testEquals() {
 		AttrValOverride a = new AttrValOverride("hello");
 		AttrValOverride b = new AttrValOverride("hello");

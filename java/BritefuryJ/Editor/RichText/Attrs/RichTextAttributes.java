@@ -1,33 +1,28 @@
-package BritefuryJ.Editor.RichText;
+package BritefuryJ.Editor.RichText.Attrs;
 
-
-import BritefuryJ.Editor.RichText.SpanAttrs.AttrValCumulative;
-import BritefuryJ.Editor.RichText.SpanAttrs.AttrValOverride;
-import BritefuryJ.Editor.RichText.SpanAttrs.AttrValue;
-import BritefuryJ.Editor.RichText.SpanAttrs.Intersection;
 
 import java.util.*;
 
-public class SpanAttributes {
+public class RichTextAttributes {
 	private HashMap<Object, AttrValue> table;
 
 
-	public SpanAttributes() {
+	public RichTextAttributes() {
 		table = new HashMap<Object, AttrValue>();
 	}
 
-	private SpanAttributes(HashMap<Object, AttrValue> values) {
+	private RichTextAttributes(HashMap<Object, AttrValue> values) {
 		this.table = values;
 	}
 
 
-	public SpanAttributes copy() {
+	public RichTextAttributes copy() {
 		HashMap<Object, AttrValue> table = new HashMap<Object, AttrValue>();
 		table.putAll(this.table);
-		return new SpanAttributes(table);
+		return new RichTextAttributes(table);
 	}
 
-	public void replaceContentsWith(SpanAttributes attrs) {
+	public void replaceContentsWith(RichTextAttributes attrs) {
 		table.clear();
 		table.putAll(attrs.table);
 	}
@@ -36,8 +31,8 @@ public class SpanAttributes {
 
 	@Override
 	public boolean equals(Object other) {
-		if (other instanceof SpanAttributes) {
-			SpanAttributes sa = (SpanAttributes)other;
+		if (other instanceof RichTextAttributes) {
+			RichTextAttributes sa = (RichTextAttributes)other;
 			return table.equals(sa.table);
 		}
 		return false;
@@ -62,8 +57,18 @@ public class SpanAttributes {
 		return table.containsKey(key);
 	}
 
-	public AttrValue get(Object key) {
+	public AttrValue getAttrVal(Object key) {
 		return table.get(key);
+	}
+
+	public Object getValue(Object key, int index) {
+		AttrValue av = table.get(key);
+		if (av != null) {
+			return av.get(index);
+		}
+		else {
+			return null;
+		}
 	}
 
 	public void putOverride(Object key, Object value) {
@@ -110,14 +115,14 @@ public class SpanAttributes {
 	}
 
 
-	public SpanAttributes withAttr(Object key, Object value) {
+	public RichTextAttributes withOverride(Object key, Object value) {
 		HashMap<Object, AttrValue> values = new HashMap<Object, AttrValue>();
 		values.putAll(table);
 		values.put(key, new AttrValOverride(value));
-		return new SpanAttributes(values);
+		return new RichTextAttributes(values);
 	}
 
-	public SpanAttributes withAppend(Object key, Object value) {
+	public RichTextAttributes withCumulative(Object key, Object value) {
 		HashMap<Object, AttrValue> values = new HashMap<Object, AttrValue>();
 		values.putAll(table);
 		AttrValue attrVal = values.get(key);
@@ -131,15 +136,15 @@ public class SpanAttributes {
 				values.put(key, s2);
 			}
 			else {
-				throw new RuntimeException("withAppend: existing value for key " + key + " is not a stack value");
+				throw new RuntimeException("withCumulative: existing value for key " + key + " is not a stack value");
 			}
 		}
-		return new SpanAttributes(values);
+		return new RichTextAttributes(values);
 	}
 
 
-	public Intersection<SpanAttributes> intersect(SpanAttributes other) {
-		SpanAttributes i = new SpanAttributes(), da = new SpanAttributes(), db = new SpanAttributes();
+	public Intersection<RichTextAttributes> intersect(RichTextAttributes other) {
+		RichTextAttributes i = new RichTextAttributes(), da = new RichTextAttributes(), db = new RichTextAttributes();
 
 		for (Map.Entry<Object, AttrValue> e_a: table.entrySet()) {
 			AttrValue b = other.table.get(e_a.getKey());
@@ -190,14 +195,14 @@ public class SpanAttributes {
 				db = null;
 			}
 
-			return new Intersection<SpanAttributes>(i, da, db);
+			return new Intersection<RichTextAttributes>(i, da, db);
 		}
 	}
 
 
 
-	public SpanAttributes difference(SpanAttributes other) {
-		SpanAttributes diff = new SpanAttributes();
+	public RichTextAttributes difference(RichTextAttributes other) {
+		RichTextAttributes diff = new RichTextAttributes();
 
 		for (Map.Entry<Object, AttrValue> e_a: table.entrySet()) {
 			AttrValue b = other.table.get(e_a.getKey());
@@ -227,7 +232,7 @@ public class SpanAttributes {
 
 
 
-	public SpanAttributes concatenate(SpanAttributes other) {
+	public RichTextAttributes concatenate(RichTextAttributes other) {
 		HashMap<Object, AttrValue> map = new HashMap<Object, AttrValue>();
 		map.putAll(this.table);
 
@@ -242,14 +247,14 @@ public class SpanAttributes {
 			}
 		}
 
-		return new SpanAttributes(map);
+		return new RichTextAttributes(map);
 	}
 
 
 
 
 
-	public static SpanAttributes fromValues(Map<Object, Object> overrideValues, Map<Object, List<Object>> cumulativeValues) {
+	public static RichTextAttributes fromValues(Map<Object, Object> overrideValues, Map<Object, List<Object>> cumulativeValues) {
 		HashMap<Object, AttrValue> table = new HashMap<Object, AttrValue>();
 
 		if (overrideValues != null) {
@@ -264,7 +269,7 @@ public class SpanAttributes {
 			}
 		}
 
-		return new SpanAttributes(table);
+		return new RichTextAttributes(table);
 	}
 
 
