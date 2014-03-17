@@ -6,33 +6,32 @@
 //##************************
 package BritefuryJ.Editor.RichText;
 
-import java.util.Map;
-
+import BritefuryJ.Editor.RichText.Attrs.RichTextAttributes;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Row;
 
 class TagPStart extends TagStart
 {
-	private Map<Object, Object> styleAttrs;
+	private RichTextAttributes paraAttrs;
 	
 	
-	public TagPStart(Map<Object, Object> styleAttrs)
+	public TagPStart(RichTextAttributes paraAttrs)
 	{
-		this.styleAttrs = styleAttrs;
+		this.paraAttrs = paraAttrs;
 	}
 	
 	
-	public Map<Object, Object> getAttrs()
+	public RichTextAttributes getAttrs()
 	{
-		return styleAttrs;
+		return paraAttrs;
 	}
 	
 	
 	@Override
 	protected Pres presentTagContents()
 	{
-		return new Row( new Object[] { new Label( " " ), Pres.coercePresentingNull(styleAttrs) } );
+		return new Row( new Object[] { new Label( " " ), Pres.coercePresentingNull(paraAttrs) } );
 	}
 
 
@@ -42,7 +41,7 @@ class TagPStart extends TagStart
 		if ( x instanceof TagPStart )
 		{
 			TagPStart t = (TagPStart)x;
-			return styleAttrs == t.styleAttrs  ||  ( styleAttrs != null  &&  t.styleAttrs != null  &&  styleAttrs.equals( t.styleAttrs ) );
+			return paraAttrs == t.paraAttrs ||  ( paraAttrs != null  &&  t.paraAttrs != null  &&  paraAttrs.equals( t.paraAttrs) );
 		}
 		else
 		{

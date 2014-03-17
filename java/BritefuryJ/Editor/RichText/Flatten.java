@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
+import BritefuryJ.Editor.RichText.Attrs.RichTextAttributes;
 import BritefuryJ.Graphics.SolidBorder;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
@@ -186,19 +187,19 @@ public class Flatten
 
 	private static boolean isStyleSpan(Object x)
 	{
-		return x instanceof EdStyleSpan;
+		return x instanceof EdSpan;
 	}
 	
 	// Create a flattened version of the sequence of tags and strings in @xs
 	// Paragraph start tags (TagPStart) remain
 	// Newlines are converted to paragraph start tags (TagPStart)
-	// Strings are wrapped in EdStyleSpan objects, with styles determined by the style span start and end tags (TagSStart and TagSEnd)
+	// Strings are wrapped in EdSpan objects, with styles determined by the style span start and end tags (TagSStart and TagSEnd)
 	// Paragraphs (editor model paragraphs) that have not been 'flattened out' but remain as structural items are left as is.
 	// SHOULD IMPLEMENT AS ITERATOR, BUT I'M BUGGERED IF I AM GOING TO SPEND TIME CONVERTING A NICE PYTHON GENERATOR TO A JAVA ITERATOR......
-	private static void flatten(ArrayList<Object> result, FlattenInput xs, HashMap<Object, Object> currentStyleAttrs)
+	private static void flatten(ArrayList<Object> result, FlattenInput xs, RichTextAttributes currentStyleAttrs)
 	{
-		Stack<HashMap<Object, Object>> styleStack = new Stack<HashMap<Object, Object>>();
-		styleStack.add( new HashMap<Object, Object>() );
+		Stack<RichTextAttributes> styleStack = new Stack<RichTextAttributes>();
+		styleStack.add( new RichTextAttributes() );
 		Object prevElement = null;
 
 		// There are 9 possible types of element encountered in xs:
@@ -208,7 +209,7 @@ public class Flatten
 		// EdInlineEmbed: value as inline
 		// EdParagraphEmbed: value as paragraph
 		// EdParagraph: complete paragraph
-		// EdStyleSpan: complete span
+		// EdSpan: complete span
 		// TagPStart: start of paragraph
 		// TagSStart: start of span
 		// TagSEnd: end of span
@@ -245,7 +246,7 @@ public class Flatten
 					xs.matches( Newline.class, EdInlineEmbed.class )  ||
 					xs.matches( Newline.class, TagSStart.class )  ||
 					xs.matches( Newline.class, TagSEnd.class )  ||
-					xs.matches( Newline.class, EdStyleSpan.class )  ||
+					xs.matches( Newline.class, EdSpan.class )  ||
 					xs.matches( Newline.class, Newline.class ) )
 			{
 				// Newline followed by text content
@@ -282,7 +283,7 @@ public class Flatten
 			else if ( xs.matches( TagPStart.class, String.class )  ||
 					xs.matches( TagPStart.class, EdInlineEmbed.class )  ||
 					xs.matches( TagPStart.class, TagSStart.class )  ||
-					xs.matches( TagPStart.class, EdStyleSpan.class )  ||
+					xs.matches( TagPStart.class, EdSpan.class )  ||
 					xs.matches( TagPStart.class, Newline.class ) )
 			{
 				// Paragraph start tag followed by text content
@@ -306,7 +307,7 @@ public class Flatten
 			{
 				// Textual content; wrap in a style span
 				Object x = xs.consume();
-				result.add( new EdStyleSpan( Arrays.asList( new Object[] { x } ), currentStyleAttrs ) );
+				result.add( new EdSpan( Arrays.asList( new Object[] { x } ), currentStyleAttrs ) );
 
 				// Text content followed by paragraph start, with no newline in between
 				// The user has deleted the newline in an attempt to join paragraphs
@@ -321,9 +322,7 @@ public class Flatten
 				// Span start tag; put attributes onto stack
 				TagSStart tag = (TagSStart)xs.consume();
 				// Update the style stack
-				HashMap<Object, Object> attrs = new HashMap<Object, Object>();
-				attrs.putAll( currentStyleAttrs );
-				attrs.putAll( tag.getStyleAttrs() );
+				RichTextAttributes attrs = currentStyleAttrs.concatenate(tag.getSpanAttrs());
 				currentStyleAttrs = attrs;
 				styleStack.add( attrs );
 
@@ -351,13 +350,11 @@ public class Flatten
 					xs.consume();
 				}
 			}
-			else if ( xs.matches( EdStyleSpan.class ) )
+			else if ( xs.matches( EdSpan.class ) )
 			{
 				// Style span; process recursively
-				EdStyleSpan span = (EdStyleSpan)xs.consume();
-				HashMap<Object, Object> attrs = new HashMap<Object, Object>();
-				attrs.putAll( currentStyleAttrs );
-				attrs.putAll( span.getStyleAttrs() );
+				EdSpan span = (EdSpan)xs.consume();
+				RichTextAttributes attrs = currentStyleAttrs.concatenate(span.getSpanAttrs());
 				flatten( result, new FlattenInput( span.getContents() ), attrs );
 
 				// Text content followed by paragraph start, with no newline in between
@@ -388,7 +385,7 @@ public class Flatten
 	private static ArrayList<Object> flatten(List<Object> xs)
 	{
 		ArrayList<Object> result = new ArrayList<Object>();
-		HashMap<Object, Object> currentStyleAttrs = new HashMap<Object, Object>();
+		RichTextAttributes currentStyleAttrs = new RichTextAttributes();
 		flatten( result, new FlattenInput( xs ), currentStyleAttrs );
 		return result;
 	}

@@ -1,6 +1,5 @@
-package BritefuryJ.Editor.RichText.SpanAttrs;
+package BritefuryJ.Editor.RichText.Attrs;
 
-import BritefuryJ.Editor.RichText.SpanAttributes;
 import BritefuryJ.Util.HashUtils;
 
 public class Intersection<T> {

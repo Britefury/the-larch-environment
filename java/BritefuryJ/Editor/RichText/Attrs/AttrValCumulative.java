@@ -1,15 +1,17 @@
-package BritefuryJ.Editor.RichText.SpanAttrs;
+package BritefuryJ.Editor.RichText.Attrs;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Graphics.SolidBorder;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Column;
+import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -21,6 +23,10 @@ public class AttrValCumulative extends AttrValue {
 
 	public AttrValCumulative(List<Object> values) {
 		stack.addAll(values);
+	}
+
+	public AttrValCumulative(Object values[]) {
+		stack.addAll(Arrays.asList(values));
 	}
 
 
@@ -173,4 +179,23 @@ public class AttrValCumulative extends AttrValue {
 
 	private static final SolidBorder stackBorder = new SolidBorder(1.0, 3.0, 4.0, 4.0, new Color(0.3f, 0.5f, 0.7f), null);
 	private static final Pres stackLabel = StyleSheet.style(Primitive.fontSize.as(10), Primitive.foreground.as(new Color(0.3f, 0.5f, 0.7f))).applyTo(new Label("Value stack"));
+
+
+
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder("cumulative[");
+		boolean first = true;
+		for (Object value: stack) {
+			if (!first) {
+				builder.append(", ");
+			}
+
+			builder.append(value);
+		}
+		builder.append("]");
+
+		return builder.toString();
+	}
 }

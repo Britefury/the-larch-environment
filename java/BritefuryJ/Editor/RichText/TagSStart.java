@@ -7,27 +7,28 @@
 package BritefuryJ.Editor.RichText;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
+import BritefuryJ.Editor.RichText.Attrs.AttrValue;
+import BritefuryJ.Editor.RichText.Attrs.RichTextAttributes;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Row;
 
 class TagSStart extends TagStart
 {
-	private HashMap<Object, Object> styleAttrs = new HashMap<Object, Object>();
+	private RichTextAttributes spanAttrs;
 	
 	
-	public TagSStart(Map<Object, Object> styleAttrs)
+	public TagSStart(RichTextAttributes spanAttrs)
 	{
-		this.styleAttrs.putAll( styleAttrs );
+		this.spanAttrs = spanAttrs;
 	}
 	
 	
-	public Map<Object, Object> getStyleAttrs()
+	public RichTextAttributes getSpanAttrs()
 	{
-		return styleAttrs;
+		return spanAttrs;
 	}
 	
 	
@@ -35,7 +36,7 @@ class TagSStart extends TagStart
 	protected Pres presentTagContents()
 	{
 		ArrayList<Object> xs = new ArrayList<Object>();
-		for (Map.Entry<Object, Object> entry: styleAttrs.entrySet())
+		for (Map.Entry<Object, AttrValue> entry: spanAttrs.entrySet())
 		{
 			xs.add( new Label( " " ) );
 			xs.add( Pres.coerce( entry.getKey() ) );
@@ -50,7 +51,7 @@ class TagSStart extends TagStart
 	{
 		if ( x instanceof TagSStart )
 		{
-			return styleAttrs.equals( ((TagSStart)x).styleAttrs );
+			return spanAttrs.equals( ((TagSStart)x).spanAttrs);
 		}
 		else
 		{
@@ -61,7 +62,7 @@ class TagSStart extends TagStart
 	@Override
 	public String toString()
 	{
-		return "<style " + styleAttrs + ">";
+		return "<style " + spanAttrs + ">";
 	}
 	
 
