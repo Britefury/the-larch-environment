@@ -51,13 +51,14 @@ class WorksheetRichTextController (RichTextController):
 			raise TypeError, 'Unknown paragraph embed proxy type {0}'.format( type( value ) )
 
 
-	def buildParagraph(self, contents, styleAttrs):
-		styleAttrs = dict( styleAttrs )
-		style = styleAttrs.get( 'style', 'normal' )
+	def buildParagraph(self, contents, paraAttrs):
+		paraAttrs = {k: paraAttrs.getValue(k, 0)   for k in paraAttrs.keySet()}
+		style = paraAttrs.get( 'style', 'normal' )
 		return EditorSchema.ParagraphEditor.newParagraph( contents, style )
 
-	def buildSpan(self, contents, styleAttrs):
-		return EditorSchema.TextSpanEditor.newTextSpan( contents, dict( styleAttrs ) )
+	def buildSpan(self, contents, spanAttrs):
+		styleAttrs = {k: spanAttrs.getValue(k, 0)   for k in spanAttrs.keySet()}
+		return EditorSchema.TextSpanEditor.newTextSpan( contents, styleAttrs )
 
 
 

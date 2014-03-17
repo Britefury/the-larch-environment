@@ -1,4 +1,4 @@
-package BritefuryJ.Editor.RichText.SpanAttrs;
+package BritefuryJ.Editor.RichText.Attrs;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.IncrementalView.FragmentView;
@@ -122,5 +122,12 @@ public class AttrValOverride extends AttrValue {
 	@Override
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState) {
 		return Pres.coerce(value);
+	}
+
+
+
+	@Override
+	public String toString() {
+		return String.valueOf(value);
 	}
 }
