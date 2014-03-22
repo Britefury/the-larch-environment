@@ -10,6 +10,8 @@ from java.util.zip import ZipEntry
 from java.lang import String
 from java.io import ByteArrayInputStream, ByteArrayOutputStream
 
+from org.python.core.util import FileUtil
+
 import collections
 import jarray
 
@@ -81,13 +83,7 @@ def scanLarchJar():
 		for handler in _jarEntryHandlers:
 			if handler.test_fn(name):
 				def _reader():
-					stream = ByteArrayOutputStream()
-					while True:
-						bytesRead = jar.read( bytesBuffer, 0, _BYTES_BUFFER_SIZE )
-						if bytesRead == -1:
-							break
-						stream.write( bytesBuffer, 0, bytesRead )
-					return stream.toByteArray()
+					return FileUtil.readBytes(jar)
 
 				handler.handle_fn(name, _reader)
 
