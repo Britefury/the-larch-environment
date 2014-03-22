@@ -16,7 +16,7 @@ import collections
 import jarray
 
 
-_BYTES_BUFFER_SIZE = 16384
+_BYTES_BUFFER_SIZE = 8192
 
 
 _jarEntryHandlers = []
@@ -73,8 +73,6 @@ def scanLarchJar():
 		raise RuntimeError, 'Larch was not loaded from a JAR file'
 
 	jar = JarInputStream( _larchJarURL.openStream() )
-
-	bytesBuffer = jarray.zeros( _BYTES_BUFFER_SIZE, 'b' )
 
 	entry = jar.getNextJarEntry()
 	while entry is not None:
