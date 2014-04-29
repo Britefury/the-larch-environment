@@ -6,35 +6,29 @@
 //##************************
 package BritefuryJ.Util;
 
-import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.ChangeHistory.Change;
 import BritefuryJ.ChangeHistory.ChangeHistory;
 import BritefuryJ.ChangeHistory.Trackable;
 import BritefuryJ.ClipboardFilter.ClipboardCopierMemo;
 import BritefuryJ.ClipboardFilter.ClipboardCopyable;
 import BritefuryJ.Incremental.IncrementalValueMonitor;
-import BritefuryJ.IncrementalView.FragmentView;
-import BritefuryJ.Pres.Pres;
 import BritefuryJ.Util.Jython.JythonIndex;
 import BritefuryJ.Util.Jython.JythonSlice;
 import BritefuryJ.Util.Jython.Jython_copy;
 import org.python.core.*;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.*;
 
-public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyable {
+public class LiveTrackedList <T> implements List<T>, Trackable, ClipboardCopyable {
 	/*
 	Change classes
 	 */
-	private static class AddCommand extends Change
+	private static class AddCommand <T> extends Change
 	{
-		private LiveTrackedList xls;
-		private Object x;
+		private LiveTrackedList<T> xls;
+		private T x;
 
-		public AddCommand(LiveTrackedList ls, Object x)
+		public AddCommand(LiveTrackedList<T> ls, T x)
 		{
 			this.xls = ls;
 			this.x = x;
@@ -59,13 +53,13 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 
 
 
-	private static class InsertCommand extends Change
+	private static class InsertCommand <T>extends Change
 	{
-		private LiveTrackedList ls;
+		private LiveTrackedList<T> ls;
 		private int i;
-		private Object x;
+		private T x;
 
-		public InsertCommand(LiveTrackedList ls, int i, Object x)
+		public InsertCommand(LiveTrackedList<T> ls, int i, T x)
 		{
 			this.ls = ls;
 			this.i = i;
@@ -91,12 +85,12 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 
 
 
-	private static class AddAllCommand extends Change
+	private static class AddAllCommand <T>extends Change
 	{
-		private LiveTrackedList ls;
-		private List<Object> x;
+		private LiveTrackedList<T> ls;
+		private List<T> x;
 
-		public AddAllCommand(LiveTrackedList ls, List<Object> x)
+		public AddAllCommand(LiveTrackedList<T> ls, List<T> x)
 		{
 			this.ls = ls;
 			this.x = x;
@@ -121,13 +115,13 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 
 
 
-	private static class InsertAllCommand extends Change
+	private static class InsertAllCommand <T>extends Change
 	{
-		private LiveTrackedList ls;
+		private LiveTrackedList<T> ls;
 		private int i;
-		private List<Object> x;
+		private List<T> x;
 
-		public InsertAllCommand(LiveTrackedList ls, int i, List<Object> x)
+		public InsertAllCommand(LiveTrackedList<T> ls, int i, List<T> x)
 		{
 			this.ls = ls;
 			this.i = i;
@@ -153,12 +147,12 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 
 
 
-	private static class ClearCommand extends Change
+	private static class ClearCommand <T>extends Change
 	{
-		private LiveTrackedList ls;
-		private ArrayList<Object> contents;
+		private LiveTrackedList<T> ls;
+		private ArrayList<T> contents;
 
-		public ClearCommand(LiveTrackedList ls, ArrayList<Object> contents)
+		public ClearCommand(LiveTrackedList<T> ls, ArrayList<T> contents)
 		{
 			this.ls = ls;
 			this.contents = contents;
@@ -182,13 +176,13 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 	}
 
 
-	private static class RemoveCommand extends Change
+	private static class RemoveCommand <T>extends Change
 	{
-		private LiveTrackedList ls;
+		private LiveTrackedList<T> ls;
 		private int i;
-		private Object x;
+		private T x;
 
-		public RemoveCommand(LiveTrackedList ls, int i, Object x)
+		public RemoveCommand(LiveTrackedList<T> ls, int i, T x)
 		{
 			this.ls = ls;
 			this.i = i;
@@ -214,13 +208,13 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 
 
 
-	private static class SetCommand extends Change
+	private static class SetCommand <T>extends Change
 	{
-		private LiveTrackedList ls;
+		private LiveTrackedList<T> ls;
 		private int i;
-		private Object oldX, x;
+		private T oldX, x;
 
-		public SetCommand(LiveTrackedList ls, int i, Object oldX, Object x)
+		public SetCommand(LiveTrackedList<T> ls, int i, T oldX, T x)
 		{
 			this.ls = ls;
 			this.i = i;
@@ -247,13 +241,13 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 
 
 
-	private static class SetContentsCommand extends Change
+	private static class SetContentsCommand <T>extends Change
 	{
-		private LiveTrackedList ls;
-		private Object[] oldContents;
-		private Object[] newContents;
+		private LiveTrackedList<T> ls;
+		private T[] oldContents;
+		private T[] newContents;
 
-		public SetContentsCommand(LiveTrackedList ls, Object[] oldContents, Object[] newContents)
+		public SetContentsCommand(LiveTrackedList<T> ls, T[] oldContents, T[] newContents)
 		{
 			this.ls = ls;
 			this.oldContents = oldContents;
@@ -277,12 +271,12 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 		}
 	}
 
-	private static class RemoveLastCommand extends Change
+	private static class RemoveLastCommand <T>extends Change
 	{
-		private LiveTrackedList ls;
-		private Object removedValues[];
+		private LiveTrackedList<T> ls;
+		private T removedValues[];
 
-		public RemoveLastCommand(LiveTrackedList ls, Object removedValues[])
+		public RemoveLastCommand(LiveTrackedList<T> ls, T removedValues[])
 		{
 			this.ls = ls;
 			this.removedValues = removedValues;
@@ -305,13 +299,13 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 		}
 	}
 
-	private static class RemoveRangeCommand extends Change
+	private static class RemoveRangeCommand <T>extends Change
 	{
-		private LiveTrackedList ls;
+		private LiveTrackedList<T> ls;
 		private int pos;
-		private Object removedValues[];
+		private T removedValues[];
 
-		public RemoveRangeCommand(LiveTrackedList ls, int pos, Object removedValues[])
+		public RemoveRangeCommand(LiveTrackedList<T> ls, int pos, T removedValues[])
 		{
 			this.ls = ls;
 			this.pos = pos;
@@ -339,29 +333,29 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 
 
 
-	protected static void onAdd(ChangeHistory changeHistory, LiveTrackedList ls, Object x)
+	protected static <T> void onAdd(ChangeHistory changeHistory, LiveTrackedList<T> ls, T x)
 	{
 		if ( changeHistory != null )
 		{
-			changeHistory.addChange( new AddCommand( ls, x ) );
+			changeHistory.addChange( new AddCommand<T>( ls, x ) );
 			changeHistory.track( x );
 		}
 	}
 
-	protected static void onInsert(ChangeHistory changeHistory, LiveTrackedList ls, int i, Object x)
+	protected static <T> void onInsert(ChangeHistory changeHistory, LiveTrackedList<T> ls, int i, T x)
 	{
 		if ( changeHistory != null )
 		{
-			changeHistory.addChange( new InsertCommand( ls, i, x ) );
+			changeHistory.addChange( new InsertCommand<T>( ls, i, x ) );
 			changeHistory.track( x );
 		}
 	}
 
-	protected static void onAddAll(ChangeHistory changeHistory, LiveTrackedList ls, List<Object> xs)
+	protected static <T> void onAddAll(ChangeHistory changeHistory, LiveTrackedList<T> ls, List<T> xs)
 	{
 		if ( changeHistory != null )
 		{
-			changeHistory.addChange( new AddAllCommand( ls, xs ) );
+			changeHistory.addChange( new AddAllCommand<T>( ls, xs ) );
 			for (Object x: xs)
 			{
 				changeHistory.track( x );
@@ -369,11 +363,11 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 		}
 	}
 
-	protected static void onInsertAll(ChangeHistory changeHistory, LiveTrackedList ls, int i, List<Object> xs)
+	protected static <T> void onInsertAll(ChangeHistory changeHistory, LiveTrackedList<T> ls, int i, List<T> xs)
 	{
 		if ( changeHistory != null )
 		{
-			changeHistory.addChange( new InsertAllCommand( ls, i, xs ) );
+			changeHistory.addChange( new InsertAllCommand<T>( ls, i, xs ) );
 			for (Object x: xs)
 			{
 				changeHistory.track( x );
@@ -381,7 +375,7 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 		}
 	}
 
-	protected static void onClear(ChangeHistory changeHistory, LiveTrackedList ls, ArrayList<Object> contents)
+	protected static <T> void onClear(ChangeHistory changeHistory, LiveTrackedList<T> ls, ArrayList<T> contents)
 	{
 		if ( changeHistory != null )
 		{
@@ -389,30 +383,30 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 			{
 				changeHistory.stopTracking( x );
 			}
-			changeHistory.addChange( new ClearCommand( ls, contents ) );
+			changeHistory.addChange( new ClearCommand<T>( ls, contents ) );
 		}
 	}
 
-	protected static void onRemove(ChangeHistory changeHistory, LiveTrackedList ls, int i, Object x)
+	protected static <T> void onRemove(ChangeHistory changeHistory, LiveTrackedList<T> ls, int i, T x)
 	{
 		if ( changeHistory != null )
 		{
 			changeHistory.stopTracking( x );
-			changeHistory.addChange( new RemoveCommand( ls, i, x ) );
+			changeHistory.addChange( new RemoveCommand<T>( ls, i, x ) );
 		}
 	}
 
-	protected static void onSet(ChangeHistory changeHistory, LiveTrackedList ls, int i, Object oldX, Object x)
+	protected static <T> void onSet(ChangeHistory changeHistory, LiveTrackedList<T> ls, int i, T oldX, T x)
 	{
 		if ( changeHistory != null )
 		{
 			changeHistory.stopTracking( oldX );
-			changeHistory.addChange( new SetCommand( ls, i, oldX, x ) );
+			changeHistory.addChange( new SetCommand<T>( ls, i, oldX, x ) );
 			changeHistory.track( x );
 		}
 	}
 
-	protected static void onSetContents(ChangeHistory changeHistory, LiveTrackedList ls, Object[] oldContents, Object[] newContents)
+	protected static <T> void onSetContents(ChangeHistory changeHistory, LiveTrackedList<T> ls, T[] oldContents, T[] newContents)
 	{
 		if ( changeHistory != null )
 		{
@@ -420,7 +414,7 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 			{
 				changeHistory.stopTracking( oldX );
 			}
-			changeHistory.addChange( new SetContentsCommand( ls, oldContents, newContents ) );
+			changeHistory.addChange( new SetContentsCommand<T>( ls, oldContents, newContents ) );
 			for (Object x: newContents)
 			{
 				changeHistory.track( x );
@@ -428,7 +422,7 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 		}
 	}
 
-	protected static void onRemoveLast(ChangeHistory changeHistory, LiveTrackedList ls, Object[] removedValues)
+	protected static <T> void onRemoveLast(ChangeHistory changeHistory, LiveTrackedList<T> ls, T[] removedValues)
 	{
 		if ( changeHistory != null )
 		{
@@ -436,11 +430,11 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 			{
 				changeHistory.stopTracking( x );
 			}
-			changeHistory.addChange( new RemoveLastCommand( ls, removedValues ) );
+			changeHistory.addChange( new RemoveLastCommand<T>( ls, removedValues ) );
 		}
 	}
 
-	protected static void onRemoveRange(ChangeHistory changeHistory, LiveTrackedList ls, int pos, Object[] removedValues)
+	protected static <T> void onRemoveRange(ChangeHistory changeHistory, LiveTrackedList<T> ls, int pos, T[] removedValues)
 	{
 		if ( changeHistory != null )
 		{
@@ -448,7 +442,7 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 			{
 				changeHistory.stopTracking( x );
 			}
-			changeHistory.addChange( new RemoveRangeCommand( ls, pos, removedValues ) );
+			changeHistory.addChange( new RemoveRangeCommand<T>( ls, pos, removedValues ) );
 		}
 	}
 
@@ -457,12 +451,12 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 	/*
 	Iterator
 	 */
-	private static class DMListIterator implements Iterator<Object>
+	private static class LiveTrackedListIterator<T> implements Iterator<T>
 	{
-		protected List<Object> src;
+		protected List<T> src;
 		protected int index;
 
-		public DMListIterator(List<Object> src)
+		public LiveTrackedListIterator(List<T> src)
 		{
 			this.src = src;
 			index = 0;
@@ -473,7 +467,7 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 			return index < src.size();
 		}
 
-		public Object next()
+		public T next()
 		{
 			if ( index < src.size() )
 			{
@@ -492,19 +486,19 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 	}
 
 
-	private static class DMListListIterator implements ListIterator<Object>
+	private static class LiveTrackedListListIterator<T> implements ListIterator<T>
 	{
-		private List<Object> src;
+		private List<T> src;
 		private int index, lastIndex;
 
-		public DMListListIterator(List<Object> src)
+		public LiveTrackedListListIterator(List<T> src)
 		{
 			this.src = src;
 			lastIndex = index = 0;
 
 		}
 
-		public DMListListIterator(List<Object> src, int i)
+		public LiveTrackedListListIterator(List<T> src, int i)
 		{
 			this.src = src;
 			lastIndex = index = i;
@@ -522,7 +516,7 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 			return index;
 		}
 
-		public Object next()
+		public T next()
 		{
 			if ( index < src.size() )
 			{
@@ -546,7 +540,7 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 			return index - 1;
 		}
 
-		public Object previous()
+		public T previous()
 		{
 			if ( index > 0 )
 			{
@@ -559,7 +553,7 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 			}
 		}
 
-		public void add(Object x)
+		public void add(T x)
 		{
 			src.add( lastIndex, x );
 		}
@@ -569,7 +563,7 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 			src.remove( lastIndex );
 		}
 
-		public void set(Object x)
+		public void set(T x)
 		{
 			src.set( lastIndex, x );
 		}
@@ -578,13 +572,13 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 
 
 
-	private static class ListView implements List<Object>
+	private static class ListView<T> implements List<T>
 	{
-		private LiveTrackedList src;
+		private LiveTrackedList<T> src;
 		private int start, stop;
 
 
-		private ListView(LiveTrackedList src, int start, int stop)
+		private ListView(LiveTrackedList<T> src, int start, int stop)
 		{
 			this.src = src;
 			this.start = start;
@@ -594,27 +588,27 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 
 
 
-		public boolean add(Object x)
+		public boolean add(T x)
 		{
 			src.add( stop, x );
 			stop++;
 			return true;
 		}
 
-		public void add(int index, Object x)
+		public void add(int index, T x)
 		{
 			src.add( start + index, x );
 			stop++;
 		}
 
-		public boolean addAll(Collection<?> xs)
+		public boolean addAll(Collection<? extends T> xs)
 		{
 			boolean bResult = src.addAll( stop, xs );
 			stop += xs.size();
 			return bResult;
 		}
 
-		public boolean addAll(int index, Collection<?> xs)
+		public boolean addAll(int index, Collection<? extends T> xs)
 		{
 			boolean bResult = src.addAll( start + index, xs );
 			stop += xs.size();
@@ -644,15 +638,11 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 
 		public boolean equals(Object xs)
 		{
-			if ( this == xs )
-			{
-				return true;
-			}
-			return src.getInternalContainer().subList( start, stop ).equals( xs );
+			return this == xs  ||  src.getInternalContainer().subList( start, stop ).equals( xs );
 		}
 
 
-		public Object get(int index)
+		public T get(int index)
 		{
 			return src.get( start + index );
 		}
@@ -678,9 +668,9 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 		}
 
 
-		public Iterator<Object> iterator()
+		public Iterator<T> iterator()
 		{
-			return new DMListIterator( this );
+			return new LiveTrackedListIterator<T>( this );
 		}
 
 
@@ -698,19 +688,19 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 		}
 
 
-		public ListIterator<Object> listIterator()
+		public ListIterator<T> listIterator()
 		{
-			return new DMListListIterator( this );
+			return new LiveTrackedListListIterator<T>( this );
 		}
 
-		public ListIterator<Object> listIterator(int i)
+		public ListIterator<T> listIterator(int i)
 		{
-			return new DMListListIterator( this, i );
+			return new LiveTrackedListListIterator<T>( this, i );
 		}
 
-		public Object remove(int i)
+		public T remove(int i)
 		{
-			Object x = src.remove( i - start );
+			T x = src.remove( i - start );
 			stop--;
 			return x;
 		}
@@ -740,7 +730,7 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 			throw new UnsupportedOperationException();
 		}
 
-		public Object set(int index, Object x)
+		public T set(int index, T x)
 		{
 			return src.set( start + index, x );
 		}
@@ -752,7 +742,7 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 
 
 
-		public List<Object> subList(int fromIndex, int toIndex)
+		public List<T> subList(int fromIndex, int toIndex)
 		{
 			if ( fromIndex < 0  ||  toIndex > size()  ||  fromIndex > toIndex )
 			{
@@ -766,7 +756,7 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 			return src.getInternalContainer().subList( start, stop ).toArray();
 		}
 
-		public <T> T[] toArray(T[] a)
+		public <U> U[] toArray(U[] a)
 		{
 			return src.getInternalContainer().subList( start, stop ).toArray( a );
 		}
@@ -775,7 +765,7 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 
 
 	private IncrementalValueMonitor incr;
-	ArrayList<Object> value;
+	ArrayList<T> value;
 	private ChangeHistory changeHistory;
 
 
@@ -784,10 +774,10 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 		this( null );
 	}
 
-	public LiveTrackedList(List<Object> xs)
+	public LiveTrackedList(List<T> xs)
 	{
 		incr = new IncrementalValueMonitor( this );
-		value = new ArrayList<Object>();
+		value = new ArrayList<T>();
 
 		if ( xs != null )
 		{
@@ -854,7 +844,7 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 	}
 
 
-	public boolean add(Object x)
+	public boolean add(T x)
 	{
 		boolean bResult = value.add( x );
 		incr.onChanged();
@@ -862,21 +852,17 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 		return bResult;
 	}
 
-	public void add(int index, Object x)
+	public void add(int index, T x)
 	{
 		value.add( index, x );
 		incr.onChanged();
 		onInsert(changeHistory, this, index, x);
 	}
 
-	public boolean addAll(Collection<?> xs)
+	public boolean addAll(Collection<? extends T> xs)
 	{
-		ArrayList<Object> cxs = new ArrayList<Object>();
-		cxs.ensureCapacity( xs.size() );
-		for (Object x: xs)
-		{
-			cxs.add(x);
-		}
+		ArrayList<T> cxs = new ArrayList<T>();
+		cxs.addAll(xs);
 
 		value.addAll( cxs );
 		incr.onChanged();
@@ -884,14 +870,10 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 		return true;
 	}
 
-	public boolean addAll(int index, Collection<?> xs)
+	public boolean addAll(int index, Collection<? extends T> xs)
 	{
-		ArrayList<Object> cxs = new ArrayList<Object>();
-		cxs.ensureCapacity( xs.size() );
-		for (Object x: xs)
-		{
-			cxs.add(x);
-		}
+		ArrayList<T> cxs = new ArrayList<T>();
+		cxs.addAll(xs);
 
 		value.addAll( index, cxs );
 		incr.onChanged();
@@ -904,7 +886,7 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 	@SuppressWarnings("unchecked")
 	public void clear()
 	{
-		ArrayList<Object> copy = (ArrayList<Object>)value.clone();
+		ArrayList<T> copy = (ArrayList<T>)value.clone();
 		value.clear();
 		incr.onChanged();
 		onClear(changeHistory, this, copy);
@@ -956,7 +938,7 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 	}
 
 
-	public Object get(int index)
+	public T get(int index)
 	{
 		onAccess();
 		return value.get( index );
@@ -991,7 +973,7 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 	}
 
 
-	public Iterator<Object> iterator()
+	public Iterator<T> iterator()
 	{
 		onAccess();
 		return value.iterator();
@@ -1005,21 +987,21 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 	}
 
 
-	public ListIterator<Object> listIterator()
+	public ListIterator<T> listIterator()
 	{
 		onAccess();
 		return value.listIterator();
 	}
 
-	public ListIterator<Object> listIterator(int i)
+	public ListIterator<T> listIterator(int i)
 	{
 		onAccess();
 		return value.listIterator( i );
 	}
 
-	public Object remove(int i)
+	public T remove(int i)
 	{
-		Object x = value.remove( i );
+		T x = value.remove( i );
 		incr.onChanged();
 		onRemove(changeHistory, this, i, x);
 		return x;
@@ -1032,7 +1014,7 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 		{
 			value.remove(i);
 			incr.onChanged();
-			onRemove(changeHistory, this, i, x);
+			onRemove(changeHistory, this, i, (T)x);
 		}
 		return i != -1;
 	}
@@ -1047,9 +1029,9 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 		throw new UnsupportedOperationException();
 	}
 
-	public Object set(int index, Object x)
+	public T set(int index, T x)
 	{
-		Object oldX = value.set( index, x );
+		T oldX = value.set( index, x );
 		incr.onChanged();
 		onSet( changeHistory, this, index, oldX, x );
 		return oldX;
@@ -1063,13 +1045,13 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 
 
 
-	public List<Object> subList(int fromIndex, int toIndex)
+	public List<T> subList(int fromIndex, int toIndex)
 	{
 		if ( fromIndex < 0  ||  toIndex > size()  ||  fromIndex > toIndex )
 		{
 			throw new IndexOutOfBoundsException();
 		}
-		return new ListView( this, fromIndex, toIndex );
+		return new ListView<T>( this, fromIndex, toIndex );
 	}
 
 	public Object[] toArray()
@@ -1097,12 +1079,12 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 
 	public void append(Object x)
 	{
-		add( x );
+		add( (T)x );
 	}
 
 	public void extend(List<Object> xs)
 	{
-		addAll( xs );
+		addAll( (List<T>)xs );
 	}
 
 	public void insert(int i, Object x)
@@ -1112,7 +1094,7 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 		i = Math.min( Math.max( i, -s ), s );
 		// Handle negative indexing
 		i = i < 0  ?  s + i  :  i;
-		add( i, x );
+		add( i, (T)x );
 	}
 
 	public Object __getitem__(int i)
@@ -1130,17 +1112,17 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 	public void __setitem__(int i, Object x)
 	{
 		i = JythonIndex.pyIndexToJava( i, size(), "DMList assignment index out of range" );
-		set( i, x );
+		set( i, (T)x );
 	}
 
 	public void __setitem__(PySlice i, List<Object> xs)
 	{
-		Object oldContents[] = value.toArray();
+		T oldContents[] = value.toArray((T[])new Object[value.size()]);
 
-		Object[] src = xs.toArray();
-		Object[] dest = value.toArray();
+		T[] src = xs.toArray((T[])new Object[xs.size()]);
+		T[] dest = value.toArray((T[])new Object[value.size()]);
 
-		Object[] result = JythonSlice.arraySetSlice( dest, i, src );
+		T[] result = (T[])JythonSlice.arraySetSlice( dest, i, src );
 
 		value.clear();
 		value.addAll( Arrays.asList( result ) );
@@ -1156,11 +1138,11 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 
 	public void __delitem__(PySlice i)
 	{
-		Object oldContents[] = value.toArray();
+		T[] oldContents = (T[])value.toArray();
 
-		Object[] dest = value.toArray();
+		T[] dest = (T[])value.toArray();
 
-		Object[] result = JythonSlice.arrayDelSlice( dest, i );
+		T[] result = (T[])JythonSlice.arrayDelSlice( dest, i );
 
 		value.clear();
 		value.addAll( Arrays.asList( result ) );
@@ -1362,7 +1344,7 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 
 	protected void removeLast(int numElements)
 	{
-		Object removedValues[] = value.subList( value.size() - numElements, value.size() ).toArray();
+		T removedValues[] = value.subList( value.size() - numElements, value.size() ).toArray((T[])new Object[numElements]);
 
 		for (int i = 0, j = value.size() - 1; i < numElements; i++, j--)
 		{
@@ -1376,7 +1358,7 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 
 	protected void removeRange(int start, int num)
 	{
-		Object removedValues[] = value.subList( start, start + num ).toArray();
+		T removedValues[] = value.subList( start, start + num ).toArray((T[])new Object[num]);
 
 		for (int i = 0; i < num; i++)
 		{
@@ -1391,7 +1373,7 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 
 	public void setContents(List<?> xs)
 	{
-		Object newContents[] = xs.toArray();
+		T newContents[] = xs.toArray((T[])new Object[xs.size()]);
 
 		commandTracker_setContents( newContents );
 	}
@@ -1400,10 +1382,10 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 	/*
 	 * Only call from DMListCommandTracker
 	 */
-	protected void commandTracker_setContents(Object xs[])
+	protected void commandTracker_setContents(T xs[])
 	{
-		Object oldContents[] = value.toArray();
-		Object newContents[] = new Object[xs.length];
+		T oldContents[] = value.toArray((T[])new Object[value.size()]);
+		T newContents[] = (T[])new Object[xs.length];
 		System.arraycopy( xs, 0, newContents, 0, xs.length );
 
 		value.clear();
@@ -1414,7 +1396,7 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 	}
 
 
-	protected ArrayList<Object> getInternalContainer()
+	protected ArrayList<T> getInternalContainer()
 	{
 		onAccess();
 		return value;
@@ -1453,7 +1435,7 @@ public class LiveTrackedList implements List<Object>, Trackable, ClipboardCopyab
 
 	public List<Object> getTrackableContents()
 	{
-		return value;
+		return (List<Object>)value;
 	}
 
 
