@@ -21,6 +21,50 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Test_LiveTrackedList extends TestCase {
+	private class ChangeCounter implements LiveTrackedList.Listener {
+		public int count = 0;
+		public Object oldContents[], newContents[];
+
+		public void onChange(Object[] oldContents, Object[] newContents) {
+			count++;
+			this.oldContents = oldContents;
+			this.newContents = newContents;
+		}
+
+		public void assertOldContentsEquals(Object expected[]) {
+			assertEquals(Arrays.asList(expected), Arrays.asList(oldContents));
+		}
+
+		public void assertOldContentsEquals(List<Object> expected) {
+			assertEquals(expected, Arrays.asList(oldContents));
+		}
+
+		public void assertOldContentsEqualsSX(String expectedSX) {
+			assertOldContentsEquals(readListSX(expectedSX));
+		}
+
+		public void assertNewContentsEquals(Object expected[]) {
+			assertEquals(Arrays.asList(expected), Arrays.asList(newContents));
+		}
+
+		public void assertNewContentsEquals(List<Object> expected) {
+			assertEquals(expected, Arrays.asList(newContents));
+		}
+
+		public void assertNewContentsEqualsSX(String expectedSX) {
+			assertNewContentsEquals(readListSX(expectedSX));
+		}
+
+
+		public void checkSX(int expectedCount, String expectedOldSX, String expectedNewSX) {
+			assertEquals(expectedCount, count);
+			assertOldContentsEqualsSX(expectedOldSX);
+			assertNewContentsEqualsSX(expectedNewSX);
+		}
+	}
+
+
+
 	ChangeHistory history;
 
 	public void setUp()
@@ -48,6 +92,10 @@ public class Test_LiveTrackedList extends TestCase {
 		}
 	}
 
+	private static boolean compareListToArray(List<Object> x, Object y[]) {
+		return x.equals(Arrays.asList(y));
+	}
+
 	public void cmpListSX(List<Object> xs, String expectedSX)
 	{
 		try
@@ -63,7 +111,23 @@ public class Test_LiveTrackedList extends TestCase {
 	}
 
 	@SuppressWarnings("unchecked")
-	public LiveTrackedList readDMListSX(String sx)
+	public List<Object> readListSX(String sx)
+	{
+		try
+		{
+			List<Object> xs = (List<Object>) DMIOReader.readFromString(sx);
+			return xs;
+		}
+		catch (DMIOReader.ParseErrorException e)
+		{
+			System.out.println( "Could not parse" );
+			fail();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public LiveTrackedList readLiveListSX(String sx)
 	{
 		try
 		{
@@ -93,7 +157,7 @@ public class Test_LiveTrackedList extends TestCase {
 
 	public LiveTrackedList readTrackedDMListSX(String sx)
 	{
-		LiveTrackedList xs = readDMListSX( sx );
+		LiveTrackedList xs = readLiveListSX(sx);
 		history.track( xs );
 		return xs;
 	}
@@ -113,7 +177,7 @@ public class Test_LiveTrackedList extends TestCase {
 
 	public void testConstructor()
 	{
-		LiveTrackedList xs = readDMListSX( "[a b c `null`]" );
+		LiveTrackedList xs = readLiveListSX("[a b c `null`]");
 		cmpListSX( xs, "[a b c `null`]" );
 
 		assertEquals( xs.get( 0 ), "a" );
@@ -121,13 +185,13 @@ public class Test_LiveTrackedList extends TestCase {
 		assertEquals( xs.get( 2 ), "c" );
 
 
-		LiveTrackedList ys = readDMListSX( "[a b c [x y z]]" );
+		LiveTrackedList ys = readLiveListSX("[a b c [x y z]]");
 		cmpListSX( ys, "[a b c [x y z]]" );
 	}
 
 	public void testCell()
 	{
-		final LiveTrackedList xs = readDMListSX( "[a b c]" );
+		final LiveTrackedList xs = readLiveListSX("[a b c]");
 
 		LiveFunction.Function eval = new LiveFunction.Function()
 		{
@@ -151,33 +215,45 @@ public class Test_LiveTrackedList extends TestCase {
 	public void testAdd()
 	{
 		LiveTrackedList xs = readTrackedDMListSX( "[a b c]" );
-		LiveTrackedList ys = readDMListSX( "[x y z]" );
+		LiveTrackedList ys = readLiveListSX("[x y z]");
 		assertTracked( xs );
 		assertNotTracked(ys);
 
+		ChangeCounter listener = new ChangeCounter();
+		xs.setListener(listener);
+
 		xs.add( "xyz" );
 		cmpListSX( xs, "[a b c xyz]" );
-		xs.add( null );
-		cmpListSX( xs, "[a b c xyz `null`]" );
-		xs.add( ys );
-		cmpListSX( xs, "[a b c xyz `null` [x y z]]" );
+		listener.checkSX(1, "[a b c]", "[a b c xyz]");
+		xs.add(null);
+		cmpListSX(xs, "[a b c xyz `null`]");
+		listener.checkSX(2, "[a b c xyz]", "[a b c xyz `null`]");
+		xs.add(ys);
+		cmpListSX(xs, "[a b c xyz `null` [x y z]]");
+		listener.checkSX(3, "[a b c xyz `null`]", "[a b c xyz `null` [x y z]]");
 		assertTracked( xs );
 		assertTracked( ys );
 
 		history.undo();
 		cmpListSX( xs, "[a b c xyz `null`]" );
+		listener.checkSX(4, "[a b c xyz `null` [x y z]]", "[a b c xyz `null`]");
 		assertTracked( xs );
 		assertNotTracked( ys );
 		history.undo();
 		cmpListSX( xs, "[a b c xyz]" );
+		listener.checkSX(5, "[a b c xyz `null`]", "[a b c xyz]");
 		history.undo();
 		cmpListSX( xs, "[a b c]" );
+		listener.checkSX(6, "[a b c xyz]", "[a b c]");
 		history.redo();
 		cmpListSX( xs, "[a b c xyz]" );
+		listener.checkSX(7, "[a b c]", "[a b c xyz]");
 		history.redo();
 		cmpListSX( xs, "[a b c xyz `null`]" );
+		listener.checkSX(8, "[a b c xyz]", "[a b c xyz `null`]");
 		history.redo();
 		cmpListSX( xs, "[a b c xyz `null` [x y z]]" );
+		listener.checkSX(9, "[a b c xyz `null`]", "[a b c xyz `null` [x y z]]");
 		assertTracked( xs );
 		assertTracked( ys );
 	}
@@ -187,21 +263,28 @@ public class Test_LiveTrackedList extends TestCase {
 	public void testAdd_insert()
 	{
 		LiveTrackedList xs = readTrackedDMListSX( "[a b c]" );
-		LiveTrackedList ys = readDMListSX( "[x y z]" );
+		LiveTrackedList ys = readLiveListSX("[x y z]");
 		assertTracked( xs );
 		assertNotTracked( ys );
 
+		ChangeCounter listener = new ChangeCounter();
+		xs.setListener(listener);
+
 		xs.add( 2, "xyz" );
 		cmpListSX( xs, "[a b xyz c]" );
+		listener.checkSX(1, "[a b c]", "[a b xyz c]");
 		xs.add( 2, null );
 		cmpListSX( xs, "[a b `null` xyz c]" );
+		listener.checkSX(2, "[a b xyz c]", "[a b `null` xyz c]");
 		xs.add( 2, ys );
 		cmpListSX( xs, "[a b [x y z] `null` xyz c]" );
+		listener.checkSX(3, "[a b `null` xyz c]", "[a b [x y z] `null` xyz c]");
 		assertTracked( xs );
 		assertTracked( ys );
 
 		history.undo();
 		cmpListSX( xs, "[a b `null` xyz c]" );
+		listener.checkSX(4, "[a b [x y z] `null` xyz c]", "[a b `null` xyz c]");
 		assertTracked( xs );
 		assertNotTracked( ys );
 		history.undo();
@@ -214,6 +297,7 @@ public class Test_LiveTrackedList extends TestCase {
 		cmpListSX( xs, "[a b `null` xyz c]" );
 		history.redo();
 		cmpListSX( xs, "[a b [x y z] `null` xyz c]" );
+		listener.checkSX(9, "[a b `null` xyz c]", "[a b [x y z] `null` xyz c]");
 		assertTracked( xs );
 		assertTracked( ys );
 	}
@@ -223,14 +307,18 @@ public class Test_LiveTrackedList extends TestCase {
 	public void testAddAll()
 	{
 		LiveTrackedList xs = readTrackedDMListSX( "[a b c]" );
-		LiveTrackedList ys = readDMListSX( "[x y z `null`]" );
-		LiveTrackedList zs = readDMListSX( "[i j [k l] m n]" );
+		LiveTrackedList ys = readLiveListSX("[x y z `null`]");
+		LiveTrackedList zs = readLiveListSX("[i j [k l] m n]");
 		assertTracked( xs );
 		assertNotTracked( ys );
 		assertNotTracked( zs );
 
+		ChangeCounter listener = new ChangeCounter();
+		xs.setListener(listener);
+
 		xs.addAll(ys);
 		cmpListSX(xs, "[a b c x y z `null`]");
+		listener.checkSX(1, "[a b c]", "[a b c x y z `null`]");
 		assertTracked(xs);
 		assertNotTracked( ys );
 		assertNotTracked(zs);
@@ -247,11 +335,13 @@ public class Test_LiveTrackedList extends TestCase {
 		assertNotTracked(zs);
 		history.undo();
 		cmpListSX(xs, "[a b c]");
+		listener.checkSX(4, "[a b c x y z `null`]", "[a b c]");
 		assertTracked(xs);
 		assertNotTracked( ys );
 		assertNotTracked(zs);
 		history.redo();
 		cmpListSX(xs, "[a b c x y z `null`]");
+		listener.checkSX(5, "[a b c]", "[a b c x y z `null`]");
 		assertTracked(xs);
 		assertNotTracked( ys );
 		assertNotTracked(zs);
@@ -266,14 +356,18 @@ public class Test_LiveTrackedList extends TestCase {
 	public void testAddAll_insert()
 	{
 		LiveTrackedList xs = readTrackedDMListSX( "[a b c]" );
-		LiveTrackedList ys = readDMListSX( "[x y z `null`]" );
-		LiveTrackedList zs = readDMListSX( "[i j [k l] m n]" );
+		LiveTrackedList ys = readLiveListSX("[x y z `null`]");
+		LiveTrackedList zs = readLiveListSX("[i j [k l] m n]");
 		assertTracked( xs );
 		assertNotTracked( ys );
 		assertNotTracked(zs);
 
+		ChangeCounter listener = new ChangeCounter();
+		xs.setListener(listener);
+
 		xs.addAll(2, ys);
 		cmpListSX(xs, "[a b x y z `null` c]");
+		listener.checkSX(1, "[a b c]", "[a b x y z `null` c]");
 		assertTracked(xs);
 		assertNotTracked( ys );
 		assertNotTracked(zs);
@@ -290,11 +384,13 @@ public class Test_LiveTrackedList extends TestCase {
 		assertNotTracked(zs);
 		history.undo();
 		cmpListSX(xs, "[a b c]");
+		listener.checkSX(4, "[a b x y z `null` c]", "[a b c]");
 		assertTracked(xs);
 		assertNotTracked( ys );
 		assertNotTracked(zs);
 		history.redo();
 		cmpListSX(xs, "[a b x y z `null` c]");
+		listener.checkSX(5, "[a b c]", "[a b x y z `null` c]");
 		assertTracked(xs);
 		assertNotTracked( ys );
 		assertNotTracked(zs);
@@ -314,17 +410,23 @@ public class Test_LiveTrackedList extends TestCase {
 		assertTracked( xs );
 		assertTracked( (LiveTrackedList)zs );
 
+		ChangeCounter listener = new ChangeCounter();
+		xs.setListener(listener);
+
 		xs.clear();
 		cmpListSX(xs, "[]");
+		listener.checkSX(1, "[a b c [x y]]", "[]");
 		assertTracked( xs );
 		assertNotTracked( (LiveTrackedList)zs );
 
 		history.undo();
 		cmpListSX(xs, "[a b c [x y]]");
+		listener.checkSX(2, "[]", "[a b c [x y]]");
 		assertTracked( xs );
 		assertTracked( (LiveTrackedList)zs );
 		history.redo();
 		cmpListSX( xs, "[]" );
+		listener.checkSX(3, "[a b c [x y]]", "[]");
 		assertTracked( xs );
 		assertNotTracked( (LiveTrackedList)zs );
 	}
@@ -333,7 +435,7 @@ public class Test_LiveTrackedList extends TestCase {
 
 	public void testContains()
 	{
-		LiveTrackedList xs = readDMListSX( "[a b c `null`]" );
+		LiveTrackedList xs = readLiveListSX("[a b c `null`]");
 		assertTrue( xs.contains( "a" ) );
 		assertTrue( xs.contains( "b" ) );
 		assertTrue( xs.contains( "c" ) );
@@ -344,10 +446,10 @@ public class Test_LiveTrackedList extends TestCase {
 
 	public void testContainsAll()
 	{
-		LiveTrackedList xs = readDMListSX( "[a b c `null`]" );
-		LiveTrackedList ys = readDMListSX( "[c a]" );
-		LiveTrackedList zs = readDMListSX( "[c d]" );
-		LiveTrackedList zzs = readDMListSX( "[c `null`]" );
+		LiveTrackedList xs = readLiveListSX("[a b c `null`]");
+		LiveTrackedList ys = readLiveListSX("[c a]");
+		LiveTrackedList zs = readLiveListSX("[c d]");
+		LiveTrackedList zzs = readLiveListSX("[c `null`]");
 		assertTrue( xs.containsAll( ys ) );
 		assertTrue( xs.containsAll( zzs ) );
 		assertFalse( xs.containsAll( zs ) );
@@ -357,8 +459,8 @@ public class Test_LiveTrackedList extends TestCase {
 
 	public void testEquals()
 	{
-		LiveTrackedList xs = readDMListSX( "[a b c `null`]" );
-		LiveTrackedList ys = readDMListSX( "[a b c `null`]" );
+		LiveTrackedList xs = readLiveListSX("[a b c `null`]");
+		LiveTrackedList ys = readLiveListSX("[a b c `null`]");
 		assertTrue( xs.equals( ys ) );
 	}
 
@@ -366,7 +468,7 @@ public class Test_LiveTrackedList extends TestCase {
 
 	public void testGet()
 	{
-		LiveTrackedList xs = readDMListSX( "[a b c `null`]" );
+		LiveTrackedList xs = readLiveListSX("[a b c `null`]");
 		assertEquals( xs.get( 0 ), "a" );
 		assertEquals( xs.get( 1 ), "b" );
 		assertEquals( xs.get( 2 ), "c" );
@@ -377,7 +479,7 @@ public class Test_LiveTrackedList extends TestCase {
 
 	public void testIndexOf()
 	{
-		LiveTrackedList xs = readDMListSX( "[a b c `null`]" );
+		LiveTrackedList xs = readLiveListSX("[a b c `null`]");
 		assertEquals( xs.indexOf( "a" ), 0 );
 		assertEquals( xs.indexOf( "b" ), 1 );
 		assertEquals( xs.indexOf( "c" ), 2 );
@@ -387,21 +489,21 @@ public class Test_LiveTrackedList extends TestCase {
 
 	public void testIsEmpty()
 	{
-		assertFalse( readDMListSX( "[a b c]" ).isEmpty() );
-		assertTrue( readDMListSX( "[]" ).isEmpty() );
+		assertFalse( readLiveListSX("[a b c]").isEmpty() );
+		assertTrue( readLiveListSX("[]").isEmpty() );
 	}
 
 
 	public void testIterator()
 	{
-		LiveTrackedList xs = readDMListSX( "[a b c `null`]" );
+		LiveTrackedList xs = readLiveListSX("[a b c `null`]");
 		assertEquals( xs, iterToList( xs.iterator() ) );
 	}
 
 
 	public void testLastIndexOf()
 	{
-		LiveTrackedList xs = readDMListSX( "[a b c `null` a b c `null`]" );
+		LiveTrackedList xs = readLiveListSX("[a b c `null` a b c `null`]");
 		assertEquals( xs.lastIndexOf( "a" ), 4 );
 		assertEquals( xs.lastIndexOf( "b" ), 5 );
 		assertEquals( xs.lastIndexOf( "c" ), 6 );
@@ -411,14 +513,14 @@ public class Test_LiveTrackedList extends TestCase {
 
 	public void testListIterator()
 	{
-		LiveTrackedList xs = readDMListSX( "[a b c `null`]" );
+		LiveTrackedList xs = readLiveListSX("[a b c `null`]");
 		assertEquals( xs, iterToList( xs.listIterator() ) );
 	}
 
 
 	public void testListIteratorFrom()
 	{
-		LiveTrackedList xs = readDMListSX( "[a b c `null`]" );
+		LiveTrackedList xs = readLiveListSX("[a b c `null`]");
 		cmpListSX( iterToList( xs.listIterator( 0 ) ), "[a b c `null`]" );
 		cmpListSX( iterToList( xs.listIterator( 1 ) ), "[b c `null`]" );
 		cmpListSX( iterToList( xs.listIterator( 2 ) ), "[c `null`]" );
@@ -434,8 +536,12 @@ public class Test_LiveTrackedList extends TestCase {
 		assertTracked( xs );
 		assertTracked((LiveTrackedList) zs);
 
+		ChangeCounter listener = new ChangeCounter();
+		xs.setListener(listener);
+
 		xs.remove(1);
 		cmpListSX(xs, "[a c `null` [x y]]");
+		listener.checkSX(1, "[a b c `null` [x y]]", "[a c `null` [x y]]");
 		xs.remove(3);
 		cmpListSX(xs, "[a c `null`]");
 		assertTracked( xs );
@@ -447,8 +553,10 @@ public class Test_LiveTrackedList extends TestCase {
 		assertTracked((LiveTrackedList) zs);
 		history.undo();
 		cmpListSX(xs, "[a b c `null` [x y]]");
+		listener.checkSX(4, "[a c `null` [x y]]", "[a b c `null` [x y]]");
 		history.redo();
 		cmpListSX(xs, "[a c `null` [x y]]");
+		listener.checkSX(5, "[a b c `null` [x y]]", "[a c `null` [x y]]");
 		history.redo();
 		cmpListSX(xs, "[a c `null`]");
 		assertTracked( xs );
@@ -462,13 +570,17 @@ public class Test_LiveTrackedList extends TestCase {
 		assertTracked( xs );
 		assertTracked((LiveTrackedList) zs);
 
+		ChangeCounter listener = new ChangeCounter();
+		xs.setListener(listener);
+
 		xs.remove("b");
 		cmpListSX(xs, "[a c `null` [x y]]");
+		listener.checkSX(1, "[a b c `null` [x y]]", "[a c `null` [x y]]");
 		xs.remove(null);
 		cmpListSX(xs, "[a c [x y]]");
 		xs.remove(zs);
 		cmpListSX(xs, "[a c]");
-		assertTracked( xs );
+		assertTracked(xs);
 		assertNotTracked( (LiveTrackedList)zs );
 
 		history.undo();
@@ -479,14 +591,16 @@ public class Test_LiveTrackedList extends TestCase {
 		cmpListSX(xs, "[a c `null` [x y]]");
 		history.undo();
 		cmpListSX(xs, "[a b c `null` [x y]]");
+		listener.checkSX(6, "[a c `null` [x y]]", "[a b c `null` [x y]]");
 		history.redo();
 		cmpListSX(xs, "[a c `null` [x y]]");
+		listener.checkSX(7, "[a b c `null` [x y]]", "[a c `null` [x y]]");
 		history.redo();
 		cmpListSX(xs, "[a c [x y]]");
 		history.redo();
 		cmpListSX(xs, "[a c]");
-		assertTracked( xs );
-		assertNotTracked( (LiveTrackedList)zs );
+		assertTracked(xs);
+		assertNotTracked((LiveTrackedList) zs);
 	}
 
 
@@ -494,48 +608,54 @@ public class Test_LiveTrackedList extends TestCase {
 	{
 		LiveTrackedList xs = readTrackedDMListSX( "[a [i j] c]" );
 		Object ij = xs.get( 1 );
-		LiveTrackedList pq = readDMListSX( "[p q]" );
+		LiveTrackedList pq = readLiveListSX("[p q]");
+
+		ChangeCounter listener = new ChangeCounter();
+		xs.setListener(listener);
 
 		cmpListSX(xs, "[a [i j] c]");
-		assertTracked( xs );
+		assertTracked(xs);
 		assertTracked( (LiveTrackedList)ij );
-		assertNotTracked( pq );
+		assertNotTracked(pq);
 
 		xs.set(1, null);
 		cmpListSX(xs, "[a `null` c]");
-		assertTracked( xs );
-		assertNotTracked( (LiveTrackedList)ij );
-		assertNotTracked( pq );
+		listener.checkSX(1, "[a [i j] c]", "[a `null` c]");
+		assertTracked(xs);
+		assertNotTracked((LiveTrackedList) ij);
+		assertNotTracked(pq);
 
 		xs.set(1, pq);
 		cmpListSX(xs, "[a [p q] c]");
-		assertTracked( xs );
-		assertNotTracked( (LiveTrackedList)ij );
-		assertTracked( pq );
+		assertTracked(xs);
+		assertNotTracked((LiveTrackedList) ij);
+		assertTracked(pq);
 
 
 		history.undo();
 		cmpListSX(xs, "[a `null` c]");
 		assertTracked( xs );
-		assertNotTracked( (LiveTrackedList)ij );
-		assertNotTracked( pq );
+		assertNotTracked((LiveTrackedList) ij);
+		assertNotTracked(pq);
 
 		history.undo();
 		cmpListSX(xs, "[a [i j] c]");
-		assertTracked( xs );
-		assertTracked( (LiveTrackedList)ij );
+		listener.checkSX(4, "[a `null` c]", "[a [i j] c]");
+		assertTracked(xs);
+		assertTracked((LiveTrackedList) ij);
 		assertNotTracked( pq );
 
 		history.redo();
 		cmpListSX(xs, "[a `null` c]");
+		listener.checkSX(5, "[a [i j] c]", "[a `null` c]");
 		assertTracked( xs );
-		assertNotTracked( (LiveTrackedList)ij );
+		assertNotTracked((LiveTrackedList) ij);
 		assertNotTracked( pq );
 
 		history.redo();
 		cmpListSX(xs, "[a [p q] c]");
-		assertTracked( xs );
-		assertNotTracked( (LiveTrackedList)ij );
+		assertTracked(xs);
+		assertNotTracked((LiveTrackedList) ij);
 		assertTracked( pq );
 	}
 
@@ -544,7 +664,7 @@ public class Test_LiveTrackedList extends TestCase {
 	{
 		LiveTrackedList xs = readTrackedDMListSX( "[a b [i j] c]" );
 		Object ij = xs.get( 2 );
-		LiveTrackedList pq = readDMListSX( "[[p] q]" );
+		LiveTrackedList pq = readLiveListSX("[[p] q]");
 		LiveTrackedList p = (LiveTrackedList)pq.get( 0 );
 
 		cmpListSX(xs, "[a b [i j] c]");
@@ -553,8 +673,12 @@ public class Test_LiveTrackedList extends TestCase {
 		assertNotTracked( pq );
 		assertNotTracked( p );
 
+		ChangeCounter listener = new ChangeCounter();
+		xs.setListener(listener);
+
 		xs.__setitem__(new PySlice(new PyInteger(1), new PyInteger(-1), Py.None), Arrays.asList(new Object[]{null}));
 		cmpListSX(xs, "[a `null` c]");
+		listener.checkSX(1, "[a b [i j] c]", "[a `null` c]");
 		assertTracked( xs );
 		assertNotTracked( (LiveTrackedList)ij );
 		assertNotTracked( pq );
@@ -562,6 +686,7 @@ public class Test_LiveTrackedList extends TestCase {
 
 		xs.__setitem__(new PySlice(new PyInteger(1), new PyInteger(-1), Py.None), Arrays.asList(new Object[]{pq}));
 		cmpListSX(xs, "[a [[p] q] c]");
+		listener.checkSX(2, "[a `null` c]", "[a [[p] q] c]");
 		assertTracked( xs );
 		assertNotTracked( (LiveTrackedList)ij );
 		assertTracked( pq );
@@ -570,6 +695,7 @@ public class Test_LiveTrackedList extends TestCase {
 
 		history.undo();
 		cmpListSX(xs, "[a `null` c]");
+		listener.checkSX(3, "[a [[p] q] c]", "[a `null` c]");
 		assertTracked( xs );
 		assertNotTracked( (LiveTrackedList)ij );
 		assertNotTracked( pq );
@@ -577,6 +703,7 @@ public class Test_LiveTrackedList extends TestCase {
 
 		history.undo();
 		cmpListSX(xs, "[a b [i j] c]");
+		listener.checkSX(4, "[a `null` c]", "[a b [i j] c]");
 		assertTracked( xs );
 		assertTracked( (LiveTrackedList)ij );
 		assertNotTracked( pq );
@@ -584,6 +711,7 @@ public class Test_LiveTrackedList extends TestCase {
 
 		history.redo();
 		cmpListSX(xs, "[a `null` c]");
+		listener.checkSX(5, "[a b [i j] c]", "[a `null` c]");
 		assertTracked( xs );
 		assertNotTracked( (LiveTrackedList)ij );
 		assertNotTracked( pq );
@@ -591,6 +719,7 @@ public class Test_LiveTrackedList extends TestCase {
 
 		history.redo();
 		cmpListSX(xs, "[a [[p] q] c]");
+		listener.checkSX(6, "[a `null` c]", "[a [[p] q] c]");
 		assertTracked( xs );
 		assertNotTracked( (LiveTrackedList)ij );
 		assertTracked( pq );
@@ -600,36 +729,24 @@ public class Test_LiveTrackedList extends TestCase {
 
 	public void testSize()
 	{
-		assertEquals( readDMListSX( "[a b c]" ).size(), 3 );
+		assertEquals(readLiveListSX("[a b c]").size(), 3);
 	}
 
 
 	public void testSublist()
 	{
-		LiveTrackedList xs = readDMListSX( "[a b c d e f]" );
+		LiveTrackedList xs = readLiveListSX("[a b c d e f]");
 		cmpListSX( xs.subList( 1, 5 ), "[b c d e]" );
-	}
-
-
-	public void testGetChildren()
-	{
-		LiveTrackedList xs = readDMListSX( "[a b c d e f]" );
-		List<Object> ys = new ArrayList<Object>();
-		for (Object x: xs.getChildren())
-		{
-			ys.add( x );
-		}
-		cmpListSX( ys, "[a b c d e f]" );
 	}
 
 
 	public void testToArray()
 	{
 		String[] strs = { "a", "b", "c" };
-		assertEquals( Arrays.asList( readDMListSX( "[a b c]" ).toArray() ), Arrays.asList( strs ) );
+		assertEquals( Arrays.asList( readLiveListSX("[a b c]").toArray() ), Arrays.asList( strs ) );
 
 		String[] a = { "a", "b", "c" };
-		assertEquals( Arrays.asList( readDMListSX( "[a b c]" ).toArray( a ) ), Arrays.asList( strs ) );
+		assertEquals( Arrays.asList( readLiveListSX("[a b c]").toArray(a) ), Arrays.asList( strs ) );
 	}
 
 
@@ -649,7 +766,7 @@ public class Test_LiveTrackedList extends TestCase {
 		cmpListSX( xs, "[a b [c d [x f]]]" );
 
 
-		LiveTrackedList ys = readDMListSX( "[p q [s t]]" );
+		LiveTrackedList ys = readLiveListSX("[p q [s t]]");
 
 		((LiveTrackedList)((LiveTrackedList)xs.get( 2 )).get( 2 )).set( 0, ys );
 		cmpListSX( xs, "[a b [c d [[p q [s t]] f]]]" );
