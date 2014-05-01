@@ -9,6 +9,7 @@ package BritefuryJ.Editor.Table.Generic;
 import java.util.ArrayList;
 import java.util.List;
 
+import BritefuryJ.Pres.Primitive.Row;
 import org.python.core.PyList;
 
 import BritefuryJ.Cell.EditableTextCell;
@@ -24,30 +25,48 @@ public class GenericTableEditor extends AbstractTableEditor<GenericTableModelInt
 	
 	
 	
-	public GenericTableEditor(String columnTitles[], boolean showLeftHeader, boolean showTopHeader, boolean growRight, boolean growDown, UnaryFn convertValueFn)
+	public GenericTableEditor(String columnTitles[], boolean showLeftHeader, boolean showTopHeader, boolean growRight, boolean growDown, UnaryFn convertValueFn, Pres blankCell)
 	{
 		super( showLeftHeader, showTopHeader, growRight, growDown );
 		this.columnTitles = columnTitles;
 		this.blankPres = EditableTextCell.blankTextCell( "", convertValueFn );
+		if (blankCell != null) {
+			this.blankPres = new Row(new Pres[] {this.blankPres, blankCell});
+		}
+	}
+	
+	public GenericTableEditor(String columnTitles[], boolean showLeftHeader, boolean showTopHeader, boolean growRight, boolean growDown, Pres blankCell)
+	{
+		this( columnTitles, showLeftHeader, showTopHeader, growRight, growDown, UnaryFn.identity, blankCell );
 	}
 	
 	public GenericTableEditor(String columnTitles[], boolean showLeftHeader, boolean showTopHeader, boolean growRight, boolean growDown)
 	{
-		this( columnTitles, showLeftHeader, showTopHeader, growRight, growDown, UnaryFn.identity );
+		this( columnTitles, showLeftHeader, showTopHeader, growRight, growDown, UnaryFn.identity, null );
 	}
+
+
 	
-	
+	public GenericTableEditor(boolean showLeftHeader, boolean showTopHeader, boolean growRight, boolean growDown, UnaryFn convertValueFn, Pres blankCell)
+	{
+		this( null, showLeftHeader, showTopHeader, growRight, growDown, convertValueFn, blankCell );
+	}
 	
 	public GenericTableEditor(boolean showLeftHeader, boolean showTopHeader, boolean growRight, boolean growDown, UnaryFn convertValueFn)
 	{
-		this( null, showLeftHeader, showTopHeader, growRight, growDown, convertValueFn );
+		this( null, showLeftHeader, showTopHeader, growRight, growDown, convertValueFn, null );
 	}
-	
+
+	public GenericTableEditor(boolean showLeftHeader, boolean showTopHeader, boolean growRight, boolean growDown, Pres blankCell)
+	{
+		this( null, showLeftHeader, showTopHeader, growRight, growDown,UnaryFn.identity,  blankCell );
+	}
+
 	public GenericTableEditor(boolean showLeftHeader, boolean showTopHeader, boolean growRight, boolean growDown)
 	{
-		this( null, showLeftHeader, showTopHeader, growRight, growDown );
+		this( null, showLeftHeader, showTopHeader, growRight, growDown, UnaryFn.identity, null );
 	}
-	
+
 	
 	
 	
