@@ -8,9 +8,11 @@ package BritefuryJ.Editor.Table.Generic;
 
 import BritefuryJ.Util.LiveTrackedList;
 
-public class GenericTableModelLive extends GenericTableModelAbstractBase<LiveTrackedList<Object>, LiveTrackedList<LiveTrackedList<Object>>>
+import java.util.List;
+
+public class GenericTableModelLive extends GenericTableModelAbstractBase
 {
-	private static RowFactory<LiveTrackedList<Object>> defaultRowFactory = new RowFactory<LiveTrackedList<Object>>()
+	private static RowFactory defaultRowFactory = new RowFactory()
 	{
 		@Override
 		public LiveTrackedList<Object> createRow()
@@ -20,23 +22,23 @@ public class GenericTableModelLive extends GenericTableModelAbstractBase<LiveTra
 	};
 
 
-	public GenericTableModelLive(LiveTrackedList<LiveTrackedList<Object>> data, ValueFactory cellFactory, RowFactory<LiveTrackedList<Object>> rowFactory, ValueCopier cellCopier)
+	public GenericTableModelLive(List<List<Object>> data, ValueFactory cellFactory, RowFactory rowFactory, ValueCopier cellCopier)
 	{
 		super(data, cellFactory, rowFactory, cellCopier);
 	}
 
-	public GenericTableModelLive(ValueFactory cellFactory, RowFactory<LiveTrackedList<Object>> rowFactory, ValueCopier cellCopier)
+	public GenericTableModelLive(ValueFactory cellFactory, RowFactory rowFactory, ValueCopier cellCopier)
 	{
-		this( new LiveTrackedList<LiveTrackedList<Object>>(), cellFactory, rowFactory, cellCopier );
+		this( new LiveTrackedList<List<Object>>(), cellFactory, rowFactory, cellCopier );
 	}
 
-	public GenericTableModelLive(LiveTrackedList<LiveTrackedList<Object>> data, ValueFactory cellFactory, ValueCopier cellCopier)
+	public GenericTableModelLive(List<List<Object>> data, ValueFactory cellFactory, ValueCopier cellCopier)
 	{
 		this(data, cellFactory, defaultRowFactory, cellCopier);
 	}
 
 	public GenericTableModelLive(ValueFactory cellFactory, ValueCopier cellCopier)
 	{
-		this( new LiveTrackedList<LiveTrackedList<Object>>(), cellFactory, defaultRowFactory, cellCopier );
+		this( new LiveTrackedList<List<Object>>(), cellFactory, defaultRowFactory, cellCopier );
 	}
 }
