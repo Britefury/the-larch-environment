@@ -11,16 +11,16 @@ import java.util.List;
 
 import BritefuryJ.Incremental.IncrementalValueMonitor;
 
-public class GenericTableModelAbstractBase<RowType extends List<Object>, TableType extends List<RowType>> implements GenericTableModelInterface
+public class GenericTableModelAbstractBase implements GenericTableModelInterface
 {
 	public static interface ValueFactory
 	{
 		Object createValue();
 	}
 
-	public static interface RowFactory <RowType extends List<Object>>
+	public static interface RowFactory
 	{
-		RowType createRow();
+		List<Object> createRow();
 	}
 
 	public static interface ValueCopier
@@ -29,15 +29,15 @@ public class GenericTableModelAbstractBase<RowType extends List<Object>, TableTy
 	}
 
 
-	private TableType data;
+	private List<List<Object>> data;
 	private ValueFactory cellFactory;
-	private RowFactory<RowType> rowFactory;
+	private RowFactory rowFactory;
 	private ValueCopier cellCopier;
 
 
 
 
-	public GenericTableModelAbstractBase(TableType data, ValueFactory cellFactory, RowFactory<RowType> rowFactory, ValueCopier cellCopier)
+	public GenericTableModelAbstractBase(List<List<Object>> data, ValueFactory cellFactory, RowFactory rowFactory, ValueCopier cellCopier)
 	{
 		this.data = data;
 		this.cellFactory = cellFactory;
@@ -170,7 +170,8 @@ public class GenericTableModelAbstractBase<RowType extends List<Object>, TableTy
 		{
 			for (int y = height; y < h; y++)
 			{
-				data.add( rowFactory.createRow() );
+				List<Object> row = rowFactory.createRow();
+				data.add(row);
 			}
 		}
 	}
