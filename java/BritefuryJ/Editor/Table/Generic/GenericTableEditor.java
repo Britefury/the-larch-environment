@@ -26,62 +26,50 @@ public class GenericTableEditor extends AbstractTableEditor<GenericTableModelInt
 	protected TableHeader topHeader, leftHeader;
 
 
-	public GenericTableEditor(TableHeader topHeader, TableHeader leftHeader, boolean growRight, boolean growDown, UnaryFn convertValueFn) {
+	public GenericTableEditor(TableHeader topHeader, TableHeader leftHeader, boolean growRight, boolean growDown, UnaryFn convertValueFn, Pres blankCell) {
 		super( leftHeader != null, topHeader != null, growRight, growDown );
-	public GenericTableEditor(String columnTitles[], boolean showLeftHeader, boolean showTopHeader, boolean growRight, boolean growDown, UnaryFn convertValueFn, Pres blankCell)
-	public GenericTableEditor(String columnTitles[], boolean showLeftHeader, boolean showTopHeader, boolean growRight, boolean growDown, UnaryFn convertValueFn)
 		this.topHeader = topHeader;
 		this.leftHeader = leftHeader;
-	{
-		super( showLeftHeader, showTopHeader, growRight, growDown );
-		this.columnTitles = columnTitles;
 		this.blankPres = EditableTextCell.blankTextCell( "", convertValueFn );
 		if (blankCell != null) {
 			this.blankPres = new Row(new Pres[] {this.blankPres, blankCell});
 		}
 	}
-	
-	public GenericTableEditor(String columnTitles[], boolean showLeftHeader, boolean showTopHeader, boolean growRight, boolean growDown, Pres blankCell)
-	{
-		this( columnTitles, showLeftHeader, showTopHeader, growRight, growDown, UnaryFn.identity, blankCell );
+
+	public GenericTableEditor(TableHeader topHeader, TableHeader leftHeader, boolean growRight, boolean growDown, UnaryFn convertValueFn) {
+		this( topHeader, leftHeader, growRight, growDown, convertValueFn, null );
+	}
+
+	public GenericTableEditor(TableHeader topHeader, TableHeader leftHeader, boolean growRight, boolean growDown, Pres blankCell) {
+		this( topHeader, leftHeader, growRight, growDown, UnaryFn.identity, blankCell );
 	}
 
 	public GenericTableEditor(TableHeader topHeader, TableHeader leftHeader, boolean growRight, boolean growDown) {
-		this(topHeader, leftHeader, growRight, growDown, UnaryFn.identity);
-		this( columnTitles, showLeftHeader, showTopHeader, growRight, growDown, UnaryFn.identity );
-		this( columnTitles, showLeftHeader, showTopHeader, growRight, growDown, UnaryFn.identity, null );
+		this( topHeader, leftHeader, growRight, growDown, UnaryFn.identity, null );
 	}
 
 
-	public GenericTableEditor(String columnTitles[], TableHeader leftHeader, boolean growRight, boolean growDown, UnaryFn convertValueFn)
-	public GenericTableEditor(boolean showLeftHeader, boolean showTopHeader, boolean growRight, boolean growDown, UnaryFn convertValueFn, Pres blankCell)
+	public GenericTableEditor(String columnTitles[], TableHeader leftHeader,boolean growRight, boolean growDown, UnaryFn convertValueFn, Pres blankCell)
 	{
-		this( null, showLeftHeader, showTopHeader, growRight, growDown, convertValueFn, blankCell );
-	}
-	
-	public GenericTableEditor(boolean showLeftHeader, boolean showTopHeader, boolean growRight, boolean growDown, UnaryFn convertValueFn)
-	public GenericTableEditor(boolean showLeftHeader, boolean showTopHeader, boolean growRight, boolean growDown, UnaryFn convertValueFn)
-	{
-		this( null, showLeftHeader, showTopHeader, growRight, growDown, convertValueFn );
-		this(TableHeaderText.forArray(columnTitles), leftHeader, growRight, growDown, convertValueFn);
-		this( null, showLeftHeader, showTopHeader, growRight, growDown, convertValueFn, null );
+		this(TableHeaderText.forArray(columnTitles), leftHeader, growRight, growDown, convertValueFn, blankCell);
 	}
 
-	public GenericTableEditor(boolean showLeftHeader, boolean showTopHeader, boolean growRight, boolean growDown, Pres blankCell)
+	public GenericTableEditor(String columnTitles[], TableHeader leftHeader,boolean growRight, boolean growDown, UnaryFn convertValueFn)
 	{
-		this( null, showLeftHeader, showTopHeader, growRight, growDown,UnaryFn.identity,  blankCell );
+		this(TableHeaderText.forArray(columnTitles), leftHeader, growRight, growDown, convertValueFn, null);
+	}
+
+	public GenericTableEditor(String columnTitles[], TableHeader leftHeader,boolean growRight, boolean growDown, Pres blankCell)
+	{
+		this(TableHeaderText.forArray(columnTitles), leftHeader, growRight, growDown, UnaryFn.identity, blankCell);
 	}
 
 	public GenericTableEditor(String columnTitles[], TableHeader leftHeader, boolean growRight, boolean growDown)
 	{
-		this( null, showLeftHeader, showTopHeader, growRight, growDown );
-		this(TableHeaderText.forArray(columnTitles), leftHeader, growRight, growDown, UnaryFn.identity);
-		this( null, showLeftHeader, showTopHeader, growRight, growDown, UnaryFn.identity, null );
+		this(TableHeaderText.forArray(columnTitles), leftHeader, growRight, growDown, UnaryFn.identity, null);
 	}
-
 	
 
-	
 	
 	
 	
