@@ -12,7 +12,6 @@ import BritefuryJ.Editor.Table.AbstractTableEditorInstance;
 import BritefuryJ.Editor.Table.TableEditorStyle;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Blank;
-import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Table;
 
 public class GenericTableEditorInstance extends AbstractTableEditorInstance<GenericTableModelInterface>
@@ -38,7 +37,6 @@ public class GenericTableEditorInstance extends AbstractTableEditorInstance<Gene
 		if ( hasTopHeader() )
 		{
 			Object firstRow[] = new Object[headerColumns];
-			String columnTitles[] = genericEditor.columnTitles;
 			if ( hasLeftHeader() )
 			{
 				firstRow[0] = new Blank();
@@ -46,8 +44,8 @@ public class GenericTableEditorInstance extends AbstractTableEditorInstance<Gene
 			for (int x = 0; x < width; x++)
 			{
 				int ex = tableXToElementX( x );
-				String title = columnTitles != null  &&  x < columnTitles.length   ?   genericEditor.columnTitles[x]  :  String.valueOf( x );
-				firstRow[ex] = new Label( title ).withStyleSheetFromAttr( TableEditorStyle.headerAttrs );
+				Pres headerCell = genericEditor.topHeader.headerCell(x);
+				firstRow[ex] = headerCell.withStyleSheetFromAttr( TableEditorStyle.headerAttrs );
 			}
 			cells[0] = firstRow;
 		}
@@ -63,7 +61,7 @@ public class GenericTableEditorInstance extends AbstractTableEditorInstance<Gene
 				Object tableRow[] = new Object[rowCols];
 				if ( hasLeftHeader() )
 				{
-					tableRow[0] = new Label( String.valueOf( y ) ).withStyleSheetFromAttr( TableEditorStyle.headerAttrs );
+					tableRow[0] = genericEditor.leftHeader.headerCell(y).withStyleSheetFromAttr( TableEditorStyle.headerAttrs );
 				}
 				for (int x = 0; x < row.size(); x++)
 				{
@@ -78,7 +76,7 @@ public class GenericTableEditorInstance extends AbstractTableEditorInstance<Gene
 				Object tableRow[] = new Object[rowCols];
 				if ( hasLeftHeader() )
 				{
-					tableRow[0] = new Label( String.valueOf( y ) ).withStyleSheetFromAttr( TableEditorStyle.headerAttrs );
+					tableRow[0] = genericEditor.leftHeader.headerCell(y).withStyleSheetFromAttr( TableEditorStyle.headerAttrs );
 				}
 				for (int x = 0; x < row.size(); x++)
 				{
