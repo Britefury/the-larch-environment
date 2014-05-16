@@ -26,11 +26,7 @@ import BritefuryJ.Pres.CompositePres;
 import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
-import BritefuryJ.Pres.Primitive.Bin;
-import BritefuryJ.Pres.Primitive.Primitive;
-import BritefuryJ.Pres.Primitive.Region;
-import BritefuryJ.Pres.Primitive.Segment;
-import BritefuryJ.Pres.Primitive.Text;
+import BritefuryJ.Pres.Primitive.*;
 import BritefuryJ.Shortcut.Shortcut;
 import BritefuryJ.Shortcut.ShortcutElementAction;
 import BritefuryJ.StyleSheet.StyleSheet;
@@ -223,7 +219,7 @@ public class EditableTextCell
 	public static Pres blankTextCell(String text, UnaryFn textToValue)
 	{
 		TreeEventListener textListener = treeEventListenerFor( textToValue );
-		Pres textPres = new Segment( new Text( text ) ).withTreeEventListener( textListener ).withElementInteractor( keyInteractor );
+		Pres textPres = new Segment( new Span(new Pres[] {new Text( text ), new Spacer(5.0, 0.0)}) ).withTreeEventListener( textListener ).withElementInteractor( keyInteractor );
 		return new Bin( new Region( textPres, clipboardHandler ) );
 	}
 
