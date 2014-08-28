@@ -613,7 +613,7 @@ class WorksheetEditorSubject (Subject):
 	def _modelView(self):
 		if self.__modelView is None:
 			try:
-				self.__modelView = EditorSchema.WorksheetEditor( None, self._model, self._importName )
+				self.__modelView = EditorSchema.WorksheetEditor( None, self._model, self._importName, self.kernel )
 			except Exception as e:
 				print e
 				raise
