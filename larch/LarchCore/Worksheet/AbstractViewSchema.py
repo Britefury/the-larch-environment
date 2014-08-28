@@ -50,18 +50,19 @@ class NodeAbstractView (object):
 class WorksheetAbstractView (NodeAbstractView):
 	_projection = None
 
-	def __init__(self, worksheet, model, importName):
+	def __init__(self, worksheet, model, importName, kernel):
 		super( WorksheetAbstractView, self ).__init__( worksheet, model )
 		self._modelToView = WeakValueDictionary()
 		self._importName = importName
+		self._kernel = kernel
+		self._module = None
 		self.refreshResults()
 		
 		
 	def _initModule(self):
 		name = self._importName   if self._importName is not None   else 'worksheet'
-		self._module = imp.new_module( name )
-		LoadBuiltins.loadBuiltins( self._module )
-		
+		self._module = self._kernel.new_module(name)
+
 		
 	def refreshResults(self):
 		self._initModule()
@@ -299,8 +300,11 @@ class PythonCodeAbstractView (NodeAbstractView):
 		
 		
 	def _refreshResults(self, module):
-		self._result = Execution.getResultOfExecutionWithinModule( self.getCode(), module, self.isResultVisible() )
-		self._incr.onChanged()
+		def result_callback(result):
+			self._result = result
+			self._incr.onChanged()
+
+		module.getResultOfExecution( self.getCode(), self.isResultVisible(), result_callback )
 
 
 

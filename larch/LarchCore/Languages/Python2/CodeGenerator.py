@@ -107,7 +107,12 @@ class Python2CodeGenerator (object):
 	def compileForExecution(self, pythonModule):
 		source = str( self( pythonModule ) )
 		return compile( source, self._filename, 'exec' )
-	
+
+
+	def compileSourceForExecution(self, pythonModule):
+		source = str( self( pythonModule ) )
+		return source
+
 	
 	def compileForExecutionAndEvaluation(self, pythonModule):
 		execModule = None
@@ -1186,6 +1191,10 @@ def compileForEvaluation(pythonExpression, filename):
 
 def compileForExecution(pythonCode, filename):
 	return Python2CodeGenerator( filename ).compileForExecution( pythonCode )
+
+
+def compileSourceForExecution(pythonCode, filename):
+	return Python2CodeGenerator( filename ).compileSourceForExecution( pythonCode )
 
 
 def compileForExecutionAndEvaluation(pythonCode, filename):

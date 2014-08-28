@@ -47,26 +47,24 @@ def _textLines(text, textStyleAttribute):
 		text = text[:-1]
 	return ApplyStyleSheetFromAttribute( textStyleAttribute, Column( [ StaticText( line )   for line in text.split( '\n' ) ] ) )
 
-def _richStringItem(item, textStyleAttribute, bUseDefaultPerspectiveForResult):
+def _richStringItem(item, textStyleAttribute):
 	if item.isStructural():
 		resultView = Pres.coercePresentingNull( item.getValue() )
-		if bUseDefaultPerspectiveForResult:
-			resultView = ApplyPerspective.defaultPerspective( resultView )
 		return resultView
 	else:
 		return _textLines( item.getValue(), textStyleAttribute )
 
-def _richStringLines(labelText, richString, textStyleAttribute, bUseDefaultPerspectiveForResult):
+def _richStringLines(labelText, richString, textStyleAttribute):
 	label = ApplyStyleSheetFromAttribute( ExecutionStyle.labelStyle, StaticText( labelText ) )
-	lines = [ _richStringItem( item, textStyleAttribute, bUseDefaultPerspectiveForResult )   for item in richString.getItems() ]
+	lines = [ _richStringItem( item, textStyleAttribute )   for item in richString.getItems() ]
 	return Overlay( [ Column( lines ).alignHExpand(), label.alignHRight().alignVTop() ] )
 
 
-def execStdout(richString, bUseDefaultPerspectiveForResult):
-	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdOutStyle, Border( _richStringLines( 'STDOUT', richString, ExecutionStyle.stdOutStyle, bUseDefaultPerspectiveForResult ).alignHExpand() ).alignHExpand() )
+def execStdout(richString):
+	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdOutStyle, Border( _richStringLines( 'STDOUT', richString, ExecutionStyle.stdOutStyle ).alignHExpand() ).alignHExpand() )
 
-def execStderr(richString, bUseDefaultPerspectiveForResult):
-	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdErrStyle, Border( _richStringLines( 'STDERR', richString, ExecutionStyle.stdErrStyle, bUseDefaultPerspectiveForResult ).alignHExpand() ).alignHExpand() )
+def execStderr(richString):
+	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdErrStyle, Border( _richStringLines( 'STDERR', richString, ExecutionStyle.stdErrStyle ).alignHExpand() ).alignHExpand() )
 	
 def execException(exceptionView):
 	label = ApplyStyleSheetFromAttribute( ExecutionStyle.labelStyle, StaticText( 'EXCEPTION:' ) )
@@ -78,13 +76,10 @@ def execResult(resultView):
 
 def executionResultBox(streams, exception, resultInTuple, bUseDefaultPerspecitveForException, bUseDefaultPerspectiveForResult):
 	boxContents = []
-	for stream in streams:
-		if stream.name == 'out':
-			boxContents.append( execStdout( stream.richString, bUseDefaultPerspectiveForResult ) )
-		elif stream.name == 'err':
-			boxContents.append( execStderr( stream.richString, bUseDefaultPerspectiveForResult ) )
-		else:
-			raise ValueError, 'Unreckognised stream \'{0}\''.format( stream.name )
+	if bUseDefaultPerspectiveForResult:
+		boxContents.append(ApplyPerspective.defaultPerspective(streams))
+	else:
+		boxContents.append(streams)
 	if exception is not None:
 		exceptionView = Pres.coerce( exception ).alignHPack()
 		if bUseDefaultPerspecitveForException:
