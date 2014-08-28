@@ -1,25 +1,30 @@
-##-*************************
-##-* This program is free software; you can use it, redistribute it and/or modify it
-##-* under the terms of the GNU General Public License version 2 as published by the
-##-* Free Software Foundation. The full text of the GNU General Public License
-##-* version 2 can be found in the file named 'COPYING' that accompanies this
-##-* program. This source code is (C)copyright Geoffrey French 1999-2014.
-##-*************************
 import os, sys, json, hmac, uuid, datetime, hashlib
 
 from org.zeromq import ZMQ
 from org.python.core.util import StringUtil
 
 
-def load_connection_file(kernel_name):
-	p = os.path.expanduser(os.path.join('~', '.ipython', 'profile_default', 'security',
-					    'kernel-{0}.json'.format(kernel_name)))
 
-	if os.path.exists(p):
-		with open(p, 'r') as f:
+class ConnectionFileError (Exception):
+	pass
+
+
+
+
+def load_connection_file(kernel_name=None, kernel_path=None):
+	if kernel_name is not None  and  kernel_path is None:
+		kernel_path = os.path.expanduser(os.path.join('~', '.ipython', 'profile_default', 'security',
+						    'kernel-{0}.json'.format(kernel_name)))
+	elif kernel_path is not None  and  kernel_name is None:
+		pass
+	elif kernel_name is None  and  kernel_path is None:
+		raise ValueError, 'Either kernel_name OR kernel_path must have a value'
+
+	if os.path.exists(kernel_path):
+		with open(kernel_path, 'r') as f:
 			return json.load(f)
 	else:
-		raise ValueError, 'Could not find connection file for kernel {0}'.format(kernel_name)
+		raise ConnectionFileError, 'Could not find connection file for kernel {0} at {1}'.format(kernel_name, p)
 
 
 DELIM = StringUtil.toBytes("<IDS|MSG>")
@@ -274,16 +279,19 @@ class KernelConnection(object):
 	    on_comm_open: 'comm_open' message on IOPUB; f(comm, data); comm is Comm instance
 	    '''
 
-	def __init__(self, kernel_name, username=''):
+	def __init__(self, kernel_name=None, kernel_path=None, username=''):
 		'''
 		IPython kernel connection constructor
 
+		Note that only one of kernel_name and kernel_path should be provided
+
 		:param kernel_name: kernel name used to identify connection file
+		:param kernel_path: path of connection file
 		:param username: username
 		:return:
 		'''
 		# Load the connection file and find out where we have to connect to
-		connection = load_connection_file(kernel_name)
+		connection = load_connection_file(kernel_name=kernel_name, kernel_path=kernel_path)
 
 		key = connection['key'].encode('utf8')
 		transport = connection['transport']

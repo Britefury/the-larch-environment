@@ -63,7 +63,14 @@ _projectCommands = CommandSet( 'LarchCore.Project', [ _saveCommand, _saveAsComma
 
 
 
-_k = ipython_kernel.IPythonKernel('31272')
+
+_ipython_kernel = None
+
+def _on_ipython_kernel_started(krn):
+	global _ipython_kernel
+	_ipython_kernel = krn
+
+ipython_kernel.start_ipython_kernel(_on_ipython_kernel_started)
 
 class ProjectSubject (Subject):
 	def __init__(self, document, model, enclosingSubject, path, importName, title):
@@ -74,8 +81,7 @@ class ProjectSubject (Subject):
 		packageFinder = PackageFinder( self, model )
 		self._rootFinder = RootFinder( self, model.pythonPackageName, packageFinder )
 		# self.kernel = inproc_kernel.InProcessKernel()
-		# self.kernel = ipython_kernel.IPythonKernel('31272')
-		self.kernel = _k
+		self.kernel = _ipython_kernel
 
 
 	@property

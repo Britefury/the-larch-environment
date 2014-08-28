@@ -11,6 +11,7 @@ for jar in JARS:
 	if jar not in sys.path:
 		sys.path.append(jar)
 from collections import deque
+import subprocess, os, atexit
 
 from java.awt import Color
 from javax.swing import SwingUtilities
@@ -44,9 +45,9 @@ class IPythonModule (abstract_kernel.AbstractModule):
 		self.__kernel._queue_exec(self, code, evaluate_last_expression, result_callback)
 
 
-class KernelListener (kernel.KernelRequestListener):
+class _KernelListener (kernel.KernelRequestListener):
 	def __init__(self, finished):
-		super(KernelListener, self).__init__()
+		super(_KernelListener, self).__init__()
 		self.std = Execution.MultiplexedRichStream(['out', 'err'])
 		self.finished = finished
 		self.result = Execution.ExecutionResult(self.std)
@@ -92,13 +93,30 @@ class KernelListener (kernel.KernelRequestListener):
 
 
 class IPythonKernel (abstract_kernel.AbstractKernel):
-	def __init__(self, kernel_name):
-		self.__exec_queue = deque()
-		self.__kernel = kernel.KernelConnection(kernel_name)
-		self.__poll_queued = False
+	__open_kernels = []
+
+
+	def __init__(self, kernel_name=None, kernel_path=None):
+		self.__kernel = kernel.KernelConnection(kernel_name=kernel_name, kernel_path=kernel_path)
 
 		self.__stdout = sys.stdout
 		self.__stderr = sys.stderr
+
+		self.__poll_queued = False
+
+		self.__open_kernels.append(self)
+
+
+	def close(self):
+		self.__kernel.close()
+		self.__open_kernels.remove(self)
+
+
+	@classmethod
+	def close_all_open_kernels(cls):
+		kernels = cls.__open_kernels[:]
+		for k in kernels:
+			k.close()
 
 
 
@@ -107,7 +125,8 @@ class IPythonKernel (abstract_kernel.AbstractKernel):
 
 
 	def _queue_exec(self, module, code, evaluate_last_expression, result_callback):
-		listener = KernelListener(result_callback)
+		print 'IPythonKernel._queue_exec'
+		listener = _KernelListener(result_callback)
 
 		src = CodeGenerator.compileSourceForExecution(code, module.name)
 		std = Execution.MultiplexedRichStream(['out', 'err'])
@@ -117,8 +136,15 @@ class IPythonKernel (abstract_kernel.AbstractKernel):
 		self.__queue_poll()
 
 
+	# def __poll_kernel(self):
+	# 	print 'Polling kernel'
+	# 	self.__kernel.poll(POLL_TIMEOUT)
+	# 	print 'Polled kernel'
+	# 	self.__queue_poll()
+
 
 	def __queue_poll(self):
+		# _queue_poll(self.__poll_kernel, unique=True)
 		if not self.__poll_queued:
 			def _poll():
 				self.__poll_queued = False
@@ -128,5 +154,76 @@ class IPythonKernel (abstract_kernel.AbstractKernel):
 			SwingUtilities.invokeLater(_poll)
 			self.__poll_queued = True
 
+
+
+
+__connection_file_paths = []
+__ipython_processes = []
+
+
+def start_ipython_kernel(on_kernel_started, connection_file_path=None):
+	# If no connection file path was specified, generate one
+	if connection_file_path is None:
+		connection_file_path = './kernel_1.json'
+
+		i = 1
+		while os.path.exists(connection_file_path):
+			i += 1
+			connection_file_path = './kernel_{0}.json'.format(i)
+
+	# Spawn the kernel
+	proc = subprocess.Popen(['ipython', 'kernel', '-f', connection_file_path])
+	__ipython_processes.append(proc)
+
+	# Poll the connection file
+	def check_connection_file():
+		if os.path.exists(connection_file_path):
+			print 'Found connection file {0}'.format(connection_file_path)
+			krn = IPythonKernel(kernel_path=connection_file_path)
+			__connection_file_paths.append(connection_file_path)
+			on_kernel_started(krn)
+		else:
+			_queue_poll(check_connection_file)
+
+	check_connection_file()
+
+
+
+
+def shutdown():
+	print 'Cleanup'
+	IPythonKernel.close_all_open_kernels()
+	for p in __connection_file_paths:
+		print 'Removing connection file {0}'.format(p)
+		os.remove(p)
+	for proc in __ipython_processes:
+		proc.terminate()
+
+
+
+
+
+_poll_queue = deque()
+_queue_handle_invoked = False
+
+def _handle_poll_queue():
+	global _queue_handle_invoked
+
+	while len(_poll_queue) > 0:
+		fn = _poll_queue.popleft()
+		fn()
+	_queue_handle_invoked = False
+
+
+
+def _queue_poll(fn, unique=False):
+	global _queue_handle_invoked
+
+	if not unique  or  fn not in _poll_queue:
+		_poll_queue.append(fn)
+
+	if not _queue_handle_invoked:
+		SwingUtilities.invokeLater(_handle_poll_queue)
+		_queue_handle_invoked = True
 
 

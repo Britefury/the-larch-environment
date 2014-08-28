@@ -15,6 +15,8 @@ from Britefury.Kernel.Document import Document
 
 from LarchCore.PythonConsole import Console
 
+from LarchCore.Kernel import ipython_kernel
+
 
 
 class AppState (object):
@@ -147,7 +149,7 @@ class AppState (object):
 		:param windowManager: the Larch window manager
 		:return: None
 		"""
-		pass
+		ipython_kernel.shutdown()
 
 
 
