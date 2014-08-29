@@ -91,29 +91,19 @@ class _KernelListener (kernel.KernelRequestListener):
 
 
 class IPythonKernel (abstract_kernel.AbstractKernel):
-	__open_kernels = []
-
-
-	def __init__(self, kernel_process):
+	def __init__(self, ctx, kernel_process):
 		self.__krn_proc = kernel_process
 		self.__kernel = kernel_process.connection
 
 		self.__stdout = sys.stdout
 		self.__stderr = sys.stderr
 
-		self.__open_kernels.append(self)
+		self.__ctx = ctx
 
 
 	def close(self):
 		self.__krn_proc.close()
-		self.__open_kernels.remove(self)
-
-
-	@classmethod
-	def close_all_open_kernels(cls):
-		kernels = cls.__open_kernels[:]
-		for k in kernels:
-			k.close()
+		self.__ctx._notify_closed(self)
 
 
 
@@ -141,68 +131,79 @@ class IPythonKernel (abstract_kernel.AbstractKernel):
 
 	def __queue_poll(self):
 		if self.__kernel.is_open():
-			_timer_enqueue(self.__poll_kernel, unique=True)
+			self.__ctx._timer_enqueue(self.__poll_kernel, unique=True)
 
 
 
+class IPythonContext (object):
+	def __init__(self):
+		self.__kernels = []
+		self.__timer = None
+		self.__timer_queue = []
 
 
-def start_ipython_kernel(on_kernel_started, connection_file_path=None):
-	krn_proc = kernel.IPythonKernelProcess(connection_file_path=connection_file_path)
+	def _notify_closed(self, kernel):
+		self.__kernels.remove(kernel)
 
-	# Poll the connection
-	def check_connection():
-		if krn_proc.connection is not None:
-			# print 'Kernel started'
+	def close(self):
+		krns = self.__kernels[:]
+		for krn in krns:
+			krn.close()
+		if self.__timer is not None:
+			self.__timer.stop()
 
-			krn = IPythonKernel(krn_proc)
-			on_kernel_started(krn)
-			return True
+
+	def start_kernel(self, on_kernel_started, connection_file_path=None):
+		krn_proc = kernel.IPythonKernelProcess(connection_file_path=connection_file_path)
+
+		# Poll the connection
+		def check_connection():
+			if krn_proc.connection is not None:
+				# print 'Kernel started'
+
+				krn = IPythonKernel(self, krn_proc)
+				self.__kernels.append(krn)
+
+				on_kernel_started(krn)
+				return True
+			else:
+				self._timer_enqueue(check_connection)
+				return False
+
+		check_connection()
+
+
+	def __handle_timer_queue(self):
+		work_done = False
+		queue_contents = self.__timer_queue[:]
+		del self.__timer_queue[:]
+		for fn in queue_contents:
+			if fn():
+				work_done = True
+		if work_done:
+			self.__timer.setDelay(10)
 		else:
-			_timer_enqueue(check_connection)
-			return False
-
-	check_connection()
+			self.__timer.setDelay(100)
 
 
 
+	def _timer_enqueue(self, fn, unique=False):
+		def action(event):
+			self.__handle_timer_queue()
 
-def shutdown():
-	# print 'Cleanup'
-	IPythonKernel.close_all_open_kernels()
+		if self.__timer is None:
+			self.__timer = Timer(100, action)
+			self.__timer.setInitialDelay(100)
+			self.__timer.start()
 
-	if _timer is not None:
-		_timer.stop()
-
-
-
-
-
-_timer_queue = []
-_timer = None
-
-def _handle_timer_queue(event):
-	work_done = False
-	queue_contents = _timer_queue[:]
-	del _timer_queue[:]
-	for fn in queue_contents:
-		if fn():
-			work_done = True
-	if work_done:
-		_timer.setDelay(10)
-	else:
-		_timer.setDelay(100)
+		if not unique  or  fn not in self.__timer_queue:
+			self.__timer_queue.append(fn)
 
 
 
-def _timer_enqueue(fn, unique=False):
-	global _timer
-	if _timer is None:
-		_timer = Timer(100, _handle_timer_queue)
-		_timer.setInitialDelay(100)
-		_timer.start()
 
-	if not unique  or  fn not in _timer_queue:
-		_timer_queue.append(fn)
+
+
+
 
 
