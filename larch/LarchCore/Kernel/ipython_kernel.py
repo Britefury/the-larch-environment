@@ -10,11 +10,9 @@ JARS = ['jeromq-0.3.5-SNAPSHOT.jar', 'guava-17.0.jar']
 for jar in JARS:
 	if jar not in sys.path:
 		sys.path.append(jar)
-from collections import deque
-import subprocess, os, atexit
 
 from java.awt import Color
-from javax.swing import SwingUtilities
+from javax.swing import Timer
 
 from jipy import kernel
 
@@ -33,7 +31,7 @@ _aborted_style = StyleSheet.style(Primitive.foreground(Color(1.0, 0.0, 0.0)))
 _aborted = _aborted_border.surround(_aborted_style.applyTo(Label('ABORTED')))
 
 
-POLL_TIMEOUT = 10
+POLL_TIMEOUT = 0
 
 
 class IPythonModule (abstract_kernel.AbstractModule):
@@ -96,19 +94,18 @@ class IPythonKernel (abstract_kernel.AbstractKernel):
 	__open_kernels = []
 
 
-	def __init__(self, kernel_name=None, kernel_path=None):
-		self.__kernel = kernel.KernelConnection(kernel_name=kernel_name, kernel_path=kernel_path)
+	def __init__(self, kernel_process):
+		self.__krn_proc = kernel_process
+		self.__kernel = kernel_process.connection
 
 		self.__stdout = sys.stdout
 		self.__stderr = sys.stderr
-
-		self.__poll_queued = False
 
 		self.__open_kernels.append(self)
 
 
 	def close(self):
-		self.__kernel.close()
+		self.__krn_proc.close()
 		self.__open_kernels.remove(self)
 
 
@@ -136,56 +133,36 @@ class IPythonKernel (abstract_kernel.AbstractKernel):
 		self.__queue_poll()
 
 
-	# def __poll_kernel(self):
-	# 	print 'Polling kernel'
-	# 	self.__kernel.poll(POLL_TIMEOUT)
-	# 	print 'Polled kernel'
-	# 	self.__queue_poll()
+	def __poll_kernel(self):
+		work_done = self.__kernel.poll(POLL_TIMEOUT)
+		self.__queue_poll()
+		return work_done
 
 
 	def __queue_poll(self):
-		# _queue_poll(self.__poll_kernel, unique=True)
-		if not self.__poll_queued:
-			def _poll():
-				self.__poll_queued = False
-				self.__kernel.poll(POLL_TIMEOUT)
-				self.__queue_poll()
-
-			SwingUtilities.invokeLater(_poll)
-			self.__poll_queued = True
+		if self.__kernel.is_open():
+			_timer_enqueue(self.__poll_kernel, unique=True)
 
 
 
-
-__connection_file_paths = []
-__ipython_processes = []
 
 
 def start_ipython_kernel(on_kernel_started, connection_file_path=None):
-	# If no connection file path was specified, generate one
-	if connection_file_path is None:
-		connection_file_path = './kernel_1.json'
+	krn_proc = kernel.IPythonKernelProcess(connection_file_path=connection_file_path)
 
-		i = 1
-		while os.path.exists(connection_file_path):
-			i += 1
-			connection_file_path = './kernel_{0}.json'.format(i)
+	# Poll the connection
+	def check_connection():
+		if krn_proc.connection is not None:
+			print 'Kernel started'
 
-	# Spawn the kernel
-	proc = subprocess.Popen(['ipython', 'kernel', '-f', connection_file_path])
-	__ipython_processes.append(proc)
-
-	# Poll the connection file
-	def check_connection_file():
-		if os.path.exists(connection_file_path):
-			print 'Found connection file {0}'.format(connection_file_path)
-			krn = IPythonKernel(kernel_path=connection_file_path)
-			__connection_file_paths.append(connection_file_path)
+			krn = IPythonKernel(krn_proc)
 			on_kernel_started(krn)
+			return True
 		else:
-			_queue_poll(check_connection_file)
+			_timer_enqueue(check_connection)
+			return False
 
-	check_connection_file()
+	check_connection()
 
 
 
@@ -193,37 +170,39 @@ def start_ipython_kernel(on_kernel_started, connection_file_path=None):
 def shutdown():
 	print 'Cleanup'
 	IPythonKernel.close_all_open_kernels()
-	for p in __connection_file_paths:
-		print 'Removing connection file {0}'.format(p)
-		os.remove(p)
-	for proc in __ipython_processes:
-		proc.terminate()
+
+	if _timer is not None:
+		_timer.stop()
 
 
 
 
 
-_poll_queue = deque()
-_queue_handle_invoked = False
+_timer_queue = []
+_timer = None
 
-def _handle_poll_queue():
-	global _queue_handle_invoked
+def _handle_timer_queue(event):
+	work_done = False
+	queue_contents = _timer_queue[:]
+	del _timer_queue[:]
+	for fn in queue_contents:
+		if fn():
+			work_done = True
+	if work_done:
+		_timer.setDelay(10)
+	else:
+		_timer.setDelay(100)
 
-	while len(_poll_queue) > 0:
-		fn = _poll_queue.popleft()
-		fn()
-	_queue_handle_invoked = False
 
 
+def _timer_enqueue(fn, unique=False):
+	global _timer
+	if _timer is None:
+		_timer = Timer(100, _handle_timer_queue)
+		_timer.setInitialDelay(100)
+		_timer.start()
 
-def _queue_poll(fn, unique=False):
-	global _queue_handle_invoked
-
-	if not unique  or  fn not in _poll_queue:
-		_poll_queue.append(fn)
-
-	if not _queue_handle_invoked:
-		SwingUtilities.invokeLater(_handle_poll_queue)
-		_queue_handle_invoked = True
+	if not unique  or  fn not in _timer_queue:
+		_timer_queue.append(fn)
 
 

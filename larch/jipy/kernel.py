@@ -1,11 +1,14 @@
-import os, sys, json, hmac, uuid, datetime, hashlib
+import os, sys, json, hmac, uuid, datetime, hashlib, subprocess, tempfile, json
 
 from org.zeromq import ZMQ
 from org.python.core.util import StringUtil
 
 
 
-class ConnectionFileError (Exception):
+class ConnectionFileNotFoundError (Exception):
+	pass
+
+class InvalidConnectionFileError (Exception):
 	pass
 
 
@@ -22,9 +25,12 @@ def load_connection_file(kernel_name=None, kernel_path=None):
 
 	if os.path.exists(kernel_path):
 		with open(kernel_path, 'r') as f:
-			return json.load(f)
+			try:
+				return json.load(f)
+			except ValueError:
+				raise InvalidConnectionFileError
 	else:
-		raise ConnectionFileError, 'Could not find connection file for kernel {0} at {1}'.format(kernel_name, p)
+		raise ConnectionFileNotFoundError, 'Could not find connection file for kernel {0} at {1}'.format(kernel_name, p)
 
 
 DELIM = StringUtil.toBytes("<IDS|MSG>")
@@ -88,6 +94,198 @@ class _MessageRouter(object):
 				self.__socket_name, msg_type, idents)
 
 
+
+class Session(object):
+	def __init__(self, key, username=''):
+		'''
+		IPython session constructor
+
+		:param key: message authentication key from connection file
+		:param username: Username of user (or empty string)
+		:return:
+		'''
+		self.__key = key.encode('utf8')
+
+		self.auth = hmac.HMAC(self.__key, digestmod=hashlib.sha256)
+
+		self.session = str(uuid.uuid4())
+		self.username = username
+
+		self.__none = self._pack({})
+
+
+	def send(self, stream, msg_type, content=None, parent=None, metadata=None, ident=None, buffers=None):
+		'''
+		Build and sent a message on a JeroMQ stream
+
+		:param stream: the JeroMQ stream over which the message is to be sent
+		:param msg_type: the message type (see IPython docs for explanation of these)
+		:param content: message content
+		:param parent: message parent header
+		:param metadata: message metadata
+		:param ident: IDENT
+		:param buffers: binary data buffers to append to message
+		:return: a tuple of (message structure, message ID)
+		'''
+		msg, msg_id = self.build_msg(msg_type, content, parent, metadata)
+		to_send = self.serialize(msg, ident)
+		if buffers is not None:
+			to_send.extend(buffers)
+		for part in to_send[:-1]:
+			stream.sendMore(part)
+		stream.send(to_send[-1])
+		return msg, msg_id
+
+	def recv(self, stream):
+		'''
+		Receive a message from a stream
+		:param stream: the JeroMQ stream from which to read the message
+		:return: a tuple: (idents, msg) where msg is the deserialized message
+		'''
+		msg_list = [stream.recv()]
+		while stream.hasReceiveMore():
+			msg_list.append(stream.recv())
+
+		# Extract identities
+		pos = msg_list.index(DELIM)
+		idents, msg_list = msg_list[:pos], msg_list[pos + 1:]
+		return idents, self.deserialize(msg_list)
+
+
+	def serialize(self, msg, ident=None):
+		'''
+		Serialize a message into a list of byte arrays
+
+		:param msg: the message to serialize
+		:param ident: the ident
+		:return: the serialize message in the form of a list of byte arrays
+		'''
+		content = msg.get('content', {})
+		if content is None:
+			content = self.__none
+		else:
+			content = self._pack(content)
+
+		payload = [self._pack(msg['header']),
+			   self._pack(msg['parent_header']),
+			   self._pack(msg['metadata']),
+			   content]
+
+		serialized = []
+
+		if isinstance(ident, list):
+			serialized.extend(ident)
+		elif ident is not None:
+			serialized.append(ident)
+		serialized.append(DELIM)
+
+		signature = self.sign(payload)
+		serialized.append(signature)
+		serialized.extend(payload)
+
+		return serialized
+
+
+	def deserialize(self, msg_list):
+		'''
+		Deserialize a message, converting it from a list of byte arrays to a message structure (a dict)
+		:param msg_list: serialized message in the form of a list of byte arrays
+		:return: message structure
+		'''
+		min_len = 5
+		if self.auth is not None:
+			signature = msg_list[0]
+			check = self.sign(msg_list[1:5])
+			if signature != check:
+				raise ValueError, 'Invalid signature'
+		if len(msg_list) < min_len:
+			raise ValueError, 'Message too short'
+		header = self._unpack(msg_list[1])
+		return {
+			'header': header,
+			'msg_id': header['msg_id'],
+			'msg_type': header['msg_type'],
+			'parent_header': self._unpack(msg_list[2]),
+			'metadata': self._unpack(msg_list[3]),
+			'content': self._unpack(msg_list[4]),
+			'buffers': msg_list[5:]
+		}
+
+
+	def build_msg_header(self, msg_type):
+		'''
+		Build a header for a message of the given type
+		:param msg_type: the message type
+		:return: the message header
+		'''
+		msg_id = str(uuid.uuid4())
+		return {
+			'msg_id': msg_id,
+			'msg_type': msg_type,
+			'username': self.username,
+			'session': self.session,
+			'date': datetime.datetime.now().isoformat(),
+			'version': KERNEL_PROTOCOL_VERSION
+		}
+
+	def build_msg(self, msg_type, content=None, parent=None, metadata=None):
+		'''
+		Build a message of the given type, with content, parent and metadata
+		:param msg_type: the message type
+		:param content: message content
+		:param parent: message parent header
+		:param metadata: metadata
+		:return: the message structure
+		'''
+		header = self.build_msg_header(msg_type)
+		msg_id = header['msg_id']
+		return {
+			       'header': header,
+			       'msg_id': msg_id,
+			       'msg_type': msg_type,
+			       'parent_header': {} if parent is None   else parent,
+			       'content': {} if content is None   else content,
+			       'metadata': {} if metadata is None   else metadata,
+		       }, msg_id
+
+
+	def sign(self, msg_payload_list):
+		'''
+		Sign a message payload
+
+		:param msg_payload_list: the message payload (header, parent header, content, metadata)
+		:return: signature hash hex digest
+		'''
+		if self.auth is None:
+			return StringUtil.toBytes('')
+		else:
+			h = self.auth.copy()
+			for m in msg_payload_list:
+				h.update(m)
+			return StringUtil.toBytes(h.hexdigest())
+
+
+	def _pack(self, x):
+		'''
+		Pack message data into a byte array
+
+		:param x: message data to pack
+		:return: byte array
+		'''
+		return StringUtil.toBytes(json.dumps(x))
+
+	def _unpack(self, x):
+		'''
+		Unpack byte array into message data
+
+		:param x: byte array to unpack
+		:return: message component
+		'''
+		return json.loads(StringUtil.fromBytes(x))
+
+
+
+
 class Comm(object):
 	def __init__(self, kernel_connection, comm_id, target_name):
 		self.__kernel = kernel_connection
@@ -100,18 +298,20 @@ class Comm(object):
 
 	def message(self, data):
 		kernel = self.__kernel
-		kernel.session.send(kernel.shell, 'comm_msg', {
-			'comm_id': self.comm_id,
-			'data': data
-		})
+		if kernel._open:
+			kernel.session.send(kernel.shell, 'comm_msg', {
+				'comm_id': self.comm_id,
+				'data': data
+			})
 
 	def close(self, data):
 		kernel = self.__kernel
-		kernel.session.send(kernel.shell, 'comm_close', {
-			'comm_id': self.comm_id,
-			'data': data
-		})
-		kernel._notify_comm_closed(self)
+		if kernel._open:
+			kernel.session.send(kernel.shell, 'comm_close', {
+				'comm_id': self.comm_id,
+				'data': data
+			})
+			kernel._notify_comm_closed(self)
 
 
 
@@ -262,6 +462,9 @@ class DebugKernelRequestListener (KernelRequestListener):
 
 
 class KernelConnection(object):
+	__ctx = None
+	__ctx_ref_count = 0
+
 	'''
 	    An IPython kernel connection
 
@@ -303,7 +506,10 @@ class KernelConnection(object):
 		control_port = connection['control_port']
 
 		# JeroMQ context
-		self.__ctx = ZMQ.context(1)
+		cls = type(self)
+		if cls.__ctx is None:
+			cls.__ctx = ZMQ.context(1)
+		cls.__ctx_ref_count += 1
 
 		# Create the four IPython sockets; SHELL, IOPUB, STDIN and CONTROL
 		self.shell = self.__ctx.socket(ZMQ.DEALER)
@@ -351,6 +557,12 @@ class KernelConnection(object):
 
 		# State
 		self.__busy = False
+		self._open = True
+
+
+
+	def is_open(self):
+		return self._open
 
 
 	def close(self):
@@ -362,7 +574,12 @@ class KernelConnection(object):
 		self.iopub.close()
 		self.stdin.close()
 		self.control.close()
-		self.__ctx.close()
+		cls = type(self)
+		cls.__ctx_ref_count -= 1
+		if cls.__ctx_ref_count == 0:
+			cls.__ctx.close()
+			cls.__ctx = None
+		self._open = False
 
 
 	def poll(self, timeout=0):
@@ -371,31 +588,36 @@ class KernelConnection(object):
 
 		:param timeout: The amount of time to wait for a message in milliseconds.
 			-1 = wait indefinitely, 0 = return immediately,
-		:return:
+		:return: a boolean indicating if events were processed
 		'''
-		n_events = self.__poller.poll(timeout)
-		while n_events > 0:
-			if self.__poller.pollin(self.__iopub_poll_index):
-				ident, msg = self.session.recv(self.iopub)
-				ident = _unpack_ident(ident)
-				self._iopub_handler.handle(ident, msg)
+		processed_events = False
+		if self._open:
+			n_events = self.__poller.poll(timeout)
+			if n_events > 0:
+				processed_events = True
+			while n_events > 0:
+				if self.__poller.pollin(self.__iopub_poll_index):
+					ident, msg = self.session.recv(self.iopub)
+					ident = _unpack_ident(ident)
+					self._iopub_handler.handle(ident, msg)
 
-			if self.__poller.pollin(self.__stdin_poll_index):
-				ident, msg = self.session.recv(self.stdin)
-				ident = _unpack_ident(ident)
-				self._stdin_handler.handle(ident, msg)
+				if self.__poller.pollin(self.__stdin_poll_index):
+					ident, msg = self.session.recv(self.stdin)
+					ident = _unpack_ident(ident)
+					self._stdin_handler.handle(ident, msg)
 
-			if self.__poller.pollin(self.__shell_poll_index):
-				ident, msg = self.session.recv(self.shell)
-				ident = _unpack_ident(ident)
-				self._shell_handler.handle(ident, msg)
+				if self.__poller.pollin(self.__shell_poll_index):
+					ident, msg = self.session.recv(self.shell)
+					ident = _unpack_ident(ident)
+					self._shell_handler.handle(ident, msg)
 
-			if self.__poller.pollin(self.__control_poll_index):
-				ident, msg = self.session.recv(self.control)
-				ident = _unpack_ident(ident)
-				self._control_handler.handle(ident, msg)
+				if self.__poller.pollin(self.__control_poll_index):
+					ident, msg = self.session.recv(self.control)
+					ident = _unpack_ident(ident)
+					self._control_handler.handle(ident, msg)
 
-			n_events = self.__poller.poll(0)
+				n_events = self.__poller.poll(0)
+		return processed_events
 
 
 	@property
@@ -418,19 +640,20 @@ class KernelConnection(object):
 		:param on_abort: status=abort callback: f()
 		:return: message ID
 		'''
-		msg, msg_id = self.session.send(self.shell, 'execute_request', {
-			'code': code,
-			'silent': silent,
-			'store_history': store_history,
-			'user_expressions': user_expressions if user_expressions is not None   else {},
-			'allow_stdin': allow_stdin
-		})
+		if self._open:
+			msg, msg_id = self.session.send(self.shell, 'execute_request', {
+				'code': code,
+				'silent': silent,
+				'store_history': store_history,
+				'user_expressions': user_expressions if user_expressions is not None   else {},
+				'allow_stdin': allow_stdin
+			})
 
-		if listener is not None:
-			self.__request_listeners[msg_id] = listener
-			listener.ref(2)
+			if listener is not None:
+				self.__request_listeners[msg_id] = listener
+				listener.ref(2)
 
-		return msg_id
+			return msg_id
 
 
 	def inspect_request(self, code, cursor_pos, detail_level=0, listener=None):
@@ -444,17 +667,18 @@ class KernelConnection(object):
 		:param on_error: status=error callback: f(ename, evalue, traceback)
 		:return: message ID
 		'''
-		msg, msg_id = self.session.send(self.shell, 'inspect_request', {
-			'code': code,
-			'cursor_pos': cursor_pos,
-			'detail_level': detail_level
-		})
+		if self._open:
+			msg, msg_id = self.session.send(self.shell, 'inspect_request', {
+				'code': code,
+				'cursor_pos': cursor_pos,
+				'detail_level': detail_level
+			})
 
-		if listener is not None:
-			self.__request_listeners[msg_id] = listener
-			listener.ref()
+			if listener is not None:
+				self.__request_listeners[msg_id] = listener
+				listener.ref()
 
-		return msg_id
+			return msg_id
 
 
 	def complete_request(self, code, cursor_pos, listener=None):
@@ -467,16 +691,17 @@ class KernelConnection(object):
 		:param on_error: status=error callback: f(ename, evalue, traceback)
 		:return: message ID
 		'''
-		msg, msg_id = self.session.send(self.shell, 'complete_request', {
-			'code': code,
-			'cursor_pos': cursor_pos
-		})
+		if self._open:
+			msg, msg_id = self.session.send(self.shell, 'complete_request', {
+				'code': code,
+				'cursor_pos': cursor_pos
+			})
 
-		if listener is not None:
-			self.__request_listeners[msg_id] = listener
-			listener.ref()
+			if listener is not None:
+				self.__request_listeners[msg_id] = listener
+				listener.ref()
 
-		return msg_id
+			return msg_id
 
 
 	def history_request_range(self, output=True, raw=False,
@@ -492,14 +717,15 @@ class KernelConnection(object):
 		:param on_history: callback: f(history)
 		:return: message ID
 		'''
-		msg, msg_id = self.session.send(self.shell, 'history_request',
-						{'output': output, 'raw': raw, 'hist_access_type': 'range',
-						 'session': session, 'start': start, 'stop': stop})
+		if self._open:
+			msg, msg_id = self.session.send(self.shell, 'history_request',
+							{'output': output, 'raw': raw, 'hist_access_type': 'range',
+							 'session': session, 'start': start, 'stop': stop})
 
-		if on_history is not None:
-			self.__history_reply_handlers[msg_id] = on_history
+			if on_history is not None:
+				self.__history_reply_handlers[msg_id] = on_history
 
-		return msg_id
+			return msg_id
 
 
 	def history_request_tail(self, output=True, raw=False,
@@ -513,14 +739,15 @@ class KernelConnection(object):
 		:param on_history: callback: f(history)
 		:return: message ID
 		'''
-		msg, msg_id = self.session.send(self.shell, 'history_request',
-						{'output': output, 'raw': raw, 'hist_access_type': 'tail',
-						 'n': n})
+		if self._open:
+			msg, msg_id = self.session.send(self.shell, 'history_request',
+							{'output': output, 'raw': raw, 'hist_access_type': 'tail',
+							 'n': n})
 
-		if on_history is not None:
-			self.__history_reply_handlers[msg_id] = on_history
+			if on_history is not None:
+				self.__history_reply_handlers[msg_id] = on_history
 
-		return msg_id
+			return msg_id
 
 
 	def history_request_search(self, output=True, raw=False,
@@ -536,14 +763,15 @@ class KernelConnection(object):
 		:param on_history: callback: f(history)
 		:return: message ID
 		'''
-		msg, msg_id = self.session.send(self.shell, 'history_request',
-						{'output': output, 'raw': raw, 'hist_access_type': 'search',
-						 'n': n, 'pattern': pattern, 'unique': unique})
+		if self._open:
+			msg, msg_id = self.session.send(self.shell, 'history_request',
+							{'output': output, 'raw': raw, 'hist_access_type': 'search',
+							 'n': n, 'pattern': pattern, 'unique': unique})
 
-		if on_history is not None:
-			self.__history_reply_handlers[msg_id] = on_history
+			if on_history is not None:
+				self.__history_reply_handlers[msg_id] = on_history
 
-		return msg_id
+			return msg_id
 
 
 	def connect_request(self, on_connect=None):
@@ -553,12 +781,13 @@ class KernelConnection(object):
 		:param on_connect: callback: f(shell_port, iopub_port, stdin_port, hb_port)
 		:return: message ID
 		'''
-		msg, msg_id = self.session.send(self.shell, 'connect_request', {})
+		if self._open:
+			msg, msg_id = self.session.send(self.shell, 'connect_request', {})
 
-		if on_connect is not None:
-			self.__connect_reply_handlers[msg_id] = on_connect
+			if on_connect is not None:
+				self.__connect_reply_handlers[msg_id] = on_connect
 
-		return msg_id
+			return msg_id
 
 
 	def kernel_info_request(self, on_kernel_info=None):
@@ -569,12 +798,13 @@ class KernelConnection(object):
 			language_version, banner)
 		:return: message ID
 		'''
-		msg, msg_id = self.session.send(self.shell, 'kernel_info', {})
+		if self._open:
+			msg, msg_id = self.session.send(self.shell, 'kernel_info', {})
 
-		if on_kernel_info is not None:
-			self.__kernel_info_reply_handlers[msg_id] = on_kernel_info
+			if on_kernel_info is not None:
+				self.__kernel_info_reply_handlers[msg_id] = on_kernel_info
 
-		return msg_id
+			return msg_id
 
 
 	def shutdown_request(self, on_shutdown=None):
@@ -584,12 +814,13 @@ class KernelConnection(object):
 		:param on_shutdown: callback: f(restart)
 		:return: message ID
 		'''
-		msg, msg_id = self.session.send(self.shell, 'shutdown', {})
+		if self._open:
+			msg, msg_id = self.session.send(self.shell, 'shutdown', {})
 
-		if on_shutdown is not None:
-			self.__shutdown_reply_handlers[msg_id] = on_shutdown
+			if on_shutdown is not None:
+				self.__shutdown_reply_handlers[msg_id] = on_shutdown
 
-		return msg_id
+			return msg_id
 
 
 	def open_comm(self, target_name, data=None):
@@ -600,17 +831,18 @@ class KernelConnection(object):
 		:param data: extra initialisation data
 		:return: a Comm object
 		'''
-		if data is None:
-			data = {}
+		if self._open:
+			if data is None:
+				data = {}
 
-		comm_id = uuid.uuid4()
-		comm = Comm(self, comm_id, target_name)
-		self.__comm_id_to_comm[comm_id] = comm
+			comm_id = uuid.uuid4()
+			comm = Comm(self, comm_id, target_name)
+			self.__comm_id_to_comm[comm_id] = comm
 
-		self.session.send(self.shell, 'comm_open',
-				  {'comm_id': comm_id, 'target_name': target_name, 'data': data})
+			self.session.send(self.shell, 'comm_open',
+					  {'comm_id': comm_id, 'target_name': target_name, 'data': data})
 
-		return comm
+			return comm
 
 
 	def _notity_comm_closed(self, comm):
@@ -864,192 +1096,55 @@ class KernelConnection(object):
 		del self.__comm_id_to_comm[comm_id]
 
 
-class Session(object):
-	def __init__(self, key, username=''):
-		'''
-		IPython session constructor
-
-		:param key: message authentication key from connection file
-		:param username: Username of user (or empty string)
-		:return:
-		'''
-		self.__key = key.encode('utf8')
-
-		self.auth = hmac.HMAC(self.__key, digestmod=hashlib.sha256)
-
-		self.session = str(uuid.uuid4())
-		self.username = username
-
-		self.__none = self._pack({})
+__connection_file_paths = []
+__ipython_processes = []
 
 
-	def send(self, stream, msg_type, content=None, parent=None, metadata=None, ident=None, buffers=None):
-		'''
-		Build and sent a message on a JeroMQ stream
-
-		:param stream: the JeroMQ stream over which the message is to be sent
-		:param msg_type: the message type (see IPython docs for explanation of these)
-		:param content: message content
-		:param parent: message parent header
-		:param metadata: message metadata
-		:param ident: IDENT
-		:param buffers: binary data buffers to append to message
-		:return: a tuple of (message structure, message ID)
-		'''
-		msg, msg_id = self.build_msg(msg_type, content, parent, metadata)
-		to_send = self.serialize(msg, ident)
-		if buffers is not None:
-			to_send.extend(buffers)
-		for part in to_send[:-1]:
-			stream.sendMore(part)
-		stream.send(to_send[-1])
-		return msg, msg_id
-
-	def recv(self, stream):
-		'''
-		Receive a message from a stream
-		:param stream: the JeroMQ stream from which to read the message
-		:return: a tuple: (idents, msg) where msg is the deserialized message
-		'''
-		msg_list = [stream.recv()]
-		while stream.hasReceiveMore():
-			msg_list.append(stream.recv())
-
-		# Extract identities
-		pos = msg_list.index(DELIM)
-		idents, msg_list = msg_list[:pos], msg_list[pos + 1:]
-		return idents, self.deserialize(msg_list)
 
 
-	def serialize(self, msg, ident=None):
-		'''
-		Serialize a message into a list of byte arrays
+class IPythonKernelProcess (object):
+	__kernels = []
 
-		:param msg: the message to serialize
-		:param ident: the ident
-		:return: the serialize message in the form of a list of byte arrays
-		'''
-		content = msg.get('content', {})
-		if content is None:
-			content = self.__none
-		else:
-			content = self._pack(content)
+	def __init__(self, connection_file_path=None):
+		# If no connection file path was specified, generate one
+		if connection_file_path is None:
+			handle, connection_file_path = tempfile.mkstemp(suffix='.json', prefix='kernel')
+			os.close(handle)
+			os.remove(connection_file_path)
 
-		payload = [self._pack(msg['header']),
-			   self._pack(msg['parent_header']),
-			   self._pack(msg['metadata']),
-			   content]
+		self.__connection_file_path = connection_file_path
 
-		serialized = []
+		# Spawn the kernel in a sub-process
+		self.__proc = subprocess.Popen(['ipython', 'kernel', '-f', self.__connection_file_path])
 
-		if isinstance(ident, list):
-			serialized.extend(ident)
-		elif ident is not None:
-			serialized.append(ident)
-		serialized.append(DELIM)
+		self.__connection = None
 
-		signature = self.sign(payload)
-		serialized.append(signature)
-		serialized.extend(payload)
-
-		return serialized
+		self.__kernels.append(self)
 
 
-	def deserialize(self, msg_list):
-		'''
-		Deserialize a message, converting it from a list of byte arrays to a message structure (a dict)
-		:param msg_list: serialized message in the form of a list of byte arrays
-		:return: message structure
-		'''
-		min_len = 5
-		if self.auth is not None:
-			signature = msg_list[0]
-			check = self.sign(msg_list[1:5])
-			if signature != check:
-				raise ValueError, 'Invalid signature'
-		if len(msg_list) < min_len:
-			raise ValueError, 'Message too short'
-		header = self._unpack(msg_list[1])
-		return {
-			'header': header,
-			'msg_id': header['msg_id'],
-			'msg_type': header['msg_type'],
-			'parent_header': self._unpack(msg_list[2]),
-			'metadata': self._unpack(msg_list[3]),
-			'content': self._unpack(msg_list[4]),
-			'buffers': msg_list[5:]
-		}
+	def is_open(self):
+		return self.__connection.is_open()   if self.__connection is not None   else None
 
 
-	def build_msg_header(self, msg_type):
-		'''
-		Build a header for a message of the given type
-		:param msg_type: the message type
-		:return: the message header
-		'''
-		msg_id = str(uuid.uuid4())
-		return {
-			'msg_id': msg_id,
-			'msg_type': msg_type,
-			'username': self.username,
-			'session': self.session,
-			'date': datetime.datetime.now().isoformat(),
-			'version': KERNEL_PROTOCOL_VERSION
-		}
-
-	def build_msg(self, msg_type, content=None, parent=None, metadata=None):
-		'''
-		Build a message of the given type, with content, parent and metadata
-		:param msg_type: the message type
-		:param content: message content
-		:param parent: message parent header
-		:param metadata: metadata
-		:return: the message structure
-		'''
-		header = self.build_msg_header(msg_type)
-		msg_id = header['msg_id']
-		return {
-			       'header': header,
-			       'msg_id': msg_id,
-			       'msg_type': msg_type,
-			       'parent_header': {} if parent is None   else parent,
-			       'content': {} if content is None   else content,
-			       'metadata': {} if metadata is None   else metadata,
-		       }, msg_id
+	def close(self):
+		if self.__connection is not None:
+			self.__connection.close()
+		self.__proc.terminate()
+		if os.path.exists(self.__connection_file_path):
+			os.remove(self.__connection_file_path)
 
 
-	def sign(self, msg_payload_list):
-		'''
-		Sign a message payload
-
-		:param msg_payload_list: the message payload (header, parent header, content, metadata)
-		:return: signature hash hex digest
-		'''
-		if self.auth is None:
-			return StringUtil.toBytes('')
-		else:
-			h = self.auth.copy()
-			for m in msg_payload_list:
-				h.update(m)
-			return StringUtil.toBytes(h.hexdigest())
 
 
-	def _pack(self, x):
-		'''
-		Pack message data into a byte array
 
-		:param x: message data to pack
-		:return: byte array
-		'''
-		return StringUtil.toBytes(json.dumps(x))
-
-	def _unpack(self, x):
-		'''
-		Unpack byte array into message data
-
-		:param x: byte array to unpack
-		:return: message component
-		'''
-		return json.loads(StringUtil.fromBytes(x))
-
+	@property
+	def connection(self):
+		if self.__connection is None:
+			if os.path.exists(self.__connection_file_path):
+				try:
+					self.__connection = KernelConnection(kernel_path=self.__connection_file_path)
+				except InvalidConnectionFileError:
+					# Try again
+					pass
+		return self.__connection
 
