@@ -52,12 +52,12 @@ class _KernelListener (kernel.KernelRequestListener):
 
 
 	def on_execute_ok(self, execution_count, payload, user_expressions):
-		print 'KernelListener.on_execute_ok'
+		# print 'KernelListener.on_execute_ok'
 		self.finished(self.result)
 
 	def on_execute_error(self, ename, evalue, traceback):
-		print 'KernelListener.on_execute_error'
-		tb = Column([Label(x)   for x in traceback])
+		# print 'KernelListener.on_execute_error'
+		tb = Column([Label(x.decode('utf8'))   for x in traceback])
 		fields = []
 		fields.append(HorizontalField('Exception name:', Label(ename)))
 		fields.append(HorizontalField('Exception value:', Label(evalue)))
@@ -66,20 +66,20 @@ class _KernelListener (kernel.KernelRequestListener):
 		self.finished(self.result)
 
 	def on_execute_abort(self):
-		print 'KernelListener.on_execute_abort'
+		# print 'KernelListener.on_execute_abort'
 		self.result.result = [_aborted]
 		self.finished(self.result)
 
 
 	def on_execute_result(self, execution_count, data, metadata):
-		print 'KernelListener.on_execute_result'
+		# print 'KernelListener.on_execute_result'
 		text = data.get('text/plain')
 		if text is not None:
 			self.result.result = [text]
 
 
 	def on_stream(self, stream_name, data):
-		print 'KernelListener.on_stream'
+		# print 'KernelListener.on_stream'
 		if stream_name == 'stdout':
 			self.std.out.write(data)
 		elif stream_name == 'stderr':
@@ -122,7 +122,7 @@ class IPythonKernel (abstract_kernel.AbstractKernel):
 
 
 	def _queue_exec(self, module, code, evaluate_last_expression, result_callback):
-		print 'IPythonKernel._queue_exec'
+		# print 'IPythonKernel._queue_exec'
 		listener = _KernelListener(result_callback)
 
 		src = CodeGenerator.compileSourceForExecution(code, module.name)
@@ -153,7 +153,7 @@ def start_ipython_kernel(on_kernel_started, connection_file_path=None):
 	# Poll the connection
 	def check_connection():
 		if krn_proc.connection is not None:
-			print 'Kernel started'
+			# print 'Kernel started'
 
 			krn = IPythonKernel(krn_proc)
 			on_kernel_started(krn)
@@ -168,7 +168,7 @@ def start_ipython_kernel(on_kernel_started, connection_file_path=None):
 
 
 def shutdown():
-	print 'Cleanup'
+	# print 'Cleanup'
 	IPythonKernel.close_all_open_kernels()
 
 	if _timer is not None:
