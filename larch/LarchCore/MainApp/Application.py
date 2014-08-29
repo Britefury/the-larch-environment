@@ -27,6 +27,13 @@ class AppState (object):
 		self._docToAppDoc = {}
 		self._documentIDCounter = 1
 		self._consoles = []
+
+		def on_kernel_stared(krn):
+			self.ipython_kernel = krn
+
+		self.ipython_context = ipython_kernel.IPythonContext()
+		self.ipython_kernel = None
+		self.ipython_context.start_kernel(on_kernel_stared)
 		
 		
 	def getOpenDocuments(self):
@@ -149,7 +156,7 @@ class AppState (object):
 		:param windowManager: the Larch window manager
 		:return: None
 		"""
-		ipython_kernel.shutdown()
+		self.ipython_context.close()
 
 
 

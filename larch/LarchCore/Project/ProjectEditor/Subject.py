@@ -23,8 +23,6 @@ from LarchCore.MainApp import DocumentManagement
 from LarchCore.Project.ProjectEditor import View
 from LarchCore.Project.ProjectEditor.ModuleFinder import RootFinder, PackageFinder
 
-from LarchCore.Kernel import inproc_kernel, ipython_kernel
-
 
 
 
@@ -64,14 +62,6 @@ _projectCommands = CommandSet( 'LarchCore.Project', [ _saveCommand, _saveAsComma
 
 
 
-_ipython_kernel = None
-
-def _on_ipython_kernel_started(krn):
-	global _ipython_kernel
-	_ipython_kernel = krn
-
-ipython_kernel.start_ipython_kernel(_on_ipython_kernel_started)
-
 class ProjectSubject (Subject):
 	def __init__(self, document, model, enclosingSubject, path, importName, title):
 		super( ProjectSubject, self ).__init__( enclosingSubject, path )
@@ -80,8 +70,6 @@ class ProjectSubject (Subject):
 		self._title = title
 		packageFinder = PackageFinder( self, model )
 		self._rootFinder = RootFinder( self, model.pythonPackageName, packageFinder )
-		# self.kernel = inproc_kernel.InProcessKernel()
-		self.kernel = _ipython_kernel
 
 
 	@property
