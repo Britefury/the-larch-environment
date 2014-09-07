@@ -21,6 +21,9 @@ class InProcessModule (abstract_kernel.AbstractModule):
 		LoadBuiltins.loadBuiltins(self.__module)
 
 
+	def assign_variable(self, name, value):
+		setattr(self.__module, name, value)
+
 	def getResultOfExecution(self, code, evaluate_last_expression, result_callback):
 		result = Execution.getResultOfExecutionWithinModule(code, self.__module, evaluate_last_expression)
 		result_callback(result)

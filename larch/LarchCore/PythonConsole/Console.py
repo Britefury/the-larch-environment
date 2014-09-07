@@ -8,7 +8,6 @@
 from java.lang import StringBuilder
 
 import sys
-import imp
 from copy import copy, deepcopy
 
 from java.awt import Color
@@ -127,16 +126,16 @@ class Console (object):
 
 
 
-	def __init__(self, name, showBanner=True):
+	def __init__(self, kernel, name, showBanner=True):
 		self._incr = IncrementalValueMonitor( self )
 
 		self._blocks = []
 		self._currentPythonModule = Python2.py25NewModuleAsRoot()
 		self._before = []
 		self._after = []
-		self._module = imp.new_module( name )
+		self._kernel = kernel
+		self._module = self._kernel.new_module(name)
 		self._showBanner = showBanner
-		LoadBuiltins.loadBuiltins( self._module )
 
 
 	def getBlocks(self):
@@ -174,7 +173,7 @@ class Console (object):
 
 
 	def assignVariable(self, name, value):
-		setattr( self._module, name, value )
+		self._module.assign_variable(name, value)
 		self._blocks.append( ConsoleVarAssignment( name, value ) )
 		self._incr.onChanged()
 
@@ -183,13 +182,15 @@ class Console (object):
 	def execute(self, bEvaluate=True):
 		module = self.getCurrentPythonModule()
 		if not Python2.isEmptyTopLevel(module):
-			execResult = Execution.getResultOfExecutionWithinModule( module, self._module, bEvaluate )
-			self._commit( module, execResult )
+			def on_result(result):
+				self._commit(module, result)
+			self._module.getResultOfExecution(module, bEvaluate, on_result)
 
 	def executeModule(self, module, bEvaluate=True):
 		if not Python2.isEmptyTopLevel(module):
-			execResult = Execution.getResultOfExecutionWithinModule( module, self._module, bEvaluate )
-			self._commit( module, execResult )
+			def on_result(result):
+				self._commit(module, result)
+			self._module.getResultOfExecution(module, bEvaluate, on_result)
 
 
 
