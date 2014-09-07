@@ -22,13 +22,13 @@ import BritefuryJ.Util.Platform;
 
 public class KeyboardTargetInteractor extends KeyboardInteractor
 {
-    private static final int NAV_NONE = -1;
-    private static final int NAV_LEFT = 1;
-    private static final int NAV_RIGHT = 2;
-    private static final int NAV_UP = 3;
-    private static final int NAV_DOWN = 4;
-    private static final int NAV_HOME = 5;
-    private static final int NAV_END = 6;
+	private static final int NAV_NONE = -1;
+	private static final int NAV_LEFT = 1;
+	private static final int NAV_RIGHT = 2;
+	private static final int NAV_UP = 3;
+	private static final int NAV_DOWN = 4;
+	private static final int NAV_HOME = 5;
+	private static final int NAV_END = 6;
 
 
 	LSRootElement root;
@@ -137,13 +137,13 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 		int keyMods = Modifier.maskKeyModifiers(modifiers);
 		boolean bCtrl = (keyMods  &  Modifier.CTRL) != 0;
 
-        boolean bCmd;
-        if (Platform.getPlatform() == Platform.MAC) {
-            bCmd = (keyMods & Modifier.META) != 0;
-        }
-        else {
-            bCmd = (keyMods & Modifier.ALT) != 0;
-        }
+		boolean bCmd;
+		if (Platform.getPlatform() == Platform.MAC) {
+			bCmd = (keyMods & Modifier.META) != 0;
+		}
+		else {
+			bCmd = (keyMods & Modifier.ALT) != 0;
+		}
 
 		if (getNavigationOperation(event) != NAV_NONE)
 		{
@@ -195,7 +195,7 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 	
 	private boolean handleNavigationKeyPress(KeyEvent event)
 	{
-        int navOp = getNavigationOperation(event);
+        	int navOp = getNavigationOperation(event);
 		if (navOp != NAV_NONE)
 		{
 			Target target = getTarget();
@@ -356,39 +356,39 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 	}
 
 
-    private static int getNavigationOperation(KeyEvent event)
-    {
-        int modifiers = Modifier.getKeyModifiersFromEvent( event );
-        int keyMods = Modifier.maskKeyModifiers(modifiers) & ~Modifier.SHIFT;   // Shift used for selecting ranges, so ignore
-        int keyCode = event.getKeyCode();
-        if (keyCode == KeyEvent.VK_LEFT && keyMods == 0)
-        {
-            return NAV_LEFT;
-        }
-        else if (keyCode == KeyEvent.VK_RIGHT && keyMods == 0)
-        {
-            return NAV_RIGHT;
-        }
-        else if (keyCode == KeyEvent.VK_UP && keyMods == 0)
-        {
-            return NAV_UP;
-        }
-        else if (keyCode == KeyEvent.VK_DOWN && keyMods == 0)
-        {
-            return NAV_DOWN;
-        }
-        else if (keyCode == KeyEvent.VK_HOME && keyMods == 0  ||
-                keyCode == KeyEvent.VK_LEFT && keyMods == Modifier.META && Platform.getPlatform() == Platform.MAC)
-        {
-            return NAV_HOME;
-        }
-        else if (keyCode == KeyEvent.VK_END && keyMods == 0  ||
-                keyCode == KeyEvent.VK_RIGHT && keyMods == Modifier.META && Platform.getPlatform() == Platform.MAC)
-        {
-            return NAV_END;
-        }
-        return NAV_NONE;
-    }
+	private static int getNavigationOperation(KeyEvent event)
+	{
+		int modifiers = Modifier.getKeyModifiersFromEvent( event );
+		int keyMods = Modifier.maskKeyModifiers(modifiers) & ~Modifier.SHIFT;   // Shift used for selecting ranges, so ignore
+		int keyCode = event.getKeyCode();
+		if (keyCode == KeyEvent.VK_LEFT && keyMods == 0)
+		{
+			return NAV_LEFT;
+		}
+		else if (keyCode == KeyEvent.VK_RIGHT && keyMods == 0)
+		{
+			return NAV_RIGHT;
+		}
+		else if (keyCode == KeyEvent.VK_UP && keyMods == 0)
+		{
+			return NAV_UP;
+		}
+		else if (keyCode == KeyEvent.VK_DOWN && keyMods == 0)
+		{
+			return NAV_DOWN;
+		}
+		else if (keyCode == KeyEvent.VK_HOME && keyMods == 0  ||
+				keyCode == KeyEvent.VK_LEFT && keyMods == Modifier.META && Platform.getPlatform() == Platform.MAC)
+		{
+			return NAV_HOME;
+		}
+		else if (keyCode == KeyEvent.VK_END && keyMods == 0  ||
+				keyCode == KeyEvent.VK_RIGHT && keyMods == Modifier.META && Platform.getPlatform() == Platform.MAC)
+		{
+			return NAV_END;
+		}
+		return NAV_NONE;
+	}
 
 	private static boolean isModifierKey(KeyEvent event)
 	{
