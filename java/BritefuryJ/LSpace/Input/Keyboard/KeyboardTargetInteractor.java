@@ -18,9 +18,19 @@ import BritefuryJ.LSpace.Focus.Target;
 import BritefuryJ.LSpace.Input.Modifier;
 import BritefuryJ.LSpace.Interactor.AbstractElementInteractor;
 import BritefuryJ.LSpace.Interactor.KeyElementInteractor;
+import BritefuryJ.Util.Platform;
 
 public class KeyboardTargetInteractor extends KeyboardInteractor
 {
+    private static final int NAV_NONE = -1;
+    private static final int NAV_LEFT = 1;
+    private static final int NAV_RIGHT = 2;
+    private static final int NAV_UP = 3;
+    private static final int NAV_DOWN = 4;
+    private static final int NAV_HOME = 5;
+    private static final int NAV_END = 6;
+
+
 	LSRootElement root;
 	
 	
@@ -92,7 +102,7 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 
 	public boolean keyReleased(Keyboard keyboard, KeyEvent event)
 	{
-		if ( isNavigationKey( event ) )
+		if (getNavigationOperation(event) != NAV_NONE)
 		{
 			return true;
 		}
@@ -124,11 +134,18 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 	public boolean keyTyped(Keyboard keyboard, KeyEvent event)
 	{
 		int modifiers = Modifier.getKeyModifiersFromEvent( event );
-		
-		boolean bCtrl = ( modifiers & Modifier.KEYS_MASK )  ==  Modifier.CTRL;
-		boolean bAlt = ( modifiers & Modifier.KEYS_MASK )  ==  Modifier.ALT;
+		int keyMods = Modifier.maskKeyModifiers(modifiers);
+		boolean bCtrl = (keyMods  &  Modifier.CTRL) != 0;
 
-		if ( isNavigationKey( event ) )
+        boolean bCmd;
+        if (Platform.getPlatform() == Platform.MAC) {
+            bCmd = (keyMods & Modifier.META) != 0;
+        }
+        else {
+            bCmd = (keyMods & Modifier.ALT) != 0;
+        }
+
+		if (getNavigationOperation(event) != NAV_NONE)
 		{
 			return true;
 		}
@@ -138,7 +155,7 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 			{
 				return false;
 			}
-			else if ( !bCtrl  &&  !bAlt)
+			else if ( !bCtrl  &&  !bCmd)
 			{
 				Selection selection = getSelection();
 				if ( selection != null  &&  selection.isEditable() )
@@ -178,34 +195,35 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 	
 	private boolean handleNavigationKeyPress(KeyEvent event)
 	{
-		if ( isNavigationKey( event ) )
+        int navOp = getNavigationOperation(event);
+		if (navOp != NAV_NONE)
 		{
 			Target target = getTarget();
 			if ( target.isValid() )
 			{
 				SelectionPoint prevPoint = target.createSelectionPoint();
-				
-				if ( event.getKeyCode() == KeyEvent.VK_LEFT )
+
+				if (navOp == NAV_LEFT)
 				{
 					target.moveLeft();
 				}
-				else if ( event.getKeyCode() == KeyEvent.VK_RIGHT )
+				else if (navOp == NAV_RIGHT)
 				{
 					target.moveRight();
 				}
-				else if ( event.getKeyCode() == KeyEvent.VK_UP )
+				else if (navOp == NAV_UP)
 				{
 					target.moveUp();
 				}
-				else if ( event.getKeyCode() == KeyEvent.VK_DOWN )
+				else if (navOp == NAV_DOWN)
 				{
 					target.moveDown();
 				}
-				else if ( event.getKeyCode() == KeyEvent.VK_HOME )
+				else if (navOp == NAV_HOME)
 				{
 					target.moveToHome();
 				}
-				else if ( event.getKeyCode() == KeyEvent.VK_END )
+				else if (navOp == NAV_END)
 				{
 					target.moveToEnd();
 				}
@@ -338,24 +356,40 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 	}
 
 
+    private static int getNavigationOperation(KeyEvent event)
+    {
+        int modifiers = Modifier.getKeyModifiersFromEvent( event );
+        int keyMods = Modifier.maskKeyModifiers(modifiers) & ~Modifier.SHIFT;   // Shift used for selecting ranges, so ignore
+        int keyCode = event.getKeyCode();
+        if (keyCode == KeyEvent.VK_LEFT && keyMods == 0)
+        {
+            return NAV_LEFT;
+        }
+        else if (keyCode == KeyEvent.VK_RIGHT && keyMods == 0)
+        {
+            return NAV_RIGHT;
+        }
+        else if (keyCode == KeyEvent.VK_UP && keyMods == 0)
+        {
+            return NAV_UP;
+        }
+        else if (keyCode == KeyEvent.VK_DOWN && keyMods == 0)
+        {
+            return NAV_DOWN;
+        }
+        else if (keyCode == KeyEvent.VK_HOME && keyMods == 0  ||
+                keyCode == KeyEvent.VK_LEFT && keyMods == Modifier.META && Platform.getPlatform() == Platform.MAC)
+        {
+            return NAV_HOME;
+        }
+        else if (keyCode == KeyEvent.VK_END && keyMods == 0  ||
+                keyCode == KeyEvent.VK_RIGHT && keyMods == Modifier.META && Platform.getPlatform() == Platform.MAC)
+        {
+            return NAV_END;
+        }
+        return NAV_NONE;
+    }
 
-
-	private static boolean isNavigationKey(KeyEvent event)
-	{
-		int modifiers = Modifier.getKeyModifiersFromEvent( event );
-		int keyMods = modifiers & Modifier.KEYS_MASK;
-		if  ( keyMods == Modifier.SHIFT  ||  keyMods == 0 )
-		{
-			int keyCode = event.getKeyCode();
-			return keyCode == KeyEvent.VK_LEFT  ||  keyCode == KeyEvent.VK_RIGHT  ||  keyCode == KeyEvent.VK_UP  ||  keyCode == KeyEvent.VK_DOWN  ||
-				keyCode == KeyEvent.VK_HOME  ||  keyCode == KeyEvent.VK_END;
-		}
-		else
-		{
-			return false;
-		}
-	}
-	
 	private static boolean isModifierKey(KeyEvent event)
 	{
 		int keyCode = event.getKeyCode();
