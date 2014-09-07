@@ -34,6 +34,9 @@ class IPythonModule (abstract_kernel.AbstractModule):
 		self.__kernel = kernel
 		self.name = name
 
+	def assign_variable(self, name, value):
+		raise NotImplementedError, 'Operation assign_variable not supported by IPythonModule'
+
 	def getResultOfExecution(self, code, evaluate_last_expression, result_callback):
 		self.__kernel._queue_exec(self, code, evaluate_last_expression, result_callback)
 
