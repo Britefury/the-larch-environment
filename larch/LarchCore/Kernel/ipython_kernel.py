@@ -6,11 +6,6 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2014.
 ##-*************************
 import sys
-JARS = ['jeromq-0.3.5-SNAPSHOT.jar', 'guava-17.0.jar']
-for jar in JARS:
-	if jar not in sys.path:
-		sys.path.append(jar)
-
 from java.awt import Color
 from javax.swing import Timer
 
