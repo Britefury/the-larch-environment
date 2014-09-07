@@ -61,6 +61,7 @@ _projectCommands = CommandSet( 'LarchCore.Project', [ _saveCommand, _saveAsComma
 
 
 
+
 class ProjectSubject (Subject):
 	def __init__(self, document, model, enclosingSubject, path, importName, title):
 		super( ProjectSubject, self ).__init__( enclosingSubject, path )
