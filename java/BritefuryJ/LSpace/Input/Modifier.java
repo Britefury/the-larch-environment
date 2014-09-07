@@ -27,8 +27,8 @@ public class Modifier
 	public static final int BUTTON7 = 0x4000;
 	public static final int BUTTON8 = 0x8000;
 
-    private static int KEY_MODS_MASK = CTRL | SHIFT | ALT | ALT_GRAPH | META;
-    private static int BUTTON_MODS_MASK = CTRL | SHIFT | ALT | ALT_GRAPH;
+	private static int KEY_MODS_MASK = CTRL | SHIFT | ALT | ALT_GRAPH | META;
+	private static int BUTTON_MODS_MASK = CTRL | SHIFT | ALT | ALT_GRAPH;
 
 	public static final int _BUTTONS_SHIFT = 8;
 	public static final int BUTTONS_MASK = 0xff00;
@@ -138,7 +138,7 @@ public class Modifier
 	}
 
 
-    public static int maskKeyModifiers(int modifiers)
+	public static int maskKeyModifiers(int modifiers)
 	{
 		return modifiers & KEY_MODS_MASK;
 	}
@@ -149,13 +149,13 @@ public class Modifier
 	}
 
 
-    public static int maskButtonModifiers(int modifiers)
-    {
-        return modifiers & BUTTON_MODS_MASK;
-    }
+	public static int maskButtonModifiers(int modifiers)
+	{
+		return modifiers & BUTTON_MODS_MASK;
+	}
 
-    public static int invMaskButtonModifiers(int modifiers)
-    {
-        return modifiers & ~BUTTON_MODS_MASK;
-    }
+	public static int invMaskButtonModifiers(int modifiers)
+	{
+		return modifiers & ~BUTTON_MODS_MASK;
+	}
 }

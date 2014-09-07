@@ -56,20 +56,20 @@ public class PointerButtonEvent extends AbstractPointerButtonEvent
 
 
 
-    public boolean isContextButtonEvent() {
-        int mods = pointer.getModifiers();
+	public boolean isContextButtonEvent() {
+		int mods = pointer.getModifiers();
 
-        boolean contextClick;
-        if (Platform.getPlatform() == Platform.MAC) {
-            // Mac: context click in response to:
-            // - button 1 & meta (CMD)
-            // - button 3
-            return button == 1  &&  (mods & Modifier.META) != 0  ||  button == 3;
-        }
-        else {
-            // Windows / Linux
-            // button 3
-            return button == 3;
-        }
-    }
+		boolean contextClick;
+		if (Platform.getPlatform() == Platform.MAC) {
+			// Mac: context click in response to:
+			// - button 1 & meta (CMD)
+			// - button 3
+			return button == 1  &&  (mods & Modifier.META) != 0  ||  button == 3;
+		}
+		else {
+			// Windows / Linux
+			// button 3
+			return button == 3;
+		}
+	}
 }
