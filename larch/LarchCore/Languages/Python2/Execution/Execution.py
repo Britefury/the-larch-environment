@@ -9,6 +9,8 @@ import sys
 
 from java.lang import Throwable
 
+from BritefuryJ.Incremental import IncrementalValueMonitor
+from BritefuryJ.Pres.Primitive import Column
 from BritefuryJ.Util.RichString import RichStringBuilder
 
 from BritefuryJ.Util.Jython import JythonException
@@ -67,6 +69,7 @@ class MultiplexedRichStream (object):
 	def __init__(self, streamNames):
 		self.__streamsByName = { name : self._SingleStream( self, name )   for name in streamNames }
 		self.__multiplexed = []
+		self.__incr = IncrementalValueMonitor()
 
 
 	def __getattr__(self, item):
@@ -107,11 +110,13 @@ class MultiplexedRichStream (object):
 	def _write(self, streamName, text):
 		stream = self.__multiplexedForName(streamName)
 		stream.write( text )
+		self.__incr.onChanged()
 
 
 	def _display(self, streamName, value):
 		stream = self.__multiplexedForName(streamName)
 		stream.display( value )
+		self.__incr.onChanged()
 
 
 	def __multiplexedForName(self, name):
@@ -124,14 +129,53 @@ class MultiplexedRichStream (object):
 		return stream
 
 
+	def __present__(self, fragment, inherited_state):
+		self.__incr.onAccess()
+		columnContents = []
+		for stream in self:
+			if stream.name == 'out':
+				columnContents.append( ExecutionPresCombinators.execStdout( stream.richString ) )
+			elif stream.name == 'err':
+				columnContents.append( ExecutionPresCombinators.execStderr( stream.richString ) )
+			else:
+				raise ValueError, 'Unreckognised stream \'{0}\''.format( stream.name )
+		return Column(columnContents)
+
+
 
 
 class ExecutionResult (object):
-	def __init__(self, streams, caughtException, result=None):
+	def __init__(self, streams, caughtException=None, result=None):
 		super( ExecutionResult, self ).__init__()
+		self.__incr = IncrementalValueMonitor()
 		self._streams = streams
 		self._caughtException = caughtException
 		self._result = result
+
+
+	@property
+	def streams(self):
+		return self._streams
+
+
+	@property
+	def caught_exception(self):
+		return self._caughtException
+
+	@caught_exception.setter
+	def caught_exception(self, e):
+		self._caughtException = e
+		self.__incr.onChanged()
+
+
+	@property
+	def result(self):
+		return self._result
+
+	@result.setter
+	def result(self, res):
+		self._result = res
+		self.__incr.onChanged()
 
 
 	def suppressStdOut(self):
@@ -166,10 +210,12 @@ class ExecutionResult (object):
 
 
 	def view(self, bUseDefaultPerspecitveForException=True, bUseDefaultPerspectiveForResult=True):
+		self.__incr.onAccess()
 		return ExecutionPresCombinators.executionResultBox( self._streams, self._caughtException, self._result, bUseDefaultPerspecitveForException, bUseDefaultPerspectiveForResult )
 
 
 	def minimalView(self, bUseDefaultPerspecitveForException=True, bUseDefaultPerspectiveForResult=True):
+		self.__incr.onAccess()
 		return ExecutionPresCombinators.minimalExecutionResultBox( self._streams, self._caughtException, self._result, bUseDefaultPerspecitveForException, bUseDefaultPerspectiveForResult )
 
 

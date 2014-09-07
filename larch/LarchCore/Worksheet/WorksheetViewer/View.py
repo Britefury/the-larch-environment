@@ -290,7 +290,7 @@ class WorksheetViewerSubject (Subject):
 	@property
 	def _modelView(self):
 		if self.__modelView is None:
-			self.__modelView = ViewSchema.WorksheetView( None, self._model, self._importName )
+			self.__modelView = ViewSchema.WorksheetView( None, self._model, self._importName, self.kernel )
 		return self.__modelView
 
 
