@@ -7,8 +7,6 @@
 //##************************
 package BritefuryJ.LSpace.Input;
 
-import BritefuryJ.Util.Platform;
-
 import java.awt.event.InputEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +26,10 @@ public class Modifier
 	public static final int BUTTON6 = 0x2000;
 	public static final int BUTTON7 = 0x4000;
 	public static final int BUTTON8 = 0x8000;
-	
+
+    private static int KEY_MODS_MASK = CTRL | SHIFT | ALT | ALT_GRAPH | META;
+    private static int BUTTON_MODS_MASK = CTRL | SHIFT | ALT | ALT_GRAPH;
+
 	public static final int _BUTTONS_SHIFT = 8;
 	public static final int BUTTONS_MASK = 0xff00;
 	
@@ -137,31 +138,24 @@ public class Modifier
 	}
 
 
-    // Don't include the META key in the keysMask, as Windows seems to report meta as being pressed when the right button is clicked, even though there is no meta key...
-    private static int keysMask = 0;
-
-
-    public static int getKeysMask() {
-        if (keysMask == 0) {
-            if (Platform.getPlatform() == Platform.MAC) {
-                keysMask = CTRL | SHIFT | ALT | ALT_GRAPH | META;
-            }
-            else {
-                // Don't include the META key in the keysMask, as Windows seems to report meta as being pressed when the right button is clicked, even though there is no meta key...
-                keysMask = CTRL | SHIFT | ALT | ALT_GRAPH;
-            }
-        }
-
-        return keysMask;
-    }
-
     public static int maskKeyModifiers(int modifiers)
 	{
-		return modifiers & getKeysMask();
+		return modifiers & KEY_MODS_MASK;
 	}
 
 	public static int invMaskKeyModifiers(int modifiers)
 	{
-		return modifiers & ~getKeysMask();
+		return modifiers & ~KEY_MODS_MASK;
 	}
+
+
+    public static int maskButtonModifiers(int modifiers)
+    {
+        return modifiers & BUTTON_MODS_MASK;
+    }
+
+    public static int invMaskButtonModifiers(int modifiers)
+    {
+        return modifiers & ~BUTTON_MODS_MASK;
+    }
 }
