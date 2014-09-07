@@ -36,7 +36,6 @@ import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
-import BritefuryJ.Pres.Primitive.Region;
 import BritefuryJ.Projection.AbstractPerspective;
 import BritefuryJ.Projection.Subject;
 import BritefuryJ.StyleSheet.StyleSheet;
@@ -133,7 +132,7 @@ public class FragmentView implements IncrementalMonitorListener, FragmentContext
 		@Override
 		public boolean buttonPress(LSElement element, PointerButtonEvent event)
 		{
-			int keyMods = Modifier.getKeyModifiers( event.getModifiers() );
+			int keyMods = Modifier.maskKeyModifiers(event.getModifiers());
 			if ( keyMods == ( Modifier.CTRL | Modifier.ALT )  ||  keyMods == ( Modifier.SHIFT | Modifier.ALT ) )
 			{
 				if ( event.getButton() == 3 )

@@ -3104,7 +3104,7 @@ abstract public class LSElement implements Presentable
 		@Override
 		public void pointerEnter(LSElement element, PointerMotionEvent event)
 		{
-			if ( ( event.getModifiers() & Modifier.KEYS_MASK )  == 0 )
+			if ( Modifier.maskKeyModifiers(event.getModifiers())  == 0 )
 			{
 				activateExplorerHighlight( element );
 			}
@@ -3120,7 +3120,7 @@ abstract public class LSElement implements Presentable
 		public void pointerMotion(LSElement element, PointerMotionEvent event)
 		{
 			// Suppress highlight if any modifier keys are pressed - this is helpful for capturing an element for SVG rendering. 
-			if ( ( event.getModifiers() & Modifier.KEYS_MASK )  != 0 )
+			if ( Modifier.maskKeyModifiers( event.getModifiers() )  != 0 )
 			{
 				deactivateExplorerHighlight( element );
 			}

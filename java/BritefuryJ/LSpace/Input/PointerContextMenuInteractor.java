@@ -16,14 +16,18 @@ import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Interactor.AbstractElementInteractor;
 import BritefuryJ.LSpace.Interactor.ContextMenuElementInteractor;
+import BritefuryJ.Util.Platform;
 
 public class PointerContextMenuInteractor extends PointerInteractor
 {
 	public boolean buttonDown(Pointer pointer, PointerButtonEvent event)
 	{
 		int button = event.getButton(), mods = pointer.getModifiers();
-		if ( button == 3  &&  ( mods & Modifier.KEYS_MASK  ) == 0  ||
-				button == 1  &&  ( mods & Modifier.KEYS_MASK ) == 0  &&  ( mods & Modifier.META ) != 0 )		// Detect Apple-click on Mac
+
+        boolean cmdClick = Platform.getPlatform() == Platform.MAC  &&  button == 1
+                &&  Modifier.maskKeyModifiers( mods ) == Modifier.META;     // Detect Apple-click on Mac
+
+		if ( button == 3  &&  Modifier.maskKeyModifiers(mods) == 0  ||  cmdClick )
 		{
 			VPopupMenu menu = new VPopupMenu();
 			
@@ -42,12 +46,12 @@ public class PointerContextMenuInteractor extends PointerInteractor
 	
 	public boolean buttonUp(Pointer pointer, PointerButtonEvent event)
 	{
-		return event.getButton() == 3  &&  ( pointer.getModifiers() & Modifier.KEYS_MASK  ) ==  0;
+		return event.getButton() == 3  &&  Modifier.maskKeyModifiers( pointer.getModifiers() ) ==  0;
 	}
 	
 	public boolean buttonClicked(Pointer pointer, PointerButtonClickedEvent event)
 	{
-		return event.getButton() == 3  &&  ( pointer.getModifiers() & Modifier.KEYS_MASK  ) ==  0;
+		return event.getButton() == 3  &&  Modifier.maskKeyModifiers(pointer.getModifiers()) ==  0;
 	}
 	
 	

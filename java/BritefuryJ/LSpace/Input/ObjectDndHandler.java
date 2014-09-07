@@ -613,7 +613,7 @@ public class ObjectDndHandler extends DndHandler
 		int requestedAspect = 0;
 		
 		int modifiers = pointer.getModifiers();
-		int mods = Modifier.getKeyModifiers( modifiers );
+		int mods = Modifier.maskKeyModifiers(modifiers);
 		if ( mods == ( Modifier.CTRL | Modifier.ALT )  ||  mods == ( Modifier.SHIFT | Modifier.ALT ) )
 		{
 			if ( button == 1 )

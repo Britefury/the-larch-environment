@@ -49,7 +49,7 @@ public class PointerNavigationInteractor extends AbstractPointerDragInteractor
 	private boolean testNavigationModifiers(PointerInterface pointer)
 	{
 		int modifiers = pointer.getModifiers();
-		int keys = Modifier.getKeyModifiers( modifiers );
+		int keys = Modifier.maskKeyModifiers(modifiers);
 		return keys == Modifier.ALT;
 	}
 	
