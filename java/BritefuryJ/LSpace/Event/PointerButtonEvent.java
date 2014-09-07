@@ -9,9 +9,10 @@ package BritefuryJ.LSpace.Event;
 
 import java.awt.geom.AffineTransform;
 
+import BritefuryJ.LSpace.Input.Modifier;
 import BritefuryJ.LSpace.Input.PointerInterface;
 import BritefuryJ.Math.Xform2;
-
+import BritefuryJ.Util.Platform;
 
 
 public class PointerButtonEvent extends AbstractPointerButtonEvent
@@ -51,4 +52,24 @@ public class PointerButtonEvent extends AbstractPointerButtonEvent
 	{
 		return new PointerButtonEvent( pointer.transformed( xToLocal ), button, action );
 	}
+
+
+
+
+    public boolean isContextButtonEvent() {
+        int mods = pointer.getModifiers();
+
+        boolean contextClick;
+        if (Platform.getPlatform() == Platform.MAC) {
+            // Mac: context click in response to:
+            // - button 1 & meta (CMD)
+            // - button 3
+            return button == 1  &&  (mods & Modifier.META) != 0  ||  button == 3;
+        }
+        else {
+            // Windows / Linux
+            // button 3
+            return button == 3;
+        }
+    }
 }

@@ -22,12 +22,9 @@ public class PointerContextMenuInteractor extends PointerInteractor
 {
 	public boolean buttonDown(Pointer pointer, PointerButtonEvent event)
 	{
-		int button = event.getButton(), mods = pointer.getModifiers();
+		int mods = Modifier.maskButtonModifiers(pointer.getModifiers());
 
-        boolean cmdClick = Platform.getPlatform() == Platform.MAC  &&  button == 1
-                &&  Modifier.maskKeyModifiers( mods ) == Modifier.META;     // Detect Apple-click on Mac
-
-		if ( button == 3  &&  Modifier.maskKeyModifiers(mods) == 0  ||  cmdClick )
+		if (event.isContextButtonEvent()  &&  mods == 0)
 		{
 			VPopupMenu menu = new VPopupMenu();
 			
