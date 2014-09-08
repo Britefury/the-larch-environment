@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2014.
 ##-*************************
-import sys
+import sys, ast
 from java.awt import Color
 from javax.swing import Timer
 
@@ -76,7 +76,7 @@ class _KernelListener (kernel.KernelRequestListener):
 		# print 'KernelListener.on_execute_result'
 		text = data.get('text/plain')
 		if text is not None:
-			self.result.result = [text]
+			self.result.result = [ast.literal_eval(text)]
 
 
 	def on_stream(self, stream_name, data):
