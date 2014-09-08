@@ -304,10 +304,13 @@ def getResultOfEvaluationWithinModule(pythonExpr, module):
 	evalCode = None
 	caughtException = None
 	result = None
-	try:
-		evalCode = CodeGenerator.compileForModuleEvaluation( module, pythonExpr, module.__name__ )
-	except:
-		caughtException = JythonException.getCurrentException()
+	if isinstance(pythonExpr, str)  or  isinstance(pythonExpr, unicode):
+		evalCode = pythonExpr
+	else:
+		try:
+			evalCode = CodeGenerator.compileForModuleEvaluation( module, pythonExpr, module.__name__ )
+		except:
+			caughtException = JythonException.getCurrentException()
 
 	if evalCode is not None:
 		savedStdout, savedStderr = sys.stdout, sys.stderr

@@ -304,7 +304,7 @@ class PythonCodeAbstractView (NodeAbstractView):
 			self._result = result
 			self._incr.onChanged()
 
-		module.getResultOfExecution( self.getCode(), self.isResultVisible(), result_callback )
+		module.execute( self.getCode(), self.isResultVisible(), result_callback )
 
 
 

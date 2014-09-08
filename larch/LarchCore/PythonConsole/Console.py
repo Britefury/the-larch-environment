@@ -107,25 +107,6 @@ def _dropPrompt(varNameTextEntryListener):
 
 
 class Console (object):
-	class Output (object):
-		def __init__(self):
-			self._builder = None
-
-		def write(self, text):
-			if not ( isinstance( text, str )  or  isinstance( text, unicode ) ):
-				raise TypeError, 'argument 1 must be string, not %s' % type( text )
-			if self._builder is None:
-				self._builder = StringBuilder()
-			self._builder.append( text )
-
-		def getText(self):
-			if self._builder is not None:
-				return self._builder.toString()
-			else:
-				return None
-
-
-
 	def __init__(self, kernel, name, showBanner=True):
 		self._incr = IncrementalValueMonitor( self )
 
@@ -135,6 +116,15 @@ class Console (object):
 		self._after = []
 		self._kernel = kernel
 		self._module = self._kernel.new_module(name)
+		self._banner_execution_result = None
+
+		if showBanner:
+			def on_result(result):
+				self._banner_execution_result = result
+				self._incr.onChanged()
+
+			self._module.evaluate('__import__("sys").version', on_result)
+
 		self._showBanner = showBanner
 
 
@@ -184,13 +174,13 @@ class Console (object):
 		if not Python2.isEmptyTopLevel(module):
 			def on_result(result):
 				self._commit(module, result)
-			self._module.getResultOfExecution(module, bEvaluate, on_result)
+			self._module.execute(module, bEvaluate, on_result)
 
 	def executeModule(self, module, bEvaluate=True):
 		if not Python2.isEmptyTopLevel(module):
 			def on_result(result):
 				self._commit(module, result)
-			self._module.getResultOfExecution(module, bEvaluate, on_result)
+			self._module.execute(module, bEvaluate, on_result)
 
 
 
@@ -225,7 +215,11 @@ class Console (object):
 
 		# Header
 		if self._showBanner:
-			bannerVersionText = [ _bannerTextStyle.applyTo( NormalText( v ) )   for v in sys.version.split( '\n' ) ]
+			banner_text = ''
+			if self._banner_execution_result is not None  and  self._banner_execution_result.result is not None:
+				# SECURITY: potential flaw; evaluating text received from kernel
+				banner_text = eval(self._banner_execution_result.result[0])
+			bannerVersionText = [ _bannerTextStyle.applyTo( NormalText( v ) )   for v in banner_text.split( '\n' ) ]
 			helpText1 = Row( [ _bannerHelpKeyTextStyle.applyTo( Label( 'Ctrl+Enter' ) ),
 					   _bannerHelpTextStyle.applyTo( Label( ' - execute and evaluate, ' ) ),
 					   _bannerHelpKeyTextStyle.applyTo( Label( 'Ctrl+Shift+Enter' ) ),

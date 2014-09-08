@@ -24,7 +24,13 @@ class InProcessModule (abstract_kernel.AbstractModule):
 	def assign_variable(self, name, value):
 		setattr(self.__module, name, value)
 
-	def getResultOfExecution(self, code, evaluate_last_expression, result_callback):
+	def evaluate(self, expr, result_callback):
+		result = Execution.getResultOfEvaluationWithinModule(expr, self.__module)
+		result_callback(result)
+
+	def execute(self, code, evaluate_last_expression, result_callback):
+		if isinstance(code, str)  or  isinstance(code, unicode):
+			raise NotImplementedError, 'InProcessModule.execute: executing of code as strings not yet supported'
 		result = Execution.getResultOfExecutionWithinModule(code, self.__module, evaluate_last_expression)
 		result_callback(result)
 
