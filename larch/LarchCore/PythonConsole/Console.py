@@ -217,8 +217,7 @@ class Console (object):
 		if self._showBanner:
 			banner_text = ''
 			if self._banner_execution_result is not None  and  self._banner_execution_result.result is not None:
-				# SECURITY: potential flaw; evaluating text received from kernel
-				banner_text = eval(self._banner_execution_result.result[0])
+				banner_text = self._banner_execution_result.result[0]
 			bannerVersionText = [ _bannerTextStyle.applyTo( NormalText( v ) )   for v in banner_text.split( '\n' ) ]
 			helpText1 = Row( [ _bannerHelpKeyTextStyle.applyTo( Label( 'Ctrl+Enter' ) ),
 					   _bannerHelpTextStyle.applyTo( Label( ' - execute and evaluate, ' ) ),
