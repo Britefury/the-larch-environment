@@ -14,7 +14,16 @@ class AbstractModule (object):
 	def assign_variable(self, name, value):
 		raise NotImplementedError, 'abstract'
 
-	def getResultOfExecution(self, code, evaluate_last_expression, result_callback):
+	def evaluate(self, expr, result_callback):
+		"""
+		Evaluate and expression within the module
+
+		:param expr: the expression to execute
+		:param result_callback: a callback function of the form f(result) that is passed the result when execution completes
+		"""
+		raise NotImplementedError, 'abstract'
+
+	def execute(self, code, evaluate_last_expression, result_callback):
 		"""
 		Execute code within the module
 
@@ -24,6 +33,7 @@ class AbstractModule (object):
 		:param result_callback: a callback function of the form f(result) that is passed the result when execution completes
 		"""
 		raise NotImplementedError, 'abstract'
+
 
 class AbstractKernel (object):
 	def new_module(self, name):

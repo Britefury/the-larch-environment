@@ -316,7 +316,7 @@ class Comm(object):
 
 
 def _get_parent_msg_id(msg):
-	return msg['parent_header']['msg_id']
+	return msg['parent_header'].get('msg_id')
 
 
 class KernelRequestListener (object):

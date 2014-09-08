@@ -37,7 +37,10 @@ class IPythonModule (abstract_kernel.AbstractModule):
 	def assign_variable(self, name, value):
 		raise NotImplementedError, 'Operation assign_variable not supported by IPythonModule'
 
-	def getResultOfExecution(self, code, evaluate_last_expression, result_callback):
+	def evaluate(self, code, result_callback):
+		self.__kernel._queue_eval(self, code, result_callback)
+
+	def execute(self, code, evaluate_last_expression, result_callback):
 		self.__kernel._queue_exec(self, code, evaluate_last_expression, result_callback)
 
 
@@ -113,7 +116,25 @@ class IPythonKernel (abstract_kernel.AbstractKernel):
 		# print 'IPythonKernel._queue_exec'
 		listener = _KernelListener(result_callback)
 
-		src = CodeGenerator.compileSourceForExecution(code, module.name)
+		if isinstance(code, str)  or  isinstance(code, unicode):
+			src = code
+		else:
+			src = CodeGenerator.compileSourceForExecution(code, module.name)
+		std = Execution.MultiplexedRichStream(['out', 'err'])
+		self.__stdout = std.out
+		self.__stderr = std.err
+		self.__kernel.execute_request(src, listener=listener)
+		self.__queue_poll()
+
+
+	def _queue_eval(self, module, expr, result_callback):
+		# print 'IPythonKernel._queue_exec'
+		listener = _KernelListener(result_callback)
+
+		if isinstance(expr, str)  or  isinstance(expr, unicode):
+			src = expr
+		else:
+			src = CodeGenerator.compileForEvaluation(expr, module.name)
 		std = Execution.MultiplexedRichStream(['out', 'err'])
 		self.__stdout = std.out
 		self.__stderr = std.err
