@@ -46,7 +46,7 @@ class KernelDescription (object):
 	_score_<attribute_name>
 	"""
 
-	def __init__(self, human_description, attributes_as_tuples):
+	def __init__(self, human_description, sys_version, attributes_as_tuples):
 		"""
 		Constructor
 

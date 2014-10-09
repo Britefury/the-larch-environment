@@ -26,10 +26,10 @@ from Britefury.Kernel.Document import Document
 from BritefuryJ.StyleSheet import StyleSheet
 from BritefuryJ.Browser.TestPages import TestsRootPage
 
-from BritefuryJ.LSpace import PageController
+from BritefuryJ.LSpace import PageController, Anchor
 from BritefuryJ.Graphics import FilledBorder
 
-from BritefuryJ.Controls import Hyperlink
+from BritefuryJ.Controls import Hyperlink, MenuItem, VPopupMenu
 from BritefuryJ.Pres import Pres
 from BritefuryJ.Pres.Primitive import Primitive, Border, Row, Column, RGrid, GridRow
 from BritefuryJ.Pres.RichText import TitleBar, HSeparator, Head, Body, Page, SplitLinkHeaderBar, NormalText, StrongSpan, EmphSpan
@@ -37,9 +37,11 @@ from BritefuryJ.Pres.UI import Section, SectionHeading1
 from BritefuryJ.Pres.Help import AttachTooltip, TipBox
 
 from BritefuryJ.Projection import Perspective
+from BritefuryJ.DefaultPerspective import DefaultPerspective
 
 from LarchCore.MainApp import Application
 from LarchCore.MainApp import DocumentManagement
+from LarchCore.Kernel import interpreter_config_page
 
 
 
@@ -163,16 +165,28 @@ class AppView (MethodDispatchView):
 
 			
 		def on_new_ipython_console(link, event):
-			def on_kernel_started(kernel):
-				consoles = node.getConsoles()
-				index = _newConsoleIndex( consoles )
+			def make_on_menu_item(krn_entry):
+				def on_menu_item(menu_item):
+					def on_kernel_started(kernel):
+						consoles = node.getConsoles()
+						index = _newConsoleIndex( consoles )
 
-				appConsole = Application.AppConsole(kernel, '<ipy_console{0}>'.format(index),
-								    'IPython console {0}'.format(index), index)
+						description = krn_entry.kernel_description.human_description
+						appConsole = Application.AppConsole(kernel, '<ipy_console{0}>'.format(index),
+										    'IPython console {0} ({1})'.format(index, description), index)
 
-				new_console(link, appConsole)
+						new_console(link, appConsole)
 
-			node.ipython_context.start_kernel(on_kernel_started)
+					kernel_factory = krn_entry.kernel_factory
+					kernel_factory.create_kernel(on_kernel_started)
+				return on_menu_item
+
+			interp_config = interpreter_config_page.get_interpreter_config()
+			menu_items = [MenuItem(DefaultPerspective.instance.applyTo(krn_entry), make_on_menu_item(krn_entry)) \
+						for krn_entry in interp_config.kernels]
+			menu = VPopupMenu(menu_items)
+
+			menu.popupMenu(link.element, Anchor.TOP_RIGHT, Anchor.TOP_LEFT)
 
 			return True
 

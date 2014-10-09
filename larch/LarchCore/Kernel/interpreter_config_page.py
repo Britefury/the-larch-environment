@@ -57,7 +57,14 @@ class IPythonInterpreterConfigEntry (object):
 		self._config_page = None
 
 
-	def kernel_factory(self, ipython_context):
+	@property
+	def kernel_description(self):
+		return self.__kernel_description
+
+
+	@property
+	def kernel_factory(self):
+		ipython_context = self._config_page._ipython_context
 		if self.__kernel_factory is None:
 			def create_kernel(kernel_created_callback):
 				ipython_context.start_kernel(kernel_created_callback, ipython_path=self.__ipython_path)
@@ -91,7 +98,7 @@ class InterpreterConfigurationPage (ConfigurationPage):
 		super( InterpreterConfigurationPage, self ).__init__()
 		self.__kernels = []
 		self._incr = IncrementalValueMonitor()
-		self._kernel_context = ipython_kernel.IPythonContext()
+		self._ipython_context = ipython_kernel.IPythonContext()
 
 
 	def __getstate__(self):
@@ -103,7 +110,7 @@ class InterpreterConfigurationPage (ConfigurationPage):
 		super( InterpreterConfigurationPage, self ).__setstate__( state )
 		self.__kernels = state['kernels']
 		self._incr = IncrementalValueMonitor()
-		self._kernel_context = ipython_kernel.IPythonContext()
+		self._ipython_context = ipython_kernel.IPythonContext()
 		for kernel in self.__kernels:
 			kernel._config_page = self
 
@@ -138,11 +145,11 @@ class InterpreterConfigurationPage (ConfigurationPage):
 		ipython_path = os.path.join(python_path, 'bin', 'ipython')
 		def on_descr(kernel_information):
 			kernel_desc = kernel_factory.KernelDescription.from_kernel_information(kernel_information)
-			entry = IPythonInterpreterConfigEntry(kernel_desc, python_path)
+			entry = IPythonInterpreterConfigEntry(kernel_desc, ipython_path)
 			entry._config_page = self
 			entry_callback(entry)
 
-		self._kernel_context.get_kernel_description(on_descr, ipython_path=ipython_path)
+		self._ipython_context.get_kernel_description(on_descr, ipython_path=ipython_path)
 
 
 	def present_interpreter_list(self, kernel_list):
@@ -200,6 +207,9 @@ def _load_interpreter_config():
 def save_interpreter_config():
 	saveUserConfig( _interpreter_config_filename, _interpreter_config )
 
+
+def shutdown_interpreter_config():
+	_interpreter_config._ipython_context.close()
 
 
 

@@ -115,11 +115,11 @@ class Console (object):
 		self._after = []
 		self._kernel = kernel
 		self._module = self._kernel.new_module(name)
-		self._banner_execution_result = None
+		self._banner_text = ''
 
 		if showBanner:
 			def on_result(result):
-				self._banner_execution_result = result
+				self._banner_text = result.result
 				self._incr.onChanged()
 
 			self._module.evaluate('__import__("sys").version', on_result)
@@ -214,10 +214,7 @@ class Console (object):
 
 		# Header
 		if self._showBanner:
-			banner_text = ''
-			if self._banner_execution_result is not None  and  self._banner_execution_result.result is not None:
-				banner_text = self._banner_execution_result.result[0]
-			bannerVersionText = [ _bannerTextStyle.applyTo( NormalText( v ) )   for v in banner_text.split( '\n' ) ]
+			bannerVersionText = [ _bannerTextStyle.applyTo( NormalText( v ) )   for v in self._banner_text.split( '\n' ) ]
 			helpText1 = Row( [ _bannerHelpKeyTextStyle.applyTo( Label( 'Ctrl+Enter' ) ),
 					   _bannerHelpTextStyle.applyTo( Label( ' - execute and evaluate, ' ) ),
 					   _bannerHelpKeyTextStyle.applyTo( Label( 'Ctrl+Shift+Enter' ) ),

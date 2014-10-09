@@ -15,7 +15,7 @@ from Britefury.Kernel.Document import Document
 
 from LarchCore.PythonConsole import Console
 
-from LarchCore.Kernel import inproc_kernel, ipython_kernel
+from LarchCore.Kernel import inproc_kernel, ipython_kernel, interpreter_config_page
 
 
 
@@ -36,7 +36,7 @@ class AppState (object):
 		self.ipython_context = ipython_kernel.IPythonContext()
 		self.ipython_kernel = None
 		self.ipython_context.start_kernel(on_kernel_stared)
-		
+
 		
 	def getOpenDocuments(self):
 		self._incr.onAccess()
@@ -159,6 +159,7 @@ class AppState (object):
 		:return: None
 		"""
 		self.ipython_context.close()
+		interpreter_config_page.shutdown_interpreter_config()
 
 
 
