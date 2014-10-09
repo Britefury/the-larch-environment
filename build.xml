@@ -26,6 +26,7 @@
             <zipfileset excludes="META-INF/*.SF" src="${jython.path}"/>
             <zipfileset excludes="META-INF/*.SF" src="./extlibs/jsoup-1.7.3.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="./extlibs/svgSalamander.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="./extlibs/jeromq-0.3.4.jar"/>
         </jar>
     </target>
 </project>

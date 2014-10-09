@@ -62,7 +62,16 @@ class MainAppSubject (TransientSubject):
 				if result is not None:
 					return result
 		return None
-		
+
+
+	@property
+	def ipython_context(self):
+		return self.getFocus().ipython_context
+
+	@property
+	def kernel(self):
+		return self.getFocus().ipython_kernel
+
 
 
 class AboutPageSubject (TransientSubject):

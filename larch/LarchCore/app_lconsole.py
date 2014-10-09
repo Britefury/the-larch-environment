@@ -15,6 +15,7 @@ from Britefury import app
 from Britefury.Windows.WindowManager import WindowManager
 
 from LarchCore.PythonConsole import Console
+from LarchCore.Kernel import inproc_kernel, ipython_kernel
 
 from LarchCore.Languages.Python2.Python2Importer import importPy2File
 
@@ -23,10 +24,12 @@ from LarchCore.Languages.Python2.Python2Importer import importPy2File
 def start_lconsole():
 	UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() )
 
+	kernel = inproc_kernel.InProcessKernel()
+
 	app.appInit()
 	world = World()
 	world.enableImportHooks()
-	console = Console.Console( 'Console' )
+	console = Console.Console( kernel, 'Console' )
 	world.setRootSubject( Console.ConsoleSubject( console, world.worldSubject ) )
 
 

@@ -145,7 +145,7 @@ class WorksheetViewer (MethodDispatchView):
 			executionResult = node.getResult()
 			if executionResult is not None:
 				if not node.isResultVisible():
-					executionResult = executionResult.suppressStdOut().suppressResult()
+					executionResult = executionResult.errorsOnly()
 				if node.isMinimal():
 					executionResultView = executionResult.minimalView()
 				else:
@@ -290,7 +290,7 @@ class WorksheetViewerSubject (Subject):
 	@property
 	def _modelView(self):
 		if self.__modelView is None:
-			self.__modelView = ViewSchema.WorksheetView( None, self._model, self._importName )
+			self.__modelView = ViewSchema.WorksheetView( None, self._model, self._importName, self.kernel )
 		return self.__modelView
 
 

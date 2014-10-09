@@ -107,7 +107,12 @@ class Python2CodeGenerator (object):
 	def compileForExecution(self, pythonModule):
 		source = str( self( pythonModule ) )
 		return compile( source, self._filename, 'exec' )
-	
+
+
+	def compileSourceForExecution(self, pythonModule):
+		source = str( self( pythonModule ) )
+		return source
+
 	
 	def compileForExecutionAndEvaluation(self, pythonModule):
 		execModule = None
@@ -575,17 +580,72 @@ class Python2CodeGenerator (object):
 		raise ValueError, 'Python2CodeGenerator does not support embedded object literals; a Python2ModuleCodeGenerator must be used'
 
 
+	# Embedded object expression
 	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectExpr )
 	def EmbeddedObjectExpr(self, node, embeddedValue):
-		raise ValueError, 'Python2CodeGenerator does not support embedded object expressions; a Python2ModuleCodeGenerator must be used'
-	
-	
+		# Unwrap isolated value
+		value = embeddedValue.getValue()
+
+
+		# Try to use the __py_compile_visit__ method
+		try:
+			visitFn = value.__py_compile_visit__
+		except AttributeError:
+			pass
+		else:
+			# Got a 'visit' function - invoke to allow object to initialise resources, etc
+			visitFn( self )
+
+
+		# Try to use the __py_evalmodel__ method
+		try:
+			modelFn = value.__py_evalmodel__
+		except AttributeError:
+			pass
+		else:
+			# Got a 'model' function - invoke to create AST nodes, then convert them to code
+			model = modelFn( self )
+			return self( model )
+
+
+		raise ValueError, 'Python2CodeGenerator does not support embedded object expressions that do not define a __py_evalmodel__ methods'
+
+
+
+	# Embedded object statement
 	@DMObjectNodeDispatchMethod( Schema.EmbeddedObjectStmt )
-	def EmbeddedObjectStmt (self, node, embeddedValue):
-		raise ValueError, 'Python2CodeGenerator does not support embedded object statements; a Python2ModuleCodeGenerator must be used'
-		
-	
-	
+	def EmbeddedObjectStmt(self, node, embeddedValue):
+		# Unwrap isolated value
+		value = embeddedValue.getValue()
+
+
+		# Try to use the __py_compile_visit__ method
+		try:
+			visitFn = value.__py_compile_visit__
+		except AttributeError:
+			pass
+		else:
+			# Got a 'visit' function - invoke to allow object to initialise resources, etc
+			visitFn( self )
+
+
+		# Try to use the __py_execmodel__ method
+		try:
+			modelFn = value.__py_execmodel__
+		except AttributeError:
+			pass
+		else:
+			# Got a 'model' function - invoke to create AST nodes, then convert them to code
+			model = modelFn( self )
+			return self( model )
+
+
+
+		raise ValueError, 'Python2CodeGenerator does not support embedded object statements that do not define a __py_execmodel__ methods'
+
+
+
+
 	# Expression statement
 	@DMObjectNodeDispatchMethod( Schema.ExprStmt )
 	def ExprStmt(self, node, expr):
@@ -1186,6 +1246,10 @@ def compileForEvaluation(pythonExpression, filename):
 
 def compileForExecution(pythonCode, filename):
 	return Python2CodeGenerator( filename ).compileForExecution( pythonCode )
+
+
+def compileSourceForExecution(pythonCode, filename):
+	return Python2CodeGenerator( filename ).compileSourceForExecution( pythonCode )
 
 
 def compileForExecutionAndEvaluation(pythonCode, filename):
