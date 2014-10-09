@@ -46,11 +46,14 @@ public class PointerNavigationInteractor extends AbstractPointerDragInteractor
 
 
 
-	private boolean testNavigationModifiers(PointerInterface pointer)
+	private boolean testNavigationModifiers(PointerInterface pointer, boolean rightButton)
 	{
 		int modifiers = pointer.getModifiers();
 		int keys = Modifier.maskKeyModifiers(modifiers);
-		return keys == Modifier.ALT;
+        // Allow META if the rightButton is true; MacOS sets META to true when the
+        // right button is pressed
+		return keys == Modifier.ALT  ||
+                (keys == (Modifier.ALT | Modifier.META)   &&  rightButton);
 	}
 	
 	
@@ -58,7 +61,7 @@ public class PointerNavigationInteractor extends AbstractPointerDragInteractor
 	public boolean dragBegin(PointerButtonEvent event)
 	{
 		PointerInterface pointer = event.getPointer();
-		if ( testNavigationModifiers( pointer ) )
+		if ( testNavigationModifiers( pointer, event.getButton() == 3 ) )
 		{
 			if ( !bNavigationDragInProgress )
 			{
@@ -122,7 +125,7 @@ public class PointerNavigationInteractor extends AbstractPointerDragInteractor
 	
 	public boolean scroll(Pointer pointer, PointerScrollEvent event)
 	{
-		if ( testNavigationModifiers( pointer ) )
+		if ( testNavigationModifiers( pointer, false ) )
 		{
 			double delta = (double)event.getScrollY();
 			double scaleDelta = Math.pow( 2.0,  ( delta / 1.5 ) );
