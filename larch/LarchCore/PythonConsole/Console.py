@@ -43,9 +43,8 @@ from BritefuryJ.Util import TypeUtils
 
 
 from LarchCore.Languages.Python2 import Python2
-from LarchCore.Languages.Python2.Execution.ExecutionPresCombinators import execStdout, execStderr, execException, execResult
-from LarchCore.Languages.Python2.Execution import Execution
 
+from LarchCore.Kernel import execution_pres
 
 
 
@@ -298,27 +297,22 @@ class ConsoleBlock (object):
 
 		executionResult = self.getExecResult()
 
-		caughtException = executionResult.getCaughtException()
-		result = executionResult.getResult()
-		streams = executionResult.getStreams()
+		caughtException = executionResult.caught_exception
+		result = executionResult.result
+		streams = executionResult.streams
 
 		moduleView = StyleSheet.style( Primitive.editable( False ) ).applyTo( Python2.python2EditorPerspective.applyTo( pythonModule ) )
 		caughtExceptionView = ApplyPerspective.defaultPerspective( caughtException )   if caughtException is not None   else None
-		resultView = ApplyPerspective.defaultPerspective( result[0] )   if result is not None   else None
+		resultView = ApplyPerspective.defaultPerspective( result )   if executionResult.has_result()   else None
 
 		code = _pythonModuleBorderStyle.applyTo( Border( moduleView.alignHExpand() ).alignHExpand() )
 		outputContents = []
 		for stream in streams:
-			if stream.name == 'out':
-				outputContents.append( execStdout( stream.richString, True ) )
-			elif stream.name == 'err':
-				outputContents.append( execStderr( stream.richString, True ) )
-			else:
-				raise ValueError, 'Unreckognised stream \'{0}\''.format( stream.name )
+			outputContents.append( execution_pres.stream_pres( stream.rich_string, stream.name ) )
 		if caughtExceptionView is not None:
-			outputContents.append( execException( caughtExceptionView ) )
+			outputContents.append( execution_pres.exec_exception( caughtExceptionView ) )
 		if resultView is not None:
-			outputContents.append( execResult( resultView ) )
+			outputContents.append( execution_pres.exec_result( resultView ) )
 		outputColumn = _blockOutputStyle.applyTo( Column( outputContents ).alignHExpand() )
 		return _blockStyle.applyTo( Border( Column( [ code, outputColumn ] ) ) ).alignHExpand()
 

@@ -13,9 +13,10 @@ from BritefuryJ.DocModel import DMNode
 
 from LarchCore.Languages.Python2 import Schema
 from LarchCore.Languages.Python2 import CodeGenerator
-from LarchCore.Languages.Python2.Execution import Execution
 from LarchCore.Languages.Python2 import PythonEditor
 from LarchCore.Languages.Python2.PythonEditor.Parser import Python2Grammar
+
+from LarchCore.Kernel import inproc_kernel
 
 
 _grammar = Python2Grammar()
@@ -237,30 +238,30 @@ class EmbeddedPython2Executable (EmbeddedPython2):
 
 
 	def getResultOfExecutionWithinModule(self, module):
-		return Execution.getResultOfExecutionWithinModule( self.model, module, False )
+		return inproc_kernel.getResultOfExecutionWithinModule( self.model, module, False )
 
 	def getResultOfExecutionAndEvaluationWithinModule(self, module):
-		return Execution.getResultOfExecutionWithinModule( self.model, module, True )
+		return inproc_kernel.getResultOfExecutionWithinModule( self.model, module, True )
 
 
 	def getResultOfExecutionInScopeWithinModule(self, module, globals, locals):
-		return Execution.getResultOfExecutionInScopeWithinModule( self.model, globals, locals, module, False )
+		return inproc_kernel.getResultOfExecutionInScopeWithinModule( self.model, globals, locals, module, False )
 
 	def getResultOfExecutionAndEvaluationInScopeWithinModule(self, module, globals, locals):
-		return Execution.getResultOfExecutionInScopeWithinModule( self.model, globals, locals, module, True )
+		return inproc_kernel.getResultOfExecutionInScopeWithinModule( self.model, globals, locals, module, True )
 
 
 	def executeWithinModule(self, module):
-		return Execution.executeWithinModule( self.model, module, False )
+		return inproc_kernel.executeWithinModule( self.model, module, False )
 
 	def executeAndEvaluateWithinModule(self, module):
-		return Execution.executeWithinModule( self.model, module, True )
+		return inproc_kernel.executeWithinModule( self.model, module, True )
 
 	def executeInScopeWithinModule(self, module, globals, locals):
-		return Execution.executeInScopeWithinModule( self.model, globals, locals, module, False )
+		return inproc_kernel.executeInScopeWithinModule( self.model, globals, locals, module, False )
 
 	def executeAndEvaluateInScopeWithinModule(self, module, globals, locals):
-		return Execution.executeInScopeWithinModule( self.model, globals, locals, module, True )
+		return inproc_kernel.executeInScopeWithinModule( self.model, globals, locals, module, True )
 
 
 

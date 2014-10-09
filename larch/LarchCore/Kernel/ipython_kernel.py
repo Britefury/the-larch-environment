@@ -5,20 +5,20 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2014.
 ##-*************************
-import sys, ast
+import sys, ast, json
 from java.awt import Color
 from javax.swing import Timer
 
-from jipy import kernel
+from mipy import kernel, request_listener
 
 from BritefuryJ.Pres.Primitive import Primitive, Label, Column
 from BritefuryJ.Pres.ObjectPres import ErrorBoxWithFields, HorizontalField, VerticalField
 from BritefuryJ.Graphics import SolidBorder
 from BritefuryJ.StyleSheet import StyleSheet
+from BritefuryJ.Incremental import IncrementalValueMonitor
 
-from . import abstract_kernel
+from . import abstract_kernel, execution_result, execution_pres
 from LarchCore.Languages.Python2 import CodeGenerator
-from LarchCore.Languages.Python2.Execution import Execution
 
 
 _aborted_border = SolidBorder(1.5, 2.0, 5.0, 5.0, Color(1.0, 0.5, 0.0), Color(1.0, 1.0, 0.9))
@@ -44,49 +44,45 @@ class IPythonModule (abstract_kernel.AbstractModule):
 		self.__kernel._queue_exec(self, code, evaluate_last_expression, result_callback)
 
 
-class _KernelListener (kernel.KernelRequestListener):
+class _KernelListener (request_listener.ExecuteRequestListener):
 	def __init__(self, finished):
 		super(_KernelListener, self).__init__()
-		self.std = Execution.MultiplexedRichStream(['out', 'err'])
+		self.result = IPythonExecutionResult()
+		self.std = self.result.streams
 		self.finished = finished
-		self.result = Execution.ExecutionResult(self.std)
 
 
 	def on_execute_ok(self, execution_count, payload, user_expressions):
-		# print 'KernelListener.on_execute_ok'
-		self.finished(self.result)
+		pass
 
 	def on_execute_error(self, ename, evalue, traceback):
 		# print 'KernelListener.on_execute_error'
-		tb = Column([Label(x.decode('utf8'))   for x in traceback])
-		fields = []
-		fields.append(HorizontalField('Exception name:', Label(ename)))
-		fields.append(HorizontalField('Exception value:', Label(evalue)))
-		fields.append(VerticalField('Traceback:', tb))
-		self.result.caught_exception = ErrorBoxWithFields('EXCEPTION IN IPYTHON KERNEL', fields)
-		self.finished(self.result)
+		self.result.set_error(IPythonExecutionError(ename, evalue, traceback))
 
 	def on_execute_abort(self):
 		# print 'KernelListener.on_execute_abort'
-		self.result.result = [_aborted]
-		self.finished(self.result)
+		self.result.notify_aborted()
 
 
 	def on_execute_result(self, execution_count, data, metadata):
 		# print 'KernelListener.on_execute_result'
 		text = data.get('text/plain')
 		if text is not None:
-			self.result.result = [ast.literal_eval(text)]
+			self.result.set_result(ast.literal_eval(text))
 
 
 	def on_stream(self, stream_name, data):
 		# print 'KernelListener.on_stream'
 		if stream_name == 'stdout':
-			self.std.out.write(data)
+			self.std.stdout.write(data)
 		elif stream_name == 'stderr':
-			self.std.err.write(data)
+			self.std.stderr.write(data)
 		else:
 			raise ValueError, 'Unknown stream name {0}'.format(stream_name)
+
+
+	def on_execute_finished(self):
+		self.finished(self.result)
 
 
 
@@ -120,9 +116,9 @@ class IPythonKernel (abstract_kernel.AbstractKernel):
 			src = code
 		else:
 			src = CodeGenerator.compileSourceForExecution(code, module.name)
-		std = Execution.MultiplexedRichStream(['out', 'err'])
-		self.__stdout = std.out
-		self.__stderr = std.err
+		std = execution_result.MultiplexedRichStream()
+		self.__stdout = std.stdout
+		self.__stderr = std.stderr
 		self.__kernel.execute_request(src, listener=listener)
 		self.__queue_poll()
 
@@ -135,9 +131,9 @@ class IPythonKernel (abstract_kernel.AbstractKernel):
 			src = expr
 		else:
 			src = CodeGenerator.compileForEvaluation(expr, module.name)
-		std = Execution.MultiplexedRichStream(['out', 'err'])
-		self.__stdout = std.out
-		self.__stderr = std.err
+		std = execution_result.MultiplexedRichStream()
+		self.__stdout = std.stdout
+		self.__stderr = std.stderr
 		self.__kernel.execute_request(src, listener=listener)
 		self.__queue_poll()
 
@@ -165,6 +161,9 @@ class IPythonContext (object):
 		self.__kernels.remove(kernel)
 
 	def close(self):
+		"""
+		Shutdown
+		"""
 		krns = self.__kernels[:]
 		for krn in krns:
 			krn.close()
@@ -172,8 +171,18 @@ class IPythonContext (object):
 			self.__timer.stop()
 
 
-	def start_kernel(self, on_kernel_started, connection_file_path=None):
-		krn_proc = kernel.IPythonKernelProcess(connection_file_path=connection_file_path)
+	def start_kernel(self, on_kernel_started, ipython_path=None, connection_file_path=None):
+		"""
+		Start an IPython kernel
+
+		:param on_kernel_started: kernel started callback fn(kernel)
+		:param connection_file_path: [optional] path where the temporary connection file should be stored
+		:param python_path: the python distribution from where the bin subdirectory contains the IPython executable
+		"""
+		if ipython_path is None:
+			ipython_path = 'ipython'
+
+		krn_proc = kernel.IPythonKernelProcess(ipython_path=ipython_path, connection_file_path=connection_file_path)
 
 		# Poll the connection
 		def check_connection():
@@ -219,10 +228,106 @@ class IPythonContext (object):
 			self.__timer_queue.append(fn)
 
 
+	def get_kernel_description(self, kernel_description_callback, ipython_path=None):
+		"""
+		Get a kernel description
+		"""
+
+		code = 'import sys, platform, json\n' + \
+			'json.dumps([platform.python_implementation(), platform.python_version_tuple(), sys.version])\n'
+
+		def _on_kernel_started(krn):
+			def on_result(result):
+				krn.close()
+				kernel_information = json.loads(result.result)
+				kernel_description_callback(kernel_information)
+
+			mod = krn.new_module('test')
+			mod.evaluate(code, on_result)
+
+		self.start_kernel(_on_kernel_started, ipython_path=ipython_path)
 
 
 
 
+class IPythonExecutionError (object):
+	def __init__(self, ename, evalue, traceback):
+		self.ename = ename
+		self.evalue = evalue
+		self.traceback = traceback
 
+
+	def __present__(self, fragment, inh):
+		tb = Column([Label(x.decode('utf8'))   for x in self.traceback])
+		fields = []
+		fields.append(HorizontalField('Error:', Label(self.ename)))
+		fields.append(HorizontalField('Value:', Label(self.evalue)))
+		fields.append(VerticalField('Traceback:', tb))
+		return ErrorBoxWithFields('ERROR IN IPYTHON KERNEL', fields)
+
+
+
+class IPythonExecutionResult (execution_result.AbstractExecutionResult):
+	def __init__(self, streams=None, caughtException=None, result_in_tuple=None):
+		super( IPythonExecutionResult, self ).__init__(streams)
+		self.__incr = IncrementalValueMonitor()
+		self._error = None
+		self._result = result_in_tuple
+		self._aborted = False
+
+
+	@property
+	def streams(self):
+		return self._streams
+
+
+	@property
+	def caught_exception(self):
+		return self._error
+
+	def set_error(self, error):
+		self._error = error
+		self.__incr.onChanged()
+
+
+	def has_result(self):
+		return self._result is not None
+
+	@property
+	def result(self):
+		return self._result[0]   if self._result is not None   else None
+
+	def set_result(self, result):
+		self._result = (result,)
+		self.__incr.onChanged()
+
+
+	def was_aborted(self):
+		return self._aborted
+
+	def notify_aborted(self):
+		self._aborted = True
+		self.__incr.onChanged()
+
+
+	def errorsOnly(self):
+		return IPythonExecutionResult( self._streams.suppress_stream( 'out' ), self._caught_exception, None )
+
+
+
+	def hasErrors(self):
+		return self._error is not None  or  self._streams.has_content_for( 'err' )
+
+
+	def view(self, bUseDefaultPerspecitveForException=True, bUseDefaultPerspectiveForResult=True):
+		self.__incr.onAccess()
+		result = _aborted   if self._aborted   else self._result
+		return execution_pres.execution_result_box( self._streams, self._error, result, bUseDefaultPerspecitveForException, bUseDefaultPerspectiveForResult )
+
+
+	def minimalView(self, bUseDefaultPerspecitveForException=True, bUseDefaultPerspectiveForResult=True):
+		self.__incr.onAccess()
+		result = _aborted   if self._aborted   else self._result
+		return execution_pres.minimal_execution_result_box( self._streams, self._error, result, bUseDefaultPerspecitveForException, bUseDefaultPerspectiveForResult )
 
 
