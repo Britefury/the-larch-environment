@@ -480,7 +480,7 @@ class WorksheetEditor (MethodDispatchView):
 		executionResult = node.getResult()
 		if executionResult is not None:
 			if not node.isResultVisible():
-				executionResult = executionResult.suppressStdOut().suppressResult()
+				executionResult = executionResult.errorsOnly()
 			executionResultView = executionResult.view()
 			
 			
@@ -613,7 +613,7 @@ class WorksheetEditorSubject (Subject):
 	def _modelView(self):
 		if self.__modelView is None:
 			try:
-				self.__modelView = EditorSchema.WorksheetEditor( None, self._model, self._importName )
+				self.__modelView = EditorSchema.WorksheetEditor( None, self._model, self._importName, self.kernel )
 			except Exception as e:
 				print e
 				raise

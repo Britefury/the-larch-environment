@@ -22,7 +22,7 @@ from BritefuryJ.StyleSheet import StyleSheet
 
 from LarchCore.Languages.Python2.PythonCommands import pythonCommandSet, WrapSelectedStatementRangeInEmbeddedObjectAction, EmbeddedStatementAtCaretAction, chainActions
 from LarchCore.Languages.Python2.Embedded import EmbeddedPython2Suite, removeEmbeddedObjectContainingElement
-from LarchCore.Languages.Python2.Execution import Execution
+from LarchCore.Kernel import inproc_kernel
 
 
 
@@ -107,7 +107,7 @@ class InlineConsole (object):
 
 	def _refresh(self):
 		if self._module is not None:
-			self._execResult = Execution.getResultOfExecutionInScopeWithinModule( self._suite.model, copy( self._scopeGlobals ), copy( self._scopeLocals ), self._module, True )
+			self._execResult = inproc_kernel.getResultOfExecutionInScopeWithinModule( self._suite.model, copy( self._scopeGlobals ), copy( self._scopeLocals ), self._module, True )
 			self._incr.onChanged()
 
 

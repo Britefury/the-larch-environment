@@ -15,6 +15,8 @@ from Britefury.Kernel.Document import Document
 
 from LarchCore.PythonConsole import Console
 
+from LarchCore.Kernel import inproc_kernel, ipython_kernel
+
 
 
 class AppState (object):
@@ -25,6 +27,15 @@ class AppState (object):
 		self._docToAppDoc = {}
 		self._documentIDCounter = 1
 		self._consoles = []
+
+		def on_kernel_stared(krn):
+			self.ipython_kernel = krn
+
+		self.inproc_kernel = inproc_kernel.InProcessKernel()
+
+		self.ipython_context = ipython_kernel.IPythonContext()
+		self.ipython_kernel = None
+		self.ipython_context.start_kernel(on_kernel_stared)
 		
 		
 	def getOpenDocuments(self):
@@ -147,7 +158,7 @@ class AppState (object):
 		:param windowManager: the Larch window manager
 		:return: None
 		"""
-		pass
+		self.ipython_context.close()
 
 
 
@@ -194,11 +205,12 @@ class AppDocument (object):
 	
 
 class AppConsole (object):
-	def __init__(self, index):
+	def __init__(self, kernel, module_name, full_name, index):
 		self._incr = IncrementalValueMonitor( self )
 		
 		self._index = index
-		self._console = Console.Console( '<console%d>'  %  ( index, ) )
+		self._full_name = full_name
+		self._console = Console.Console( kernel, module_name )
 
 
 	def subject(self, enclosingSubject):
@@ -209,6 +221,10 @@ class AppConsole (object):
 		self._incr.onAccess()
 		return self._index
 	
+	def get_full_name(self):
+		self._incr.onAccess()
+		return self._full_name
+
 	def getConsole(self):
 		self._incr.onAccess()
 		return self._console

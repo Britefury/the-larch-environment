@@ -23,6 +23,7 @@ from BritefuryJ.ObjectPresentation import PresentationStateListenerList
 from BritefuryJ.DefaultPerspective import DefaultPerspective
 
 from LarchCore.PythonConsole import Console
+from LarchCore.Kernel import inproc_kernel
 
 
 _fragSelectorEntryBorder = SolidBorder( 1.0, 3.0, 6.0, 6.0, Color( 0.8, 0.8, 0.8 ), None, Color( 0.5, 0.5, 0.5 ), Color( 0.9, 0.9, 0.9 ) )
@@ -141,7 +142,8 @@ class _FragmentInspector (object):
 	def __init__(self, fragment):
 		self._fragment = fragment
 
-		self._console = Console.Console( '<popup_console>', False )
+		kernel = inproc_kernel.InProcessKernel()
+		self._console = Console.Console( kernel, '<popup_console>', False )
 		self._console.assignVariable( 'm', fragment.model )
 		self._console.assignVariable( 'frag', fragment )
 

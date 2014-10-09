@@ -140,11 +140,8 @@ class AppView (MethodDispatchView):
 				node.registerOpenDocument( document )
 			return True
 
-		
-		def _onNewConsole(link, event):
-			consoles = node.getConsoles()
-			index = _newConsoleIndex( consoles )
-			appConsole = Application.AppConsole( index )
+
+		def new_console(link, appConsole):
 			node.addConsole( appConsole )
 
 			subject = appConsole.subject( fragment.subject )
@@ -152,10 +149,34 @@ class AppView (MethodDispatchView):
 			pageController = link.element.rootElement.pageController
 			pageController.openSubject( subject, PageController.OpenOperation.OPEN_IN_CURRENT_TAB )
 
-			return True
+
 		
+		def on_new_local_console(link, event):
+			consoles = node.getConsoles()
+			index = _newConsoleIndex( consoles )
+			appConsole = Application.AppConsole(node.inproc_kernel, '<local_console{0}>'.format(index),
+							    'Local console {0}'.format(index), index )
+
+			new_console(link, appConsole)
+
+			return True
+
 			
-			
+		def on_new_ipython_console(link, event):
+			def on_kernel_started(kernel):
+				consoles = node.getConsoles()
+				index = _newConsoleIndex( consoles )
+
+				appConsole = Application.AppConsole(kernel, '<ipy_console{0}>'.format(index),
+								    'IPython console {0}'.format(index), index)
+
+				new_console(link, appConsole)
+
+			node.ipython_context.start_kernel(on_kernel_started)
+
+			return True
+
+
 		openDocViews = Pres.mapCoerce( node.getOpenDocuments() )
 		consoles = Pres.mapCoerce( node.getConsoles() )
 
@@ -174,8 +195,9 @@ class AppView (MethodDispatchView):
 		openDocumentsBox = AttachTooltip( openDocumentsBox, 'Click NEW to create a new document. To open from a file, click OPEN, or drag files from a file explorer application.', False )
 		
 		
-		newConsoleLink = Hyperlink( 'NEW', _onNewConsole )
-		consolesBox = _contentsList( [ newConsoleLink ], consoles, 'Python consoles' )
+		new_local_console_link = Hyperlink( 'NEW LOCAL', on_new_local_console )
+		new_ipython_console_link = Hyperlink( 'NEW IPYTHON', on_new_ipython_console )
+		consolesBox = _contentsList( [ new_local_console_link, new_ipython_console_link ], consoles, 'Python consoles' )
 
 
 		tip = TipBox( [ NormalText( [ StrongSpan( 'Getting started: ' ), 'To get programming quickly, create a new Python console by pressing ', EmphSpan( 'new' ), ', beneath', EmphSpan( ' Python consoles' ), '.' ] ),
@@ -260,10 +282,8 @@ class AppView (MethodDispatchView):
 
 	@ObjectDispatchMethod( Application.AppConsole )
 	def AppConsole(self, fragment, state, node):
-		index = node.getIndex()
-		name = 'Console %d'  %  ( index, )
 		subject = node.subject( fragment.subject )
-		consoleLink = Hyperlink( name, subject ).padX( 0.0, _appDocRightPadding )
+		consoleLink = Hyperlink( node.get_full_name(), subject ).padX( 0.0, _appDocRightPadding )
 	
 		return GridRow( [ consoleLink ] )
 
