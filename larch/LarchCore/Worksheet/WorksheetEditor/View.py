@@ -480,7 +480,7 @@ class WorksheetEditor (MethodDispatchView):
 		executionResult = node.getResult()
 		if executionResult is not None:
 			if not node.isResultVisible():
-				executionResult = executionResult.suppressStdOut().suppressResult()
+				executionResult = executionResult.errorsOnly()
 			executionResultView = executionResult.view()
 			
 			

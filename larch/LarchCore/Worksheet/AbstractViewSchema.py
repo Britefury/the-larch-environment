@@ -21,8 +21,7 @@ from BritefuryJ.Projection import SubjectPath
 
 from Britefury import LoadBuiltins
 
-from LarchCore.Languages.Python2.Execution import Execution
-
+from LarchCore.Kernel import inproc_kernel
 
 
 
@@ -366,7 +365,7 @@ class InlinePythonCodeAbstractView (NodeAbstractView):
 
 
 	def _refreshResults(self, module):
-		self._result = Execution.getResultOfEvaluationWithinModule( self.getExpr(), module )
+		self._result = inproc_kernel.getResultOfEvaluationWithinModule( self.getExpr(), module )
 		self._incr.onChanged()
 
 
