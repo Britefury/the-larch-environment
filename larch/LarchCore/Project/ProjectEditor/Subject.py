@@ -96,6 +96,12 @@ class ProjectSubject (Subject):
 		return self._title
 
 
+	def get_kernel(self, kernel_callback):
+		self._model.get_kernel(kernel_callback)
+
+
+
+
 	def buildBoundCommandSetList(self, cmdSets):
 		cmdSets.add( _projectCommands.bindTo( self ) )
 		self.enclosingSubject.buildBoundCommandSetList( cmdSets )

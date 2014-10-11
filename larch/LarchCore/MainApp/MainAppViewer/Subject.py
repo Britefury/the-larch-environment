@@ -64,15 +64,6 @@ class MainAppSubject (TransientSubject):
 		return None
 
 
-	@property
-	def ipython_context(self):
-		return self.getFocus().ipython_context
-
-	@property
-	def kernel(self):
-		return self.getFocus().ipython_kernel
-
-
 
 class AboutPageSubject (TransientSubject):
 	def __init__(self, appStateSubject):

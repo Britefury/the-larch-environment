@@ -16,10 +16,13 @@ import sys
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
-from BritefuryJ.Controls import Hyperlink, MenuItem
+from BritefuryJ.Controls import Hyperlink, MenuItem, VPopupMenu
 
 from BritefuryJ.Graphics import SolidBorder, FilledOutlinePainter
 
+from BritefuryJ.DefaultPerspective import DefaultPerspective
+
+from BritefuryJ.Pres import Pres
 from BritefuryJ.Pres.Primitive import Primitive, Label, Spacer, Border, Row, Column, Table
 from BritefuryJ.Pres.RichText import Body, NormalText, EmphSpan
 from BritefuryJ.Pres.UI import Section, SectionHeading2, SectionHeading3, NotesText
@@ -32,20 +35,10 @@ from Britefury.Config.ConfigurationPage import ConfigurationPage
 from LarchCore.Kernel import kernel_factory, ipython_kernel
 
 
-_interpreter_type_style = StyleSheet.style(Primitive.fontSize(10), Primitive.fontSmallCaps(True), Primitive.foreground(Color(0.4, 0.4, 0.4)))
-_interpreter_descr_style = StyleSheet.style(Primitive.foreground(Color(0.2, 0.2, 0.6)))
-_interpreter_border = SolidBorder(1.0, 3.0, 5.0, 5.0, Color(0.3, 0.3, 0.3), None)
-
 _item_hover_highlight_style = StyleSheet.style( Primitive.hoverBackground( FilledOutlinePainter( Color( 0.8, 0.825, 0.9 ), Color( 0.125, 0.341, 0.574 ), BasicStroke( 1.0 ) ) ) )
 
 
 _interpreter_config_filename = 'interpreters'
-
-
-def _present_interpreter(kernel_type, kernel_description):
-	ktype = _interpreter_type_style.applyTo(Label(kernel_type))
-	descr = _interpreter_descr_style.applyTo(Label(kernel_description.human_description))
-	return _interpreter_border.surround(Column([ktype, descr.padX(7.0, 0.0)]))
 
 
 
@@ -86,7 +79,7 @@ class IPythonInterpreterConfigEntry (object):
 
 
 	def __present__(self, fragment, inh):
-		return _present_interpreter('IPython', self.__kernel_description)
+		return Pres.coerce(self.__kernel_description)
 
 
 
@@ -118,8 +111,20 @@ class InterpreterConfigurationPage (ConfigurationPage):
 
 
 	@property
-	def kernels(self):
+	def kernel_entries(self):
 		return self.__kernels
+
+	@property
+	def kernel_descriptions(self):
+		return [entry.kernel_description   for entry in self.__kernels]
+
+	@property
+	def kernel_factories(self):
+		return [entry.kernel_factory   for entry in self.__kernels]
+
+
+	def get_best_kernel_factory(self, kernel_description):
+		return kernel_description.get_best_factory(self.kernel_factories)
 
 
 	def getSubjectTitle(self):
@@ -144,7 +149,7 @@ class InterpreterConfigurationPage (ConfigurationPage):
 		# Get the description of the kernel at the given path
 		ipython_path = os.path.join(python_path, 'bin', 'ipython')
 		def on_descr(kernel_information):
-			kernel_desc = kernel_factory.KernelDescription.from_kernel_information(kernel_information)
+			kernel_desc = kernel_factory.KernelDescription.from_kernel_information('IPython', kernel_information)
 			entry = IPythonInterpreterConfigEntry(kernel_desc, ipython_path)
 			entry._config_page = self
 			entry_callback(entry)
@@ -198,6 +203,17 @@ class InterpreterConfigurationPage (ConfigurationPage):
 		self._incr.onAccess()
 		ipython_kernels = self.interpreters_section( 'IPython interpreters', self.__kernels )
 		return Body( [ ipython_kernels ] )
+
+
+	def interpreter_chooser_menu(self, on_choose_kernel_factory):
+		def make_on_menu_item(krn_entry):
+			def on_menu_item(menu_item):
+				on_choose_kernel_factory(krn_entry.kernel_factory)
+			return on_menu_item
+
+		menu_items = [MenuItem(DefaultPerspective.instance.applyTo(krn_entry), make_on_menu_item(krn_entry)) \
+			      for krn_entry in self.kernel_entries]
+		return VPopupMenu(menu_items)
 
 
 def _load_interpreter_config():

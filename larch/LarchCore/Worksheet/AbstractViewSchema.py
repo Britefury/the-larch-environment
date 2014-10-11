@@ -49,29 +49,30 @@ class NodeAbstractView (object):
 class WorksheetAbstractView (NodeAbstractView):
 	_projection = None
 
-	def __init__(self, worksheet, model, importName, kernel):
+	def __init__(self, worksheet, model, importName, kernel_source):
 		super( WorksheetAbstractView, self ).__init__( worksheet, model )
 		self._modelToView = WeakValueDictionary()
 		self._importName = importName
-		self._kernel = kernel
+		self._kernel_source = kernel_source
 		self._module = None
 		self.refreshResults()
 		
 		
-	def _initModule(self):
+	def __init_module(self, module_init_callback):
 		name = self._importName   if self._importName is not None   else 'worksheet'
-		self._module = self._kernel.new_module(name)
+		def _on_kernel_created(kernel):
+			self._module = kernel.new_module(name)
+			module_init_callback(self._module)
+		self._kernel_source(_on_kernel_created)
 
 		
 	def refreshResults(self):
-		self._initModule()
 		body = self.getBody()
-		body.refreshResults( self._module )
-	
-		
-	def getModule(self):
-		return self._module
-		
+		body.clear_results()
+		def on_module_initialised(module):
+			body.refreshResults(module)
+		self.__init_module(on_module_initialised)
+
 		
 	def getBody(self):
 		return self._viewOf( self._model['body'] )
@@ -98,7 +99,12 @@ class BodyAbstractView (NodeAbstractView):
 	def __init__(self, worksheet, model):
 		super( BodyAbstractView, self ).__init__( worksheet, model )
 		self._contentsLive = LiveFunction( self._computeContents )
-		
+
+
+	def clear_results(self):
+		for v in self.getContents():
+			v._clear_results()
+
 		
 	def refreshResults(self, module):
 		for v in self.getContents():
@@ -124,6 +130,11 @@ class _TextAbstractView (NodeAbstractView):
 	def getText(self):
 		return self._textLive.getValue()
 
+
+	def _clear_results(self):
+		for x in self.getText():
+			if not isinstance( x, str )  and  not isinstance( x, unicode ):
+				x._clear_results()
 
 	def _refreshResults(self, module):
 		for x in self.getText():
@@ -198,6 +209,9 @@ class LinkAbstractView (NodeAbstractView):
 	def text(self):
 		return self._model['text']
 
+
+	def _clear_results(self):
+		pass
 
 	def _refreshResults(self, module):
 		pass
@@ -298,6 +312,10 @@ class PythonCodeAbstractView (NodeAbstractView):
 		
 		
 		
+	def _clear_results(self):
+		self._result = None
+		self._incr.onChanged()
+
 	def _refreshResults(self, module):
 		def result_callback(result):
 			self._result = result
@@ -364,6 +382,10 @@ class InlinePythonCodeAbstractView (NodeAbstractView):
 
 
 
+	def _clear_results(self):
+		self._result = None
+		self._incr.onChanged()
+
 	def _refreshResults(self, module):
 		self._result = inproc_kernel.getResultOfEvaluationWithinModule( self.getExpr(), module )
 		self._incr.onChanged()
@@ -382,6 +404,9 @@ class InlineEmbeddedObjectAbstractView (NodeAbstractView):
 		return self._model['embeddedValue'].getValue()
 
 
+	def _clear_results(self):
+		pass
+
 	def _refreshResults(self, module):
 		pass
 
@@ -398,6 +423,9 @@ class ParagraphEmbeddedObjectAbstractView (NodeAbstractView):
 	def value(self):
 		return self._model['embeddedValue'].getValue()
 
+
+	def _clear_results(self):
+		pass
 
 	def _refreshResults(self, module):
 		pass
