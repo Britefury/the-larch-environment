@@ -165,26 +165,20 @@ class AppView (MethodDispatchView):
 
 			
 		def on_new_ipython_console(link, event):
-			def make_on_menu_item(krn_entry):
-				def on_menu_item(menu_item):
-					def on_kernel_started(kernel):
-						consoles = node.getConsoles()
-						index = _newConsoleIndex( consoles )
+			def on_choose_kernel_factory(kernel_factory):
+				def on_kernel_started(kernel):
+					consoles = node.getConsoles()
+					index = _newConsoleIndex( consoles )
 
-						description = krn_entry.kernel_description.human_description
-						appConsole = Application.AppConsole(kernel, '<ipy_console{0}>'.format(index),
-										    'IPython console {0} ({1})'.format(index, description), index)
+					description = kernel_factory.description.human_description
+					appConsole = Application.AppConsole(kernel, '<ipy_console{0}>'.format(index),
+									    'IPython console {0} ({1})'.format(index, description), index)
 
-						new_console(link, appConsole)
+					new_console(link, appConsole)
 
-					kernel_factory = krn_entry.kernel_factory
-					kernel_factory.create_kernel(on_kernel_started)
-				return on_menu_item
+				kernel_factory.create_kernel(on_kernel_started)
 
-			interp_config = interpreter_config_page.get_interpreter_config()
-			menu_items = [MenuItem(DefaultPerspective.instance.applyTo(krn_entry), make_on_menu_item(krn_entry)) \
-						for krn_entry in interp_config.kernels]
-			menu = VPopupMenu(menu_items)
+			menu = interpreter_config_page.get_interpreter_config().interpreter_chooser_menu(on_choose_kernel_factory)
 
 			menu.popupMenu(link.element, Anchor.TOP_RIGHT, Anchor.TOP_LEFT)
 

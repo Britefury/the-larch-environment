@@ -12,15 +12,27 @@ import uuid
 from BritefuryJ.ChangeHistory import Trackable
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
+from LarchCore.Kernel import interpreter_config_page, kernel_factory
+
 from LarchCore.Project.ProjectContainer import ProjectContainer
 from LarchCore.Project import ProjectEditor, ProjectPage
 
 
 
-
 class ProjectRoot (ProjectContainer):
-	def __init__(self, packageName=None, contents=None):
+	def __init__(self, kernel_description=None, packageName=None, contents=None):
 		super( ProjectRoot, self ).__init__( contents )
+
+		if kernel_description is None:
+			interp_conf = interpreter_config_page.get_interpreter_config()
+			kernel_description = interp_conf.kernel_descriptions[0]   if len(interp_conf.kernel_descriptions) > 0   else None
+
+		self.__kernel_description = kernel_description
+
+		self.__kernel = None
+		self.__kernel_factory_in_use = None
+		self.__kernel_creation_in_progress = False
+
 		self._pythonPackageName = packageName
 		self.__frontPageId = None
 		self.__startupPageId = None
@@ -28,6 +40,59 @@ class ProjectRoot (ProjectContainer):
 		self.__idToPage = {}
 
 		self._startupExecuted = False
+
+
+	@property
+	def kernel_description(self):
+		return self.__kernel_description
+
+	@kernel_description.setter
+	def kernel_description(self, value):
+		self.__kernel_description = value
+		self._incr.onChanged()
+
+
+
+	def __init_kernel(self):
+		if self.__kernel_description is not None:
+			factory = interpreter_config_page.get_interpreter_config().get_best_kernel_factory(self.__kernel_description)
+
+
+			self.__kernel_factory_in_use = factory
+
+
+	def get_kernel(self, kernel_callback):
+		if self.__kernel_description is not None:
+			# Get the best kernel factory to use
+			factory = interpreter_config_page.get_interpreter_config().get_best_kernel_factory(self.__kernel_description)
+
+			create_kernel = False
+			if factory != self.__kernel_factory_in_use:
+				# The best factory is different from the one already in use
+				self.__kernel_factory_in_use = factory
+				create_kernel = True
+			elif self.__kernel is None  and  not self.__kernel_creation_in_progress:
+				create_kernel = True
+
+			if create_kernel:
+				# Create a new kernel
+				def on_kernel_created(kernel):
+					self.__kernel_creation_in_progress = False
+					self.__kernel = kernel
+					kernel_callback(kernel)
+
+				factory.create_kernel(on_kernel_created)
+				self.__kernel_creation_in_progress = True
+			elif self.__kernel is not None:
+				kernel_callback(self.__kernel)
+		else:
+			# No kernel description set; cannot create
+			raise kernel_factory.KernelNotChosenError
+
+
+
+
+
 
 
 	@property
@@ -45,6 +110,7 @@ class ProjectRoot (ProjectContainer):
 
 	def __getstate__(self):
 		state = super( ProjectRoot, self ).__getstate__()
+		state['kernel_description'] = self.__kernel_description
 		state['pythonPackageName'] = self._pythonPackageName
 		state['frontPageId'] = self.__frontPageId
 		state['startupPageId'] = self.__startupPageId
@@ -56,16 +122,17 @@ class ProjectRoot (ProjectContainer):
 
 		# Need to initialise the ID table before loading contents
 		super( ProjectRoot, self ).__setstate__( state )
+		self.__kernel_description = state['kernel_description']
 		self._pythonPackageName = state['pythonPackageName']
 		self.__frontPageId = state.get( 'frontPageId' )
 		self.__startupPageId = state.get( 'startupPageId' )
 
 
 	def __copy__(self):
-		return ProjectRoot( self._pythonPackageName, self[:] )
+		return ProjectRoot( self.__kernel_description, self._pythonPackageName, self[:] )
 	
 	def __deepcopy__(self, memo):
-		return ProjectRoot( self._pythonPackageName, [ deepcopy( x, memo )   for x in self ] )
+		return ProjectRoot( self.__kernel_description, self._pythonPackageName, [ deepcopy( x, memo )   for x in self ] )
 	
 	
 	def __new_subject__(self, document, enclosingSubject, path, importName, title):

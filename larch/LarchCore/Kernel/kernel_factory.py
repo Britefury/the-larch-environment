@@ -5,6 +5,10 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2014.
 ##-*************************
+from java.awt import Color
+from BritefuryJ.Pres.Primitive import Primitive, Label, Spacer, Border, Row, Column, Table
+from BritefuryJ.StyleSheet import StyleSheet
+from BritefuryJ.Graphics import SolidBorder
 
 VM_INPROCESS = 'InProcess'
 VM_CPYTHON = 'CPython'
@@ -28,6 +32,11 @@ def extract_variant_and_distribution_from_sys_version(sys_version):
 		return VARIANT_NONE, DISTRIBUTION_NONE
 
 
+
+class KernelNotChosenError (Exception):
+	pass
+
+
 class KernelDescription (object):
 	"""Kernel description
 
@@ -46,7 +55,7 @@ class KernelDescription (object):
 	_score_<attribute_name>
 	"""
 
-	def __init__(self, human_description, sys_version, attributes_as_tuples):
+	def __init__(self, human_description, interp_name, attributes_as_tuples):
 		"""
 		Constructor
 
@@ -55,22 +64,24 @@ class KernelDescription (object):
 				pair tuples in a list in order of decreasing importance
 		"""
 		self.__human_description = human_description
+		self.__interp_name = interp_name
 		self.__attributes_as_tuples = attributes_as_tuples
 		self.__attributes_as_dict = dict(attributes_as_tuples)
 
 
 	def __eq__(self, other):
 		if isinstance(other, KernelDescription):
-			return self.__attributes_as_tuples == other.__attributes_as_tuples
+			return self.__interp_name == other.__interp_name  and  self.__attributes_as_tuples == other.__attributes_as_tuples
 		else:
 			return NotImplemented
 
 	def __ne__(self, other):
-		if isinstance(other, KernelDescription):
-			return self.__attributes_as_tuples != other.__attributes_as_tuples
-		else:
-			return NotImplemented
+		return not (self == other)
 
+
+	@property
+	def interpreter_name(self):
+		return self.__interp_name
 
 	@property
 	def human_description(self):
@@ -88,6 +99,10 @@ class KernelDescription (object):
 		if len(factories) == 0:
 			return None
 		else:
+			# Filter factories by interpreter name
+			factories = [factory   for factory in factories   if factory.description.interpreter_name == self.__interp_name]
+
+			# Score and choose
 			scores_and_factories = [(self.__score_factory(factory), factory)   for factory in factories]
 			scores_and_factories = sorted(scores_and_factories, key=lambda x: x[0])
 			factory = scores_and_factories[-1][1]
@@ -136,14 +151,14 @@ class KernelDescription (object):
 
 
 	@staticmethod
-	def standard_format(vm, language_version, variant, distribution):
+	def standard_format(interp_name, vm, language_version, variant, distribution):
 		human_description = '{0}, v{1}'.format(vm, '.'.join(language_version))
 		if variant is not None:
 			human_description += ', ' + variant
 		if distribution is not None:
 			human_description += ', ' + distribution
 
-		return KernelDescription(human_description, [
+		return KernelDescription(human_description, interp_name, [
 			('vm', vm),
 			('language_version', language_version),
 			('variant', variant),
@@ -151,11 +166,22 @@ class KernelDescription (object):
 		])
 
 	@staticmethod
-	def from_kernel_information(kernel_information):
+	def from_kernel_information(interp_name, kernel_information):
 		implementation, version_tuple, sys_version = kernel_information
 		variant, distribution = extract_variant_and_distribution_from_sys_version(sys_version)
-		return KernelDescription.standard_format(implementation, list(version_tuple), variant, distribution)
+		return KernelDescription.standard_format(interp_name, implementation, list(version_tuple), variant, distribution)
 
+
+	def __present__(self, fragment, inh):
+		kname = self._interpreter_type_style.applyTo(Label(self.__interp_name))
+		descr = self._interpreter_descr_style.applyTo(Label(self.__human_description))
+		return self._interpreter_border.surround(Column([kname, descr.padX(7.0, 0.0)]))
+
+
+
+	_interpreter_type_style = StyleSheet.style(Primitive.fontSize(10), Primitive.fontSmallCaps(True), Primitive.foreground(Color(0.4, 0.4, 0.4)))
+	_interpreter_descr_style = StyleSheet.style(Primitive.foreground(Color(0.2, 0.2, 0.6)))
+	_interpreter_border = SolidBorder(1.0, 3.0, 5.0, 5.0, Color(0.3, 0.3, 0.3), None)
 
 
 
