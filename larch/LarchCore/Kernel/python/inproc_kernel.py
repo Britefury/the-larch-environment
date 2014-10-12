@@ -44,6 +44,14 @@ class InProcessKernel (python_kernel.AbstractPythonKernel):
 		return InProcessModule(name)
 
 
+class InProcessContext (object):
+	def start_kernel(self, on_kernel_started):
+		"""
+		Start an in-process kernel
+		"""
+		on_kernel_started(InProcessKernel())
+
+
 
 
 class InProcessExecutionResult (execution_result.AbstractExecutionResult):
