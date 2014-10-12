@@ -17,7 +17,8 @@ from BritefuryJ.Graphics import SolidBorder
 from BritefuryJ.StyleSheet import StyleSheet
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
-from . import abstract_kernel, execution_result, execution_pres
+from .. import execution_result, execution_pres
+from . import python_kernel
 from LarchCore.Languages.Python2 import CodeGenerator
 
 
@@ -29,13 +30,10 @@ _aborted = _aborted_border.surround(_aborted_style.applyTo(Label('ABORTED')))
 POLL_TIMEOUT = 0
 
 
-class IPythonModule (abstract_kernel.AbstractModule):
+class IPythonModule (python_kernel.AbstractPythonModule):
 	def __init__(self, kernel, name):
 		self.__kernel = kernel
 		self.name = name
-
-	def assign_variable(self, name, value):
-		raise NotImplementedError, 'Operation assign_variable not supported by IPythonModule'
 
 	def evaluate(self, code, result_callback):
 		self.__kernel._queue_eval(self, code, result_callback)
@@ -87,7 +85,7 @@ class _KernelListener (request_listener.ExecuteRequestListener):
 
 
 
-class IPythonKernel (abstract_kernel.AbstractKernel):
+class IPythonKernel (python_kernel.AbstractPythonKernel):
 	def __init__(self, ctx, kernel_process):
 		self.__krn_proc = kernel_process
 		self.__kernel = kernel_process.connection
@@ -311,7 +309,7 @@ class IPythonExecutionResult (execution_result.AbstractExecutionResult):
 
 
 	def errorsOnly(self):
-		return IPythonExecutionResult( self._streams.suppress_stream( 'out' ), self._caught_exception, None )
+		return IPythonExecutionResult( self._streams.suppress_stream( 'out' ), self._error, None )
 
 
 

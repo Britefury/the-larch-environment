@@ -12,10 +12,11 @@ from javax.swing import JOptionPane
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from Britefury.Kernel.Document import Document
+from LarchCore.Kernel.python import inproc_kernel
 
 from LarchCore.PythonConsole import Console
 
-from LarchCore.Kernel import inproc_kernel, ipython_kernel, interpreter_config_page
+from LarchCore.Kernel import interpreter_config_page
 
 
 

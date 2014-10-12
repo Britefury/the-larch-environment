@@ -45,6 +45,7 @@ from BritefuryJ.Util import TypeUtils
 from LarchCore.Languages.Python2 import Python2
 
 from LarchCore.Kernel import execution_pres
+from LarchCore.Kernel.python import inproc_kernel
 
 
 
@@ -115,6 +116,7 @@ class Console (object):
 		self._after = []
 		self._kernel = kernel
 		self._module = self._kernel.new_module(name)
+		self._can_assign = isinstance(self._module, inproc_kernel.InProcessModule)
 		self._banner_text = ''
 
 		if showBanner:
@@ -162,9 +164,10 @@ class Console (object):
 
 
 	def assignVariable(self, name, value):
-		self._module.assign_variable(name, value)
-		self._blocks.append( ConsoleVarAssignment( name, value ) )
-		self._incr.onChanged()
+		if self._can_assign:
+			self._module.assign_variable(name, value)
+			self._blocks.append( ConsoleVarAssignment( name, value ) )
+			self._incr.onChanged()
 
 
 
@@ -251,7 +254,8 @@ class Console (object):
 		currentModule = currentModule.withShortcut( _historyNextShortcut, _onHistoryNext )
 
 		m = _pythonModuleBorderStyle.applyTo( Border( currentModule.alignHExpand() ) ).alignHExpand()
-		m = m.withDropDest( dropDest )
+		if self._can_assign:
+			m = m.withDropDest( dropDest )
 		def _ensureCurrentModuleVisible(element, ctx, style):
 			element.ensureVisible()
 		m = m.withCustomElementAction( _ensureCurrentModuleVisible )

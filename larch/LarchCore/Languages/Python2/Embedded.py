@@ -10,13 +10,12 @@ from copy import deepcopy
 import java.util.List
 
 from BritefuryJ.DocModel import DMNode
+from LarchCore.Kernel.python import inproc_kernel
 
 from LarchCore.Languages.Python2 import Schema
 from LarchCore.Languages.Python2 import CodeGenerator
 from LarchCore.Languages.Python2 import PythonEditor
 from LarchCore.Languages.Python2.PythonEditor.Parser import Python2Grammar
-
-from LarchCore.Kernel import inproc_kernel
 
 
 _grammar = Python2Grammar()

@@ -13,11 +13,12 @@ from Britefury import LoadBuiltins
 
 from LarchCore.Languages.Python2 import CodeGenerator
 
-from . import abstract_kernel, execution_result, execution_pres
+from .. import abstract_kernel, execution_result, execution_pres
+from . import python_kernel
 
 
 
-class InProcessModule (abstract_kernel.AbstractModule):
+class InProcessModule (python_kernel.AbstractPythonModule):
 	def __init__(self, name):
 		self.__module = imp.new_module(name)
 		LoadBuiltins.loadBuiltins(self.__module)
@@ -38,7 +39,7 @@ class InProcessModule (abstract_kernel.AbstractModule):
 
 
 
-class InProcessKernel (abstract_kernel.AbstractKernel):
+class InProcessKernel (python_kernel.AbstractPythonKernel):
 	def new_module(self, name):
 		return InProcessModule(name)
 

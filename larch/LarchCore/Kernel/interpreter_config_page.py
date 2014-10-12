@@ -5,34 +5,24 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2014.
 ##-*************************
-from javax.swing import JOptionPane, JFileChooser
-from javax.swing.filechooser import FileNameExtensionFilter
-from java.net import URI
-
-from java.awt import Color, BasicStroke
-
 import os
-import sys
 
+from javax.swing import JFileChooser
+from java.awt import Color, BasicStroke
 from BritefuryJ.Incremental import IncrementalValueMonitor
-
 from BritefuryJ.Controls import Hyperlink, MenuItem, VPopupMenu
-
-from BritefuryJ.Graphics import SolidBorder, FilledOutlinePainter
-
+from BritefuryJ.Graphics import FilledOutlinePainter
 from BritefuryJ.DefaultPerspective import DefaultPerspective
-
 from BritefuryJ.Pres import Pres
-from BritefuryJ.Pres.Primitive import Primitive, Label, Spacer, Border, Row, Column, Table
-from BritefuryJ.Pres.RichText import Body, NormalText, EmphSpan
-from BritefuryJ.Pres.UI import Section, SectionHeading2, SectionHeading3, NotesText
+from BritefuryJ.Pres.Primitive import Primitive, Column
+from BritefuryJ.Pres.RichText import Body
+from BritefuryJ.Pres.UI import Section, SectionHeading2
 from BritefuryJ.StyleSheet import StyleSheet
-
 from Britefury.Config.UserConfig import loadUserConfig, saveUserConfig
 from Britefury.Config import Configuration
 from Britefury.Config.ConfigurationPage import ConfigurationPage
-
-from LarchCore.Kernel import kernel_factory, ipython_kernel
+from LarchCore.Kernel import kernel_factory
+from LarchCore.Kernel.python import ipython_kernel
 
 
 _item_hover_highlight_style = StyleSheet.style( Primitive.hoverBackground( FilledOutlinePainter( Color( 0.8, 0.825, 0.9 ), Color( 0.125, 0.341, 0.574 ), BasicStroke( 1.0 ) ) ) )
