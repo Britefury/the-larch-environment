@@ -29,7 +29,7 @@ class AppState (object):
 		self._documentIDCounter = 1
 		self._consoles = []
 
-		self.inproc_kernel = inproc_kernel.InProcessKernel()
+		self.inproc_context = inproc_kernel.InProcessContext()
 
 		
 	def getOpenDocuments(self):

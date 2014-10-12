@@ -156,10 +156,14 @@ class AppView (MethodDispatchView):
 		def on_new_local_console(link, event):
 			consoles = node.getConsoles()
 			index = _newConsoleIndex( consoles )
-			appConsole = Application.AppConsole(node.inproc_kernel, '<local_console{0}>'.format(index),
-							    'Local console {0}'.format(index), index )
 
-			new_console(link, appConsole)
+			def on_kernel_started(kernel):
+				appConsole = Application.AppConsole(kernel, '<local_console{0}>'.format(index),
+								    'Local console {0}'.format(index), index )
+
+				new_console(link, appConsole)
+
+			node.inproc_context.start_kernel(on_kernel_started)
 
 			return True
 
