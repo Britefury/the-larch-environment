@@ -21,9 +21,9 @@ from BritefuryJ.Logging import LogView
 from BritefuryJ.ObjectPresentation import PresentationStateListenerList
 
 from BritefuryJ.DefaultPerspective import DefaultPerspective
+from LarchCore.Kernel.python import inproc_kernel
 
 from LarchCore.PythonConsole import Console
-from LarchCore.Kernel import inproc_kernel
 
 
 _fragSelectorEntryBorder = SolidBorder( 1.0, 3.0, 6.0, 6.0, Color( 0.8, 0.8, 0.8 ), None, Color( 0.5, 0.5, 0.5 ), Color( 0.9, 0.9, 0.9 ) )

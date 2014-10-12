@@ -11,9 +11,6 @@
 
 
 class AbstractModule (object):
-	def assign_variable(self, name, value):
-		raise NotImplementedError, 'abstract'
-
 	def evaluate(self, expr, result_callback):
 		"""
 		Evaluate and expression within the module

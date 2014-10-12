@@ -10,7 +10,7 @@ from copy import deepcopy, copy
 from java.awt import Color
 from java.awt.event import KeyEvent
 
-from BritefuryJ.Command import Command, CommandSet
+from BritefuryJ.Command import Command
 
 from BritefuryJ.Graphics import SolidBorder
 from BritefuryJ.LSpace.Interactor import KeyElementInteractor
@@ -19,11 +19,10 @@ from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from BritefuryJ.Pres.Primitive import Primitive, Label, Column
 from BritefuryJ.StyleSheet import StyleSheet
+from LarchCore.Kernel.python import inproc_kernel
 
 from LarchCore.Languages.Python2.PythonCommands import pythonCommandSet, WrapSelectedStatementRangeInEmbeddedObjectAction, EmbeddedStatementAtCaretAction, chainActions
 from LarchCore.Languages.Python2.Embedded import EmbeddedPython2Suite, removeEmbeddedObjectContainingElement
-from LarchCore.Kernel import inproc_kernel
-
 
 
 _titleStyle = StyleSheet.style( Primitive.fontSize( 9 ) )

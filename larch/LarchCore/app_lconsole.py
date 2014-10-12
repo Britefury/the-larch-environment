@@ -13,9 +13,9 @@ from Britefury.Kernel.World import World
 from Britefury import app
 
 from Britefury.Windows.WindowManager import WindowManager
+from LarchCore.Kernel.python import inproc_kernel
 
 from LarchCore.PythonConsole import Console
-from LarchCore.Kernel import inproc_kernel, ipython_kernel
 
 from LarchCore.Languages.Python2.Python2Importer import importPy2File
 
