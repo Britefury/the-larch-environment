@@ -115,8 +115,8 @@ class Console (object):
 		self._before = []
 		self._after = []
 		self._kernel = kernel
-		self._module = self._kernel.new_module(name)
-		self._can_assign = isinstance(self._module, inproc_kernel.InProcessModule)
+		self._module = self._kernel.new_live_module(name)
+		self._can_assign = isinstance(self._module, inproc_kernel.InProcessLiveModule)
 		self._banner_text = ''
 
 		if showBanner:
