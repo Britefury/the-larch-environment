@@ -33,5 +33,5 @@ class AbstractModule (object):
 
 
 class AbstractKernel (object):
-	def new_module(self, name):
+	def new_module(self, full_name):
 		raise NotImplementedError, 'abstract'

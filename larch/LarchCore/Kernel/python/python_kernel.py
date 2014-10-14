@@ -17,3 +17,10 @@ class AbstractPythonModule (abstract_kernel.AbstractModule):
 
 class AbstractPythonKernel (abstract_kernel.AbstractKernel):
 	pass
+
+
+
+class AbstractPythonContext (object):
+	pass
+
+
