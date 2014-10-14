@@ -16,7 +16,7 @@ class ModuleFinder (object):
 		self.__registered_modules = set()
 		self.__path_to_module_source = {}
 		self.__path_to_module_loader = {}
-		self.__implicit_package_paths = set()
+		self.__implicit_package_paths = None
 
 
 	@property
@@ -36,43 +36,18 @@ class ModuleFinder (object):
 		return (path[:i]   for i in xrange(len(path) - 1, 0, -1))
 
 
-	def __register_loader(self, path, loader):
-		"""
-		Register a module loader for the given path
-		"""
-		self.__path_to_module_loader[path] = loader
-
-	def __unregister_loader(self, path):
-		"""
-		Unregister a loader for the given path
-		"""
-		try:
-			loader = self.__path_to_module_loader[path]
-		except KeyError:
-			pass
-		else:
-			loader.unload()
-			del self.__path_to_module_loader[path]
-
-
 	def __refresh_implicit_package_paths(self):
 		"""
 		Re-build the set of implicit package paths
 		"""
-		for path in self.__path_to_module_source.keys():
-			self.__register_implicit_package_paths(path)
+		if self.__implicit_package_paths is None:
+			self.__implicit_package_paths = set()
+			for path in self.__path_to_module_source.keys():
+				self.__register_implicit_package_paths(path)
 
 	def __register_implicit_package_paths(self, path_segs):
 		for sub_path in self.__sub_paths(path_segs):
 			self.__implicit_package_paths.add(sub_path)
-
-	def __unregister_implicit_package_paths(self, path_segs):
-		for sub_path in self.__sub_paths(path_segs):
-			if sub_path in self.__path_to_module_source:
-				break
-			if sub_path in self.__implicit_package_paths:
-				self.__implicit_package_paths.remove(sub_path)
-				self.__unregister_loader(sub_path)
 
 
 
@@ -83,13 +58,8 @@ class ModuleFinder (object):
 		path_segs = tuple(self.__prefix_segs + name_segs)
 		self.__registered_modules.add(name)
 		self.__path_to_module_source[path_segs] = source
+		self.__refresh_implicit_package_paths()
 		self.__register_implicit_package_paths(path_segs)
-		try:
-			loader = self.__path_to_module_loader[path_segs]
-		except KeyError:
-			pass
-		else:
-			loader.set_source(source)
 
 
 	def remove_module(self, name):
@@ -99,14 +69,14 @@ class ModuleFinder (object):
 		path_segs = tuple(self.__prefix_segs + name_segs)
 		self.__registered_modules.remove(name)
 		del self.__path_to_module_source[path_segs]
-		self.__unregister_loader(path_segs)
-		self.__unregister_implicit_package_paths(path_segs)
 
 
 	def unload_all_modules(self):
 		for loader in self.__path_to_module_loader.values():
 			if loader is not None:
 				loader.unload()
+		self.__path_to_module_loader = {}
+		self.__implicit_package_paths = None
 
 
 
@@ -164,7 +134,6 @@ class ModuleLoader (object):
 
 
 	def set_source(self, source):
-		self.unload()
 		self.__source = source
 
 
@@ -204,7 +173,7 @@ class ModuleLoader (object):
 _module_finder_name = __name__
 
 
-_install_loader_src_template = '''
+_install_loader_template = '''
 _mod___ = __import__('imp').new_module({0})
 __import__('sys').modules[{0}] = _mod___
 _mod___.__file__ = {0}
@@ -220,7 +189,17 @@ def install_loader_src(loader_mod_name, prefix=''):
 	mod = sys.modules[_module_finder_name]
 	mod_source = inspect.getsource(mod)
 
-	return _install_loader_src_template.format(repr(loader_mod_name), repr(mod_source), repr(prefix))
+	return _install_loader_template.format(repr(loader_mod_name), repr(mod_source), repr(prefix))
+
+
+_uninstall_loader_template = '''
+_mod___ = __import__({0})
+_mod___.finder.uninstall_hooks()
+del _mod___.finder
+del _mod___
+'''
+def uninstall_loader_src(loader_mod_name):
+	return _uninstall_loader_template.format(repr(loader_mod_name))
 
 
 _set_module_src_template = '''
@@ -327,8 +306,39 @@ class TestCase_module_finder (unittest.TestCase):
 		del a1, a2
 
 		import a1, a2
+		self.assertEqual(1, a1.x)
+		self.assertEqual(2, a2.x)
+
+		self.finder.unload_all_modules()
+
+		del a1, a2
+
+		import a1, a2
 		self.assertEqual(10, a1.x)
 		self.assertEqual(20, a2.x)
+
+
+	def test_modify_nested_module(self):
+		self.finder.set_module_source('a.b.c.d1', 'x=1\n')
+		self.finder.set_module_source('a.b', 'x=2\n')
+
+		from a import b
+		from a.b.c import d1
+		self.assertEqual(1, d1.x)
+		self.assertEqual(2, b.x)
+
+		self.finder.set_module_source('a.b', 'x=3')
+
+		del b
+		del d1
+
+		self.finder.unload_all_modules()
+
+		from a import b
+		from a.b.c import d1
+		self.assertEqual(1, d1.x)
+		self.assertEqual(3, b.x)
+
 
 
 	def test_remove_module(self):
@@ -347,18 +357,25 @@ class TestCase_module_finder (unittest.TestCase):
 		self.assertIsNotNone(__import__('a.b1'))
 
 		self.finder.remove_module('a.b1.c2.d2')
+		self.assertIsNotNone(__import__('a.b1.c2.d2'))
+		self.assertIsNotNone(__import__('a.b1.c2'))
+		self.assertIsNotNone(__import__('a.b1'))
+		self.assertIsNotNone(__import__('a.b2'))
+		self.finder.unload_all_modules()
 		self.assertRaises(ImportError, lambda: __import__('a.b1.c2.d2'))
 		self.assertRaises(ImportError, lambda: __import__('a.b1.c2'))
 		self.assertIsNotNone(__import__('a.b1'))
 		self.assertIsNotNone(__import__('a.b2'))
 
 		self.finder.remove_module('a.b1.c1.d1')
+		self.finder.unload_all_modules()
 		self.assertRaises(ImportError, lambda: __import__('a.b1.c1.d1'))
 		self.assertRaises(ImportError, lambda: __import__('a.b1.c1'))
 		self.assertRaises(ImportError, lambda: __import__('a.b1'))
 		self.assertIsNotNone(__import__('a'))
 
 		self.finder.remove_module('a.b2.c3.d3')
+		self.finder.unload_all_modules()
 		self.assertRaises(ImportError, lambda: __import__('a.b2.c3.d3'))
 		self.assertRaises(ImportError, lambda: __import__('a.b2.c3'))
 		self.assertRaises(ImportError, lambda: __import__('a.b2'))
@@ -388,6 +405,9 @@ class TestCase_module_finder (unittest.TestCase):
 		exec loader_remove_module_src('_loader___', 'a.b.c')
 
 		self.assertRaises(ImportError, self.__import_fn('a'b'c'))
+
+		exec loader_unload_all_modules_src('_loader___')
+		exec uninstall_loader_src('_loader___')
 
 		del sys.modules['_loader___']
 
