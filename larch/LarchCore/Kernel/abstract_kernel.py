@@ -10,7 +10,7 @@
 
 
 
-class AbstractModule (object):
+class AbstractLiveModule (object):
 	def evaluate(self, expr, result_callback):
 		"""
 		Evaluate and expression within the module
@@ -33,5 +33,5 @@ class AbstractModule (object):
 
 
 class AbstractKernel (object):
-	def new_module(self, full_name):
+	def new_live_module(self, full_name):
 		raise NotImplementedError, 'abstract'

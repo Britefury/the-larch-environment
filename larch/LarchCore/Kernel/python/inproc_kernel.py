@@ -14,11 +14,11 @@ from Britefury import LoadBuiltins
 from LarchCore.Languages.Python2 import CodeGenerator
 
 from .. import abstract_kernel, execution_result, execution_pres
-from . import python_kernel
+from . import python_kernel, module_finder
 
 
 
-class InProcessModule (python_kernel.AbstractPythonModule):
+class InProcessLiveModule (python_kernel.AbstractPythonLiveModule):
 	def __init__(self, name):
 		self.__module = imp.new_module(name)
 		LoadBuiltins.loadBuiltins(self.__module)
@@ -40,11 +40,23 @@ class InProcessModule (python_kernel.AbstractPythonModule):
 
 
 class InProcessKernel (python_kernel.AbstractPythonKernel):
-	def __init__(self, ctx):
-		self.__ctx = ctx
+	def __init__(self):
+		self.__module_finder = module_finder.ModuleFinder()
+		self.__module_finder.install_hooks()
 
-	def new_module(self, full_name):
-		return InProcessModule(full_name)
+	def _shutdown(self):
+		self.__module_finder.unload_all_modules()
+		self.__module_finder.uninstall_hooks()
+
+	def new_live_module(self, full_name):
+		return InProcessLiveModule(full_name)
+
+
+	def set_module_source(self, fullname, source):
+		self.__module_finder.set_module_source(fullname, source)
+
+	def remove_module(self, fullname):
+		self.__module_finder.remove_module(fullname)
 
 
 
@@ -56,9 +68,13 @@ class InProcessContext (python_kernel.AbstractPythonContext):
 		"""
 		Start an in-process kernel
 		"""
-		kernel = InProcessKernel(self)
+		kernel = InProcessKernel()
 		on_kernel_started(kernel)
 		self.__kernels.append(kernel)
+
+	def shutdown_kernel(self, kernel):
+		kernel._shutdown()
+		self.__kernels.remove(kernel)
 
 
 

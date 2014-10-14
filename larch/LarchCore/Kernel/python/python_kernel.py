@@ -10,17 +10,34 @@ from LarchCore.Kernel import abstract_kernel
 
 
 
-class AbstractPythonModule (abstract_kernel.AbstractModule):
+class AbstractPythonLiveModule (abstract_kernel.AbstractLiveModule):
 	pass
 
 
 
 class AbstractPythonKernel (abstract_kernel.AbstractKernel):
-	pass
+	def _shutdown(self):
+		pass
+
+	def new_live_module(self, full_name):
+		raise NotImplementedError, 'abstract'
+
+
+	def set_module_source(self, fullname, source):
+		raise NotImplementedError, 'abstract'
+
+	def remove_module(self, fullname):
+		raise NotImplementedError, 'abstract'
+
 
 
 
 class AbstractPythonContext (object):
-	pass
+	def start_kernel(self, on_kernel_started):
+		raise NotImplementedError, 'abstract'
+
+	def shutdown_kernel(self, kernel):
+		raise NotImplementedError, 'abstract'
+
 
 

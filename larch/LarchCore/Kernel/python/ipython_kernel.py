@@ -30,7 +30,7 @@ _aborted = _aborted_border.surround(_aborted_style.applyTo(Label('ABORTED')))
 POLL_TIMEOUT = 0
 
 
-class IPythonModule (python_kernel.AbstractPythonModule):
+class IPythonLiveModule (python_kernel.AbstractPythonLiveModule):
 	def __init__(self, kernel, name):
 		self.__kernel = kernel
 		self.name = name
@@ -96,14 +96,14 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 		self.__ctx = ctx
 
 
-	def close(self):
+	def _shutdown(self):
 		self.__krn_proc.close()
 		self.__ctx._notify_closed(self)
 
 
 
-	def new_module(self, full_name):
-		return IPythonModule(self, full_name)
+	def new_live_module(self, full_name):
+		return IPythonLiveModule(self, full_name)
 
 
 	def _queue_exec(self, module, code, evaluate_last_expression, result_callback):
@@ -164,7 +164,7 @@ class IPythonContext (python_kernel.AbstractPythonContext):
 		"""
 		krns = self.__kernels[:]
 		for krn in krns:
-			krn.close()
+			krn._shutdown()
 		if self.__timer is not None:
 			self.__timer.stop()
 
@@ -236,11 +236,11 @@ class IPythonContext (python_kernel.AbstractPythonContext):
 
 		def _on_kernel_started(krn):
 			def on_result(result):
-				krn.close()
+				krn._shutdown()
 				kernel_information = json.loads(result.result)
 				kernel_description_callback(kernel_information)
 
-			mod = krn.new_module('test')
+			mod = krn.new_live_module('test')
 			mod.evaluate(code, on_result)
 
 		self.start_kernel(_on_kernel_started, ipython_path=ipython_path)
