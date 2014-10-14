@@ -40,16 +40,25 @@ class InProcessModule (python_kernel.AbstractPythonModule):
 
 
 class InProcessKernel (python_kernel.AbstractPythonKernel):
-	def new_module(self, name):
-		return InProcessModule(name)
+	def __init__(self, ctx):
+		self.__ctx = ctx
+
+	def new_module(self, full_name):
+		return InProcessModule(full_name)
 
 
-class InProcessContext (object):
+
+class InProcessContext (python_kernel.AbstractPythonContext):
+	def __init__(self):
+		self.__kernels = []
+
 	def start_kernel(self, on_kernel_started):
 		"""
 		Start an in-process kernel
 		"""
-		on_kernel_started(InProcessKernel())
+		kernel = InProcessKernel(self)
+		on_kernel_started(kernel)
+		self.__kernels.append(kernel)
 
 
 

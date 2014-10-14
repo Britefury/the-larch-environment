@@ -102,8 +102,8 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 
 
 
-	def new_module(self, name):
-		return IPythonModule(self, name)
+	def new_module(self, full_name):
+		return IPythonModule(self, full_name)
 
 
 	def _queue_exec(self, module, code, evaluate_last_expression, result_callback):
@@ -148,7 +148,7 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 
 
 
-class IPythonContext (object):
+class IPythonContext (python_kernel.AbstractPythonContext):
 	def __init__(self):
 		self.__kernels = []
 		self.__timer = None
