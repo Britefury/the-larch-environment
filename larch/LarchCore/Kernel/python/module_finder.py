@@ -9,24 +9,11 @@ import sys, imp, inspect
 
 
 class ModuleFinder (object):
-	def __init__(self, prefix=''):
-		self.__prefix = prefix
-		self.__prefix_segs = []
-
+	def __init__(self):
 		self.__registered_modules = set()
 		self.__path_to_module_source = {}
 		self.__path_to_module_loader = {}
 		self.__implicit_package_paths = None
-
-
-	@property
-	def prefix(self):
-		return self.__prefix
-
-	@prefix.setter
-	def prefix(self, value):
-		self.__prefix = value
-		self.__prefix_segs = value.split('.')
 
 
 	def __sub_paths(self, path):
@@ -54,8 +41,7 @@ class ModuleFinder (object):
 
 
 	def set_module_source(self, name, source):
-		name_segs = name.split('.')
-		path_segs = tuple(self.__prefix_segs + name_segs)
+		path_segs = tuple(name.split('.'))
 		self.__registered_modules.add(name)
 		self.__path_to_module_source[path_segs] = source
 		self.__refresh_implicit_package_paths()
@@ -65,8 +51,7 @@ class ModuleFinder (object):
 	def remove_module(self, name):
 		if name not in self.__registered_modules:
 			raise ValueError, 'No module {0} has been registered with this ModuleFinder'.format(name)
-		name_segs = name.split('.')
-		path_segs = tuple(self.__prefix_segs + name_segs)
+		path_segs = tuple(name.split('.'))
 		self.__registered_modules.remove(name)
 		del self.__path_to_module_source[path_segs]
 
@@ -180,16 +165,16 @@ _mod___.__file__ = {0}
 _mod___.__loader__ = None
 _mod___.__path__ = {0}.split('.')
 exec {1} in _mod___.__dict__
-_mod___.finder = _mod___.ModuleFinder({2})
+_mod___.finder = _mod___.ModuleFinder()
 _mod___.finder.install_hooks()
 del _mod___
 '''
 
-def install_loader_src(loader_mod_name, prefix=''):
+def install_loader_src(loader_mod_name):
 	mod = sys.modules[_module_finder_name]
 	mod_source = inspect.getsource(mod)
 
-	return _install_loader_template.format(repr(loader_mod_name), repr(mod_source), repr(prefix))
+	return _install_loader_template.format(repr(loader_mod_name), repr(mod_source))
 
 
 _uninstall_loader_template = '''
@@ -252,44 +237,6 @@ class TestCase_module_finder (unittest.TestCase):
 		import a1, a2
 		self.assertEqual(1, a1.x)
 		self.assertEqual(2, a2.x)
-
-
-	def test_modules_under_prefix(self):
-		self.finder.prefix = 'a.b'
-
-		self.finder.set_module_source('c1', 'x = 1\n')
-		self.finder.set_module_source('c2', 'x = 2\n')
-
-		from a.b import c1, c2
-		import a
-		from a import b
-		self.assertEqual(1, c1.x)
-		self.assertEqual(2, c2.x)
-		self.assertIn('b', a.__dict__)
-		self.assertIn('c1', b.__dict__)
-		self.assertIn('c2', b.__dict__)
-
-
-	def test_nested_modules_under_prefix(self):
-		self.finder.prefix = 'a.b'
-
-		self.finder.set_module_source('c.d1.e1', 'x = 1\n')
-		self.finder.set_module_source('c.d1.e2', 'x = 2\n')
-		self.finder.set_module_source('c.d2.e3', 'x = 3\n')
-
-		from a.b.c.d1 import e1, e2
-		from a.b.c.d2 import e3
-		import a
-		from a import b
-		from a.b import c
-		from a.b.c import d1, d2
-		self.assertEqual(1, e1.x)
-		self.assertEqual(2, e2.x)
-		self.assertEqual(3, e3.x)
-		self.assertIn('b', a.__dict__)
-		self.assertIn('c', b.__dict__)
-		self.assertIn('d1', c.__dict__)
-		self.assertIn('d2', c.__dict__)
 
 
 	def test_modify_module(self):
