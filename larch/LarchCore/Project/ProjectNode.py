@@ -30,6 +30,13 @@ class ProjectNode (object):
 		raise NotImplementedError, 'abstract'
 
 
+	def _join_import_names(self, a, b):
+		if a == '':
+			return b
+		else:
+			return '.'.join(a, b)
+
+
 	def __getstate__(self):
 		return {}
 	
