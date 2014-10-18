@@ -38,6 +38,11 @@ class _ImportableModule (object):
 		self.__update_required = True
 
 
+	@property
+	def name_in_use(self):
+		return self.__name_in_use
+
+
 
 	def set_source(self, src):
 		def on_source_modified(incremental_monitor):
@@ -84,6 +89,7 @@ class _ImportableModule (object):
 class AbstractPythonKernel (abstract_kernel.AbstractKernel):
 	def __init__(self):
 		self._importable_modules = []
+		self.__deleted_modules = []
 
 
 	def _shutdown(self):
@@ -100,6 +106,7 @@ class AbstractPythonKernel (abstract_kernel.AbstractKernel):
 
 	def delete_importable_module(self, m):
 		self._importable_modules.remove(m)
+		self.__deleted_modules.append(m)
 
 
 	def update_importable_modules(self):
@@ -109,8 +116,15 @@ class AbstractPythonKernel (abstract_kernel.AbstractKernel):
 			m._update(modules_to_remove, modules_to_set)
 		for fullname in modules_to_remove:
 			self.remove_module(fullname)
+
+		for m in self.__deleted_modules:
+			fullname = m.name_in_use
+			if fullname is not None:
+				self.remove_module(fullname)
+
 		for fullname, source in modules_to_set:
 			self.set_module_source(fullname, source)
+		self.__deleted_modules = []
 
 
 	def set_module_source(self, fullname, source):
@@ -156,7 +170,7 @@ class Test_ImportableModule (unittest.TestCase):
 		del self.kernel
 
 
-	def assertChangesAndClear(self, expected_set, expected_removed):
+	def assert_changes_and_clear(self, expected_set, expected_removed):
 		self.assertEqual(expected_set, self.kernel.module_sources)
 		self.assertEqual(expected_removed, self.kernel.removed_modules)
 		self.kernel.module_sources = {}
@@ -165,68 +179,73 @@ class Test_ImportableModule (unittest.TestCase):
 
 	def test_no_modules(self):
 		self.kernel.update_importable_modules()
-		self.assertChangesAndClear({}, set())
+		self.assert_changes_and_clear({}, set())
 
 	def test_single_module(self):
 		# Create module, leave unnamed
 		m1 = self.kernel.new_importable_module()
 		self.kernel.update_importable_modules()
-		self.assertChangesAndClear({}, set())
+		self.assert_changes_and_clear({}, set())
 
 		# Set name
 		m1.name = 'm1'
 		self.kernel.update_importable_modules()
-		self.assertChangesAndClear({}, set())
+		self.assert_changes_and_clear({}, set())
 
 		# Set source as string
 		m1.set_source('x')
 		self.kernel.update_importable_modules()
 		# Set
-		self.assertChangesAndClear({'m1': 'x'}, set())
+		self.assert_changes_and_clear({'m1': 'x'}, set())
 
 		# Change source
 		m1.set_source('y')
 		self.kernel.update_importable_modules()
-		self.assertChangesAndClear({'m1': 'y'}, set())
+		self.assert_changes_and_clear({'m1': 'y'}, set())
 
 		# Change name
 		m1.name = 'm1b'
 		self.kernel.update_importable_modules()
-		self.assertChangesAndClear({'m1b': 'y'}, {'m1'})
+		self.assert_changes_and_clear({'m1b': 'y'}, {'m1'})
 
 		# Change name twice
 		m1.name = 'm1c'
 		m1.name = 'm1d'
 		self.kernel.update_importable_modules()
-		self.assertChangesAndClear({'m1d': 'y'}, {'m1b'})
+		self.assert_changes_and_clear({'m1d': 'y'}, {'m1b'})
 
 		# Change source twice
 		m1.set_source('w')
 		m1.set_source('q')
 		self.kernel.update_importable_modules()
-		self.assertChangesAndClear({'m1d': 'q'}, set())
+		self.assert_changes_and_clear({'m1d': 'q'}, set())
 
 		# Change name and source
 		m1.name = 'm1'
 		m1.set_source('x')
 		self.kernel.update_importable_modules()
-		self.assertChangesAndClear({'m1': 'x'}, {'m1d'})
+		self.assert_changes_and_clear({'m1': 'x'}, {'m1d'})
 
 		# Use live source
 		s_live = LiveValue('y')
 		m1.set_source(s_live)
 		self.kernel.update_importable_modules()
-		self.assertChangesAndClear({'m1': 'y'}, set())
+		self.assert_changes_and_clear({'m1': 'y'}, set())
 
 		# Change live source
 		s_live.setLiteralValue('z')
 		self.kernel.update_importable_modules()
-		self.assertChangesAndClear({'m1': 'z'}, set())
+		self.assert_changes_and_clear({'m1': 'z'}, set())
 
 		# Change live source again
 		s_live.setLiteralValue('x')
 		self.kernel.update_importable_modules()
-		self.assertChangesAndClear({'m1': 'x'}, set())
+		self.assert_changes_and_clear({'m1': 'x'}, set())
+
+		# Delete module
+		self.kernel.delete_importable_module(m1)
+		self.kernel.update_importable_modules()
+		self.assert_changes_and_clear({}, {'m1'})
 
 
 	def test_two_modules(self):
@@ -234,25 +253,25 @@ class Test_ImportableModule (unittest.TestCase):
 		m1 = self.kernel.new_importable_module()
 		m2 = self.kernel.new_importable_module()
 		self.kernel.update_importable_modules()
-		self.assertChangesAndClear({}, set())
+		self.assert_changes_and_clear({}, set())
 
 		# Change m1 name, m2 source
 		m1.name = 'm1'
 		m2.set_source('y')
 		self.kernel.update_importable_modules()
-		self.assertChangesAndClear({}, set())
+		self.assert_changes_and_clear({}, set())
 
 		# Change m1 source, m2 name
 		m1.set_source('x')
 		m2.name = 'm2'
 		self.kernel.update_importable_modules()
-		self.assertChangesAndClear({'m1': 'x', 'm2': 'y'}, set())
+		self.assert_changes_and_clear({'m1': 'x', 'm2': 'y'}, set())
 
 		# Swap names
 		m1.name = 'm2'
 		m2.name = 'm1'
 		self.kernel.update_importable_modules()
-		self.assertChangesAndClear({'m2': 'x', 'm1': 'y'}, {'m1', 'm2'})
+		self.assert_changes_and_clear({'m2': 'x', 'm1': 'y'}, {'m1', 'm2'})
 
 
 
