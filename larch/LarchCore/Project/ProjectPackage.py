@@ -24,7 +24,7 @@ class ProjectPackage (ProjectContainer):
 
 	@property
 	def importName(self):
-		return self.parent.importName + '.' + self._name
+		return self._join_import_names(self.parent.importName, self._name)
 
 
 	def __getstate__(self):

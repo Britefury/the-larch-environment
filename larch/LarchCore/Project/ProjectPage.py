@@ -29,7 +29,7 @@ class ProjectPage (ProjectNode):
 		if self._name == '__init__':
 			return self.parent.importName
 		else:
-			return self.parent.importName + '.' + self._name
+			return self._join_import_names(self.parent.importName, self._name)
 
 
 	@property
