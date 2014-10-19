@@ -7,7 +7,7 @@
 ##-*************************
 import os, platform
 
-from javax.swing import JFileChooser
+from javax.swing import JFileChooser, JOptionPane
 from java.awt import Color, BasicStroke
 from BritefuryJ.Incremental import IncrementalValueMonitor
 from BritefuryJ.Controls import Hyperlink, MenuItem, VPopupMenu, Checkbox
@@ -29,6 +29,23 @@ _item_hover_highlight_style = StyleSheet.style( Primitive.hoverBackground( Fille
 
 
 _interpreter_config_filename = 'interpreters'
+
+
+
+class CouldNotFindIPythonError (Exception):
+	pass
+
+def _find_ipython(python_path):
+	paths = [os.path.join(python_path, 'bin', 'ipython'),	# POSIX
+		 os.path.join(python_path, 'scripts', 'ipython.exe')	# Windows
+	]
+
+	for p in paths:
+		if os.path.exists(p):
+			return p
+
+	return None
+
 
 
 
@@ -211,14 +228,18 @@ class InterpreterConfigurationPage (ConfigurationPage):
 
 	def _make_kernel_config_entry(self, entry_callback, python_path):
 		# Get the description of the kernel at the given path
-		ipython_path = os.path.join(python_path, 'bin', 'ipython')
-		def on_descr(kernel_information):
-			kernel_desc = kernel_factory.KernelDescription.from_kernel_information('IPython', kernel_information)
-			entry = IPythonInterpreterConfigEntry(kernel_desc, ipython_path)
-			entry._config_page = self
-			entry_callback(entry)
+		ipython_path = _find_ipython(python_path)
 
-		self._ipython_context.get_kernel_description(on_descr, ipython_path=ipython_path)
+		if ipython_path is not None:
+			def on_descr(kernel_information):
+				kernel_desc = kernel_factory.KernelDescription.from_kernel_information('IPython', kernel_information)
+				entry = IPythonInterpreterConfigEntry(kernel_desc, ipython_path)
+				entry._config_page = self
+				entry_callback(entry)
+
+			self._ipython_context.get_kernel_description(on_descr, ipython_path=ipython_path)
+		else:
+			raise CouldNotFindIPythonError
 
 
 	def present_interpreter_list(self, kernel_list):
@@ -248,7 +269,11 @@ class InterpreterConfigurationPage (ConfigurationPage):
 							kernel_list.append(entry)
 							self._incr.onChanged()
 
-						self._make_kernel_config_entry(on_entry_made, filename)
+						try:
+							self._make_kernel_config_entry(on_entry_made, filename)
+						except CouldNotFindIPythonError:
+							JOptionPane.showMessageDialog(component, "Could not find IPython", "Error", JOptionPane.ERROR_MESSAGE)
+
 
 		newLink = Hyperlink( 'NEW', _on_new )
 		controls = newLink.pad( 10.0, 5.0 )

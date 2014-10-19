@@ -41,6 +41,7 @@ class InProcessLiveModule (python_kernel.AbstractPythonLiveModule):
 
 class InProcessKernel (python_kernel.AbstractPythonKernel):
 	def __init__(self):
+		super(InProcessKernel, self).__init__()
 		self.__module_finder = module_finder.ModuleFinder()
 		self.__module_finder.install_hooks()
 
@@ -58,6 +59,8 @@ class InProcessKernel (python_kernel.AbstractPythonKernel):
 	def remove_module(self, fullname):
 		self.__module_finder.remove_module(fullname)
 
+	def is_in_process(self):
+		return True
 
 
 class InProcessContext (python_kernel.AbstractPythonContext):
