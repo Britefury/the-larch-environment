@@ -3,7 +3,7 @@
 ##-* under the terms of the GNU General Public License version 2 as published by the
 ##-* Free Software Foundation. The full text of the GNU General Public License
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
-##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
+##-* program. This source code is (C)copyright Geoffrey French 1999-2014.
 ##-*************************
 from copy import deepcopy
 import os
@@ -32,6 +32,7 @@ class ProjectRoot (ProjectContainer):
 		self.__kernel = None
 		self.__kernel_factory_in_use = None
 		self.__kernel_creation_in_progress = False
+		self.__get_kernel_callbacks = []
 
 		self._pythonPackageName = packageName
 		self.__frontPageId = None
@@ -78,12 +79,22 @@ class ProjectRoot (ProjectContainer):
 				# Create a new kernel
 				def on_kernel_created(kernel):
 					self.__kernel_creation_in_progress = False
+					self.__notify_kernel_change(self.__kernel, kernel)
 					self.__kernel = kernel
-					kernel_callback(kernel)
+					callbacks = self.__get_kernel_callbacks[:]
+					self.__get_kernel_callbacks = []
+					for callback in callbacks:
+						callback(kernel)
 
 				factory.create_kernel(on_kernel_created)
+				# Queue the callback
+				self.__get_kernel_callbacks.append(kernel_callback)
 				self.__kernel_creation_in_progress = True
+			elif self.__kernel_creation_in_progress:
+				# Kernel creation already kicked off; queue the callback
+				self.__get_kernel_callbacks.append(kernel_callback)
 			elif self.__kernel is not None:
+				# Kernel already up and running; invoke callback immediately
 				kernel_callback(self.__kernel)
 		else:
 			# No kernel description set; cannot create
@@ -92,7 +103,8 @@ class ProjectRoot (ProjectContainer):
 
 
 
-
+	def __notify_kernel_change(self, old_kernel, new_kernel):
+		pass
 
 
 	@property
@@ -196,9 +208,9 @@ class ProjectRoot (ProjectContainer):
 		self._pythonPackageName = name
 		self._incr.onChanged()
 		if self.__change_history__ is not None:
-			def set(name):
+			def set_pkg_name(name):
 				self.pythonPackageName = name
-			self.__change_history__.addChange( lambda: set( name ), lambda: set( oldName ), 'Project root set python package name' )
+			self.__change_history__.addChange( lambda: set( name ), lambda: set_pkg_name(oldName), 'Project root set python package name' )
 
 
 
