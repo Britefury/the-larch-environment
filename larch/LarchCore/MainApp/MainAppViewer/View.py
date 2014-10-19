@@ -153,30 +153,19 @@ class AppView (MethodDispatchView):
 
 
 		
-		def on_new_local_console(link, event):
-			consoles = node.getConsoles()
-			index = _newConsoleIndex( consoles )
-
-			def on_kernel_started(kernel):
-				appConsole = Application.AppConsole(kernel, '<local_console{0}>'.format(index),
-								    'Local console {0}'.format(index), index )
-
-				new_console(link, appConsole)
-
-			node.inproc_context.start_kernel(on_kernel_started)
-
-			return True
-
-			
-		def on_new_ipython_console(link, event):
+		def on_new_console(link, event):
 			def on_choose_kernel_factory(kernel_factory):
 				def on_kernel_started(kernel):
 					consoles = node.getConsoles()
 					index = _newConsoleIndex( consoles )
 
 					description = kernel_factory.description.human_description
-					appConsole = Application.AppConsole(kernel, '<ipy_console{0}>'.format(index),
-									    'IPython console {0} ({1})'.format(index, description), index)
+
+					if kernel.is_in_process():
+						full_name = 'In-process console {0} ({1})'.format(index, description)
+					else:
+						full_name = 'IPython console {0} ({1})'.format(index, description)
+					appConsole = Application.AppConsole(kernel, '<console{0}>'.format(index), full_name, index)
 
 					new_console(link, appConsole)
 
@@ -207,9 +196,8 @@ class AppView (MethodDispatchView):
 		openDocumentsBox = AttachTooltip( openDocumentsBox, 'Click NEW to create a new document. To open from a file, click OPEN, or drag files from a file explorer application.', False )
 		
 		
-		new_local_console_link = Hyperlink( 'NEW LOCAL', on_new_local_console )
-		new_ipython_console_link = Hyperlink( 'NEW IPYTHON', on_new_ipython_console )
-		consolesBox = _contentsList( [ new_local_console_link, new_ipython_console_link ], consoles, 'Python consoles' )
+		new_console_link = Hyperlink( 'NEW', on_new_console )
+		consolesBox = _contentsList( [ new_console_link ], consoles, 'Python consoles' )
 
 
 		tip = TipBox( [ NormalText( [ StrongSpan( 'Getting started: ' ), 'To get programming quickly, create a new Python console by pressing ', EmphSpan( 'new' ), ', beneath', EmphSpan( ' Python consoles' ), '.' ] ),

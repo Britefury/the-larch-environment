@@ -87,6 +87,7 @@ class _KernelListener (request_listener.ExecuteRequestListener):
 
 class IPythonKernel (python_kernel.AbstractPythonKernel):
 	def __init__(self, ctx, kernel_process):
+		super(IPythonKernel, self).__init__()
 		self.__krn_proc = kernel_process
 		self.__kernel = kernel_process.connection
 
@@ -145,6 +146,9 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 	def __queue_poll(self):
 		if self.__kernel.is_open():
 			self.__ctx._timer_enqueue(self.__poll_kernel, unique=True)
+
+	def is_in_process(self):
+		return False
 
 
 

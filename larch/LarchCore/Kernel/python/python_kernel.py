@@ -134,6 +134,10 @@ class AbstractPythonKernel (abstract_kernel.AbstractKernel):
 		raise NotImplementedError, 'abstract'
 
 
+	def is_in_process(self):
+		raise NotImplementedError, 'abstract'
+
+
 
 
 class AbstractPythonContext (object):
