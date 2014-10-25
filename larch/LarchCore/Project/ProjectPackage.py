@@ -53,6 +53,7 @@ class ProjectPackage (ProjectContainer):
 		self._incr.onChanged()
 		if self.__change_history__ is not None:
 			self.__change_history__.addChange( lambda: self.setName( name ), lambda: self.setName( oldName ), 'Package set name' )
+		self.update_importable_modules()
 
 
 

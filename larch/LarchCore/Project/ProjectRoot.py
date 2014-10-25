@@ -78,9 +78,18 @@ class ProjectRoot (ProjectContainer):
 			if create_kernel:
 				# Create a new kernel
 				def on_kernel_created(kernel):
+					# Kernel creation in progress
 					self.__kernel_creation_in_progress = False
-					self.__notify_kernel_change(self.__kernel, kernel)
+					# Notify that we are changing kernel
+					self.__notify_kernel_shutdown(self.__kernel)
+					# Shutdown any existing kernel
+					if self.__kernel is not None:
+						self.__kernel.shutdown()
+					# Update
 					self.__kernel = kernel
+					# Notify that we are changing kernel
+					self.__notify_kernel_started(self.__kernel)
+					# Invoke callbacks
 					callbacks = self.__get_kernel_callbacks[:]
 					self.__get_kernel_callbacks = []
 					for callback in callbacks:
@@ -101,10 +110,18 @@ class ProjectRoot (ProjectContainer):
 			raise kernel_factory.KernelNotChosenError
 
 
+	@property
+	def current_kernel(self):
+		return self.__kernel
 
 
-	def __notify_kernel_change(self, old_kernel, new_kernel):
-		pass
+	def __notify_kernel_started(self, kernel):
+		self.register_importable_modules()
+
+
+	def __notify_kernel_shutdown(self, kernel):
+		self.unregister_importable_modules()
+
 
 
 	@property
@@ -285,8 +302,3 @@ class ProjectRoot (ProjectContainer):
 	def startupPage(self, page):
 		self.__startupPageId = page._id   if page is not None   else None
 		self._incr.onChanged()
-
-
-
-
-

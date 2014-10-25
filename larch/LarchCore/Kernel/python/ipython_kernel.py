@@ -87,19 +87,17 @@ class _KernelListener (request_listener.ExecuteRequestListener):
 
 class IPythonKernel (python_kernel.AbstractPythonKernel):
 	def __init__(self, ctx, kernel_process):
-		super(IPythonKernel, self).__init__()
+		super(IPythonKernel, self).__init__(ctx)
 		self.__krn_proc = kernel_process
 		self.__kernel = kernel_process.connection
 
 		self.__stdout = sys.stdout
 		self.__stderr = sys.stderr
 
-		self.__ctx = ctx
 
-
-	def _shutdown(self):
+	def shutdown(self):
 		self.__krn_proc.close()
-		self.__ctx._notify_closed(self)
+		super(IPythonKernel, self).shutdown()
 
 
 
@@ -145,7 +143,7 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 
 	def __queue_poll(self):
 		if self.__kernel.is_open():
-			self.__ctx._timer_enqueue(self.__poll_kernel, unique=True)
+			self._ctx._timer_enqueue(self.__poll_kernel, unique=True)
 
 	def is_in_process(self):
 		return False
@@ -159,7 +157,7 @@ class IPythonContext (python_kernel.AbstractPythonContext):
 		self.__timer_queue = []
 
 
-	def _notify_closed(self, kernel):
+	def _notify_kernel_shutdown(self, kernel):
 		self.__kernels.remove(kernel)
 
 	def close(self):
@@ -168,7 +166,7 @@ class IPythonContext (python_kernel.AbstractPythonContext):
 		"""
 		krns = self.__kernels[:]
 		for krn in krns:
-			krn._shutdown()
+			krn.shutdown()
 		if self.__timer is not None:
 			self.__timer.stop()
 
@@ -240,7 +238,7 @@ class IPythonContext (python_kernel.AbstractPythonContext):
 
 		def _on_kernel_started(krn):
 			def on_result(result):
-				krn._shutdown()
+				krn.shutdown()
 				kernel_information = json.loads(result.result)
 				kernel_description_callback(kernel_information)
 

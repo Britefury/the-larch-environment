@@ -15,6 +15,7 @@ from LarchCore.Languages.Python2.Python2Importer import importPy2File
 from LarchCore.Languages.Python2.PythonEditor.Subject import Python2Subject
 from LarchCore.Languages.Python2.PythonEditor.View import perspective as python2EditorPerspective
 from LarchCore.Languages.Python2.TextExporter import PythonTextExporter
+from LarchCore.Languages.Python2.CodeGenerator import Python2CodeGenerator
 
 
 from LarchCore.Project.PageData import PageData, registerPageFactory, registerPageImporter
@@ -45,6 +46,10 @@ def isEmptyTopLevel(x):
 class Python2PageData (PageData):
 	def makeEmptyContents(self):
 		return _py25NewModule()
+
+	def get_source_code(self, filename):
+		code_gen = Python2CodeGenerator(filename)
+		return code_gen.compileForExecution( self.contents )
 
 	def exportAsString(self, filename):
 		exporter = PythonTextExporter( filename )
