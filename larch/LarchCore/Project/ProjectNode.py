@@ -52,6 +52,16 @@ class ProjectNode (object):
 
 
 
+	def register_importable_modules(self):
+		pass
+
+	def unregister_importable_modules(self):
+		pass
+
+	def update_importable_modules(self):
+		pass
+
+
 
 	def __get_trackable_contents__(self):
 		return None

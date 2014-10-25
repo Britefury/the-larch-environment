@@ -40,14 +40,15 @@ class InProcessLiveModule (python_kernel.AbstractPythonLiveModule):
 
 
 class InProcessKernel (python_kernel.AbstractPythonKernel):
-	def __init__(self):
-		super(InProcessKernel, self).__init__()
+	def __init__(self, ctx):
+		super(InProcessKernel, self).__init__(ctx)
 		self.__module_finder = module_finder.ModuleFinder()
 		self.__module_finder.install_hooks()
 
-	def _shutdown(self):
+	def shutdown(self):
 		self.__module_finder.unload_all_modules()
 		self.__module_finder.uninstall_hooks()
+		super(InProcessKernel, self).shutdown()
 
 	def new_live_module(self, full_name):
 		return InProcessLiveModule(full_name)
@@ -71,12 +72,13 @@ class InProcessContext (python_kernel.AbstractPythonContext):
 		"""
 		Start an in-process kernel
 		"""
-		kernel = InProcessKernel()
+		kernel = InProcessKernel(self)
 		on_kernel_started(kernel)
 		self.__kernels.append(kernel)
 
-	def shutdown_kernel(self, kernel):
-		kernel._shutdown()
+
+
+	def _notify_kernel_shutdown(self, kernel):
 		self.__kernels.remove(kernel)
 
 

@@ -26,6 +26,15 @@ class _ImportableModule (object):
 		self.__update_required = True
 		self.__source = None
 
+		def on_source_modified(incremental_monitor):
+			self.__update_required = True
+
+		self.__on_source_modified = on_source_modified
+
+
+	def destroy(self):
+		self.__kernel.destroy_importable_module(self)
+
 
 
 	@property
@@ -45,15 +54,12 @@ class _ImportableModule (object):
 
 
 	def set_source(self, src):
-		def on_source_modified(incremental_monitor):
-			self.__update_required = True
-
 		if src is not self.__source:
 			if isinstance(self.__source, LiveInterface):
-				self.__source.removeListener(on_source_modified)
+				self.__source.removeListener(self.__on_source_modified)
 			self.__source = src
 			if isinstance(self.__source, LiveInterface):
-				self.__source.addListener(on_source_modified)
+				self.__source.addListener(self.__on_source_modified)
 			self.__update_required = True
 
 
@@ -87,13 +93,14 @@ class _ImportableModule (object):
 
 
 class AbstractPythonKernel (abstract_kernel.AbstractKernel):
-	def __init__(self):
+	def __init__(self, ctx):
+		self._ctx = ctx
 		self._importable_modules = []
 		self.__deleted_modules = []
 
 
-	def _shutdown(self):
-		pass
+	def shutdown(self):
+		self._ctx._notify_kernel_shutdown(self)
 
 	def new_live_module(self, full_name):
 		raise NotImplementedError, 'abstract'
@@ -104,7 +111,7 @@ class AbstractPythonKernel (abstract_kernel.AbstractKernel):
 		self._importable_modules.append(m)
 		return m
 
-	def delete_importable_module(self, m):
+	def destroy_importable_module(self, m):
 		self._importable_modules.remove(m)
 		self.__deleted_modules.append(m)
 
@@ -144,8 +151,9 @@ class AbstractPythonContext (object):
 	def start_kernel(self, on_kernel_started):
 		raise NotImplementedError, 'abstract'
 
-	def shutdown_kernel(self, kernel):
-		raise NotImplementedError, 'abstract'
+
+	def _notify_kernel_shutdown(self, kernel):
+		pass
 
 
 import unittest
@@ -247,7 +255,7 @@ class Test_ImportableModule (unittest.TestCase):
 		self.assert_changes_and_clear({'m1': 'x'}, set())
 
 		# Delete module
-		self.kernel.delete_importable_module(m1)
+		self.kernel.destroy_importable_module(m1)
 		self.kernel.update_importable_modules()
 		self.assert_changes_and_clear({}, {'m1'})
 
