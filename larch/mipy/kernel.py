@@ -213,10 +213,13 @@ class KernelConnection(object):
 		Send an execute request to the remote kernel via the SHELL socket
 
 		:param code: the code to execute
-		:param silent:
-		:param store_history:
-		:param user_expressions:
-		:param allow_stdin:
+		:param silent: (default False) if True, an entry will not be created in the history
+		(store_history will be forced to False), will not broadcast output ot IOPUB channel
+		(no execute_input event) and will not have an execute_result (no execute_result event)
+		:param store_history: (default True) if False a history entry will not be created
+		:param user_expressions: (default None) a dictionary mapping names to expressions to be evaluated
+		:param allow_stdin: (default True) if False, the kernel will raise StdInNotImplementedError
+		if stdin is attempted
 		:param on_ok: status=ok callback: f(execution_count, payload, user_expressions)
 		:param on_error: status=error callback: f(ename, evalue, traceback)
 		:param on_abort: status=abort callback: f()
@@ -455,10 +458,10 @@ class KernelConnection(object):
 				evalue = content['evalue']
 				traceback = content['traceback']
 				execute_request_listener.on_execute_error(ename, evalue, traceback)
-			elif status == 'abort':
+			elif status == 'abort'  or  status == 'aborted':
 				execute_request_listener.on_execute_abort()
 			else:
-				raise ValueError, 'Unknown execute_reply status'
+				raise ValueError, 'Unknown execute_reply status {0}'.format(status)
 			self.__unref_execute_request_listener(parent_msg_id, execute_request_listener)
 		else:
 			print 'No listener for execute_reply'
@@ -900,6 +903,47 @@ class TestCase_jipy_kernel (unittest.TestCase):
 			krn_event('on_execute_finished'),
 			])
 		self.assertEqual(ev.events[-1]['event_name'], 'on_execute_finished')
+
+
+	def test_060_execute_no_history(self):
+		ev = self._make_event_log_exec_listener()
+
+		code = 'print "Hello world"\n3.141\n'
+
+		self.krn.execute_request(code, listener=ev, store_history=False)
+		while len(ev.events) < 7:
+			self.krn.poll(-1)
+
+		self.assertEventListsEqual(ev.events, [
+			krn_event('on_status', busy=True),
+			krn_event('on_execute_input', code=code, execution_count=6),
+			krn_event('on_execute_ok', execution_count=5, payload=[], user_expressions={}),
+			krn_event('on_execute_result', execution_count=6, data={'text/plain': '3.141'}, metadata={}),
+			krn_event('on_stream', stream_name='stdout', data='Hello world\n'),
+			krn_event('on_status', busy=False),
+			krn_event('on_execute_finished'),
+			])
+		self.assertEqual(ev.events[-1]['event_name'], 'on_execute_finished')
+
+
+	def test_070_execute_silent(self):
+		ev = self._make_event_log_exec_listener()
+
+		code = 'print "Hello world"\n3.141\n'
+
+		self.krn.execute_request(code, listener=ev, silent=True)
+		while len(ev.events) < 5:
+			self.krn.poll(-1)
+
+		self.assertEventListsEqual(ev.events, [
+			krn_event('on_status', busy=True),
+			krn_event('on_execute_ok', execution_count=5, payload=[], user_expressions={}),
+			krn_event('on_stream', stream_name='stdout', data='Hello world\n'),
+			krn_event('on_status', busy=False),
+			krn_event('on_execute_finished'),
+			])
+		self.assertEqual(ev.events[-1]['event_name'], 'on_execute_finished')
+
 
 
 def test_poll_speed():

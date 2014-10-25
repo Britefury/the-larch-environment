@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2014.
 ##-*************************
-import sys, imp, inspect
+import sys, imp, inspect, os, binascii
 
 
 
@@ -14,12 +14,25 @@ class AbstractModuleSource (object):
 		raise NotImplementedError, 'abstract'
 
 
+	@staticmethod
+	def coerce(x):
+		if isinstance(x, str)  or  isinstance(x, unicode):
+			return ModuleSourceStr(x)
+		elif isinstance(x, AbstractModuleSource):
+			return x
+		else:
+			raise TypeError, 'Could not coerce a {0} into a AbstractModuleSource'.format(type(x))
+
+
 class ModuleSourceStr (AbstractModuleSource):
 	def __init__(self, src):
-		self.source = src
+		self.__source_str = src
 
 	def execute(self, module):
-		exec self.source in module.__dict__
+		exec self.__source_str in module.__dict__
+
+
+ModuleSourceStr.empty = ModuleSourceStr('')
 
 
 
@@ -56,8 +69,7 @@ class ModuleFinder (object):
 
 
 	def set_module_source(self, name, source):
-		if isinstance(source, str)  or  isinstance(source, unicode):
-			source = ModuleSourceStr(source)
+		source = AbstractModuleSource.coerce(source)
 
 		path_segs = tuple(name.split('.'))
 		self.__registered_modules.add(name)
@@ -89,7 +101,7 @@ class ModuleFinder (object):
 		except KeyError:
 			self.__refresh_implicit_package_paths()
 			if path in self.__implicit_package_paths:
-				return ''
+				return ModuleSourceStr.empty
 			else:
 				return None
 
@@ -174,6 +186,11 @@ class ModuleLoader (object):
 
 
 _module_finder_name = __name__
+
+
+
+def loader_module_name():
+	return '__loader__{0}'.format(binascii.hexlify(os.urandom(32)))
 
 
 _install_loader_template = '''

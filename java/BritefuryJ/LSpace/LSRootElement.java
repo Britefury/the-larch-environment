@@ -1346,7 +1346,15 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 			boolean closeAutomatically, boolean requestFocus)
 	{
 		Point mouse = component.getMousePosition();
-		PresentationPopupWindow popup =  component.createPopupPresentation( popupContents, mouse.x, mouse.y, popupAnchor, closeAutomatically, requestFocus, false );
+        PresentationPopupWindow popup;
+        if (mouse == null) {
+            Point mousePosOnScreen = MouseInfo.getPointerInfo().getLocation();
+            Point componentPos = component.getLocationOnScreen();
+            mouse = new Point(mousePosOnScreen.x - componentPos.x, mousePosOnScreen.y - componentPos.y);
+        }
+        popup =  component.createPopupPresentation( popupContents, mouse.x, mouse.y, popupAnchor, closeAutomatically, requestFocus, false );
+
+
 		if ( !requestFocus )
 		{
 			// Ensure focus is returned to the invoking component
