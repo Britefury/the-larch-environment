@@ -18,7 +18,7 @@ from BritefuryJ.StyleSheet import StyleSheet
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from .. import execution_result, execution_pres
-from . import python_kernel
+from . import python_kernel, module_finder
 from LarchCore.Languages.Python2 import CodeGenerator
 
 
@@ -36,10 +36,10 @@ class IPythonLiveModule (python_kernel.AbstractPythonLiveModule):
 		self.name = name
 
 	def evaluate(self, code, result_callback):
-		self.__kernel._queue_eval(self, code, result_callback)
+		self.__kernel._queue_eval(self.name, code, result_callback)
 
 	def execute(self, code, evaluate_last_expression, result_callback):
-		self.__kernel._queue_exec(self, code, evaluate_last_expression, result_callback)
+		self.__kernel._queue_exec(self.name, code, evaluate_last_expression, result_callback)
 
 
 class _KernelListener (request_listener.ExecuteRequestListener):
@@ -80,7 +80,8 @@ class _KernelListener (request_listener.ExecuteRequestListener):
 
 
 	def on_execute_finished(self):
-		self.finished(self.result)
+		if self.finished is not None:
+			self.finished(self.result)
 
 
 
@@ -94,6 +95,12 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 		self.__stdout = sys.stdout
 		self.__stderr = sys.stderr
 
+		# Setup module finder
+		self.__loader_module_name = module_finder.loader_module_name()
+
+		self.__install_loader()
+
+
 
 	def shutdown(self):
 		self.__krn_proc.close()
@@ -105,14 +112,39 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 		return IPythonLiveModule(self, full_name)
 
 
-	def _queue_exec(self, module, code, evaluate_last_expression, result_callback):
+	def set_module_source(self, fullname, source):
+		sources = []
+		if isinstance(source, str)  or  isinstance(source, unicode):
+			sources.append(source)
+		elif isinstance(source, list):
+			for x in source:
+				if isinstance(x, str)  or  isinstance(x, unicode):
+					sources.append(x)
+				else:
+					code = CodeGenerator.compileSourceForExecution(x, fullname)
+					sources.append(code)
+		else:
+			raise TypeError, 'source should be a str, unicode or a list, it is a {0}'.format(type(source))
+
+		src = '\n'.join(sources)
+		self.__loader_set_module_source(fullname, src)
+
+	def remove_module(self, fullname):
+		self.__loader_remove_module(fullname)
+
+	def is_in_process(self):
+		return False
+
+
+
+	def _queue_exec(self, module_name, code, evaluate_last_expression, result_callback, silent=False, store_history=True):
 		# print 'IPythonKernel._queue_exec'
 		listener = _KernelListener(result_callback)
 
 		if isinstance(code, str)  or  isinstance(code, unicode):
 			src = code
 		else:
-			src = CodeGenerator.compileSourceForExecution(code, module.name)
+			src = CodeGenerator.compileSourceForExecution(code, module_name)
 		std = execution_result.MultiplexedRichStream()
 		self.__stdout = std.stdout
 		self.__stderr = std.stderr
@@ -120,14 +152,14 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 		self.__queue_poll()
 
 
-	def _queue_eval(self, module, expr, result_callback):
+	def _queue_eval(self, module_name, expr, result_callback):
 		# print 'IPythonKernel._queue_exec'
 		listener = _KernelListener(result_callback)
 
 		if isinstance(expr, str)  or  isinstance(expr, unicode):
 			src = expr
 		else:
-			src = CodeGenerator.compileForEvaluation(expr, module.name)
+			src = CodeGenerator.compileForEvaluation(expr, module_name)
 		std = execution_result.MultiplexedRichStream()
 		self.__stdout = std.stdout
 		self.__stderr = std.stderr
@@ -147,6 +179,32 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 
 	def is_in_process(self):
 		return False
+
+
+	def __module_loader_exec(self, src):
+		self._queue_exec(self.__loader_module_name, src, False, None)
+
+
+	def __install_loader(self):
+		src = module_finder.install_loader_src(self.__loader_module_name)
+		self.__module_loader_exec(src)
+
+	def __uninstall_loader(self):
+		src = module_finder.uninstall_loader_src(self.__loader_module_name)
+		self.__module_loader_exec(src)
+
+	def __loader_set_module_source(self, module_name, module_src):
+		src = module_finder.loader_set_module_source_src(self.__loader_module_name, module_name, module_src)
+		self.__module_loader_exec(src)
+
+	def __loader_remove_module(self, module_name):
+		src = module_finder.loader_remove_module_src(self.__loader_module_name, module_name)
+		self.__module_loader_exec(src)
+
+	def __loader_unload_all_modules_src(self):
+		src = module_finder.loader_unload_all_modules_src(self.__loader_module_name)
+		self.__module_loader_exec(src)
+
 
 
 
