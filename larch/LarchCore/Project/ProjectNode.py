@@ -34,7 +34,7 @@ class ProjectNode (object):
 		if a == '':
 			return b
 		else:
-			return '.'.join(a, b)
+			return '.'.join([a, b])
 
 
 	def __getstate__(self):

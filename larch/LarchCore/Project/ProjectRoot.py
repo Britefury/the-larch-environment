@@ -43,6 +43,33 @@ class ProjectRoot (ProjectContainer):
 		self._startupExecuted = False
 
 
+	def __getstate__(self):
+		state = super( ProjectRoot, self ).__getstate__()
+		state['kernel_description'] = self.__kernel_description
+		state['pythonPackageName'] = self._pythonPackageName
+		state['frontPageId'] = self.__frontPageId
+		state['startupPageId'] = self.__startupPageId
+		return state
+
+	def __setstate__(self, state):
+		self.__idToPage = {}
+		self._startupExecuted = False
+
+		self.__kernel = None
+		self.__kernel_factory_in_use = None
+		self.__kernel_creation_in_progress = False
+		self.__get_kernel_callbacks = []
+
+		self._startupExecuted = False
+
+		# Need to initialise the ID table before loading contents
+		super( ProjectRoot, self ).__setstate__( state )
+		self.__kernel_description = state['kernel_description']
+		self._pythonPackageName = state['pythonPackageName']
+		self.__frontPageId = state.get( 'frontPageId' )
+		self.__startupPageId = state.get( 'startupPageId' )
+
+
 	@property
 	def kernel_description(self):
 		return self.__kernel_description
@@ -95,10 +122,12 @@ class ProjectRoot (ProjectContainer):
 					for callback in callbacks:
 						callback(kernel)
 
-				factory.create_kernel(on_kernel_created)
 				# Queue the callback
 				self.__get_kernel_callbacks.append(kernel_callback)
 				self.__kernel_creation_in_progress = True
+				# Kick off kernel creation:
+				# MUST DO THIS LAST; callback may be called IMMEDIATELY, so everything must be ready
+				factory.create_kernel(on_kernel_created)
 			elif self.__kernel_creation_in_progress:
 				# Kernel creation already kicked off; queue the callback
 				self.__get_kernel_callbacks.append(kernel_callback)
@@ -135,26 +164,6 @@ class ProjectRoot (ProjectContainer):
 			return []
 		else:
 			return super( ProjectRoot, self ).moduleNames
-
-
-	def __getstate__(self):
-		state = super( ProjectRoot, self ).__getstate__()
-		state['kernel_description'] = self.__kernel_description
-		state['pythonPackageName'] = self._pythonPackageName
-		state['frontPageId'] = self.__frontPageId
-		state['startupPageId'] = self.__startupPageId
-		return state
-	
-	def __setstate__(self, state):
-		self.__idToPage = {}
-		self._startupExecuted = False
-
-		# Need to initialise the ID table before loading contents
-		super( ProjectRoot, self ).__setstate__( state )
-		self.__kernel_description = state['kernel_description']
-		self._pythonPackageName = state['pythonPackageName']
-		self.__frontPageId = state.get( 'frontPageId' )
-		self.__startupPageId = state.get( 'startupPageId' )
 
 
 	def __copy__(self):

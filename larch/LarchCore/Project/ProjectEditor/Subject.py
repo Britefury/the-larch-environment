@@ -21,7 +21,6 @@ from BritefuryJ.Pres.Primitive import Spacer, Column
 from LarchCore.MainApp import DocumentManagement
 
 from LarchCore.Project.ProjectEditor import View
-from LarchCore.Project.ProjectEditor.ModuleFinder import RootFinder, PackageFinder
 
 
 
@@ -68,8 +67,6 @@ class ProjectSubject (Subject):
 		self._document = document
 		self._model = model
 		self._title = title
-		packageFinder = PackageFinder( self, model )
-		self._rootFinder = RootFinder( self, model.pythonPackageName, packageFinder )
 
 
 	@property
@@ -105,10 +102,6 @@ class ProjectSubject (Subject):
 	def buildBoundCommandSetList(self, cmdSets):
 		cmdSets.add( _projectCommands.bindTo( self ) )
 		self.enclosingSubject.buildBoundCommandSetList( cmdSets )
-
-
-	def import_resolve(self, name, fullname, path):
-		return self._rootFinder.import_resolve( name, fullname, path )
 
 
 	def _pageSubject(self, page):

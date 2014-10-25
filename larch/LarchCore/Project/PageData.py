@@ -45,7 +45,7 @@ class PageData (object):
 
 
 	@abstractmethod
-	def get_source_code(self, filename):
+	def get_source_code(self):
 		pass
 
 	@abstractmethod

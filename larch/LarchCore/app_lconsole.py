@@ -27,7 +27,6 @@ def start_lconsole():
 
 	app.appInit()
 	world = World()
-	world.enableImportHooks()
 
 
 	def on_kernel_started(kernel):

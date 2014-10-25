@@ -18,6 +18,25 @@ from . import python_kernel, module_finder
 
 
 
+class InProcModuleSource (module_finder.AbstractModuleSource):
+	def __init__(self, source):
+		self.__source = source
+
+	def execute(self, module):
+		if isinstance(self.__source, str)  or  isinstance(self.__source, unicode):
+			exec self.__source in module.__dict__
+		elif isinstance(self.__source, list):
+			for x in self.__source:
+				if isinstance(x, str)  or  isinstance(x, unicode):
+					exec x in module.__dict__
+				else:
+					code = CodeGenerator.compileForModuleExecution(module, x, module.__name__)
+					exec code in module.__dict__
+		else:
+			raise TypeError, 'source should be a str, unicode or a list, it is a {0} ({1})'.format(type(self.__source), self.__source)
+
+
+
 class InProcessLiveModule (python_kernel.AbstractPythonLiveModule):
 	def __init__(self, name):
 		self.__module = imp.new_module(name)
@@ -55,7 +74,7 @@ class InProcessKernel (python_kernel.AbstractPythonKernel):
 
 
 	def set_module_source(self, fullname, source):
-		self.__module_finder.set_module_source(fullname, source)
+		self.__module_finder.set_module_source(fullname, InProcModuleSource(source))
 
 	def remove_module(self, fullname):
 		self.__module_finder.remove_module(fullname)

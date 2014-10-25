@@ -8,6 +8,21 @@
 import sys, imp, inspect
 
 
+
+class AbstractModuleSource (object):
+	def execute(self, module):
+		raise NotImplementedError, 'abstract'
+
+
+class ModuleSourceStr (AbstractModuleSource):
+	def __init__(self, src):
+		self.source = src
+
+	def execute(self, module):
+		exec self.source in module.__dict__
+
+
+
 class ModuleFinder (object):
 	def __init__(self):
 		self.__registered_modules = set()
@@ -41,6 +56,9 @@ class ModuleFinder (object):
 
 
 	def set_module_source(self, name, source):
+		if isinstance(source, str)  or  isinstance(source, unicode):
+			source = ModuleSourceStr(source)
+
 		path_segs = tuple(name.split('.'))
 		self.__registered_modules.add(name)
 		self.__path_to_module_source[path_segs] = source
@@ -139,7 +157,7 @@ class ModuleLoader (object):
 
 		mod = self.new_module(fullname)
 
-		exec self.__source in mod.__dict__
+		self.__source.execute(mod)
 
 		self.__fullname = fullname
 		self.__module = mod
