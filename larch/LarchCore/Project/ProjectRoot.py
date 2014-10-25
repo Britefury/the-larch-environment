@@ -24,8 +24,7 @@ class ProjectRoot (ProjectContainer):
 		super( ProjectRoot, self ).__init__( contents )
 
 		if kernel_description is None:
-			interp_conf = interpreter_config_page.get_interpreter_config()
-			kernel_description = interp_conf.kernel_descriptions[0]   if len(interp_conf.kernel_descriptions) > 0   else None
+			kernel_description = self.__default_kernel_description()
 
 		self.__kernel_description = kernel_description
 
@@ -64,10 +63,18 @@ class ProjectRoot (ProjectContainer):
 
 		# Need to initialise the ID table before loading contents
 		super( ProjectRoot, self ).__setstate__( state )
-		self.__kernel_description = state['kernel_description']
+		self.__kernel_description = state.get('kernel_description')
+		if self.__kernel_description is None:
+			self.__kernel_description = self.__default_kernel_description()
 		self._pythonPackageName = state['pythonPackageName']
 		self.__frontPageId = state.get( 'frontPageId' )
 		self.__startupPageId = state.get( 'startupPageId' )
+
+
+	def __default_kernel_description(self):
+		interp_conf = interpreter_config_page.get_interpreter_config()
+		return interp_conf.kernel_descriptions[0]   if len(interp_conf.kernel_descriptions) > 0   else None
+
 
 
 	@property
