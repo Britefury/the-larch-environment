@@ -5,13 +5,18 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2014.
 ##-*************************
-import sys, ast, json
+import sys, ast, json, binascii
 from java.awt import Color
+from java.io import ByteArrayInputStream
 from javax.swing import Timer
+from javax.imageio import ImageIO
+
+from org.python.core.util import StringUtil
 
 from mipy import kernel, request_listener
 
-from BritefuryJ.Pres.Primitive import Primitive, Label, Column
+from BritefuryJ.Pres import Pres
+from BritefuryJ.Pres.Primitive import Primitive, Label, Column, Image
 from BritefuryJ.Pres.ObjectPres import ErrorBoxWithFields, HorizontalField, VerticalField
 from BritefuryJ.Graphics import SolidBorder
 from BritefuryJ.StyleSheet import StyleSheet
@@ -79,6 +84,20 @@ class _KernelListener (request_listener.ExecuteRequestListener):
 			raise ValueError, 'Unknown stream name {0}'.format(stream_name)
 
 
+	def on_display_data(self, source, data, metadata):
+		"""
+		'display_data' message on IOPUB socket
+
+		:param source: who created the data
+		:param data: dictionary mapping MIME type to raw data representation in that format
+		:param metadata: metadata describing the content of `data`
+		"""
+		for mime_type, raw in data.items():
+			if mime_type.startswith('image/'):
+				image = binascii.a2b_base64(raw)
+				self.result.display_image(mime_type, image)
+
+
 	def on_execute_finished(self):
 		if self.finished is not None:
 			self.finished(self.result)
@@ -99,6 +118,7 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 		self.__loader_module_name = module_finder.loader_module_name()
 
 		self.__install_loader()
+		self.__matplotlib_inline()
 
 
 
@@ -204,6 +224,10 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 	def __loader_unload_all_modules_src(self):
 		src = module_finder.loader_unload_all_modules_src(self.__loader_module_name)
 		self.__module_loader_exec(src)
+
+
+	def __matplotlib_inline(self):
+		self.__module_loader_exec('%matplotlib inline')
 
 
 
@@ -332,6 +356,7 @@ class IPythonExecutionResult (execution_result.AbstractExecutionResult):
 		self._error = None
 		self._result = result_in_tuple
 		self._aborted = False
+		self._images = []
 
 
 	@property
@@ -360,6 +385,18 @@ class IPythonExecutionResult (execution_result.AbstractExecutionResult):
 		self.__incr.onChanged()
 
 
+	def display_image(self, mime_type, image_data):
+		image_bytes = StringUtil.toBytes(image_data)
+		in_stream = ByteArrayInputStream(image_bytes)
+		img = ImageIO.read(in_stream)
+		if img is not None:
+			self._images.append(img)
+			self.__incr.onChanged()
+		else:
+			print 'display_image: failed to read image of mime type {0} with {1} bytes'.format(mime_type, len(image_data))
+			print image_data
+
+
 	def was_aborted(self):
 		return self._aborted
 
@@ -377,15 +414,31 @@ class IPythonExecutionResult (execution_result.AbstractExecutionResult):
 		return self._error is not None  or  self._streams.has_content_for( 'err' )
 
 
+	def _result_view(self):
+		contents = []
+		for img in self._images:
+			contents.append(Image(img, float(img.getWidth()), float(img.getHeight())))
+		if self._aborted:
+			contents.append(self._aborted)
+		else:
+			if self._result is not None:
+				contents.append(Pres.coercePresentingNull( self._result[0] ).alignHPack())
+		if len(contents) == 0:
+			return None
+		else:
+			return (Column(contents), )
+
+
+
 	def view(self, bUseDefaultPerspecitveForException=True, bUseDefaultPerspectiveForResult=True):
 		self.__incr.onAccess()
-		result = _aborted   if self._aborted   else self._result
+		result = self._result_view()
 		return execution_pres.execution_result_box( self._streams, self._error, result, bUseDefaultPerspecitveForException, bUseDefaultPerspectiveForResult )
 
 
 	def minimalView(self, bUseDefaultPerspecitveForException=True, bUseDefaultPerspectiveForResult=True):
 		self.__incr.onAccess()
-		result = _aborted   if self._aborted   else self._result
+		result = self._result_view()
 		return execution_pres.minimal_execution_result_box( self._streams, self._error, result, bUseDefaultPerspecitveForException, bUseDefaultPerspectiveForResult )
 
 
