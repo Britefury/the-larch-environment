@@ -54,6 +54,7 @@ class WorksheetAbstractView (NodeAbstractView):
 	def __init_module(self, module_init_callback):
 		name = self._importName   if self._importName is not None   else 'worksheet'
 		def _on_kernel_created(kernel):
+			kernel.update_importable_modules()
 			self._module = kernel.new_live_module(name)
 			module_init_callback(self._module)
 		self._kernel_source(_on_kernel_created)

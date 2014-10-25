@@ -246,7 +246,7 @@ class _WorksheetModuleLoader (object):
 
 
 def _refreshWorksheet(subject, pageController):
-	subject._modelView.refreshResults()
+	subject._get_model_view().refreshResults()
 
 
 _refreshCommand = Command( CommandName( '&Refresh worksheet' ), _refreshWorksheet, Shortcut( KeyEvent.VK_ENTER, Modifier.CTRL ) )
@@ -287,8 +287,7 @@ class WorksheetViewerSubject (Subject):
 		return self
 
 	
-	@property
-	def _modelView(self):
+	def _get_model_view(self):
 		if self.__modelView is None:
 			self.__modelView = ViewSchema.WorksheetView( None, self._model, self._importName, self.get_kernel )
 		return self.__modelView
@@ -299,7 +298,7 @@ class WorksheetViewerSubject (Subject):
 
 
 	def getFocus(self):
-		f = self._modelView
+		f = self._get_model_view()
 		# This causes execution results to refresh on page view
 		f.refreshResults()
 		return f

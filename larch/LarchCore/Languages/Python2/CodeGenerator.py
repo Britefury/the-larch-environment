@@ -1024,13 +1024,6 @@ class Python2ModuleCodeGenerator (Python2CodeGenerator):
 		for i, x in enumerate( self._resourceMap ):
 			self._resourceValueIdToIndex[id(x)] = i
 
-		self._module = module
-
-
-
-	@property
-	def module(self):
-		return self._module
 
 
 	def _quotedNode(self, node):

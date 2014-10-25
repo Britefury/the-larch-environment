@@ -66,10 +66,10 @@ class _ImportableModule (object):
 	def __get_source(self):
 		if self.__source is None:
 			return None
-		elif isinstance(self.__source, str)  or  isinstance(self.__source, unicode):
-			return self.__source
 		elif isinstance(self.__source, LiveInterface):
-			return self.__source.value
+			return self.__source.getValue()
+		else:
+			return self.__source
 
 
 

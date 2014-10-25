@@ -49,22 +49,6 @@ class MainAppSubject (TransientSubject):
 		
 	
 	
-	def import_resolve(self, name, fullname, path):
-		for appDocument in self._appState.getOpenDocuments():
-			doc = appDocument.getDocument()
-			subject = doc.newSubject( self, None, doc.getDocumentName() )
-			try:
-				resolve = subject.import_resolve
-			except AttributeError:
-				pass
-			else:
-				result = resolve( name, fullname, path )
-				if result is not None:
-					return result
-		return None
-
-
-
 class AboutPageSubject (TransientSubject):
 	def __init__(self, appStateSubject):
 		super( AboutPageSubject, self ).__init__( appStateSubject )

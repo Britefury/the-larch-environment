@@ -47,9 +47,8 @@ class Python2PageData (PageData):
 	def makeEmptyContents(self):
 		return _py25NewModule()
 
-	def get_source_code(self, filename):
-		code_gen = Python2CodeGenerator(filename)
-		return code_gen.compileForExecution( self.contents )
+	def get_source_code(self):
+		return [self.contents]
 
 	def exportAsString(self, filename):
 		exporter = PythonTextExporter( filename )
