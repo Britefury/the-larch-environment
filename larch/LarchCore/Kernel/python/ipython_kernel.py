@@ -5,8 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2014.
 ##-*************************
-import sys, ast, json, binascii
-from java.awt import Color
+import sys, ast, json, binascii, re
+from java.awt import Color, Font
 from java.io import ByteArrayInputStream
 from javax.swing import Timer
 from javax.imageio import ImageIO
@@ -17,6 +17,7 @@ from mipy import kernel, request_listener
 
 from BritefuryJ.Pres import Pres
 from BritefuryJ.Pres.Primitive import Primitive, Label, Column, Image
+from BritefuryJ.Pres.RichText import NormalText, RichText
 from BritefuryJ.Pres.ObjectPres import ErrorBoxWithFields, HorizontalField, VerticalField
 from BritefuryJ.Graphics import SolidBorder
 from BritefuryJ.StyleSheet import StyleSheet
@@ -31,6 +32,11 @@ _aborted_border = SolidBorder(1.5, 2.0, 5.0, 5.0, Color(1.0, 0.5, 0.0), Color(1.
 _aborted_style = StyleSheet.style(Primitive.foreground(Color(1.0, 0.0, 0.0)))
 _aborted = _aborted_border.surround(_aborted_style.applyTo(Label('ABORTED')))
 
+_text_result_style = StyleSheet.style(RichText.normalTextAttrs(StyleSheet.style(Primitive.fontFace(Font.MONOSPACED),
+										Primitive.editable(False))))
+
+# ANSI escape sequence pattern from http://stackoverflow.com/questions/13506033/filtering-out-ansi-escape-sequences
+_ansi_escape_pattern = re.compile(r'\x1b\[([0-9,A-Z]{1,2}(;[0-9]{1,2})?(;[0-9]{3})?)?[m|K]?')
 
 POLL_TIMEOUT = 0
 
@@ -60,6 +66,7 @@ class _KernelListener (request_listener.ExecuteRequestListener):
 
 	def on_execute_error(self, ename, evalue, traceback):
 		# print 'KernelListener.on_execute_error'
+		traceback = [_ansi_escape_pattern.sub('', x)   for x in traceback]
 		self.result.set_error(IPythonExecutionError(ename, evalue, traceback))
 
 	def on_execute_abort(self):
@@ -71,7 +78,12 @@ class _KernelListener (request_listener.ExecuteRequestListener):
 		# print 'KernelListener.on_execute_result'
 		text = data.get('text/plain')
 		if text is not None:
-			self.result.set_result(ast.literal_eval(text))
+			try:
+				value = ast.literal_eval(text)
+			except ValueError:
+				self.result.set_text_result(text)
+			else:
+				self.result.set_result(value)
 
 
 	def on_stream(self, stream_name, data):
@@ -382,6 +394,12 @@ class IPythonExecutionResult (execution_result.AbstractExecutionResult):
 
 	def set_result(self, result):
 		self._result = (result,)
+		self.__incr.onChanged()
+
+	def set_text_result(self, text_result):
+		lines = text_result.split('\n')
+		res = _text_result_style.applyTo(Column([NormalText(line)   for line in lines]))
+		self._result = (res,)
 		self.__incr.onChanged()
 
 
