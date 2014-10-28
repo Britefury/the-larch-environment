@@ -195,9 +195,13 @@ class ProjectRoot (ProjectContainer):
 				startupPage = self.startupPage
 				if startupPage is not None:
 					self._startupExecuted = True
-					__import__( startupPage.importName )
+					raise NotImplementedError, 'Startup page not executed'
+					# __import__( startupPage.importName )
 
-	def reset(self):
+	def restart_kernel(self):
+		if self.__kernel is not None:
+			self.__kernel.shutdown()
+			self.__kernel = None
 		self._startupExecuted = False
 
 
