@@ -233,7 +233,7 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 		src = module_finder.loader_remove_module_src(self.__loader_module_name, module_name)
 		self.__module_loader_exec(src)
 
-	def __loader_unload_all_modules_src(self):
+	def __loader_unload_all_modules(self):
 		src = module_finder.loader_unload_all_modules_src(self.__loader_module_name)
 		self.__module_loader_exec(src)
 

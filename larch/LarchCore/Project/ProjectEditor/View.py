@@ -405,19 +405,13 @@ class ProjectView (MethodDispatchView):
 
 
 		# Clear imported modules
-		def _onReset(button, event):
-			project.reset()
-			modules = document.unloadAllImportedModules()
-			heading = SectionHeading2( 'Unloaded modules:' )
-			modules = Column( [ Label( module )   for module in modules ] )
-			report = Section( heading, modules )
-			BubblePopup.popupInBubbleAdjacentTo( report, button.getElement(), Anchor.BOTTOM, True, True )
-		resetButton = Button.buttonWithLabel( 'Reset', _onReset ).alignHPack()
-		resetButton = AttachTooltip( resetButton, 'Unloads all modules that were imported from this project from the Python module cache. This way they can be re-imported, allowing modifications to take effect.' )
-		resetRow = Form.Section( 'Reset', 'Unload project modules', resetButton )
+		def _on_restart_kernel(button, event):
+			project.restart_kernel()
+		restart_button = Button.buttonWithLabel( 'Restart kernel', _on_restart_kernel ).alignHPack()
+		restart_row = Form.Section( 'Restart', 'Shut the kernel down and start a new one.', restart_button )
 
 
-		projectSection = Form( 'Project', [ kernel_row, pythonPackageNameRow, resetRow ] )
+		projectSection = Form( 'Project', [ kernel_row, pythonPackageNameRow, restart_row ] )
 
 
 		# Project index
