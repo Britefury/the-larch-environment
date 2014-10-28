@@ -80,7 +80,8 @@ class _KernelListener (request_listener.ExecuteRequestListener):
 		if text is not None:
 			try:
 				value = ast.literal_eval(text)
-			except ValueError:
+			except:
+				# Not a literal
 				self.result.set_text_result(text)
 			else:
 				self.result.set_result(value)
