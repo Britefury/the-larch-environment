@@ -24,6 +24,8 @@ from BritefuryJ.Browser import TabbedBrowser
 
 from BritefuryJ.Pres.Help import AttachTooltip, TipBox
 
+from BritefuryJ.Util import Platform
+
 
 
 def _action(name, f):
@@ -71,11 +73,16 @@ class Window (object):
 
 		editMenu = JMenu( 'Edit' )
 
+		if Platform.getPlatform() is Platform.MAC:
+			command_key_mask = ActionEvent.META_MASK
+		else:
+			command_key_mask = ActionEvent.CTRL_MASK;
+
 		self.__editUndoItem = JMenuItem( 'Undo' )
 		undoAction = _action( 'undo', self.__onUndo )
 		self.__editUndoItem.setActionCommand( undoAction.getValue( Action.NAME ) )
 		self.__editUndoItem.addActionListener( undoAction )
-		self.__editUndoItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_Z, ActionEvent.CTRL_MASK ) )
+		self.__editUndoItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_Z, command_key_mask ) )
 		self.__editUndoItem.setMnemonic( KeyEvent.VK_U )
 		editMenu.add( self.__editUndoItem )
 
@@ -83,7 +90,7 @@ class Window (object):
 		redoAction = _action( 'redo', self.__onRedo )
 		self.__editRedoItem.setActionCommand( redoAction.getValue( Action.NAME ) )
 		self.__editRedoItem.addActionListener( redoAction )
-		self.__editRedoItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_Y, ActionEvent.CTRL_MASK ) )
+		self.__editRedoItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_Y, command_key_mask ) )
 		self.__editRedoItem.setMnemonic( KeyEvent.VK_R )
 		editMenu.add( self.__editRedoItem )
 
@@ -92,21 +99,21 @@ class Window (object):
 		editCutItem = JMenuItem( 'Cut' )
 		editCutItem.setActionCommand( TransferHandler.getCutAction().getValue( Action.NAME ) )
 		editCutItem.addActionListener( transferActionListener )
-		editCutItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_X, ActionEvent.CTRL_MASK ) )
+		editCutItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_X, command_key_mask ) )
 		editCutItem.setMnemonic( KeyEvent.VK_T )
 		editMenu.add( editCutItem )
 
 		editCopyItem = JMenuItem( 'Copy' )
 		editCopyItem.setActionCommand( TransferHandler.getCopyAction().getValue( Action.NAME ) )
 		editCopyItem.addActionListener( transferActionListener )
-		editCopyItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_C, ActionEvent.CTRL_MASK ) )
+		editCopyItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_C, command_key_mask ) )
 		editCopyItem.setMnemonic( KeyEvent.VK_C )
 		editMenu.add( editCopyItem )
 
 		editPasteItem = JMenuItem( 'Paste' )
 		editPasteItem.setActionCommand( TransferHandler.getPasteAction().getValue( Action.NAME ) )
 		editPasteItem.addActionListener( transferActionListener )
-		editPasteItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_V, ActionEvent.CTRL_MASK ) )
+		editPasteItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_V, command_key_mask ) )
 		editPasteItem.setMnemonic( KeyEvent.VK_P )
 		editMenu.add( editPasteItem )
 
