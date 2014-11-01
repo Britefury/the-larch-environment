@@ -150,7 +150,7 @@ class _FragmentInspector (object):
 		self._console = None
 
 		def on_kernel_started(kernel):
-			self._console = Console.Console( kernel, '<popup_console>', False )
+			self._console = Console.Console( kernel, False )
 			self._console.assignVariable( 'm', fragment.model )
 			self._console.assignVariable( 'frag', fragment )
 			self._incr.onChanged()

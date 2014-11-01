@@ -33,5 +33,5 @@ class AbstractLiveModule (object):
 
 
 class AbstractKernel (object):
-	def new_live_module(self, full_name):
+	def get_live_module(self):
 		raise NotImplementedError, 'abstract'

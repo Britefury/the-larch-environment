@@ -63,14 +63,15 @@ class InProcessKernel (python_kernel.AbstractPythonKernel):
 		super(InProcessKernel, self).__init__(ctx)
 		self.__module_finder = module_finder.ModuleFinder()
 		self.__module_finder.install_hooks()
+		self.__live_module = InProcessLiveModule('__live__')
 
 	def shutdown(self):
 		self.__module_finder.unload_all_modules()
 		self.__module_finder.uninstall_hooks()
 		super(InProcessKernel, self).shutdown()
 
-	def new_live_module(self, full_name):
-		return InProcessLiveModule(full_name)
+	def get_live_module(self):
+		return self.__live_module
 
 
 	def set_module_source(self, fullname, source):

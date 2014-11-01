@@ -1318,7 +1318,12 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 	public PresentationPopupWindow createPopupAtMousePosition(LSElement popupContents, Anchor popupAnchor,
 			boolean closeAutomatically, boolean requestFocus)
 	{
-		Point mouse = component.getMousePosition();
+        Point mouse = component.getMousePosition();
+        if (mouse == null) {
+            Point mousePosOnScreen = MouseInfo.getPointerInfo().getLocation();
+            Point componentPos = component.getLocationOnScreen();
+            mouse = new Point(mousePosOnScreen.x - componentPos.x, mousePosOnScreen.y - componentPos.y);
+        }
 		PresentationPopupWindow popup =  component.createPopupPresentation( popupContents, mouse.x, mouse.y, popupAnchor, closeAutomatically, requestFocus, true );
 		if ( !requestFocus )
 		{
@@ -1346,13 +1351,12 @@ public class LSRootElement extends LSBin implements SelectionListener, DndContro
 			boolean closeAutomatically, boolean requestFocus)
 	{
 		Point mouse = component.getMousePosition();
-        PresentationPopupWindow popup;
         if (mouse == null) {
             Point mousePosOnScreen = MouseInfo.getPointerInfo().getLocation();
             Point componentPos = component.getLocationOnScreen();
             mouse = new Point(mousePosOnScreen.x - componentPos.x, mousePosOnScreen.y - componentPos.y);
         }
-        popup =  component.createPopupPresentation( popupContents, mouse.x, mouse.y, popupAnchor, closeAutomatically, requestFocus, false );
+        PresentationPopupWindow popup =  component.createPopupPresentation( popupContents, mouse.x, mouse.y, popupAnchor, closeAutomatically, requestFocus, false );
 
 
 		if ( !requestFocus )

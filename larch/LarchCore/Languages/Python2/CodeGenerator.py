@@ -104,6 +104,11 @@ class Python2CodeGenerator (object):
 		return compile( source, self._filename, 'eval' )
 	
 	
+	def compileSourceForEvaluation(self, pythonExpression):
+		source = str( self( pythonExpression ) )
+		return source
+
+
 	def compileForExecution(self, pythonModule):
 		source = str( self( pythonModule ) )
 		return compile( source, self._filename, 'exec' )
@@ -1235,6 +1240,10 @@ class Python2ModuleCodeGenerator (Python2CodeGenerator):
 
 def compileForEvaluation(pythonExpression, filename):
 	return Python2CodeGenerator( filename ).compileForEvaluation( pythonExpression )
+
+
+def compileSourceForEvaluation(pythonExpression, filename):
+	return Python2CodeGenerator( filename ).compileSourceForEvaluation( pythonExpression )
 
 
 def compileForExecution(pythonCode, filename):

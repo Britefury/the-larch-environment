@@ -107,7 +107,7 @@ def _dropPrompt(varNameTextEntryListener):
 
 
 class Console (object):
-	def __init__(self, kernel, name, showBanner=True):
+	def __init__(self, kernel, showBanner=True):
 		self._incr = IncrementalValueMonitor( self )
 
 		self._blocks = []
@@ -115,7 +115,7 @@ class Console (object):
 		self._before = []
 		self._after = []
 		self._kernel = kernel
-		self._module = self._kernel.new_live_module(name)
+		self._module = self._kernel.get_live_module()
 		self._can_assign = isinstance(self._module, inproc_kernel.InProcessLiveModule)
 		self._banner_text = ''
 
