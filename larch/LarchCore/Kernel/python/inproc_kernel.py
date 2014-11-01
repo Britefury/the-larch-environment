@@ -40,6 +40,7 @@ class InProcModuleSource (module_finder.AbstractModuleSource):
 class InProcessLiveModule (python_kernel.AbstractPythonLiveModule):
 	def __init__(self, name):
 		self.__module = imp.new_module(name)
+		self.__execution_count = 0
 		LoadBuiltins.loadBuiltins(self.__module)
 
 
@@ -53,7 +54,8 @@ class InProcessLiveModule (python_kernel.AbstractPythonLiveModule):
 	def execute(self, code, evaluate_last_expression, result_callback):
 		if isinstance(code, str)  or  isinstance(code, unicode):
 			raise NotImplementedError, 'InProcessModule.execute: executing of code as strings not yet supported'
-		result = getResultOfExecutionWithinModule(code, self.__module, evaluate_last_expression)
+		self.__execution_count += 1
+		result = getResultOfExecutionWithinModule(code, self.__module, evaluate_last_expression, self.__execution_count)
 		result_callback(result)
 
 
@@ -105,10 +107,11 @@ class InProcessContext (python_kernel.AbstractPythonContext):
 
 
 class InProcessExecutionResult (execution_result.AbstractExecutionResult):
-	def __init__(self, streams=None, caughtException=None, result_in_tuple=None):
+	def __init__(self, streams=None, caughtException=None, result_in_tuple=None, execution_count=None):
 		super(InProcessExecutionResult, self).__init__(streams)
 		self._caught_exception = caughtException
 		self._result_in_tuple = result_in_tuple
+		self._execution_count = execution_count
 
 
 	@property
@@ -138,17 +141,19 @@ class InProcessExecutionResult (execution_result.AbstractExecutionResult):
 
 
 	def view(self, bUseDefaultPerspecitveForException=True, bUseDefaultPerspectiveForResult=True):
-		return execution_pres.execution_result_box( self._streams, self._caught_exception, self._result_in_tuple, bUseDefaultPerspecitveForException, bUseDefaultPerspectiveForResult )
+		return execution_pres.execution_result_box( self._streams, self._caught_exception, self._result_in_tuple,
+							    bUseDefaultPerspecitveForException, bUseDefaultPerspectiveForResult, self._execution_count )
 
 
 	def minimalView(self, bUseDefaultPerspecitveForException=True, bUseDefaultPerspectiveForResult=True):
-		return execution_pres.minimal_execution_result_box( self._streams, self._caught_exception, self._result_in_tuple, bUseDefaultPerspecitveForException, bUseDefaultPerspectiveForResult )
+		return execution_pres.minimal_execution_result_box( self._streams, self._caught_exception, self._result_in_tuple,
+								    bUseDefaultPerspecitveForException, bUseDefaultPerspectiveForResult )
 
 
 
 
 
-def getResultOfExecutionWithinModule(pythonCode, module, bEvaluate):
+def getResultOfExecutionWithinModule(pythonCode, module, bEvaluate, execution_count=None):
 	std = execution_result.MultiplexedRichStream(['stdout', 'stderr'])
 
 	evalCode = execCode = None
@@ -180,10 +185,10 @@ def getResultOfExecutionWithinModule(pythonCode, module, bEvaluate):
 			caughtException = JythonException.getCurrentException()
 
 		sys.stdout, sys.stderr = savedStdout, savedStderr
-	return InProcessExecutionResult( std, caughtException, result )
+	return InProcessExecutionResult( std, caughtException, result, execution_count )
 
 
-def getResultOfExecutionInScopeWithinModule(pythonCode, globals, locals, module, bEvaluate):
+def getResultOfExecutionInScopeWithinModule(pythonCode, globals, locals, module, bEvaluate, execution_count=None):
 	std = execution_result.MultiplexedRichStream(['stdout', 'stderr'])
 
 	evalCode = execCode = None
@@ -220,7 +225,7 @@ def getResultOfExecutionInScopeWithinModule(pythonCode, globals, locals, module,
 			caughtException = JythonException.getCurrentException()
 
 		sys.stdout, sys.stderr = savedStdout, savedStderr
-	return InProcessExecutionResult( std, caughtException, result )
+	return InProcessExecutionResult( std, caughtException, result, execution_count )
 
 
 
