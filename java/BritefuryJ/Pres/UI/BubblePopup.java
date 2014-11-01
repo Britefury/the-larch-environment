@@ -6,13 +6,7 @@
 //##************************
 package BritefuryJ.Pres.UI;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Shape;
-import java.awt.Stroke;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Path2D;
@@ -451,10 +445,8 @@ public class BubblePopup
 
 	public static PresentationPopupWindow popupInBubbleAdjacentToMouse(Object contents, LSElement target, Anchor popupAnchor, boolean closeAutomatically, boolean requestFocus)
 	{
-		PresentationComponent component = target.getRootElement().getComponent();
-		Point mouse = component.getMousePosition();
-		Point loc = component.getLocationOnScreen();
-		Point2 mousePos = new Point2( (double)( mouse.x + loc.x ), (double)( mouse.y + loc.y ) );
+        Point mouse = MouseInfo.getPointerInfo().getLocation();
+        Point2 mousePos = new Point2((double)mouse.x, (double)mouse.y);
 		MouseBubblePres b = new MouseBubblePres( contents, mousePos );
 		
 		return b.popupAtMousePosition( target, popupAnchor, closeAutomatically, requestFocus );
