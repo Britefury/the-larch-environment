@@ -62,7 +62,7 @@ class _KernelListener (request_listener.ExecuteRequestListener):
 
 
 	def on_execute_ok(self, execution_count, payload, user_expressions):
-		pass
+		self.result.execution_count = execution_count
 
 	def on_execute_error(self, ename, evalue, traceback):
 		# print 'KernelListener.on_execute_error'
@@ -76,6 +76,7 @@ class _KernelListener (request_listener.ExecuteRequestListener):
 
 	def on_execute_result(self, execution_count, data, metadata):
 		# print 'KernelListener.on_execute_result'
+		self.result.execution_count = execution_count
 		text = data.get('text/plain')
 		if text is not None:
 			try:
@@ -183,7 +184,7 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 		std = execution_result.MultiplexedRichStream()
 		self.__stdout = std.stdout
 		self.__stderr = std.stderr
-		self.__kernel.execute_request(src, listener=listener)
+		self.__kernel.execute_request(src, listener=listener, silent=silent, store_history=store_history)
 		self.__queue_poll()
 
 
@@ -217,7 +218,7 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 
 
 	def __module_loader_exec(self, src):
-		self._queue_exec(self.__loader_module_name, src, False, None)
+		self._queue_exec(self.__loader_module_name, src, False, None, store_history=False)
 
 
 	def __install_loader(self):
@@ -365,13 +366,14 @@ class IPythonExecutionError (object):
 
 
 class IPythonExecutionResult (execution_result.AbstractExecutionResult):
-	def __init__(self, streams=None, caughtException=None, result_in_tuple=None):
+	def __init__(self, streams=None, caughtException=None, result_in_tuple=None, execution_count=None):
 		super( IPythonExecutionResult, self ).__init__(streams)
 		self.__incr = IncrementalValueMonitor()
 		self._error = None
 		self._result = result_in_tuple
 		self._aborted = False
 		self._images = []
+		self._execution_count = execution_count
 
 
 	@property
@@ -426,6 +428,16 @@ class IPythonExecutionResult (execution_result.AbstractExecutionResult):
 		self.__incr.onChanged()
 
 
+	@property
+	def execution_count(self):
+		return self._execution_count
+
+	@execution_count.setter
+	def execution_count(self, value):
+		self._execution_count = value
+		self.__incr.onChanged()
+
+
 	def errorsOnly(self):
 		return IPythonExecutionResult( self._streams.suppress_stream( 'out' ), self._error, None )
 
@@ -454,12 +466,14 @@ class IPythonExecutionResult (execution_result.AbstractExecutionResult):
 	def view(self, bUseDefaultPerspecitveForException=True, bUseDefaultPerspectiveForResult=True):
 		self.__incr.onAccess()
 		result = self._result_view()
-		return execution_pres.execution_result_box( self._streams, self._error, result, bUseDefaultPerspecitveForException, bUseDefaultPerspectiveForResult )
+		return execution_pres.execution_result_box( self._streams, self._error, result, bUseDefaultPerspecitveForException,
+							    bUseDefaultPerspectiveForResult, self._execution_count )
 
 
 	def minimalView(self, bUseDefaultPerspecitveForException=True, bUseDefaultPerspectiveForResult=True):
 		self.__incr.onAccess()
 		result = self._result_view()
-		return execution_pres.minimal_execution_result_box( self._streams, self._error, result, bUseDefaultPerspecitveForException, bUseDefaultPerspectiveForResult )
+		return execution_pres.minimal_execution_result_box( self._streams, self._error, result, bUseDefaultPerspecitveForException,
+								    bUseDefaultPerspectiveForResult )
 
 

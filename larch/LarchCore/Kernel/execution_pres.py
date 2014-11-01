@@ -9,7 +9,7 @@ from java.awt import Color
 
 from BritefuryJ.AttributeTable import AttributeNamespace, InheritedAttributeNonNull, PyDerivedValueTable
 from BritefuryJ.StyleSheet import StyleSheet
-from BritefuryJ.Graphics import SolidBorder
+from BritefuryJ.Graphics import SolidBorder, FilledOutlinePainter
 from BritefuryJ.Pres import ApplyStyleSheetFromAttribute, Pres, ApplyPerspective
 from BritefuryJ.Pres.Primitive import Primitive, Label, StaticText, Column, Overlay, Bin, Border, Paragraph
 
@@ -18,13 +18,18 @@ from BritefuryJ.Pres.Primitive import Primitive, Label, StaticText, Column, Over
 class ExecutionStyle (object):
 	execution = AttributeNamespace( 'CodeExecution' )
 
+	execution_count_style = InheritedAttributeNonNull(execution, 'execution_count_style', StyleSheet,
+							  StyleSheet.style(Primitive.foreground(Color(1.0, 1.0, 1.0)),
+									   Primitive.fontSize(9),
+									   Primitive.background(FilledOutlinePainter(Color(0.1, 0.2, 0.4, 0.7), Color(0.15, 0.3, 0.6, 0.7)))))
+
 	label_style = InheritedAttributeNonNull( execution, 'label_style', StyleSheet,
 						StyleSheet.style( Primitive.fontSize( 10 ) ) )
 
 	stdout_style = InheritedAttributeNonNull( execution, 'stdout_style', StyleSheet,
-						 StyleSheet.style( Primitive.border( SolidBorder( 1.0, 3.0, 7.0, 7.0, Color( 0.5, 1.0, 0.5 ), Color( 0.9, 1.0, 0.9 ) ) ), Primitive.foreground( Color( 0.0, 0.5, 0.0 ) ) ) )
+						 StyleSheet.style( Primitive.border( SolidBorder( 1.0, 3.0, 7.0, 7.0, Color( 0.8, 1.0, 0.8 ), Color( 0.975, 1.0, 0.975 ) ) ), Primitive.foreground( Color( 0.0, 0.5, 0.0 ) ) ) )
 	stderr_style = InheritedAttributeNonNull( execution, 'stderr_style', StyleSheet,
-						 StyleSheet.style( Primitive.border( SolidBorder( 1.0, 3.0, 7.0, 7.0, Color( 1.0, 0.75, 0.5 ), Color( 1.0, 0.95, 0.9 ) ) ), Primitive.foreground( Color( 0.75, 0.375, 0.0 ) ) ) )
+						 StyleSheet.style( Primitive.border( SolidBorder( 1.0, 3.0, 7.0, 7.0, Color( 1.0, 0.9, 0.8 ), Color( 1.0, 0.9875, 0.975 ) ) ), Primitive.foreground( Color( 0.75, 0.375, 0.0 ) ) ) )
 	stream_style = InheritedAttributeNonNull( execution, 'stream_style', StyleSheet,
 						 StyleSheet.style( Primitive.border( SolidBorder( 1.0, 3.0, 7.0, 7.0, Color( 0.75, 0.75, 0.75 ), Color( 0.95, 0.95, 0.95 ) ) ), Primitive.foreground( Color( 0.75, 0.375, 0.0 ) ) ) )
 
@@ -56,10 +61,9 @@ def _rich_string_item(item, text_style_attribute):
 	else:
 		return _text_lines( item.getValue(), text_style_attribute )
 
-def _rich_string_lines(label_text, rich_string, text_style_attribute):
-	label = ApplyStyleSheetFromAttribute( ExecutionStyle.label_style, StaticText( label_text ) )
+def _rich_string_lines(rich_string, text_style_attribute):
 	lines = [ _rich_string_item( item, text_style_attribute )   for item in rich_string.getItems() ]
-	return Overlay( [ Column( lines ).alignHExpand(), label.alignHRight().alignVTop() ] )
+	return Overlay( [ Column( lines ).alignHExpand() ] )
 
 _stream_styles = {
 	'stdout': ExecutionStyle.stdout_style,
@@ -68,7 +72,7 @@ _stream_styles = {
 
 def stream_pres(rich_string, stream_name):
 	stream_style = _stream_styles.get(stream_name, ExecutionStyle.stream_style)
-	return ApplyStyleSheetFromAttribute(stream_style, Border( _rich_string_lines( stream_name.upper(), rich_string, stream_style ).alignHExpand() ).alignHExpand() )
+	return ApplyStyleSheetFromAttribute(stream_style, Border( _rich_string_lines( rich_string, stream_style ).alignHExpand() ).alignHExpand() )
 
 def exec_exception(exception_view):
 	label = ApplyStyleSheetFromAttribute( ExecutionStyle.label_style, StaticText( 'EXCEPTION:' ) )
@@ -79,8 +83,17 @@ def exec_result(result_view):
 
 
 
-def execution_result_box(streams, exception, result_in_tuple, use_default_perspective_for_exception, use_default_perspective_for_result):
+def execution_result_box(streams, exception, result_in_tuple, use_default_perspective_for_exception, use_default_perspective_for_result,
+			 execution_count):
 	box_contents = []
+
+	if execution_count is not None:
+		ex_count_text = '[{0}]'.format(execution_count)
+		ex_count = ApplyStyleSheetFromAttribute(ExecutionStyle.execution_count_style, Bin(Label(ex_count_text).pad(4.0, 2.0)))
+		ex_count = ex_count.alignHRight().alignVTop()
+	else:
+		ex_count = None
+
 	if use_default_perspective_for_result:
 		box_contents.append(ApplyPerspective.defaultPerspective(streams))
 	else:
@@ -97,7 +110,10 @@ def execution_result_box(streams, exception, result_in_tuple, use_default_perspe
 		box_contents.append( exec_result( result_view ) )
 
 	if len( box_contents ) > 0:
-		return ApplyStyleSheetFromAttribute( ExecutionStyle.resultBoxStyle, Column( box_contents ).alignHExpand() )
+		p = ApplyStyleSheetFromAttribute( ExecutionStyle.resultBoxStyle, Column( box_contents ).alignHExpand() )
+		if execution_count is not None:
+			p = Overlay([p.padY(5.0, 0.0), ex_count]).alignHExpand()
+		return p
 	else:
 		return None
 
