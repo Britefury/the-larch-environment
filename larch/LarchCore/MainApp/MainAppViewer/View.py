@@ -165,7 +165,7 @@ class AppView (MethodDispatchView):
 						full_name = 'In-process console {0} ({1})'.format(index, description)
 					else:
 						full_name = 'IPython console {0} ({1})'.format(index, description)
-					appConsole = Application.AppConsole(kernel, '<console{0}>'.format(index), full_name, index)
+					appConsole = Application.AppConsole(kernel, full_name, index)
 
 					new_console(link, appConsole)
 

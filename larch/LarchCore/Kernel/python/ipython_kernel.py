@@ -133,6 +133,8 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 		self.__install_loader()
 		self.__matplotlib_inline()
 
+		self.__live_module = IPythonLiveModule(self, '__live__')
+
 
 
 	def shutdown(self):
@@ -141,8 +143,8 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 
 
 
-	def new_live_module(self, full_name):
-		return IPythonLiveModule(self, full_name)
+	def get_live_module(self):
+		return self.__live_module
 
 
 	def set_module_source(self, fullname, source):
@@ -192,7 +194,7 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 		if isinstance(expr, str)  or  isinstance(expr, unicode):
 			src = expr
 		else:
-			src = CodeGenerator.compileForEvaluation(expr, module_name)
+			src = CodeGenerator.compileSourceForEvaluation(expr, module_name)
 		std = execution_result.MultiplexedRichStream()
 		self.__stdout = std.stdout
 		self.__stderr = std.stderr
@@ -337,7 +339,7 @@ class IPythonContext (python_kernel.AbstractPythonContext):
 				kernel_information = json.loads(result.result)
 				kernel_description_callback(kernel_information)
 
-			mod = krn.new_live_module('test')
+			mod = krn.get_live_module()
 			mod.evaluate(code, on_result)
 
 		self.start_kernel(_on_kernel_started, ipython_path=ipython_path)

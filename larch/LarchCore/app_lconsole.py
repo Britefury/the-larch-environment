@@ -30,7 +30,7 @@ def start_lconsole():
 
 
 	def on_kernel_started(kernel):
-		console = Console.Console( kernel, 'Console' )
+		console = Console.Console(kernel)
 		world.setRootSubject( Console.ConsoleSubject( console, world.worldSubject ) )
 
 		if len( sys.argv ) > 1:

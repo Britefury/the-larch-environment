@@ -199,12 +199,12 @@ class AppDocument (object):
 	
 
 class AppConsole (object):
-	def __init__(self, kernel, module_name, full_name, index):
+	def __init__(self, kernel, full_name, index):
 		self._incr = IncrementalValueMonitor( self )
 		
 		self._index = index
 		self._full_name = full_name
-		self._console = Console.Console( kernel, module_name )
+		self._console = Console.Console( kernel )
 
 
 	def subject(self, enclosingSubject):
