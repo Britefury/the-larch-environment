@@ -45,8 +45,9 @@ class Comm(object):
 
 
 class CommManager (object):
-	def __init__(self):
+	def __init__(self, default_handler=None):
 		self.__target_to_handler = {}
+		self.__default_handler = default_handler
 
 
 	def attach_to_kernel(self, kernel_connection):
@@ -67,8 +68,6 @@ class CommManager (object):
 
 
 	def on_comm_open(self, comm, data):
-		try:
-			handler = self.__target_to_handler[comm.target_name]
-		except KeyError:
-			raise KeyError, 'No comm handler for target name \'{0}\''.format(comm.target_name)
-		handler(comm, data)
+		handler = self.__target_to_handler.get(comm.target_name, self.__default_handler)
+		if handler is not None:
+			handler(comm, data)

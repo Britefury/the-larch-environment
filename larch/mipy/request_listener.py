@@ -85,7 +85,7 @@ class KernelRequestListener (object):
 
 
 
-class ExecuteRequestListener (KernelRequestListener):
+class ExecuteRequestListenerMixin (object):
 	"""
 	A listener passed to request methods of the `KernelConnection` class.
 
@@ -156,7 +156,7 @@ class ExecuteRequestListener (KernelRequestListener):
 
 
 
-class InspectRequestListener (KernelRequestListener):
+class InspectRequestListenerMixin (object):
 	"""
 	A listener passed to request methods of the `KernelConnection` class.
 
@@ -190,7 +190,7 @@ class InspectRequestListener (KernelRequestListener):
 
 
 
-class CompleteRequestListener (KernelRequestListener):
+class CompleteRequestListenerMixin (object):
 	"""
 	A listener passed to request methods of the `KernelConnection` class.
 
@@ -226,8 +226,9 @@ class CompleteRequestListener (KernelRequestListener):
 
 
 
-class PrintKernelRequestListenerMixin (object):
+class PrintKernelRequestListenerMixin (KernelRequestListener):
 	def __init__(self, name):
+		super(PrintKernelRequestListenerMixin, self).__init__()
 		self.name = name
 
 
@@ -249,10 +250,10 @@ class PrintKernelRequestListenerMixin (object):
 		print '[{0}]: on_request_finished'.format(self.name)
 
 
-class PrintExecuteRequestListener (PrintKernelRequestListenerMixin, ExecuteRequestListener):
+class PrintExecuteRequestListener (PrintKernelRequestListenerMixin, ExecuteRequestListenerMixin):
 	def __init__(self, name):
 		PrintKernelRequestListenerMixin.__init__(self, name)
-		ExecuteRequestListener.__init__(self)
+		ExecuteRequestListenerMixin.__init__(self)
 
 
 	def on_execute_input(self, execution_count, code):
@@ -277,10 +278,10 @@ class PrintExecuteRequestListener (PrintKernelRequestListenerMixin, ExecuteReque
 		print '[{0}]: error: ename={1}, evalue={2}, traceback={3}'.format(self.name, ename, evalue, traceback)
 
 
-class PrintInspectRequestListener (PrintKernelRequestListenerMixin, InspectRequestListener):
+class PrintInspectRequestListener (PrintKernelRequestListenerMixin, InspectRequestListenerMixin):
 	def __init__(self, name):
 		PrintKernelRequestListenerMixin.__init__(self, name)
-		InspectRequestListener.__init__(self)
+		InspectRequestListenerMixin.__init__(self)
 
 	def on_inspect_ok(self, data, metadata):
 		print '[{0}]: inspect_reply OK: data={1}, metadata={2}'.format(self.name, data, metadata)
@@ -290,10 +291,10 @@ class PrintInspectRequestListener (PrintKernelRequestListenerMixin, InspectReque
 		print '[{0}]: inspect_reply ERROR: ename={1}, evalue={2}, traceback={3}'.format(self.name, ename, evalue, traceback)
 
 
-class PrintCompleteRequestListener (PrintKernelRequestListenerMixin, CompleteRequestListener):
+class PrintCompleteRequestListener (PrintKernelRequestListenerMixin, CompleteRequestListenerMixin):
 	def __init__(self, name):
 		PrintKernelRequestListenerMixin.__init__(self, name)
-		CompleteRequestListener.__init__(self)
+		CompleteRequestListenerMixin.__init__(self)
 
 	def on_complete_ok(self, matches, cursor_start, cursor_end, metadata):
 		print '[{0}]: complete_reply OK: matches={1}, cursor_start={2}, cursor_end={3}, metadata={4}'.format(self.name, matches,
@@ -309,8 +310,9 @@ def krn_event(name, **kwargs):
 	return dict(event_name=name, **kwargs)
 
 
-class EventLogKernelRequestListenerMixin (object):
+class EventLogKernelRequestListener (KernelRequestListener):
 	def __init__(self, on_input_callback):
+		super(EventLogKernelRequestListener, self).__init__()
 		self.events = []
 		self.__on_input_callback = on_input_callback
 
@@ -338,16 +340,10 @@ class EventLogKernelRequestListenerMixin (object):
 
 
 
-class EventLogKernelRequestListener (EventLogKernelRequestListenerMixin, KernelRequestListener):
+class EventLogExecuteRequestListener (EventLogKernelRequestListener, ExecuteRequestListenerMixin):
 	def __init__(self, on_input_callback):
-		EventLogKernelRequestListenerMixin.__init__(self, on_input_callback)
-		KernelRequestListener.__init__(self)
-
-
-class EventLogExecuteRequestListener (EventLogKernelRequestListenerMixin, ExecuteRequestListener):
-	def __init__(self, on_input_callback):
-		EventLogKernelRequestListenerMixin.__init__(self, on_input_callback)
-		ExecuteRequestListener.__init__(self)
+		EventLogKernelRequestListener.__init__(self, on_input_callback)
+		ExecuteRequestListenerMixin.__init__(self)
 
 	def on_execute_input(self, execution_count, code):
 		self.events.append(krn_event('on_execute_input', execution_count=execution_count, code=code))
@@ -371,10 +367,10 @@ class EventLogExecuteRequestListener (EventLogKernelRequestListenerMixin, Execut
 		self.events.append(krn_event('on_error', ename=ename, evalue=evalue, traceback=traceback))
 
 
-class EventLogInspectRequestListener (EventLogKernelRequestListenerMixin, InspectRequestListener):
+class EventLogInspectRequestListener (EventLogKernelRequestListener, InspectRequestListenerMixin):
 	def __init__(self, on_input_callback):
-		EventLogKernelRequestListenerMixin.__init__(self, on_input_callback)
-		InspectRequestListener.__init__(self)
+		EventLogKernelRequestListener.__init__(self, on_input_callback)
+		InspectRequestListenerMixin.__init__(self)
 
 	def on_inspect_ok(self, data, metadata):
 		self.events.append(krn_event('on_inspect_ok', data=data, metadata=metadata))
@@ -385,10 +381,10 @@ class EventLogInspectRequestListener (EventLogKernelRequestListenerMixin, Inspec
 
 
 
-class EventLogCompleteRequestListener (EventLogKernelRequestListenerMixin, CompleteRequestListener):
+class EventLogCompleteRequestListener (EventLogKernelRequestListener, CompleteRequestListenerMixin):
 	def __init__(self, on_input_callback):
-		EventLogKernelRequestListenerMixin.__init__(self, on_input_callback)
-		CompleteRequestListener.__init__(self)
+		EventLogKernelRequestListener.__init__(self, on_input_callback)
+		CompleteRequestListenerMixin.__init__(self)
 
 	def on_complete_ok(self, matches, cursor_start, cursor_end, metadata):
 		self.events.append(krn_event('on_complete_ok', matches=matches, cursor_start=cursor_start, cursor_end=cursor_end, metadata=metadata))
