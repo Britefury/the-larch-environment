@@ -225,9 +225,7 @@ class KernelConnection(object):
 		:param user_expressions: (default None) a dictionary mapping names to expressions to be evaluated
 		:param allow_stdin: (default True) if False, the kernel will raise StdInNotImplementedError
 		if stdin is attempted
-		:param on_ok: status=ok callback: f(execution_count, payload, user_expressions)
-		:param on_error: status=error callback: f(ename, evalue, traceback)
-		:param on_abort: status=abort callback: f()
+		:param listener: None, or an object that implements KernelRequestListener and ExecuteRequestListenerMixin
 		:return: message ID
 		'''
 		if self._open:
@@ -253,8 +251,7 @@ class KernelConnection(object):
 		:param code: the code to inspect
 		:param cursor_pos: the position of the cursor (in unicode characters) where inspection is requested
 		:param detail_level: 0 or 1
-		:param on_ok: status=ok callback: f(status, data, metadata)
-		:param on_error: status=error callback: f(ename, evalue, traceback)
+		:param listener: None, or an object that implements KernelRequestListener and InspectRequestListenerMixin
 		:return: message ID
 		'''
 		if self._open:
@@ -277,8 +274,7 @@ class KernelConnection(object):
 
 		:param code: the code to complete
 		:param cursor_pos: the position of the cursor (in unicode characters) where completion is requested
-		:param on_ok: status=ok callback: f(matches, cursor_start, cursor_end, metadata)
-		:param on_error: status=error callback: f(ename, evalue, traceback)
+		:param listener: None, or an object that implements KernelRequestListener and CompleteRequestListenerMixin
 		:return: message ID
 		'''
 		if self._open:
