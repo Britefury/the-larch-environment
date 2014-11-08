@@ -4,8 +4,13 @@
 ##-* 'License.txt' in this distribution.
 ##-* This source code is (C)copyright Geoffrey French 1999-2014.
 ##-*************************
+import re
 
-class AbstractKernelRequestListener (object):
+_ansi_escape_pattern = re.compile(r'\x1b\[([0-9,A-Z]{1,2}(;[0-9]{1,2})?(;[0-9]{3})?)?[m|K]?')
+
+
+
+class KernelRequestListener (object):
 	"""
 	A listener passed to request methods of the `KernelConnection` class.
 
@@ -17,6 +22,19 @@ class AbstractKernelRequestListener (object):
 	Events will be received in-order on a specific socket. The order of messages arriving on different
 	is arbitrary.
 	"""
+	def __init__(self):
+		self.__refcount = 0
+
+
+	def ref(self, count=1):
+		self.__refcount += count
+
+
+	def unref(self, count=1):
+		self.__refcount -= count
+		return self.__refcount <= 0
+
+
 	def on_stream(self, stream_name, data):
 		"""
 		'stream' message on IOPUB socket
@@ -55,10 +73,19 @@ class AbstractKernelRequestListener (object):
 		pass
 
 
+	def on_request_finished(self):
+		"""
+		Invoked when all messages have been received that indicate that the request has finished.
+		Will be the last event that is received.
+		"""
+		pass
 
 
 
-class ExecuteRequestListener (AbstractKernelRequestListener):
+
+
+
+class ExecuteRequestListener (KernelRequestListener):
 	"""
 	A listener passed to request methods of the `KernelConnection` class.
 
@@ -126,17 +153,10 @@ class ExecuteRequestListener (AbstractKernelRequestListener):
 		"""
 		pass
 
-	def on_execute_finished(self):
-		"""
-		Invoked when all messages have been received that indicate that execution has finished.
-		Will be the last event that is received.
-		"""
-		pass
 
 
 
-
-class InspectRequestListener (AbstractKernelRequestListener):
+class InspectRequestListener (KernelRequestListener):
 	"""
 	A listener passed to request methods of the `KernelConnection` class.
 
@@ -170,7 +190,7 @@ class InspectRequestListener (AbstractKernelRequestListener):
 
 
 
-class CompleteRequestListener (AbstractKernelRequestListener):
+class CompleteRequestListener (KernelRequestListener):
 	"""
 	A listener passed to request methods of the `KernelConnection` class.
 
@@ -225,11 +245,14 @@ class PrintKernelRequestListenerMixin (object):
 		data = raw_input(prompt)
 		reply_callback(data)
 
+	def on_request_finished(self):
+		print '[{0}]: on_request_finished'.format(self.name)
 
 
 class PrintExecuteRequestListener (PrintKernelRequestListenerMixin, ExecuteRequestListener):
 	def __init__(self, name):
 		PrintKernelRequestListenerMixin.__init__(self, name)
+		ExecuteRequestListener.__init__(self)
 
 
 	def on_execute_input(self, execution_count, code):
@@ -240,6 +263,7 @@ class PrintExecuteRequestListener (PrintKernelRequestListenerMixin, ExecuteReque
 		print '[{0}]: execute_reply OK: execution_count={1}, payload={2}, user_expressions={3}'.format(self.name, execution_count, payload, user_expressions)
 
 	def on_execute_error(self, ename, evalue, traceback):
+		traceback = [_ansi_escape_pattern.sub('', x)   for x in traceback]
 		print '[{0}]: execute_reply ERROR: ename={1}, evalue={2}, traceback={3}'.format(self.name, ename, evalue, traceback)
 
 	def on_execute_abort(self):
@@ -249,32 +273,34 @@ class PrintExecuteRequestListener (PrintKernelRequestListenerMixin, ExecuteReque
 		print '[{0}]: execute_result: execution_count={1}, data={2}, metadata={3}'.format(self.name, execution_count, data, metadata)
 
 	def on_error(self, ename, evalue, traceback):
+		traceback = [_ansi_escape_pattern.sub('', x)   for x in traceback]
 		print '[{0}]: error: ename={1}, evalue={2}, traceback={3}'.format(self.name, ename, evalue, traceback)
-
-	def on_execute_finished(self):
-		print '[{0}]: execute_finished'.format(self.name)
 
 
 class PrintInspectRequestListener (PrintKernelRequestListenerMixin, InspectRequestListener):
 	def __init__(self, name):
 		PrintKernelRequestListenerMixin.__init__(self, name)
+		InspectRequestListener.__init__(self)
 
 	def on_inspect_ok(self, data, metadata):
 		print '[{0}]: inspect_reply OK: data={1}, metadata={2}'.format(self.name, data, metadata)
 
 	def on_inspect_error(self, ename, evalue, traceback):
+		traceback = [_ansi_escape_pattern.sub('', x)   for x in traceback]
 		print '[{0}]: inspect_reply ERROR: ename={1}, evalue={2}, traceback={3}'.format(self.name, ename, evalue, traceback)
 
 
 class PrintCompleteRequestListener (PrintKernelRequestListenerMixin, CompleteRequestListener):
 	def __init__(self, name):
 		PrintKernelRequestListenerMixin.__init__(self, name)
+		CompleteRequestListener.__init__(self)
 
 	def on_complete_ok(self, matches, cursor_start, cursor_end, metadata):
 		print '[{0}]: complete_reply OK: matches={1}, cursor_start={2}, cursor_end={3}, metadata={4}'.format(self.name, matches,
 														     cursor_start, cursor_end, metadata)
 
 	def on_complete_error(self, ename, evalue, traceback):
+		traceback = [_ansi_escape_pattern.sub('', x)   for x in traceback]
 		print '[{0}]: complete_reply ERROR: ename={1}, evalue={2}, traceback={3}'.format(self.name, ename, evalue, traceback)
 
 
@@ -307,12 +333,21 @@ class EventLogKernelRequestListenerMixin (object):
 		data = self.__on_input_callback(prompt)
 		reply_callback(data)
 
+	def on_request_finished(self):
+		self.events.append(krn_event('on_request_finished'))
 
+
+
+class EventLogKernelRequestListener (EventLogKernelRequestListenerMixin, KernelRequestListener):
+	def __init__(self, on_input_callback):
+		EventLogKernelRequestListenerMixin.__init__(self, on_input_callback)
+		KernelRequestListener.__init__(self)
 
 
 class EventLogExecuteRequestListener (EventLogKernelRequestListenerMixin, ExecuteRequestListener):
 	def __init__(self, on_input_callback):
 		EventLogKernelRequestListenerMixin.__init__(self, on_input_callback)
+		ExecuteRequestListener.__init__(self)
 
 	def on_execute_input(self, execution_count, code):
 		self.events.append(krn_event('on_execute_input', execution_count=execution_count, code=code))
@@ -322,6 +357,7 @@ class EventLogExecuteRequestListener (EventLogKernelRequestListenerMixin, Execut
 		self.events.append(krn_event('on_execute_ok', execution_count=execution_count, payload=payload, user_expressions=user_expressions))
 
 	def on_execute_error(self, ename, evalue, traceback):
+		traceback = [_ansi_escape_pattern.sub('', x)   for x in traceback]
 		self.events.append(krn_event('on_execute_error', ename=ename, evalue=evalue, traceback=traceback))
 
 	def on_execute_abort(self):
@@ -331,20 +367,20 @@ class EventLogExecuteRequestListener (EventLogKernelRequestListenerMixin, Execut
 		self.events.append(krn_event('on_execute_result', execution_count=execution_count, data=data, metadata=metadata))
 
 	def on_error(self, ename, evalue, traceback):
+		traceback = [_ansi_escape_pattern.sub('', x)   for x in traceback]
 		self.events.append(krn_event('on_error', ename=ename, evalue=evalue, traceback=traceback))
-
-	def on_execute_finished(self):
-		self.events.append(krn_event('on_execute_finished'))
 
 
 class EventLogInspectRequestListener (EventLogKernelRequestListenerMixin, InspectRequestListener):
 	def __init__(self, on_input_callback):
 		EventLogKernelRequestListenerMixin.__init__(self, on_input_callback)
+		InspectRequestListener.__init__(self)
 
 	def on_inspect_ok(self, data, metadata):
 		self.events.append(krn_event('on_inspect_ok', data=data, metadata=metadata))
 
 	def on_inspect_error(self, ename, evalue, traceback):
+		traceback = [_ansi_escape_pattern.sub('', x)   for x in traceback]
 		self.events.append(krn_event('on_inspect_error', ename=ename, evalue=evalue, traceback=traceback))
 
 
@@ -352,11 +388,13 @@ class EventLogInspectRequestListener (EventLogKernelRequestListenerMixin, Inspec
 class EventLogCompleteRequestListener (EventLogKernelRequestListenerMixin, CompleteRequestListener):
 	def __init__(self, on_input_callback):
 		EventLogKernelRequestListenerMixin.__init__(self, on_input_callback)
+		CompleteRequestListener.__init__(self)
 
 	def on_complete_ok(self, matches, cursor_start, cursor_end, metadata):
 		self.events.append(krn_event('on_complete_ok', matches=matches, cursor_start=cursor_start, cursor_end=cursor_end, metadata=metadata))
 
 	def on_complete_error(self, ename, evalue, traceback):
+		traceback = [_ansi_escape_pattern.sub('', x)   for x in traceback]
 		self.events.append(krn_event('on_complete_error', ename=ename, evalue=evalue, traceback=traceback))
 
 

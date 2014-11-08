@@ -112,7 +112,7 @@ class _KernelListener (request_listener.ExecuteRequestListener):
 				self.result.display_image(mime_type, image)
 
 
-	def on_execute_finished(self):
+	def on_request_finished(self):
 		if self.finished is not None:
 			self.finished(self.result)
 
