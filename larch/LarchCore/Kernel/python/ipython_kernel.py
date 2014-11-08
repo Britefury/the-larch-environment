@@ -53,7 +53,7 @@ class IPythonLiveModule (python_kernel.AbstractPythonLiveModule):
 		self.__kernel._queue_exec(self.name, code, evaluate_last_expression, result_callback)
 
 
-class _KernelListener (request_listener.ExecuteRequestListener):
+class _KernelListener (request_listener.KernelRequestListener, request_listener.ExecuteRequestListenerMixin):
 	def __init__(self, finished):
 		super(_KernelListener, self).__init__()
 		self.result = IPythonExecutionResult()
