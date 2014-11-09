@@ -178,6 +178,7 @@ class AbstractExecutionResult (object):
 		if streams is None:
 			streams = MultiplexedRichStream(['stdout', 'stderr'])
 		self._streams = streams
+		self.finished_callback = None
 
 
 	@property

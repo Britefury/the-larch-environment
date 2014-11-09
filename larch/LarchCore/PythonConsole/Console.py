@@ -20,7 +20,7 @@ from Britefury import LoadBuiltins
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
-from BritefuryJ.Live import LiveValue
+from BritefuryJ.Live import LiveValue, LiveFunction
 
 from BritefuryJ.AttributeTable import SimpleAttributeTable
 
@@ -117,14 +117,18 @@ class Console (object):
 		self._kernel = kernel
 		self._module = self._kernel.get_live_module()
 		self._can_assign = isinstance(self._module, inproc_kernel.InProcessLiveModule)
-		self._banner_text = ''
+		self._banner_text_live = LiveValue('')
 
 		if showBanner:
-			def on_result(result):
-				self._banner_text = result.result
-				self._incr.onChanged()
+			result = self._module.evaluate('__import__("sys").version')
 
-			self._module.evaluate('__import__("sys").version', on_result)
+			@LiveFunction
+			def banner():
+				text = result.result
+				return text   if text is not None   else ''
+			self._banner_text_live = banner
+
+			self._incr.onChanged()
 
 		self._showBanner = showBanner
 
@@ -174,15 +178,13 @@ class Console (object):
 	def execute(self, bEvaluate=True):
 		module = self.getCurrentPythonModule()
 		if not Python2.isEmptyTopLevel(module):
-			def on_result(result):
-				self._commit(module, result)
-			self._module.execute(module, bEvaluate, on_result)
+			result = self._module.execute(module, bEvaluate)
+			self._commit(module, result)
 
 	def executeModule(self, module, bEvaluate=True):
 		if not Python2.isEmptyTopLevel(module):
-			def on_result(result):
-				self._commit(module, result)
-			self._module.execute(module, bEvaluate, on_result)
+			result = self._module.execute(module, bEvaluate)
+			self._commit(module, result)
 
 
 
@@ -217,7 +219,8 @@ class Console (object):
 
 		# Header
 		if self._showBanner:
-			bannerVersionText = [ _bannerTextStyle.applyTo( NormalText( v ) )   for v in self._banner_text.split( '\n' ) ]
+			banner_text = self._banner_text_live.getValue()
+			bannerVersionText = [ _bannerTextStyle.applyTo( NormalText( v ) )   for v in banner_text.split( '\n' ) ]
 			helpText1 = Row( [ _bannerHelpKeyTextStyle.applyTo( Label( 'Ctrl+Enter' ) ),
 					   _bannerHelpTextStyle.applyTo( Label( ' - execute and evaluate, ' ) ),
 					   _bannerHelpKeyTextStyle.applyTo( Label( 'Ctrl+Shift+Enter' ) ),

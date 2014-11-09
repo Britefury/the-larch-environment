@@ -47,16 +47,14 @@ class InProcessLiveModule (python_kernel.AbstractPythonLiveModule):
 	def assign_variable(self, name, value):
 		setattr(self.__module, name, value)
 
-	def evaluate(self, expr, result_callback):
-		result = getResultOfEvaluationWithinModule(expr, self.__module)
-		result_callback(result)
+	def evaluate(self, expr):
+		return getResultOfEvaluationWithinModule(expr, self.__module)
 
-	def execute(self, code, evaluate_last_expression, result_callback):
+	def execute(self, code, evaluate_last_expression):
 		if isinstance(code, str)  or  isinstance(code, unicode):
 			raise NotImplementedError, 'InProcessModule.execute: executing of code as strings not yet supported'
 		self.__execution_count += 1
-		result = getResultOfExecutionWithinModule(code, self.__module, evaluate_last_expression, self.__execution_count)
-		result_callback(result)
+		return getResultOfExecutionWithinModule(code, self.__module, evaluate_last_expression, self.__execution_count)
 
 
 
@@ -112,6 +110,8 @@ class InProcessExecutionResult (execution_result.AbstractExecutionResult):
 		self._caught_exception = caughtException
 		self._result_in_tuple = result_in_tuple
 		self._execution_count = execution_count
+		if self.finished_callback is not None:
+			self.finished_callback(self)
 
 
 	@property
