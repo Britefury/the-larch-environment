@@ -13,15 +13,17 @@ from javax.imageio import ImageIO
 
 from org.python.core.util import StringUtil
 
-from mipy import kernel, request_listener
+from mipy import kernel, request_listener, comm
 
 from BritefuryJ.Pres import Pres
 from BritefuryJ.Pres.Primitive import Primitive, Label, Column, Image
 from BritefuryJ.Pres.RichText import NormalText, RichText
 from BritefuryJ.Pres.ObjectPres import ErrorBoxWithFields, HorizontalField, VerticalField
+from BritefuryJ.Controls import IntSlider
 from BritefuryJ.Graphics import SolidBorder
 from BritefuryJ.StyleSheet import StyleSheet
 from BritefuryJ.Incremental import IncrementalValueMonitor
+from BritefuryJ.Live import LiveValue
 
 from .. import execution_result, execution_pres
 from . import python_kernel, module_finder
@@ -56,8 +58,8 @@ class IPythonLiveModule (python_kernel.AbstractPythonLiveModule):
 
 
 class _KernelListener (request_listener.KernelRequestListener):
-	def __init__(self, result):
-		super(_KernelListener, self).__init__()
+	def __init__(self, comm_manager, result):
+		super(_KernelListener, self).__init__(comm_manager)
 		self.result = result
 		self.std = self.result.streams
 
@@ -135,11 +137,6 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 		self.__matplotlib_inline()
 
 		self.__live_module = IPythonLiveModule(self, '__live__')
-
-
-		def on_comm_open(comm, data):
-			print 'ipython_kernel.IPythonKernel.__init__: on_comm_open {0}'.format(comm.target_name)
-		self.__kernel.on_comm_open = on_comm_open
 
 
 
@@ -382,15 +379,98 @@ class IPythonExecutionError (object):
 
 
 
+class _IPythonWidgetModel (object):
+	def __init__(self, result, comm, data):
+		self.result = result
+		self.comm = comm
+		self.comm.on_message = self._on_message
+		self.comm.on_closed_remotely = self._on_closed_remotely
+		self.open = True
+		self.state = {}
+		self.__incr = IncrementalValueMonitor()
+
+
+	def close(self):
+		# if self.open:
+		# 	self.comm.close()
+		# 	self.open = False
+		pass
+
+
+	def update_state(self, state):
+		self.state.update(state)
+		self.__incr.onChanged()
+
+
+	def _on_closed_remotely(self, comm, data):
+		self.open = False
+		print '_IPythonWidgetModel._on_closed_remotely'
+
+
+	def _on_message(self, comm, data):
+		method = data['method']
+		if method == 'update':
+			self.update_state(data['state'])
+		elif method == 'display':
+			self.result._display_widget(self)
+
+
+	def __present__(self, fragment, inh):
+		self.__incr.onAccess()
+		view_name = self.state['_view_name']
+
+		if view_name == 'IntSliderView':
+			def _on_change(control, new_value):
+				sync_data = {'value': new_value}
+				self.state.update(sync_data)
+				self.comm.send({'method': 'backbone', 'sync_data': sync_data})
+				value_live.setLiteralValue(new_value)
+
+			value = int(self.state['value'])
+			value_live = LiveValue(value)
+			slider_min = int(self.state['min'])
+			slider_max = int(self.state['max'])
+			if slider_min >= 0  or  slider_max <= 0:
+				pivot = int((slider_min + slider_max) * 0.5)
+			else:
+				pivot = 0
+			return IntSlider(value_live, slider_min, slider_max, pivot, 400.0, _on_change)
+		else:
+			return Label(view_name)
+
+
+
+
 class IPythonExecutionResult (execution_result.AbstractExecutionResult):
-	def __init__(self, streams=None):
+	def __init__(self, streams=None, comm_manager=None):
 		super( IPythonExecutionResult, self ).__init__(streams)
-		self._listener = _KernelListener(self)
+
+		if comm_manager is None:
+			comm_manager = comm.CommManager(self.__default_comm_handler)
+			comm_manager.register_comm_open_handler('WidgetModel', self.__handle_comm_WidgetModel)
+
+		self.__comm_manager = comm_manager
+		self._listener = _KernelListener(comm_manager, self)
 		self._error = None
 		self._result = None
 		self._aborted = False
 		self._images = []
 		self._execution_count = None
+		self._widgets = []
+		self._visible_widgets = []
+
+
+	def __default_comm_handler(self, comm, data):
+		print 'IPythonExecutionResult.__default_comm_handler: {0}'.format(comm.target_name)
+
+	def __handle_comm_WidgetModel(self, comm, data):
+		widget = _IPythonWidgetModel(self, comm, data)
+		self._widgets.append(widget)
+
+
+	def _display_widget(self, widget):
+		self._visible_widgets.append(widget)
+		self._incr.onChanged()
 
 
 	def result_finished(self):
@@ -399,12 +479,19 @@ class IPythonExecutionResult (execution_result.AbstractExecutionResult):
 
 	def clear(self):
 		super(IPythonExecutionResult, self).clear()
+
+		for widget in self._widgets:
+			widget.close()
+		self._widgets = []
+		self._visible_widgets = []
+
 		self._error = None
 		self._result = None
 		self._aborted = False
 		self._images = []
 		self._execution_count = None
 		self._incr.onChanged()
+		self._widgets = []
 
 
 	@property
@@ -480,19 +567,31 @@ class IPythonExecutionResult (execution_result.AbstractExecutionResult):
 
 
 	def errorsOnly(self):
-		return IPythonExecutionResult( self._streams.suppress_stream( 'out' ), self._error, None )
+		res = IPythonExecutionResult( self.__comm_manager, self._streams.suppress_stream( 'out' ) )
+		if self._error is not None:
+			res.set_error(self._error)
+		return res
 
 
 
 	def _result_view(self):
 		contents = []
+
+		# Images
 		for img in self._images:
 			contents.append(Image(img, float(img.getWidth()), float(img.getHeight())))
+
+		# Widgets
+		for widget in self._visible_widgets:
+			contents.append(Pres.coerce(widget))
+
+		# Result value
 		if self._aborted:
 			contents.append(self._aborted)
 		else:
 			if self._result is not None:
 				contents.append(Pres.coercePresentingNull( self._result[0] ).alignHPack())
+
 		if len(contents) == 0:
 			return None
 		else:
