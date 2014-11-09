@@ -102,9 +102,6 @@ class AbstractPythonKernel (abstract_kernel.AbstractKernel):
 	def shutdown(self):
 		self._ctx._notify_kernel_shutdown(self)
 
-	def get_live_module(self):
-		raise NotImplementedError, 'abstract'
-
 
 	def new_importable_module(self):
 		m = _ImportableModule(self)

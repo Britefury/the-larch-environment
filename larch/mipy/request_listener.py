@@ -22,17 +22,14 @@ class KernelRequestListener (object):
 	Events will be received in-order on a specific socket. The order of messages arriving on different
 	is arbitrary.
 	"""
-	def __init__(self):
-		self.__refcount = 0
+	def __init__(self, comm_manager=None):
+		self._kernel = None
+		self._source_msg_id = None
+		self._comm_manager = comm_manager
 
 
-	def ref(self, count=1):
-		self.__refcount += count
-
-
-	def unref(self, count=1):
-		self.__refcount -= count
-		return self.__refcount <= 0
+	def detach(self):
+		self._kernel._detach_listener(self)
 
 
 	def on_stream(self, stream_name, data):
@@ -72,31 +69,22 @@ class KernelRequestListener (object):
 		"""
 		pass
 
-
-	def on_request_finished(self):
+	def on_comm_open(self, comm, data):
 		"""
-		Invoked when all messages have been received that indicate that the request has finished.
-		Will be the last event that is received.
+		'comm_open' message on IOPUB socket
+
+		:param comm: the Comm object that has been opened
+		:param data: extra JSON information for initialising the comm
 		"""
-		pass
+		if self._comm_manager is not None:
+			self._comm_manager.on_comm_open(comm, data)
 
 
 
+	#
+	# EXECUTE REQUEST EVENTS
+	#
 
-
-
-class ExecuteRequestListenerMixin (object):
-	"""
-	A listener passed to request methods of the `KernelConnection` class.
-
-	This listener will receive events back from the kernel as they come.
-
-
-	Notes about event ordering:
-
-	Events will be received in-order on a specific socket. The order of messages arriving on different
-	is arbitrary.
-	"""
 	def on_execute_input(self, execution_count, code):
 		"""
 		'execute_input' message on IOPUB socket
@@ -155,19 +143,12 @@ class ExecuteRequestListenerMixin (object):
 
 
 
+	#
+	#
+	# INSPECT REQUEST EVENTS
+	#
+	#
 
-class InspectRequestListenerMixin (object):
-	"""
-	A listener passed to request methods of the `KernelConnection` class.
-
-	This listener will receive events back from the kernel as they come.
-
-
-	Notes about event ordering:
-
-	Events will be received in-order on a specific socket. The order of messages arriving on different
-	is arbitrary.
-	"""
 	def on_inspect_ok(self, data, metadata):
 		"""
 		'inspect_reply' message with status='ok' on SHELL socket
@@ -189,19 +170,12 @@ class InspectRequestListenerMixin (object):
 
 
 
+	#
+	#
+	# COMPLETE REQUEST EVENTS
+	#
+	#
 
-class CompleteRequestListenerMixin (object):
-	"""
-	A listener passed to request methods of the `KernelConnection` class.
-
-	This listener will receive events back from the kernel as they come.
-
-
-	Notes about event ordering:
-
-	Events will be received in-order on a specific socket. The order of messages arriving on different
-	is arbitrary.
-	"""
 	def on_complete_ok(self, matches, cursor_start, cursor_end, metadata):
 		"""
 		'complete_reply' message with status='ok' on SHELL socket
@@ -227,8 +201,8 @@ class CompleteRequestListenerMixin (object):
 
 
 class PrintKernelRequestListenerMixin (KernelRequestListener):
-	def __init__(self, name):
-		super(PrintKernelRequestListenerMixin, self).__init__()
+	def __init__(self, name, comm_manager=None):
+		super(PrintKernelRequestListenerMixin, self).__init__(comm_manager)
 		self.name = name
 
 
@@ -246,19 +220,14 @@ class PrintKernelRequestListenerMixin (KernelRequestListener):
 		data = raw_input(prompt)
 		reply_callback(data)
 
-	def on_request_finished(self):
-		print '[{0}]: on_request_finished'.format(self.name)
+	def on_comm_open(self, comm, data):
+		super(PrintKernelRequestListenerMixin, self).on_comm_open(comm, data)
+		print '[{0}]: on_comm_open'.format(self.name)
 
-
-class PrintExecuteRequestListener (PrintKernelRequestListenerMixin, ExecuteRequestListenerMixin):
-	def __init__(self, name):
-		PrintKernelRequestListenerMixin.__init__(self, name)
-		ExecuteRequestListenerMixin.__init__(self)
 
 
 	def on_execute_input(self, execution_count, code):
 		print '[{0}]: execute_input: execution_count={1}, code={2}'.format(self.name, execution_count, code)
-
 
 	def on_execute_ok(self, execution_count, payload, user_expressions):
 		print '[{0}]: execute_reply OK: execution_count={1}, payload={2}, user_expressions={3}'.format(self.name, execution_count, payload, user_expressions)
@@ -278,11 +247,6 @@ class PrintExecuteRequestListener (PrintKernelRequestListenerMixin, ExecuteReque
 		print '[{0}]: error: ename={1}, evalue={2}, traceback={3}'.format(self.name, ename, evalue, traceback)
 
 
-class PrintInspectRequestListener (PrintKernelRequestListenerMixin, InspectRequestListenerMixin):
-	def __init__(self, name):
-		PrintKernelRequestListenerMixin.__init__(self, name)
-		InspectRequestListenerMixin.__init__(self)
-
 	def on_inspect_ok(self, data, metadata):
 		print '[{0}]: inspect_reply OK: data={1}, metadata={2}'.format(self.name, data, metadata)
 
@@ -291,10 +255,6 @@ class PrintInspectRequestListener (PrintKernelRequestListenerMixin, InspectReque
 		print '[{0}]: inspect_reply ERROR: ename={1}, evalue={2}, traceback={3}'.format(self.name, ename, evalue, traceback)
 
 
-class PrintCompleteRequestListener (PrintKernelRequestListenerMixin, CompleteRequestListenerMixin):
-	def __init__(self, name):
-		PrintKernelRequestListenerMixin.__init__(self, name)
-		CompleteRequestListenerMixin.__init__(self)
 
 	def on_complete_ok(self, matches, cursor_start, cursor_end, metadata):
 		print '[{0}]: complete_reply OK: matches={1}, cursor_start={2}, cursor_end={3}, metadata={4}'.format(self.name, matches,
@@ -311,8 +271,8 @@ def krn_event(name, **kwargs):
 
 
 class EventLogKernelRequestListener (KernelRequestListener):
-	def __init__(self, on_input_callback):
-		super(EventLogKernelRequestListener, self).__init__()
+	def __init__(self, on_input_callback, comm_manager=None):
+		super(EventLogKernelRequestListener, self).__init__(comm_manager)
 		self.events = []
 		self.__on_input_callback = on_input_callback
 
@@ -338,16 +298,14 @@ class EventLogKernelRequestListener (KernelRequestListener):
 	def on_request_finished(self):
 		self.events.append(krn_event('on_request_finished'))
 
+	def on_comm_open(self, comm, data):
+		super(EventLogKernelRequestListener, self).on_comm_open(comm, data)
+		self.events.append(krn_event('on_comm_open'))
 
 
-class EventLogExecuteRequestListener (EventLogKernelRequestListener, ExecuteRequestListenerMixin):
-	def __init__(self, on_input_callback):
-		EventLogKernelRequestListener.__init__(self, on_input_callback)
-		ExecuteRequestListenerMixin.__init__(self)
 
 	def on_execute_input(self, execution_count, code):
 		self.events.append(krn_event('on_execute_input', execution_count=execution_count, code=code))
-
 
 	def on_execute_ok(self, execution_count, payload, user_expressions):
 		self.events.append(krn_event('on_execute_ok', execution_count=execution_count, payload=payload, user_expressions=user_expressions))
@@ -367,10 +325,6 @@ class EventLogExecuteRequestListener (EventLogKernelRequestListener, ExecuteRequ
 		self.events.append(krn_event('on_error', ename=ename, evalue=evalue, traceback=traceback))
 
 
-class EventLogInspectRequestListener (EventLogKernelRequestListener, InspectRequestListenerMixin):
-	def __init__(self, on_input_callback):
-		EventLogKernelRequestListener.__init__(self, on_input_callback)
-		InspectRequestListenerMixin.__init__(self)
 
 	def on_inspect_ok(self, data, metadata):
 		self.events.append(krn_event('on_inspect_ok', data=data, metadata=metadata))
@@ -380,11 +334,6 @@ class EventLogInspectRequestListener (EventLogKernelRequestListener, InspectRequ
 		self.events.append(krn_event('on_inspect_error', ename=ename, evalue=evalue, traceback=traceback))
 
 
-
-class EventLogCompleteRequestListener (EventLogKernelRequestListener, CompleteRequestListenerMixin):
-	def __init__(self, on_input_callback):
-		EventLogKernelRequestListener.__init__(self, on_input_callback)
-		CompleteRequestListenerMixin.__init__(self)
 
 	def on_complete_ok(self, matches, cursor_start, cursor_end, metadata):
 		self.events.append(krn_event('on_complete_ok', matches=matches, cursor_start=cursor_start, cursor_end=cursor_end, metadata=metadata))

@@ -50,16 +50,6 @@ class CommManager (object):
 		self.__default_handler = default_handler
 
 
-	def attach_to_kernel(self, kernel_connection):
-		kernel_connection.on_comm_open = self.on_comm_open
-
-	def detach_from_kernel(self, kernel_connection):
-		if kernel_connection.on_comm_open is self.on_comm_open:
-			kernel_connection.on_comm_open = None
-		else:
-			raise ValueError, 'Not attached to kernel {0}'.format(kernel_connection)
-
-
 	def register_comm_open_handler(self, target_name, handler):
 		self.__target_to_handler[target_name] = handler
 

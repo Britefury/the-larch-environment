@@ -100,7 +100,8 @@ class MultiplexedRichStream (object):
 	def __init__(self, streamNames=None):
 		if streamNames is None:
 			streamNames = ['stdout', 'stderr']
-		self.__streams_by_name = { name : self._SingleStream( self, name )   for name in streamNames }
+		self.__stream_names = streamNames
+		self.__streams_by_name = { name : self._SingleStream( self, name )   for name in self.__stream_names }
 		self.__multiplexed = []
 		self.__incr = IncrementalValueMonitor()
 
@@ -120,6 +121,12 @@ class MultiplexedRichStream (object):
 
 	def __len__(self):
 		return len( self.__multiplexed )
+
+
+	def clear(self):
+		self.__streams_by_name = { name : self._SingleStream( self, name )   for name in self.__stream_names }
+		self.__multiplexed = []
+		self.__incr.onChanged()
 
 
 	def suppress_stream(self, name):
@@ -175,10 +182,19 @@ class MultiplexedRichStream (object):
 
 class AbstractExecutionResult (object):
 	def __init__(self, streams=None):
+		self._incr = IncrementalValueMonitor()
 		if streams is None:
 			streams = MultiplexedRichStream(['stdout', 'stderr'])
 		self._streams = streams
-		self.finished_callback = None
+		self.result_callback = None
+
+
+	def result_finished(self):
+		pass
+
+
+	def clear(self):
+		self._streams.clear()
 
 
 	@property
@@ -190,6 +206,12 @@ class AbstractExecutionResult (object):
 	def caught_exception(self):
 		raise NotImplementedError, 'abstract'
 
+	def set_error(self, error):
+		raise NotImplementedError, 'abstract'
+
+	def has_errors(self):
+		raise NotImplementedError, 'abstract'
+
 
 	def has_result(self):
 		raise NotImplementedError, 'abstract'
@@ -197,6 +219,10 @@ class AbstractExecutionResult (object):
 	@property
 	def result(self):
 		raise NotImplementedError, 'abstract'
+
+	def set_result(self, result):
+		if self.result_callback is not None:
+			self.result_callback(self)
 
 
 	def was_aborted(self):

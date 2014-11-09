@@ -43,20 +43,22 @@ POLL_TIMEOUT = 0
 
 class IPythonLiveModule (python_kernel.AbstractPythonLiveModule):
 	def __init__(self, kernel, name):
-		self.__kernel = kernel
+		super(IPythonLiveModule, self).__init__(kernel)
 		self.name = name
 
-	def evaluate(self, code):
-		return self.__kernel._queue_eval(self.name, code)
+	def evaluate(self, code, result):
+		result.clear()
+		self._kernel._queue_eval(self.name, code, result)
 
-	def execute(self, code, evaluate_last_expression):
-		return self.__kernel._queue_exec(self.name, code, evaluate_last_expression)
+	def execute(self, code, evaluate_last_expression, result):
+		result.clear()
+		self._kernel._queue_exec(self.name, code, evaluate_last_expression, result)
 
 
-class _KernelListener (request_listener.KernelRequestListener, request_listener.ExecuteRequestListenerMixin):
-	def __init__(self):
+class _KernelListener (request_listener.KernelRequestListener):
+	def __init__(self, result):
 		super(_KernelListener, self).__init__()
-		self.result = IPythonExecutionResult()
+		self.result = result
 		self.std = self.result.streams
 
 
@@ -114,11 +116,6 @@ class _KernelListener (request_listener.KernelRequestListener, request_listener.
 		print 'ipython_kernel._KernelListener.on_display_data: data keys: {0}'.format(sorted(list(data.keys())))
 
 
-	def on_request_finished(self):
-		if self.result.finished_callback is not None:
-			self.result.finished_callback(self.result)
-
-
 
 
 
@@ -152,6 +149,9 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 
 
 
+	def new_execution_result(self):
+		return IPythonExecutionResult()
+
 	def get_live_module(self):
 		return self.__live_module
 
@@ -181,9 +181,9 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 
 
 
-	def _queue_exec(self, module_name, code, evaluate_last_expression, silent=False, store_history=True):
+	def _queue_exec(self, module_name, code, evaluate_last_expression, result, silent=False, store_history=True):
 		# print 'IPythonKernel._queue_exec'
-		listener = _KernelListener()
+		listener = result._listener   if result is not None   else None
 
 		if isinstance(code, str)  or  isinstance(code, unicode):
 			src = code
@@ -195,12 +195,10 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 		self.__kernel.execute_request(src, listener=listener, silent=silent, store_history=store_history)
 		self.__queue_poll()
 
-		return listener.result
 
-
-	def _queue_eval(self, module_name, expr):
+	def _queue_eval(self, module_name, expr, result):
 		# print 'IPythonKernel._queue_exec'
-		listener = _KernelListener()
+		listener = result._listener   if result is not None   else None
 
 		if isinstance(expr, str)  or  isinstance(expr, unicode):
 			src = expr
@@ -211,8 +209,6 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 		self.__stderr = std.stderr
 		self.__kernel.execute_request(src, listener=listener)
 		self.__queue_poll()
-
-		return listener.result
 
 
 	def __poll_kernel(self):
@@ -343,18 +339,26 @@ class IPythonContext (python_kernel.AbstractPythonContext):
 		Get a kernel description
 		"""
 
+		# Code to get the kernel description
 		code = 'import sys, platform, json\n' + \
 			'json.dumps([platform.python_implementation(), platform.python_version_tuple(), sys.version])\n'
+		# Code to cause the kernel to exit
+		exit_code = 'exit()'
 
 		def _on_kernel_started(krn):
-			def result_finished(result):
-				krn.shutdown()
+			def on_result(result):
+				result.result_finished()
 				kernel_information = json.loads(result.result)
 				kernel_description_callback(kernel_information)
 
 			mod = krn.get_live_module()
-			result = mod.evaluate(code)
-			result.finished_callback = result_finished
+
+			result = krn.new_execution_result()
+			result.result_callback = on_result
+			mod.evaluate(code, result)
+
+			exit_result = krn.new_execution_result()
+			mod.evaluate(exit_code, exit_result)
 
 		self.start_kernel(_on_kernel_started, ipython_path=ipython_path)
 
@@ -379,50 +383,68 @@ class IPythonExecutionError (object):
 
 
 class IPythonExecutionResult (execution_result.AbstractExecutionResult):
-	def __init__(self, streams=None, caughtException=None, result_in_tuple=None, execution_count=None):
+	def __init__(self, streams=None):
 		super( IPythonExecutionResult, self ).__init__(streams)
-		self.__incr = IncrementalValueMonitor()
+		self._listener = _KernelListener(self)
 		self._error = None
-		self._result = result_in_tuple
+		self._result = None
 		self._aborted = False
 		self._images = []
-		self._execution_count = execution_count
+		self._execution_count = None
+
+
+	def result_finished(self):
+		self._listener.detach()
+
+
+	def clear(self):
+		super(IPythonExecutionResult, self).clear()
+		self._error = None
+		self._result = None
+		self._aborted = False
+		self._images = []
+		self._execution_count = None
+		self._incr.onChanged()
 
 
 	@property
 	def streams(self):
-		self.__incr.onAccess()
+		self._incr.onAccess()
 		return self._streams
 
 
 	@property
 	def caught_exception(self):
-		self.__incr.onAccess()
+		self._incr.onAccess()
 		return self._error
 
 	def set_error(self, error):
 		self._error = error
-		self.__incr.onChanged()
+		self._incr.onChanged()
+
+	def has_errors(self):
+		self._incr.onAccess()
+		return self._error is not None  or  self._streams.has_content_for( 'err' )
 
 
 	def has_result(self):
-		self.__incr.onAccess()
+		self._incr.onAccess()
 		return self._result is not None
 
 	@property
 	def result(self):
-		self.__incr.onAccess()
+		self._incr.onAccess()
 		return self._result[0]   if self._result is not None   else None
 
 	def set_result(self, result):
 		self._result = (result,)
-		self.__incr.onChanged()
+		self._incr.onChanged()
+		super(IPythonExecutionResult, self).set_result(result)
 
 	def set_text_result(self, text_result):
 		lines = text_result.split('\n')
 		res = _text_result_style.applyTo(Column([NormalText(line)   for line in lines]))
-		self._result = (res,)
-		self.__incr.onChanged()
+		self.set_result(res)
 
 
 	def display_image(self, mime_type, image_data):
@@ -431,40 +453,35 @@ class IPythonExecutionResult (execution_result.AbstractExecutionResult):
 		img = ImageIO.read(in_stream)
 		if img is not None:
 			self._images.append(img)
-			self.__incr.onChanged()
+			self._incr.onChanged()
 		else:
 			print 'display_image: failed to read image of mime type {0} with {1} bytes'.format(mime_type, len(image_data))
 			print image_data
 
 
 	def was_aborted(self):
-		self.__incr.onAccess()
+		self._incr.onAccess()
 		return self._aborted
 
 	def notify_aborted(self):
 		self._aborted = True
-		self.__incr.onChanged()
+		self._incr.onChanged()
 
 
 	@property
 	def execution_count(self):
-		self.__incr.onAccess()
+		self._incr.onAccess()
 		return self._execution_count
 
 	@execution_count.setter
 	def execution_count(self, value):
 		self._execution_count = value
-		self.__incr.onChanged()
+		self._incr.onChanged()
 
 
 	def errorsOnly(self):
 		return IPythonExecutionResult( self._streams.suppress_stream( 'out' ), self._error, None )
 
-
-
-	def hasErrors(self):
-		self.__incr.onAccess()
-		return self._error is not None  or  self._streams.has_content_for( 'err' )
 
 
 	def _result_view(self):
@@ -484,14 +501,14 @@ class IPythonExecutionResult (execution_result.AbstractExecutionResult):
 
 
 	def view(self, bUseDefaultPerspecitveForException=True, bUseDefaultPerspectiveForResult=True):
-		self.__incr.onAccess()
+		self._incr.onAccess()
 		result = self._result_view()
 		return execution_pres.execution_result_box( self._streams, self._error, result, bUseDefaultPerspecitveForException,
 							    bUseDefaultPerspectiveForResult, self._execution_count )
 
 
 	def minimalView(self, bUseDefaultPerspecitveForException=True, bUseDefaultPerspectiveForResult=True):
-		self.__incr.onAccess()
+		self._incr.onAccess()
 		result = self._result_view()
 		return execution_pres.minimal_execution_result_box( self._streams, self._error, result, bUseDefaultPerspecitveForException,
 								    bUseDefaultPerspectiveForResult )
