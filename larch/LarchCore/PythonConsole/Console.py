@@ -117,16 +117,17 @@ class Console (object):
 		self._kernel = kernel
 		self._module = self._kernel.get_live_module()
 		self._can_assign = isinstance(self._module, inproc_kernel.InProcessLiveModule)
-		self._banner_text_live = LiveValue('')
+		self._banner_text = ''
 
 		if showBanner:
-			result = self._module.evaluate('__import__("sys").version')
+			def on_banner_result(result):
+				self._banner_text = result.result
+				result.result_finished()
+				self._incr.onChanged()
 
-			@LiveFunction
-			def banner():
-				text = result.result
-				return text   if text is not None   else ''
-			self._banner_text_live = banner
+			result = self._kernel.new_execution_result()
+			result.result_callback = on_banner_result
+			self._module.evaluate('__import__("sys").version', result)
 
 			self._incr.onChanged()
 
@@ -178,12 +179,14 @@ class Console (object):
 	def execute(self, bEvaluate=True):
 		module = self.getCurrentPythonModule()
 		if not Python2.isEmptyTopLevel(module):
-			result = self._module.execute(module, bEvaluate)
+			result = self._module.new_execution_result()
+			self._module.execute(module, bEvaluate, result)
 			self._commit(module, result)
 
 	def executeModule(self, module, bEvaluate=True):
 		if not Python2.isEmptyTopLevel(module):
-			result = self._module.execute(module, bEvaluate)
+			result = self._module.new_execution_result()
+			self._module.execute(module, bEvaluate, result)
 			self._commit(module, result)
 
 
@@ -219,8 +222,7 @@ class Console (object):
 
 		# Header
 		if self._showBanner:
-			banner_text = self._banner_text_live.getValue()
-			bannerVersionText = [ _bannerTextStyle.applyTo( NormalText( v ) )   for v in banner_text.split( '\n' ) ]
+			bannerVersionText = [ _bannerTextStyle.applyTo( NormalText( v ) )   for v in self._banner_text.split( '\n' ) ]
 			helpText1 = Row( [ _bannerHelpKeyTextStyle.applyTo( Label( 'Ctrl+Enter' ) ),
 					   _bannerHelpTextStyle.applyTo( Label( ' - execute and evaluate, ' ) ),
 					   _bannerHelpKeyTextStyle.applyTo( Label( 'Ctrl+Shift+Enter' ) ),

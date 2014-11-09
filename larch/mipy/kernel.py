@@ -70,7 +70,6 @@ class KernelConnection(object):
 	    on_status: 'status' message on IOPUB socket; f(busy)
 	    on_execute_input: 'execute_input' message on IOPUB socket; f(execution_count, code)
 	    on_clear_output: 'clear_output' message on IOPUB socket; f(wait)
-	    on_comm_open: 'comm_open' message on IOPUB; f(comm, data); comm is Comm instance
 	    '''
 
 	def __init__(self, kernel_name=None, kernel_path=None, username=''):
@@ -150,7 +149,6 @@ class KernelConnection(object):
 		# Event callbacks
 		self.on_status = None
 		self.on_clear_output = None
-		self.on_comm_open = None
 
 		# State
 		self.__busy = False
@@ -167,16 +165,17 @@ class KernelConnection(object):
 		Shutdown
 		:return: None
 		'''
-		self.shell.close()
-		self.iopub.close()
-		self.stdin.close()
-		self.control.close()
-		cls = type(self)
-		cls.__ctx_ref_count -= 1
-		if cls.__ctx_ref_count == 0:
-			cls.__ctx.term()
-			cls.__ctx = None
-		self._open = False
+		if self._open:
+			self.shell.close()
+			self.iopub.close()
+			self.stdin.close()
+			self.control.close()
+			cls = type(self)
+			cls.__ctx_ref_count -= 1
+			if cls.__ctx_ref_count == 0:
+				cls.__ctx.term()
+				cls.__ctx = None
+			self._open = False
 
 
 	def poll(self, timeout=0):
@@ -206,10 +205,20 @@ class KernelConnection(object):
 		return self.__busy
 
 
-	def __unref_kernel_listener(self, parent_msg_id, listener, count=1):
-		if listener.unref(count):
-			del self.__request_listeners[parent_msg_id]
-			listener.on_request_finished()
+	def _attach_listener(self, source_msg_id, listener):
+		self._detach_listener(listener)
+
+		listener._source_msg_id = source_msg_id
+		listener._kernel = self
+		self.__request_listeners[source_msg_id] = listener
+
+
+	def _detach_listener(self, listener):
+		if listener._source_msg_id is not None:
+			del self.__request_listeners[listener._source_msg_id]
+			listener._source_msg_id = None
+			listener._kernel = None
+
 
 
 	def execute_request(self, code, silent=False, store_history=True, user_expressions=None, allow_stdin=True,
@@ -225,7 +234,8 @@ class KernelConnection(object):
 		:param user_expressions: (default None) a dictionary mapping names to expressions to be evaluated
 		:param allow_stdin: (default True) if False, the kernel will raise StdInNotImplementedError
 		if stdin is attempted
-		:param listener: None, or an object that implements KernelRequestListener and ExecuteRequestListenerMixin
+		:param listener: None, or a KernelRequestListener. Note that the listener will be disconnected from any prior requests
+			to which it was attached; it will no longer receive any events resulting from that request.
 		:return: message ID
 		'''
 		if self._open:
@@ -238,8 +248,7 @@ class KernelConnection(object):
 			})
 
 			if listener is not None:
-				self.__request_listeners[msg_id] = listener
-				listener.ref(2)
+				self._attach_listener(msg_id, listener)
 
 			return msg_id
 
@@ -251,7 +260,8 @@ class KernelConnection(object):
 		:param code: the code to inspect
 		:param cursor_pos: the position of the cursor (in unicode characters) where inspection is requested
 		:param detail_level: 0 or 1
-		:param listener: None, or an object that implements KernelRequestListener and InspectRequestListenerMixin
+		:param listener: None, or a KernelRequestListener. Note that the listener will be disconnected from any prior requests
+			to which it was attached; it will no longer receive any events resulting from that request.
 		:return: message ID
 		'''
 		if self._open:
@@ -262,8 +272,7 @@ class KernelConnection(object):
 			})
 
 			if listener is not None:
-				self.__request_listeners[msg_id] = listener
-				listener.ref(2)
+				self._attach_listener(msg_id, listener)
 
 			return msg_id
 
@@ -274,7 +283,8 @@ class KernelConnection(object):
 
 		:param code: the code to complete
 		:param cursor_pos: the position of the cursor (in unicode characters) where completion is requested
-		:param listener: None, or an object that implements KernelRequestListener and CompleteRequestListenerMixin
+		:param listener: None, or a KernelRequestListener. Note that the listener will be disconnected from any prior requests
+			to which it was attached; it will no longer receive any events resulting from that request.
 		:return: message ID
 		'''
 		if self._open:
@@ -284,8 +294,7 @@ class KernelConnection(object):
 			})
 
 			if listener is not None:
-				self.__request_listeners[msg_id] = listener
-				listener.ref(2)
+				self._attach_listener(msg_id, listener)
 
 			return msg_id
 
@@ -415,7 +424,8 @@ class KernelConnection(object):
 
 		:param target_name: name identifying the constructor on the other end
 		:param data: extra initialisation data
-		:param listener: a Kernel
+		:param listener: None, or a KernelRequestListener. Note that the listener will be disconnected from any prior requests
+			to which it was attached; it will no longer receive any events resulting from that request.
 		:return: a Comm object
 		'''
 		if self._open:
@@ -430,8 +440,7 @@ class KernelConnection(object):
 					  {'comm_id': str(comm_id), 'target_name': target_name, 'data': data})
 
 			if listener is not None:
-				self.__request_listeners[msg_id] = listener
-				listener.ref(1)
+				self._attach_listener(msg_id, listener)
 
 			return comm
 
@@ -460,7 +469,6 @@ class KernelConnection(object):
 				kernel_request_listener.on_execute_abort()
 			else:
 				raise ValueError, 'Unknown execute_reply status {0}'.format(status)
-			self.__unref_kernel_listener(parent_msg_id, kernel_request_listener)
 		else:
 			print 'No listener for execute_reply'
 
@@ -514,7 +522,6 @@ class KernelConnection(object):
 				kernel_request_listener.on_inspect_error(ename, evalue, traceback)
 			else:
 				raise ValueError, 'Unknown inspect_reply status'
-			self.__unref_kernel_listener(parent_msg_id, kernel_request_listener)
 		else:
 			print 'No listener for inspect_reply'
 
@@ -539,7 +546,6 @@ class KernelConnection(object):
 				kernel_request_listener.on_complete_error(ename, evalue, traceback)
 			else:
 				raise ValueError, 'Unknown complete_reply status'
-			self.__unref_kernel_listener(parent_msg_id, kernel_request_listener)
 		else:
 			print 'No listener for complete_reply'
 
@@ -616,8 +622,6 @@ class KernelConnection(object):
 		kernel_request_listener = self.__request_listeners.get(parent_msg_id)
 		if kernel_request_listener is not None:
 			kernel_request_listener.on_status(self.__busy)
-			if not self.__busy:
-				self.__unref_kernel_listener(parent_msg_id, kernel_request_listener)
 		if self.on_status is not None:
 			self.on_status(parent_msg_id, self.__busy)
 
@@ -662,8 +666,10 @@ class KernelConnection(object):
 		comm = Comm(self, comm_id, target_name, False)
 		self.__comm_id_to_comm[comm_id] = comm
 
-		if self.on_comm_open is not None:
-			self.on_comm_open(comm, data)
+		parent_msg_id = _get_parent_msg_id(msg)
+		kernel_request_listener = self.__request_listeners.get(parent_msg_id)
+		if kernel_request_listener is not None:
+			kernel_request_listener.on_comm_open(comm, data)
 
 	def _handle_msg_iopub_comm_msg(self, ident, msg):
 		content = msg['content']
@@ -795,14 +801,14 @@ class TestCase_jipy_kernel (unittest.TestCase):
 
 
 
-	def _make_event_log_listener(self, ListenerType, on_input=None):
+	def _make_event_log_listener(self, ListenerType, comm_manager=None, on_input=None):
 		if on_input is None:
 			on_input = lambda prompt: 'test_input'
-		return ListenerType(on_input)
+		return ListenerType(on_input, comm_manager=comm_manager)
 
 
 	def test_010_krn_import_time(self):
-		ev = self._make_event_log_listener(EventLogExecuteRequestListener)
+		ev = self._make_event_log_listener(EventLogKernelRequestListener)
 
 		code = 'import time, sys\n'
 
@@ -815,18 +821,16 @@ class TestCase_jipy_kernel (unittest.TestCase):
 			krn_event('on_execute_input', code=code, execution_count=1),
 			krn_event('on_execute_ok', execution_count=1, payload=[], user_expressions={}),
 			krn_event('on_status', busy=False),
-			krn_event('on_request_finished'),
 			])
-		self.assertEqual(ev.events[-1]['event_name'], 'on_request_finished')
 
 
 	def test_020_krn_sleep(self):
-		ev = self._make_event_log_listener(EventLogExecuteRequestListener)
+		ev = self._make_event_log_listener(EventLogKernelRequestListener)
 
 		code = 'time.sleep(0.1)\n'
 
 		self.krn.execute_request(code, listener=ev)
-		while len(ev.events) < 5:
+		while len(ev.events) < 4:
 			self.krn.poll(-1)
 
 		self.assertEventListsEqual(ev.events, [
@@ -834,18 +838,16 @@ class TestCase_jipy_kernel (unittest.TestCase):
 			krn_event('on_execute_input', code=code, execution_count=2),
 			krn_event('on_execute_ok', execution_count=2, payload=[], user_expressions={}),
 			krn_event('on_status', busy=False),
-			krn_event('on_request_finished'),
 			])
-		self.assertEqual(ev.events[-1]['event_name'], 'on_request_finished')
 
 
 	def test_030_krn_stdout(self):
-		ev = self._make_event_log_listener(EventLogExecuteRequestListener)
+		ev = self._make_event_log_listener(EventLogKernelRequestListener)
 
 		code = 'print "Hello world"\n'
 
 		self.krn.execute_request(code, listener=ev)
-		while len(ev.events) < 6:
+		while len(ev.events) < 5:
 			self.krn.poll(-1)
 
 		self.assertEventListsEqual(ev.events, [
@@ -854,18 +856,16 @@ class TestCase_jipy_kernel (unittest.TestCase):
 			krn_event('on_execute_ok', execution_count=3, payload=[], user_expressions={}),
 			krn_event('on_stream', stream_name='stdout', data='Hello world\n'),
 			krn_event('on_status', busy=False),
-			krn_event('on_request_finished'),
 			])
-		self.assertEqual(ev.events[-1]['event_name'], 'on_request_finished')
 
 
 	def test_040_expr(self):
-		ev = self._make_event_log_listener(EventLogExecuteRequestListener)
+		ev = self._make_event_log_listener(EventLogKernelRequestListener)
 
 		code = '3.141\n'
 
 		self.krn.execute_request(code, listener=ev)
-		while len(ev.events) < 6:
+		while len(ev.events) < 5:
 			self.krn.poll(-1)
 
 		self.assertEventListsEqual(ev.events, [
@@ -874,18 +874,16 @@ class TestCase_jipy_kernel (unittest.TestCase):
 			krn_event('on_execute_ok', execution_count=4, payload=[], user_expressions={}),
 			krn_event('on_execute_result', execution_count=4, data={'text/plain': '3.141'}, metadata={}),
 			krn_event('on_status', busy=False),
-			krn_event('on_request_finished'),
 			])
-		self.assertEqual(ev.events[-1]['event_name'], 'on_request_finished')
 
 
 	def test_050_raise(self):
-		ev = self._make_event_log_listener(EventLogExecuteRequestListener)
+		ev = self._make_event_log_listener(EventLogKernelRequestListener)
 
 		code = 'raise ValueError\n'
 
 		self.krn.execute_request(code, listener=ev)
-		while len(ev.events) < 6:
+		while len(ev.events) < 5:
 			self.krn.poll(-1)
 
 		tb = [u'---------------------------------------------------------------------------\nValueError                                Traceback (most recent call last)',
@@ -897,18 +895,16 @@ class TestCase_jipy_kernel (unittest.TestCase):
 			krn_event('on_execute_error', ename='ValueError', evalue='', traceback=tb),
 			krn_event('on_error', ename='ValueError', evalue='', traceback=tb),
 			krn_event('on_status', busy=False),
-			krn_event('on_request_finished'),
 			])
-		self.assertEqual(ev.events[-1]['event_name'], 'on_request_finished')
 
 
 	def test_060_execute_no_history(self):
-		ev = self._make_event_log_listener(EventLogExecuteRequestListener)
+		ev = self._make_event_log_listener(EventLogKernelRequestListener)
 
 		code = 'print "Hello world"\n3.141\n'
 
 		self.krn.execute_request(code, listener=ev, store_history=False)
-		while len(ev.events) < 7:
+		while len(ev.events) < 6:
 			self.krn.poll(-1)
 
 		self.assertEventListsEqual(ev.events, [
@@ -918,18 +914,16 @@ class TestCase_jipy_kernel (unittest.TestCase):
 			krn_event('on_execute_result', execution_count=6, data={'text/plain': '3.141'}, metadata={}),
 			krn_event('on_stream', stream_name='stdout', data='Hello world\n'),
 			krn_event('on_status', busy=False),
-			krn_event('on_request_finished'),
 			])
-		self.assertEqual(ev.events[-1]['event_name'], 'on_request_finished')
 
 
 	def test_070_execute_silent(self):
-		ev = self._make_event_log_listener(EventLogExecuteRequestListener)
+		ev = self._make_event_log_listener(EventLogKernelRequestListener)
 
 		code = 'print "Hello world"\n3.141\n'
 
 		self.krn.execute_request(code, listener=ev, silent=True)
-		while len(ev.events) < 5:
+		while len(ev.events) < 4:
 			self.krn.poll(-1)
 
 		self.assertEventListsEqual(ev.events, [
@@ -937,13 +931,11 @@ class TestCase_jipy_kernel (unittest.TestCase):
 			krn_event('on_execute_ok', execution_count=5, payload=[], user_expressions={}),
 			krn_event('on_stream', stream_name='stdout', data='Hello world\n'),
 			krn_event('on_status', busy=False),
-			krn_event('on_request_finished'),
 			])
-		self.assertEqual(ev.events[-1]['event_name'], 'on_request_finished')
 
 
 	def test_080_open_comm_from_frontend(self):
-		ev_exec = self._make_event_log_listener(EventLogExecuteRequestListener)
+		ev_exec = self._make_event_log_listener(EventLogKernelRequestListener)
 
 		code1 = """
 from IPython.core.getipython import get_ipython
@@ -969,7 +961,7 @@ received_comm.send({'text': 'Hi there'})
 """
 
 		self.krn.execute_request(code1, listener=ev_exec, store_history=False)
-		while len(ev_exec.events) < 5:
+		while len(ev_exec.events) < 4:
 			self.krn.poll(-1)
 
 		self.assertEventListsEqual(ev_exec.events, [
@@ -977,9 +969,7 @@ received_comm.send({'text': 'Hi there'})
 			krn_event('on_execute_input', code=code1, execution_count=6),
 			krn_event('on_execute_ok', execution_count=5, payload=[], user_expressions={}),
 			krn_event('on_status', busy=False),
-			krn_event('on_request_finished'),
 			])
-		self.assertEqual(ev_exec.events[-1]['event_name'], 'on_request_finished')
 
 		ev_open_comm = self._make_event_log_listener(EventLogKernelRequestListener)
 		comm = self.krn.open_comm('mipy_test', {'a': 1}, listener=ev_open_comm)
@@ -989,21 +979,27 @@ received_comm.send({'text': 'Hi there'})
 			received_messages.append(data)
 		comm.on_message = on_comm_message
 
-		while len(ev_open_comm.events) < 4:
+		while len(ev_open_comm.events) < 3:
 			self.krn.poll(-1)
 
 		self.assertEventListsEqual(ev_open_comm.events, [
 			krn_event('on_status', busy=True),
 			krn_event('on_stream', stream_name='stdout', data="mipy test opened {u'a': 1}\n"),
 			krn_event('on_status', busy=False),
-			krn_event('on_request_finished'),
 			])
 
 
 		ev_exec.clear()
 		self.krn.execute_request(code2, listener=ev_exec, store_history=False)
-		while len(ev_exec.events) < 5:
+		while len(ev_exec.events) < 4:
 			self.krn.poll(-1)
+
+		self.assertEventListsEqual(ev_exec.events, [
+			krn_event('on_status', busy=True),
+			krn_event('on_execute_input', code=code2, execution_count=6),
+			krn_event('on_execute_ok', execution_count=5, payload=[], user_expressions={}),
+			krn_event('on_status', busy=False),
+			])
 
 		self.assertEqual(received_messages, [{'text': 'Hi there'}])
 		del received_messages[:]
@@ -1032,9 +1028,7 @@ received_comm.send({'text': 'Hi there'})
 		manager.register_comm_open_handler('mipy_test', on_mipy_test_opened)
 
 
-		manager.attach_to_kernel(self.krn)
-
-		ev_exec = self._make_event_log_listener(EventLogExecuteRequestListener)
+		ev_exec = self._make_event_log_listener(EventLogKernelRequestListener, comm_manager=manager)
 
 		code1 = """
 from IPython.kernel.comm.comm import Comm
@@ -1053,11 +1047,10 @@ comm.send({'text': 'Hi there'})
 		self.assertEventListsEqual(ev_exec.events, [
 			krn_event('on_status', busy=True),
 			krn_event('on_execute_input', code=code1, execution_count=6),
+			krn_event('on_comm_open'),
 			krn_event('on_execute_ok', execution_count=5, payload=[], user_expressions={}),
 			krn_event('on_status', busy=False),
-			krn_event('on_request_finished'),
 			])
-		self.assertEqual(ev_exec.events[-1]['event_name'], 'on_request_finished')
 
 		self.assertEqual(1, len(open_comms))
 		self.assertEqual([{'a': 1}], open_comm_data)
@@ -1065,13 +1058,40 @@ comm.send({'text': 'Hi there'})
 
 		ev_exec.clear()
 		self.krn.execute_request(code2, listener=ev_exec, store_history=False)
-		while len(ev_exec.events) < 5:
+		while len(ev_exec.events) < 4:
 			self.krn.poll(-1)
+
+		self.assertEventListsEqual(ev_exec.events, [
+			krn_event('on_status', busy=True),
+			krn_event('on_execute_input', code=code2, execution_count=6),
+			krn_event('on_execute_ok', execution_count=5, payload=[], user_expressions={}),
+			krn_event('on_status', busy=False),
+			])
 
 
 		self.assertEqual([{'text': 'Hi there'}], received_messages)
 
 
+	def test_100_shutdown_during_execution(self):
+		ev_exec1 = self._make_event_log_listener(EventLogKernelRequestListener)
+		ev_exec2 = self._make_event_log_listener(EventLogKernelRequestListener)
+
+		code1 = 'print 1'
+		code2 = 'exit()'
+
+		self.krn.execute_request(code1, listener=ev_exec1, store_history=False)
+		self.krn.execute_request(code2, listener=ev_exec2, store_history=False)
+
+		while len(ev_exec1.events) < 4:
+			self.krn.poll(-1)
+
+		self.assertEventListsEqual(ev_exec1.events, [
+			krn_event('on_status', busy=True),
+			krn_event('on_execute_input', code=code1, execution_count=6),
+			krn_event('on_execute_ok', execution_count=5, payload=[], user_expressions={}),
+			krn_event('on_stream', stream_name='stdout', data='1\n'),
+			krn_event('on_status', busy=False),
+			])
 
 
 

@@ -54,14 +54,16 @@ class WorksheetAbstractView (NodeAbstractView):
 	def _get_module(self, module_callback):
 		def _on_kernel_created(kernel):
 			kernel.update_importable_modules()
-			self._module = kernel.get_live_module()
+			module = kernel.get_live_module()
+			if module is not self._module:
+				self._module = module
+				self.getBody().clear_results()
 			module_callback(self._module)
 		self._kernel_source(_on_kernel_created)
 
 		
 	def refresh_worksheet_output(self):
 		body = self.getBody()
-		body.clear_results()
 		def on_module_initialised(module):
 			body.refresh_worksheet_output(module)
 		self._get_module(on_module_initialised)
@@ -99,7 +101,7 @@ class BodyAbstractView (NodeAbstractView):
 		for v in self.getContents():
 			v._clear_results()
 
-		
+
 	def refresh_worksheet_output(self, module):
 		self._module = module
 		for v in self.getContents():
@@ -295,7 +297,7 @@ class PythonCodeAbstractView (NodeAbstractView):
 			return False
 		elif style == self.STYLE_ERRORS:
 			result = self.getResult()
-			return result.hasErrors()
+			return result.has_errors()
 		else:
 			return True
 
@@ -312,8 +314,16 @@ class PythonCodeAbstractView (NodeAbstractView):
 		self._incr.onChanged()
 
 	def _refresh_worksheet_output(self, module):
-		self._result = module.execute(self.getCode(), self.isResultVisible())
-		self._incr.onChanged()
+		if self._result is not None  and  module is not self._module:
+			self._result.result_finished()
+			self._result = None
+
+		if self._result is None:
+			self._result = module.new_execution_result()
+			self._module = module
+			self._incr.onChanged()
+
+		module.execute(self.getCode(), self.isResultVisible(), self._result)
 
 
 	def refresh_output(self):
@@ -345,6 +355,7 @@ class InlinePythonCodeAbstractView (NodeAbstractView):
 		NodeAbstractView.__init__( self, worksheet, model )
 		self._incr = IncrementalValueMonitor( self )
 		self._result = None
+		self._module = None
 
 
 	def getExpr(self):
@@ -385,8 +396,16 @@ class InlinePythonCodeAbstractView (NodeAbstractView):
 		self._incr.onChanged()
 
 	def _refresh_worksheet_output(self, module):
-		self._result = module.evaluate(self.getExpr())
-		self._incr.onChanged()
+		if self._result is not None  and  module is not self._module:
+			self._result.result_finished()
+			self._result = None
+
+		if self._result is None:
+			self._result = module.new_execution_result()
+			self._module = module
+			self._incr.onChanged()
+
+		module.evaluate(self.getExpr(), self._result)
 
 	def refresh_output(self):
 		def module_callback(module):

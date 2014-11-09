@@ -38,7 +38,8 @@ class InProcModuleSource (module_finder.AbstractModuleSource):
 
 
 class InProcessLiveModule (python_kernel.AbstractPythonLiveModule):
-	def __init__(self, name):
+	def __init__(self, kernel, name):
+		super(InProcessLiveModule, self).__init__(kernel)
 		self.__module = imp.new_module(name)
 		self.__execution_count = 0
 		LoadBuiltins.loadBuiltins(self.__module)
@@ -47,14 +48,16 @@ class InProcessLiveModule (python_kernel.AbstractPythonLiveModule):
 	def assign_variable(self, name, value):
 		setattr(self.__module, name, value)
 
-	def evaluate(self, expr):
-		return getResultOfEvaluationWithinModule(expr, self.__module)
+	def evaluate(self, expr, result):
+		result.clear()
+		return _evaluateWithinModuleIntoResult(result, expr, self.__module)
 
-	def execute(self, code, evaluate_last_expression):
+	def execute(self, code, evaluate_last_expression, result):
 		if isinstance(code, str)  or  isinstance(code, unicode):
 			raise NotImplementedError, 'InProcessModule.execute: executing of code as strings not yet supported'
+		result.clear()
 		self.__execution_count += 1
-		return getResultOfExecutionWithinModule(code, self.__module, evaluate_last_expression, self.__execution_count)
+		return _executeWithinModuleIntoResult(result, code, self.__module, evaluate_last_expression, self.__execution_count)
 
 
 
@@ -63,12 +66,15 @@ class InProcessKernel (python_kernel.AbstractPythonKernel):
 		super(InProcessKernel, self).__init__(ctx)
 		self.__module_finder = module_finder.ModuleFinder()
 		self.__module_finder.install_hooks()
-		self.__live_module = InProcessLiveModule('__live__')
+		self.__live_module = InProcessLiveModule(self, '__live__')
 
 	def shutdown(self):
 		self.__module_finder.unload_all_modules()
 		self.__module_finder.uninstall_hooks()
 		super(InProcessKernel, self).shutdown()
+
+	def new_execution_result(self):
+		return InProcessExecutionResult()
 
 	def get_live_module(self):
 		return self.__live_module
@@ -105,18 +111,31 @@ class InProcessContext (python_kernel.AbstractPythonContext):
 
 
 class InProcessExecutionResult (execution_result.AbstractExecutionResult):
-	def __init__(self, streams=None, caughtException=None, result_in_tuple=None, execution_count=None):
+	def __init__(self, streams=None):
 		super(InProcessExecutionResult, self).__init__(streams)
-		self._caught_exception = caughtException
-		self._result_in_tuple = result_in_tuple
-		self._execution_count = execution_count
-		if self.finished_callback is not None:
-			self.finished_callback(self)
+		self._caught_exception = None
+		self._result_in_tuple = None
+		self._execution_count = None
+
+
+	def clear(self):
+		super(InProcessExecutionResult, self).clear()
+		self._caught_exception = None
+		self._result_in_tuple = None
+		self._execution_count = None
+		self._incr.onChanged()
 
 
 	@property
 	def caught_exception(self):
 		return self._caught_exception
+
+	def set_error(self, error):
+		self._caught_exception = error
+		self._incr.onChanged()
+
+	def has_errors(self):
+		return self._caught_exception is not None  or  self._streams.has_content_for( 'err' )
 
 
 	def has_result(self):
@@ -126,18 +145,22 @@ class InProcessExecutionResult (execution_result.AbstractExecutionResult):
 	def result(self):
 		return self._result_in_tuple[0]   if self._result_in_tuple is not None   else None
 
+	def set_result(self, result):
+		self._result_in_tuple = (result,)
+		self._incr.onChanged()
+		super(InProcessExecutionResult, self).set_result(result)
+
 
 	def was_aborted(self):
 		return False
 
 
 	def errorsOnly(self):
-		return InProcessExecutionResult( self._streams.suppress_stream( 'out' ), self._caught_exception, None )
+		res = InProcessExecutionResult(self._streams.suppress_stream( 'out' ))
+		if self._caught_exception is not None:
+			res.set_error(self._caught_exception)
+		return res
 
-
-
-	def hasErrors(self):
-		return self._caught_exception is not None  or  self._streams.has_content_for( 'err' )
 
 
 	def view(self, bUseDefaultPerspecitveForException=True, bUseDefaultPerspectiveForResult=True):
@@ -153,39 +176,40 @@ class InProcessExecutionResult (execution_result.AbstractExecutionResult):
 
 
 
-def getResultOfExecutionWithinModule(pythonCode, module, bEvaluate, execution_count=None):
-	std = execution_result.MultiplexedRichStream(['stdout', 'stderr'])
-
+def _executeWithinModuleIntoResult(result, pythonCode, module, bEvaluate, execution_count=None):
 	evalCode = execCode = None
-	caughtException = None
-	result = None
 	if bEvaluate:
 		try:
 			execCode, evalCode = CodeGenerator.compileForModuleExecutionAndEvaluation( module, pythonCode, module.__name__ )
 		except:
-			caughtException = JythonException.getCurrentException()
+			result.set_error(JythonException.getCurrentException())
 	else:
 		try:
 			execCode = CodeGenerator.compileForModuleExecution( module, pythonCode, module.__name__ )
 		except:
-			caughtException = JythonException.getCurrentException()
+			result.set_error(JythonException.getCurrentException())
 
 	if execCode is not None  or  evalCode is not None:
 		savedStdout, savedStderr = sys.stdout, sys.stderr
-		sys.stdout = std.stdout
-		sys.stderr = std.stderr
-		setattr( module, 'display', std.stdout.display )
-		setattr( module, 'displayerr', std.stderr.display )
+		sys.stdout = result.streams.stdout
+		sys.stderr = result.streams.stderr
+		setattr( module, 'display', result.streams.stdout.display )
+		setattr( module, 'displayerr', result.streams.stderr.display )
 
 		try:
 			exec execCode in module.__dict__
 			if evalCode is not None:
-				result = [ eval( evalCode, module.__dict__ ) ]
+				result.set_result(eval( evalCode, module.__dict__ ))
 		except:
-			caughtException = JythonException.getCurrentException()
+			result.set_error(JythonException.getCurrentException())
 
 		sys.stdout, sys.stderr = savedStdout, savedStderr
-	return InProcessExecutionResult( std, caughtException, result, execution_count )
+
+
+def getResultOfExecutingWithinModule(pythonCode, module, bEvaluate, execution_count=None):
+	result = InProcessExecutionResult()
+	_executeWithinModuleIntoResult(result, pythonCode, module, bEvaluate, execution_count)
+	return result
 
 
 def getResultOfExecutionInScopeWithinModule(pythonCode, globals, locals, module, bEvaluate, execution_count=None):
@@ -231,32 +255,34 @@ def getResultOfExecutionInScopeWithinModule(pythonCode, globals, locals, module,
 
 
 
-def getResultOfEvaluationWithinModule(pythonExpr, module):
-	std = execution_result.MultiplexedRichStream(['stdout', 'stderr'])
-
+def _evaluateWithinModuleIntoResult(result, pythonExpr, module):
 	evalCode = None
-	caughtException = None
-	result = None
 	if isinstance(pythonExpr, str)  or  isinstance(pythonExpr, unicode):
 		evalCode = pythonExpr
 	else:
 		try:
 			evalCode = CodeGenerator.compileForModuleEvaluation( module, pythonExpr, module.__name__ )
 		except:
-			caughtException = JythonException.getCurrentException()
+			result.set_error(JythonException.getCurrentException())
 
 	if evalCode is not None:
 		savedStdout, savedStderr = sys.stdout, sys.stderr
-		sys.stdout = std.stdout
-		sys.stderr = std.stderr
+		sys.stdout = result.streams.stdout
+		sys.stderr = result.streams.stderr
 
 		try:
-			result = [ eval( evalCode, module.__dict__ ) ]
+			result.set_result(eval( evalCode, module.__dict__ ))
 		except:
-			caughtException = JythonException.getCurrentException()
+			result.set_error(JythonException.getCurrentException())
 
 		sys.stdout, sys.stderr = savedStdout, savedStderr
-	return InProcessExecutionResult( std, caughtException, result )
+
+
+def getResultOfEvaluationWithinModule(pythonExpr, module):
+	result = InProcessExecutionResult()
+	_evaluateWithinModuleIntoResult(result, pythonExpr, module)
+	return result
+
 
 
 def getResultOfEvaluationInScopeWithinModule(pythonExpr, globals, locals, module):
