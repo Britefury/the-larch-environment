@@ -46,19 +46,18 @@ class IPythonLiveModule (python_kernel.AbstractPythonLiveModule):
 		self.__kernel = kernel
 		self.name = name
 
-	def evaluate(self, code, result_callback):
-		self.__kernel._queue_eval(self.name, code, result_callback)
+	def evaluate(self, code):
+		return self.__kernel._queue_eval(self.name, code)
 
-	def execute(self, code, evaluate_last_expression, result_callback):
-		self.__kernel._queue_exec(self.name, code, evaluate_last_expression, result_callback)
+	def execute(self, code, evaluate_last_expression):
+		return self.__kernel._queue_exec(self.name, code, evaluate_last_expression)
 
 
 class _KernelListener (request_listener.KernelRequestListener, request_listener.ExecuteRequestListenerMixin):
-	def __init__(self, finished):
+	def __init__(self):
 		super(_KernelListener, self).__init__()
 		self.result = IPythonExecutionResult()
 		self.std = self.result.streams
-		self.finished = finished
 
 
 	def on_execute_ok(self, execution_count, payload, user_expressions):
@@ -77,7 +76,7 @@ class _KernelListener (request_listener.KernelRequestListener, request_listener.
 	def on_execute_result(self, execution_count, data, metadata):
 		# print 'KernelListener.on_execute_result'
 		self.result.execution_count = execution_count
-		text = data.get('text/plain')
+		text = data.pop('text/plain', None)
 		if text is not None:
 			try:
 				value = ast.literal_eval(text)
@@ -86,6 +85,8 @@ class _KernelListener (request_listener.KernelRequestListener, request_listener.
 				self.result.set_text_result(text)
 			else:
 				self.result.set_result(value)
+		if len(data) > 0:
+			print 'ipyton_kernel._KernelListener.on_execute_result: data keys: {0}'.format(sorted(list(data.keys())))
 
 
 	def on_stream(self, stream_name, data):
@@ -110,11 +111,13 @@ class _KernelListener (request_listener.KernelRequestListener, request_listener.
 			if mime_type.startswith('image/'):
 				image = binascii.a2b_base64(raw)
 				self.result.display_image(mime_type, image)
+		print 'ipython_kernel._KernelListener.on_display_data: data keys: {0}'.format(sorted(list(data.keys())))
 
 
 	def on_request_finished(self):
-		if self.finished is not None:
-			self.finished(self.result)
+		if self.result.finished_callback is not None:
+			self.result.finished_callback(self.result)
+
 
 
 
@@ -135,6 +138,11 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 		self.__matplotlib_inline()
 
 		self.__live_module = IPythonLiveModule(self, '__live__')
+
+
+		def on_comm_open(comm, data):
+			print 'ipython_kernel.IPythonKernel.__init__: on_comm_open {0}'.format(comm.target_name)
+		self.__kernel.on_comm_open = on_comm_open
 
 
 
@@ -173,9 +181,9 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 
 
 
-	def _queue_exec(self, module_name, code, evaluate_last_expression, result_callback, silent=False, store_history=True):
+	def _queue_exec(self, module_name, code, evaluate_last_expression, silent=False, store_history=True):
 		# print 'IPythonKernel._queue_exec'
-		listener = _KernelListener(result_callback)
+		listener = _KernelListener()
 
 		if isinstance(code, str)  or  isinstance(code, unicode):
 			src = code
@@ -187,10 +195,12 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 		self.__kernel.execute_request(src, listener=listener, silent=silent, store_history=store_history)
 		self.__queue_poll()
 
+		return listener.result
 
-	def _queue_eval(self, module_name, expr, result_callback):
+
+	def _queue_eval(self, module_name, expr):
 		# print 'IPythonKernel._queue_exec'
-		listener = _KernelListener(result_callback)
+		listener = _KernelListener()
 
 		if isinstance(expr, str)  or  isinstance(expr, unicode):
 			src = expr
@@ -201,6 +211,8 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 		self.__stderr = std.stderr
 		self.__kernel.execute_request(src, listener=listener)
 		self.__queue_poll()
+
+		return listener.result
 
 
 	def __poll_kernel(self):
@@ -335,13 +347,14 @@ class IPythonContext (python_kernel.AbstractPythonContext):
 			'json.dumps([platform.python_implementation(), platform.python_version_tuple(), sys.version])\n'
 
 		def _on_kernel_started(krn):
-			def on_result(result):
+			def result_finished(result):
 				krn.shutdown()
 				kernel_information = json.loads(result.result)
 				kernel_description_callback(kernel_information)
 
 			mod = krn.get_live_module()
-			mod.evaluate(code, on_result)
+			result = mod.evaluate(code)
+			result.finished_callback = result_finished
 
 		self.start_kernel(_on_kernel_started, ipython_path=ipython_path)
 
@@ -378,11 +391,13 @@ class IPythonExecutionResult (execution_result.AbstractExecutionResult):
 
 	@property
 	def streams(self):
+		self.__incr.onAccess()
 		return self._streams
 
 
 	@property
 	def caught_exception(self):
+		self.__incr.onAccess()
 		return self._error
 
 	def set_error(self, error):
@@ -391,10 +406,12 @@ class IPythonExecutionResult (execution_result.AbstractExecutionResult):
 
 
 	def has_result(self):
+		self.__incr.onAccess()
 		return self._result is not None
 
 	@property
 	def result(self):
+		self.__incr.onAccess()
 		return self._result[0]   if self._result is not None   else None
 
 	def set_result(self, result):
@@ -421,6 +438,7 @@ class IPythonExecutionResult (execution_result.AbstractExecutionResult):
 
 
 	def was_aborted(self):
+		self.__incr.onAccess()
 		return self._aborted
 
 	def notify_aborted(self):
@@ -430,6 +448,7 @@ class IPythonExecutionResult (execution_result.AbstractExecutionResult):
 
 	@property
 	def execution_count(self):
+		self.__incr.onAccess()
 		return self._execution_count
 
 	@execution_count.setter
@@ -444,6 +463,7 @@ class IPythonExecutionResult (execution_result.AbstractExecutionResult):
 
 
 	def hasErrors(self):
+		self.__incr.onAccess()
 		return self._error is not None  or  self._streams.has_content_for( 'err' )
 
 

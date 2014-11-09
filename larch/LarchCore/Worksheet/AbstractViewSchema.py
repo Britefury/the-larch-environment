@@ -312,11 +312,8 @@ class PythonCodeAbstractView (NodeAbstractView):
 		self._incr.onChanged()
 
 	def _refresh_worksheet_output(self, module):
-		def result_callback(result):
-			self._result = result
-			self._incr.onChanged()
-
-		module.execute( self.getCode(), self.isResultVisible(), result_callback )
+		self._result = module.execute(self.getCode(), self.isResultVisible())
+		self._incr.onChanged()
 
 
 	def refresh_output(self):
@@ -388,11 +385,8 @@ class InlinePythonCodeAbstractView (NodeAbstractView):
 		self._incr.onChanged()
 
 	def _refresh_worksheet_output(self, module):
-		def result_callback(result):
-			self._result = result
-			self._incr.onChanged()
-
-		module.evaluate( self.getExpr(), result_callback )
+		self._result = module.evaluate(self.getExpr())
+		self._incr.onChanged()
 
 	def refresh_output(self):
 		def module_callback(module):
