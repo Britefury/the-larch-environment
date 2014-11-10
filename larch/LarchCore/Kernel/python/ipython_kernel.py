@@ -16,7 +16,7 @@ from org.python.core.util import StringUtil
 from mipy import kernel, request_listener, comm
 
 from BritefuryJ.Pres import Pres
-from BritefuryJ.Pres.Primitive import Primitive, Label, Column, Image
+from BritefuryJ.Pres.Primitive import Primitive, Label, Column, Image, Blank
 from BritefuryJ.Pres.RichText import NormalText, RichText
 from BritefuryJ.Pres.ObjectPres import ErrorBoxWithFields, HorizontalField, VerticalField
 from BritefuryJ.Controls import IntSlider
@@ -28,6 +28,7 @@ from BritefuryJ.Live import LiveValue
 from .. import execution_result, execution_pres
 from . import python_kernel, module_finder
 from LarchCore.Languages.Python2 import CodeGenerator
+from LarchCore.ipython import widgets
 
 
 _aborted_border = SolidBorder(1.5, 2.0, 5.0, 5.0, Color(1.0, 0.5, 0.0), Color(1.0, 1.0, 0.9))
@@ -378,69 +379,6 @@ class IPythonExecutionError (object):
 		return ErrorBoxWithFields('ERROR IN IPYTHON KERNEL', fields)
 
 
-
-class _IPythonWidgetModel (object):
-	def __init__(self, result, comm, data):
-		self.result = result
-		self.comm = comm
-		self.comm.on_message = self._on_message
-		self.comm.on_closed_remotely = self._on_closed_remotely
-		self.open = True
-		self.state = {}
-		self.__incr = IncrementalValueMonitor()
-
-
-	def close(self):
-		# if self.open:
-		# 	self.comm.close()
-		# 	self.open = False
-		pass
-
-
-	def update_state(self, state):
-		self.state.update(state)
-		self.__incr.onChanged()
-
-
-	def _on_closed_remotely(self, comm, data):
-		self.open = False
-		print '_IPythonWidgetModel._on_closed_remotely'
-
-
-	def _on_message(self, comm, data):
-		method = data['method']
-		if method == 'update':
-			self.update_state(data['state'])
-		elif method == 'display':
-			self.result._display_widget(self)
-
-
-	def __present__(self, fragment, inh):
-		self.__incr.onAccess()
-		view_name = self.state['_view_name']
-
-		if view_name == 'IntSliderView':
-			def _on_change(control, new_value):
-				sync_data = {'value': new_value}
-				self.state.update(sync_data)
-				self.comm.send({'method': 'backbone', 'sync_data': sync_data})
-				value_live.setLiteralValue(new_value)
-
-			value = int(self.state['value'])
-			value_live = LiveValue(value)
-			slider_min = int(self.state['min'])
-			slider_max = int(self.state['max'])
-			if slider_min >= 0  or  slider_max <= 0:
-				pivot = int((slider_min + slider_max) * 0.5)
-			else:
-				pivot = 0
-			return IntSlider(value_live, slider_min, slider_max, pivot, 400.0, _on_change)
-		else:
-			return Label(view_name)
-
-
-
-
 class IPythonExecutionResult (execution_result.AbstractExecutionResult):
 	def __init__(self, streams=None, comm_manager=None):
 		super( IPythonExecutionResult, self ).__init__(streams)
@@ -464,7 +402,7 @@ class IPythonExecutionResult (execution_result.AbstractExecutionResult):
 		print 'IPythonExecutionResult.__default_comm_handler: {0}'.format(comm.target_name)
 
 	def __handle_comm_WidgetModel(self, comm, data):
-		widget = _IPythonWidgetModel(self, comm, data)
+		widget = widgets.IPythonWidgetModel(self, comm, data)
 		self._widgets.append(widget)
 
 
