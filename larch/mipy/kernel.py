@@ -677,8 +677,11 @@ class KernelConnection(object):
 		comm_id = content['comm_id']
 		data = content['data']
 
+		parent_msg_id = _get_parent_msg_id(msg)
+		kernel_request_listener = self.__request_listeners.get(parent_msg_id)
+
 		comm = self.__comm_id_to_comm[comm_id]
-		comm._handle_message(data)
+		comm._handle_message(data, kernel_request_listener)
 
 	def _handle_msg_iopub_comm_close(self, ident, msg):
 		content = msg['content']
@@ -686,8 +689,11 @@ class KernelConnection(object):
 		comm_id = content['comm_id']
 		data = content['data']
 
+		parent_msg_id = _get_parent_msg_id(msg)
+		kernel_request_listener = self.__request_listeners.get(parent_msg_id)
+
 		comm = self.__comm_id_to_comm[comm_id]
-		comm._handle_closed_remotely(data)
+		comm._handle_closed_remotely(data, kernel_request_listener)
 		del self.__comm_id_to_comm[comm_id]
 
 
