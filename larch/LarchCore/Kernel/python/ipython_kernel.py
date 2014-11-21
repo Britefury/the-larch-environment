@@ -28,7 +28,7 @@ from BritefuryJ.Live import LiveValue
 from .. import execution_result, execution_pres
 from . import python_kernel, module_finder
 from LarchCore.Languages.Python2 import CodeGenerator
-from LarchCore.ipython import widgets
+from LarchCore.ipython import ipy_widgets
 
 
 _aborted_border = SolidBorder(1.5, 2.0, 5.0, 5.0, Color(1.0, 0.5, 0.0), Color(1.0, 1.0, 0.9))
@@ -402,7 +402,7 @@ class IPythonExecutionResult (execution_result.AbstractExecutionResult):
 		print 'IPythonExecutionResult.__default_comm_handler: {0}'.format(comm.target_name)
 
 	def __handle_comm_WidgetModel(self, comm, data):
-		widget = widgets.IPythonWidgetModel(self, comm, data)
+		widget = ipy_widgets.IPythonWidgetModel(self, comm, data)
 		self._widgets.append(widget)
 
 
@@ -505,7 +505,7 @@ class IPythonExecutionResult (execution_result.AbstractExecutionResult):
 
 
 	def errorsOnly(self):
-		res = IPythonExecutionResult( self.__comm_manager, self._streams.suppress_stream( 'out' ) )
+		res = IPythonExecutionResult(self._streams.suppress_stream( 'out' ), self.__comm_manager)
 		if self._error is not None:
 			res.set_error(self._error)
 		return res

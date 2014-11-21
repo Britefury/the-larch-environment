@@ -34,13 +34,13 @@ class Comm(object):
 			kernel._notify_comm_closed(self)
 
 
-	def _handle_message(self, data):
+	def _handle_message(self, data, kernel_request_listener):
 		if self.on_message is not None:
-			self.on_message(self, data)
+			self.on_message(self, data, kernel_request_listener)
 
-	def _handle_closed_remotely(self, data):
+	def _handle_closed_remotely(self, data, kernel_request_listener):
 		if self.on_closed_remotely is not None:
-			self.on_closed_remotely(self, data)
+			self.on_closed_remotely(self, data, kernel_request_listener)
 
 
 
