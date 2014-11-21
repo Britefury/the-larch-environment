@@ -7,7 +7,25 @@ from BritefuryJ.Pres import Pres
 from BritefuryJ.Pres.Primitive import Blank, Label, Row, Spacer
 
 
+_view_name_to_class = {
+}
+
+
+
+class IPythonWidgetViewType (type):
+	def __init__(cls, name, bases, dict):
+		super(IPythonWidgetViewType, cls).__init__(name, bases, dict)
+
+		view_name = dict.get('__viewname__', name)
+		if view_name is not None:
+			_view_name_to_class[view_name] = cls
+
+
 class IPythonWidgetView (object):
+	__metaclass__ = IPythonWidgetViewType
+
+	__viewname__ = None
+
 	def __init__(self, comm, state):
 		self._incr = IncrementalValueMonitor()
 		self._comm = comm
@@ -79,12 +97,7 @@ class ButtonView (IPythonWidgetView):
 		return Button.buttonWithLabel(self.description, _on_click)
 
 
-_view_name_to_class = {
-	'IntSliderView': IntSliderView,
-	'CheckboxView': CheckboxView,
-	'ToggleButtonView': ToggleButtonView,
-	'ButtonView': ButtonView,
-}
+
 
 class IPythonWidgetModel (object):
 	def __init__(self, result, comm, data):
