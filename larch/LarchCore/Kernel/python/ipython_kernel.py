@@ -139,6 +139,7 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 
 		self.__live_module = IPythonLiveModule(self, '__live__')
 
+		self._widget_manager = ipy_widgets.IPythonWidgetManager()
 
 
 	def shutdown(self):
@@ -148,7 +149,7 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 
 
 	def new_execution_result(self):
-		return IPythonExecutionResult()
+		return IPythonExecutionResult(self)
 
 	def get_live_module(self):
 		return self.__live_module
@@ -380,13 +381,14 @@ class IPythonExecutionError (object):
 
 
 class IPythonExecutionResult (execution_result.AbstractExecutionResult):
-	def __init__(self, streams=None, comm_manager=None):
+	def __init__(self, kernel, streams=None, comm_manager=None):
 		super( IPythonExecutionResult, self ).__init__(streams)
 
 		if comm_manager is None:
 			comm_manager = comm.CommManager(self.__default_comm_handler)
 			comm_manager.register_comm_open_handler('WidgetModel', self.__handle_comm_WidgetModel)
 
+		self.__kernel = kernel
 		self.__comm_manager = comm_manager
 		self._listener = _KernelListener(comm_manager, self)
 		self._error = None
@@ -402,7 +404,8 @@ class IPythonExecutionResult (execution_result.AbstractExecutionResult):
 		print 'IPythonExecutionResult.__default_comm_handler: {0}'.format(comm.target_name)
 
 	def __handle_comm_WidgetModel(self, comm, data):
-		widget = ipy_widgets.IPythonWidgetModel(self, comm, data)
+		widget_manager = self.__kernel._widget_manager
+		widget = widget_manager.new_widget(self, comm, data)
 		self._widgets.append(widget)
 
 
@@ -505,7 +508,7 @@ class IPythonExecutionResult (execution_result.AbstractExecutionResult):
 
 
 	def errorsOnly(self):
-		res = IPythonExecutionResult(self._streams.suppress_stream( 'out' ), self.__comm_manager)
+		res = IPythonExecutionResult(self.__kernel, self._streams.suppress_stream( 'out' ), self.__comm_manager)
 		if self._error is not None:
 			res.set_error(self._error)
 		return res
