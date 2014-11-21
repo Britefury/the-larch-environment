@@ -34,8 +34,9 @@ if os.name == 'java':
 			while n_events > 0:
 				for index, socket in self.__indices_and_sockets:
 					if self.__poller.pollin(index):
-						event_callback(socket)
 						n_events_processed += 1
+						event_callback(socket)
+
 
 				n_events = self.__poller.poll(0)
 			return n_events_processed
