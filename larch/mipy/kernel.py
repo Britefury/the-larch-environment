@@ -735,6 +735,8 @@ class KernelConnection(object):
 				kernel_request_listener.on_comm_open(comm, data)
 			except:
 				_show_handler_exception(self, 'iopub:comm_open')
+		else:
+			print 'No listener for iopub:comm_open'
 
 	def _handle_msg_iopub_comm_msg(self, ident, msg):
 		content = msg['content']
