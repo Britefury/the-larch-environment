@@ -15,7 +15,7 @@ class ContainerView (IPythonWidgetView):
 		pass
 		# for child_comm_id in self._children:
 		# 	widget_model = self._widget_manager.get_by_comm_id(child_comm_id)
-		# 	widget_model.display(self._widget_model.result)
+		# 	widget_model.display(self.model.result)
 
 	def __present__(self, fragment, inh):
 		self._incr.onAccess()

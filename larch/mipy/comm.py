@@ -16,22 +16,26 @@ class Comm(object):
 		self.on_closed_remotely = None
 
 
-	def send(self, data):
+	def send(self, data, listener=None):
 		kernel = self.__kernel
 		if kernel._open:
-			kernel.session.send(kernel.shell, 'comm_msg', {
+			msg, msg_id = kernel.session.send(kernel.shell, 'comm_msg', {
 				'comm_id': self.comm_id,
 				'data': data
 			})
+			if listener is not None:
+				kernel._attach_listener(msg_id, listener)
 
-	def close(self, data):
+	def close(self, data, listener=None):
 		kernel = self.__kernel
 		if kernel._open:
-			kernel.session.send(kernel.shell, 'comm_close', {
+			msg, msg_id = kernel.session.send(kernel.shell, 'comm_close', {
 				'comm_id': self.comm_id,
 				'data': data
 			})
 			kernel._notify_comm_closed(self)
+			if listener is not None:
+				kernel._attach_listener(msg_id, listener)
 
 
 	def _handle_message(self, data, kernel_request_listener):

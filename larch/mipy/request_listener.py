@@ -29,7 +29,8 @@ class KernelRequestListener (object):
 
 
 	def detach(self):
-		self._kernel._detach_listener(self)
+		if self._kernel is not None:
+			self._kernel._detach_listener(self)
 
 
 	def on_stream(self, stream_name, data):

@@ -26,7 +26,7 @@ class IPythonWidgetView (object):
 	def __init__(self, widget_model, widget_manager, comm, state):
 		self._incr = IncrementalValueMonitor()
 		self._comm = comm
-		self._widget_model = widget_model
+		self.model = widget_model
 		self._widget_manager = widget_manager
 		self.__dict__.update(state)
 
@@ -55,6 +55,11 @@ class IPythonWidgetModel (object):
 		self._state = {}
 		self.__incr = IncrementalValueMonitor()
 		self._view = None
+		self.__kernel_listener = self.result.new_kernel_request_listener()
+
+
+	def send(self, msg):
+		self.comm.send(msg, listener=self.__kernel_listener)
 
 
 	def close(self):
@@ -62,11 +67,13 @@ class IPythonWidgetModel (object):
 		# 	self.comm.close()
 		# 	self.open = False
 		self.__widget_manager._notify_widget_closed(self)
+		self.__kernel_listener.detach()
 
 
 	def _on_closed_remotely(self, comm, data, kernel_request_listener):
 		self.open = False
 		self.__widget_manager._notify_widget_closed(self)
+		self.__kernel_listener.detach()
 		print 'IPythonWidgetModel._on_closed_remotely'
 
 

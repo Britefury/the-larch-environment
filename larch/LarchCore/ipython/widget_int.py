@@ -16,7 +16,7 @@ class IntSliderView (IPythonWidgetView):
 		def _on_change(control, new_value):
 			sync_data = {'value': new_value}
 			self._internal_update(sync_data)
-			self._comm.send({'method': 'backbone', 'sync_data': sync_data})
+			self.model.send({'method': 'backbone', 'sync_data': sync_data})
 			value_live.setLiteralValue(new_value)
 
 		value = int(self.value)
