@@ -13,7 +13,7 @@ class ButtonView (IPythonWidgetView):
 	def __present__(self, fragment, inh):
 		self._incr.onAccess()
 		def _on_click(control, event):
-			self.model.send({'method': 'custom', 'content': {'event': 'click'}})
+			self.model.send_custom({'event': 'click'})
 
 		return Button.buttonWithLabel(self.description, _on_click)
 
