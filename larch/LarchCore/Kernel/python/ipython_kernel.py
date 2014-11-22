@@ -112,6 +112,10 @@ class _KernelListener (request_listener.KernelRequestListener):
 		:param data: dictionary mapping MIME type to raw data representation in that format
 		:param metadata: metadata describing the content of `data`
 		"""
+		# Clear the rich data first
+		self.result.clear_rich_display()
+
+		# Add new items
 		for mime_type, raw in data.items():
 			if mime_type.startswith('image/'):
 				image = binascii.a2b_base64(raw)
@@ -182,7 +186,7 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 
 	def _queue_exec(self, module_name, code, evaluate_last_expression, result, silent=False, store_history=True):
 		# print 'IPythonKernel._queue_exec'
-		listener = result._listener   if result is not None   else None
+		listener = result._exec_listener   if result is not None   else None
 
 		if isinstance(code, str)  or  isinstance(code, unicode):
 			src = code
@@ -197,7 +201,7 @@ class IPythonKernel (python_kernel.AbstractPythonKernel):
 
 	def _queue_eval(self, module_name, expr, result):
 		# print 'IPythonKernel._queue_exec'
-		listener = result._listener   if result is not None   else None
+		listener = result._exec_listener   if result is not None   else None
 
 		if isinstance(expr, str)  or  isinstance(expr, unicode):
 			src = expr
@@ -390,7 +394,7 @@ class IPythonExecutionResult (execution_result.AbstractExecutionResult):
 
 		self.__kernel = kernel
 		self.__comm_manager = comm_manager
-		self._listener = _KernelListener(comm_manager, self)
+		self._exec_listener = self.new_kernel_request_listener()
 		self._error = None
 		self._result = None
 		self._aborted = False
@@ -398,6 +402,11 @@ class IPythonExecutionResult (execution_result.AbstractExecutionResult):
 		self._execution_count = None
 		self._widgets = []
 		self._visible_widgets = []
+
+
+	def new_kernel_request_listener(self):
+		return _KernelListener(self.__comm_manager, self)
+
 
 
 	def __default_comm_handler(self, comm, data):
@@ -415,7 +424,7 @@ class IPythonExecutionResult (execution_result.AbstractExecutionResult):
 
 
 	def result_finished(self):
-		self._listener.detach()
+		self._exec_listener.detach()
 
 
 	def clear(self):
@@ -474,6 +483,10 @@ class IPythonExecutionResult (execution_result.AbstractExecutionResult):
 		res = _text_result_style.applyTo(Column([NormalText(line)   for line in lines]))
 		self.set_result(res)
 
+
+	def clear_rich_display(self):
+		self._images = []
+		self._incr.onChanged()
 
 	def display_image(self, mime_type, image_data):
 		image_bytes = StringUtil.toBytes(image_data)
