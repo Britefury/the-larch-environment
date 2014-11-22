@@ -29,9 +29,9 @@ public class RealSlider extends Slider
 		
 	
 		protected RealSliderControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element, Painter backgroundPainter, Painter backgroundHoverPainter,
-				Paint pivotPaint, Painter valuePainter, double rounding, double min, double max, double pivot, RealSliderListener listener)
+				Paint pivotPaint, Painter valueBoxPainter, Painter valuePainter, double rounding, double min, double max, double pivot, RealSliderListener listener)
 		{
-			super( ctx, style, value, element, backgroundPainter, backgroundHoverPainter, pivotPaint, valuePainter, rounding );
+			super( ctx, style, value, element, backgroundPainter, backgroundHoverPainter, pivotPaint, valueBoxPainter, valuePainter, rounding );
 			
 			this.min = min;
 			this.max = max;
@@ -130,8 +130,9 @@ public class RealSlider extends Slider
 	
 	@Override
 	protected SliderControl createSliderControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element, Painter backgroundPainter, Painter backgroundHoverPainter,
-			Paint pivotPaint, Painter valuePainter, double rounding)
+			Paint pivotPaint, Painter valueBoxPainter, Painter valuePainter, double rounding)
 	{
-		return new RealSliderControl( ctx, style, value, element, backgroundPainter, backgroundHoverPainter, pivotPaint, valuePainter, rounding, min, max, pivot, listener );
+		return new RealSliderControl( ctx, style, value, element, backgroundPainter, backgroundHoverPainter,
+                pivotPaint, valueBoxPainter, valuePainter, rounding, min, max, pivot, listener );
 	}
 }
