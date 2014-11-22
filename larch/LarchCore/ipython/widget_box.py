@@ -4,7 +4,8 @@ from BritefuryJ.Live import LiveValue, LiveFunction
 from BritefuryJ.Controls import Button, Checkbox, IntSlider, ToggleButton
 
 from BritefuryJ.Pres import Pres
-from BritefuryJ.Pres.Primitive import Blank, Label, Row, Spacer, Column
+from BritefuryJ.Pres.Primitive import Primitive, Blank, Label, Row, Spacer, Column
+from BritefuryJ.StyleSheet import StyleSheet
 
 from LarchCore.ipython.widget import IPythonWidgetView
 
@@ -23,6 +24,9 @@ class ContainerView (IPythonWidgetView):
 		child_comm_ids = self._children
 		children = [self._widget_manager.get_by_comm_id(child_comm_id)   for child_comm_id in child_comm_ids]
 
-		return Column(children)
+		return self._container_style(Column(children))
+
+
+	_container_style = StyleSheet.style(Primitive.columnSpacing(3.0))
 
 
