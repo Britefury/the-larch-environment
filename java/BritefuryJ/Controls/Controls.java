@@ -147,8 +147,11 @@ public class Controls
 	public static final InheritedAttribute sliderBackgroundHoverPainter = new InheritedAttribute( controlsNamespace, "sliderBackgroundHoverPainter", Painter.class,
 			new OutlinePainter( new Color( 0.5f, 0.5f, 0.5f ), new BasicStroke( 1.0f ) ) );
 	public static final InheritedAttributeNonNull sliderPivotPaint = new InheritedAttributeNonNull( controlsNamespace, "sliderPivotPaint", Paint.class, new Color( 255, 143, 0 ) );
+	public static final InheritedAttributeNonNull sliderValueBoxPainter = new InheritedAttributeNonNull( controlsNamespace, "sliderValueBoxPainter", Painter.class,
+			new FillPainter( new Color( 255, 217, 128) ) );
 	public static final InheritedAttributeNonNull sliderValuePainter = new InheritedAttributeNonNull( controlsNamespace, "sliderValuePainter", Painter.class,
-			new FillPainter( new Color( 255, 194, 51 ) ) );
+            new FilledOutlinePainter(new Color(255, 194, 51),
+                    new Color(179, 152, 89)));
 	public static final InheritedAttributeNonNull sliderRounding = new InheritedAttributeNonNull( controlsNamespace, "sliderDragboxRounding", Double.class, 6.0 );
 	public static final InheritedAttributeNonNull sliderSize = new InheritedAttributeNonNull( controlsNamespace, "sliderSize", Double.class, 16.0 );
 	
