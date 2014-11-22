@@ -4,3 +4,4 @@ from LarchCore.ipython.widget_button import *
 from LarchCore.ipython.widget_bool import *
 from LarchCore.ipython.widget_int import *
 from LarchCore.ipython.widget_float import *
+from LarchCore.ipython.widget_string import *
