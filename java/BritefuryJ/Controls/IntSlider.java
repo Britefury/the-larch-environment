@@ -29,9 +29,9 @@ public class IntSlider extends Slider
 		
 	
 		protected IntSliderControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element, Painter backgroundPainter, Painter backgroundHoverPainter,
-				Paint pivotPaint, Painter valuePainter, double rounding, int min, int max, int pivot, IntSliderListener listener)
+				Paint pivotPaint, Painter valueBoxPainter, Painter valuePainter, double rounding, int min, int max, int pivot, IntSliderListener listener)
 		{
-			super( ctx, style, value, element, backgroundPainter, backgroundHoverPainter, pivotPaint, valuePainter, rounding );
+			super( ctx, style, value, element, backgroundPainter, backgroundHoverPainter, pivotPaint, valueBoxPainter, valuePainter, rounding );
 			
 			this.min = min;
 			this.max = max;
@@ -131,8 +131,9 @@ public class IntSlider extends Slider
 	
 	@Override
 	protected SliderControl createSliderControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element, Painter backgroundPainter, Painter backgroundHoverPainter,
-			Paint pivotPaint, Painter valuePainter, double rounding)
+			Paint pivotPaint, Painter valueBoxPainter, Painter valuePainter, double rounding)
 	{
-		return new IntSliderControl( ctx, style, value, element, backgroundPainter, backgroundHoverPainter, pivotPaint, valuePainter, rounding, min, max, pivot, listener );
+		return new IntSliderControl( ctx, style, value, element, backgroundPainter, backgroundHoverPainter,
+                pivotPaint, valueBoxPainter, valuePainter, rounding, min, max, pivot, listener );
 	}
 }
