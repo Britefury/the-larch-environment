@@ -446,7 +446,7 @@ public class BubblePopup
 	public static PresentationPopupWindow popupInBubbleAdjacentToMouse(Object contents, LSElement target, Anchor popupAnchor, boolean closeAutomatically, boolean requestFocus)
 	{
         Point mouse = MouseInfo.getPointerInfo().getLocation();
-		Point2 mousePos = new Point2((double)mouse.x, (double)mouse.y);
+        Point2 mousePos = new Point2((double)mouse.x, (double)mouse.y);
 		MouseBubblePres b = new MouseBubblePres( contents, mousePos );
 		
 		return b.popupAtMousePosition( target, popupAnchor, closeAutomatically, requestFocus );

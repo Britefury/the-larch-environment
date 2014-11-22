@@ -13,6 +13,7 @@ import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.Arc2D;
 import java.awt.geom.RoundRectangle2D;
 
 import BritefuryJ.Graphics.Painter;
@@ -76,9 +77,12 @@ public abstract class Slider extends ControlPres
 				
 				double x = Math.min( pivotPos, valuePos );
 				double w = Math.abs( valuePos - pivotPos );
-				Shape valueShape = new Rectangle2D.Double( x, 0.0, w, size.y );
-				valuePainter.drawShape( graphics, valueShape );
-				
+				Shape valueBoxShape = new Rectangle2D.Double( x, 0.0, w, size.y );
+				valueBoxPainter.drawShape( graphics, valueBoxShape );
+
+                Shape valueShape = new Arc2D.Double(valuePos - size.y*0.5, 0.0, size.y, size.y, 0.0, 360.0, Arc2D.CHORD);
+                valuePainter.drawShape( graphics, valueShape );
+
 
 				// Draw pivot
 				if ( pivot != min  &&  pivot != max )
@@ -152,13 +156,21 @@ public abstract class Slider extends ControlPres
 				Vector2 size = element.getActualSize();
 
 				double valueFrac = pos.x / size.x;
+                double step = getSliderStep();
 				
 				valueFrac = Math.min( Math.max( valueFrac, 0.0 ), 1.0 );
 				
 				double min = getSliderMin();
 				double max = getSliderMax();
-				double value = min  +  ( max - min ) * valueFrac;
-				
+                double valueOffset = (max - min) * valueFrac;
+
+                if (step != 0.0) {
+                    double steps = Math.round(valueOffset / step);
+                    valueOffset = steps * step;
+                }
+
+                double value = min + valueOffset;
+
 				changeValue( value );
 			}
 		}
@@ -169,14 +181,14 @@ public abstract class Slider extends ControlPres
 		
 		protected LSElement element;
 		
-		private Painter backgroundPainter, backgroundHoverPainter, valuePainter;
+		private Painter backgroundPainter, backgroundHoverPainter, valueBoxPainter, valuePainter;
 		private Paint pivotPaint;
 		private double rounding; 
 		
 		
 		
 		public SliderControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element, Painter backgroundPainter, Painter backgroundHoverPainter,
-				Paint pivotPaint, Painter valuePainter, double rounding)
+				Paint pivotPaint, Painter valueBoxPainter, Painter valuePainter, double rounding)
 		{
 			super( ctx, style );
 			
@@ -187,6 +199,7 @@ public abstract class Slider extends ControlPres
 			this.backgroundPainter = backgroundPainter;
 			this.backgroundHoverPainter = backgroundHoverPainter;
 			this.pivotPaint = pivotPaint;
+            this.valueBoxPainter = valueBoxPainter;
 			this.valuePainter = valuePainter;
 			this.rounding = rounding;
 
@@ -214,6 +227,7 @@ public abstract class Slider extends ControlPres
 		
 		protected abstract double getSliderMin();
 		protected abstract double getSliderMax();
+		protected abstract double getSliderStep();
 		protected abstract double getSliderPivot();
 		protected abstract double getSliderValue();
 		protected abstract void changeValue(double value);
@@ -255,6 +269,7 @@ public abstract class Slider extends ControlPres
 		Painter backgroundPainter = style.get( Controls.sliderBackgroundPainter, Painter.class );
 		Painter backgroundHoverPainter = style.get( Controls.sliderBackgroundHoverPainter, Painter.class );
 		Paint pivotPaint = style.get( Controls.sliderPivotPaint, Paint.class );
+		Painter valueBoxPainter = style.get( Controls.sliderValueBoxPainter, Painter.class );
 		Painter valuePainter = style.get( Controls.sliderValuePainter, Painter.class );
 		double rounding = style.get( Controls.sliderRounding, Double.class );
 		double size = style.get( Controls.sliderSize, Double.class ); 
@@ -266,12 +281,13 @@ public abstract class Slider extends ControlPres
 		
 		LSElement element = slider.present( ctx, style );
 		
-		return createSliderControl( ctx, style, value, element, backgroundPainter, backgroundHoverPainter, pivotPaint, valuePainter, rounding );
+		return createSliderControl( ctx, style, value, element, backgroundPainter, backgroundHoverPainter,
+                pivotPaint, valueBoxPainter, valuePainter, rounding );
 	}
 	
 	private static final StyleSheet boxStyle = StyleSheet.style( Primitive.shapePainter.as( null ), Primitive.hoverShapePainter.as( null ) );
 	
 	
 	protected abstract SliderControl createSliderControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element, Painter backgroundPainter, Painter backgroundHoverPainter,
-			Paint pivotPaint, Painter valuePainter, double rounding);
+			Paint pivotPaint, Painter valueBoxPainter, Painter valuePainter, double rounding);
 }
