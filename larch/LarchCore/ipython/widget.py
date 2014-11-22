@@ -58,7 +58,13 @@ class IPythonWidgetModel (object):
 		self.__kernel_listener = self.result.new_kernel_request_listener()
 
 
-	def send(self, msg):
+	def send_sync(self, sync_data):
+		self.__send({'method': 'backbone', 'sync_data': sync_data})
+
+	def send_custom(self, content):
+		self.__send({'method': 'custom', 'content': content})
+
+	def __send(self, msg):
 		self.comm.send(msg, listener=self.__kernel_listener)
 
 

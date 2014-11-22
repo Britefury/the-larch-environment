@@ -15,7 +15,7 @@ class CheckboxView (IPythonWidgetView):
 		def _on_change(control, new_value):
 			sync_data = {'value': new_value}
 			self._internal_update(sync_data)
-			self.model.send({'method': 'backbone', 'sync_data': sync_data})
+			self.model.send_sync(sync_data)
 			value_live.setLiteralValue(new_value)
 
 		value = bool(self.value)
@@ -29,7 +29,7 @@ class ToggleButtonView (IPythonWidgetView):
 		def _on_change(control, new_value):
 			sync_data = {'value': new_value}
 			self._internal_update(sync_data)
-			self.model.send({'method': 'backbone', 'sync_data': sync_data})
+			self.model.send_sync(sync_data)
 			value_live.setLiteralValue(new_value)
 
 		value = bool(self.value)
