@@ -156,13 +156,21 @@ public abstract class Slider extends ControlPres
 				Vector2 size = element.getActualSize();
 
 				double valueFrac = pos.x / size.x;
+                double step = getSliderStep();
 				
 				valueFrac = Math.min( Math.max( valueFrac, 0.0 ), 1.0 );
 				
 				double min = getSliderMin();
 				double max = getSliderMax();
-				double value = min  +  ( max - min ) * valueFrac;
-				
+                double valueOffset = (max - min) * valueFrac;
+
+                if (step != 0.0) {
+                    double steps = Math.round(valueOffset / step);
+                    valueOffset = steps * step;
+                }
+
+                double value = min + valueOffset;
+
 				changeValue( value );
 			}
 		}
@@ -219,6 +227,7 @@ public abstract class Slider extends ControlPres
 		
 		protected abstract double getSliderMin();
 		protected abstract double getSliderMax();
+		protected abstract double getSliderStep();
 		protected abstract double getSliderPivot();
 		protected abstract double getSliderValue();
 		protected abstract void changeValue(double value);

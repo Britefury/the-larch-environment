@@ -24,17 +24,18 @@ public class IntSlider extends Slider
 
 	public static class IntSliderControl extends SliderControl
 	{
-		private int min, max, pivot;
+		private int min, max, step, pivot;
 		private IntSliderListener listener;
 		
 	
 		protected IntSliderControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element, Painter backgroundPainter, Painter backgroundHoverPainter,
-				Paint pivotPaint, Painter valueBoxPainter, Painter valuePainter, double rounding, int min, int max, int pivot, IntSliderListener listener)
+				Paint pivotPaint, Painter valueBoxPainter, Painter valuePainter, double rounding, int min, int max, int step, int pivot, IntSliderListener listener)
 		{
 			super( ctx, style, value, element, backgroundPainter, backgroundHoverPainter, pivotPaint, valueBoxPainter, valuePainter, rounding );
 			
 			this.min = min;
 			this.max = max;
+			this.step = step;
 			this.pivot = pivot;
 			this.listener = listener;
 	
@@ -53,11 +54,16 @@ public class IntSlider extends Slider
 			return max;
 		}
 		
+		protected double getSliderStep()
+		{
+			return step;
+		}
+		
 		protected double getSliderPivot()
 		{
 			return pivot;
 		}
-		
+
 		protected double getSliderValue()
 		{
 			Integer val = (Integer)value.getStaticValue();
@@ -68,7 +74,9 @@ public class IntSlider extends Slider
 		protected void changeValue(double newValue)
 		{
 			int currentValue = (Integer)value.getStaticValue();
-			int val = Math.min( Math.max( (int)( newValue + 0.5 ), min ), max );
+            double offset = newValue - min;
+            int intOffset = (int)(offset + 0.5);
+			int val = Math.min( Math.max( min+intOffset, min ), max );
 			if ( val != currentValue )
 			{
 				//value.setLiteralValue( val );
@@ -99,32 +107,33 @@ public class IntSlider extends Slider
 
 
 	
-	private int min, max, pivot;
+	private int min, max, step, pivot;
 	private IntSliderListener listener;
 	
 	
-	private IntSlider(LiveSource valueSource, int min, int max, int pivot, double width, IntSliderListener listener)
+	private IntSlider(LiveSource valueSource, int min, int max, int step, int pivot, double width, IntSliderListener listener)
 	{
 		super( valueSource, width );
 		this.min = min;
 		this.max = max;
+		this.step = step;
 		this.pivot = pivot;
 		this.listener = listener;
 	}
 	
-	public IntSlider(int initialValue, int min, int max, int pivot, double width, IntSliderListener listener)
+	public IntSlider(int initialValue, int min, int max, int step, int pivot, double width, IntSliderListener listener)
 	{
-		this( new LiveSourceValue( initialValue ), min, max, pivot, width, listener );
+		this( new LiveSourceValue( initialValue ), min, max, step, pivot, width, listener );
 	}
 	
-	public IntSlider(LiveInterface value, int min, int max, int pivot, double width, IntSliderListener listener)
+	public IntSlider(LiveInterface value, int min, int max, int step, int pivot, double width, IntSliderListener listener)
 	{
-		this( new LiveSourceRef( value ), min, max, pivot, width, listener );
+		this( new LiveSourceRef( value ), min, max, step, pivot, width, listener );
 	}
 	
-	public IntSlider(LiveValue value, int min, int max, int pivot, double width)
+	public IntSlider(LiveValue value, int min, int max, int step, int pivot, double width)
 	{
-		this( new LiveSourceRef( value ), min, max, pivot, width, new CommitListener( value ) );
+		this( new LiveSourceRef( value ), min, max, step, pivot, width, new CommitListener( value ) );
 	}
 	
 	
@@ -134,6 +143,6 @@ public class IntSlider extends Slider
 			Paint pivotPaint, Painter valueBoxPainter, Painter valuePainter, double rounding)
 	{
 		return new IntSliderControl( ctx, style, value, element, backgroundPainter, backgroundHoverPainter,
-                pivotPaint, valueBoxPainter, valuePainter, rounding, min, max, pivot, listener );
+                pivotPaint, valueBoxPainter, valuePainter, rounding, min, max, step, pivot, listener );
 	}
 }

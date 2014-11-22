@@ -40,9 +40,9 @@ public class SliderTestPage extends TestPage
 	protected Pres createContents()
 	{
 		LiveValue realValue = new LiveValue( -5.0 );
-		LiveValue intValue = new LiveValue( -5 );
-		RealSlider realSlider = new RealSlider( realValue, -10.0, 10.0, 0.0, 300.0 );
-		IntSlider intSlider = new IntSlider( intValue, -10, 10, 0, 300.0 );
+		LiveValue intValue = new LiveValue( -6 );
+		RealSlider realSlider = new RealSlider( realValue, -10.0, 10.0, 0.5, 0.0, 300.0 );
+		IntSlider intSlider = new IntSlider( intValue, -10, 10, 2, 0, 300.0 );
 		
 		Pres realLine = StyleSheet.style( Primitive.rowSpacing.as( 20.0 ) ).applyTo( new Row( new Object[] { new Label( "Real number: " ),
 			    new SpaceBin( 200.0, -1.0, realSlider.alignHExpand() ).alignVCentre(), realValue } ).padX( 5.0 ) );
