@@ -23,10 +23,11 @@ class FloatSliderView (IPythonWidgetView):
 		value_live = LiveValue(value)
 		slider_min = float(self.min)
 		slider_max = float(self.max)
+		slider_step = float(self.step)
 		if slider_min >= 0  or  slider_max <= 0:
 			pivot = int((slider_min + slider_max) * 0.5)
 		else:
 			pivot = 0
-		return Row([Label(self.description), Spacer(10.0, 0.0), RealSlider(value_live, slider_min, slider_max, pivot, 400.0, _on_change)])
+		return Row([Label(self.description), Spacer(10.0, 0.0), RealSlider(value_live, slider_min, slider_max, slider_step, pivot, 400.0, _on_change)])
 
 

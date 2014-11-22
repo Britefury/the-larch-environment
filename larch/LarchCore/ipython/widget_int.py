@@ -23,10 +23,11 @@ class IntSliderView (IPythonWidgetView):
 		value_live = LiveValue(value)
 		slider_min = int(self.min)
 		slider_max = int(self.max)
+		slider_step = int(self.step)
 		if slider_min >= 0  or  slider_max <= 0:
 			pivot = int((slider_min + slider_max) * 0.5)
 		else:
 			pivot = 0
-		return Row([Label(self.description), Spacer(10.0, 0.0), IntSlider(value_live, slider_min, slider_max, pivot, 400.0, _on_change)])
+		return Row([Label(self.description), Spacer(10.0, 0.0), IntSlider(value_live, slider_min, slider_max, slider_step, pivot, 400.0, _on_change)])
 
 
