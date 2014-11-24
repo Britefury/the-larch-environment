@@ -39,7 +39,7 @@ public abstract class AbstractSlider extends ControlPres
 {
 	public abstract static class AbstractSliderControl extends Control implements IncrementalMonitorListener
 	{
-		protected abstract class AbstractSliderInteractor implements ElementPainter, DragElementInteractor
+		protected abstract class AbstractSliderInteractor implements ElementPainter
 		{
 			@Override
 			public void drawBackground(LSElement element, Graphics2D graphics)
@@ -108,16 +108,9 @@ public abstract class AbstractSlider extends ControlPres
 			this.backgroundHoverPainter = backgroundHoverPainter;
 			this.rounding = rounding;
 
-			AbstractSliderInteractor sliderInteractor = createInteractor();
-			element.addElementInteractor( sliderInteractor );
-			element.addPainter( sliderInteractor );
-
 			element.setFixedValue( value.elementValueFunction() );
 		}
 
-
-        protected abstract AbstractSliderInteractor createInteractor();
-		
 		
 		public LiveInterface getValue()
 		{
@@ -135,12 +128,10 @@ public abstract class AbstractSlider extends ControlPres
 		
 		protected abstract double getSliderMin();
 		protected abstract double getSliderMax();
-		protected abstract double getSliderStep();
 
 
-        protected double applyStep(double value) {
+        protected double applyStep(double value, double step) {
             double min = getSliderMin();
-            double step = getSliderStep();
             double valueOffset = value - min;
 
             if (step != 0.0) {

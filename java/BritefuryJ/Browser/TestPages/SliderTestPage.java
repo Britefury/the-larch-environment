@@ -6,10 +6,7 @@
 //##************************
 package BritefuryJ.Browser.TestPages;
 
-import BritefuryJ.Controls.IntRangeSlider;
-import BritefuryJ.Controls.IntSlider;
-import BritefuryJ.Controls.RealRangeSlider;
-import BritefuryJ.Controls.RealSlider;
+import BritefuryJ.Controls.*;
 import BritefuryJ.Live.LiveFunction;
 import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.Pres;
@@ -19,6 +16,7 @@ import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Pres.Primitive.SpaceBin;
 import BritefuryJ.Pres.RichText.Body;
+import BritefuryJ.Pres.UI.Section;
 import BritefuryJ.Pres.UI.SectionHeading2;
 import BritefuryJ.StyleSheet.StyleSheet;
 
@@ -82,8 +80,10 @@ public class SliderTestPage extends TestPage
 		LiveValue intValue = new LiveValue( -6 );
         final LiveValue realRangeValue = new LiveValue(new double[]{-5.0, 5.0});
         final LiveValue intRangeValue = new LiveValue(new int[]{-6, 6});
-		RealSlider realSlider = new RealSlider( realValue, -10.0, 10.0, 0.5, 0.0, 300.0 );
-		IntSlider intSlider = new IntSlider( intValue, -10, 10, 2, 0, 300.0 );
+		RealSlider realSlider = new RealSlider( realValue, -10.0, 10.0, 0.5, 300.0 );
+		IntSlider intSlider = new IntSlider( intValue, -10, 10, 2, 300.0 );
+        RealProgressBar realProgress = new RealProgressBar(realValue, -10.0, 10.0, 300.0);
+        IntProgressBar intProgress = new IntProgressBar(intValue, -10, 10, 300.0);
         RealRangeSlider realRangeSlider = new RealRangeSlider(realRangeValue, -10.0, 10.0, 0.5, 300.0);
         IntRangeSlider intRangeSlider = new IntRangeSlider(intRangeValue, -10, 10, 2, 300.0);
 
@@ -97,18 +97,24 @@ public class SliderTestPage extends TestPage
 			    new SpaceBin( 200.0, -1.0, realSlider.alignHExpand() ).alignVCentre(), realValue } ).padX( 5.0 ) );
 		Pres intLine = StyleSheet.style( Primitive.rowSpacing.as( 20.0 ) ).applyTo( new Row( new Object[] { new Label( "Integer: " ),
 			    new SpaceBin( 200.0, -1.0, intSlider.alignHExpand() ).alignVCentre(), intValue } ).padX( 5.0 ) );
+		Pres realProgLine = StyleSheet.style( Primitive.rowSpacing.as( 20.0 ) ).applyTo( new Row( new Object[] { new Label( "Real number progress bar: " ),
+			    new SpaceBin( 200.0, -1.0, realProgress.alignHExpand() ).alignVCentre(), realValue } ).padX( 5.0 ) );
+		Pres intProgLine = StyleSheet.style( Primitive.rowSpacing.as( 20.0 ) ).applyTo( new Row( new Object[] { new Label( "Integer progress bar: " ),
+			    new SpaceBin( 200.0, -1.0, intProgress.alignHExpand() ).alignVCentre(), intValue } ).padX( 5.0 ) );
         Pres realRangeLine = StyleSheet.style( Primitive.rowSpacing.as( 20.0 ) ).applyTo( new Row( new Object[] { new Label( "Real range: " ),
                 new SpaceBin( 200.0, -1.0, realRangeSlider.alignHExpand() ).alignVCentre(),
                 realRangeLower, new Label(":"), realRangeUpper } ).padX( 5.0 ) );
         Pres intRangeLine = StyleSheet.style( Primitive.rowSpacing.as( 20.0 ) ).applyTo( new Row( new Object[] { new Label( "Integer range: " ),
                 new SpaceBin( 200.0, -1.0, intRangeSlider.alignHExpand() ).alignVCentre(),
                 intRangeLower, new Label(":"), intRangeUpper } ).padX( 5.0 ) );
-		Pres spinEntrySectionContents = new Column( new Pres[] {
-                new Label("Numeric value sliders:"),
-                realLine, intLine,
-                new Label("Ranged sliders:"),
-                realRangeLine, intRangeLine } );
-		
-		return new Body( new Pres[] { new SectionHeading2( "Sliders" ), spinEntrySectionContents } );
+
+        Pres numericSection = new Section(new SectionHeading2("Numeric value sliders"),
+                new Column(new Pres[] {realLine, intLine}));
+        Pres progressSection = new Section(new SectionHeading2("Progress bars"),
+                new Column(new Pres[] {realProgLine, intProgLine}));
+        Pres rangeSection = new Section(new SectionHeading2("Ranged sliders"),
+                new Column(new Pres[] {realRangeLine, intRangeLine}));
+
+		return new Body( new Pres[] { numericSection, progressSection, rangeSection } );
 	}
 }

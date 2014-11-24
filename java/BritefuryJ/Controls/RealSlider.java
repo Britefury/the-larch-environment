@@ -24,19 +24,18 @@ public class RealSlider extends NumericSlider
 
 	public static class RealSliderControl extends NumericSliderControl
 	{
-		private double min, max, step, pivot;
+		private double min, max, step;
 		private RealSliderListener listener;
 		
 	
 		protected RealSliderControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element, Painter backgroundPainter, Painter backgroundHoverPainter,
-				Paint pivotPaint, Painter valueBoxPainter, Painter valuePainter, Painter valueHighlightPainter, double rounding, double min, double max, double step, double pivot, RealSliderListener listener)
+				Painter valuePainter, Painter valueHighlightPainter, double rounding, double min, double max, double step, RealSliderListener listener)
 		{
-			super( ctx, style, value, element, backgroundPainter, backgroundHoverPainter, pivotPaint, valueBoxPainter, valuePainter, valueHighlightPainter, rounding );
+			super( ctx, style, value, element, backgroundPainter, backgroundHoverPainter, valuePainter, valueHighlightPainter, rounding );
 			
 			this.min = min;
 			this.max = max;
 			this.step = step;
-			this.pivot = pivot;
 			this.listener = listener;
 	
 			element.setFixedValue( value.elementValueFunction() );
@@ -59,11 +58,6 @@ public class RealSlider extends NumericSlider
 			return step;
 		}
 		
-		protected double getSliderPivot()
-		{
-			return pivot;
-		}
-
 		protected double getSliderValue()
 		{
 			return (Double)value.getStaticValue();
@@ -104,42 +98,41 @@ public class RealSlider extends NumericSlider
 
 
 	
-	private double min, max, step, pivot;
+	private double min, max, step;
 	private RealSliderListener listener;
 	
 	
-	private RealSlider(LiveSource valueSource, double min, double max, double step, double pivot, double width, RealSliderListener listener)
+	private RealSlider(LiveSource valueSource, double min, double max, double step, double width, RealSliderListener listener)
 	{
 		super( valueSource, width );
 		this.min = min;
 		this.max = max;
 		this.step = step;
-		this.pivot = pivot;
 		this.listener = listener;
 	}
 	
-	public RealSlider(double initialValue, double min, double max, double step, double pivot, double width, RealSliderListener listener)
+	public RealSlider(double initialValue, double min, double max, double step, double width, RealSliderListener listener)
 	{
-		this( new LiveSourceValue( initialValue ), min, max, step, pivot, width, listener );
+		this( new LiveSourceValue( initialValue ), min, max, step, width, listener );
 	}
 	
-	public RealSlider(LiveInterface value, double min, double max, double step, double pivot, double width, RealSliderListener listener)
+	public RealSlider(LiveInterface value, double min, double max, double step, double width, RealSliderListener listener)
 	{
-		this( new LiveSourceRef( value ), min, max, step, pivot, width, listener );
+		this( new LiveSourceRef( value ), min, max, step, width, listener );
 	}
 	
-	public RealSlider(LiveValue value, double min, double max, double step, double pivot, double width)
+	public RealSlider(LiveValue value, double min, double max, double step, double width)
 	{
-		this( new LiveSourceRef( value ), min, max, step, pivot, width, new CommitListener( value ) );
+		this( new LiveSourceRef( value ), min, max, step, width, new CommitListener( value ) );
 	}
 	
 	
 	
 	@Override
 	protected AbstractSliderControl createSliderControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element, Painter backgroundPainter, Painter backgroundHoverPainter,
-			Paint pivotPaint, Painter valueBoxPainter, Painter valuePainter, Painter valueHighlightPainter, double rounding)
+			Painter valuePainter, Painter valueHighlightPainter, double rounding)
 	{
 		return new RealSliderControl( ctx, style, value, element, backgroundPainter, backgroundHoverPainter,
-                pivotPaint, valueBoxPainter, valuePainter, valueHighlightPainter, rounding, min, max, step, pivot, listener );
+                valuePainter, valueHighlightPainter, rounding, min, max, step, listener );
 	}
 }

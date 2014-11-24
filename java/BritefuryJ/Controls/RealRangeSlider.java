@@ -158,7 +158,7 @@ public class RealRangeSlider extends RangeSlider
     @Override
     protected AbstractSliderControl createSliderControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element,
                                                         Painter backgroundPainter, Painter backgroundHoverPainter,
-                                                        Paint pivotPaint, Painter valueBoxPainter, Painter valuePainter, Painter valueHighlightPainter, double rounding)
+                                                        Painter valueBoxPainter, Painter valuePainter, Painter valueHighlightPainter, double rounding)
     {
         return new RealRangeSliderControl( ctx, style, value, element, backgroundPainter, backgroundHoverPainter,
                 valueBoxPainter, valuePainter, valueHighlightPainter, rounding, min, max, step, listener );

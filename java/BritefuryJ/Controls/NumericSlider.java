@@ -10,6 +10,7 @@ import BritefuryJ.Graphics.Painter;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerMotionEvent;
+import BritefuryJ.LSpace.Interactor.DragElementInteractor;
 import BritefuryJ.LSpace.Interactor.HoverElementInteractor;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Live.LiveInterface;
@@ -31,42 +32,21 @@ public abstract class NumericSlider extends AbstractSlider {
     public abstract static class NumericSliderControl extends AbstractSlider.AbstractSliderControl
     {
         protected class NumericSliderInteractor extends AbstractSlider.AbstractSliderControl.AbstractSliderInteractor
-                implements HoverElementInteractor
+                implements HoverElementInteractor, DragElementInteractor
         {
             private boolean highlight = false;
 
             @Override
             protected void drawValue(Graphics2D graphics, Vector2 size, double min, double max) {
-                double pivot = getSliderPivot();
                 double val = getSliderValue();
 
 
-                double pivotFrac = ( pivot - min )  /  ( max - min );
-                double pivotPos = size.x * pivotFrac;
-
-
-                // Draw value
                 double valueFrac = ( val - min ) / ( max - min );
                 double valuePos = size.x * valueFrac;
-
-                double x = Math.min( pivotPos, valuePos );
-                double w = Math.abs( valuePos - pivotPos );
-                Shape valueBoxShape = new Rectangle2D.Double( x, 0.0, w, size.y );
-                valueBoxPainter.drawShape( graphics, valueBoxShape );
 
                 Shape valueShape = new Arc2D.Double(valuePos - size.y*0.5, 0.0, size.y, size.y, 0.0, 360.0, Arc2D.CHORD);
                 Painter valPainter = highlight ? valueHighlightPainter  :  valuePainter;
                 valPainter.drawShape( graphics, valueShape );
-
-
-                // Draw pivot
-                if ( pivot != min  &&  pivot != max )
-                {
-                    Shape pivotShape = new Line2D.Double( pivotPos, 0.0, pivotPos, size.y );
-                    graphics.setPaint( pivotPaint );
-                    graphics.setStroke( new BasicStroke( 1.0f ) );
-                    graphics.draw( pivotShape );
-                }
             }
 
 
@@ -124,7 +104,7 @@ public abstract class NumericSlider extends AbstractSlider {
                 double max = getSliderMax();
 
                 double value = min + (max - min) * valueFrac;
-                value = applyStep(value);
+                value = applyStep(value, getSliderStep());
 
                 changeValue( value );
             }
@@ -132,26 +112,22 @@ public abstract class NumericSlider extends AbstractSlider {
 
 
 
-        private Painter valueBoxPainter, valuePainter, valueHighlightPainter;
-        private Paint pivotPaint;
+        private Painter valuePainter, valueHighlightPainter;
 
 
 
         public NumericSliderControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element,
                                     Painter backgroundPainter, Painter backgroundHoverPainter,
-                                    Paint pivotPaint, Painter valueBoxPainter, Painter valuePainter, Painter valueHighlightPainter, double rounding)
+                                    Painter valuePainter, Painter valueHighlightPainter, double rounding)
         {
             super(ctx, style, value, element, backgroundPainter, backgroundHoverPainter, rounding);
 
-            this.pivotPaint = pivotPaint;
-            this.valueBoxPainter = valueBoxPainter;
             this.valuePainter = valuePainter;
             this.valueHighlightPainter = valueHighlightPainter;
-        }
 
-        @Override
-        protected AbstractSliderInteractor createInteractor() {
-            return new NumericSliderInteractor();
+            NumericSliderInteractor sliderInteractor = new NumericSliderInteractor();
+            element.addPainter( sliderInteractor );
+            element.addElementInteractor( sliderInteractor );
         }
 
         public LiveInterface getValue()
@@ -168,8 +144,8 @@ public abstract class NumericSlider extends AbstractSlider {
 
 
 
-        protected abstract double getSliderPivot();
         protected abstract double getSliderValue();
+        protected abstract double getSliderStep();
         protected abstract void changeValue(double value);
 
 
@@ -205,8 +181,6 @@ public abstract class NumericSlider extends AbstractSlider {
 
         Painter backgroundPainter = style.get( Controls.sliderBackgroundPainter, Painter.class );
         Painter backgroundHoverPainter = style.get( Controls.sliderBackgroundHoverPainter, Painter.class );
-        Paint pivotPaint = style.get( Controls.sliderPivotPaint, Paint.class );
-        Painter valueBoxPainter = style.get( Controls.sliderValueBoxPainter, Painter.class );
         Painter valuePainter = style.get( Controls.sliderValuePainter, Painter.class );
         Painter valueHighlightPainter = style.get(Controls.sliderValueHighlightPainter, Painter.class);
         double rounding = style.get( Controls.sliderRounding, Double.class );
@@ -220,11 +194,12 @@ public abstract class NumericSlider extends AbstractSlider {
         LSElement element = slider.present( ctx, style );
 
         return createSliderControl( ctx, style, value, element, backgroundPainter, backgroundHoverPainter,
-                pivotPaint, valueBoxPainter, valuePainter, valueHighlightPainter, rounding );
+                valuePainter, valueHighlightPainter, rounding );
     }
 
     private static final StyleSheet boxStyle = StyleSheet.style( Primitive.shapePainter.as( null ), Primitive.hoverShapePainter.as( null ) );
 
 
-    protected abstract AbstractSliderControl createSliderControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element, Painter backgroundPainter, Painter backgroundHoverPainter,
-                                                                 Paint pivotPaint, Painter valueBoxPainter, Painter valuePainter, Painter valueHighlightPainter, double rounding);}
+    protected abstract AbstractSliderControl createSliderControl(PresentationContext ctx, StyleValues style, LiveInterface value,
+                                                                 LSElement element, Painter backgroundPainter, Painter backgroundHoverPainter,
+                                                                 Painter valuePainter, Painter valueHighlightPainter, double rounding);}
