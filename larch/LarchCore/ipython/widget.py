@@ -84,7 +84,8 @@ class IPythonWidgetModel (object):
 
 
 	def display(self, result):
-		self._view.on_display()
+		if self._view is not None:
+			self._view.on_display()
 		result._display_widget(self)
 
 	def _on_message(self, comm, data, kernel_request_listener):
