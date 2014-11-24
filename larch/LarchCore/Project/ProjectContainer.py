@@ -94,8 +94,21 @@ class ProjectContainer (ProjectNode):
 	
 	def remove(self, x):
 		self._contents.remove( x )
-		
-		
+
+
+
+	def register_importable_modules(self):
+		for x in self._contents:
+			x.register_importable_modules()
+
+	def unregister_importable_modules(self):
+		for x in self._contents:
+			x.unregister_importable_modules()
+
+	def update_importable_modules(self):
+		for x in self._contents:
+			x.update_importable_modules()
+
 
 		
 	@property
