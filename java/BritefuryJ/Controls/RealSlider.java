@@ -15,23 +15,23 @@ import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
 
-public class RealSlider extends Slider
+public class RealSlider extends NumericSlider
 {
 	public static interface RealSliderListener
 	{
 		public void onSliderValueChanged(RealSliderControl spinEntry, double value);
 	}
 
-	public static class RealSliderControl extends SliderControl
+	public static class RealSliderControl extends NumericSliderControl
 	{
 		private double min, max, step, pivot;
 		private RealSliderListener listener;
 		
 	
 		protected RealSliderControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element, Painter backgroundPainter, Painter backgroundHoverPainter,
-				Paint pivotPaint, Painter valueBoxPainter, Painter valuePainter, double rounding, double min, double max, double step, double pivot, RealSliderListener listener)
+				Paint pivotPaint, Painter valueBoxPainter, Painter valuePainter, Painter valueHighlightPainter, double rounding, double min, double max, double step, double pivot, RealSliderListener listener)
 		{
-			super( ctx, style, value, element, backgroundPainter, backgroundHoverPainter, pivotPaint, valueBoxPainter, valuePainter, rounding );
+			super( ctx, style, value, element, backgroundPainter, backgroundHoverPainter, pivotPaint, valueBoxPainter, valuePainter, valueHighlightPainter, rounding );
 			
 			this.min = min;
 			this.max = max;
@@ -136,10 +136,10 @@ public class RealSlider extends Slider
 	
 	
 	@Override
-	protected SliderControl createSliderControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element, Painter backgroundPainter, Painter backgroundHoverPainter,
-			Paint pivotPaint, Painter valueBoxPainter, Painter valuePainter, double rounding)
+	protected AbstractSliderControl createSliderControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element, Painter backgroundPainter, Painter backgroundHoverPainter,
+			Paint pivotPaint, Painter valueBoxPainter, Painter valuePainter, Painter valueHighlightPainter, double rounding)
 	{
 		return new RealSliderControl( ctx, style, value, element, backgroundPainter, backgroundHoverPainter,
-                pivotPaint, valueBoxPainter, valuePainter, rounding, min, max, step, pivot, listener );
+                pivotPaint, valueBoxPainter, valuePainter, valueHighlightPainter, rounding, min, max, step, pivot, listener );
 	}
 }

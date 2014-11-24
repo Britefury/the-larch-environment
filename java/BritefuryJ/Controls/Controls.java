@@ -152,6 +152,9 @@ public class Controls
 	public static final InheritedAttributeNonNull sliderValuePainter = new InheritedAttributeNonNull( controlsNamespace, "sliderValuePainter", Painter.class,
             new FilledOutlinePainter(new Color(255, 194, 51),
                     new Color(179, 152, 89)));
+	public static final InheritedAttributeNonNull sliderValueHighlightPainter = new InheritedAttributeNonNull( controlsNamespace, "sliderValueHighlightPainter", Painter.class,
+            new FilledOutlinePainter(new Color(255, 153, 51),
+                    new Color(179, 134, 89)));
 	public static final InheritedAttributeNonNull sliderRounding = new InheritedAttributeNonNull( controlsNamespace, "sliderDragboxRounding", Double.class, 6.0 );
 	public static final InheritedAttributeNonNull sliderSize = new InheritedAttributeNonNull( controlsNamespace, "sliderSize", Double.class, 16.0 );
 	

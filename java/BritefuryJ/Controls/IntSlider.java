@@ -15,23 +15,23 @@ import BritefuryJ.Live.LiveValue;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
 
-public class IntSlider extends Slider
+public class IntSlider extends NumericSlider
 {
 	public static interface IntSliderListener
 	{
 		public void onSliderValueChanged(IntSliderControl spinEntry, int value);
 	}
 
-	public static class IntSliderControl extends SliderControl
+	public static class IntSliderControl extends NumericSliderControl
 	{
 		private int min, max, step, pivot;
 		private IntSliderListener listener;
 		
 	
 		protected IntSliderControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element, Painter backgroundPainter, Painter backgroundHoverPainter,
-				Paint pivotPaint, Painter valueBoxPainter, Painter valuePainter, double rounding, int min, int max, int step, int pivot, IntSliderListener listener)
+				Paint pivotPaint, Painter valueBoxPainter, Painter valuePainter, Painter valueHighlightPainter, double rounding, int min, int max, int step, int pivot, IntSliderListener listener)
 		{
-			super( ctx, style, value, element, backgroundPainter, backgroundHoverPainter, pivotPaint, valueBoxPainter, valuePainter, rounding );
+			super( ctx, style, value, element, backgroundPainter, backgroundHoverPainter, pivotPaint, valueBoxPainter, valuePainter, valueHighlightPainter, rounding );
 			
 			this.min = min;
 			this.max = max;
@@ -139,10 +139,18 @@ public class IntSlider extends Slider
 	
 	
 	@Override
-	protected SliderControl createSliderControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element, Painter backgroundPainter, Painter backgroundHoverPainter,
-			Paint pivotPaint, Painter valueBoxPainter, Painter valuePainter, double rounding)
+	protected AbstractSliderControl createSliderControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element, Painter backgroundPainter, Painter backgroundHoverPainter,
+			Paint pivotPaint, Painter valueBoxPainter, Painter valuePainter, Painter valueHighlightPainter, double rounding)
 	{
 		return new IntSliderControl( ctx, style, value, element, backgroundPainter, backgroundHoverPainter,
-                pivotPaint, valueBoxPainter, valuePainter, rounding, min, max, step, pivot, listener );
+                pivotPaint, valueBoxPainter, valuePainter, valueHighlightPainter, rounding, min, max, step, pivot, listener );
 	}
+
+
+
+    protected static int convertDoubleToInt(double x, int min, int max) {
+        double offset = x - min;
+        int intOffset = (int)(offset + 0.5);
+        return Math.min( Math.max( min+intOffset, min ), max );
+    }
 }
