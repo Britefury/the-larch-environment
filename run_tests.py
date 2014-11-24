@@ -28,6 +28,9 @@ import LarchCore.Languages.Python2.Builder
 import LarchCore.Languages.Python2.Python2Importer
 import LarchCore.Languages.Python2.PythonEditor.Parser
 import LarchCore.Languages.Java.JavaEditor.Parser
+import LarchCore.Kernel.kernel_factory
+import LarchCore.Kernel.python.module_finder
+import LarchCore.Kernel.python.python_kernel
 import LarchTools.PythonTools.VisualRegex.Parser
 import LarchTools.PythonTools.VisualRegex.CodeGenerator
 import LarchTools.PythonTools.GUIEditor.DataModel
@@ -48,6 +51,9 @@ testModules = [ Britefury.Tests.BritefuryJ.Parser.Utils.Operators,
 		LarchCore.Languages.Python2.Python2Importer,
 		LarchCore.Languages.Python2.PythonEditor.Parser,
 		LarchCore.Languages.Java.JavaEditor.Parser,
+		LarchCore.Kernel.kernel_factory,
+		LarchCore.Kernel.python.module_finder,
+		LarchCore.Kernel.python.python_kernel,
 		LarchTools.PythonTools.VisualRegex.Parser,
 		LarchTools.PythonTools.VisualRegex.CodeGenerator,
 		LarchTools.PythonTools.GUIEditor.DataModel,
