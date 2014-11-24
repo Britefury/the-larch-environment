@@ -146,18 +146,20 @@ public class Controls
 			new OutlinePainter( new Color( 0.6f, 0.6f, 0.6f ), new BasicStroke( 1.0f ) ) );
 	public static final InheritedAttribute sliderBackgroundHoverPainter = new InheritedAttribute( controlsNamespace, "sliderBackgroundHoverPainter", Painter.class,
 			new OutlinePainter( new Color( 0.5f, 0.5f, 0.5f ), new BasicStroke( 1.0f ) ) );
-	public static final InheritedAttributeNonNull sliderPivotPaint = new InheritedAttributeNonNull( controlsNamespace, "sliderPivotPaint", Paint.class, new Color( 255, 143, 0 ) );
-	public static final InheritedAttributeNonNull sliderValueBoxPainter = new InheritedAttributeNonNull( controlsNamespace, "sliderValueBoxPainter", Painter.class,
-			new FillPainter( new Color( 255, 217, 128) ) );
 	public static final InheritedAttributeNonNull sliderValuePainter = new InheritedAttributeNonNull( controlsNamespace, "sliderValuePainter", Painter.class,
             new FilledOutlinePainter(new Color(255, 194, 51),
                     new Color(179, 152, 89)));
 	public static final InheritedAttributeNonNull sliderValueHighlightPainter = new InheritedAttributeNonNull( controlsNamespace, "sliderValueHighlightPainter", Painter.class,
             new FilledOutlinePainter(new Color(255, 153, 51),
                     new Color(179, 134, 89)));
+    public static final InheritedAttributeNonNull sliderValueBoxPainter = new InheritedAttributeNonNull( controlsNamespace, "sliderValueBoxPainter", Painter.class,
+            new FillPainter( new Color( 255, 217, 128) ) );
 	public static final InheritedAttributeNonNull sliderRounding = new InheritedAttributeNonNull( controlsNamespace, "sliderDragboxRounding", Double.class, 6.0 );
 	public static final InheritedAttributeNonNull sliderSize = new InheritedAttributeNonNull( controlsNamespace, "sliderSize", Double.class, 16.0 );
-	
+    public static final InheritedAttributeNonNull progressBarValuePaint = new InheritedAttributeNonNull( controlsNamespace, "progressBarValuePaint", Paint.class, new Color(128, 191, 255) );
+    public static final InheritedAttributeNonNull progressValueBoxPainter = new InheritedAttributeNonNull( controlsNamespace, "progressValueBoxPainter", Painter.class,
+            new FillPainter( new Color(143, 167, 191) ) );
+
 	
 	public static final InheritedAttributeNonNull objectDropBoxClassNameStyle = new InheritedAttributeNonNull( controlsNamespace, "objectDropBoxClassNameStyle", StyleSheet.class,
 			    StyleSheet.style( Primitive.fontItalic.as( true ) ) );

@@ -11,6 +11,7 @@ import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
 import BritefuryJ.LSpace.Event.PointerMotionEvent;
 import BritefuryJ.LSpace.Input.PointerInterface;
+import BritefuryJ.LSpace.Interactor.DragElementInteractor;
 import BritefuryJ.LSpace.Interactor.MotionElementInteractor;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Live.LiveInterface;
@@ -59,7 +60,7 @@ public abstract class RangeSlider extends AbstractSlider {
                 double min = getSliderMin();
                 double max = getSliderMax();
                 double value = min + (max - min) * valueFrac;
-                value = applyStep(value);
+                value = applyStep(value, getSliderStep());
 
                 double range[] = getSliderValue();
                 double lower = range[0], upper = range[1];
@@ -103,8 +104,8 @@ public abstract class RangeSlider extends AbstractSlider {
                 double deltaFrac = deltaX / size.x;
                 double deltaValue = (max - min) * deltaFrac;
 
-                double lower = applyStep(startLower + deltaValue);
-                double upper = applyStep(startUpper + deltaValue);
+                double lower = applyStep(startLower + deltaValue, getSliderStep());
+                double upper = applyStep(startUpper + deltaValue, getSliderStep());
 
                 lower = Math.min(Math.max(lower, min), max);
                 upper = Math.min(Math.max(upper, min), max);
@@ -114,7 +115,7 @@ public abstract class RangeSlider extends AbstractSlider {
         }
 
         protected class RangeSliderInteractor extends AbstractSlider.AbstractSliderControl.AbstractSliderInteractor
-                implements MotionElementInteractor
+                implements MotionElementInteractor, DragElementInteractor
         {
             private HashMap<PointerInterface, RangeDrag> pointerToRangeDrag = new HashMap<PointerInterface, RangeDrag>();
             private RangeFocus highlightFocus;
@@ -262,11 +263,10 @@ public abstract class RangeSlider extends AbstractSlider {
             this.valueBoxPainter = valueBoxPainter;
             this.valuePainter = valuePainter;
             this.valueHighlightPainter = valueHighlightPainter;
-        }
 
-        @Override
-        protected AbstractSliderInteractor createInteractor() {
-            return new RangeSliderInteractor();
+            RangeSliderInteractor sliderInteractor = new RangeSliderInteractor();
+            element.addPainter( sliderInteractor );
+            element.addElementInteractor( sliderInteractor );
         }
 
         public LiveInterface getValue()
@@ -284,6 +284,7 @@ public abstract class RangeSlider extends AbstractSlider {
 
 
         protected abstract double[] getSliderValue();
+        protected abstract double getSliderStep();
         protected abstract void changeRange(double lower, double upper);
 
 
@@ -319,7 +320,6 @@ public abstract class RangeSlider extends AbstractSlider {
 
         Painter backgroundPainter = style.get( Controls.sliderBackgroundPainter, Painter.class );
         Painter backgroundHoverPainter = style.get( Controls.sliderBackgroundHoverPainter, Painter.class );
-        Paint pivotPaint = style.get( Controls.sliderPivotPaint, Paint.class );
         Painter valueBoxPainter = style.get( Controls.sliderValueBoxPainter, Painter.class );
         Painter valuePainter = style.get( Controls.sliderValuePainter, Painter.class );
         Painter valueHighlightPainter = style.get(Controls.sliderValueHighlightPainter, Painter.class);
@@ -334,7 +334,7 @@ public abstract class RangeSlider extends AbstractSlider {
         LSElement element = slider.present( ctx, style );
 
         return createSliderControl( ctx, style, value, element, backgroundPainter, backgroundHoverPainter,
-                pivotPaint, valueBoxPainter, valuePainter, valueHighlightPainter, rounding );
+                valueBoxPainter, valuePainter, valueHighlightPainter, rounding );
     }
 
     private static final StyleSheet boxStyle = StyleSheet.style( Primitive.shapePainter.as( null ), Primitive.hoverShapePainter.as( null ) );
@@ -342,6 +342,6 @@ public abstract class RangeSlider extends AbstractSlider {
 
     protected abstract AbstractSliderControl createSliderControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element,
                                                                  Painter backgroundPainter, Painter backgroundHoverPainter,
-                                                                 Paint pivotPaint, Painter valueBoxPainter, Painter valuePainter, Painter valueHighlightPainter,
+                                                                 Painter valueBoxPainter, Painter valuePainter, Painter valueHighlightPainter,
                                                                  double rounding);
 }
