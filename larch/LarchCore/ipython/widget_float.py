@@ -1,6 +1,6 @@
 from BritefuryJ.Live import LiveValue
 
-from BritefuryJ.Controls import RealSlider, RealProgressBar, RealRangeSlider
+from BritefuryJ.Controls import RealSlider, ProgressBar, RealRangeSlider
 
 from BritefuryJ.Pres.Primitive import Label, Row, Spacer
 
@@ -54,7 +54,7 @@ class ProgressView (IPythonWidgetView):
 		slider_min = float(self.min)
 		slider_max = float(self.max)
 		return Row([Label(self.description), Spacer(10.0, 0.0),
-				RealProgressBar(value_live, slider_min, slider_max, 400.0),
+				ProgressBar(value_live, slider_min, slider_max, 400.0),
 			    Spacer(10.0, 0.0), value_live])
 
 
