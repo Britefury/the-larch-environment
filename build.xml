@@ -3,7 +3,7 @@
     <!--this file was created by Eclipse Runnable JAR Export Wizard-->
     <!--ANT 1.7 is required                                        -->
     <property name="larch.version" value="UNVERSIONED"/>
-	<property name="jython.path" value="/jython2.7b1_s/jython.jar"/>
+	<property name="jython.path" value="/jython2.7b3_s/jython.jar"/>
 
 	<target name="standalone_jar">
         <jar destfile="./larch-in-a-jar-${larch.version}.jar">
@@ -26,6 +26,7 @@
             <zipfileset excludes="META-INF/*.SF" src="${jython.path}"/>
             <zipfileset excludes="META-INF/*.SF" src="./extlibs/jsoup-1.7.3.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="./extlibs/svgSalamander.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="./extlibs/jeromq-0.3.4.jar"/>
         </jar>
     </target>
 </project>

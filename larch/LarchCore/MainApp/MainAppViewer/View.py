@@ -26,10 +26,10 @@ from Britefury.Kernel.Document import Document
 from BritefuryJ.StyleSheet import StyleSheet
 from BritefuryJ.Browser.TestPages import TestsRootPage
 
-from BritefuryJ.LSpace import PageController
+from BritefuryJ.LSpace import PageController, Anchor
 from BritefuryJ.Graphics import FilledBorder
 
-from BritefuryJ.Controls import Hyperlink
+from BritefuryJ.Controls import Hyperlink, MenuItem, VPopupMenu
 from BritefuryJ.Pres import Pres
 from BritefuryJ.Pres.Primitive import Primitive, Border, Row, Column, RGrid, GridRow
 from BritefuryJ.Pres.RichText import TitleBar, HSeparator, Head, Body, Page, SplitLinkHeaderBar, NormalText, StrongSpan, EmphSpan
@@ -37,9 +37,11 @@ from BritefuryJ.Pres.UI import Section, SectionHeading1
 from BritefuryJ.Pres.Help import AttachTooltip, TipBox
 
 from BritefuryJ.Projection import Perspective
+from BritefuryJ.DefaultPerspective import DefaultPerspective
 
 from LarchCore.MainApp import Application
 from LarchCore.MainApp import DocumentManagement
+from LarchCore.Kernel import interpreter_config_page
 
 
 
@@ -140,11 +142,8 @@ class AppView (MethodDispatchView):
 				node.registerOpenDocument( document )
 			return True
 
-		
-		def _onNewConsole(link, event):
-			consoles = node.getConsoles()
-			index = _newConsoleIndex( consoles )
-			appConsole = Application.AppConsole( index )
+
+		def new_console(link, appConsole):
 			node.addConsole( appConsole )
 
 			subject = appConsole.subject( fragment.subject )
@@ -152,10 +151,33 @@ class AppView (MethodDispatchView):
 			pageController = link.element.rootElement.pageController
 			pageController.openSubject( subject, PageController.OpenOperation.OPEN_IN_CURRENT_TAB )
 
-			return True
+
 		
-			
-			
+		def on_new_console(link, event):
+			def on_choose_kernel_factory(kernel_factory):
+				def on_kernel_started(kernel):
+					consoles = node.getConsoles()
+					index = _newConsoleIndex( consoles )
+
+					description = kernel_factory.description.human_description
+
+					if kernel.is_in_process():
+						full_name = 'In-process console {0} ({1})'.format(index, description)
+					else:
+						full_name = 'IPython console {0} ({1})'.format(index, description)
+					appConsole = Application.AppConsole(kernel, full_name, index)
+
+					new_console(link, appConsole)
+
+				kernel_factory.create_kernel(on_kernel_started)
+
+			menu = interpreter_config_page.get_interpreter_config().interpreter_chooser_menu(on_choose_kernel_factory)
+
+			menu.popupMenu(link.element, Anchor.TOP_RIGHT, Anchor.TOP_LEFT)
+
+			return True
+
+
 		openDocViews = Pres.mapCoerce( node.getOpenDocuments() )
 		consoles = Pres.mapCoerce( node.getConsoles() )
 
@@ -174,8 +196,8 @@ class AppView (MethodDispatchView):
 		openDocumentsBox = AttachTooltip( openDocumentsBox, 'Click NEW to create a new document. To open from a file, click OPEN, or drag files from a file explorer application.', False )
 		
 		
-		newConsoleLink = Hyperlink( 'NEW', _onNewConsole )
-		consolesBox = _contentsList( [ newConsoleLink ], consoles, 'Python consoles' )
+		new_console_link = Hyperlink( 'NEW', on_new_console )
+		consolesBox = _contentsList( [ new_console_link ], consoles, 'Python consoles' )
 
 
 		tip = TipBox( [ NormalText( [ StrongSpan( 'Getting started: ' ), 'To get programming quickly, create a new Python console by pressing ', EmphSpan( 'new' ), ', beneath', EmphSpan( ' Python consoles' ), '.' ] ),
@@ -260,10 +282,8 @@ class AppView (MethodDispatchView):
 
 	@ObjectDispatchMethod( Application.AppConsole )
 	def AppConsole(self, fragment, state, node):
-		index = node.getIndex()
-		name = 'Console %d'  %  ( index, )
 		subject = node.subject( fragment.subject )
-		consoleLink = Hyperlink( name, subject ).padX( 0.0, _appDocRightPadding )
+		consoleLink = Hyperlink( node.get_full_name(), subject ).padX( 0.0, _appDocRightPadding )
 	
 		return GridRow( [ consoleLink ] )
 
