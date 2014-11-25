@@ -82,8 +82,7 @@ public class SliderTestPage extends TestPage
         final LiveValue intRangeValue = new LiveValue(new int[]{-6, 6});
 		RealSlider realSlider = new RealSlider( realValue, -10.0, 10.0, 0.5, 300.0 );
 		IntSlider intSlider = new IntSlider( intValue, -10, 10, 2, 300.0 );
-        RealProgressBar realProgress = new RealProgressBar(realValue, -10.0, 10.0, 300.0);
-        IntProgressBar intProgress = new IntProgressBar(intValue, -10, 10, 300.0);
+        ProgressBar progress = new ProgressBar(realValue, -10.0, 10.0, 300.0);
         RealRangeSlider realRangeSlider = new RealRangeSlider(realRangeValue, -10.0, 10.0, 0.5, 300.0);
         IntRangeSlider intRangeSlider = new IntRangeSlider(intRangeValue, -10, 10, 2, 300.0);
 
@@ -97,10 +96,8 @@ public class SliderTestPage extends TestPage
 			    new SpaceBin( 200.0, -1.0, realSlider.alignHExpand() ).alignVCentre(), realValue } ).padX( 5.0 ) );
 		Pres intLine = StyleSheet.style( Primitive.rowSpacing.as( 20.0 ) ).applyTo( new Row( new Object[] { new Label( "Integer: " ),
 			    new SpaceBin( 200.0, -1.0, intSlider.alignHExpand() ).alignVCentre(), intValue } ).padX( 5.0 ) );
-		Pres realProgLine = StyleSheet.style( Primitive.rowSpacing.as( 20.0 ) ).applyTo( new Row( new Object[] { new Label( "Real number progress bar: " ),
-			    new SpaceBin( 200.0, -1.0, realProgress.alignHExpand() ).alignVCentre(), realValue } ).padX( 5.0 ) );
-		Pres intProgLine = StyleSheet.style( Primitive.rowSpacing.as( 20.0 ) ).applyTo( new Row( new Object[] { new Label( "Integer progress bar: " ),
-			    new SpaceBin( 200.0, -1.0, intProgress.alignHExpand() ).alignVCentre(), intValue } ).padX( 5.0 ) );
+		Pres progLine = StyleSheet.style( Primitive.rowSpacing.as( 20.0 ) ).applyTo( new Row( new Object[] { new Label( "Progress bar: " ),
+			    new SpaceBin( 200.0, -1.0, progress.alignHExpand() ).alignVCentre(), realValue } ).padX(5.0) );
         Pres realRangeLine = StyleSheet.style( Primitive.rowSpacing.as( 20.0 ) ).applyTo( new Row( new Object[] { new Label( "Real range: " ),
                 new SpaceBin( 200.0, -1.0, realRangeSlider.alignHExpand() ).alignVCentre(),
                 realRangeLower, new Label(":"), realRangeUpper } ).padX( 5.0 ) );
@@ -110,8 +107,8 @@ public class SliderTestPage extends TestPage
 
         Pres numericSection = new Section(new SectionHeading2("Numeric value sliders"),
                 new Column(new Pres[] {realLine, intLine}));
-        Pres progressSection = new Section(new SectionHeading2("Progress bars"),
-                new Column(new Pres[] {realProgLine, intProgLine}));
+        Pres progressSection = new Section(new SectionHeading2("Progress bar"),
+                new Column(new Pres[] {progLine}));
         Pres rangeSection = new Section(new SectionHeading2("Ranged sliders"),
                 new Column(new Pres[] {realRangeLine, intRangeLine}));
 

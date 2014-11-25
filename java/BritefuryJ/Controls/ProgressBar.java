@@ -22,8 +22,8 @@ import java.awt.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 
-public abstract class ProgressBar extends AbstractSlider {
-    public abstract static class ProgressBarControl extends AbstractSlider.AbstractSliderControl
+public class ProgressBar extends AbstractSlider {
+    public static class ProgressBarControl extends AbstractSlider.AbstractSliderControl
     {
         protected class ProgressBarInteractor extends AbstractSlider.AbstractSliderControl.AbstractSliderInteractor
         {
@@ -50,20 +50,25 @@ public abstract class ProgressBar extends AbstractSlider {
 
         private Painter valueBoxPainter;
         private Paint valuePaint;
+        protected double min, max;
 
 
 
         public ProgressBarControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element,
-                                    Painter backgroundPainter, Painter backgroundHoverPainter,
-                                    Paint valuePaint, Painter valueBoxPainter, double rounding)
+                                  Painter backgroundPainter, Painter backgroundHoverPainter,
+                                  Paint valuePaint, Painter valueBoxPainter, double rounding, double min, double max)
         {
             super(ctx, style, value, element, backgroundPainter, backgroundHoverPainter, rounding);
 
             this.valuePaint = valuePaint;
             this.valueBoxPainter = valueBoxPainter;
+            this.max = max;
+            this.min = min;
 
             ProgressBarInteractor sliderInteractor = new ProgressBarInteractor();
             element.addPainter( sliderInteractor );
+
+            element.setFixedValue( value.elementValueFunction() );
         }
 
         public LiveInterface getValue()
@@ -79,8 +84,20 @@ public abstract class ProgressBar extends AbstractSlider {
         }
 
 
+        protected double getSliderMin()
+        {
+            return min;
+        }
 
-        protected abstract double getProgressValue();
+        protected double getSliderMax()
+        {
+            return max;
+        }
+
+        protected double getProgressValue()
+        {
+            return (Double)value.getStaticValue();
+        }
 
 
         @Override
@@ -98,15 +115,26 @@ public abstract class ProgressBar extends AbstractSlider {
 
     private LiveSource valueSource;
     private double width;
+    private double min, max;
 
-    public ProgressBar(LiveSource valueSource, double width)
+    private ProgressBar(LiveSource valueSource, double min, double max, double width)
     {
         super(valueSource, width);
         this.valueSource = valueSource;
         this.width = width;
+        this.min = min;
+        this.max = max;
     }
 
+    public ProgressBar(double initialValue, double min, double max, double width)
+    {
+        this( new LiveSourceValue( initialValue ), min, max, width );
+    }
 
+    public ProgressBar(LiveInterface value, double min, double max, double width)
+    {
+        this( new LiveSourceRef( value ), min, max, width );
+    }
 
     @Override
     public Control createControl(PresentationContext ctx, StyleValues style)
@@ -134,5 +162,10 @@ public abstract class ProgressBar extends AbstractSlider {
     private static final StyleSheet boxStyle = StyleSheet.style( Primitive.shapePainter.as( null ), Primitive.hoverShapePainter.as( null ) );
 
 
-    protected abstract AbstractSliderControl createProgressBarControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element, Painter backgroundPainter, Painter backgroundHoverPainter,
-                                                                      Paint valuePaint, Painter valueBoxPainter, double rounding);}
+    protected ProgressBarControl createProgressBarControl(PresentationContext ctx, StyleValues style, LiveInterface value, LSElement element, Painter backgroundPainter, Painter backgroundHoverPainter,
+                                                                      Paint valuePaint, Painter valueBoxPainter, double rounding)
+    {
+        return new ProgressBarControl( ctx, style, value, element, backgroundPainter, backgroundHoverPainter,
+                valuePaint, valueBoxPainter, rounding, min, max );
+    }
+}
