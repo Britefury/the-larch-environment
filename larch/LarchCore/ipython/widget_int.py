@@ -1,6 +1,6 @@
 from BritefuryJ.Live import LiveValue
 
-from BritefuryJ.Controls import IntSlider, IntProgressBar, IntRangeSlider
+from BritefuryJ.Controls import IntSlider, IntRangeSlider
 
 from BritefuryJ.Pres.Primitive import Label, Row, Spacer
 
