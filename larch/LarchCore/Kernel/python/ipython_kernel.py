@@ -59,10 +59,11 @@ class IPythonLiveModule (python_kernel.AbstractPythonLiveModule):
 
 
 class _KernelListener (request_listener.KernelRequestListener):
-	def __init__(self, comm_manager, result):
+	def __init__(self, comm_manager, result, on_status_waiting=None):
 		super(_KernelListener, self).__init__(comm_manager)
 		self.result = result
 		self.std = self.result.streams
+		self.__on_status_waiting = on_status_waiting
 
 
 	def on_execute_ok(self, execution_count, payload, user_expressions):
@@ -121,6 +122,11 @@ class _KernelListener (request_listener.KernelRequestListener):
 				image = binascii.a2b_base64(raw)
 				self.result.display_image(mime_type, image)
 		print 'ipython_kernel._KernelListener.on_display_data: data keys: {0}'.format(sorted(list(data.keys())))
+
+
+	def on_status(self, busy):
+		if not busy  and  self.__on_status_waiting is not None:
+			self.__on_status_waiting(self)
 
 
 
@@ -404,8 +410,8 @@ class IPythonExecutionResult (execution_result.AbstractExecutionResult):
 		self._visible_widgets = []
 
 
-	def new_kernel_request_listener(self):
-		return _KernelListener(self.__comm_manager, self)
+	def new_kernel_request_listener(self, on_status_waiting=None):
+		return _KernelListener(self.__comm_manager, self, on_status_waiting=on_status_waiting)
 
 
 

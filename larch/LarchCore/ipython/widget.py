@@ -1,3 +1,5 @@
+import collections
+
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from BritefuryJ.Pres import Pres
@@ -44,6 +46,8 @@ class IPythonWidgetView (object):
 
 
 class IPythonWidgetModel (object):
+	DEFAULT_MSG_THROTTLE = 3
+
 	def __init__(self, widget_manager, result, comm, data):
 		print 'IPythonWidgetModel.__init__: comm.comm_id={0}'.format(comm.comm_id)
 		self.__widget_manager = widget_manager
@@ -55,17 +59,48 @@ class IPythonWidgetModel (object):
 		self._state = {}
 		self.__incr = IncrementalValueMonitor()
 		self._view = None
-		self.__kernel_listener = self.result.new_kernel_request_listener()
+
+		self.__sync_kernel_listeners_waiting = collections.deque()
+		self.__all_sync_kernel_listeners = []
+		self.__num_sync_kernel_listeners = 0
+		self.__custom_kernel_listener = self.result.new_kernel_request_listener()
+
+
+	@property
+	def _message_throttle(self):
+		try:
+			return self.msg_throttle
+		except AttributeError:
+			return self.DEFAULT_MSG_THROTTLE
+
+
+	def __on_kernel_request_listener_waiting(self, listener):
+		self.__sync_kernel_listeners_waiting.append(listener)
+
+	def _sync_kernel_request_listener(self):
+		if len(self.__sync_kernel_listeners_waiting) == 0:
+			if self.__num_sync_kernel_listeners < self._message_throttle:
+				listener = self.result.new_kernel_request_listener(self.__on_kernel_request_listener_waiting)
+				self.__num_sync_kernel_listeners += 1
+				self.__all_sync_kernel_listeners.append(listener)
+				return listener
+			else:
+				return None
+		else:
+			listener = self.__sync_kernel_listeners_waiting.popleft()
+			return listener
 
 
 	def send_sync(self, sync_data):
-		self.__send({'method': 'backbone', 'sync_data': sync_data})
+		listener = self._sync_kernel_request_listener()
+		if listener is not None:
+			self.__send({'method': 'backbone', 'sync_data': sync_data}, listener)
 
 	def send_custom(self, content):
-		self.__send({'method': 'custom', 'content': content})
+		self.__send({'method': 'custom', 'content': content}, self.__custom_kernel_listener)
 
-	def __send(self, msg):
-		self.comm.send(msg, listener=self.__kernel_listener)
+	def __send(self, msg, kernel_request_listener=None):
+		self.comm.send(msg, listener=kernel_request_listener)
 
 
 	def close(self):
@@ -73,13 +108,17 @@ class IPythonWidgetModel (object):
 		# 	self.comm.close()
 		# 	self.open = False
 		self.__widget_manager._notify_widget_closed(self)
-		self.__kernel_listener.detach()
+		self.__custom_kernel_listener.detach()
+		for listener in self.__all_sync_kernel_listeners:
+			listener.detach()
 
 
 	def _on_closed_remotely(self, comm, data, kernel_request_listener):
 		self.open = False
 		self.__widget_manager._notify_widget_closed(self)
-		self.__kernel_listener.detach()
+		self.__custom_kernel_listener.detach()
+		for listener in self.__all_sync_kernel_listeners:
+			listener.detach()
 		print 'IPythonWidgetModel._on_closed_remotely'
 
 
