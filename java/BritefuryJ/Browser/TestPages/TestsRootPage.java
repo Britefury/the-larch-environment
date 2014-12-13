@@ -179,6 +179,7 @@ public class TestsRootPage extends AbstractTestPage implements Presentable
 	public static final ObjectDropBoxTestPage objectDrop = new ObjectDropBoxTestPage();
 	public static final OptionMenuTestPage optionMenu = new OptionMenuTestPage();
 	public static final PopupTestPage popup = new PopupTestPage();
+	public static final RadioButtonTestPage radioButton = new RadioButtonTestPage();
 	public static final ScrollBarTestPage scrollBar = new ScrollBarTestPage();
 	public static final ScrolledViewportTestPage scrolledViewport = new ScrolledViewportTestPage();
 	public static final SliderTestPage slider = new SliderTestPage();
@@ -200,6 +201,7 @@ public class TestsRootPage extends AbstractTestPage implements Presentable
 		new Hyperlink( "Object drop box", subjectFor( objectDrop ) ),
 		new Hyperlink( "Option menu", subjectFor( optionMenu ) ),
 		new Hyperlink( "Popup", subjectFor( popup ) ),
+		new Hyperlink("Radio button", subjectFor(radioButton)),
 		new Hyperlink( "Scroll bar", subjectFor( scrollBar ) ),
 		new Hyperlink( "Scrolled viewport", subjectFor( scrolledViewport ) ),
 		new Hyperlink( "Slider", subjectFor( slider ) ),
