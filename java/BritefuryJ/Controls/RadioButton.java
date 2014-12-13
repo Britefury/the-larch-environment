@@ -28,7 +28,7 @@ public class RadioButton extends ControlPres
 {
 	public static interface RadioButtonListener
 	{
-		public void onRadioButton(RadioButtonControl checkbox, Object value);
+		public void onRadioButton(RadioButtonControl radioButton, Object value);
 	}
 
 
@@ -65,7 +65,7 @@ public class RadioButton extends ControlPres
 
 			graphics.setPaint( outerPaint );
 			graphics.setStroke( stroke );
-			graphics.draw( outerCircle );
+			graphics.draw(outerCircle);
 			graphics.setStroke( savedStroke );
 
 			if ( radio.isOn() )
@@ -87,9 +87,9 @@ public class RadioButton extends ControlPres
 		private RadioButtonControl radio;
 
 
-		public RadioButtonInteractor(RadioButtonControl checkbox)
+		public RadioButtonInteractor(RadioButtonControl radioButton)
 		{
-			this.radio = checkbox;
+			this.radio = radioButton;
 		}
 
 
@@ -112,13 +112,13 @@ public class RadioButton extends ControlPres
 
 	public static class RadioButtonControl extends ControlPres.Control implements IncrementalMonitorListener
 	{
-		private LSElement element, box, check;
+		private LSElement element, box, radio;
 		private LiveInterface state;
 		private Object choiceValue;
 		private RadioButtonListener listener;
 
 
-		protected RadioButtonControl(PresentationContext ctx, StyleValues style, LSElement element, LSElement box, LSElement check, LiveInterface state, Object choiceValue, RadioButtonListener listener,
+		protected RadioButtonControl(PresentationContext ctx, StyleValues style, LSElement element, LSElement box, LSElement radio, LiveInterface state, Object choiceValue, RadioButtonListener listener,
 					     Paint outerPaint, Paint innerPaint, double circleSpacing)
 		{
 			super( ctx, style );
@@ -126,8 +126,8 @@ public class RadioButton extends ControlPres
 			this.element = element;
 			this.box = box;
 			this.box.addElementInteractor( new RadioButtonInteractor( this ) );
-			this.check = check;
-			check.addPainter(new RadioButtonRadioPainter(outerPaint, innerPaint, circleSpacing, this ));
+			this.radio = radio;
+			radio.addPainter(new RadioButtonRadioPainter(outerPaint, innerPaint, circleSpacing, this ));
 			this.state = state;
 			this.state.addListener( this );
 			this.choiceValue = choiceValue;
@@ -174,7 +174,7 @@ public class RadioButton extends ControlPres
 
 			element.setFixedValue( value );
 
-			check.queueFullRedraw();
+			radio.queueFullRedraw();
 		}
 	}
 
@@ -192,11 +192,11 @@ public class RadioButton extends ControlPres
 		}
 
 		@Override
-		public void onRadioButton(RadioButtonControl checkbox, Object value)
+		public void onRadioButton(RadioButtonControl radioButton, Object value)
 		{
 			if ( listener != null )
 			{
-				listener.onRadioButton(checkbox, value);
+				listener.onRadioButton(radioButton, value);
 			}
 			this.value.setLiteralValue( value );
 		}
