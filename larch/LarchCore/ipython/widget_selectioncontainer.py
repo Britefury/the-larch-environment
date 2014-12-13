@@ -12,9 +12,7 @@ from LarchCore.ipython.widget_container import ContainerView
 
 class TabView (ContainerView):
 	def _on_edit(self, selected_index):
-		sync_data = {'selected_index': selected_index}
-		self._internal_update(sync_data)
-		self.model.send_sync(sync_data)
+		self._state_sync(selected_index=selected_index)
 
 	def _present_children(self):
 		child_comm_ids = self._children

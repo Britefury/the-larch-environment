@@ -43,6 +43,10 @@ class IPythonWidgetView (object):
 		self.__dict__.update(state)
 		self._incr.onChanged()
 
+	def _state_sync(self, **sync_data):
+		self._internal_update(sync_data)
+		self.model._send_sync(sync_data)
+
 
 
 class IPythonWidgetModel (object):
@@ -91,7 +95,7 @@ class IPythonWidgetModel (object):
 			return listener
 
 
-	def send_sync(self, sync_data):
+	def _send_sync(self, sync_data):
 		listener = self._sync_kernel_request_listener()
 		if listener is not None:
 			self.__send({'method': 'backbone', 'sync_data': sync_data}, listener)
@@ -145,7 +149,6 @@ class IPythonWidgetModel (object):
 				else:
 					self._view.update(self._state)
 		elif method == 'display':
-			print 'IPythonWidgetModel._on_message: {0} display {1}'.format(self._state.get('_view_name'), data)
 			if kernel_request_listener is not None:
 				result = kernel_request_listener.result
 			else:

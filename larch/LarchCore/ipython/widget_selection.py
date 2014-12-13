@@ -12,9 +12,7 @@ from LarchCore.ipython.widget import IPythonWidgetView
 
 class ToggleButtonsView (IPythonWidgetView):
 	def _on_edit(self, value_name):
-		sync_data = {'value_name': value_name}
-		self._internal_update(sync_data)
-		self.model.send_sync(sync_data)
+		self._state_sync(value_name=value_name)
 
 	def __present__(self, fragment, inh):
 		def on_choice(control, prev_index, new_index):
@@ -33,9 +31,7 @@ class ToggleButtonsView (IPythonWidgetView):
 
 class DropdownView (IPythonWidgetView):
 	def _on_edit(self, value_name):
-		sync_data = {'value_name': value_name}
-		self._internal_update(sync_data)
-		self.model.send_sync(sync_data)
+		self._state_sync(value_name=value_name)
 
 	def __present__(self, fragment, inh):
 		def on_choice(control, prev_index, new_index):
