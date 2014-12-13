@@ -6,11 +6,16 @@
 //##************************
 package BritefuryJ.Controls;
 
-import java.awt.Paint;
+import java.awt.*;
+import java.awt.geom.Line2D;
 
 import BritefuryJ.Graphics.AbstractBorder;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
+import BritefuryJ.LSpace.ElementPainter;
+import BritefuryJ.LSpace.Event.AbstractPointerButtonEvent;
+import BritefuryJ.LSpace.Event.PointerButtonClickedEvent;
+import BritefuryJ.LSpace.Interactor.ClickElementInteractor;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Live.LiveInterface;
 import BritefuryJ.Live.LiveValue;
@@ -31,8 +36,77 @@ public class Checkbox extends ControlPres
 	{
 		public void onCheckbox(CheckboxControl checkbox, boolean state);
 	}
-	
-	
+
+
+	protected static class CheckboxCheckPainter implements ElementPainter
+	{
+		private Paint paint;
+		private Checkbox.CheckboxControl checkbox;
+		private static final Stroke stroke = new BasicStroke( 2.0f );
+
+
+		public CheckboxCheckPainter(Paint paint, Checkbox.CheckboxControl checkbox)
+		{
+			this.paint = paint;
+			this.checkbox = checkbox;
+		}
+
+		@Override
+		public void drawBackground(LSElement element, Graphics2D graphics)
+		{
+		}
+
+		@Override
+		public void draw(LSElement element, Graphics2D graphics)
+		{
+			if ( checkbox.getState() )
+			{
+				double w = element.getActualWidth();
+				double h = element.getActualHeight();
+				Line2D.Double a = new Line2D.Double( 0.0, 0.0, w, h );
+				Line2D.Double b = new Line2D.Double( w, 0.0, 0.0, h );
+
+				Paint savedPaint = graphics.getPaint();
+				Stroke savedStroke = graphics.getStroke();
+				graphics.setPaint( paint );
+				graphics.setStroke( stroke );
+				graphics.draw( a );
+				graphics.draw( b );
+				graphics.setStroke( savedStroke );
+				graphics.setPaint( savedPaint );
+			}
+		}
+	}
+
+
+	protected static class CheckboxCheckInteractor implements ClickElementInteractor
+	{
+		private Checkbox.CheckboxControl checkbox;
+
+
+		public CheckboxCheckInteractor(Checkbox.CheckboxControl checkbox)
+		{
+			this.checkbox = checkbox;
+		}
+
+
+
+		@Override
+		public boolean testClickEvent(LSElement element, AbstractPointerButtonEvent event)
+		{
+			return event.getButton() == 1;
+		}
+
+		@Override
+		public boolean buttonClicked(LSElement element, PointerButtonClickedEvent event)
+		{
+			checkbox.toggle();
+			return true;
+		}
+	}
+
+
+
 	public static class CheckboxControl extends Control implements IncrementalMonitorListener
 	{
 		private LSElement element, box, check;
@@ -46,9 +120,9 @@ public class Checkbox extends ControlPres
 			
 			this.element = element;
 			this.box = box;
-			this.box.addElementInteractor( new CheckboxHelper.CheckboxCheckInteractor( this ) );
+			this.box.addElementInteractor( new CheckboxCheckInteractor( this ) );
 			this.check = check;
-			check.addPainter( new CheckboxHelper.CheckboxCheckPainter( checkForeground, this ) );
+			check.addPainter( new CheckboxCheckPainter( checkForeground, this ) );
 			this.state = state;
 			this.state.addListener( this );
 			this.listener = listener;

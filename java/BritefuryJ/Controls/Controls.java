@@ -56,6 +56,16 @@ public class Controls
 	public static final InheritedAttributeNonNull checkboxSpacing = new InheritedAttributeNonNull( controlsNamespace, "checkboxSpacing", Double.class, 5.0 );
 	public static final InheritedAttributeNonNull checkboxPadding = new InheritedAttributeNonNull( controlsNamespace, "checkboxPadding", Double.class, 1.0 );
 
+
+	public static final InheritedAttributeNonNull radioButtonHoverBackground = new InheritedAttributeNonNull( controlsNamespace, "radioButtonHoverBackground", Painter.class,
+			new FilledOutlinePainter( new Color( 0.95f, 0.95f, 0.95f  ), new Color( 0.8f, 0.8f, 0.8f  ) ) );
+	public static final InheritedAttributeNonNull radioButtonOuterCirclePaint = new InheritedAttributeNonNull( controlsNamespace, "radioButtonOuterCirclePaint", Paint.class, new Color( 0.5f, 0.5f, 0.5f, 0.5f  ) );
+	public static final InheritedAttributeNonNull radioButtonInnerCirclePaint = new InheritedAttributeNonNull( controlsNamespace, "radioButtonInnerCirclePaint", Paint.class, new Color( 0, 111, 128 ) );
+	public static final InheritedAttributeNonNull radioButtonCircleSpacing = new InheritedAttributeNonNull( controlsNamespace, "radioButtonCircleSpacing", Double.class, 2.0 );
+	public static final InheritedAttributeNonNull radioButtonRadioSize = new InheritedAttributeNonNull( controlsNamespace, "radioButtonRadioSize", Double.class, 12.0 );
+	public static final InheritedAttributeNonNull radioButtonSpacing = new InheritedAttributeNonNull( controlsNamespace, "radioButtonSpacing", Double.class, 5.0 );
+	public static final InheritedAttributeNonNull radioButtonPadding = new InheritedAttributeNonNull( controlsNamespace, "radioButtonPadding", Double.class, 1.0 );
+
 	
 	public static final InheritedAttributeNonNull optionMenuBorder = new InheritedAttributeNonNull( controlsNamespace, "optionMenuBorder", AbstractBorder.class,
 			new SolidBorder( 1.0, 2.0, new Color( 0.7f, 0.7f, 0.7f ), new Color( 0.925f, 0.925f, 0.925f  ), new Color( 0.6f, 0.6f, 0.6f ), new Color( 0.875f, 0.875f, 0.875f ) ) );
@@ -249,6 +259,24 @@ public class Controls
 	}
 	
 	
+
+	protected static DerivedValueTable<StyleSheet> radioButtonStyle = new DerivedValueTable<StyleSheet>( controlsNamespace )
+	{
+		protected StyleSheet evaluate(AttributeTable attribs)
+		{
+			double spacing = attribs.get(radioButtonSpacing, Double.class );
+			Painter background = attribs.get( radioButtonHoverBackground, Painter.class );
+			return StyleSheet.style( Primitive.hoverBackground.as( background ), Primitive.rowSpacing.as( spacing ) );
+		}
+	};
+
+	public static StyleValues useRadioButtonAttrs(StyleValues style)
+	{
+		return style.useAttr( radioButtonHoverBackground ).useAttr( radioButtonOuterCirclePaint ).useAttr( radioButtonInnerCirclePaint ).useAttr( radioButtonCircleSpacing )
+				.useAttr( radioButtonRadioSize ).useAttr( radioButtonSpacing ).useAttr( radioButtonPadding );
+	}
+
+
 
 	public static StyleValues useOptionMenuAttrs(StyleValues style)
 	{
