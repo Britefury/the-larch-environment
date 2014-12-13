@@ -20,9 +20,7 @@ class IntSliderView (IPythonWidgetView):
 	def __present__(self, fragment, inh):
 		self._incr.onAccess()
 		def _on_change(control, new_value):
-			sync_data = {'value': new_value}
-			self._internal_update(sync_data)
-			self.model.send_sync(sync_data)
+			self._state_sync(value=new_value)
 			value_live.setLiteralValue(new_value)
 
 		def _on_range_change(control, new_lower, new_upper):
