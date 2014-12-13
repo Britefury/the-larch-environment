@@ -18,13 +18,13 @@ class TextView (IPythonWidgetView):
 
 		def onAccept(self, text_entry, text):
 			self._view._on_edit(text)
+			self._value_live.setLiteralValue(text)
 
 
 	def _on_edit(self, new_value):
 		sync_data = {'value': new_value}
 		self._internal_update(sync_data)
 		self.model.send_sync(sync_data)
-		self._value_live.setLiteralValue(new_value)
 
 	def __present__(self, fragment, inh):
 		self._incr.onAccess()
@@ -44,13 +44,13 @@ class TextareaView (IPythonWidgetView):
 
 		def onAccept(self, text_area, text):
 			self._view._on_edit(text)
+			self._value_live.setLiteralValue(text)
 
 
 	def _on_edit(self, new_value):
 		sync_data = {'value': new_value}
 		self._internal_update(sync_data)
 		self.model.send_sync(sync_data)
-		self._value_live.setLiteralValue(new_value)
 
 	def __present__(self, fragment, inh):
 		self._incr.onAccess()
