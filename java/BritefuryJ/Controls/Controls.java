@@ -79,11 +79,21 @@ public class Controls
 	public static final InheritedAttributeNonNull dropDownExpanderHeaderArrowSize = new InheritedAttributeNonNull( controlsNamespace, "dropDownExpanderHeaderArrowSize", Double.class, 12.0 );
 	public static final InheritedAttributeNonNull dropDownExpanderHeaderArrowPainter = new InheritedAttributeNonNull( controlsNamespace, "dropDownExpanderHeaderArrowPainter", Painter.class,
 			new FillPainter( new Color( 0, 111, 128 ) ) );
-	public static final InheritedAttributeNonNull dropDownExpanderHeaderBorder = new InheritedAttributeNonNull( controlsNamespace, "dropDownExpanderHeaderBorder", AbstractBorder.class,
-			new SolidBorder( 1.0, 2.0, 4.0, 4.0, new Color( 0.75f, 0.75f, 0.75f ), new Color( 0.95f, 0.95f, 0.95f ), new Color( 0.7f, 0.7f, 0.7f ), new Color( 0.9f, 0.9f, 0.9f ) ) );
+	public static final InheritedAttributeNonNull dropDownExpanderBorder = new InheritedAttributeNonNull( controlsNamespace, "dropDownExpanderBorder", AbstractBorder.class,
+			new SolidBorder( 1.0, 2.0, 4.0, 4.0, new Color( 0.75f, 0.75f, 0.75f ), null, new Color( 0.7f, 0.7f, 0.7f ), null ) );
+	public static final InheritedAttributeNonNull dropDownExpanderHeaderPaint = new InheritedAttributeNonNull( controlsNamespace, "dropDownExpanderHeaderPaint", Paint.class,
+			new Color( 0.925f, 0.925f, 0.925f ));
+	public static final InheritedAttributeNonNull dropDownExpanderHeaderHoverPaint = new InheritedAttributeNonNull( controlsNamespace, "dropDownExpanderHeaderHoverPaint", Paint.class,
+			new Color( 0.875f, 0.875f, 0.875f ));
 	public static final InheritedAttributeNonNull dropDownExpanderPadding = new InheritedAttributeNonNull( controlsNamespace, "dropDownExpanderPadding", Double.class, 21.0 );
-	
-	
+
+
+	public static final InheritedAttributeNonNull accordionContainerBorder = new InheritedAttributeNonNull( controlsNamespace, "accordionContainerBorder", AbstractBorder.class,
+			new SolidBorder( 1.0, 2.0, 4.0, 4.0, new Color( 0.85f, 0.85f, 0.85f ), null));
+	public static final InheritedAttributeNonNull accordionContainerSpacingColumnStyle = new InheritedAttributeNonNull( controlsNamespace, "accordionContainerSpacingColumnStyle", StyleSheet.class,
+			StyleSheet.style(Primitive.columnSpacing.as(3.0)));
+
+
 	public static final InheritedAttributeNonNull tabbedBoxRounding = new InheritedAttributeNonNull( controlsNamespace, "tabbedBoxRounding", Double.class, 5.0 );
 	public static final InheritedAttributeNonNull tabbedBoxContentsPadding = new InheritedAttributeNonNull( controlsNamespace, "tabbedBoxContentsPadding", Double.class, 5.0 );
 	public static final InheritedAttributeNonNull tabbedBoxTabPadding = new InheritedAttributeNonNull( controlsNamespace, "tabbedBoxTabPadding", Double.class, 6.0 );
@@ -292,6 +302,13 @@ public class Controls
 	
 	
 	
+	public static StyleValues useAccordionContainerAttrs(StyleValues style)
+	{
+		return style.useAttr( accordionContainerBorder ).useAttr( accordionContainerSpacingColumnStyle );
+	}
+
+
+
 	public static StyleValues useTabsAttrs(StyleValues style)
 	{
 		return style;
