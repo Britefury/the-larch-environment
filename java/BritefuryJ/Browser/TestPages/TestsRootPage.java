@@ -164,9 +164,10 @@ public class TestsRootPage extends AbstractTestPage implements Presentable
 		new Hyperlink( "Viewport", subjectFor( viewport ) ),
 	};
 
-	
-	
-	
+
+
+
+	public static final AccordionContainerTestPage accordion = new AccordionContainerTestPage();
 	public static final BubblePopupTestPage bubblePopup = new BubblePopupTestPage();
 	public static final ButtonTestPage button = new ButtonTestPage();
 	public static final CheckboxTestPage checkbox = new CheckboxTestPage();
@@ -189,6 +190,7 @@ public class TestsRootPage extends AbstractTestPage implements Presentable
 	public static final TextEntryTestPage textEntry = new TextEntryTestPage();
 	
 	private static final Hyperlink controlsLinks[] = {
+		new Hyperlink( "Accordion container", subjectFor( accordion ) ),
 		new Hyperlink( "Bubble popup", subjectFor( bubblePopup ) ),
 		new Hyperlink( "Button", subjectFor( button ) ),
 		new Hyperlink( "Check box", subjectFor( checkbox ) ),

@@ -7,6 +7,8 @@
 package BritefuryJ.Controls;
 
 import BritefuryJ.Graphics.AbstractBorder;
+import BritefuryJ.Graphics.BorderWithHeaderBar;
+import BritefuryJ.Graphics.FillPainter;
 import BritefuryJ.Graphics.Painter;
 import BritefuryJ.LSpace.LSBin;
 import BritefuryJ.LSpace.LSElement;
@@ -25,6 +27,8 @@ import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
+
+import java.awt.*;
 
 public class DropDownExpander extends Expander
 {
@@ -97,9 +101,12 @@ public class DropDownExpander extends Expander
 		StyleValues usedStyle = Controls.useDropDownExpanderAttrs( style );
 
 		StyleSheet arrowStyle = StyleSheet.style( Primitive.shapePainter.as( style.get( Controls.dropDownExpanderHeaderArrowPainter, Painter.class ) ) );
-		double arrowSize = style.get( Controls.dropDownExpanderHeaderArrowSize, Double.class );
+		double arrowSize = style.get(Controls.dropDownExpanderHeaderArrowSize, Double.class);
 		double padding = style.get( Controls.dropDownExpanderPadding, Double.class );
-		AbstractBorder headerBorder = style.get( Controls.dropDownExpanderHeaderBorder, AbstractBorder.class );
+		AbstractBorder expanderBorder = style.get( Controls.dropDownExpanderBorder, AbstractBorder.class );
+		Paint headerPaint = style.get( Controls.dropDownExpanderHeaderPaint, Paint.class );
+		Paint headerHoverPaint = style.get( Controls.dropDownExpanderHeaderHoverPaint, Paint.class );
+
 		
 		Pres expandedArrow = arrowStyle.applyTo( new Arrow( Arrow.Direction.DOWN, arrowSize ) );
 		Pres contractedArrow = arrowStyle.applyTo( new Arrow( Arrow.Direction.RIGHT, arrowSize ) );
@@ -107,13 +114,16 @@ public class DropDownExpander extends Expander
 		DropDownExpanderInteractor headerInteractor = new DropDownExpanderInteractor();
 
 		StyleSheet headerRowStyle = StyleSheet.style( Primitive.rowSpacing.as( style.get( Controls.dropDownExpanderHeaderContentsSpacing, Double.class ) ) );
-		
-		Pres expandedHeader = headerBorder.surround( headerRowStyle.applyTo( new Row( 
-				new Pres[] { expandedArrow.alignHPack().alignVCentre(), header.alignHExpand() } ) ) ).withElementInteractor( headerInteractor );
-		Pres expanded = new Column( new Pres[] { expandedHeader, contents.padX( padding, 0.0 ) } );
 
-		Pres contracted = headerBorder.surround( headerRowStyle.applyTo( new Row(
-				new Pres[] { contractedArrow.alignHPack().alignVCentre(),header.alignHExpand() } ) ) ).withElementInteractor( headerInteractor );
+		BorderWithHeaderBar body = new BorderWithHeaderBar(expanderBorder, headerPaint, headerHoverPaint);
+
+		Pres expandedHeader = headerRowStyle.applyTo( new Row(
+				new Pres[] { expandedArrow.alignHPack().alignHPack().alignVCentre(), header.alignHExpand() } ) ).withElementInteractor( headerInteractor ).alignHExpand();
+		Pres expanded = body.surround(expandedHeader, contents.padX(padding, 0.0));
+
+		Pres contractedHeader = headerRowStyle.applyTo( new Row(
+				new Pres[] { contractedArrow.alignHPack().alignHPack().alignVCentre(), header.alignHExpand() } ) ).withElementInteractor( headerInteractor ).alignHExpand();
+		Pres contracted = body.surroundHeader(contractedHeader);
 		
 		LiveInterface state = stateSource.getLive();
 
