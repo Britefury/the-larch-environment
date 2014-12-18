@@ -161,7 +161,7 @@ public class RadioButton extends ControlPres
 
 		protected boolean isOn()
 		{
-			return getValue() == choiceValue;
+			return getValue().equals(choiceValue);
 		}
 
 

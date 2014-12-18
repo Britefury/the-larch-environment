@@ -133,12 +133,7 @@ public class ListSelect extends ControlPres
         this.listener = listener;
     }
 
-    public ListSelect(Object contents[], Object values[], Object initialChoice, ListSelectListener listener)
-    {
-        this(contents, values, new LiveSourceValue(initialChoice), listener);
-    }
-
-    public ListSelect(Object contents[], Object values[], LiveValue choice, ListSelectListener listener)
+    public ListSelect(Object contents[], Object values[], LiveInterface choice, ListSelectListener listener)
     {
         this(contents, values, new LiveSourceRef(choice), listener);
     }
@@ -146,6 +141,11 @@ public class ListSelect extends ControlPres
     public ListSelect(Object contents[], Object values[], LiveValue choice)
     {
         this(contents, values, new LiveSourceRef(choice), new CommitListener(choice, null));
+    }
+
+    public ListSelect(Object contents[], Object values[], Object initialChoice, ListSelectListener listener)
+    {
+        this(contents, values, new LiveSourceValue(initialChoice), listener);
     }
 
     public ListSelect(Object contents[], Object values[], ListSelectListener listener)
@@ -163,12 +163,7 @@ public class ListSelect extends ControlPres
         return labels;
     }
 
-    public static ListSelect listSelectWithLabels(String labelTexts[], Object values[], Object initialChoice, ListSelectListener listener)
-    {
-        return new ListSelect(labelTextsToLabels(labelTexts), values, initialChoice, listener);
-    }
-
-    public static ListSelect listSelectWithLabels(String labelTexts[], Object values[], LiveValue choice, ListSelectListener listener)
+    public static ListSelect listSelectWithLabels(String labelTexts[], Object values[], LiveInterface choice, ListSelectListener listener)
     {
         return new ListSelect(labelTextsToLabels(labelTexts), values, choice, listener);
     }
@@ -176,6 +171,11 @@ public class ListSelect extends ControlPres
     public static ListSelect listSelectWithLabels(String labelTexts[], Object values[], LiveValue choice)
     {
         return new ListSelect(labelTextsToLabels(labelTexts), values, choice);
+    }
+
+    public static ListSelect listSelectWithLabels(String labelTexts[], Object values[], Object initialChoice, ListSelectListener listener)
+    {
+        return new ListSelect(labelTextsToLabels(labelTexts), values, initialChoice, listener);
     }
 
     public static ListSelect listSelectWithLabels(String labelTexts[], Object values[], ListSelectListener listener)
@@ -206,7 +206,7 @@ public class ListSelect extends ControlPres
 
                 @Override
                 public Object evaluate() {
-                    return choice.getValue() == thisChoice;
+                    return choice.getValue().equals(thisChoice);
                 }
             });
 
