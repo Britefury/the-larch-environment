@@ -50,7 +50,6 @@ def start_larch():
 
 	app.appInit()
 	world = World()
-	world.enableImportHooks()
 
 	if len( sys.argv ) > 1:
 		if sys.argv[1] == '-app':

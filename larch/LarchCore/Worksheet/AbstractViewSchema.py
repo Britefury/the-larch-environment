@@ -7,8 +7,6 @@
 ##-*************************
 from weakref import WeakValueDictionary
 
-import imp
-
 from BritefuryJ.Incremental import IncrementalValueMonitor
 from BritefuryJ.Live import LiveFunction
 
@@ -18,13 +16,7 @@ from BritefuryJ.StyleSheet import StyleSheet
 
 from BritefuryJ.Projection import SubjectPath
 
-
-from Britefury import LoadBuiltins
-
-from LarchCore.Languages.Python2.Execution import Execution
-
-
-
+from LarchCore.Kernel.python import inproc_kernel
 
 
 class NodeAbstractView (object):
@@ -50,28 +42,32 @@ class NodeAbstractView (object):
 class WorksheetAbstractView (NodeAbstractView):
 	_projection = None
 
-	def __init__(self, worksheet, model, importName):
+	def __init__(self, worksheet, model, importName, kernel_source):
 		super( WorksheetAbstractView, self ).__init__( worksheet, model )
 		self._modelToView = WeakValueDictionary()
 		self._importName = importName
-		self.refreshResults()
+		self._kernel_source = kernel_source
+		self._module = None
+		# self.refreshResults()
 		
 		
-	def _initModule(self):
-		name = self._importName   if self._importName is not None   else 'worksheet'
-		self._module = imp.new_module( name )
-		LoadBuiltins.loadBuiltins( self._module )
+	def _get_module(self, module_callback):
+		def _on_kernel_created(kernel):
+			kernel.update_importable_modules()
+			module = kernel.get_live_module()
+			if module is not self._module:
+				self._module = module
+				self.getBody().clear_results()
+			module_callback(self._module)
+		self._kernel_source(_on_kernel_created)
+
 		
-		
-	def refreshResults(self):
-		self._initModule()
+	def refresh_worksheet_output(self):
 		body = self.getBody()
-		body.refreshResults( self._module )
-	
-		
-	def getModule(self):
-		return self._module
-		
+		def on_module_initialised(module):
+			body.refresh_worksheet_output(module)
+		self._get_module(on_module_initialised)
+
 		
 	def getBody(self):
 		return self._viewOf( self._model['body'] )
@@ -98,11 +94,18 @@ class BodyAbstractView (NodeAbstractView):
 	def __init__(self, worksheet, model):
 		super( BodyAbstractView, self ).__init__( worksheet, model )
 		self._contentsLive = LiveFunction( self._computeContents )
-		
-		
-	def refreshResults(self, module):
+		self._module = None
+
+
+	def clear_results(self):
 		for v in self.getContents():
-			v._refreshResults( module )
+			v._clear_results()
+
+
+	def refresh_worksheet_output(self, module):
+		self._module = module
+		for v in self.getContents():
+			v._refresh_worksheet_output( module )
 		
 		
 	def getContents(self):
@@ -125,10 +128,15 @@ class _TextAbstractView (NodeAbstractView):
 		return self._textLive.getValue()
 
 
-	def _refreshResults(self, module):
+	def _clear_results(self):
 		for x in self.getText():
 			if not isinstance( x, str )  and  not isinstance( x, unicode ):
-				x._refreshResults( module )
+				x._clear_results()
+
+	def _refresh_worksheet_output(self, module):
+		for x in self.getText():
+			if not isinstance( x, str )  and  not isinstance( x, unicode ):
+				x._refresh_worksheet_output( module )
 
 
 	def _computeText(self):
@@ -199,7 +207,10 @@ class LinkAbstractView (NodeAbstractView):
 		return self._model['text']
 
 
-	def _refreshResults(self, module):
+	def _clear_results(self):
+		pass
+
+	def _refresh_worksheet_output(self, module):
 		pass
 
 
@@ -286,7 +297,7 @@ class PythonCodeAbstractView (NodeAbstractView):
 			return False
 		elif style == self.STYLE_ERRORS:
 			result = self.getResult()
-			return result.hasErrors()
+			return result.has_errors()
 		else:
 			return True
 
@@ -298,9 +309,27 @@ class PythonCodeAbstractView (NodeAbstractView):
 		
 		
 		
-	def _refreshResults(self, module):
-		self._result = Execution.getResultOfExecutionWithinModule( self.getCode(), module, self.isResultVisible() )
+	def _clear_results(self):
+		self._result = None
 		self._incr.onChanged()
+
+	def _refresh_worksheet_output(self, module):
+		if self._result is not None  and  module is not self._module:
+			self._result.result_finished()
+			self._result = None
+
+		if self._result is None:
+			self._result = module.new_execution_result()
+			self._module = module
+			self._incr.onChanged()
+
+		module.execute(self.getCode(), self.isResultVisible(), self._result)
+
+
+	def refresh_output(self):
+		def module_callback(module):
+			self._refresh_worksheet_output(module)
+		self._worksheet._get_module(module_callback)
 
 
 
@@ -326,6 +355,7 @@ class InlinePythonCodeAbstractView (NodeAbstractView):
 		NodeAbstractView.__init__( self, worksheet, model )
 		self._incr = IncrementalValueMonitor( self )
 		self._result = None
+		self._module = None
 
 
 	def getExpr(self):
@@ -361,10 +391,26 @@ class InlinePythonCodeAbstractView (NodeAbstractView):
 
 
 
-	def _refreshResults(self, module):
-		self._result = Execution.getResultOfEvaluationWithinModule( self.getExpr(), module )
+	def _clear_results(self):
+		self._result = None
 		self._incr.onChanged()
 
+	def _refresh_worksheet_output(self, module):
+		if self._result is not None  and  module is not self._module:
+			self._result.result_finished()
+			self._result = None
+
+		if self._result is None:
+			self._result = module.new_execution_result()
+			self._module = module
+			self._incr.onChanged()
+
+		module.evaluate(self.getExpr(), self._result)
+
+	def refresh_output(self):
+		def module_callback(module):
+			self._refresh_worksheet_output(module)
+		self._worksheet._get_module(module_callback)
 
 
 
@@ -379,7 +425,10 @@ class InlineEmbeddedObjectAbstractView (NodeAbstractView):
 		return self._model['embeddedValue'].getValue()
 
 
-	def _refreshResults(self, module):
+	def _clear_results(self):
+		pass
+
+	def _refresh_worksheet_output(self, module):
 		pass
 
 
@@ -396,5 +445,8 @@ class ParagraphEmbeddedObjectAbstractView (NodeAbstractView):
 		return self._model['embeddedValue'].getValue()
 
 
-	def _refreshResults(self, module):
+	def _clear_results(self):
+		pass
+
+	def _refresh_worksheet_output(self, module):
 		pass
