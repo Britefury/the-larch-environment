@@ -178,7 +178,7 @@ public class AccordionContainer extends ControlPres
 
 				@Override
 				public Object evaluate() {
-					return (Integer)choice.getValue() == thisChoice;
+					return choice.getValue().equals(thisChoice);
 				}
 			});
 
