@@ -176,6 +176,7 @@ public class TestsRootPage extends AbstractTestPage implements Presentable
 	public static final EditableLabelTestPage editableLabel = new EditableLabelTestPage();
 	public static final ExpanderTestPage expander = new ExpanderTestPage();
 	public static final HyperlinkTestPage hyperlink = new HyperlinkTestPage();
+    public static final ListSelectTestPage listSelect = new ListSelectTestPage();
 	public static final NumericLabelTestPage numLabel = new NumericLabelTestPage();
 	public static final ObjectDropBoxTestPage objectDrop = new ObjectDropBoxTestPage();
 	public static final OptionMenuTestPage optionMenu = new OptionMenuTestPage();
@@ -199,6 +200,7 @@ public class TestsRootPage extends AbstractTestPage implements Presentable
 		new Hyperlink( "Editable label", subjectFor( editableLabel ) ),
 		new Hyperlink( "Expander", subjectFor( expander ) ),
 		new Hyperlink( "Hyperlink", subjectFor( hyperlink ) ),
+            new Hyperlink( "List select", subjectFor( listSelect ) ),
 		new Hyperlink( "Numeric label", subjectFor( numLabel ) ),
 		new Hyperlink( "Object drop box", subjectFor( objectDrop ) ),
 		new Hyperlink( "Option menu", subjectFor( optionMenu ) ),
