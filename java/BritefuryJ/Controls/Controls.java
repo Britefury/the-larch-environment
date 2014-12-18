@@ -94,7 +94,18 @@ public class Controls
 			StyleSheet.style(Primitive.columnSpacing.as(3.0)));
 
 
-	public static final InheritedAttributeNonNull tabbedBoxRounding = new InheritedAttributeNonNull( controlsNamespace, "tabbedBoxRounding", Double.class, 5.0 );
+    public static final InheritedAttributeNonNull listSelectItemPaddingX = new InheritedAttributeNonNull( controlsNamespace, "listSelectItemPaddingX", double.class, 4.0);
+    public static final InheritedAttributeNonNull listSelectItemPaddingY = new InheritedAttributeNonNull( controlsNamespace, "listSelectItemPaddingY", double.class, 1.0);
+    public static final InheritedAttributeNonNull listSelectToggleStyle = new InheritedAttributeNonNull( controlsNamespace, "listSelectToggleStyle", StyleSheet.class,
+            StyleSheet.style(
+                    Controls.toggleButtonInactiveBorder.as(new FilledBorder( 4.0, 4.0, 4.0, 4.0, null, new Color(0.9f, 0.9f, 0.9f))),
+                    Controls.toggleButtonActiveBorder.as(new SolidBorder( 1.0, 3.0, new Color( 0.85f, 0.85f, 0.85f ),
+                            new Color( 0.95f, 0.95f, 0.95f  ), new Color( 0.75f, 0.75f, 0.75f ), new Color( 0.9f, 0.9f, 0.9f ) ))));
+    public static final InheritedAttributeNonNull listSelectBorder = new InheritedAttributeNonNull( controlsNamespace, "listSelectBorder", AbstractBorder.class,
+            new SolidBorder(1.0, 1.0, new Color(0.9f, 0.9f, 0.9f), null));
+
+
+    public static final InheritedAttributeNonNull tabbedBoxRounding = new InheritedAttributeNonNull( controlsNamespace, "tabbedBoxRounding", Double.class, 5.0 );
 	public static final InheritedAttributeNonNull tabbedBoxContentsPadding = new InheritedAttributeNonNull( controlsNamespace, "tabbedBoxContentsPadding", Double.class, 5.0 );
 	public static final InheritedAttributeNonNull tabbedBoxTabPadding = new InheritedAttributeNonNull( controlsNamespace, "tabbedBoxTabPadding", Double.class, 6.0 );
 	public static final InheritedAttributeNonNull tabbedBoxHeaderSpacing = new InheritedAttributeNonNull( controlsNamespace, "tabbedBoxHeaderSpacing", Double.class, 5.0 );
@@ -305,6 +316,13 @@ public class Controls
 	public static StyleValues useAccordionContainerAttrs(StyleValues style)
 	{
 		return style.useAttr( accordionContainerBorder ).useAttr( accordionContainerSpacingColumnStyle );
+	}
+
+
+
+	public static StyleValues useListSelectAttrs(StyleValues style)
+	{
+		return style.useAttr( listSelectItemPaddingX ).useAttr( listSelectItemPaddingY ).useAttr( listSelectToggleStyle ).useAttr(listSelectBorder);
 	}
 
 
