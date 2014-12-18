@@ -3,7 +3,7 @@ from java.awt import Color
 from BritefuryJ.Incremental import IncrementalValueMonitor
 from BritefuryJ.Live import LiveValue, LiveFunction
 
-from BritefuryJ.Controls import SwitchButton, OptionMenu, RadioButton
+from BritefuryJ.Controls import SwitchButton, OptionMenu, RadioButton, ListSelect
 
 from BritefuryJ.Graphics import SolidBorder
 
@@ -68,6 +68,25 @@ class RadioButtonsView (IPythonWidgetView):
 			    self._radio_border.surround(Column(radios))])
 
 	_radio_border = SolidBorder(1.0, 3.0, 4.0, 4.0, Color(0.85, 0.85, 0.85), None)
+
+
+
+class SelectView (IPythonWidgetView):
+	def _on_edit(self, value_name):
+		self._state_sync(value_name=value_name)
+
+	def __present__(self, fragment, inh):
+		def on_choice(control, new_choice):
+			self._on_edit(new_choice)
+			value_live.setLiteralValue(new_choice)
+
+		self._incr.onAccess()
+		value_name = unicode(self.value_name)
+		value_live = LiveValue(value_name)
+		choices = list(self.value_names)
+		select = ListSelect.listSelectWithLabels(choices, choices, value_live, on_choice)
+		return Row([Label(self.description), Spacer(10.0, 0.0),
+			    select])
 
 
 
