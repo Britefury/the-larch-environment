@@ -136,7 +136,7 @@ class IPythonWidgetModel (object):
 		if method == 'update':
 			state = data['state']
 			self._state.update(state)
-			view_name = state['_view_name']
+			view_name = self._state['_view_name']
 			view_class = _view_name_to_class.get(view_name)
 			if view_class is None:
 				print 'IPythonWidgetModel._on_message: no view class for {0}, id={1}'.format(view_name, self.comm.comm_id)
@@ -181,6 +181,11 @@ class IPythonWidgetManager (object):
 
 	def get_by_comm_id(self, comm_id):
 		return self.__comm_id_to_widget.get(comm_id)
+
+	def get_by_view_id(self, view_id):
+		if view_id.startswith('IPY_MODEL_'):
+			view_id = view_id[10:]
+		return self.get_by_comm_id(view_id)
 
 	def _notify_widget_closed(self, widget):
 		comm_id = widget.comm.comm_id

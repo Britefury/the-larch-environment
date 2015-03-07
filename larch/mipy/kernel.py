@@ -645,11 +645,11 @@ class KernelConnection(object):
 		content = msg['content']
 		parent_msg_id = _get_parent_msg_id(msg)
 		stream_name = content['name']
-		data = content['data']
+		text = content['text']
 		kernel_request_listener = self.__request_listeners.get(parent_msg_id)
 		if kernel_request_listener is not None:
 			try:
-				kernel_request_listener.on_stream(stream_name, data)
+				kernel_request_listener.on_stream(stream_name, text)
 			except:
 				_show_handler_exception(self, 'iopub:stream')
 		else:
@@ -658,13 +658,12 @@ class KernelConnection(object):
 	def _handle_msg_iopub_display_data(self, ident, msg):
 		content = msg['content']
 		parent_msg_id = _get_parent_msg_id(msg)
-		source = content['source']
 		data = content['data']
 		metadata = content['metadata']
 		kernel_request_listener = self.__request_listeners.get(parent_msg_id)
 		if kernel_request_listener is not None:
 			try:
-				kernel_request_listener.on_display_data(source, data, metadata)
+				kernel_request_listener.on_display_data(data, metadata)
 			except:
 				_show_handler_exception(self, 'iopub:display_data')
 		else:
@@ -934,7 +933,7 @@ class TestCase_kernel (unittest.TestCase):
 			krn_event('on_status', busy=True),
 			krn_event('on_execute_input', code=code, execution_count=3),
 			krn_event('on_execute_ok', execution_count=3, payload=[], user_expressions={}),
-			krn_event('on_stream', stream_name='stdout', data='Hello world\n'),
+			krn_event('on_stream', stream_name='stdout', text='Hello world\n'),
 			krn_event('on_status', busy=False),
 			])
 
@@ -966,14 +965,19 @@ class TestCase_kernel (unittest.TestCase):
 		while len(ev.events) < 5:
 			self.krn.poll(-1)
 
-		tb = [u'---------------------------------------------------------------------------\nValueError                                Traceback (most recent call last)',
+		tb = [u'---------------------------------------------------------------------------',
+		      u'ValueError                                Traceback (most recent call last)',
 		      u'<ipython-input-5-94ef6d30a139> in <module>()\n----> 1 raise ValueError\n', u'ValueError: ']
+		tb_list = [u'---------------------------------------------------------------------------',
+			   u'ValueError                                Traceback (most recent call last)',
+			   u'<ipython-input-5-94ef6d30a139> in <module>()\n----> 1 raise ValueError\n',
+			   u'ValueError: ']
 
 		self.assertEventListsEqual(ev.events, [
 			krn_event('on_status', busy=True),
 			krn_event('on_execute_input', code=code, execution_count=5),
-			krn_event('on_execute_error', ename='ValueError', evalue='', traceback=tb),
-			krn_event('on_error', ename='ValueError', evalue='', traceback=tb),
+			krn_event('on_execute_error', ename=u'ValueError', evalue=u'', traceback=tb),
+			krn_event('on_error', ename=u'ValueError', evalue=u'', traceback=tb_list),
 			krn_event('on_status', busy=False),
 			])
 
@@ -992,7 +996,7 @@ class TestCase_kernel (unittest.TestCase):
 			krn_event('on_execute_input', code=code, execution_count=6),
 			krn_event('on_execute_ok', execution_count=5, payload=[], user_expressions={}),
 			krn_event('on_execute_result', execution_count=6, data={'text/plain': '3.141'}, metadata={}),
-			krn_event('on_stream', stream_name='stdout', data='Hello world\n'),
+			krn_event('on_stream', stream_name='stdout', text='Hello world\n'),
 			krn_event('on_status', busy=False),
 			])
 
@@ -1009,7 +1013,7 @@ class TestCase_kernel (unittest.TestCase):
 		self.assertEventListsEqual(ev.events, [
 			krn_event('on_status', busy=True),
 			krn_event('on_execute_ok', execution_count=5, payload=[], user_expressions={}),
-			krn_event('on_stream', stream_name='stdout', data='Hello world\n'),
+			krn_event('on_stream', stream_name='stdout', text='Hello world\n'),
 			krn_event('on_status', busy=False),
 			])
 
@@ -1033,7 +1037,7 @@ def on_mipy_test_open(comm, data):
 	print 'mipy test opened {0}'.format(data['content']['data'])
 	received_comm.on_msg(reply)
 
-comm_manager = get_ipython().comm_manager
+comm_manager = get_ipython().kernel.comm_manager
 comm_manager.register_target('mipy_test', on_mipy_test_open)
 """
 
@@ -1065,7 +1069,7 @@ received_comm.send({'text': 'Hi there'})
 
 		self.assertEventListsEqual(ev_open_comm.events, [
 			krn_event('on_status', busy=True),
-			krn_event('on_stream', stream_name='stdout', data="mipy test opened {u'a': 1}\n"),
+			krn_event('on_stream', stream_name='stdout', text="mipy test opened {u'a': 1}\n"),
 			krn_event('on_status', busy=False),
 			])
 
@@ -1094,7 +1098,7 @@ received_comm.send({'text': 'Hi there'})
 		while len(ev_comm_msg.events) < 3:
 			self.assertEventListsEqual(ev_exec.events, [
 				krn_event('on_status', busy=True),
-				krn_event('on_stream', stream_name='stdout', data="Received {u'b': 2}\n"),
+				krn_event('on_stream', stream_name='stdout', text="Received {u'b': 2}\n"),
 				krn_event('on_status', busy=False),
 				])
 
@@ -1177,7 +1181,7 @@ comm.send({'text': 'Hi there'})
 			krn_event('on_status', busy=True),
 			krn_event('on_execute_input', code=code1, execution_count=6),
 			krn_event('on_execute_ok', execution_count=5, payload=[], user_expressions={}),
-			krn_event('on_stream', stream_name='stdout', data='1\n'),
+			krn_event('on_stream', stream_name='stdout', text='1\n'),
 			krn_event('on_status', busy=False),
 			])
 
