@@ -15,45 +15,45 @@ from LarchCore.ipython.widget import IPythonWidgetView
 
 
 class ToggleButtonsView (IPythonWidgetView):
-	def _on_edit(self, value_name):
-		self._state_sync(value_name=value_name)
+	def _on_edit(self, selected_label):
+		self._state_sync(selected_label=selected_label)
 
 	def __present__(self, fragment, inh):
 		def on_choice(control, prev_index, new_index):
-			value_name = self.value_names[new_index]
-			self._on_edit(value_name)
+			selected_label = self._options_labels[new_index]
+			self._on_edit(selected_label)
 			value_live.setLiteralValue(new_index)
 
 		self._incr.onAccess()
-		value_name = unicode(self.value_name)
-		value_live = LiveValue(self.value_names.index(value_name))
-		choices = [Label(choice)   for choice in self.value_names]
+		selected_label = unicode(self.selected_label)
+		value_live = LiveValue(self._options_labels.index(selected_label))
+		choices = [Label(choice)   for choice in self._options_labels]
 		return Row([Label(self.description), Spacer(10.0, 0.0),
 			    SwitchButton(choices, choices, SwitchButton.Orientation.HORIZONTAL, value_live, on_choice)])
 
 
 
 class DropdownView (IPythonWidgetView):
-	def _on_edit(self, value_name):
-		self._state_sync(value_name=value_name)
+	def _on_edit(self, selected_label):
+		self._state_sync(selected_label=selected_label)
 
 	def __present__(self, fragment, inh):
 		def on_choice(control, prev_index, new_index):
-			value_name = self.value_names[new_index]
-			self._on_edit(value_name)
+			selected_label = self._options_labels[new_index]
+			self._on_edit(selected_label)
 			value_live.setLiteralValue(new_index)
 
 		self._incr.onAccess()
-		value_name = unicode(self.value_name)
-		value_live = LiveValue(self.value_names.index(value_name))
+		selected_label = unicode(self.selected_label)
+		value_live = LiveValue(self._options_labels.index(selected_label))
 		return Row([Label(self.description), Spacer(10.0, 0.0),
-			    OptionMenu([Label(choice)   for choice in self.value_names], value_live, on_choice)])
+			    OptionMenu([Label(choice)   for choice in self._options_labels], value_live, on_choice)])
 
 
 
 class RadioButtonsView (IPythonWidgetView):
-	def _on_edit(self, value_name):
-		self._state_sync(value_name=value_name)
+	def _on_edit(self, selected_label):
+		self._state_sync(selected_label=selected_label)
 
 	def __present__(self, fragment, inh):
 		def on_choice(control, new_choice):
@@ -61,9 +61,9 @@ class RadioButtonsView (IPythonWidgetView):
 			value_live.setLiteralValue(new_choice)
 
 		self._incr.onAccess()
-		value_name = unicode(self.value_name)
-		value_live = LiveValue(value_name)
-		radios = [RadioButton.radioButtonWithLabel(choice, choice, value_live, on_choice)   for choice in self.value_names]
+		selected_label = unicode(self.selected_label)
+		value_live = LiveValue(selected_label)
+		radios = [RadioButton.radioButtonWithLabel(choice, choice, value_live, on_choice)   for choice in self._options_labels]
 		return Row([Label(self.description), Spacer(10.0, 0.0),
 			    self._radio_border.surround(Column(radios))])
 
@@ -72,8 +72,8 @@ class RadioButtonsView (IPythonWidgetView):
 
 
 class SelectView (IPythonWidgetView):
-	def _on_edit(self, value_name):
-		self._state_sync(value_name=value_name)
+	def _on_edit(self, selected_label):
+		self._state_sync(selected_label=selected_label)
 
 	def __present__(self, fragment, inh):
 		def on_choice(control, new_choice):
@@ -81,9 +81,9 @@ class SelectView (IPythonWidgetView):
 			value_live.setLiteralValue(new_choice)
 
 		self._incr.onAccess()
-		value_name = unicode(self.value_name)
-		value_live = LiveValue(value_name)
-		choices = list(self.value_names)
+		selected_label = unicode(self.selected_label)
+		value_live = LiveValue(selected_label)
+		choices = list(self._options_labels)
 		select = ListSelect.listSelectWithLabels(choices, choices, value_live, on_choice)
 		return Row([Label(self.description), Spacer(10.0, 0.0),
 			    select])
