@@ -15,8 +15,8 @@ class TabView (ContainerView):
 		self._state_sync(selected_index=selected_index)
 
 	def _present_children(self):
-		child_comm_ids = self._children
-		children = [self._widget_manager.get_by_comm_id(child_comm_id)   for child_comm_id in child_comm_ids]
+		child_view_ids = self.children
+		children = [self._widget_manager.get_by_view_id(child_view_id)   for child_view_id in child_view_ids]
 
 		tabs = []
 
@@ -36,8 +36,8 @@ class AccordionView (ContainerView):
 		self._state_sync(selected_index=selected_index)
 
 	def _present_children(self):
-		child_comm_ids = self._children
-		children = [self._widget_manager.get_by_comm_id(child_comm_id)   for child_comm_id in child_comm_ids]
+		child_view_ids = self.children
+		children = [self._widget_manager.get_by_view_id(child_view_id)   for child_view_id in child_view_ids]
 
 		tabs = []
 
