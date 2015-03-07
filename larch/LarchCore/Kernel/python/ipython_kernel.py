@@ -105,11 +105,10 @@ class _KernelListener (request_listener.KernelRequestListener):
 			raise ValueError, 'Unknown stream name {0}'.format(stream_name)
 
 
-	def on_display_data(self, source, data, metadata):
+	def on_display_data(self, data, metadata):
 		"""
 		'display_data' message on IOPUB socket
 
-		:param source: who created the data
 		:param data: dictionary mapping MIME type to raw data representation in that format
 		:param metadata: metadata describing the content of `data`
 		"""
@@ -396,7 +395,7 @@ class IPythonExecutionResult (execution_result.AbstractExecutionResult):
 
 		if comm_manager is None:
 			comm_manager = comm.CommManager(self.__default_comm_handler)
-			comm_manager.register_comm_open_handler('WidgetModel', self.__handle_comm_WidgetModel)
+			comm_manager.register_comm_open_handler('ipython.widget', self.__handle_comm_WidgetModel)
 
 		self.__kernel = kernel
 		self.__comm_manager = comm_manager

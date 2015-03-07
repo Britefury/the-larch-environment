@@ -33,20 +33,19 @@ class KernelRequestListener (object):
 			self._kernel._detach_listener(self)
 
 
-	def on_stream(self, stream_name, data):
+	def on_stream(self, stream_name, text):
 		"""
 		'stream' message on IOPUB socket
 
 		:param stream_name: the stream name, e.g. stdout, stderr
-		:param data: the text written to the stream
+		:param text: the text written to the stream
 		"""
 		pass
 
-	def on_display_data(self, source, data, metadata):
+	def on_display_data(self, data, metadata):
 		"""
 		'display_data' message on IOPUB socket
 
-		:param source: who created the data
 		:param data: dictionary mapping MIME type to raw data representation in that format
 		:param metadata: metadata describing the content of `data`
 		"""
@@ -207,11 +206,11 @@ class PrintKernelRequestListenerMixin (KernelRequestListener):
 		self.name = name
 
 
-	def on_stream(self, stream_name, data):
-		print '[{0}]: stream: stream_name={1}, data={2}'.format(self.name, stream_name, data)
+	def on_stream(self, stream_name, text):
+		print '[{0}]: stream: stream_name={1}, text={2}'.format(self.name, stream_name, text)
 
-	def on_display_data(self, source, data, metadata):
-		print '[{0}]: display_data: source={1}, data={2}, metadata={3}'.format(self.name, source, data, metadata)
+	def on_display_data(self, data, metadata):
+		print '[{0}]: display_data: data={1}, metadata={2}'.format(self.name, data, metadata)
 
 	def on_status(self, busy):
 		print '[{0}]: status: busy={1}'.format(self.name, busy)
@@ -282,11 +281,11 @@ class EventLogKernelRequestListener (KernelRequestListener):
 		self.events = []
 
 
-	def on_stream(self, stream_name, data):
-		self.events.append(krn_event('on_stream', stream_name=stream_name, data=data))
+	def on_stream(self, stream_name, text):
+		self.events.append(krn_event('on_stream', stream_name=stream_name, text=text))
 
-	def on_display_data(self, source, data, metadata):
-		self.events.append(krn_event('on_display_data', source=source, data=data, metadata=metadata))
+	def on_display_data(self, data, metadata):
+		self.events.append(krn_event('on_display_data', data=data, metadata=metadata))
 
 	def on_status(self, busy):
 		self.events.append(krn_event('on_status', busy=busy))
