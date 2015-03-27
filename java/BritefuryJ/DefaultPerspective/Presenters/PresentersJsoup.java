@@ -43,7 +43,6 @@ public class PresentersJsoup extends ObjectPresenterRegistry {
 			Pres header = htmlSourceStyle.applyTo( new Label( "HTML Source (via jsoup)" ) ).pad( 2.0, 2.0 ).alignHExpand();
 
 			List<Node> children = source.childNodes();
-			System.out.println("Document has " + children.size() + " child nodes");
 			Pres childPres = new Column( children.toArray() );
 
 			return new ObjectBorder( new Column( new Pres[] { header, childPres.padX( 15.0, 0.0 ) } ) );
