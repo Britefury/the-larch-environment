@@ -92,11 +92,12 @@ public class DataImporter <TargetType extends Target> extends AbstractDataImport
 	private static CanImportFlavorFn localFlavorImportFn(Class<?> type)
 	{
 		final DataFlavor localFlavor = new LocalDataFlavor( type );
-		CanImportFlavorFn test = new CanImportFlavorFn()
-		{
-			public boolean canImportFlavor(DataFlavor flavor)
-			{
-				return flavor.equals( localFlavor );
+		CanImportFlavorFn test = new CanImportFlavorFn() {
+			public boolean canImportFlavor(DataFlavor flavor) {
+                // The comparison must be in the order potentialTarget.equals(incoming)
+                // as the changes introduced by JDK8 to the way HTML content is handled
+                // when it is pasted in require this ordering.
+                return localFlavor.equals( flavor );
 			}
 		};
 		return test;
@@ -106,7 +107,10 @@ public class DataImporter <TargetType extends Target> extends AbstractDataImport
 	{
 		CanImportFlavorFn test = new CanImportFlavorFn() {
 			public boolean canImportFlavor(DataFlavor flavor) {
-				return flavor.equals(requiredFlavor);
+                // The comparison must be in the order potentialTarget.equals(incoming)
+                // as the changes introduced by JDK8 to the way HTML content is handled
+                // when it is pasted in require this ordering.
+                return requiredFlavor.equals(flavor);
 			}
 		};
 		return test;
