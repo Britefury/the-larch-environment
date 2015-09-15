@@ -76,15 +76,32 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 
 
 
+    protected int[] getChildrenLineBreakCosts(List<LSElement> nodes)
+    {
+        int lineBreakCosts[] = new int[nodes.size()];
+        for (int i = 0; i < nodes.size(); i++)
+        {
+            lineBreakCosts[i] = nodes.get( i ).computeLineBreakCost();
+        }
+        return lineBreakCosts;
+    }
+
+    private int[] getLeavesLineBreakCosts()
+    {
+        refreshSubtree();
+        return getChildrenLineBreakCosts(Arrays.asList(leaves));
+    }
 
 
-	@Override
+
+    @Override
 	protected void updateRequisitionX()
 	{
 		refreshSubtree();
 		
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
-		ParagraphLayout.computeRequisitionX( layoutReqBox, getLeavesRefreshedRequisitionXBoxes(), getIndentation(), getSpacing() );
+		ParagraphLayout.computeRequisitionX( layoutReqBox, getLeavesRefreshedRequisitionXBoxes(), getLeavesLineBreakCosts(),
+                getIndentation(), getSpacing() );
 	}
 
 	@Override
@@ -112,7 +129,8 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 		int childAllocFlags[] = getLeavesAlignmentFlags();
 		double prevWidth[] = getLeavesAllocationX();
 		
-		lines = ParagraphLayout.allocateX( layoutReqBox, childBoxes, getAllocationBox(), childAllocBoxes, childAllocFlags, getIndentation(), getSpacing() );
+		lines = ParagraphLayout.allocateX( layoutReqBox, childBoxes, getAllocationBox(), childAllocBoxes, childAllocFlags,
+                getLeavesLineBreakCosts(), getIndentation(), getSpacing() );
 		
 		refreshLeavesAllocationX( prevWidth );
 	}

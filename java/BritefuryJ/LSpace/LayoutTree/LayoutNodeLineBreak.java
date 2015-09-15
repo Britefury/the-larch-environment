@@ -6,25 +6,42 @@
 //##************************
 package BritefuryJ.LSpace.LayoutTree;
 
+import BritefuryJ.LSpace.ElementFilter;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.LSLineBreak;
+import BritefuryJ.LSpace.Layout.LReqBox;
 import BritefuryJ.LSpace.Layout.LReqBoxInterface;
+import BritefuryJ.Math.Point2;
 
-public class LayoutNodeLineBreak extends LayoutNodeBlank
+public class LayoutNodeLineBreak extends LeafLayoutNodeSharedReq
 {
+    private static LReqBox lineBreakReq = new LReqBox(0.0, 0.0, 0.0, 0.0);
+
 	public LayoutNodeLineBreak(LSLineBreak element)
 	{
-		super( element );
+		super( element, lineBreakReq );
 	}
 
 
 
 	protected void updateRequisitionX()
 	{
-		super.updateRequisitionX();
-		
-		LReqBoxInterface layoutReqBox = getRequisitionBox();
-		LSLineBreak lineBreak = (LSLineBreak)element;
-		
-		lineBreak.initialiseLineBreakRequisition( layoutReqBox );
 	}
+
+    protected void updateRequisitionY()
+    {
+    }
+
+
+    public LSElement getLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter)
+    {
+        if ( filter == null  ||  filter.testElement( element ) )
+        {
+            return element;
+        }
+        else
+        {
+            return null;
+        }
+    }
 }

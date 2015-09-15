@@ -18,23 +18,20 @@ public class LReqBox implements LReqBoxInterface
 	protected static double ONE_PLUS_EPSILON = 1.0 + EPSILON;
 	
 	
-	private static int FLAG_LINEBREAK = 0x1  *  ElementAlignment._ELEMENTALIGN_END;
 	private static int FLAG_PARAGRAPH_INDENT = 0x2  *  ElementAlignment._ELEMENTALIGN_END;
 	private static int FLAG_PARAGRAPH_DEDENT = 0x4  *  ElementAlignment._ELEMENTALIGN_END;
 	
 	
 	protected int flags = 0;
-	protected int lineBreakCost;
-	
+
 	protected double minWidth, prefWidth, minHAdvance, prefHAdvance;
 	protected double reqHeight, reqVSpacing;
 	protected double refY;
-	
+
 	
 	
 	public LReqBox()
 	{
-		lineBreakCost = -1;
 	}
 	
 	public LReqBox(double width, double hAdvance, double height, double vSpacing)
@@ -44,7 +41,6 @@ public class LReqBox implements LReqBoxInterface
 		reqHeight = height;
 		reqVSpacing = vSpacing;
 		refY = height * 0.5;
-		lineBreakCost = -1;
 	}
 	
 	public LReqBox(double width, double hAdvance, double height, double vSpacing, double refY)
@@ -54,7 +50,6 @@ public class LReqBox implements LReqBoxInterface
 		this.reqHeight = height;
 		this.reqVSpacing = vSpacing;
 		this.refY = refY;
-		lineBreakCost = -1;
 	}
 
 	public LReqBox(double minWidth, double prefWidth, double minHAdvance, double prefHAdvance, double height, double vSpacing, double refY)
@@ -66,7 +61,6 @@ public class LReqBox implements LReqBoxInterface
 		this.reqHeight = height;
 		this.reqVSpacing = vSpacing;
 		this.refY = refY;
-		lineBreakCost = -1;
 	}
 
 	
@@ -81,11 +75,8 @@ public class LReqBox implements LReqBoxInterface
 		refY = box.getReqRefY();
 		
 		flags = 0;
-		setFlag( FLAG_LINEBREAK, box.isReqLineBreak() );
 		setFlag( FLAG_PARAGRAPH_INDENT, box.isReqParagraphIndentMarker() );
 		setFlag( FLAG_PARAGRAPH_DEDENT, box.isReqParagraphDedentMarker() );
-
-		lineBreakCost = box.getReqLineBreakCost();
 	}
 	
 	public LReqBox(LReqBoxInterface box, Xform2 xform)
@@ -99,11 +90,8 @@ public class LReqBox implements LReqBoxInterface
 		refY = xform.scale( box.getReqRefY() );
 
 		flags = 0;
-		setFlag( FLAG_LINEBREAK, box.isReqLineBreak() );
 		setFlag( FLAG_PARAGRAPH_INDENT, box.isReqParagraphIndentMarker() );
 		setFlag( FLAG_PARAGRAPH_DEDENT, box.isReqParagraphDedentMarker() );
-
-		lineBreakCost = box.getReqLineBreakCost();
 	}
 	
 	
@@ -233,14 +221,6 @@ public class LReqBox implements LReqBoxInterface
 	
 	
 	
-	public void setLineBreakCost(int cost)
-	{
-		lineBreakCost = cost;
-		setFlag( FLAG_LINEBREAK, true );
-	}
-	
-	
-	
 	public void setParagraphIndentMarker()
 	{
 		setFlag( FLAG_PARAGRAPH_INDENT, true );
@@ -340,26 +320,7 @@ public class LReqBox implements LReqBoxInterface
 		return new LReqBox( this, xform );
 	}
 	
-	
-	
-	public LReqBox lineBreakBox(int cost)
-	{
-		LReqBox b = new LReqBox( this );
-		b.setFlag( FLAG_LINEBREAK, true );
-		b.lineBreakCost = cost;
-		return b;
-	}
-	
-	public boolean isReqLineBreak()
-	{
-		return getFlag( FLAG_LINEBREAK );
-	}
-	
-	public int getReqLineBreakCost()
-	{
-		return lineBreakCost;
-	}
-	
+
 	
 	
 	private void setFlag(int f, boolean value)
