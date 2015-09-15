@@ -11,7 +11,7 @@ import BritefuryJ.LSpace.Layout.LReqBoxInterface;
 import BritefuryJ.LSpace.LayoutTree.LayoutNodeLineBreak;
 import BritefuryJ.LSpace.StyleParams.ElementStyleParams;
 
-public class LSLineBreak extends LSBlank
+public class LSLineBreak extends LSElement
 {
 	public LSLineBreak()
 	{
@@ -34,13 +34,7 @@ public class LSLineBreak extends LSBlank
 	//
 	//
 	
-	public void initialiseLineBreakRequisition(LReqBoxInterface reqBox)
-	{
-		reqBox.setLineBreakCost( computeLineBreakCost() );
-	}
-
-	
-	private int computeLineBreakCost()
+	public int computeLineBreakCost()
 	{
 		int cost = 0;
 		LSContainer w = getParent();
@@ -54,4 +48,31 @@ public class LSLineBreak extends LSBlank
 		
 		return cost;
 	}
+
+
+
+    //
+    //
+    // TEXT REPRESENTATION METHODS
+    //
+    //
+
+    @Override
+    public String getLeafTextRepresentation()
+    {
+        return "";
+    }
+
+
+    //
+    //
+    // VALUE METHODS
+    //
+    //
+
+    @Override
+    public Object getDefaultValue()
+    {
+        return null;
+    }
 }

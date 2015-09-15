@@ -35,15 +35,13 @@ import BritefuryJ.LSpace.Event.PointerEvent;
 import BritefuryJ.LSpace.Event.PointerMotionEvent;
 import BritefuryJ.LSpace.Input.*;
 import BritefuryJ.LSpace.Interactor.*;
-import BritefuryJ.LSpace.Layout.ElementAlignment;
-import BritefuryJ.LSpace.Layout.HAlignment;
-import BritefuryJ.LSpace.Layout.LAllocV;
-import BritefuryJ.LSpace.Layout.VAlignment;
+import BritefuryJ.LSpace.Layout.*;
 import BritefuryJ.LSpace.LayoutTree.ArrangedSequenceLayoutNode;
 import BritefuryJ.LSpace.LayoutTree.LayoutNode;
 import BritefuryJ.LSpace.Marker.Marker;
 import BritefuryJ.LSpace.StyleParams.ElementStyleParams;
 import BritefuryJ.LSpace.TextFocus.Caret;
+import BritefuryJ.LSpace.Util.TextVisual;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -418,10 +416,7 @@ abstract public class LSElement implements Presentable
 	protected Object fixedValue;
 	
 	private HashMap<Object, PropertyValue> properties = null;
-	
-	
-	
-	
+
 	//
 	//
 	// FIELDS AS DICTIONARY VALUES
@@ -556,6 +551,12 @@ abstract public class LSElement implements Presentable
 			return row;
 		}
 	}
+
+
+
+    public int computeLineBreakCost() {
+        return -1;
+    }
 	
 	
 

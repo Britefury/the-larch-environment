@@ -31,14 +31,16 @@ public class ParagraphLayout
 	private static class BreakEntry
 	{
 		public LReqBoxInterface breakBox;
+        public int lineBreakCost;
 		public int indexInChildList;
 		public double xAfterBreak;
 		public IndentationEntry lineIndentation;
 		
 		
-		public BreakEntry(LReqBoxInterface child, int indexInChildList, double xAfterBreak, IndentationEntry lineIndentation)
+		public BreakEntry(LReqBoxInterface child, int lineBreakCost, int indexInChildList, double xAfterBreak, IndentationEntry lineIndentation)
 		{
 			this.breakBox = child;
+            this.lineBreakCost = lineBreakCost;
 			this.indexInChildList = indexInChildList;
 			this.xAfterBreak = xAfterBreak;
 			this.lineIndentation = lineIndentation;
@@ -194,7 +196,7 @@ public class ParagraphLayout
 	
 	
 
-	public static void computeRequisitionX(LReqBoxInterface box, LReqBoxInterface children[], double indentation, double hSpacing)
+	public static void computeRequisitionX(LReqBoxInterface box, LReqBoxInterface children[], int childLineBreakCosts[], double indentation, double hSpacing)
 	{
 		// Accumulate the width required for all the children
 		
@@ -235,7 +237,7 @@ public class ParagraphLayout
 			prefX = prefAdvance + hSpacing;
 			
 		
-			if ( child.isReqLineBreak() )
+			if ( childLineBreakCosts[i] >= 0 )
 			{
 				minWidth = Math.max( minWidth, lineWidth );
 				minAdvance = Math.max( minAdvance, lineAdvance );
@@ -294,7 +296,7 @@ public class ParagraphLayout
 
 
 
-	public static Line[] allocateX(LReqBoxInterface box, LReqBoxInterface children[], LAllocBoxInterface allocBox, LAllocBoxInterface childrenAlloc[], int childAllocationFlags[], double indentation, double spacing)
+	public static Line[] allocateX(LReqBoxInterface box, LReqBoxInterface children[], LAllocBoxInterface allocBox, LAllocBoxInterface childrenAlloc[], int childAllocationFlags[], int childLineBreakCosts[], double indentation, double spacing)
 	{
 		// The paragraph-flow algorithm works as follows:
 		// Children are positioned left-to-right, sequentially. Their positions are accumulated.
@@ -355,10 +357,10 @@ public class ParagraphLayout
 			lineX = lineAdvance + spacing;
 			
 			// Keep track of the best and most recent line break boxes
-			if ( child.isReqLineBreak() )
+			if ( childLineBreakCosts[i] >= 0 )
 			{
-				BreakEntry entry = new BreakEntry( child, i, lineX, indentationStack.lastElement() );
-				if ( bestLineBreak == null  ||  child.getReqLineBreakCost() <= bestLineBreak.breakBox.getReqLineBreakCost() )
+				BreakEntry entry = new BreakEntry( child, childLineBreakCosts[i], i, lineX, indentationStack.lastElement() );
+				if ( bestLineBreak == null  ||  childLineBreakCosts[i] <= bestLineBreak.lineBreakCost )
 				{
 					bestLineBreak = entry;
 					bestLineBreakEntryIndex = lineBreaks.size();
@@ -397,7 +399,7 @@ public class ParagraphLayout
 						}
 						
 						// We have found a 'new best break' if break @j has a lower cost than the current 'best'
-						if ( newBestBreakEntry == null  ||  entry.breakBox.getReqLineBreakCost() < newBestBreakEntry.breakBox.getReqLineBreakCost() )
+						if ( newBestBreakEntry == null  ||  entry.lineBreakCost < newBestBreakEntry.lineBreakCost )
 						{
 							newBestBreakEntry = entry;
 							newBestBreakEntryIndex = j;
@@ -497,7 +499,7 @@ public class ParagraphLayout
 						}
 					}
 					
-					if ( bestLineBreak == null  ||  entry.breakBox.getReqLineBreakCost() <= bestLineBreak.breakBox.getReqLineBreakCost() )
+					if ( bestLineBreak == null  ||  entry.lineBreakCost <= bestLineBreak.lineBreakCost )
 					{
 						// Found a better line break
 						bestLineBreak = entry;

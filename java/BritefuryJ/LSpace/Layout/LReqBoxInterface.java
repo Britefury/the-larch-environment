@@ -21,11 +21,9 @@ public interface LReqBoxInterface
 	public abstract double getReqRefY();
 	public abstract double getReqHeightBelowRefPoint();
 	
-	public abstract boolean isReqLineBreak();
 	public abstract boolean isReqParagraphIndentMarker();
 	public abstract boolean isReqParagraphDedentMarker();
-	public abstract int getReqLineBreakCost();
-	
+
 	public abstract LReqBoxInterface transformedRequisition(Xform2 xform);
 
 
@@ -39,8 +37,6 @@ public interface LReqBoxInterface
 	public abstract void setRequisitionY(double height, double vSpacing);
 	public abstract void setRequisitionY(double height, double vSpacing, double refY);
 	public abstract void setRequisitionY(LReqBoxInterface reqBox);
-
-	public abstract void setLineBreakCost(int cost);
 
 	public abstract void borderX(double leftMargin, double rightMargin);
 	public abstract void borderY(double topMargin, double bottomMargin);
