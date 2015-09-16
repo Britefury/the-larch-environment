@@ -30,6 +30,13 @@ class ProjectNode (object):
 		raise NotImplementedError, 'abstract'
 
 
+	def _join_import_names(self, a, b):
+		if a == '':
+			return b
+		else:
+			return '.'.join([a, b])
+
+
 	def __getstate__(self):
 		return {}
 	
@@ -43,6 +50,16 @@ class ProjectNode (object):
 	def export(self, path):
 		pass
 
+
+
+	def register_importable_modules(self):
+		pass
+
+	def unregister_importable_modules(self):
+		pass
+
+	def update_importable_modules(self):
+		pass
 
 
 
