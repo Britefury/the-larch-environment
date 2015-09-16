@@ -1,1 +1,1 @@
-jython lconsole.py
+jython lconsole.py $@

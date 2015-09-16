@@ -12,6 +12,7 @@ sys.path.append( os.path.join( os.getcwd(), 'larch' ) )
 sys.path.append( os.path.join( os.getcwd(), 'bin' ) )
 sys.path.append( os.path.join( os.getcwd(), 'extlibs', 'jsoup-1.7.3.jar' ) )
 sys.path.append( os.path.join( os.getcwd(), 'extlibs', 'svgSalamander.jar' ) )
+sys.path.append( os.path.join( os.getcwd(), 'extlibs', 'jeromq-0.3.4.jar' ) )
 
 from LarchCore.app_larch import start_larch
 
