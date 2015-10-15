@@ -90,12 +90,9 @@ class VisualRegexSyntaxRecognizingController (SyntaxRecognizingController):
 		self._unparsedEditRule = self.editRule( [ self._expr ] )
 		self._expressionTopLevelEditRule = self.softStructuralEditRule( [ self._exprOuterValid, self._exprOuterInvalid, self._topLevel ] )
 
-
-
-
-	expression = EditRuleMethodApplicator( lambda self: self._expressionEditRule )
-	unparsed = EditRuleMethodApplicator( lambda self: self._unparsedEditRule )
-	expressionTopLevel = EditRuleMethodApplicator( lambda self: self._expressionTopLevelEditRule )
+		self.expression = self._expressionEditRule
+		self.unparsed = self._unparsedEditRule
+		self.expressionTopLevel = self._expressionTopLevelEditRule
 
 
 
