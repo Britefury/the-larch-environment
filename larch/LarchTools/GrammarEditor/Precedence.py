@@ -23,6 +23,7 @@ PRECEDENCE_TERMINAL = 0
 PRECEDENCE_INVOKE_RULE = 0
 
 PRECEDENCE_REPEAT = 10
+PRECEDENCE_ACTION = 15
 PRECEDENCE_SEQUENCE = 20
 PRECEDENCE_CHOICE = 30
 
@@ -48,6 +49,7 @@ nodePrecedence[Schema.Terminal] = PRECEDENCE_TERMINAL
 nodePrecedence[Schema.InvokeRule] = PRECEDENCE_INVOKE_RULE
 
 nodePrecedence[Schema.AbstractRepeat] = PRECEDENCE_REPEAT
+nodePrecedence[Schema.Action] = PRECEDENCE_ACTION
 nodePrecedence[Schema.Sequence] = PRECEDENCE_SEQUENCE
 nodePrecedence[Schema.Choice] = PRECEDENCE_CHOICE
 

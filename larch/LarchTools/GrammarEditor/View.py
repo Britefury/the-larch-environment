@@ -17,6 +17,8 @@ from BritefuryJ.Parser import ParserExpression
 from Britefury.Kernel.View.DispatchView import MethodDispatchView
 from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod
 
+from BritefuryJ.Command import Command, CommandSet, CommandSetRegistry
+from BritefuryJ.Shortcut import Shortcut
 
 from BritefuryJ.DocModel import DMObject
 
@@ -25,7 +27,7 @@ from BritefuryJ.LSpace.Interactor import KeyElementInteractor
 
 from BritefuryJ.AttributeTable import AttributeNamespace, InheritedAttributeNonNull, PyDerivedValueTable
 
-from BritefuryJ.Pres import ApplyPerspective, ApplyStyleSheetFromAttribute
+from BritefuryJ.Pres import ApplyPerspective, ApplyStyleSheetFromAttribute, Pres
 from BritefuryJ.Pres.Primitive import Primitive, Box, Text, Label, HiddenText, Segment, Script, Span, Row, Column, Paragraph, FlowGrid, Whitespace, Border
 
 from BritefuryJ.StyleSheet import StyleSheet
@@ -45,7 +47,7 @@ from BritefuryJ.Editor.SyntaxRecognizing.SyntaxRecognizingController import Edit
 from LarchCore.Languages.Python2.PythonEditor.PythonEditorCombinators import PythonEditorStyle
 from LarchTools.PythonTools.VisualRegex.View import _repeatBorder, _controlCharStyle
 
-from LarchTools.GrammarEditor import Schema, Precedence
+from LarchTools.GrammarEditor import Schema, Precedence, helpers
 from LarchTools.GrammarEditor.Parser import GrammarEditorGrammar
 from LarchTools.GrammarEditor.SRController import GrammarEditorSyntaxRecognizingController
 
@@ -66,6 +68,10 @@ from LarchTools.GrammarEditor.SRController import GrammarEditorSyntaxRecognizing
 # 	commentStyle = InheritedAttributeNonNull( grammarEditor, 'commentStyle', StyleSheet,
 # 						  StyleSheet.style( Primitive.fontFace( _grammarCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.4, 0.4, 0.4 ) ) ) )
 
+
+_pyActionBorder = SolidBorder( 1.5, 4.0, 10.0, 10.0, Color( 0.2, 0.75, 0.0 ), None )
+
+py_tagline_style = StyleSheet.style(Primitive.fontSize(10), Primitive.foreground(Color(0.0, 0.5, 0.0)))
 
 
 _non_escaped_string_re = re.compile( r'(\\(?:[abnfrt\\' + '\'\"' + r']|(?:x[0-9a-fA-F]{2})|(?:u[0-9a-fA-F]{4})|(?:U[0-9a-fA-F]{8})))' )
@@ -96,6 +102,20 @@ def string_literal(quotation, value, raw):
 	boxContents.extend( [ quotationPres,  valuePres,  quotationPres ] )
 
 	return Row( boxContents )
+
+
+
+class StatementProperty (object):
+	pass
+
+StatementProperty.instance = StatementProperty()
+
+
+class GrammarDefProperty (object):
+	pass
+
+GrammarDefProperty.instance = GrammarDefProperty()
+
 
 
 def literal(string_view):
@@ -136,7 +156,9 @@ def optional(subexp):
 def repeat_range(subexp, min, max):
 	return _repetition( subexp, Row( [ _controlCharStyle( Text( '{' ) ), Text( min ),  _controlCharStyle( Text( ':' ) ), Text( max ), _controlCharStyle( Text( '}' ) ) ] ) )
 
-
+def action_pres(subexp, action):
+	arrow =ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text(' -> '))
+	return Row([subexp, arrow, action])
 
 def sequence(subexps):
 	items = []
@@ -154,7 +176,7 @@ def choice(subexps):
 		for x in subexps[1:]:
 			p = [ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text('| ')), x]
 			items.append(Paragraph(p))
-	return Column(items)
+	return Column(0, items)
 
 
 
@@ -164,10 +186,13 @@ def blank_line():
 def comment_stmt(comment):
 	return ApplyStyleSheetFromAttribute( PythonEditorStyle.commentStyle, Text( '#' + comment ) )
 
-def statement_line(rule):
+def statement_line(rule, model):
 	rule = Segment( rule )
 	newLine = Whitespace( '\n' )
-	return Paragraph( [ rule, newLine ] ).alignHPack()
+	p = Paragraph( [ rule, newLine ] ).alignHPack()
+	if model is not None:
+		p = p.withProperty( StatementProperty.instance, model )
+	return p
 
 def rule_def(name, body_view):
 	n = ApplyStyleSheetFromAttribute( PythonEditorStyle.numLiteralStyle, Text( name ) )
@@ -228,6 +253,14 @@ class GrammarEditorView (MethodDispatchView):
 		return word(string_literal( quote, value, False ))
 
 
+	@DMObjectNodeDispatchMethod( Schema.RegEx )
+	@_controller.expressionEditRule
+	def RegEx(self, fragment, inheritedState, model, regex):
+		p = EditPerspective.instance.applyTo(regex)
+		p = Segment(StructuralItem( _controller, model, p ))
+		return p
+
+
 
 	# INVOKE RULE
 
@@ -274,6 +307,28 @@ class GrammarEditorView (MethodDispatchView):
 		return repeat_range(subexp_view, a, b)
 
 
+	# ACTION
+
+	@DMObjectNodeDispatchMethod( Schema.ActionPy )
+	@_controller.expressionEditRule
+	def ActionPy(self, fragment, inheritedState, model, py):
+		p = EditPerspective.instance.applyTo(py)
+		p = Paragraph( [ HiddenText( u'\ue000' ), p, HiddenText( u'\ue000' ) ] )
+		tagline = py_tagline_style.applyTo(Label('py'))
+		p = Column(1, [tagline, p])
+		p = _pyActionBorder.surround(p)
+		p = Segment(StructuralItem( _controller, model, p ))
+		return p
+
+
+	@DMObjectNodeDispatchMethod( Schema.Action )
+	@_controller.expressionEditRule
+	def Action(self, fragment, inheritedState, model, subexp, action):
+		subexp_view = SREInnerFragment( subexp, Precedence.PRECEDENCE_ACTION )
+		action_view = SREInnerFragment( action, Precedence.PRECEDENCE_ACTION )
+		return action_pres(subexp_view, action_view)
+
+
 	# SEQUENCE, CHOICE
 
 	@DMObjectNodeDispatchMethod( Schema.Sequence )
@@ -300,6 +355,11 @@ class GrammarEditorView (MethodDispatchView):
 			if isinstance( x, str )  or  isinstance( x, unicode ):
 				view = unparseable_text( x )
 				return view
+			elif isinstance( x, DMObject ):
+				view = SREInnerFragment( x, Precedence.PRECEDENCE_CONTAINER_UNPARSED, EditMode.DISPLAY )
+				#<NO_TREE_EVENT_LISTENER>
+				view = StructuralItem( _controller, x, view )
+				return view
 			else:
 				raise TypeError, 'UNPARSED should contain a list of only strings or nodes, not a %s'  %  ( type( x ), )
 		views = [ _viewItem( x )   for x in value ]
@@ -310,26 +370,37 @@ class GrammarEditorView (MethodDispatchView):
 	@DMObjectNodeDispatchMethod( Schema.BlankLine )
 	@_controller.statementEditRule
 	def BlankLine(self, fragment, inheritedState, model):
-		return statement_line(blank_line())
+		return statement_line(blank_line(), model)
 
 
 	@DMObjectNodeDispatchMethod( Schema.CommentStmt )
 	@_controller.statementEditRule
 	def CommentStmt(self, fragment, inheritedState, model, comment):
-		return statement_line(comment_stmt(comment))
+		return statement_line(comment_stmt(comment), model)
 
 	@DMObjectNodeDispatchMethod(Schema.RuleDefinitionStmt)
 	@_controller.statementEditRule
 	def RuleDefinitionStmt(self, fragment, inh, model, name, body):
 		body_view = SREInnerFragment( body, Precedence.PRECEDENCE_STMT )
-		return statement_line(rule_def(name, body_view))
+		return statement_line(rule_def(name, body_view), model)
+
+
+	@DMObjectNodeDispatchMethod(Schema.HelperBlockPy)
+	@_controller.statementEditRule
+	def HelperBlockPy(self, fragment, inh, model, py):
+		p = EditPerspective.instance.applyTo(py)
+		tagline = py_tagline_style.applyTo(Label('py'))
+		p = Column(1, [tagline, p])
+		p = _pyActionBorder.surround(p)
+		p = Row([Segment(StructuralItem( _controller, model, p ))])
+		return p
 
 
 	@DMObjectNodeDispatchMethod( Schema.UnparsedStmt )
 	@_controller.statementEditRule
 	def UnparsedStmt(self, fragment, inheritedState, model, value):
 		valueView = SREInnerFragment( value, Precedence.PRECEDENCE_STMT )
-		return statement_line(unparsed_statement( valueView ))
+		return statement_line(unparsed_statement( valueView ), model)
 
 
 	# OUTER NODES
@@ -337,10 +408,10 @@ class GrammarEditorView (MethodDispatchView):
 	def GrammarDefinition(self, fragment, inheritedState, model, rules):
 		if len( rules ) == 0:
 			# Empty module - create a single blank line so that there is something to edit
-			lineViews = [ statement_line( blank_line() ) ]
+			lineViews = [ statement_line( blank_line(), None ) ]
 		else:
 			lineViews = SREInnerFragment.map( rules, Precedence.PRECEDENCE_NONE, EditMode.EDIT )
-		g = grammar_view( lineViews ).alignHPack().alignVRefY()
+		g = grammar_view( lineViews ).alignHPack().alignVRefY().withProperty(GrammarDefProperty.instance, model).withCommands(grammarCommands)
 		g = SoftStructuralItem( GrammarEditorSyntaxRecognizingController.instance, [ GrammarEditorSyntaxRecognizingController.instance._makeGrammarEditFilter( rules ),
 											     GrammarEditorSyntaxRecognizingController.instance._topLevel ], rules, g )
 		return g
@@ -350,3 +421,102 @@ class GrammarEditorView (MethodDispatchView):
 _parser = GrammarEditorGrammar()
 _view = GrammarEditorView( _parser )
 perspective = SequentialEditorPerspective( _view.fragmentViewFunction, _controller )
+
+
+
+
+def insertSpecialFormStatementAtMarker(marker, specialForm):
+	element = marker.getElement()
+
+	stmtVal = element.findPropertyInAncestors( StatementProperty.instance )
+	grammar_def_val = element.findPropertyInAncestors( GrammarDefProperty.instance )
+
+	if grammar_def_val is not None  and  grammar_def_val.getElement().getRegion() is element.getRegion():
+		grammar_def = grammar_def_val.getValue()
+		rules = grammar_def['rules']
+		if stmtVal is not None  and  stmtVal.getElement().getRegion() is element.getRegion():
+			stmt = stmtVal.getValue()
+			index = rules.indexOfById( stmt )
+
+			if index != -1:
+				if stmt.isInstanceOf( Schema.BlankLine ):
+					rules[index] = specialForm
+					return
+				else:
+					i = marker.getClampedIndexInSubtree( stmtVal.getElement() )
+					if i > 0:
+						index += 1
+					rules.insert( index, specialForm )
+					return
+		rules.append( specialForm )
+	else:
+		if grammar_def_val is not None:
+			print 'insertSpecialFormStatementAtMarker: Could not find suite'
+		else:
+			print 'insertSpecialFormStatementAtMarker: Could not find suite; regions did not match'
+
+
+def _makeInsertSpecialFormAtCaretAction(specialFormAtCaretFactory, insertSpecialFormAtCaretFn):
+	"""
+	valueAtCaretFactory - function( caret )  ->  value
+	embedFn - function( value )  ->  AST node
+	"""
+	def _action(context, pageController):
+		element = context
+		rootElement = element.getRootElement()
+
+		caret = rootElement.getCaret()
+		if caret.isValid()  and  caret.isEditable():
+			specialForm = specialFormAtCaretFactory( caret )
+			if specialForm is not None:
+				insertSpecialFormAtCaretFn( caret, specialForm )
+				return True
+
+		return False
+
+	return _action
+
+
+def _makeInsertEmbeddedObjectAtCaretAction(valueAtCaretFactory, embedFn, insertSpecialFormAtCaretFn):
+	"""
+	valueAtCaretFactory - function( caret )  ->  value
+	embedFn - function( value )  ->  AST node
+	"""
+	def _specialFormAtCaret(caret):
+		value = valueAtCaretFactory( caret )
+		return embedFn( value )   if value is not None   else None
+
+	return _makeInsertSpecialFormAtCaretAction( _specialFormAtCaret, insertSpecialFormAtCaretFn )
+
+def _makeInsertEmbeddedObjectStmtAtCaretAction(valueAtCaretFactory, embedFn):
+	"""
+	valueAtCaretFactory - function( caret )  ->  value
+	embedFn - function( value )  ->  AST node
+	"""
+	return _makeInsertEmbeddedObjectAtCaretAction(valueAtCaretFactory, embedFn, insertSpecialFormStatementAtCaret)
+
+
+def insertSpecialFormStatementAtCaret(caret, specialForm):
+	return insertSpecialFormStatementAtMarker( caret.getMarker(), specialForm )
+
+
+def SpecialFormStmtAtCaretAction(specialFormAtCaretFactory):
+	"""
+	specialFormAtCaretFactory - function( caret )  ->  specialForm
+	"""
+	return _makeInsertSpecialFormAtCaretAction(specialFormAtCaretFactory, insertSpecialFormStatementAtCaret)
+
+
+
+@SpecialFormStmtAtCaretAction
+def _new_python_helper(caret):
+	return Schema.HelperBlockPy(py=helpers.new_python_helper_suite())
+
+_pythonHelperCommand = Command( '&P&ython &Helper', _new_python_helper )
+
+
+grammarCommandSet = CommandSet( 'LarchTools.GrammarEditor.GrammarEditor', [_pythonHelperCommand] )
+
+
+grammarCommands = CommandSetRegistry( 'LarchTools.GrammarEditor' )
+grammarCommands.registerCommandSet(grammarCommandSet)
