@@ -38,6 +38,10 @@ OneOrMore = schema.newClass('OneOrMore', AbstractRepeat, ['subexp'])
 Repeat = schema.newClass('Repeat', AbstractRepeat, ['subexp', 'n'])
 RepeatRange = schema.newClass('RepeatRange', AbstractRepeat, ['subexp', 'a', 'b'])
 
+# Functions
+Action = schema.newClass('Action', Expression, ['subexp', 'action'])
+ActionPy = schema.newClass('ActionPy', Expression, ['py'])
+
 # Combinators
 Sequence = schema.newClass('Sequence', Expression, ['subexps'])
 Choice = schema.newClass('Choice', Expression, ['subexps'])
@@ -51,6 +55,8 @@ BlankLine = schema.newClass( 'BlankLine', Statement, [] )
 CommentStmt = schema.newClass( 'CommentStmt', Statement, [ 'comment' ] )
 UnparsedStmt = schema.newClass( 'UnparsedStmt', Statement, [ 'value' ] )
 RuleDefinitionStmt = schema.newClass('RuleDefinitionStmt', Statement, ['name', 'body'])
+
+HelperBlockPy = schema.newClass('HelperBlockPy', Statement, ['py'])
 
 
 

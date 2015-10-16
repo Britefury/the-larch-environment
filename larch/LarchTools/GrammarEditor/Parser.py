@@ -8,6 +8,8 @@
 from copy import deepcopy
 import re, string
 
+from BritefuryJ.DocModel import DMNode
+
 from BritefuryJ.Parser import Literal, Keyword, RegEx, Word, SeparatedList, ObjectNode
 from BritefuryJ.Parser.Utils import Tokens
 from BritefuryJ.Parser.Utils.OperatorParser import PrefixLevel, SuffixLevel, InfixLeftLevel, InfixRightLevel, InfixChainLevel, UnaryOperator, BinaryOperator, ChainOperator, OperatorTable
@@ -16,7 +18,10 @@ from Britefury.Tests.BritefuryJ.Parser.ParserTestCase import ParserTestCase
 
 from Britefury.Grammar.Grammar import Grammar, Rule, RuleList
 
-from LarchTools.GrammarEditor import Schema
+from LarchCore.Languages.Python2.Embedded import EmbeddedPython2Expr
+from LarchTools.PythonTools.VisualRegex.VisualRegex import VisualPythonRegex
+
+from LarchTools.GrammarEditor import Schema, helpers
 
 
 
@@ -40,7 +45,7 @@ def _string_literal_to_quotation(x):
 	x = x.strip()
 	if x[0] == "'":
 		return 'single'
-	elif x[0] == "'":
+	elif x[0] == '"':
 		return 'double'
 	else:
 		raise ValueError('Unknown quotation mark {0}'.format(x[0]))
@@ -70,7 +75,7 @@ class GrammarEditorGrammar (Grammar):
 
 	@Rule
 	def regex(self):
-		return ObjectNode( Schema.RegEx )
+		return ObjectNode( Schema.RegEx ) | Literal('re').action(lambda input, begin, end, xs, bindings: Schema.RegEx(regex=DMNode.embed(helpers.new_empty_regex())))
 
 
 	@Rule
@@ -118,13 +123,24 @@ class GrammarEditorGrammar (Grammar):
 
 
 	@Rule
+	def action(self):
+		def _action_py(xs):
+			a = xs[2]
+			if a is None:
+				a = Schema.ActionPy(py=DMNode.embed(helpers.new_python_action()))
+			return a
+		return ObjectNode( Schema.Action ) | \
+		       (self.repetition() + Literal('->') + ObjectNode(Schema.ActionPy).optional()).action(
+			       lambda input, begin, end, xs, bindings: Schema.Action(subexp=xs[0], action=_action_py(xs))) | self.repetition()
+
+	@Rule
 	def sequence(self):
 		def _node(xs):
 			if len(xs) == 1:
 				return xs[0]
 			else:
 				return Schema.Sequence(subexps=xs)
-		return self.repetition().oneOrMore().action(lambda input, begin, end, xs, bindings: _node(xs))
+		return self.action().oneOrMore().action(lambda input, begin, end, xs, bindings: _node(xs))
 
 	@Rule
 	def choice(self):
@@ -218,18 +234,22 @@ class TestCase_GEParser (ParserTestCase):
 
 	def test_literal(self):
 		g = GrammarEditorGrammar()
-		self._parseStringTest( g.literal(), '"a"', Schema.Literal(literal_text='a') )
-		self._parseStringTest( g.literal(), "'a'", Schema.Literal(literal_text='a') )
+		self._parseStringTest( g.literal(), '"a"', Schema.Literal(value='a', quotation='double') )
+		self._parseStringTest( g.literal(), "'a'", Schema.Literal(value='a', quotation='single') )
 
 	def test_keyword(self):
 		g = GrammarEditorGrammar()
-		self._parseStringTest( g.keyword(), 'k"a"', Schema.Keyword(keyword_text='a') )
-		self._parseStringTest( g.keyword(), 'k"a_1"', Schema.Keyword(keyword_text='a_1') )
+		self._parseStringTest( g.keyword(), 'k"a"', Schema.Keyword(value='a', quotation='double') )
+		self._parseStringTest( g.keyword(), 'k"a_1"', Schema.Keyword(value='a_1', quotation='double') )
 		self._parseStringFailTest(g.keyword(), ':0')
 
 	def test_word(self):
 		g = GrammarEditorGrammar()
-		self._parseStringTest( g.word(), 'w"abcdef"', Schema.Word(word_chars='abcdef') )
+		self._parseStringTest( g.word(), 'w"abcdef"', Schema.Word(value='abcdef', quotation='double') )
+
+	def test_regex(self):
+		g = GrammarEditorGrammar()
+		# self._parseStringTest( g.regex(), 're', Schema.RegEx(regex=DMNode.embed(VisualPythonRegex())) )
 
 	def test_invoke_rule(self):
 		g = GrammarEditorGrammar()
@@ -237,9 +257,9 @@ class TestCase_GEParser (ParserTestCase):
 
 	def test_atom(self):
 		g = GrammarEditorGrammar()
-		self._parseStringTest(g.atom(), '"a"', Schema.Literal(literal_text='a'))
-		self._parseStringTest( g.atom(), 'k"a_1"', Schema.Keyword(keyword_text='a_1') )
-		self._parseStringTest( g.atom(), 'w"abcdef"', Schema.Word(word_chars='abcdef') )
+		self._parseStringTest(g.atom(), '"a"', Schema.Literal(value='a', quotation='double'))
+		self._parseStringTest( g.atom(), 'k"a_1"', Schema.Keyword(value='a_1', quotation='double') )
+		self._parseStringTest( g.atom(), 'w"abcdef"', Schema.Word(value='abcdef', quotation='double') )
 		self._parseStringTest( g.atom(), '<a>', Schema.InvokeRule(name='a') )
 
 	def test_repetition(self):
@@ -251,6 +271,12 @@ class TestCase_GEParser (ParserTestCase):
 		self._parseStringTest(g.repetition(), '<a>{2:}', Schema.RepeatRange(subexp=Schema.InvokeRule(name='a'), a='2', b=None))
 		self._parseStringTest(g.repetition(), '<a>{:2}', Schema.RepeatRange(subexp=Schema.InvokeRule(name='a'), a=None, b='2'))
 		self._parseStringTest(g.repetition(), '<a>{1:2}', Schema.RepeatRange(subexp=Schema.InvokeRule(name='a'), a='1', b='2'))
+
+	def test_action(self):
+		g = GrammarEditorGrammar()
+		self._parseStringTest(g.action(), '<a> ->', Schema.Action(subexp=Schema.InvokeRule(name='a'),
+									  action=Schema.ActionPy(py=EmbeddedPython2Expr())))
+
 
 	def test_sequence(self):
 		g = GrammarEditorGrammar()
