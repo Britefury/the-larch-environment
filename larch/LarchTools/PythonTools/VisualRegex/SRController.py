@@ -12,7 +12,6 @@ from BritefuryJ.DocModel import DMNode
 from BritefuryJ.LSpace.TextFocus import TextSelection
 
 from BritefuryJ.Editor.Sequential import SequentialClipboardHandler, SelectionEditTreeEvent
-from BritefuryJ.Editor.Sequential.py import EditRuleMethodApplicator
 
 from BritefuryJ.Editor.SyntaxRecognizing import SyntaxRecognizingController
 
