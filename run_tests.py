@@ -31,6 +31,7 @@ import LarchCore.Languages.Java.JavaEditor.Parser
 import LarchTools.PythonTools.VisualRegex.Parser
 import LarchTools.PythonTools.VisualRegex.CodeGenerator
 import LarchTools.PythonTools.GUIEditor.DataModel
+import LarchTools.GrammarEditor.Parser
 # import LarchTools.CodeSheets.DataModel
 
 
@@ -51,6 +52,7 @@ testModules = [ Britefury.Tests.BritefuryJ.Parser.Utils.Operators,
 		LarchTools.PythonTools.VisualRegex.Parser,
 		LarchTools.PythonTools.VisualRegex.CodeGenerator,
 		LarchTools.PythonTools.GUIEditor.DataModel,
+		LarchTools.GrammarEditor.Parser,
 		# LarchTools.CodeSheets.DataModel,
 		]
 
