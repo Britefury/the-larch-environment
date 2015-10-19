@@ -7,7 +7,7 @@
 ##-*************************
 import imp
 
-from BritefuryJ.Parser import Production, Literal, RegEx, Word, Keyword, Sequence, Choice
+from BritefuryJ.Parser import Production, Literal, RegEx, Word, Keyword, Sequence, Combine, Choice
 
 from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod, methodDispatch
 
@@ -27,58 +27,35 @@ class GrammarParserGeneratorRuleNameError (GrammarParserGeneratorError):
 class GrammarParserGeneratorInvalidNumberError (GrammarParserGeneratorError):
 	pass
 
+class GrammarParserGeneratorWongNumberOfMacroArgumentsError (GrammarParserGeneratorError):
+	pass
 
 
-class _GrammarParserGeneratorFirstPass (object):
-	"""
-	The first pass:
-	- builds the name -> Production table
-	- executes all blocks of helper code
-	"""
-	__dispatch_num_args__ = 0
 
-	def __init__(self, module):
-		self.name_to_production = {}
+class _GrammarGeneratorContext (object):
+	def __init__(self, module, name_to_rule, name_to_macro):
 		self.module = module
+		self.name_to_rule = name_to_rule
+		self.name_to_macro = name_to_macro
+
+
+class _GrammarParserExpressionGenerator (object):
+	__dispatch_num_args__ = 0
 
 	# Callable - use document model model method dispatch mechanism
 	def __call__(self, x):
 		return methodDispatch( self, x )
 
-	# Base class
-	@DMObjectNodeDispatchMethod( Schema.Node )
-	def Node(self, model):
-		return None
-
-	# Define rule - map name to production
-	@DMObjectNodeDispatchMethod( Schema.RuleDefinitionStmt )
-	def RuleDefinitionStmt(self, model, name, body):
-		self.name_to_production[name] = Production(name)
-
-	# Execute helper block
-	@DMObjectNodeDispatchMethod( Schema.HelperBlockPy )
-	def HelperBlockPy(self, model, py):
-		py.executeWithinModule(self.module)
-
-	# Grammar definition
-	@DMObjectNodeDispatchMethod( Schema.GrammarDefinition )
-	def GrammarDefinition(self, model, rules):
-		for stmt in rules:
-			self(stmt)
 
 
+	def _get_rule_by_name(self, name):
+		raise NotImplementedError, 'abstract for {0}'.format(type(self))
 
-class GrammarParserGenerator (object):
-	__dispatch_num_args__ = 0
+	def _get_macro_by_name(self, name):
+		raise NotImplementedError, 'abstract for {0}'.format(type(self))
 
-	def __init__(self, module):
-		self.module = module
-		self.__first_pass = _GrammarParserGeneratorFirstPass(module)
-		self.name_to_rule = self.__first_pass.name_to_production
-
-	# Callable - use document model model method dispatch mechanism
-	def __call__(self, x):
-		return methodDispatch( self, x )
+	def _get_globals(self):
+		raise NotImplementedError, 'abstract for {0}'.format(type(self))
 
 
 
@@ -108,9 +85,19 @@ class GrammarParserGenerator (object):
 	@DMObjectNodeDispatchMethod(Schema.InvokeRule)
 	def InvokeRule(self, model, name):
 		try:
-			return self.__first_pass.name_to_production[name]
+			return self._get_rule_by_name(name)
 		except KeyError:
 			raise GrammarParserGeneratorRuleNameError('No rule named \'{0}\''.format(name))
+
+
+	@DMObjectNodeDispatchMethod(Schema.InvokeMacro)
+	def InvokeMacro(self, model, macro_name, param_exprs):
+		try:
+			macro = self._get_macro_by_name(macro_name)
+		except KeyError:
+			raise GrammarParserGeneratorRuleNameError('No macro named \'{0}\''.format(macro_name))
+		params = [self(p) for p in param_exprs]
+		return macro(*params)
 
 
 	@DMObjectNodeDispatchMethod( Schema.Optional )
@@ -169,7 +156,7 @@ class GrammarParserGenerator (object):
 
 	@DMObjectNodeDispatchMethod( Schema.ActionPy )
 	def ActionPy(self, model, py):
-		return py.evalute(self.__first_pass.module.__dict__, None)
+		return py.evalute(self._get_globals(), None)
 
 
 	# Combinators
@@ -177,9 +164,108 @@ class GrammarParserGenerator (object):
 	def Sequence(self, model, subexps):
 		return Sequence([self(s) for s in subexps])
 
+	@DMObjectNodeDispatchMethod( Schema.Combine )
+	def Combine(self, model, subexps):
+		return Combine([self(s) for s in subexps])
+
 	@DMObjectNodeDispatchMethod( Schema.Choice )
 	def Choice(self, model, subexps):
 		return Choice([self(s) for s in subexps])
+
+
+
+class _GrammarParserGeneratorFirstPass (object):
+	"""
+	The first pass:
+	- builds the name -> Production table
+	- executes all blocks of helper code
+	"""
+	__dispatch_num_args__ = 0
+
+	def __init__(self, context):
+		self.context = context
+
+	# Callable - use document model model method dispatch mechanism
+	def __call__(self, x):
+		return methodDispatch( self, x )
+
+	# Base class
+	@DMObjectNodeDispatchMethod( Schema.Node )
+	def Node(self, model):
+		return None
+
+	# Define rule - map name to production
+	@DMObjectNodeDispatchMethod( Schema.RuleDefinitionStmt )
+	def RuleDefinitionStmt(self, model, name, body):
+		self.context.name_to_rule[name] = Production(name)
+
+	@DMObjectNodeDispatchMethod(Schema.MacroDefinitionStmt)
+	def MacroDefinitionStmt(self, model, name, args, body):
+		macro = _Macro(self.context, name, args, body)
+		self.context.name_to_macro[name] = macro
+
+	# Execute helper block
+	@DMObjectNodeDispatchMethod( Schema.HelperBlockPy )
+	def HelperBlockPy(self, model, py):
+		py.executeWithinModule(self.context.module)
+
+	# Grammar definition
+	@DMObjectNodeDispatchMethod( Schema.GrammarDefinition )
+	def GrammarDefinition(self, model, rules):
+		for stmt in rules:
+			self(stmt)
+
+
+class GrammarMacroInvocation (_GrammarParserExpressionGenerator):
+	def __init__(self, macro, name_to_param):
+		self.macro = macro
+		self.name_to_param = name_to_param
+
+	def _get_rule_by_name(self, name):
+		try:
+			return self.name_to_param[name]
+		except KeyError:
+			return self.macro.context.name_to_rule[name]
+
+	def _get_macro_by_name(self, name):
+		return self.macro.context.name_to_macro[name]
+
+	def _get_globals(self):
+		return self.macro.context.module.__dict__
+
+
+
+class _Macro (object):
+	def __init__(self, context, name, args, body):
+		self.context = context
+		self.name = name
+		self.args = args
+		self.body = body
+
+	def __call__(self, *params):
+		if len(params) != len(self.args):
+			raise GrammarParserGeneratorWongNumberOfMacroArgumentsError(
+				'Macro {0} accepts {1} arguments, given {2}'.format(self.name, len(self.args), len(params)))
+		name_to_param = {arg: param for arg, param in zip(self.args, params)}
+		# print 'Macro invocation: {0}({1})'.format(self.macro.name, self.name_to_param)
+		return GrammarMacroInvocation(self, name_to_param)(self.body)
+
+
+
+class GrammarParserGenerator (_GrammarParserExpressionGenerator):
+	def __init__(self, context):
+		self.context = context
+		self.__first_pass = _GrammarParserGeneratorFirstPass(context)
+
+
+	def _get_rule_by_name(self, name):
+		return self.context.name_to_rule[name]
+
+	def _get_macro_by_name(self, name):
+		return self.context.name_to_macro[name]
+
+	def _get_globals(self):
+		return self.context.module.__dict__
 
 
 	# Statements
@@ -199,8 +285,12 @@ class GrammarParserGenerator (object):
 	# Define rule
 	@DMObjectNodeDispatchMethod( Schema.RuleDefinitionStmt )
 	def RuleDefinitionStmt(self, model, name, body):
-		prod = self.__first_pass.name_to_production[name]
+		prod = self.__first_pass.context.name_to_rule[name]
 		prod.setExpression(self(body))
+
+	@DMObjectNodeDispatchMethod(Schema.MacroDefinitionStmt)
+	def MacroDefinitionStmt(self, model, name, args, body):
+		pass
 
 	# Ignore helper block
 	@DMObjectNodeDispatchMethod( Schema.HelperBlockPy )
@@ -227,7 +317,9 @@ class GrammarTestRunner (object):
 
 	def __init__(self, module_name='__grammar_tests__'):
 		module = imp.new_module(module_name)
-		self.parser_gen = GrammarParserGenerator(module)
+		context = _GrammarGeneratorContext(module, {}, {})
+		self.context = context
+		self.parser_gen = GrammarParserGenerator(context)
 
 	# Callable - use document model model method dispatch mechanism
 	def __call__(self, x):
@@ -243,7 +335,7 @@ class GrammarTestRunner (object):
 	# Ignore unit tests
 	@DMObjectNodeDispatchMethod( Schema.UnitTestTable )
 	def UnitTestTable(self, model, test_table):
-		test_table.run_tests(self.parser_gen.module, self.parser_gen.name_to_rule)
+		test_table.run_tests(self.context.module, self.context.name_to_rule)
 
 	# Grammar definition
 	@DMObjectNodeDispatchMethod( Schema.GrammarDefinition )
