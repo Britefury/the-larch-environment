@@ -57,6 +57,7 @@ UnparsedStmt = schema.newClass( 'UnparsedStmt', Statement, [ 'value' ] )
 RuleDefinitionStmt = schema.newClass('RuleDefinitionStmt', Statement, ['name', 'body'])
 
 HelperBlockPy = schema.newClass('HelperBlockPy', Statement, ['py'])
+UnitTestTable = schema.newClass('UnitTestTable', Statement, ['test_table'])
 
 
 
