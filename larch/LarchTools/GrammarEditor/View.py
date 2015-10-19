@@ -17,13 +17,13 @@ from BritefuryJ.Parser import ParserExpression
 from Britefury.Kernel.View.DispatchView import MethodDispatchView
 from Britefury.Dispatch.MethodDispatch import DMObjectNodeDispatchMethod
 
-from BritefuryJ.Command import Command, CommandSet, CommandSetRegistry
-from BritefuryJ.Shortcut import Shortcut
-
 from BritefuryJ.DocModel import DMObject
 
 from BritefuryJ.Graphics import SolidBorder, FilledBorder, FillPainter
 from BritefuryJ.LSpace.Interactor import KeyElementInteractor
+from BritefuryJ.LSpace.Input import Modifier
+
+from BritefuryJ.Shortcut import Shortcut
 
 from BritefuryJ.AttributeTable import AttributeNamespace, InheritedAttributeNonNull, PyDerivedValueTable
 
@@ -47,7 +47,7 @@ from BritefuryJ.Editor.SyntaxRecognizing.SyntaxRecognizingController import Edit
 from LarchCore.Languages.Python2.PythonEditor.PythonEditorCombinators import PythonEditorStyle
 from LarchTools.PythonTools.VisualRegex.View import _repeatBorder, _controlCharStyle
 
-from LarchTools.GrammarEditor import Schema, Precedence, helpers
+from LarchTools.GrammarEditor import Schema, Precedence, helpers, Properties, Commands, parser_generator
 from LarchTools.GrammarEditor.Parser import GrammarEditorGrammar
 from LarchTools.GrammarEditor.SRController import GrammarEditorSyntaxRecognizingController
 
@@ -102,20 +102,6 @@ def string_literal(quotation, value, raw):
 	boxContents.extend( [ quotationPres,  valuePres,  quotationPres ] )
 
 	return Row( boxContents )
-
-
-
-class StatementProperty (object):
-	pass
-
-StatementProperty.instance = StatementProperty()
-
-
-class GrammarDefProperty (object):
-	pass
-
-GrammarDefProperty.instance = GrammarDefProperty()
-
 
 
 def literal(string_view):
@@ -191,8 +177,16 @@ def statement_line(rule, model):
 	newLine = Whitespace( '\n' )
 	p = Paragraph( [ rule, newLine ] ).alignHPack()
 	if model is not None:
-		p = p.withProperty( StatementProperty.instance, model )
+		p = p.withProperty( Properties.StatementProperty.instance, model )
 	return p
+
+def special_form_statement_line(v, model):
+	v = StructuralItem( _controller, model, v )
+	v = Segment( v )
+	v = Paragraph( [ v ] ).alignHPack()
+	v = v.withProperty( Properties.StatementProperty.instance, model )
+	return v
+
 
 def rule_def(name, body_view):
 	n = ApplyStyleSheetFromAttribute( PythonEditorStyle.numLiteralStyle, Text( name ) )
@@ -386,18 +380,24 @@ class GrammarEditorView (MethodDispatchView):
 
 
 	@DMObjectNodeDispatchMethod(Schema.HelperBlockPy)
-	@_controller.statementEditRule
+	@_controller.specialFormStatementEditRule
 	def HelperBlockPy(self, fragment, inh, model, py):
 		p = EditPerspective.instance.applyTo(py)
 		tagline = py_tagline_style.applyTo(Label('py'))
 		p = Column(1, [tagline, p])
 		p = _pyActionBorder.surround(p)
-		p = Row([Segment(StructuralItem( _controller, model, p ))])
-		return p
+		return special_form_statement_line(p, model)
+
+
+	@DMObjectNodeDispatchMethod(Schema.UnitTestTable)
+	@_controller.specialFormStatementEditRule
+	def UnitTestTable(self, fragment, inh, model, test_table):
+		p = EditPerspective.instance.applyTo(test_table)
+		return special_form_statement_line(p, model)
 
 
 	@DMObjectNodeDispatchMethod( Schema.UnparsedStmt )
-	@_controller.statementEditRule
+	@_controller.specialFormStatementEditRule
 	def UnparsedStmt(self, fragment, inheritedState, model, value):
 		valueView = SREInnerFragment( value, Precedence.PRECEDENCE_STMT )
 		return statement_line(unparsed_statement( valueView ), model)
@@ -406,12 +406,17 @@ class GrammarEditorView (MethodDispatchView):
 	# OUTER NODES
 	@DMObjectNodeDispatchMethod( Schema.GrammarDefinition )
 	def GrammarDefinition(self, fragment, inheritedState, model, rules):
+		def _run_unit_tests(element):
+			test_runner = parser_generator.GrammarTestRunner()
+			test_runner(model)
+
 		if len( rules ) == 0:
 			# Empty module - create a single blank line so that there is something to edit
 			lineViews = [ statement_line( blank_line(), None ) ]
 		else:
 			lineViews = SREInnerFragment.map( rules, Precedence.PRECEDENCE_NONE, EditMode.EDIT )
-		g = grammar_view( lineViews ).alignHPack().alignVRefY().withProperty(GrammarDefProperty.instance, model).withCommands(grammarCommands)
+		g = grammar_view( lineViews ).alignHPack().alignVRefY().withProperty(Properties.GrammarDefProperty.instance, model).withCommands(Commands.grammarCommands)
+		g = g.withShortcut( Shortcut( KeyEvent.VK_U, Modifier.ALT), _run_unit_tests )
 		g = SoftStructuralItem( GrammarEditorSyntaxRecognizingController.instance, [ GrammarEditorSyntaxRecognizingController.instance._makeGrammarEditFilter( rules ),
 											     GrammarEditorSyntaxRecognizingController.instance._topLevel ], rules, g )
 		return g
@@ -425,98 +430,4 @@ perspective = SequentialEditorPerspective( _view.fragmentViewFunction, _controll
 
 
 
-def insertSpecialFormStatementAtMarker(marker, specialForm):
-	element = marker.getElement()
 
-	stmtVal = element.findPropertyInAncestors( StatementProperty.instance )
-	grammar_def_val = element.findPropertyInAncestors( GrammarDefProperty.instance )
-
-	if grammar_def_val is not None  and  grammar_def_val.getElement().getRegion() is element.getRegion():
-		grammar_def = grammar_def_val.getValue()
-		rules = grammar_def['rules']
-		if stmtVal is not None  and  stmtVal.getElement().getRegion() is element.getRegion():
-			stmt = stmtVal.getValue()
-			index = rules.indexOfById( stmt )
-
-			if index != -1:
-				if stmt.isInstanceOf( Schema.BlankLine ):
-					rules[index] = specialForm
-					return
-				else:
-					i = marker.getClampedIndexInSubtree( stmtVal.getElement() )
-					if i > 0:
-						index += 1
-					rules.insert( index, specialForm )
-					return
-		rules.append( specialForm )
-	else:
-		if grammar_def_val is not None:
-			print 'insertSpecialFormStatementAtMarker: Could not find suite'
-		else:
-			print 'insertSpecialFormStatementAtMarker: Could not find suite; regions did not match'
-
-
-def _makeInsertSpecialFormAtCaretAction(specialFormAtCaretFactory, insertSpecialFormAtCaretFn):
-	"""
-	valueAtCaretFactory - function( caret )  ->  value
-	embedFn - function( value )  ->  AST node
-	"""
-	def _action(context, pageController):
-		element = context
-		rootElement = element.getRootElement()
-
-		caret = rootElement.getCaret()
-		if caret.isValid()  and  caret.isEditable():
-			specialForm = specialFormAtCaretFactory( caret )
-			if specialForm is not None:
-				insertSpecialFormAtCaretFn( caret, specialForm )
-				return True
-
-		return False
-
-	return _action
-
-
-def _makeInsertEmbeddedObjectAtCaretAction(valueAtCaretFactory, embedFn, insertSpecialFormAtCaretFn):
-	"""
-	valueAtCaretFactory - function( caret )  ->  value
-	embedFn - function( value )  ->  AST node
-	"""
-	def _specialFormAtCaret(caret):
-		value = valueAtCaretFactory( caret )
-		return embedFn( value )   if value is not None   else None
-
-	return _makeInsertSpecialFormAtCaretAction( _specialFormAtCaret, insertSpecialFormAtCaretFn )
-
-def _makeInsertEmbeddedObjectStmtAtCaretAction(valueAtCaretFactory, embedFn):
-	"""
-	valueAtCaretFactory - function( caret )  ->  value
-	embedFn - function( value )  ->  AST node
-	"""
-	return _makeInsertEmbeddedObjectAtCaretAction(valueAtCaretFactory, embedFn, insertSpecialFormStatementAtCaret)
-
-
-def insertSpecialFormStatementAtCaret(caret, specialForm):
-	return insertSpecialFormStatementAtMarker( caret.getMarker(), specialForm )
-
-
-def SpecialFormStmtAtCaretAction(specialFormAtCaretFactory):
-	"""
-	specialFormAtCaretFactory - function( caret )  ->  specialForm
-	"""
-	return _makeInsertSpecialFormAtCaretAction(specialFormAtCaretFactory, insertSpecialFormStatementAtCaret)
-
-
-
-@SpecialFormStmtAtCaretAction
-def _new_python_helper(caret):
-	return Schema.HelperBlockPy(py=helpers.new_python_helper_suite())
-
-_pythonHelperCommand = Command( '&P&ython &Helper', _new_python_helper )
-
-
-grammarCommandSet = CommandSet( 'LarchTools.GrammarEditor.GrammarEditor', [_pythonHelperCommand] )
-
-
-grammarCommands = CommandSetRegistry( 'LarchTools.GrammarEditor' )
-grammarCommands.registerCommandSet(grammarCommandSet)

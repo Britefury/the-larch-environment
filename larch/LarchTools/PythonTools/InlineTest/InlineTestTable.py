@@ -38,6 +38,7 @@ from LarchCore.Languages.Python2.Embedded import EmbeddedPython2Suite
 from LarchCore.Languages.Python2 import Schema
 
 from LarchTools.PythonTools.InlineTest.InlineTest import AbstractInlineTest, inlineTestCommandSet
+from LarchTools.PythonTools.InlineTest.TestTable import AbstractTestTableRow, AbstractTestTable
 
 
 _resultFailStyle = StyleSheet.style( Primitive.foreground( Color( 0.5, 0.4, 0.0 ) ) )
@@ -47,40 +48,23 @@ _resultNone = StyleSheet.style( Primitive.foreground( Color( 0.4, 0.4, 0.4 ) ) )
 
 
 
-class AbstractInlineTestTableRow (object):
+class AbstractInlineTestTableRow (AbstractTestTableRow):
 	def __init__(self):
+		super(AbstractInlineTestTableRow, self).__init__()
 		self.__testTable = None
-		self.__result = LiveValue( _resultNone )
 		self.__testMethodName = None
-		# Form: either ( 'value', value )  or  ( 'exception', exceptionType )  or  None
-		self._expected = TrackedLiveValue( None )
-		self._actual = TrackedLiveValue( None )
-
-		self.__change_history__ = None
 
 
-
-	def __getstate__(self):
-		return { 'expected' : self._expected.getStaticValue() }
 
 	def __setstate__(self, state):
-		self.__change_history__ = None
+		super(AbstractInlineTestTableRow, self).__setstate__(state)
 		self.__testTable = None
-		self.__result = LiveValue( _resultNone )
 		self.__testMethodName = None
-		self._expected = TrackedLiveValue( state['expected'] )
-		self._actual = TrackedLiveValue( None )
-
-
-	def __get_trackable_contents__(self):
-		return [ self._expected ]
 
 
 
 	def reset(self):
-		self.__result.setLiteralValue( _resultNone )
 		self.__testMethodName = None
-		self._actual.setLiteralValue( None )
 
 
 	def _regsiterTestTable(self, testTable):
@@ -110,18 +94,6 @@ class AbstractInlineTestTableRow (object):
 	@property
 	def _scope(self):
 		return self.__testTable._scope   if self.__testTable is not None   else ( None, None, None )
-
-
-	def _debug(self):
-		return None
-
-
-	def __debugWrap(self, p):
-		d = self._debug()
-		if d is not None:
-			return Column( [ p, Pres.coerce( d ).alignHPack() ] ).alignVTop()
-		else:
-			return p
 
 
 	def _createMethodAST(self, codeGen):
@@ -161,102 +133,6 @@ class AbstractInlineTestTableRow (object):
 
 
 
-	def _testValue(self, kind, data, excType=None):
-		self._actual.setLiteralValue( ( kind, data ) )
-		expected = self._expected.getStaticValue()
-		if expected is not None:
-			expectedKind, expectedData = expected
-			if kind == expectedKind:
-				if expectedKind == 'exception':
-					if excType == expectedData:
-						self.__result.setLiteralValue( _resultPass )
-					else:
-						title = _resultFailStyle( Label( 'FAIL' ) )
-						heading = Label( 'Expected exception of type %s, got:' % expectedData.__name__ )
-						res = Column( [ title, heading, data ] )
-						self.__result.setLiteralValue( res )
-				elif expectedKind == 'value':
-					if data == expectedData:
-						self.__result.setLiteralValue( _resultPass )
-					else:
-						title = _resultFailStyle( Label( 'FAIL' ) )
-						heading1 = Label( 'Expected:' )
-						heading2 = Label( 'Got:' )
-						res = Column( [ title, heading1, expectedData, heading2, data ] )
-						self.__result.setLiteralValue( res )
-				else:
-					raise TypeError, 'unknown expected result kind %s' % expectedKind
-			else:
-				resContents = [ _resultFailStyle( Label( 'FAIL' ) ) ]
-
-				if expectedKind == 'exception':
-					resContents.append( Label( 'Expected exception of type %s:' % expectedData.__name__ ) )
-				elif expectedKind == 'value':
-					resContents.append( Label( 'Expected:' ) )
-					resContents.append( expectedData )
-				else:
-					raise TypeError, 'unknown expected result kind %s' % expectedKind
-
-				if kind == 'exception':
-					resContents.append( Label( 'Got exception:' ) )
-					resContents.append( data )
-				elif kind == 'value':
-					resContents.append( Label( 'Expected:' ) )
-					resContents.append( data )
-				else:
-					raise TypeError, 'unknown result kind %s' % kind
-
-				self.__result.setLiteralValue( Column( resContents ) )
-		else:
-			def _onFix(button, event):
-				if kind == 'exception':
-					self._expected.setLiteralValue( ( kind, excType ) )
-				elif kind == 'value':
-					self._expected.setLiteralValue( ( kind, data ) )
-				else:
-					raise TypeError, 'unknown result kind %s' % kind
-				self.__result.setLiteralValue( _resultNone )
-
-			fixButton = Button.buttonWithLabel( 'Set expected result', _onFix )
-			title = Label( 'No expected result, received:' )
-			self.__result.setLiteralValue( Column( [ title, Pres.coerce( data ).pad( 5.0, 0.0, 5.0, 5.0 ), fixButton ] ).alignHPack().alignVTop() )
-
-
-
-
-
-
-
-	@property
-	def result(self):
-		return self.__debugWrap( self.__result )
-
-
-	@property
-	def expected(self):
-		expected = self._expected.getValue()
-		if expected is not None:
-			expectedKind, expectedData = expected
-			if expectedKind == 'exception':
-				return Label( 'Exception of type %s' % expectedData.__name__ )
-			elif expectedKind == 'value':
-				return expectedData
-			else:
-				raise TypeError, 'unknown expected result kind %s' % expectedKind
-		else:
-			return Blank()
-
-
-	@expected.setter
-	def expected(self, x):
-		if x is None:
-			self._expected.setLiteralValue( None )
-
-
-
-
-AbstractInlineTestTableRow._resultColumn = AttributeColumn( 'Result', 'result' )
-AbstractInlineTestTableRow._expectedColumn = AttributeColumn( 'Expected', 'expected', None, None )
 
 
 
@@ -265,43 +141,24 @@ _notSet = StyleSheet.style( Primitive.fontItalic( True ) )( Label( 'not set' ) )
 _inlineTestTableBorder = SolidBorder( 1.5, 3.0, 5.0, 5.0, Color( 0.4, 0.4, 0.5 ), None )
 
 
-class AbstractInlineTestTable (AbstractInlineTest):
+class AbstractInlineTestTable (AbstractInlineTest, AbstractTestTable):
 	_tableEditor = NotImplemented
 
 
 	def __init__(self, name='test'):
 		super( AbstractInlineTestTable, self ).__init__()
-		self._name = TrackedLiveValue( name )
-		self._tests = LiveList()
-		self.__change_history__ = None
-
 		self.__methodNames = UniqueNameTable()
 
 
-
-	def __getstate__(self):
-		state = super( AbstractInlineTestTable, self ).__getstate__()
-		state['name'] = self._name.getStaticValue()
-		state['tests'] = self._tests
-		return state
 
 	def __setstate__(self, state):
 		super( AbstractInlineTestTable, self ).__setstate__( state )
-		self._name = TrackedLiveValue( state['name'] )
-		self._tests = state['tests']
-		self.__change_history__ = None
-
 		self.__methodNames = UniqueNameTable()
-
-
-	def __get_trackable_contents__(self):
-		return [ self._name, self._tests ]
 
 
 
 	def reset(self):
-		for test in self._tests:
-			test.reset()
+		super( AbstractInlineTestTable, self ).reset()
 		self.__methodNames.clear()
 
 
@@ -311,15 +168,12 @@ class AbstractInlineTestTable (AbstractInlineTest):
 		return 'Test_' + self._name.getStaticValue()
 
 
-	def _runTestsOnInstance(self, instance):
-		for test in self._tests:
-			test.runOnInstance( instance )
-
-
 	def _uniqueMethodName(self, name):
 		return self.__methodNames.uniqueName( name )
 
-
+	def _runTestsOnInstance(self, instance):
+		for test in self._tests:
+			test.runOnInstance( instance )
 
 
 	def _createTestClassBodyStmts(self, codeGen, testedBlock):
@@ -332,26 +186,6 @@ class AbstractInlineTestTable (AbstractInlineTest):
 			stmts.append( test._createMethodAST( codeGen ) )
 			first = False
 		return stmts
-
-
-
-
-	__embed_hide_frame__ = True
-
-	def __present__(self, fragment, inheritedState):
-		title = SectionHeading2( 'Unit tests' )
-
-		nameEntry = _nameBorder.surround( EditableLabel( self._name, _notSet ).regexValidated( Tokens.identifierPattern, 'Please enter a valid identifier' ) )
-
-		header = Row( [ title, Spacer( 25.0, 0.0 ), nameEntry ] )
-
-		if self._tableEditor is NotImplemented:
-			raise NotImplementedError, 'Table editor is abstract'
-
-		table = self._tableEditor.editTable( self._tests )
-
-		return _inlineTestTableBorder.surround( Column( [ header, Spacer( 0.0, 5.0 ), table ] ) )
-
 
 
 

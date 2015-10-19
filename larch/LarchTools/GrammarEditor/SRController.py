@@ -43,6 +43,19 @@ def _isValidUnparsedStatementValue(value):
 	i = value.indexOf( '\n' )
 	return i != -1   and   i == len( value ) - 1
 
+def _isValidUnparsedSpecialFormStatementValue(value):
+	# Unparsed statement is only valid if there is ONE newline, and it is at the end
+	unparseable = False
+	for item in value.getItems():
+		if not item.isStructural():
+			if len(item.getValue().strip()) > 0:
+				unparseable = True
+				break
+	if unparseable:
+		return _isValidUnparsedStatementValue(value)
+	else:
+		return False
+
 def _commitUnparsedStatment(model, value):
 	withoutNewline = value[:-1]
 	unparsed = Schema.UnparsedStmt( value=Schema.UNPARSED( value=withoutNewline.getItemValues() ) )
@@ -110,6 +123,7 @@ class GrammarEditorSyntaxRecognizingController (SyntaxRecognizingController):
 		self._expr = self.parsingEditFilter( 'Expression', self._grammar.expression(), gramReplaceNode )
 		self._stmt = self.parsingEditFilter( 'Statement', self._grammar.single_line_statement_valid(), gramReplaceNode )
 		self._stmtUnparsed = self.unparsedEditFilter( 'Unparsed statement', _isValidUnparsedStatementValue, _commitUnparsedStatment, _commitInnerUnparsed )
+		self._specialFormStmtUnparsed = self.unparsedEditFilter( 'Unparsed special-form stmt', _isValidUnparsedSpecialFormStatementValue, _commitUnparsedStatment, _commitInnerUnparsed )
 		self._topLevel = self.topLevelEditFilter()
 
 		self.expressionEditRule = self.editRule( _grammarPrecedenceHandler, [ self._expr ] )
@@ -117,6 +131,7 @@ class GrammarEditorSyntaxRecognizingController (SyntaxRecognizingController):
 		self.unparsedEditRule = self.editRule( [ self._expr ] )
 		self.statementEditRule = self.softStructuralEditRule( [ self._stmt, self._stmtUnparsed ] )
 		self.unparsedStatementEditRule = self.editRule( [ self._stmt, self._stmtUnparsed ] )
+		self.specialFormStatementEditRule = self.softStructuralEditRule( [ self._stmt, self._specialFormStmtUnparsed ] )
 
 
 
