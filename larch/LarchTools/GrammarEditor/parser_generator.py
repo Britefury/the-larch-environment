@@ -138,11 +138,11 @@ class GrammarParserGenerator (object):
 		try:
 			min_r = int(a)
 		except ValueError:
-			raise GrammarParserGeneratorInvalidNumberError('Invalid minimum number of repetitions \'{0}\''.format(n))
+			raise GrammarParserGeneratorInvalidNumberError('Invalid minimum number of repetitions \'{0}\''.format(a))
 		try:
 			max_r = int(b)
 		except ValueError:
-			raise GrammarParserGeneratorInvalidNumberError('Invalid maximum number of repetitions \'{0}\''.format(n))
+			raise GrammarParserGeneratorInvalidNumberError('Invalid maximum number of repetitions \'{0}\''.format(b))
 		return self(subexp).repeat(min_r, max_r)
 
 

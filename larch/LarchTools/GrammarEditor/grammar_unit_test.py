@@ -191,7 +191,7 @@ class GrammarTestTableRow (AbstractTestTableRow):
 			if parser_input is None:
 				self._testValue('value', None)
 			else:
-				test_value = self._parserTest(rule, parser_input)
+				test_value = self._parserTest(rule, parser_input[0])
 		except:
 			self._testValue('exception', JythonException.getCurrentException(), sys.exc_info()[0])
 		else:
