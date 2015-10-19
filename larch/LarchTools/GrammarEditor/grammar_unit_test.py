@@ -188,7 +188,10 @@ class GrammarTestTableRow (AbstractTestTableRow):
 			parser_input = self._inputCode.executeAndEvaluateWithinModule(module)
 			self.__parser = rule
 			self.__input = parser_input
-			test_value = self._parserTest(rule, parser_input)
+			if parser_input is None:
+				self._testValue('value', None)
+			else:
+				test_value = self._parserTest(rule, parser_input)
 		except:
 			self._testValue('exception', JythonException.getCurrentException(), sys.exc_info()[0])
 		else:
@@ -205,16 +208,17 @@ class GrammarTestTableRow (AbstractTestTableRow):
 
 	def _onTrace(self, hyperlink):
 		if self.__parser is not None and self.__input is not None:
-			if isinstance(self.__input, str) or isinstance(self.__input, unicode):
-				parseResult = self.__parser.traceParseStringChars(self.__input)
-			elif isinstance(self.__input, list) or isinstance(self.__input, List):
-				parseResult = self.__parser.traceParseListItems(self.__input)
-			elif isinstance(self.__input, RichString):
-				parseResult = self.__parser.traceParseRichStringItems(self.__input)
-			elif isinstance(self.__input, DMNode):
-				parseResult = self.__parser.traceParseNode(self.__input)
+			input_data = self.__input[0]
+			if isinstance(input_data, str) or isinstance(input_data, unicode):
+				parseResult = self.__parser.traceParseStringChars(input_data)
+			elif isinstance(input_data, list) or isinstance(input_data, List):
+				parseResult = self.__parser.traceParseListItems(input_data)
+			elif isinstance(input_data, RichString):
+				parseResult = self.__parser.traceParseRichStringItems(input_data)
+			elif isinstance(input_data, DMNode):
+				parseResult = self.__parser.traceParseNode(input_data)
 			else:
-				raise TypeError, 'Cannot handle input of type %s' % type(self.__input)
+				raise TypeError, 'Cannot handle input of type %s' % type(input_data)
 
 			element = hyperlink.element
 			subject = DefaultPerspective.instance.objectSubject(parseResult)
