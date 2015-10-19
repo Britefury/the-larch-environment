@@ -417,6 +417,7 @@ class GrammarEditorView (MethodDispatchView):
 			lineViews = SREInnerFragment.map( rules, Precedence.PRECEDENCE_NONE, EditMode.EDIT )
 		g = grammar_view( lineViews ).alignHPack().alignVRefY().withProperty(Properties.GrammarDefProperty.instance, model).withCommands(Commands.grammarCommands)
 		g = g.withShortcut( Shortcut( KeyEvent.VK_U, Modifier.ALT), _run_unit_tests )
+		g = g.withShortcut( Shortcut( KeyEvent.VK_U, Modifier.META), _run_unit_tests )
 		g = SoftStructuralItem( GrammarEditorSyntaxRecognizingController.instance, [ GrammarEditorSyntaxRecognizingController.instance._makeGrammarEditFilter( rules ),
 											     GrammarEditorSyntaxRecognizingController.instance._topLevel ], rules, g )
 		return g
