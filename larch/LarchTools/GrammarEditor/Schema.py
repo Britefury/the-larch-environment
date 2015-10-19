@@ -38,12 +38,20 @@ OneOrMore = schema.newClass('OneOrMore', AbstractRepeat, ['subexp'])
 Repeat = schema.newClass('Repeat', AbstractRepeat, ['subexp', 'n'])
 RepeatRange = schema.newClass('RepeatRange', AbstractRepeat, ['subexp', 'a', 'b'])
 
+# Look ahead
+Peek = schema.newClass('Peek', Expression, ['subexp'])
+PeekNot = schema.newClass('PeekNot', Expression, ['subexp'])
+
+# Control
+Suppress = schema.newClass('Suppress', Expression, ['subexp'])
+
 # Functions
 Action = schema.newClass('Action', Expression, ['subexp', 'action'])
 ActionPy = schema.newClass('ActionPy', Expression, ['py'])
 
 # Combinators
 Sequence = schema.newClass('Sequence', Expression, ['subexps'])
+Combine = schema.newClass('Combine', Expression, ['subexps'])
 Choice = schema.newClass('Choice', Expression, ['subexps'])
 
 

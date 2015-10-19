@@ -102,7 +102,6 @@ class GrammarEditorGrammar (Grammar):
 		       (Literal('{') + Tokens.decimalInteger + Literal('}')).action(
 			       lambda input, begin, end, xs, bindings: ('n', xs[1]))
 
-
 	@Rule
 	def repetition(self):
 		def _apply_rep(subexp, rep):
@@ -121,6 +120,12 @@ class GrammarEditorGrammar (Grammar):
 				raise ValueError('Invalid repeat code')
 		return (self.atom() + self._repeats()).action(lambda input, begin, end, xs, bindings: _apply_rep(xs[0], xs[1])) | self.atom()
 
+	@Rule
+	def peekOrControl(self):
+		return (Literal('/!') + self.repetition()).action(lambda input, begin, end, xs, bindings: Schema.PeekNot(subexp=xs[1])) | \
+			(Literal('/') + self.repetition()).action(lambda input, begin, end, xs, bindings: Schema.Peek(subexp=xs[1])) | \
+			(self.repetition() + Literal('~')).action(lambda input, begin, end, xs, bindings: Schema.Suppress(subexp=xs[0])) | \
+			self.repetition()
 
 	@Rule
 	def action(self):
@@ -130,8 +135,8 @@ class GrammarEditorGrammar (Grammar):
 				a = Schema.ActionPy(py=DMNode.embed(helpers.new_python_action()))
 			return a
 		return ObjectNode( Schema.Action ) | \
-		       (self.repetition() + Literal('->') + ObjectNode(Schema.ActionPy).optional()).action(
-			       lambda input, begin, end, xs, bindings: Schema.Action(subexp=xs[0], action=_action_py(xs))) | self.repetition()
+		       (self.peekOrControl() + Literal('->') + ObjectNode(Schema.ActionPy).optional()).action(
+			       lambda input, begin, end, xs, bindings: Schema.Action(subexp=xs[0], action=_action_py(xs))) | self.peekOrControl()
 
 	@Rule
 	def sequence(self):
@@ -143,6 +148,18 @@ class GrammarEditorGrammar (Grammar):
 		return self.action().oneOrMore().action(lambda input, begin, end, xs, bindings: _node(xs))
 
 	@Rule
+	def combine(self):
+		def _unwind(xs):
+			head, tail = xs
+			if len(tail) == 0:
+				return head
+			else:
+				se = [head] + [pair[1] for pair in tail]
+				return Schema.Combine(subexps=se)
+		return (self.sequence() + (Literal('-') + self.sequence()).zeroOrMore()).action(
+			lambda input, begin, end, xs, bindings: _unwind(xs))
+
+	@Rule
 	def choice(self):
 		def _unwind(xs):
 			head, tail = xs
@@ -151,7 +168,7 @@ class GrammarEditorGrammar (Grammar):
 			else:
 				se = [head] + [pair[1] for pair in tail]
 				return Schema.Choice(subexps=se)
-		return (self.sequence() + (Literal('|') + self.sequence()).zeroOrMore()).action(
+		return (self.combine() + (Literal('|') + self.combine()).zeroOrMore()).action(
 				lambda input, begin, end, xs, bindings: _unwind(xs))
 
 
