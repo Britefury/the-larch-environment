@@ -28,7 +28,7 @@ from BritefuryJ.Shortcut import Shortcut
 from BritefuryJ.AttributeTable import AttributeNamespace, InheritedAttributeNonNull, PyDerivedValueTable
 
 from BritefuryJ.Pres import ApplyPerspective, ApplyStyleSheetFromAttribute, Pres
-from BritefuryJ.Pres.Primitive import Primitive, Box, Text, Label, HiddenText, Segment, Script, Span, Row, Column, Paragraph, FlowGrid, Whitespace, Border
+from BritefuryJ.Pres.Primitive import Primitive, Box, Text, Label, Spacer, HiddenText, Segment, Script, Span, Row, Column, Paragraph, FlowGrid, Whitespace, Border
 
 from BritefuryJ.StyleSheet import StyleSheet
 
@@ -124,6 +124,20 @@ def invoke_rule(name):
 	n = ApplyStyleSheetFromAttribute( PythonEditorStyle.numLiteralStyle, Text( name ) )
 	return Span([left, n, right])
 
+def invoke_macro(macro_name, param_views):
+	open = ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text( '(' ) )
+	close = ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text( ')' ) )
+	comma = ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text( ', ' ) )
+	name = ApplyStyleSheetFromAttribute( PythonEditorStyle.numLiteralStyle, Text( macro_name ) )
+	params = []
+	if len(param_views) > 0:
+		params.append(param_views[0])
+		for p in param_views[1:]:
+			params.append(comma)
+			params.append(p)
+	return Span([name, open] + params + [close])
+
+
 def _repetition(subexp, repetitions):
 	return Script.scriptRSuper( Row( [ subexp ] ), _repeatBorder.surround( repetitions ) )
 
@@ -211,6 +225,23 @@ def rule_def(name, body_view):
 	assign = ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text( ' := ' ) )
 	return Row([n, assign, Paragraph([body_view])])
 
+def macro_def(name, args, body_view):
+	def_keyword = ApplyStyleSheetFromAttribute(PythonEditorStyle.keywordStyle, Text('def '))
+	macro_name = ApplyStyleSheetFromAttribute( PythonEditorStyle.numLiteralStyle, Text( name ) )
+	open = ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text( '(' ) )
+	close = ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text( ')' ) )
+	comma = ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text( ', ' ) )
+	colon = ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text( ':' ) )
+	args_view = []
+	if len(args) > 0:
+		args_view.append(ApplyStyleSheetFromAttribute( PythonEditorStyle.numLiteralStyle, Text(args[0]) ))
+		for a in args[1:]:
+			args_view.append(comma)
+			args_view.append(ApplyStyleSheetFromAttribute( PythonEditorStyle.numLiteralStyle, Text(a) ))
+	header = Paragraph([def_keyword, macro_name, open] + args_view + [close, colon])
+	body = Paragraph([Spacer(30.0, 0.0), body_view])
+	return Column([header, body])
+
 def grammar_view(rules):
 	return Column( rules )
 
@@ -280,6 +311,15 @@ class GrammarEditorView (MethodDispatchView):
 	@_controller.expressionEditRule
 	def InvokeRule(self, fragment, inheritedState, model, name):
 		return invoke_rule(name)
+
+
+	# INVOKE MACRO
+
+	@DMObjectNodeDispatchMethod( Schema.InvokeMacro )
+	@_controller.expressionEditRule
+	def InvokeMacro(self, fragment, inheritedState, model, macro_name, param_exprs):
+		param_views = SREInnerFragment.map( param_exprs, Precedence.PRECEDENCE_SEQUENCE )
+		return invoke_macro(macro_name, param_views)
 
 
 	# REPETITION
@@ -426,6 +466,12 @@ class GrammarEditorView (MethodDispatchView):
 	def RuleDefinitionStmt(self, fragment, inh, model, name, body):
 		body_view = SREInnerFragment( body, Precedence.PRECEDENCE_STMT )
 		return statement_line(rule_def(name, body_view), model)
+
+	@DMObjectNodeDispatchMethod(Schema.MacroDefinitionStmt)
+	@_controller.statementEditRule
+	def MacroDefinitionStmt(self, fragment, inh, model, name, args, body):
+		body_view = SREInnerFragment( body, Precedence.PRECEDENCE_STMT )
+		return statement_line(macro_def(name, args, body_view), model)
 
 
 	@DMObjectNodeDispatchMethod(Schema.HelperBlockPy)

@@ -184,14 +184,14 @@ class GrammarTestTableRow (AbstractTestTableRow):
 
 	def run_test(self, module, name_to_rule):
 		try:
-			rule = name_to_rule[self._rule_name.getStaticValue()]
+			parser = name_to_rule[self._rule_name.getStaticValue()]
 			parser_input = self._inputCode.executeAndEvaluateWithinModule(module)
-			self.__parser = rule
+			self.__parser = parser
 			self.__input = parser_input
 			if parser_input is None:
-				self._testValue('value', None)
+				test_value = None
 			else:
-				test_value = self._parserTest(rule, parser_input[0])
+				test_value = self._parserTest(parser, parser_input[0])
 		except:
 			self._testValue('exception', JythonException.getCurrentException(), sys.exc_info()[0])
 		else:
@@ -283,7 +283,7 @@ class GrammarTestTable (AbstractTestTable):
 
 	def run_tests(self, module, name_to_rule):
 		for test in self._tests:
-			test.run_test( module, name_to_rule )
+			test.run_test(module, name_to_rule)
 
 
 	_resultColumn = AttributeColumn( 'Result', 'result' )

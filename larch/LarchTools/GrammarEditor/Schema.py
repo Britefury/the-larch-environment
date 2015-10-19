@@ -29,6 +29,7 @@ RegEx = schema.newClass('RegEx', Terminal, ['regex'])
 
 # Non-terminals
 InvokeRule = schema.newClass('InvokeRule', Expression, ['name'])
+InvokeMacro = schema.newClass('InvokeMacro', Expression, ['macro_name', 'param_exprs'])
 
 # Repetition
 AbstractRepeat = schema.newClass('AbstractRepeat', Expression, [])
@@ -63,6 +64,7 @@ BlankLine = schema.newClass( 'BlankLine', Statement, [] )
 CommentStmt = schema.newClass( 'CommentStmt', Statement, [ 'comment' ] )
 UnparsedStmt = schema.newClass( 'UnparsedStmt', Statement, [ 'value' ] )
 RuleDefinitionStmt = schema.newClass('RuleDefinitionStmt', Statement, ['name', 'body'])
+MacroDefinitionStmt = schema.newClass('MacroDefinitionStmt', Statement, ['name', 'args', 'body'])
 
 HelperBlockPy = schema.newClass('HelperBlockPy', Statement, ['py'])
 UnitTestTable = schema.newClass('UnitTestTable', Statement, ['test_table'])

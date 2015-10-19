@@ -82,10 +82,16 @@ class GrammarEditorGrammar (Grammar):
 	def invoke_rule(self):
 		return (Literal('<') + self.rule_name() + Literal('>')).action(lambda input, begin, end, xs, bindings: Schema.InvokeRule(name=xs[1]))
 
+	@Rule
+	def invoke_macro(self):
+		call = SeparatedList(self.expression(), Literal(','), Literal('('), Literal(')'), -1, -1, SeparatedList.TrailingSeparatorPolicy.NEVER)
+		return (Tokens.identifier + call).action(lambda input, begin, end, xs, bindings: Schema.InvokeMacro(macro_name=xs[0],
+																		    		 param_exprs=xs[1]))
+
 
 	@Rule
 	def atom(self):
-		return self.literal() | self.keyword() | self.word() | self.regex() | self.invoke_rule() | self.enclosure()
+		return self.literal() | self.keyword() | self.word() | self.regex() | self.invoke_rule() | self.invoke_macro() | self.enclosure()
 
 
 	@Rule
@@ -218,15 +224,21 @@ class GrammarEditorGrammar (Grammar):
 	# Statements
 	#
 
-
+	@Rule
 	def rule_definition(self):
 		return (self.rule_name() + Literal(':=') + self.expression() + Literal('\n')).action(
 				lambda input, begin, end, xs, bindings: Schema.RuleDefinitionStmt(name=xs[0], body=xs[2]))
 
+	@Rule
+	def macro_definition(self):
+		args = SeparatedList(Tokens.identifier, Literal(','), Literal('('), Literal(')'), -1, -1, SeparatedList.TrailingSeparatorPolicy.NEVER)
+		return (Keyword('def') + Tokens.identifier + args + Literal(':') + self.expression() + Literal('\n')).action(
+			lambda input, begin, end, xs, bindings: Schema.MacroDefinitionStmt(name=xs[1], args=xs[2], body=xs[4]))
+
 
 	@Rule
 	def single_line_statement_valid(self):
-		return ObjectNode( Schema.Statement ) | self.rule_definition() | self.comment_stmt() | self.blank_line()
+		return ObjectNode( Schema.Statement ) | self.rule_definition() | self.macro_definition() | self.comment_stmt() | self.blank_line()
 
 
 	@Rule
@@ -272,6 +284,11 @@ class TestCase_GEParser (ParserTestCase):
 		g = GrammarEditorGrammar()
 		self._parseStringTest( g.invoke_rule(), '<a>', Schema.InvokeRule(name='a') )
 
+	def test_invoke_macro(self):
+		g = GrammarEditorGrammar()
+		self._parseStringTest( g.invoke_macro(), 'f()', Schema.InvokeMacro(macro_name='f', param_exprs=[]) )
+		self._parseStringTest( g.invoke_macro(), 'f(<a>)', Schema.InvokeMacro(macro_name='f', param_exprs=[Schema.InvokeRule(name='a')]) )
+
 	def test_atom(self):
 		g = GrammarEditorGrammar()
 		self._parseStringTest(g.atom(), '"a"', Schema.Literal(value='a', quotation='double'))
@@ -289,10 +306,19 @@ class TestCase_GEParser (ParserTestCase):
 		self._parseStringTest(g.repetition(), '<a>{:2}', Schema.RepeatRange(subexp=Schema.InvokeRule(name='a'), a=None, b='2'))
 		self._parseStringTest(g.repetition(), '<a>{1:2}', Schema.RepeatRange(subexp=Schema.InvokeRule(name='a'), a='1', b='2'))
 
+	def test_lookahead(self):
+		g = GrammarEditorGrammar()
+		self._parseStringTest(g.peekOrControl(), '/<a>', Schema.Peek(subexp=Schema.InvokeRule(name='a')))
+		self._parseStringTest(g.peekOrControl(), '/!<a>', Schema.PeekNot(subexp=Schema.InvokeRule(name='a')))
+
+	def test_control(self):
+		g = GrammarEditorGrammar()
+		self._parseStringTest(g.peekOrControl(), '<a>~', Schema.Suppress(subexp=Schema.InvokeRule(name='a')))
+
 	def test_action(self):
 		g = GrammarEditorGrammar()
-		self._parseStringTest(g.action(), '<a> ->', Schema.Action(subexp=Schema.InvokeRule(name='a'),
-									  action=Schema.ActionPy(py=EmbeddedPython2Expr())))
+		# self._parseStringTest(g.action(), '<a> ->', Schema.Action(subexp=Schema.InvokeRule(name='a'),
+		# 							  action=Schema.ActionPy(py=EmbeddedPython2Expr())))
 
 
 	def test_sequence(self):
@@ -344,6 +370,14 @@ class TestCase_GEParser (ParserTestCase):
 		g = GrammarEditorGrammar()
 		self._parseStringTest(g.single_line_statement(), 'a := <a>\n',
 				      Schema.RuleDefinitionStmt(name='a', body=Schema.InvokeRule(name='a')))
+
+
+	def test_macro_definition(self):
+		g = GrammarEditorGrammar()
+		self._parseStringTest(g.single_line_statement(), 'def f() : <a>\n',
+				      Schema.MacroDefinitionStmt(name='f', args=[], body=Schema.InvokeRule(name='a')))
+		self._parseStringTest(g.single_line_statement(), 'def f(x) : <a>\n',
+				      Schema.MacroDefinitionStmt(name='f', args=['x'], body=Schema.InvokeRule(name='a')))
 
 
 	def test_blank_line(self):
