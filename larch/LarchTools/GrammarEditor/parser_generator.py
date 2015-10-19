@@ -146,6 +146,22 @@ class GrammarParserGenerator (object):
 		return self(subexp).repeat(min_r, max_r)
 
 
+	# Look ahead
+	@DMObjectNodeDispatchMethod( Schema.Peek )
+	def Peek(self, model, subexp):
+		return self(subexp).peek()
+
+	@DMObjectNodeDispatchMethod( Schema.PeekNot )
+	def PeekNot(self, model, subexp):
+		return self(subexp).peekNot()
+
+
+	# Control
+	@DMObjectNodeDispatchMethod( Schema.Suppress )
+	def Suppress(self, model, subexp):
+		return self(subexp).suppress()
+
+
 	# Action
 	@DMObjectNodeDispatchMethod( Schema.Action )
 	def Action(self, model, subexp, action):

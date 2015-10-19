@@ -142,6 +142,15 @@ def optional(subexp):
 def repeat_range(subexp, min, max):
 	return _repetition( subexp, Row( [ _controlCharStyle( Text( '{' ) ), Text( min ),  _controlCharStyle( Text( ':' ) ), Text( max ), _controlCharStyle( Text( '}' ) ) ] ) )
 
+def peek(subexp):
+	return Span([ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text('/')), subexp])
+
+def peek_not(subexp):
+	return Span([ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text('/!')), subexp])
+
+def suppress(subexp):
+	return Span([subexp, ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text('~'))])
+
 def action_pres(subexp, action):
 	arrow =ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text(' -> '))
 	return Row([subexp, arrow, action])
@@ -152,6 +161,15 @@ def sequence(subexps):
 		items.append(subexps[0])
 		for x in subexps[1:]:
 			items.append(Text(' '))
+			items.append(x)
+	return Span(items)
+
+def combine(subexps):
+	items = []
+	if len(subexps) > 0:
+		items.append(subexps[0])
+		for x in subexps[1:]:
+			items.append(ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text(' - ')))
 			items.append(x)
 	return Span(items)
 
@@ -301,6 +319,30 @@ class GrammarEditorView (MethodDispatchView):
 		return repeat_range(subexp_view, a, b)
 
 
+	# LOOK AHEAD
+
+	@DMObjectNodeDispatchMethod( Schema.Peek )
+	@_controller.expressionEditRule
+	def Peek(self, fragment, inheritedState, model, subexp):
+		subexp_view = SREInnerFragment( subexp, Precedence.PRECEDENCE_REPEAT )
+		return peek(subexp_view)
+
+
+	@DMObjectNodeDispatchMethod( Schema.PeekNot )
+	@_controller.expressionEditRule
+	def PeekNot(self, fragment, inheritedState, model, subexp):
+		subexp_view = SREInnerFragment( subexp, Precedence.PRECEDENCE_REPEAT )
+		return peek_not(subexp_view)
+
+
+	@DMObjectNodeDispatchMethod( Schema.Suppress )
+	@_controller.expressionEditRule
+	def Suppress(self, fragment, inheritedState, model, subexp):
+		subexp_view = SREInnerFragment( subexp, Precedence.PRECEDENCE_REPEAT )
+		return suppress(subexp_view)
+
+
+
 	# ACTION
 
 	@DMObjectNodeDispatchMethod( Schema.ActionPy )
@@ -330,6 +372,13 @@ class GrammarEditorView (MethodDispatchView):
 	def Sequence(self, fragment, inheritedState, model, subexps):
 		subexp_views = SREInnerFragment.map( subexps, Precedence.PRECEDENCE_SEQUENCE )
 		return sequence(subexp_views)
+
+
+	@DMObjectNodeDispatchMethod( Schema.Combine )
+	@_controller.expressionEditRule
+	def Combine(self, fragment, inheritedState, model, subexps):
+		subexp_views = SREInnerFragment.map( subexps, Precedence.PRECEDENCE_CHOICE )
+		return combine(subexp_views)
 
 
 	@DMObjectNodeDispatchMethod( Schema.Choice )
