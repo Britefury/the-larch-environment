@@ -208,13 +208,12 @@ class AbstractTestTable (object):
 
 
 	def __getstate__(self):
-		state = super( AbstractTestTable, self ).__getstate__()
+		state = {}
 		state['name'] = self._name.getStaticValue()
 		state['tests'] = self._tests
 		return state
 
 	def __setstate__(self, state):
-		super( AbstractTestTable, self ).__setstate__( state )
 		self._name = TrackedLiveValue( state['name'] )
 		self._tests = state['tests']
 		self.__change_history__ = None

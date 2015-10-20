@@ -156,7 +156,7 @@ class _GrammarParserExpressionGenerator (object):
 
 	@DMObjectNodeDispatchMethod( Schema.ActionPy )
 	def ActionPy(self, model, py):
-		return py.evalute(self._get_globals(), None)
+		return py.evaluate(self._get_globals(), None)
 
 
 	# Combinators
