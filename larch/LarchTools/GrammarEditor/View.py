@@ -240,7 +240,7 @@ def macro_def(name, args, body_view):
 			args_view.append(ApplyStyleSheetFromAttribute( PythonEditorStyle.numLiteralStyle, Text(a) ))
 	header = Paragraph([def_keyword, macro_name, open] + args_view + [close, colon])
 	body = Paragraph([Spacer(30.0, 0.0), body_view])
-	return Column([header, body])
+	return Column(0, [header, body])
 
 def grammar_view(rules):
 	return Column( rules )

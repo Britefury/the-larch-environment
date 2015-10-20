@@ -151,8 +151,14 @@ class AbstractInlineTestTable (AbstractInlineTest, AbstractTestTable):
 
 
 
+	def __getstate__(self):
+		state = AbstractInlineTest.__getstate__(self)
+		state.update(AbstractTestTable.__getstate__(self))
+		return state
+
 	def __setstate__(self, state):
-		super( AbstractInlineTestTable, self ).__setstate__( state )
+		AbstractInlineTest.__setstate__(self, state)
+		AbstractTestTable.__setstate__(self, state)
 		self.__methodNames = UniqueNameTable()
 
 
