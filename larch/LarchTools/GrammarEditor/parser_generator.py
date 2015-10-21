@@ -37,6 +37,8 @@ class _GrammarGeneratorContext (object):
 		self.module = module
 		self.name_to_rule = name_to_rule
 		self.name_to_macro = name_to_macro
+		self.op_table_forward_decls = {}
+		self.expr_evaluator = GrammarParserGeneratorExpressionEvaluator(self)
 
 
 class _GrammarParserExpressionGenerator (object):
@@ -209,6 +211,15 @@ class _GrammarParserGeneratorFirstPass (object):
 	def HelperBlockPy(self, model, py):
 		py.executeWithinModule(self.context.module)
 
+	# Operator table - build forward expressions
+	@DMObjectNodeDispatchMethod( Schema.OperatorTable )
+	def OperatorTable(self, model, op_table):
+		op_table_id = id(model)
+		fwds = op_table.forward_declarations()
+		self.context.op_table_forward_decls[op_table_id] = fwds
+		for f in fwds:
+			self.context.name_to_rule[f.getExpressionName()] = f
+
 	# Grammar definition
 	@DMObjectNodeDispatchMethod( Schema.GrammarDefinition )
 	def GrammarDefinition(self, model, rules):
@@ -250,6 +261,26 @@ class _Macro (object):
 		# print 'Macro invocation: {0}({1})'.format(self.macro.name, self.name_to_param)
 		return GrammarMacroInvocation(self, name_to_param)(self.body)
 
+
+
+class GrammarParserGeneratorExpressionEvaluator (_GrammarParserExpressionGenerator):
+	def __init__(self, context):
+		self.context = context
+
+
+	def _get_rule_by_name(self, name):
+		return self.context.name_to_rule[name]
+
+	def _get_macro_by_name(self, name):
+		return self.context.name_to_macro[name]
+
+	def _get_globals(self):
+		return self.context.module.__dict__
+
+	# Grammar definition
+	@DMObjectNodeDispatchMethod( Schema.GrammarExpression )
+	def GrammarExpression(self, model, expr):
+		return self(expr)
 
 
 class GrammarParserGenerator (_GrammarParserExpressionGenerator):
@@ -296,6 +327,13 @@ class GrammarParserGenerator (_GrammarParserExpressionGenerator):
 	@DMObjectNodeDispatchMethod( Schema.HelperBlockPy )
 	def HelperBlockPy(self, model, py):
 		pass
+
+	# Operator table
+	@DMObjectNodeDispatchMethod( Schema.OperatorTable )
+	def OperatorTable(self, model, op_table):
+		op_table_id = id(model)
+		fwds = self.context.op_table_forward_decls[op_table_id]
+		op_table.build_parsers(fwds, self.context)
 
 	# Ignore unit tests
 	@DMObjectNodeDispatchMethod( Schema.UnitTestTable )

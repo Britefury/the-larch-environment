@@ -21,13 +21,14 @@ public class InfixRightLevel extends BinaryOperatorLevel
 	{
 		private BinaryOperatorParseAction action;
 		private int leftPos;
-		private Object left;
+		private Object left, opValue;
 		
-		public InfixRightOperatorResultBuilder(BinaryOperatorParseAction action, int leftPos, Object left)
+		public InfixRightOperatorResultBuilder(BinaryOperatorParseAction action, int leftPos, Object left, Object opValue)
 		{
 			this.action = action;
 			this.leftPos = leftPos;
 			this.left = left;
+			this.opValue = opValue;
 		}
 		
 		
@@ -39,7 +40,7 @@ public class InfixRightLevel extends BinaryOperatorLevel
 
 		public Object buildResult(Object input, int begin, int rightEnd, Object right)
 		{
-			return action.invoke( input, begin, rightEnd, left, right );
+			return action.invoke( input, begin, rightEnd, left, opValue, right );
 		}
 	}
 
@@ -88,7 +89,8 @@ public class InfixRightLevel extends BinaryOperatorLevel
 		{
 			List<Object> xs = (List<Object>)x;
 			Object left = xs.get( 0 );
-			return new InfixRightOperatorResultBuilder( action, begin, left );
+			Object opValue = xs.get(1);
+			return new InfixRightOperatorResultBuilder( action, begin, left, opValue );
 		}
 	}
 	

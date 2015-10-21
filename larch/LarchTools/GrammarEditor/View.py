@@ -242,7 +242,10 @@ def macro_def(name, args, body_view):
 	body = Paragraph([Spacer(30.0, 0.0), body_view])
 	return Column(0, [header, body])
 
-def grammar_view(rules):
+def grammar_expr_view(expr_view):
+	return Paragraph( [expr_view] )
+
+def grammar_def_view(rules):
 	return Column( rules )
 
 
@@ -484,6 +487,13 @@ class GrammarEditorView (MethodDispatchView):
 		return special_form_statement_line(p, model)
 
 
+	@DMObjectNodeDispatchMethod(Schema.OperatorTable)
+	@_controller.specialFormStatementEditRule
+	def OperatorTable(self, fragment, inh, model, op_table):
+		p = EditPerspective.instance.applyTo(op_table)
+		return special_form_statement_line(p, model)
+
+
 	@DMObjectNodeDispatchMethod(Schema.UnitTestTable)
 	@_controller.specialFormStatementEditRule
 	def UnitTestTable(self, fragment, inh, model, test_table):
@@ -499,6 +509,18 @@ class GrammarEditorView (MethodDispatchView):
 
 
 	# OUTER NODES
+	@DMObjectNodeDispatchMethod( Schema.GrammarExpression )
+	@_controller.expressionTopLevelEditRule
+	def GrammarExpression(self, fragment, inheritedState, model, expr):
+		if expr is not None:
+			expr_view = SREInnerFragment(expr, Precedence.PRECEDENCE_NONE, EditMode.EDIT)
+		else:
+			expr_view = Text('')
+
+		g = grammar_expr_view( expr_view ).alignHPack().alignVRefY()
+		return g
+
+
 	@DMObjectNodeDispatchMethod( Schema.GrammarDefinition )
 	def GrammarDefinition(self, fragment, inheritedState, model, rules):
 		def _run_unit_tests(element):
@@ -510,13 +532,12 @@ class GrammarEditorView (MethodDispatchView):
 			lineViews = [ statement_line( blank_line(), None ) ]
 		else:
 			lineViews = SREInnerFragment.map( rules, Precedence.PRECEDENCE_NONE, EditMode.EDIT )
-		g = grammar_view( lineViews ).alignHPack().alignVRefY().withProperty(Properties.GrammarDefProperty.instance, model).withCommands(Commands.grammarCommands)
+		g = grammar_def_view( lineViews ).alignHPack().alignVRefY().withProperty(Properties.GrammarDefProperty.instance, model).withCommands(Commands.grammarCommands)
 		g = g.withShortcut( Shortcut( KeyEvent.VK_U, Modifier.ALT), _run_unit_tests )
 		g = g.withShortcut( Shortcut( KeyEvent.VK_U, Modifier.META), _run_unit_tests )
 		g = SoftStructuralItem( GrammarEditorSyntaxRecognizingController.instance, [ GrammarEditorSyntaxRecognizingController.instance._makeGrammarEditFilter( rules ),
-											     GrammarEditorSyntaxRecognizingController.instance._topLevel ], rules, g )
+																					 GrammarEditorSyntaxRecognizingController.instance._topLevel ], rules, g )
 		return g
-
 
 
 _parser = GrammarEditorGrammar()

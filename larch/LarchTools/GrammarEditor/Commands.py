@@ -100,14 +100,20 @@ def _new_python_helper(caret):
 	return Schema.HelperBlockPy(py=helpers.new_python_helper_suite())
 
 @SpecialFormStmtAtCaretAction
+def _newOperatorTableAtCaret(caret):
+	from LarchTools.GrammarEditor.operator_table import GrammarOperatorTable
+	return Schema.OperatorTable(op_table=GrammarOperatorTable())
+
+@SpecialFormStmtAtCaretAction
 def _newGrammarTestTableAtCaret(caret):
 	return Schema.UnitTestTable(test_table=grammar_unit_test.GrammarTestTable())
 
 _pythonHelperCommand = Command( '&P&ython &Helper', _new_python_helper )
+_op_table_command = Command('&Grammar &Operator &Table', _newOperatorTableAtCaret)
 _unitTestCommand = Command('&Grammar &Table &Test', _newGrammarTestTableAtCaret)
 
 
-grammarCommandSet = CommandSet( 'LarchTools.GrammarEditor.GrammarEditor', [_pythonHelperCommand, _unitTestCommand] )
+grammarCommandSet = CommandSet( 'LarchTools.GrammarEditor.GrammarEditor', [_pythonHelperCommand, _op_table_command, _unitTestCommand] )
 
 
 grammarCommands = CommandSetRegistry( 'LarchTools.GrammarEditor' )

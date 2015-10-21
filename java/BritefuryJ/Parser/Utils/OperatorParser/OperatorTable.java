@@ -18,7 +18,6 @@ import BritefuryJ.Parser.Utils.Tokens;
 
 public class OperatorTable
 {
-	private ParserExpression rootParser;
 	private ArrayList<OperatorLevel> levels;
 	
 	
@@ -26,9 +25,8 @@ public class OperatorTable
 	// Constructor
 	//
 	
-	public OperatorTable(OperatorLevel levels[], ParserExpression rootParser)
+	public OperatorTable(OperatorLevel levels[])
 	{
-		this.rootParser = rootParser;
 		this.levels = new ArrayList<OperatorLevel>();
 		this.levels.addAll( Arrays.asList( levels ) );
 	}
@@ -52,32 +50,47 @@ public class OperatorTable
 		}
 		return null;
 	}
-	
-	
-	public List<ParserExpression> buildParsers() throws Production.CannotOverwriteProductionExpressionException
-	{
-		ParserExpression prevLevelParser = rootParser;
-		ArrayList<ParserExpression> levelParsers = new ArrayList<ParserExpression>();
-		ArrayList<Production> reachupForwardDeclarations = new ArrayList<Production>();
 
-		for (int i = 0; i < levels.size(); i++)
+	private ArrayList<Production> buildForwardDeclarations(String namePrefix, int n) {
+		ArrayList<Production> levelParsers = new ArrayList<Production>();
+		for (int i = 0; i < n; i++)
 		{
-			reachupForwardDeclarations.add( new Production( "oplvl_reachup_" + i ) );
+			Production levelParser = new Production( namePrefix + i );
+			levelParsers.add( levelParser );
 		}
+		return levelParsers;
+	}
+
+
+	public void buildParsers(List<Production> levelForwardDeclarations, ParserExpression rootParser) throws Production.CannotOverwriteProductionExpressionException {
+		if (levelForwardDeclarations.size() != levels.size()) {
+			throw new RuntimeException("the number of levels (" + levels.size() + ") and forward declarations (" + levelForwardDeclarations.size() + ") not match");
+		}
+
+		ParserExpression prevLevelParser = rootParser;
+		ArrayList<Production> reachupForwardDeclarations = buildForwardDeclarations("oplvl_reachup_", levels.size());
 
 		for (int i = 0; i < levels.size(); i++)
 		{
 			OperatorLevel lvl = levels.get( i );
-			
-			ParserExpression levelParser = new Production( "oplvl_" + i, lvl.buildParser( this, prevLevelParser, reachupForwardDeclarations ).__or__( prevLevelParser ) );
+			Production levelParser = levelForwardDeclarations.get(i);
+			levelParser.setExpression(lvl.buildParser( this, prevLevelParser, reachupForwardDeclarations ).__or__( prevLevelParser ));
+
 			ParserExpression reachupParser = lvl.buildParserForReachUp( this, prevLevelParser );
-			levelParsers.add( levelParser );
 			reachupForwardDeclarations.get( i ).setExpression( reachupParser );
-			
+
 			prevLevelParser = levelParser;
 		}
-		
-		return levelParsers;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<ParserExpression> createAndBuildParsers(ParserExpression rootParser) throws Production.CannotOverwriteProductionExpressionException
+	{
+		ArrayList<Production> forwardDeclarations = buildForwardDeclarations("oplvl_", levels.size());
+
+		buildParsers(forwardDeclarations, rootParser);
+
+		return (ArrayList<ParserExpression>)(ArrayList<?>)forwardDeclarations;
 	}
 	
 	
@@ -86,17 +99,17 @@ public class OperatorTable
 	{
 		BinaryOperatorParseAction mulAction = new BinaryOperatorParseAction()
 		{
-			public Object invoke(Object input, int begin, int end, Object left, Object right)
+			public Object invoke(Object input, int begin, int end, Object left, Object op, Object right)
 			{
-				return Arrays.asList( '*', left, right );
+				return Arrays.asList( op, left, right );
 			}
 		};
 
 		UnaryOperatorParseAction notAction = new UnaryOperatorParseAction()
 		{
-			public Object invoke(Object input, int begin, int end, Object x)
+			public Object invoke(Object input, int begin, int end, Object x, Object op)
 			{
-				return Arrays.asList( '!', x );
+				return Arrays.asList( op, x );
 			}
 		};
 		
@@ -108,8 +121,8 @@ public class OperatorTable
 		//PrefixLevel l1 = new PrefixLevel( Arrays.asList( new UnaryOperator[] { inv } ) );
 		SuffixLevel l1 = new SuffixLevel( Arrays.asList( inv ) );
 		
-		OperatorTable t = new OperatorTable( new OperatorLevel[] { l0, l1 }, Tokens.identifier );
-		List<ParserExpression> parsers = t.buildParsers();
+		OperatorTable t = new OperatorTable( new OperatorLevel[] { l0, l1 } );
+		List<ParserExpression> parsers = t.createAndBuildParsers(Tokens.identifier);
 		ParserExpression e = parsers.get( parsers.size() - 1 );
 		
 		return e.traceParseStringChars( "a * b * c!" );
