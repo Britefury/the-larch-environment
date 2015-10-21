@@ -539,9 +539,9 @@ class Python2Grammar (Grammar):
 				PrefixLevel( [ UnaryOperator( Keyword( Keywords.notKeyword ),  Schema.NotTest, 'x' ) ] ),
 				InfixLeftLevel( [ BinaryOperator( Keyword( Keywords.andKeyword ),  Schema.AndTest, 'x', 'y' ) ] ),
 				InfixLeftLevel( [ BinaryOperator( Keyword( Keywords.orKeyword ),  Schema.OrTest, 'x', 'y' ) ] ),
-				],  self.primary() )
+				] )
 
-		return opTable.buildParsers()
+		return opTable.createAndBuildParsers(self.primary())
 
 
 

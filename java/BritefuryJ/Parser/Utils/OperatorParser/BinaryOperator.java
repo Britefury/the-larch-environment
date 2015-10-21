@@ -39,7 +39,7 @@ public class BinaryOperator extends Operator
 		}
 		
 		
-		public Object invoke(Object input, int begin, int end, Object x, Object y)
+		public Object invoke(Object input, int begin, int end, Object x, Object opValue, Object y)
 		{
 			try
 			{
@@ -62,9 +62,9 @@ public class BinaryOperator extends Operator
 			this.callable = callable;
 		}
 
-		public Object invoke(Object input, int begin, int end, Object left, Object right)
+		public Object invoke(Object input, int begin, int end, Object left, Object opValue, Object right)
 		{
-			return callable.__call__( new PyObject[] { Py.java2py( input ), new PyInteger( begin ), new PyInteger( end ), Py.java2py( left ), Py.java2py( right ) } );
+			return callable.__call__( new PyObject[] { Py.java2py( input ), new PyInteger( begin ), new PyInteger( end ), Py.java2py( left ), Py.java2py(opValue), Py.java2py( right ) } );
 		}
 	}
 

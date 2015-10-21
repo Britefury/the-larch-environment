@@ -37,6 +37,23 @@ def gramReplaceNode(data, replacement):
 def _isValidUnparsedValue(value):
 	return True
 
+def _isValidExprOrTargetOuterUnparsed(value):
+	return '\n' not in value
+
+def _commitExprOuterValid(model, parsed):
+	expr = model['expr']
+	if parsed != expr:
+		model['expr'] = parsed
+
+def _commitExprOuterEmpty(model, parsed):
+	model['expr'] = Schema.UNPARSED( value=[ '' ] )
+
+def _commitExprOuterUnparsed(model, value):
+	values = value.getItemValues()
+	if values == []:
+		values = [ '' ]
+	model['expr'] = Schema.UNPARSED( value=values )
+
 
 def _isValidUnparsedStatementValue(value):
 	# Unparsed statement is only valid if there is ONE newline, and it is at the end
@@ -125,6 +142,8 @@ class GrammarEditorSyntaxRecognizingController (SyntaxRecognizingController):
 		self._stmtUnparsed = self.unparsedEditFilter( 'Unparsed statement', _isValidUnparsedStatementValue, _commitUnparsedStatment, _commitInnerUnparsed )
 		self._specialFormStmtUnparsed = self.unparsedEditFilter( 'Unparsed special-form stmt', _isValidUnparsedSpecialFormStatementValue, _commitUnparsedStatment, _commitInnerUnparsed )
 		self._topLevel = self.topLevelEditFilter()
+		self._exprOuterValid = self.parsingEditFilter( 'Expression-outer-valid', self._grammar.expression(), _commitExprOuterValid, _commitExprOuterEmpty )
+		self._exprOuterInvalid = self.unparsedEditFilter( 'Expression-outer-invalid', _isValidExprOrTargetOuterUnparsed, _commitExprOuterUnparsed )
 
 		self.expressionEditRule = self.editRule( _grammarPrecedenceHandler, [ self._expr ] )
 		self.structuralExpressionEditRule = self.softStructuralEditRule( _grammarPrecedenceHandler, [ self._expr ] )
@@ -132,6 +151,7 @@ class GrammarEditorSyntaxRecognizingController (SyntaxRecognizingController):
 		self.statementEditRule = self.softStructuralEditRule( [ self._stmt, self._stmtUnparsed ] )
 		self.unparsedStatementEditRule = self.editRule( [ self._stmt, self._stmtUnparsed ] )
 		self.specialFormStatementEditRule = self.softStructuralEditRule( [ self._stmt, self._specialFormStmtUnparsed ] )
+		self.expressionTopLevelEditRule = self.softStructuralEditRule( _grammarPrecedenceHandler, [ self._exprOuterValid, self._exprOuterInvalid, self._topLevel ] )
 
 
 

@@ -67,8 +67,10 @@ RuleDefinitionStmt = schema.newClass('RuleDefinitionStmt', Statement, ['name', '
 MacroDefinitionStmt = schema.newClass('MacroDefinitionStmt', Statement, ['name', 'args', 'body'])
 
 HelperBlockPy = schema.newClass('HelperBlockPy', Statement, ['py'])
+OperatorTable = schema.newClass('OperatorTable', Statement, ['op_table'])
 UnitTestTable = schema.newClass('UnitTestTable', Statement, ['test_table'])
 
 
 
+GrammarExpression = schema.newClass('GrammarExpression', Node, ['expr'])
 GrammarDefinition = schema.newClass('GrammarDefinition', Node, ['rules'])

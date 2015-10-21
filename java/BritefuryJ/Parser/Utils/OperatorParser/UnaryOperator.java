@@ -37,7 +37,7 @@ public class UnaryOperator extends Operator
 		}
 		
 		
-		public Object invoke(Object input, int begin, int end, Object x)
+		public Object invoke(Object input, int begin, int end, Object x, Object opValue)
 		{
 			try
 			{
@@ -60,9 +60,9 @@ public class UnaryOperator extends Operator
 			this.callable = callable;
 		}
 
-		public Object invoke(Object input, int begin, int end, Object x)
+		public Object invoke(Object input, int begin, int end, Object x, Object opValue)
 		{
-			return callable.__call__( new PyObject[] { Py.java2py( input ), new PyInteger( begin ), new PyInteger( end ), Py.java2py( x ) } );
+			return callable.__call__( new PyObject[] { Py.java2py( input ), new PyInteger( begin ), new PyInteger( end ), Py.java2py( x ), Py.java2py(opValue) } );
 		}
 	}
 	
@@ -71,13 +71,15 @@ public class UnaryOperator extends Operator
 	{
 		private UnaryOperatorParseAction action;
 		private int operatorBegin, operatorEnd;
+		private Object opValue;
 		private Map<String, Object> opBindings;
 		
-		public UnaryOperatorResultBuilder(UnaryOperatorParseAction action, int operatorBegin, int operatorEnd, Map<String, Object> opBindings)
+		public UnaryOperatorResultBuilder(UnaryOperatorParseAction action, int operatorBegin, int operatorEnd, Object opValue, Map<String, Object> opBindings)
 		{
 			this.action = action;
 			this.operatorBegin = operatorBegin;
 			this.operatorEnd = operatorEnd;
+			this.opValue = opValue;
 			this.opBindings = opBindings;
 		}
 		
@@ -100,7 +102,7 @@ public class UnaryOperator extends Operator
 
 		public Object buildResult(Object input, int begin, int end, Object x)
 		{
-			return action.invoke( input, begin, end, x );
+			return action.invoke( input, begin, end, x, opValue );
 		}
 	}
 	
@@ -118,7 +120,7 @@ public class UnaryOperator extends Operator
 		
 		public Object invoke(Object input, int begin, int end, Object x, Map<String, Object> bindings)
 		{
-			return new UnaryOperatorResultBuilder( action, begin, end, bindings );
+			return new UnaryOperatorResultBuilder( action, begin, end, x, bindings );
 		}
 	}
 

@@ -1,15 +1,24 @@
+from java.awt import Color
+
 from BritefuryJ.Incremental import IncrementalValueMonitor
 from BritefuryJ.Live import TrackedLiveValue, LiveFunction
 
+from BritefuryJ.Parser import Production
+from BritefuryJ.Parser.Utils.OperatorParser import UnaryOperator, BinaryOperator, InfixLeftLevel, InfixRightLevel, PrefixLevel, SuffixLevel, OperatorTable
+
 from BritefuryJ.Controls import OptionMenu
 
-from BritefuryJ.Pres.Primitive import Label
+from BritefuryJ.Graphics import SolidBorder
+
+from BritefuryJ.Pres.Primitive import Label, Spacer, Row, Column
+from BritefuryJ.Pres.UI import SectionHeading2, SectionHeading3
 
 from BritefuryJ.Editor.Table.ObjectList import AttributeColumn, ObjectListTableEditor
 
 from Britefury.Util.LiveList import LiveList
 
 from LarchCore.Languages.Python2.Embedded import EmbeddedPython2Expr
+from LarchTools.GrammarEditor.GrammarEditor import GrammarExpressionEditor
 
 
 class EnumOptionMenu (object):
@@ -40,31 +49,60 @@ class EnumOptionMenu (object):
 
 
 class OpLevelRow (object):
-    def __init__(self, action=None):
+    def __init__(self, op_expr=None, action=None):
+        if op_expr is None:
+            op_expr = GrammarExpressionEditor()
         if action is None:
             action = EmbeddedPython2Expr()
+        self.__op_expr = TrackedLiveValue(op_expr)
         self.__action = TrackedLiveValue(action)
         self.__change_history__ = None
 
 
     def __getstate__(self):
         state = {}
+        state['op_expr'] = self.__op_expr.getStaticValue()
         state['action'] = self.__action.getStaticValue()
         return state
 
     def __setstate__(self, state):
+        self.__op_expr = TrackedLiveValue(state['op_expr'])
         self.__action = TrackedLiveValue(state['action'])
         self.__change_history__ = None
 
 
     def __get_trackable_contents__(self):
-        return [ self.__action ]
+        return [ self.__op_expr, self.__action ]
 
 
     def __clipboard_copy__(self, memo):
+        op_expr = memo.copy(self.__op_expr.getStaticValue())
         action = memo.copy(self.__action.getStaticValue())
-        return OpLevelRow(action)
+        return OpLevelRow(op_expr, action)
 
+
+    def op_parser_expression(self, context):
+        return self.__op_expr.getStaticValue().parser_expression(context)
+
+    def parse_action(self, context):
+        return self.__action.getStaticValue().evaluate(context.module.__dict__, None)
+
+    def unary_operator(self, context):
+        f = self.parse_action(context)
+        return UnaryOperator(self.op_parser_expression(context), lambda input, begin, end, subexp, op: f(subexp, op))
+
+    def binary_operator(self, context):
+        f = self.parse_action(context)
+        return BinaryOperator(self.op_parser_expression(context), lambda input, begin, end, left, op, right: f(left, op, right))
+
+
+    @property
+    def op_expr(self):
+        return self.__op_expr.getValue()
+
+    @op_expr.setter
+    def op_expr(self, value):
+        self.__op_expr.setLiteralValue(value)
 
 
     @property
@@ -79,12 +117,10 @@ class OpLevelRow (object):
 
 
 class OpLevelTable (LiveList):
-    # _operator_expr_column = AttributeColumn('Op. expr', 'op_expr')
+    _operator_expr_column = AttributeColumn('Op. expr', 'op_expr', GrammarExpressionEditor)
     _operator_action_column = AttributeColumn('Op. action', 'action', EmbeddedPython2Expr)
 
-    # _table_editor = ObjectListTableEditor([_operator_expr_column, _operator_action_column],
-    #                                       OpLevelRow, True, True, True, True)
-    _table_editor = ObjectListTableEditor([_operator_action_column],
+    _table_editor = ObjectListTableEditor([_operator_expr_column, _operator_action_column],
                                           OpLevelRow, True, True, True, True)
 
 
@@ -149,6 +185,25 @@ class OperatorTableRow (object):
         return [ self.__rule_name, self.__level_type, self.__operators ]
 
 
+    def forward_declaration(self):
+        return Production(self.__rule_name.getValue())
+
+
+    def operator_level(self, context):
+        level_type = self.__level_type.getStaticValue()
+        if level_type == self.LEVEL_TYPE_PREFIX:
+            return PrefixLevel([op.unary_operator(context) for op in self.__operators.getStaticValue()])
+        elif level_type == self.LEVEL_TYPE_SUFFIX:
+            return SuffixLevel([op.unary_operator(context) for op in self.__operators.getStaticValue()])
+        elif level_type == self.LEVEL_TYPE_INFIX_LEFT:
+            return InfixLeftLevel([op.binary_operator(context) for op in self.__operators.getStaticValue()])
+        elif level_type == self.LEVEL_TYPE_INFIX_RIGHT:
+            return InfixRightLevel([op.binary_operator(context) for op in self.__operators.getStaticValue()])
+        elif level_type == self.LEVEL_TYPE_INFIX_CHAIN:
+            raise NotImplementedError, 'not implemented yet'
+
+
+
     @property
     def rule_name(self):
         return self.__rule_name.getValue()
@@ -191,7 +246,65 @@ class OperatorTableRow (object):
 
 
 
-class OperatorTable (LiveList):
+class GrammarOperatorTable (object):
+    def __init__(self, incoming_expr=None, levels=None):
+        super( GrammarOperatorTable, self ).__init__()
+        if incoming_expr is None:
+            incoming_expr = GrammarExpressionEditor()
+        levels = LiveList(levels)
+        self.__incoming_expr = TrackedLiveValue(incoming_expr)
+        self.__levels = levels
+        self.__change_history__ = None
+
+
+
+    def __getstate__(self):
+        state = {}
+        state['incoming_expr'] = self.__incoming_expr.getStaticValue()
+        state['levels'] = self.__levels
+        return state
+
+    def __setstate__(self, state):
+        self.__incoming_expr = TrackedLiveValue( state['incoming_expr'] )
+        self.__levels = state['levels']
+        self.__change_history__ = None
+
+
+    def __get_trackable_contents__(self):
+        return [ self.__incoming_expr, self.__levels ]
+
+
+    def forward_declarations(self):
+        return [lvl.forward_declaration() for lvl in self.__levels]
+
+    def build_parsers(self, forward_declarations, context):
+        root_parser = self.__incoming_expr.getStaticValue().parser_expression(context)
+        ops = OperatorTable([lvl.operator_level(context) for lvl in self.__levels])
+        ops.buildParsers(forward_declarations, root_parser)
+
+
+    @property
+    def levels(self):
+        return self.__levels
+
+    @property
+    def incoming_expr(self):
+        return self.__incoming_expr.getValue()
+
+
+    __embed_hide_frame__ = True
+
+    def __present__(self, fragment, inheritedState):
+        title = SectionHeading2( 'Operators' )
+        incoming = Row([SectionHeading3('Incoming expr: '), self.__incoming_expr])
+
+        header = Column( [ title, incoming ] )
+
+        table = self._table_editor.editTable( self.__levels )
+
+        return self._operator_table_border.surround( Column( [ header, Spacer( 0.0, 5.0 ), table ] ) )
+
+
     _rule_name_column = AttributeColumn('Grammar rule', 'rule_name', str)
     _level_type_column = AttributeColumn('Precedence level', 'level_type_view')
     _operators_column = AttributeColumn('Operators', 'operators')
@@ -199,7 +312,6 @@ class OperatorTable (LiveList):
     _table_editor = ObjectListTableEditor([_rule_name_column, _level_type_column, _operators_column],
                                           OperatorTableRow, True, True, True, True)
 
-    def __present__(self, fragment, inh):
-        return self._table_editor.editTable(self)
+    _operator_table_border = SolidBorder( 1.5, 3.0, 5.0, 5.0, Color( 0.4, 0.4, 0.5 ), None )
 
 
