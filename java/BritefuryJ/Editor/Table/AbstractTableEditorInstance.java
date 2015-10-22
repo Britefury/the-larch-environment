@@ -6,7 +6,9 @@
 //##************************
 package BritefuryJ.Editor.Table;
 
+import BritefuryJ.Controls.PopupMenu;
 import BritefuryJ.LSpace.ElementSearchBredthFirst;
+import BritefuryJ.LSpace.Interactor.ContextMenuElementInteractor;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.TableElement;
 import BritefuryJ.LSpace.Event.PointerButtonEvent;
@@ -96,9 +98,7 @@ public abstract class AbstractTableEditorInstance <ModelType>
 			return new TableSelectionPoint( AbstractTableEditorInstance.this, table, tx, ty );
 		}
 	}
-	
-	
-	
+
 	private class TableEditorPres extends Pres
 	{
 		private Pres contents;

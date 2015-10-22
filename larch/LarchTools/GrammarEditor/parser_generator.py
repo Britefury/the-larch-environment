@@ -35,6 +35,7 @@ class GrammarParserGeneratorWongNumberOfMacroArgumentsError (GrammarParserGenera
 class _GrammarGeneratorContext (object):
 	def __init__(self, module, name_to_rule, name_to_macro):
 		self.module = module
+		self.module.macro = _make_macro_wrapper(self)
 		self.name_to_rule = name_to_rule
 		self.name_to_macro = name_to_macro
 		self.op_table_forward_decls = {}
@@ -246,7 +247,12 @@ class GrammarMacroInvocation (_GrammarParserExpressionGenerator):
 
 
 
-class _Macro (object):
+class _AbstractMacro (object):
+	def __call__(self, *params):
+		raise NotImplementedError
+
+
+class _Macro (_AbstractMacro):
 	def __init__(self, context, name, args, body):
 		self.context = context
 		self.name = name
@@ -261,6 +267,22 @@ class _Macro (object):
 		# print 'Macro invocation: {0}({1})'.format(self.macro.name, self.name_to_param)
 		return GrammarMacroInvocation(self, name_to_param)(self.body)
 
+
+class _FunctionMacro (_AbstractMacro):
+	def __init__(self, context, function):
+		self.context = context
+		self.function = function
+
+	def __call__(self, *params):
+		return self.function(*params)
+
+
+def _make_macro_wrapper(context):
+	def as_macro(fn):
+		macro = _FunctionMacro(context, fn)
+		context.name_to_macro[fn.__name__] = macro
+		return macro
+	return as_macro
 
 
 class GrammarParserGeneratorExpressionEvaluator (_GrammarParserExpressionGenerator):
