@@ -4,12 +4,14 @@ from BritefuryJ.Incremental import IncrementalValueMonitor
 from BritefuryJ.Live import TrackedLiveValue, LiveFunction
 
 from BritefuryJ.Parser import Production
-from BritefuryJ.Parser.Utils.OperatorParser import UnaryOperator, BinaryOperator, InfixLeftLevel, InfixRightLevel, PrefixLevel, SuffixLevel, OperatorTable
+from BritefuryJ.Parser.Utils.OperatorParser import UnaryOperator, BinaryOperator, ChainOperator, \
+    InfixLeftLevel, InfixRightLevel, InfixChainLevel, PrefixLevel, SuffixLevel, OperatorTable
 
 from BritefuryJ.Controls import OptionMenu
 
 from BritefuryJ.Graphics import SolidBorder
 
+from BritefuryJ.Pres import Pres
 from BritefuryJ.Pres.Primitive import Label, Spacer, Row, Column
 from BritefuryJ.Pres.UI import SectionHeading2, SectionHeading3
 
@@ -95,6 +97,10 @@ class OpLevelRow (object):
         f = self.parse_action(context)
         return BinaryOperator(self.op_parser_expression(context), lambda input, begin, end, left, op, right: f(left, op, right))
 
+    def chain_operator(self, context):
+        f = self.parse_action(context)
+        return ChainOperator(self.op_parser_expression(context), lambda input, begin, end, subexp, op: f(subexp, op))
+
 
     @property
     def op_expr(self):
@@ -128,6 +134,20 @@ class OpLevelTable (LiveList):
         return self._table_editor.editTable(self)
 
 
+_pyActionBorder = SolidBorder( 1.5, 4.0, 10.0, 10.0, Color( 0.2, 0.75, 0.0 ), None )
+
+class _OpTableRowOperatorsView (object):
+    def __init__(self, level_type, operators, level_action):
+        self.level_type = level_type
+        self.operators = operators
+        self.level_action = level_action
+
+    def __present__(self, fragment, inh):
+        if self.level_type == OperatorTableRow.LEVEL_TYPE_INFIX_CHAIN:
+            return Column([self.operators, Spacer(0.0, 5.0), Row([SectionHeading3('Level action: ').alignHPack().alignVRefY(),
+                                                                  _pyActionBorder.surround(self.level_action).alignHExpand().alignVRefY()])])
+        else:
+            return Pres.coerce(self.operators)
 
 
 class OperatorTableRow (object):
@@ -160,6 +180,7 @@ class OperatorTableRow (object):
         self.__rule_name = TrackedLiveValue('')
         self.__level_type = TrackedLiveValue(self.LEVEL_TYPE_PREFIX)
         self.__operators = TrackedLiveValue(OpLevelTable())
+        self.__level_action = TrackedLiveValue(EmbeddedPython2Expr())
         self.__change_history__ = None
 
         self.__level_type_view = EnumOptionMenu(self._LEVEL_TYPE_VALUES, self._LEVEL_TYPE_LABELS, self.__level_type)
@@ -171,12 +192,17 @@ class OperatorTableRow (object):
         state['rule_name'] = self.__rule_name.getStaticValue()
         state['level_type'] = self.__level_type.getStaticValue()
         state['operators'] = self.__operators.getStaticValue()
+        state['level_action'] = self.__level_action.getStaticValue()
         return state
 
     def __setstate__(self, state):
         self.__rule_name = TrackedLiveValue(state['rule_name'])
         self.__level_type = TrackedLiveValue(state['level_type'])
         self.__operators = TrackedLiveValue(state['operators'])
+        level_action = state.get('level_action')
+        if level_action is None:
+            level_action = EmbeddedPython2Expr()
+        self.__level_action = TrackedLiveValue(level_action)
         self.__change_history__ = None
         self.__level_type_view = EnumOptionMenu(self._LEVEL_TYPE_VALUES, self._LEVEL_TYPE_LABELS, self.__level_type)
 
@@ -200,7 +226,11 @@ class OperatorTableRow (object):
         elif level_type == self.LEVEL_TYPE_INFIX_RIGHT:
             return InfixRightLevel([op.binary_operator(context) for op in self.__operators.getStaticValue()])
         elif level_type == self.LEVEL_TYPE_INFIX_CHAIN:
-            raise NotImplementedError, 'not implemented yet'
+            f = self.__level_action.getStaticValue().evaluate(context.module.__dict__, None)
+            level_action = lambda input, begin, end, x, ys: f(x, ys)
+            return InfixChainLevel([op.chain_operator(context) for op in self.__operators.getStaticValue()], level_action)
+        else:
+            raise ValueError('Unknown level type \'{0}\''.format(level_type))
 
 
 
@@ -240,6 +270,20 @@ class OperatorTableRow (object):
         if value is None:
             value = OpLevelTable()
         self.__operators.setLiteralValue(value)
+
+
+    @property
+    def operators_view(self):
+        return _OpTableRowOperatorsView(self.__level_type.getValue(), self.__operators.getValue(), self.__level_action.getValue())
+
+    @operators_view.setter
+    def operators_view(self, value):
+        if value is None:
+            self.__operators.setLiteralValue(OpLevelTable())
+            self.__level_action.setLiteralValue(EmbeddedPython2Expr())
+        else:
+            self.__operators.setLiteralValue(value.operators)
+            self.__level_action.setLiteralValue(value.level_action)
 
 
 
@@ -307,7 +351,7 @@ class GrammarOperatorTable (object):
 
     _rule_name_column = AttributeColumn('Grammar rule', 'rule_name', str)
     _level_type_column = AttributeColumn('Precedence level', 'level_type_view')
-    _operators_column = AttributeColumn('Operators', 'operators')
+    _operators_column = AttributeColumn('Operators', 'operators_view')
 
     _table_editor = ObjectListTableEditor([_rule_name_column, _level_type_column, _operators_column],
                                           OperatorTableRow, True, True, True, True)

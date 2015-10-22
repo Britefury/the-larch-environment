@@ -50,7 +50,6 @@ from BritefuryJ.Editor.SyntaxRecognizing.SyntaxRecognizingController import Edit
 
 from BritefuryJ.Util.Jython import JythonException
 
-from LarchCore.Languages.Python2.PythonEditor.PythonEditorCombinators import PythonEditorStyle
 from LarchTools.PythonTools.VisualRegex.View import _repeatBorder, _controlCharStyle
 
 from LarchTools.GrammarEditor import Schema, Precedence, helpers, Properties, Commands, parser_generator
@@ -59,25 +58,47 @@ from LarchTools.GrammarEditor.SRController import GrammarEditorSyntaxRecognizing
 
 
 
-# class GrammarEditorStyle (object):
-# 	grammarEditor = AttributeNamespace( 'grammarEditor' )
-#
-# 	_grammarCodeFont = 'Noto Sans; SansSerif'
-#
-# 	#keywordStyle = InheritedAttributeNonNull( pythonEditor, 'keywordStyle', StyleSheet,
-# 	#StyleSheet.style( Primitive.fontFace( _pythonCodeFont ), Primitive.fontSize( 14 ), Primitive.fontBold( True ),
-# 	#Primitive.foreground( Color( 0.25, 0.0, 0.5 ) ), Primitive.fontSmallCaps( True ) )
-#
-# 	keywordStyle = InheritedAttributeNonNull( grammarEditor, 'keywordStyle', StyleSheet,
-# 						  StyleSheet.style( Primitive.fontFace( _grammarCodeFont ), Primitive.fontSize( 14 ), Primitive.fontBold( True ),
-# 								    Primitive.foreground( Color( 0.25, 0.0, 0.5 ) ) ) )
-# 	commentStyle = InheritedAttributeNonNull( grammarEditor, 'commentStyle', StyleSheet,
-# 						  StyleSheet.style( Primitive.fontFace( _grammarCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.4, 0.4, 0.4 ) ) ) )
+class GrammarEditorStyle (object):
+	grammarEditor = AttributeNamespace( 'grammarEditor' )
 
+	_grammarCodeFont = 'Noto Sans; SansSerif'
+
+	keywordStyle = InheritedAttributeNonNull( grammarEditor, 'keywordStyle', StyleSheet,
+											  StyleSheet.style( Primitive.fontFace( _grammarCodeFont ), Primitive.fontSize( 14 ), Primitive.fontBold( True ),
+																Primitive.foreground( Color( 0.25, 0.0, 0.5 ) ) ) )
+
+	commentStyle = InheritedAttributeNonNull( grammarEditor, 'commentStyle', StyleSheet,
+						  StyleSheet.style( Primitive.fontFace( _grammarCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.4, 0.4, 0.4 ) ) ) )
+
+	quotationStyle = InheritedAttributeNonNull( grammarEditor, 'quotationStyle', StyleSheet,
+												StyleSheet.style( Primitive.fontFace( _grammarCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.0, 0.0, 0.5 ) ) ) )
+	stringLiteralStyle = InheritedAttributeNonNull( grammarEditor, 'stringLiteralStyle', StyleSheet,
+													StyleSheet.style( Primitive.fontFace( _grammarCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.25, 0.0, 0.5 ) ) ) )
+	stringLiteralEscapeStyle = InheritedAttributeNonNull( grammarEditor, 'stringLiteralEscapeStyle', StyleSheet,
+														  StyleSheet.style( Primitive.fontFace( _grammarCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.25, 0.2, 0.15 ) ),
+																			Primitive.border( SolidBorder( 1.0, 1.0, 4.0, 4.0, Color( 0.75, 0.6, 0.5 ), Color( 1.0, 0.85, 0.75 ) ) ) ) )
+	ruleNameStyle = InheritedAttributeNonNull( grammarEditor, 'ruleNameStyle', StyleSheet,
+												 StyleSheet.style( Primitive.fontFace( _grammarCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.0, 0.5, 0.5 ) ) ) )
+	macroNameStyle = InheritedAttributeNonNull( grammarEditor, 'macroNameStyle', StyleSheet,
+												 StyleSheet.style( Primitive.fontFace( _grammarCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.0, 0.5, 0.0 ) ) ) )
+
+	punctuationStyle = InheritedAttributeNonNull( grammarEditor, 'punctuationStyle', StyleSheet,
+												  StyleSheet.style( Primitive.fontFace( _grammarCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.0, 0.0, 1.0 ) ) ) )
+	delimStyle = InheritedAttributeNonNull( grammarEditor, 'delimStyle', StyleSheet,
+											StyleSheet.style( Primitive.fontFace( _grammarCodeFont ), Primitive.fontSize( 14 ), Primitive.foreground( Color( 0.0, 0.0, 1.0 ) ) ) )
+	operatorStyle = InheritedAttributeNonNull( grammarEditor, 'operatorStyle', StyleSheet,
+											   StyleSheet.style( Primitive.fontFace( _grammarCodeFont ), Primitive.fontBold( True ), Primitive.fontSize( 14 ),
+																 Primitive.foreground( Color( 0.35, 0.35, 0.9 ) ) ) )
+
+	unparseableStyle = InheritedAttributeNonNull( grammarEditor, 'unparseableStyle', StyleSheet,
+												  StyleSheet.style( Primitive.fontFace( _grammarCodeFont ), Primitive.fontSize( 14 ),
+																	Primitive.foreground( Color.black ), Primitive.textSquiggleUnderlinePaint( Color.red ) ) )
+
+	py_tagline_style = InheritedAttributeNonNull( grammarEditor, 'py_tagline_style', StyleSheet,
+												  StyleSheet.style(Primitive.fontSize(10), Primitive.foreground(Color(0.0, 0.5, 0.0))))
 
 _pyActionBorder = SolidBorder( 1.5, 4.0, 10.0, 10.0, Color( 0.2, 0.75, 0.0 ), None )
 
-py_tagline_style = StyleSheet.style(Primitive.fontSize(10), Primitive.foreground(Color(0.0, 0.5, 0.0)))
 
 
 _non_escaped_string_re = re.compile( r'(\\(?:[abnfrt\\' + '\'\"' + r']|(?:x[0-9a-fA-F]{2})|(?:u[0-9a-fA-F]{4})|(?:U[0-9a-fA-F]{8})))' )
@@ -87,24 +108,24 @@ def string_literal(quotation, value, raw):
 
 	# Split the value into pieces of escaped and non-escaped content
 	if raw:
-		valuePres = ApplyStyleSheetFromAttribute( PythonEditorStyle.stringLiteralStyle, Text( value ) )
+		valuePres = ApplyStyleSheetFromAttribute( GrammarEditorStyle.stringLiteralStyle, Text( value ) )
 	else:
 		segments = _non_escaped_string_re.split( value )
 		if len( segments ) == 1:
-			valuePres = ApplyStyleSheetFromAttribute( PythonEditorStyle.stringLiteralStyle, Text( value ) )
+			valuePres = ApplyStyleSheetFromAttribute( GrammarEditorStyle.stringLiteralStyle, Text( value ) )
 		else:
 			escape = False
 			segsAsPres = []
 			for seg in segments:
 				if seg is not None  and  len( seg ) > 0:
 					if escape:
-						segsAsPres.append( ApplyStyleSheetFromAttribute( PythonEditorStyle.stringLiteralEscapeStyle, Border( Text( seg ) ) ) )
+						segsAsPres.append( ApplyStyleSheetFromAttribute( GrammarEditorStyle.stringLiteralEscapeStyle, Border( Text( seg ) ) ) )
 					else:
 						segsAsPres.append( Text( seg ) )
 				escape = not escape
-			valuePres = ApplyStyleSheetFromAttribute( PythonEditorStyle.stringLiteralStyle, Span( segsAsPres ) )
+			valuePres = ApplyStyleSheetFromAttribute( GrammarEditorStyle.stringLiteralStyle, Span( segsAsPres ) )
 
-	quotationPres = ApplyStyleSheetFromAttribute( PythonEditorStyle.quotationStyle, Text( quotation ) )
+	quotationPres = ApplyStyleSheetFromAttribute( GrammarEditorStyle.quotationStyle, Text( quotation ) )
 	boxContents.extend( [ quotationPres,  valuePres,  quotationPres ] )
 
 	return Row( boxContents )
@@ -115,26 +136,26 @@ def literal(string_view):
 
 
 def keyword(string_view):
-	prefix = ApplyStyleSheetFromAttribute( PythonEditorStyle.keywordStyle, Text( 'k' ) )
+	prefix = ApplyStyleSheetFromAttribute( GrammarEditorStyle.keywordStyle, Text( 'k' ) )
 	return Span([prefix, string_view])
 
 
 def word(string_view):
-	prefix = ApplyStyleSheetFromAttribute( PythonEditorStyle.keywordStyle, Text( 'w' ) )
+	prefix = ApplyStyleSheetFromAttribute( GrammarEditorStyle.keywordStyle, Text( 'w' ) )
 	return Span([prefix, string_view])
 
 
 def invoke_rule(name):
-	left = ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text( '<' ) )
-	right = ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text( '>' ) )
-	n = ApplyStyleSheetFromAttribute( PythonEditorStyle.numLiteralStyle, Text( name ) )
+	left = ApplyStyleSheetFromAttribute( GrammarEditorStyle.delimStyle, Text( '<' ) )
+	right = ApplyStyleSheetFromAttribute( GrammarEditorStyle.delimStyle, Text( '>' ) )
+	n = ApplyStyleSheetFromAttribute( GrammarEditorStyle.ruleNameStyle, Text( name ) )
 	return Span([left, n, right])
 
 def invoke_macro(macro_name, param_views):
-	open = ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text( '(' ) )
-	close = ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text( ')' ) )
-	comma = ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text( ', ' ) )
-	name = ApplyStyleSheetFromAttribute( PythonEditorStyle.numLiteralStyle, Text( macro_name ) )
+	open = ApplyStyleSheetFromAttribute( GrammarEditorStyle.delimStyle, Text( '(' ) )
+	close = ApplyStyleSheetFromAttribute( GrammarEditorStyle.delimStyle, Text( ')' ) )
+	comma = ApplyStyleSheetFromAttribute( GrammarEditorStyle.punctuationStyle, Text( ', ' ) )
+	name = ApplyStyleSheetFromAttribute( GrammarEditorStyle.macroNameStyle, Text( macro_name ) )
 	params = []
 	if len(param_views) > 0:
 		params.append(param_views[0])
@@ -163,16 +184,20 @@ def repeat_range(subexp, min, max):
 	return _repetition( subexp, Row( [ _controlCharStyle( Text( '{' ) ), Text( min ),  _controlCharStyle( Text( ':' ) ), Text( max ), _controlCharStyle( Text( '}' ) ) ] ) )
 
 def peek(subexp):
-	return Span([ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text('/')), subexp])
+	return Span([ApplyStyleSheetFromAttribute( GrammarEditorStyle.punctuationStyle, Text('/')), subexp])
 
 def peek_not(subexp):
-	return Span([ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text('/!')), subexp])
+	return Span([ApplyStyleSheetFromAttribute( GrammarEditorStyle.punctuationStyle, Text('/!')), subexp])
 
 def suppress(subexp):
-	return Span([subexp, ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text('~'))])
+	return Span([subexp, ApplyStyleSheetFromAttribute( GrammarEditorStyle.punctuationStyle, Text('~'))])
 
 def action_pres(subexp, action):
-	arrow =ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text(' -> '))
+	arrow =ApplyStyleSheetFromAttribute( GrammarEditorStyle.operatorStyle, Text(' -> '))
+	return Row([subexp, arrow, action])
+
+def condition_pres(subexp, action):
+	arrow =ApplyStyleSheetFromAttribute( GrammarEditorStyle.operatorStyle, Text(' & '))
 	return Row([subexp, arrow, action])
 
 def sequence(subexps):
@@ -189,7 +214,7 @@ def combine(subexps):
 	if len(subexps) > 0:
 		items.append(subexps[0])
 		for x in subexps[1:]:
-			items.append(ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text(' - ')))
+			items.append(ApplyStyleSheetFromAttribute( GrammarEditorStyle.operatorStyle, Text(' - ')))
 			items.append(x)
 	return Span(items)
 
@@ -198,7 +223,7 @@ def choice(subexps):
 	if len(subexps) > 0:
 		items.append(Paragraph([subexps[0]]))
 		for x in subexps[1:]:
-			p = [ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text('| ')), x]
+			p = [ApplyStyleSheetFromAttribute( GrammarEditorStyle.operatorStyle, Text('| ')), x]
 			items.append(Paragraph(p))
 	return Column(0, items)
 
@@ -208,7 +233,7 @@ def blank_line():
 	return Text( '' )
 
 def comment_stmt(comment):
-	return ApplyStyleSheetFromAttribute( PythonEditorStyle.commentStyle, Text( '#' + comment ) )
+	return ApplyStyleSheetFromAttribute( GrammarEditorStyle.commentStyle, Text( '#' + comment ) )
 
 def statement_line(rule, model):
 	rule = Segment( rule )
@@ -227,23 +252,23 @@ def special_form_statement_line(v, model):
 
 
 def rule_def(name, body_view):
-	n = ApplyStyleSheetFromAttribute( PythonEditorStyle.numLiteralStyle, Text( name ) )
-	assign = ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text( ' := ' ) )
+	n = ApplyStyleSheetFromAttribute( GrammarEditorStyle.ruleNameStyle, Text( name ) )
+	assign = ApplyStyleSheetFromAttribute( GrammarEditorStyle.operatorStyle, Text( ' := ' ) )
 	return Row([n, assign, Paragraph([body_view])])
 
 def macro_def(name, args, body_view):
-	def_keyword = ApplyStyleSheetFromAttribute(PythonEditorStyle.keywordStyle, Text('def '))
-	macro_name = ApplyStyleSheetFromAttribute( PythonEditorStyle.numLiteralStyle, Text( name ) )
-	open = ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text( '(' ) )
-	close = ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text( ')' ) )
-	comma = ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text( ', ' ) )
-	colon = ApplyStyleSheetFromAttribute( PythonEditorStyle.punctuationStyle, Text( ':' ) )
+	def_keyword = ApplyStyleSheetFromAttribute(GrammarEditorStyle.keywordStyle, Text('def '))
+	macro_name = ApplyStyleSheetFromAttribute( GrammarEditorStyle.macroNameStyle, Text( name ) )
+	open = ApplyStyleSheetFromAttribute( GrammarEditorStyle.delimStyle, Text( '(' ) )
+	close = ApplyStyleSheetFromAttribute( GrammarEditorStyle.delimStyle, Text( ')' ) )
+	comma = ApplyStyleSheetFromAttribute( GrammarEditorStyle.punctuationStyle, Text( ', ' ) )
+	colon = ApplyStyleSheetFromAttribute( GrammarEditorStyle.punctuationStyle, Text( ':' ) )
 	args_view = []
 	if len(args) > 0:
-		args_view.append(ApplyStyleSheetFromAttribute( PythonEditorStyle.numLiteralStyle, Text(args[0]) ))
+		args_view.append(ApplyStyleSheetFromAttribute( GrammarEditorStyle.ruleNameStyle, Text(args[0]) ))
 		for a in args[1:]:
 			args_view.append(comma)
-			args_view.append(ApplyStyleSheetFromAttribute( PythonEditorStyle.numLiteralStyle, Text(a) ))
+			args_view.append(ApplyStyleSheetFromAttribute( GrammarEditorStyle.ruleNameStyle, Text(a) ))
 	header = Paragraph([def_keyword, macro_name, open] + args_view + [close, colon])
 	body = Paragraph([Spacer(30.0, 0.0), body_view])
 	return Column(0, [header, body])
@@ -265,7 +290,7 @@ def grammar_def_view(rules):
 #
 
 def unparseable_text(text):
-	return ApplyStyleSheetFromAttribute( PythonEditorStyle.unparseableStyle, Text( text ) )
+	return ApplyStyleSheetFromAttribute( GrammarEditorStyle.unparseableStyle, Text( text ) )
 
 def unparsed_elements(components):
 	return Span( components )
@@ -392,14 +417,14 @@ class GrammarEditorView (MethodDispatchView):
 
 
 
-	# ACTION
+	# ACTION, CONDITION
 
 	@DMObjectNodeDispatchMethod( Schema.ActionPy )
 	@_controller.expressionEditRule
 	def ActionPy(self, fragment, inheritedState, model, py):
 		p = EditPerspective.instance.applyTo(py)
 		p = Paragraph( [ HiddenText( u'\ue000' ), p, HiddenText( u'\ue000' ) ] )
-		tagline = py_tagline_style.applyTo(Label('py'))
+		tagline = ApplyStyleSheetFromAttribute( GrammarEditorStyle.py_tagline_style, Label('py') )
 		p = Column(1, [tagline, p])
 		p = _pyActionBorder.surround(p)
 		p = Segment(StructuralItem( _controller, model, p ))
@@ -412,6 +437,14 @@ class GrammarEditorView (MethodDispatchView):
 		subexp_view = SREInnerFragment( subexp, Precedence.PRECEDENCE_ACTION )
 		action_view = SREInnerFragment( action, Precedence.PRECEDENCE_ACTION )
 		return action_pres(subexp_view, action_view)
+
+
+	@DMObjectNodeDispatchMethod( Schema.Condition )
+	@_controller.expressionEditRule
+	def Condition(self, fragment, inheritedState, model, subexp, condition):
+		subexp_view = SREInnerFragment( subexp, Precedence.PRECEDENCE_ACTION )
+		condition_view = SREInnerFragment( condition, Precedence.PRECEDENCE_ACTION )
+		return condition_pres(subexp_view, condition_view)
 
 
 	# SEQUENCE, CHOICE
@@ -487,7 +520,7 @@ class GrammarEditorView (MethodDispatchView):
 	@_controller.specialFormStatementEditRule
 	def HelperBlockPy(self, fragment, inh, model, py):
 		p = EditPerspective.instance.applyTo(py)
-		tagline = py_tagline_style.applyTo(Label('py'))
+		tagline = ApplyStyleSheetFromAttribute( GrammarEditorStyle.py_tagline_style, Label('py') )
 		p = Column(1, [tagline, p])
 		p = _pyActionBorder.surround(p)
 		return special_form_statement_line(p, model)

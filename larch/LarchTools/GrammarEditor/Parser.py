@@ -142,7 +142,22 @@ class GrammarEditorGrammar (Grammar):
 			return a
 		return ObjectNode( Schema.Action ) | \
 		       (self.peekOrControl() + Literal('->') + ObjectNode(Schema.ActionPy).optional()).action(
-			       lambda input, begin, end, xs, bindings: Schema.Action(subexp=xs[0], action=_action_py(xs))) | self.peekOrControl()
+			       lambda input, begin, end, xs, bindings: Schema.Action(subexp=xs[0], action=_action_py(xs)))
+
+	@Rule
+	def condition(self):
+		def _action_py(xs):
+			a = xs[2]
+			if a is None:
+				a = Schema.ActionPy(py=DMNode.embed(helpers.new_python_action()))
+			return a
+		return ObjectNode( Schema.Condition ) | \
+		       (self.peekOrControl() + Literal('&') + ObjectNode(Schema.ActionPy).optional()).action(
+			       lambda input, begin, end, xs, bindings: Schema.Condition(subexp=xs[0], condition=_action_py(xs)))
+
+	@Rule
+	def function(self):
+		return self.action() | self.condition() | self.peekOrControl()
 
 	@Rule
 	def sequence(self):
@@ -151,7 +166,7 @@ class GrammarEditorGrammar (Grammar):
 				return xs[0]
 			else:
 				return Schema.Sequence(subexps=xs)
-		return self.action().oneOrMore().action(lambda input, begin, end, xs, bindings: _node(xs))
+		return self.function().oneOrMore().action(lambda input, begin, end, xs, bindings: _node(xs))
 
 	@Rule
 	def combine(self):

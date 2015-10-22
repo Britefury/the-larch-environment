@@ -49,6 +49,7 @@ Suppress = schema.newClass('Suppress', Expression, ['subexp'])
 # Functions
 Action = schema.newClass('Action', Expression, ['subexp', 'action'])
 ActionPy = schema.newClass('ActionPy', Expression, ['py'])
+Condition = schema.newClass('Condition', Expression, ['subexp', 'condition'])
 
 # Combinators
 Sequence = schema.newClass('Sequence', Expression, ['subexps'])
