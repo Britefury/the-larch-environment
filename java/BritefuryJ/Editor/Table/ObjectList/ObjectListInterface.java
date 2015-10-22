@@ -11,5 +11,6 @@ public interface ObjectListInterface
 	int size();
 	Object get(int i);
 	void append(Object x);
+	void insert(int i, Object x);
 	void removeRange(int start, int end);
 }

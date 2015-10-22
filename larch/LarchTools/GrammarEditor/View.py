@@ -25,13 +25,17 @@ from BritefuryJ.LSpace.Input import Modifier
 
 from BritefuryJ.Shortcut import Shortcut
 
+from BritefuryJ.Live import LiveValue
+
 from BritefuryJ.AttributeTable import AttributeNamespace, InheritedAttributeNonNull, PyDerivedValueTable
 
 from BritefuryJ.Pres import ApplyPerspective, ApplyStyleSheetFromAttribute, Pres
-from BritefuryJ.Pres.Primitive import Primitive, Box, Text, Label, Spacer, HiddenText, Segment, Script, Span, Row, Column, Paragraph, FlowGrid, Whitespace, Border
+from BritefuryJ.Pres.Primitive import Primitive, Box, Text, Label, Blank, Spacer, HiddenText, Segment, Script, Span, Row, Column, Paragraph, FlowGrid, Whitespace, Border
+from BritefuryJ.Pres.UI import SectionHeading3
 
 from BritefuryJ.StyleSheet import StyleSheet
 
+from BritefuryJ.DefaultPerspective import DefaultPerspective
 from BritefuryJ.EditPerspective import EditPerspective
 
 from BritefuryJ.Projection import Perspective
@@ -43,6 +47,8 @@ from BritefuryJ.Editor.Sequential.Item import StructuralItem, SoftStructuralItem
 from BritefuryJ.Editor.SyntaxRecognizing.Precedence import PrecedenceHandler
 from BritefuryJ.Editor.SyntaxRecognizing import SREInnerFragment
 from BritefuryJ.Editor.SyntaxRecognizing.SyntaxRecognizingController import EditMode
+
+from BritefuryJ.Util.Jython import JythonException
 
 from LarchCore.Languages.Python2.PythonEditor.PythonEditorCombinators import PythonEditorStyle
 from LarchTools.PythonTools.VisualRegex.View import _repeatBorder, _controlCharStyle
@@ -523,9 +529,18 @@ class GrammarEditorView (MethodDispatchView):
 
 	@DMObjectNodeDispatchMethod( Schema.GrammarDefinition )
 	def GrammarDefinition(self, fragment, inheritedState, model, rules):
+		exc_view = LiveValue(Blank())
+
 		def _run_unit_tests(element):
-			test_runner = parser_generator.GrammarTestRunner()
-			test_runner(model)
+			try:
+				test_runner = parser_generator.GrammarTestRunner()
+				test_runner(model)
+			except:
+				exc = JythonException.getCurrentException()
+				exc_pres = DefaultPerspective.instance.applyTo(exc)
+				exc_view.setLiteralValue(Column([SectionHeading3('Caught exception:'), Pres.coerce(exc_pres).padX(10.0, 0.0)]))
+			else:
+				exc_view.setLiteralValue(Blank())
 
 		if len( rules ) == 0:
 			# Empty module - create a single blank line so that there is something to edit
@@ -535,6 +550,7 @@ class GrammarEditorView (MethodDispatchView):
 		g = grammar_def_view( lineViews ).alignHPack().alignVRefY().withProperty(Properties.GrammarDefProperty.instance, model).withCommands(Commands.grammarCommands)
 		g = g.withShortcut( Shortcut( KeyEvent.VK_U, Modifier.ALT), _run_unit_tests )
 		g = g.withShortcut( Shortcut( KeyEvent.VK_U, Modifier.META), _run_unit_tests )
+		g = Column([g, Spacer(0.0, 5.0), exc_view.withFixedValue('')])
 		g = SoftStructuralItem( GrammarEditorSyntaxRecognizingController.instance, [ GrammarEditorSyntaxRecognizingController.instance._makeGrammarEditFilter( rules ),
 																					 GrammarEditorSyntaxRecognizingController.instance._topLevel ], rules, g )
 		return g

@@ -324,6 +324,12 @@ public abstract class PresentationComponent extends JComponent implements Compon
 		}
 
 		@Override
+		public void insert(int i, Object x)
+		{
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
 		public void removeRange(int start, int end)
 		{
 			throw new UnsupportedOperationException();
