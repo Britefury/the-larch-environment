@@ -157,7 +157,7 @@ class GrammarEditorSyntaxRecognizingController (SyntaxRecognizingController):
 
 	def isClipboardEditLevelFragmentView(self, fragment):
 		model = fragment.model
-		return isinstance( model, DMNode )  and  model.isInstanceOf( Schema.GrammarDefinition )
+		return isinstance( model, DMNode )  and  model.isInstanceOf( Schema.TopLevel )
 
 
 
