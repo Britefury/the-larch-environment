@@ -41,8 +41,6 @@ public class ObjectNode extends ParserExpression
 	
 	public ObjectNode(DMObjectClass objClass)
 	{
-		assert fieldNames.length == fieldExps.length;
-		
 		this.objClass = objClass;
 		
 		this.fieldNames = new String[0];
@@ -53,7 +51,7 @@ public class ObjectNode extends ParserExpression
 
 	public ObjectNode(DMObjectClass objClass, Object[] fieldExps) throws ParserCoerceException
 	{
-		assert fieldNames.length == fieldExps.length;
+		assert objClass.getNumFields() == fieldExps.length;
 		
 		this.objClass = objClass;
 		

@@ -156,6 +156,12 @@ class GrammarEditorGrammar (Grammar):
 			       lambda input, begin, end, xs, bindings: Schema.Condition(subexp=xs[0], condition=_action_py(xs)))
 
 	@Rule
+	def meta_parse(self):
+		return ObjectNode( Schema.MetaParse ) | \
+		       (self.peekOrControl() + Literal('==>') + Literal('{') + self.expression() + Literal('}') ).action(
+			       lambda input, begin, end, xs, bindings: Schema.MetaParse(subexp=xs[0], meta_expr=xs[3]))
+
+	@Rule
 	def function(self):
 		return self.action() | self.condition() | self.peekOrControl()
 

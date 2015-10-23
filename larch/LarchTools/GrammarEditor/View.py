@@ -193,12 +193,18 @@ def suppress(subexp):
 	return Span([subexp, ApplyStyleSheetFromAttribute( GrammarEditorStyle.punctuationStyle, Text('~'))])
 
 def action_pres(subexp, action):
-	arrow =ApplyStyleSheetFromAttribute( GrammarEditorStyle.operatorStyle, Text(' -> '))
+	arrow = ApplyStyleSheetFromAttribute( GrammarEditorStyle.operatorStyle, Text(' -> '))
 	return Row([subexp, arrow, action])
 
 def condition_pres(subexp, action):
-	arrow =ApplyStyleSheetFromAttribute( GrammarEditorStyle.operatorStyle, Text(' & '))
-	return Row([subexp, arrow, action])
+	amps = ApplyStyleSheetFromAttribute( GrammarEditorStyle.operatorStyle, Text(' & '))
+	return Row([subexp, amps, action])
+
+def metaparse_pres(subexp, meta_expr):
+	arrow = ApplyStyleSheetFromAttribute( GrammarEditorStyle.operatorStyle, Text(' ==> '))
+	open = ApplyStyleSheetFromAttribute( GrammarEditorStyle.delimStyle, Text('{ '))
+	close = ApplyStyleSheetFromAttribute( GrammarEditorStyle.delimStyle, Text(' }'))
+	return Row([subexp, arrow, open, meta_expr, close])
 
 def sequence(subexps):
 	items = []
@@ -445,6 +451,14 @@ class GrammarEditorView (MethodDispatchView):
 		subexp_view = SREInnerFragment( subexp, Precedence.PRECEDENCE_ACTION )
 		condition_view = SREInnerFragment( condition, Precedence.PRECEDENCE_ACTION )
 		return condition_pres(subexp_view, condition_view)
+
+
+	@DMObjectNodeDispatchMethod( Schema.MetaParse )
+	@_controller.expressionEditRule
+	def MetaParse(self, fragment, inheritedState, model, subexp, meta_expr):
+		subexp_view = SREInnerFragment( subexp, Precedence.PRECEDENCE_ACTION )
+		meta_expr_view = SREInnerFragment( meta_expr, Precedence.PRECEDENCE_ACTION )
+		return metaparse_pres(subexp_view, meta_expr_view)
 
 
 	# SEQUENCE, CHOICE

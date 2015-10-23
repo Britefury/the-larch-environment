@@ -13,43 +13,13 @@ import java.util.*;
 
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMSchema;
-import BritefuryJ.Parser.Action;
-import BritefuryJ.Parser.AnyList;
-import BritefuryJ.Parser.AnyNode;
-import BritefuryJ.Parser.AnyObject;
-import BritefuryJ.Parser.AnyString;
-import BritefuryJ.Parser.Choice;
-import BritefuryJ.Parser.Combine;
-import BritefuryJ.Parser.Condition;
-import BritefuryJ.Parser.Delegate;
-import BritefuryJ.Parser.Keyword;
-import BritefuryJ.Parser.ListNode;
-import BritefuryJ.Parser.Literal;
-import BritefuryJ.Parser.LiteralNode;
-import BritefuryJ.Parser.ObjectNode;
-import BritefuryJ.Parser.OneOrMore;
+import BritefuryJ.Parser.*;
 import BritefuryJ.Parser.Optional;
-import BritefuryJ.Parser.ParseAction;
-import BritefuryJ.Parser.ParseCondition;
-import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.ParserExpression.ParserCoerceException;
-import BritefuryJ.Parser.Peek;
-import BritefuryJ.Parser.PeekNot;
-import BritefuryJ.Parser.Production;
 import BritefuryJ.Parser.Production.CannotOverwriteProductionExpressionException;
-import BritefuryJ.Parser.RegEx;
-import BritefuryJ.Parser.Repetition;
-import BritefuryJ.Parser.SeparatedList;
 import BritefuryJ.Parser.SeparatedList.CannotApplyConditionAfterActionException;
 import BritefuryJ.Parser.SeparatedList.CannotApplyMoreThanOneActionException;
 import BritefuryJ.Parser.SeparatedList.CannotApplyMoreThanOneConditionException;
-import BritefuryJ.Parser.Sequence;
-import BritefuryJ.Parser.StringNode;
-import BritefuryJ.Parser.StructuralObject;
-import BritefuryJ.Parser.Suppress;
-import BritefuryJ.Parser.TracedParseResult;
-import BritefuryJ.Parser.Word;
-import BritefuryJ.Parser.ZeroOrMore;
 import BritefuryJ.Util.RichString.RichStringBuilder;
 
 public class Test_Parser extends ParserTestCase
@@ -552,6 +522,61 @@ public class Test_Parser extends ParserTestCase
 		matchTestRichStringSX( new LiteralNode( Foo.newInstance( new Object[] { "x" } ) ),
 				new RichStringBuilder( new RichStringBuilder.Item[] { new RichStringBuilder.StructuralItem( readInputSX( "{m=tests.Parser.Test_Parser.s : (m Foo a=x)}" ) ) } ).richString(), "{m=tests.Parser.Test_Parser.s : (m Foo a=x)}" );
 		matchTestListSX( new LiteralNode( Foo.newInstance( new Object[] { "x" } ) ), "{m=tests.Parser.Test_Parser.s : [(m Foo a=x)]}", "{m=tests.Parser.Test_Parser.s : (m Foo a=x)}" );
+	}
+
+
+	public void testMetaParse()
+	{
+		ParseAction f = new ParseAction()
+		{
+			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
+			{
+				String v = (String)value;
+				return v + v;
+			}
+		};
+
+		ParseAction g = new ParseAction()
+		{
+			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
+			{
+				String v = (String)value;
+				return v + v + v;
+			}
+		};
+
+		ParseAction f_l = new ParseAction()
+		{
+			@SuppressWarnings("unchecked")
+			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
+			{
+				List<Object> v = (List<Object>)value;
+				ArrayList<Object> x = new ArrayList<Object>();
+				x.addAll( v );
+				x.addAll( v );
+				return x;
+			}
+		};
+
+		assertTrue(new MetaParse(new Literal("abc"), new AnyList()).isEquivalentTo(new MetaParse(new Literal("abc"), new AnyList())));
+		assertFalse(new MetaParse(new Literal("abc"), new AnyList()).isEquivalentTo(new MetaParse(new Literal("def"), new AnyList())));
+		assertFalse(new MetaParse(new Literal("abc"), new AnyList()).isEquivalentTo(new MetaParse(new Literal("abc"), new AnyNode())));
+		assertTrue(new MetaParse(new Literal("abc"), new AnyList()).isEquivalentTo(new Literal("abc").metaParse(new AnyList())));
+
+
+		ParserExpression baseParser = new Word("abcxyz").oneOrMore();
+		ParserExpression metaParser = new Word("abc").oneOrMore().__add__(new Word("xyz").oneOrMore());
+		ParserExpression parser = baseParser.metaParse(metaParser);
+
+		// Test valid case
+		matchTestStringAndRichStringSX(baseParser, "a b c x y z", "[a b c x y z]");
+		// List from `baseParser` should be split further by `metaParser`
+		matchTestStringAndRichStringSX(parser, "a b c x y z", "[[a b c] [x y z]]");
+
+		// `baseParser` shouldn't care about the ordering of the elements
+		matchTestStringAndRichStringSX(baseParser, "x y z a b c", "[x y z a b c]");
+		// Where `metaParser` should not accept this
+		matchFailTestString(parser, "x y z a b c");
 	}
 
 

@@ -454,6 +454,10 @@ public abstract class ParserExpression
 	{
 		return new Condition( this, cond );
 	}
+
+	public ParserExpression metaParse(ParserExpression metaExpr) {
+		return new MetaParse(this, metaExpr);
+	}
 	
 	public ParserExpression bindTo(String name)
 	{

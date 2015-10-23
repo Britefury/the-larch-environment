@@ -46,10 +46,11 @@ PeekNot = schema.newClass('PeekNot', Expression, ['subexp'])
 # Control
 Suppress = schema.newClass('Suppress', Expression, ['subexp'])
 
-# Functions
+# Actions and conditions
 Action = schema.newClass('Action', Expression, ['subexp', 'action'])
 ActionPy = schema.newClass('ActionPy', Expression, ['py'])
 Condition = schema.newClass('Condition', Expression, ['subexp', 'condition'])
+MetaParse = schema.newClass('MetaParse', Expression, ['subexp', 'meta_expr'])
 
 # Combinators
 Sequence = schema.newClass('Sequence', Expression, ['subexps'])
@@ -73,5 +74,6 @@ UnitTestTable = schema.newClass('UnitTestTable', Statement, ['test_table'])
 
 
 
-GrammarExpression = schema.newClass('GrammarExpression', Node, ['expr'])
-GrammarDefinition = schema.newClass('GrammarDefinition', Node, ['rules'])
+TopLevel = schema.newClass( 'TopLevel', Node, [] )
+GrammarExpression = schema.newClass('GrammarExpression', TopLevel, ['expr'])
+GrammarDefinition = schema.newClass('GrammarDefinition', TopLevel, ['rules'])
