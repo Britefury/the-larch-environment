@@ -128,16 +128,43 @@ public class MetaParse extends ParserExpression {
     @SuppressWarnings("unchecked")
     protected ParseResult metaEvaluateValue(Object val) {
         if (val instanceof List) {
-            return metaExpr.parseListItems((List<Object>) val);
+            List<Object> xs = (List<Object>)val;
+            ParseResult res = metaExpr.parseListItems(xs);
+            if (res.isValid() && res.getEnd() == xs.size()) {
+                return res;
+            }
+            else {
+                return ParseResult.failure(res.getEnd());
+            }
         }
         else if (val instanceof RichString) {
-            return metaExpr.parseRichStringItems((RichString) val);
+            RichString str = (RichString)val;
+            ParseResult res = metaExpr.parseRichStringItems((RichString) val);
+            if (res.isValid() && res.getEnd() == str.length()) {
+                return res;
+            }
+            else {
+                return ParseResult.failure(res.getEnd());
+            }
         }
         else if (val instanceof String) {
-            return metaExpr.parseStringChars((String)val);
+            String str = (String)val;
+            ParseResult res = metaExpr.parseStringChars(str);
+            if (res.isValid() && res.getEnd() == str.length()) {
+                return res;
+            }
+            else {
+                return ParseResult.failure(res.getEnd());
+            }
         }
         else {
-            return metaExpr.parseNode(val);
+            ParseResult res = metaExpr.parseNode(val);
+            if (res.isValid() && res.getEnd() == 1) {
+                return res;
+            }
+            else {
+                return ParseResult.failure(res.getEnd());
+            }
         }
     }
 

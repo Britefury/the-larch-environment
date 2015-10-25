@@ -162,8 +162,8 @@ class _GrammarParserExpressionGenerator (object):
 		return py.evaluate(self._get_globals(), None)
 
 	@DMObjectNodeDispatchMethod( Schema.Condition )
-	def Condition(self, model, subexp, action):
-		return self(subexp).condition(self(action))
+	def Condition(self, model, subexp, condition):
+		return self(subexp).condition(self(condition))
 
 	@DMObjectNodeDispatchMethod( Schema.MetaParse )
 	def MetaParse(self, model, subexp, meta_expr):

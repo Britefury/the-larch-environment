@@ -163,7 +163,7 @@ class GrammarEditorGrammar (Grammar):
 
 	@Rule
 	def function(self):
-		return self.action() | self.condition() | self.peekOrControl()
+		return self.action() | self.condition() | self.meta_parse() | self.peekOrControl()
 
 	@Rule
 	def sequence(self):
