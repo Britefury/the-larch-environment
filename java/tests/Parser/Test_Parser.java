@@ -527,37 +527,6 @@ public class Test_Parser extends ParserTestCase
 
 	public void testMetaParse()
 	{
-		ParseAction f = new ParseAction()
-		{
-			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
-			{
-				String v = (String)value;
-				return v + v;
-			}
-		};
-
-		ParseAction g = new ParseAction()
-		{
-			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
-			{
-				String v = (String)value;
-				return v + v + v;
-			}
-		};
-
-		ParseAction f_l = new ParseAction()
-		{
-			@SuppressWarnings("unchecked")
-			public Object invoke(Object input, int begin, int end, Object value, Map<String, Object> bindings)
-			{
-				List<Object> v = (List<Object>)value;
-				ArrayList<Object> x = new ArrayList<Object>();
-				x.addAll( v );
-				x.addAll( v );
-				return x;
-			}
-		};
-
 		assertTrue(new MetaParse(new Literal("abc"), new AnyList()).isEquivalentTo(new MetaParse(new Literal("abc"), new AnyList())));
 		assertFalse(new MetaParse(new Literal("abc"), new AnyList()).isEquivalentTo(new MetaParse(new Literal("def"), new AnyList())));
 		assertFalse(new MetaParse(new Literal("abc"), new AnyList()).isEquivalentTo(new MetaParse(new Literal("abc"), new AnyNode())));
@@ -577,6 +546,11 @@ public class Test_Parser extends ParserTestCase
 		matchTestStringAndRichStringSX(baseParser, "x y z a b c", "[x y z a b c]");
 		// Where `metaParser` should not accept this
 		matchFailTestString(parser, "x y z a b c");
+
+		// `baseParser` shouldn't care about the ordering of the elements
+		matchTestStringAndRichStringSX(baseParser, "a x y z b c", "[a x y z b c]");
+		// Where `metaParser` should not accept this
+		matchFailTestString(parser, "a x y z b c");
 	}
 
 
