@@ -49,6 +49,8 @@ from Britefury import app_in_jar
 
 from LarchCore.MainApp import DocumentManagement
 
+from LarchCore.Kernel import interpreter_config_page
+
 from LarchCore.Project.ProjectRoot import ProjectRoot
 from LarchCore.Project.ProjectPackage import ProjectPackage
 from LarchCore.Project.ProjectPage import ProjectPage
@@ -174,6 +176,7 @@ _linkDragSource = ObjectDndHandler.DragSource( LinkSubjectDrag, _dragSourceCreat
 _controlsStyle = StyleSheet.style( Controls.bClosePopupOnActivate( True ) )
 _projectIndexNameStyle = StyleSheet.style( Primitive.foreground( Color( 0.25, 0.35, 0.5 ) ), Primitive.fontSize( 16 ), Primitive.fontFace( Primitive.lightFontName ) )
 _packageNameStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.0, 0.5 ) ), Primitive.fontSize( 14 ), Primitive.fontFace( Primitive.lightFontName ) )
+_kernel_border = SolidBorder(1.0, 3.0, 5.0, 5.0, Color(0.5, 0.6, 0.7), Color(0.95, 0.975, 1.0))
 _itemHoverHighlightStyle = StyleSheet.style( Primitive.hoverBackground( FilledOutlinePainter( Color( 0.8, 0.825, 0.9 ), Color( 0.125, 0.341, 0.574 ), BasicStroke( 1.0 ) ) ) )
 _pythonPackageNameStyle = StyleSheet.style( Primitive.foreground( Color( 0.0, 0.0, 0.5 ) ) )
 _pythonPackageNameNotSetStyle = StyleSheet.style( Primitive.foreground( Color( 0.5, 0.0, 0.0 ) ) )
@@ -187,6 +190,8 @@ _notesRowStyle = StyleSheet.style( Primitive.rowSpacing( 10.0 ) )
 _notesGap = 15.0
 
 _packageContentsIndentation = 20.0
+
+_no_kernel = StyleSheet.style(Primitive.fontItalic(True)).applyTo(Label('None selected'))
 
 
 _packageIcon = Image( Image.getResource( '/LarchCore/Project/images/Package.png' ) )
@@ -366,8 +371,28 @@ class ProjectView (MethodDispatchView):
 
 
 		#
+		# Interpreter / kernel
+		#
+		def _on_choose_kernel(button, event):
+			def on_choose_kernel_factory(kernel_factory):
+				project.kernel_description = kernel_factory.description
+
+			menu = interpreter_config_page.get_interpreter_config().interpreter_chooser_menu(on_choose_kernel_factory)
+			menu.popupMenu(button.element, Anchor.TOP_RIGHT, Anchor.TOP_LEFT)
+
+
+
+		#
 		# Project Section
 		#
+
+		# Interpreter choice
+		choose_kernel_button = Button.buttonWithLabel('Choose...', _on_choose_kernel).alignHPack()
+		kernel_desc = DefaultPerspective.instance(project.kernel_description)   if project.kernel_description is not None   else _no_kernel
+		kernel_desc = _kernel_border.surround(kernel_desc)
+		kernel_row = Form.Section( 'Interpreter / kernel', 'Please choose the interpreter / kernel on which your code should run',
+					   Column([choose_kernel_button, Spacer(0.0, 1.0), kernel_desc]) )
+
 
 		# Python package name
 		notSet = _pythonPackageNameNotSetStyle.applyTo( Label( '<not set>' ) )
@@ -378,19 +403,13 @@ class ProjectView (MethodDispatchView):
 
 
 		# Clear imported modules
-		def _onReset(button, event):
-			project.reset()
-			modules = document.unloadAllImportedModules()
-			heading = SectionHeading2( 'Unloaded modules:' )
-			modules = Column( [ Label( module )   for module in modules ] )
-			report = Section( heading, modules )
-			BubblePopup.popupInBubbleAdjacentTo( report, button.getElement(), Anchor.BOTTOM, True, True )
-		resetButton = Button.buttonWithLabel( 'Reset', _onReset )
-		resetButton = AttachTooltip( resetButton, 'Unloads all modules that were imported from this project from the Python module cache. This way they can be re-imported, allowing modifications to take effect.' )
-		resetRow = Form.Section( 'Reset', 'Unload project modules', resetButton )
+		def _on_restart_kernel(button, event):
+			project.restart_kernel()
+		restart_button = Button.buttonWithLabel( 'Restart kernel', _on_restart_kernel ).alignHPack()
+		restart_row = Form.Section( 'Restart', 'Shut the kernel down and start a new one.', restart_button )
 
 
-		projectSection = Form( 'Project', [ pythonPackageNameRow, resetRow ] )
+		projectSection = Form( 'Project', [ kernel_row, pythonPackageNameRow, restart_row ] )
 
 
 		# Project index

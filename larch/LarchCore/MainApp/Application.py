@@ -10,8 +10,11 @@ from javax.swing import JOptionPane
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from Britefury.Kernel.Document import Document
+from LarchCore.Kernel.python import inproc_kernel
 
 from LarchCore.PythonConsole import Console
+
+from LarchCore.Kernel import interpreter_config_page
 
 
 
@@ -23,7 +26,9 @@ class AppState (object):
 		self._docToAppDoc = {}
 		self._documentIDCounter = 1
 		self._consoles = []
-		
+
+		self.inproc_context = inproc_kernel.InProcessContext()
+
 		
 	def getOpenDocuments(self):
 		self._incr.onAccess()
@@ -145,7 +150,7 @@ class AppState (object):
 		:param windowManager: the Larch window manager
 		:return: None
 		"""
-		pass
+		interpreter_config_page.shutdown_interpreter_config()
 
 
 
@@ -192,11 +197,12 @@ class AppDocument (object):
 	
 
 class AppConsole (object):
-	def __init__(self, index):
+	def __init__(self, kernel, full_name, index):
 		self._incr = IncrementalValueMonitor( self )
 		
 		self._index = index
-		self._console = Console.Console( '<console%d>'  %  ( index, ) )
+		self._full_name = full_name
+		self._console = Console.Console( kernel )
 
 
 	def subject(self, enclosingSubject):
@@ -207,6 +213,10 @@ class AppConsole (object):
 		self._incr.onAccess()
 		return self._index
 	
+	def get_full_name(self):
+		self._incr.onAccess()
+		return self._full_name
+
 	def getConsole(self):
 		self._incr.onAccess()
 		return self._console
