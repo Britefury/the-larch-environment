@@ -6,6 +6,7 @@
 from LarchCore.Worksheet.WorksheetViewer.View import perspective as worksheetViewerPerspective, WorksheetViewerSubject
 from LarchCore.Worksheet import Schema
 from LarchCore.Worksheet.TextExporter import WorksheetTextExporter
+from LarchCore.Worksheet.source_extractor import WorksheetSourceExtractor
 
 from LarchCore.Project.PageData import PageData, registerPageFactory
 
@@ -19,6 +20,12 @@ def newWorksheet():
 class WorksheetPageData (PageData):
 	def makeEmptyContents(self):
 		return newWorksheet()
+
+	def get_source_code(self):
+		src_extractor = WorksheetSourceExtractor()
+		source = []
+		src_extractor(self.contents, source)
+		return source
 
 	def exportAsString(self, filename):
 		exporter = WorksheetTextExporter( filename )

@@ -8,7 +8,7 @@ from copy import deepcopy, copy
 from java.awt import Color
 from java.awt.event import KeyEvent
 
-from BritefuryJ.Command import Command, CommandSet
+from BritefuryJ.Command import Command
 
 from BritefuryJ.Graphics import SolidBorder
 from BritefuryJ.LSpace.Interactor import KeyElementInteractor
@@ -17,11 +17,10 @@ from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from BritefuryJ.Pres.Primitive import Primitive, Label, Column
 from BritefuryJ.StyleSheet import StyleSheet
+from LarchCore.Kernel.python import inproc_kernel
 
 from LarchCore.Languages.Python2.PythonCommands import pythonCommandSet, WrapSelectedStatementRangeInEmbeddedObjectAction, EmbeddedStatementAtCaretAction, chainActions
 from LarchCore.Languages.Python2.Embedded import EmbeddedPython2Suite, removeEmbeddedObjectContainingElement
-from LarchCore.Languages.Python2.Execution import Execution
-
 
 
 _titleStyle = StyleSheet.style( Primitive.fontSize( 9 ) )
@@ -105,7 +104,7 @@ class InlineConsole (object):
 
 	def _refresh(self):
 		if self._module is not None:
-			self._execResult = Execution.getResultOfExecutionInScopeWithinModule( self._suite.model, copy( self._scopeGlobals ), copy( self._scopeLocals ), self._module, True )
+			self._execResult = inproc_kernel.getResultOfExecutionInScopeWithinModule( self._suite.model, copy( self._scopeGlobals ), copy( self._scopeLocals ), self._module, True )
 			self._incr.onChanged()
 
 

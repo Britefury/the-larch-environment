@@ -273,7 +273,7 @@ def _worksheetContextMenuFactory(element, menu):
 	
 	
 	def _onRefresh(button, event):
-		model.refreshResults()
+		model.refresh_worksheet_output()
 
 	model = element.getFragmentContext().getModel()
 
@@ -322,7 +322,9 @@ class WorksheetEditor (MethodDispatchView):
 
 		tip = TipBox( [ NormalText( [ StrongSpan( 'Text: ' ), 'Type to add text to the worksheet.\nRight click to access the context menu, from which styles can be applied.' ] ),
 			      NormalText( [ StrongSpan( 'Code: ' ), 'Code can be added from the context menu. You can add complete blocks of python code in between paragraphs, or single expressions to be evaluated with paragraph text.' ] ),
-			      NormalText( [ 'To re-execute all code within the worksheet, press ', EmphSpan( 'Control-Enter' ) ] ) ],
+			      NormalText( [ 'To execute all code within the worksheet, press ', EmphSpan( 'Control-Shift-Enter' ) ] ),
+			      NormalText( [ 'To execute a single block of code or an expression, press ', EmphSpan( 'Control-Enter' ) ] ),
+			      ],
 			      'larchcore.worksheet.edit.howto' )
 
 
@@ -478,7 +480,7 @@ class WorksheetEditor (MethodDispatchView):
 		executionResult = node.getResult()
 		if executionResult is not None:
 			if not node.isResultVisible():
-				executionResult = executionResult.suppressStdOut().suppressResult()
+				executionResult = executionResult.errorsOnly()
 			executionResultView = executionResult.view()
 			
 			
@@ -502,6 +504,12 @@ class WorksheetEditor (MethodDispatchView):
 		p = _pythonCodeBox.surround( headerBox.padY( 0.0, 3.0 ), box.padY( 5.0, 0.0 ) )
 
 		p = WorksheetRichTextController.instance.editableParagraphEmbed( node, p )
+
+		def _on_refresh_output(element):
+			node.refresh_output()
+
+		p = p.withShortcut(_refreshBlockShortcut, _on_refresh_output)
+
 		return p.alignHExpand()
 
 
@@ -549,6 +557,12 @@ class WorksheetEditor (MethodDispatchView):
 
 		p = p.withContextMenuInteractor( _inlinePythonCodeContextMenuFactory )
 		p = WorksheetRichTextController.instance.editableInlineEmbed( node, p )
+
+		def _on_refresh_output(element):
+			node.refresh_output()
+
+		p = p.withShortcut(_refreshBlockShortcut, _on_refresh_output)
+
 		return p.alignHExpand()
 
 
@@ -585,10 +599,11 @@ _linkStyle = StyleSheet.style( Primitive.hoverBackground( FilledOutlinePainter( 
 
 
 def _refreshWorksheet(subject, pageController):
-	subject._modelView.refreshResults()
+	subject._get_model_view().refresh_worksheet_output()
 
 
-_refreshCommand = Command( CommandName( '&Refresh worksheet' ), _refreshWorksheet, Shortcut( KeyEvent.VK_ENTER, Modifier.CTRL ) )
+_refreshBlockShortcut = Shortcut( KeyEvent.VK_ENTER, Modifier.CTRL )
+_refreshCommand = Command( CommandName( '&Refresh worksheet' ), _refreshWorksheet, Shortcut( KeyEvent.VK_ENTER, Modifier.CTRL | Modifier.SHIFT ) )
 _worksheetEditorCommands = CommandSet( 'LarchCore.Worksheet.Editor', [ _refreshCommand ] )
 
 
@@ -607,11 +622,10 @@ class WorksheetEditorSubject (Subject):
 		self._title = title
 
 
-	@property
-	def _modelView(self):
+	def _get_model_view(self):
 		if self.__modelView is None:
 			try:
-				self.__modelView = EditorSchema.WorksheetEditor( None, self._model, self._importName )
+				self.__modelView = EditorSchema.WorksheetEditor( None, self._model, self._importName, self.get_kernel )
 			except Exception as e:
 				print e
 				raise
@@ -623,9 +637,9 @@ class WorksheetEditorSubject (Subject):
 
 
 	def getFocus(self):
-		f = self._modelView
+		f = self._get_model_view()
 		# This causes execution results to refresh on page view
-		f.refreshResults()
+		# f.refresh_worksheet_output()
 		return f
 	
 	def getPerspective(self):

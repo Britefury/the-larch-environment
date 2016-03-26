@@ -42,6 +42,9 @@ class PageData (object):
 			contents.realiseAsRoot()
 
 
+	@abstractmethod
+	def get_source_code(self):
+		pass
 
 	@abstractmethod
 	def exportAsString(self, filename):

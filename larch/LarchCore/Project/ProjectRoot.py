@@ -10,15 +10,27 @@ import uuid
 from BritefuryJ.ChangeHistory import Trackable
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
+from LarchCore.Kernel import interpreter_config_page, kernel_factory
+
 from LarchCore.Project.ProjectContainer import ProjectContainer
 from LarchCore.Project import ProjectEditor, ProjectPage
 
 
 
-
 class ProjectRoot (ProjectContainer):
-	def __init__(self, packageName=None, contents=None):
+	def __init__(self, kernel_description=None, packageName=None, contents=None):
 		super( ProjectRoot, self ).__init__( contents )
+
+		if kernel_description is None:
+			kernel_description = self.__default_kernel_description()
+
+		self.__kernel_description = kernel_description
+
+		self.__kernel = None
+		self.__kernel_factory_in_use = None
+		self.__kernel_creation_in_progress = False
+		self.__get_kernel_callbacks = []
+
 		self._pythonPackageName = packageName
 		self.__frontPageId = None
 		self.__startupPageId = None
@@ -26,6 +38,124 @@ class ProjectRoot (ProjectContainer):
 		self.__idToPage = {}
 
 		self._startupExecuted = False
+
+
+	def __getstate__(self):
+		state = super( ProjectRoot, self ).__getstate__()
+		state['kernel_description'] = self.__kernel_description
+		state['pythonPackageName'] = self._pythonPackageName
+		state['frontPageId'] = self.__frontPageId
+		state['startupPageId'] = self.__startupPageId
+		return state
+
+	def __setstate__(self, state):
+		self.__idToPage = {}
+		self._startupExecuted = False
+
+		self.__kernel = None
+		self.__kernel_factory_in_use = None
+		self.__kernel_creation_in_progress = False
+		self.__get_kernel_callbacks = []
+
+		self._startupExecuted = False
+
+		# Need to initialise the ID table before loading contents
+		super( ProjectRoot, self ).__setstate__( state )
+		self.__kernel_description = state.get('kernel_description')
+		if self.__kernel_description is None:
+			self.__kernel_description = self.__default_kernel_description()
+		self._pythonPackageName = state['pythonPackageName']
+		self.__frontPageId = state.get( 'frontPageId' )
+		self.__startupPageId = state.get( 'startupPageId' )
+
+
+	def __default_kernel_description(self):
+		interp_conf = interpreter_config_page.get_interpreter_config()
+		return interp_conf.kernel_descriptions[0]   if len(interp_conf.kernel_descriptions) > 0   else None
+
+
+
+	@property
+	def kernel_description(self):
+		return self.__kernel_description
+
+	@kernel_description.setter
+	def kernel_description(self, value):
+		self.__kernel_description = value
+		self._incr.onChanged()
+
+
+
+	def __init_kernel(self):
+		if self.__kernel_description is not None:
+			factory = interpreter_config_page.get_interpreter_config().get_best_kernel_factory(self.__kernel_description)
+
+
+			self.__kernel_factory_in_use = factory
+
+
+	def get_kernel(self, kernel_callback):
+		if self.__kernel_description is not None:
+			# Get the best kernel factory to use
+			factory = interpreter_config_page.get_interpreter_config().get_best_kernel_factory(self.__kernel_description)
+
+			create_kernel = False
+			if factory != self.__kernel_factory_in_use:
+				# The best factory is different from the one already in use
+				self.__kernel_factory_in_use = factory
+				create_kernel = True
+			elif self.__kernel is None  and  not self.__kernel_creation_in_progress:
+				create_kernel = True
+
+			if create_kernel:
+				# Create a new kernel
+				def on_kernel_created(kernel):
+					# Kernel creation in progress
+					self.__kernel_creation_in_progress = False
+					# Notify that we are changing kernel
+					self.__notify_kernel_shutdown(self.__kernel)
+					# Shutdown any existing kernel
+					if self.__kernel is not None:
+						self.__kernel.shutdown()
+					# Update
+					self.__kernel = kernel
+					# Notify that we are changing kernel
+					self.__notify_kernel_started(self.__kernel)
+					# Invoke callbacks
+					callbacks = self.__get_kernel_callbacks[:]
+					self.__get_kernel_callbacks = []
+					for callback in callbacks:
+						callback(kernel)
+
+				# Queue the callback
+				self.__get_kernel_callbacks.append(kernel_callback)
+				self.__kernel_creation_in_progress = True
+				# Kick off kernel creation:
+				# MUST DO THIS LAST; callback may be called IMMEDIATELY, so everything must be ready
+				factory.create_kernel(on_kernel_created)
+			elif self.__kernel_creation_in_progress:
+				# Kernel creation already kicked off; queue the callback
+				self.__get_kernel_callbacks.append(kernel_callback)
+			elif self.__kernel is not None:
+				# Kernel already up and running; invoke callback immediately
+				kernel_callback(self.__kernel)
+		else:
+			# No kernel description set; cannot create
+			raise kernel_factory.KernelNotChosenError
+
+
+	@property
+	def current_kernel(self):
+		return self.__kernel
+
+
+	def __notify_kernel_started(self, kernel):
+		self.register_importable_modules()
+
+
+	def __notify_kernel_shutdown(self, kernel):
+		self.unregister_importable_modules()
+
 
 
 	@property
@@ -41,29 +171,11 @@ class ProjectRoot (ProjectContainer):
 			return super( ProjectRoot, self ).moduleNames
 
 
-	def __getstate__(self):
-		state = super( ProjectRoot, self ).__getstate__()
-		state['pythonPackageName'] = self._pythonPackageName
-		state['frontPageId'] = self.__frontPageId
-		state['startupPageId'] = self.__startupPageId
-		return state
-	
-	def __setstate__(self, state):
-		self.__idToPage = {}
-		self._startupExecuted = False
-
-		# Need to initialise the ID table before loading contents
-		super( ProjectRoot, self ).__setstate__( state )
-		self._pythonPackageName = state['pythonPackageName']
-		self.__frontPageId = state.get( 'frontPageId' )
-		self.__startupPageId = state.get( 'startupPageId' )
-
-
 	def __copy__(self):
-		return ProjectRoot( self._pythonPackageName, self[:] )
+		return ProjectRoot( self.__kernel_description, self._pythonPackageName, self[:] )
 	
 	def __deepcopy__(self, memo):
-		return ProjectRoot( self._pythonPackageName, [ deepcopy( x, memo )   for x in self ] )
+		return ProjectRoot( self.__kernel_description, self._pythonPackageName, [ deepcopy( x, memo )   for x in self ] )
 	
 	
 	def __new_subject__(self, document, enclosingSubject, path, importName, title):
@@ -81,9 +193,13 @@ class ProjectRoot (ProjectContainer):
 				startupPage = self.startupPage
 				if startupPage is not None:
 					self._startupExecuted = True
-					__import__( startupPage.importName )
+					raise NotImplementedError, 'Startup page not executed'
+					# __import__( startupPage.importName )
 
-	def reset(self):
+	def restart_kernel(self):
+		if self.__kernel is not None:
+			self.__kernel.shutdown()
+			self.__kernel = None
 		self._startupExecuted = False
 
 
@@ -127,9 +243,9 @@ class ProjectRoot (ProjectContainer):
 		self._pythonPackageName = name
 		self._incr.onChanged()
 		if self.__change_history__ is not None:
-			def set(name):
+			def set_pkg_name(name):
 				self.pythonPackageName = name
-			self.__change_history__.addChange( lambda: set( name ), lambda: set( oldName ), 'Project root set python package name' )
+			self.__change_history__.addChange( lambda: set( name ), lambda: set_pkg_name(oldName), 'Project root set python package name' )
 
 
 
@@ -204,8 +320,3 @@ class ProjectRoot (ProjectContainer):
 	def startupPage(self, page):
 		self.__startupPageId = page._id   if page is not None   else None
 		self._incr.onChanged()
-
-
-
-
-

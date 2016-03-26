@@ -132,7 +132,7 @@ def _loadPathsConfig():
 def savePathsConfig():
 	saveUserConfig( _pathsConfigFilename, _pathsConfig )
 
-			
+
 
 
 _pathsConfig = None

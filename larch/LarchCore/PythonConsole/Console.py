@@ -6,7 +6,6 @@
 from java.lang import StringBuilder
 
 import sys
-import imp
 from copy import copy, deepcopy
 
 from java.awt import Color
@@ -19,7 +18,7 @@ from Britefury import LoadBuiltins
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
-from BritefuryJ.Live import LiveValue
+from BritefuryJ.Live import LiveValue, LiveFunction
 
 from BritefuryJ.AttributeTable import SimpleAttributeTable
 
@@ -42,9 +41,9 @@ from BritefuryJ.Util import TypeUtils
 
 
 from LarchCore.Languages.Python2 import Python2
-from LarchCore.Languages.Python2.Execution.ExecutionPresCombinators import execStdout, execStderr, execException, execResult
-from LarchCore.Languages.Python2.Execution import Execution
 
+from LarchCore.Kernel import execution_pres
+from LarchCore.Kernel.python import inproc_kernel
 
 
 
@@ -106,35 +105,31 @@ def _dropPrompt(varNameTextEntryListener):
 
 
 class Console (object):
-	class Output (object):
-		def __init__(self):
-			self._builder = None
-
-		def write(self, text):
-			if not ( isinstance( text, str )  or  isinstance( text, unicode ) ):
-				raise TypeError, 'argument 1 must be string, not %s' % type( text )
-			if self._builder is None:
-				self._builder = StringBuilder()
-			self._builder.append( text )
-
-		def getText(self):
-			if self._builder is not None:
-				return self._builder.toString()
-			else:
-				return None
-
-
-
-	def __init__(self, name, showBanner=True):
+	def __init__(self, kernel, showBanner=True):
 		self._incr = IncrementalValueMonitor( self )
 
 		self._blocks = []
 		self._currentPythonModule = Python2.py25NewModuleAsRoot()
 		self._before = []
 		self._after = []
-		self._module = imp.new_module( name )
+		self._kernel = kernel
+		self._module = self._kernel.get_live_module()
+		self._can_assign = isinstance(self._module, inproc_kernel.InProcessLiveModule)
+		self._banner_text = ''
+
+		if showBanner:
+			def on_banner_result(result):
+				self._banner_text = result.result
+				result.result_finished()
+				self._incr.onChanged()
+
+			result = self._kernel.new_execution_result()
+			result.result_callback = on_banner_result
+			self._module.evaluate('__import__("sys").version', result)
+
+			self._incr.onChanged()
+
 		self._showBanner = showBanner
-		LoadBuiltins.loadBuiltins( self._module )
 
 
 	def getBlocks(self):
@@ -172,22 +167,25 @@ class Console (object):
 
 
 	def assignVariable(self, name, value):
-		setattr( self._module, name, value )
-		self._blocks.append( ConsoleVarAssignment( name, value ) )
-		self._incr.onChanged()
+		if self._can_assign:
+			self._module.assign_variable(name, value)
+			self._blocks.append( ConsoleVarAssignment( name, value ) )
+			self._incr.onChanged()
 
 
 
 	def execute(self, bEvaluate=True):
 		module = self.getCurrentPythonModule()
 		if not Python2.isEmptyTopLevel(module):
-			execResult = Execution.getResultOfExecutionWithinModule( module, self._module, bEvaluate )
-			self._commit( module, execResult )
+			result = self._module.new_execution_result()
+			self._module.execute(module, bEvaluate, result)
+			self._commit(module, result)
 
 	def executeModule(self, module, bEvaluate=True):
 		if not Python2.isEmptyTopLevel(module):
-			execResult = Execution.getResultOfExecutionWithinModule( module, self._module, bEvaluate )
-			self._commit( module, execResult )
+			result = self._module.new_execution_result()
+			self._module.execute(module, bEvaluate, result)
+			self._commit(module, result)
 
 
 
@@ -222,7 +220,7 @@ class Console (object):
 
 		# Header
 		if self._showBanner:
-			bannerVersionText = [ _bannerTextStyle.applyTo( NormalText( v ) )   for v in sys.version.split( '\n' ) ]
+			bannerVersionText = [ _bannerTextStyle.applyTo( NormalText( v ) )   for v in self._banner_text.split( '\n' ) ]
 			helpText1 = Row( [ _bannerHelpKeyTextStyle.applyTo( Label( 'Ctrl+Enter' ) ),
 					   _bannerHelpTextStyle.applyTo( Label( ' - execute and evaluate, ' ) ),
 					   _bannerHelpKeyTextStyle.applyTo( Label( 'Ctrl+Shift+Enter' ) ),
@@ -259,7 +257,8 @@ class Console (object):
 		currentModule = currentModule.withShortcut( _historyNextShortcut, _onHistoryNext )
 
 		m = _pythonModuleBorderStyle.applyTo( Border( currentModule.alignHExpand() ) ).alignHExpand()
-		m = m.withDropDest( dropDest )
+		if self._can_assign:
+			m = m.withDropDest( dropDest )
 		def _ensureCurrentModuleVisible(element, ctx, style):
 			element.ensureVisible()
 		m = m.withCustomElementAction( _ensureCurrentModuleVisible )
@@ -302,27 +301,22 @@ class ConsoleBlock (object):
 
 		executionResult = self.getExecResult()
 
-		caughtException = executionResult.getCaughtException()
-		result = executionResult.getResult()
-		streams = executionResult.getStreams()
+		caughtException = executionResult.caught_exception
+		result = executionResult.result
+		streams = executionResult.streams
 
 		moduleView = StyleSheet.style( Primitive.editable( False ) ).applyTo( Python2.python2EditorPerspective.applyTo( pythonModule ) )
 		caughtExceptionView = ApplyPerspective.defaultPerspective( caughtException )   if caughtException is not None   else None
-		resultView = ApplyPerspective.defaultPerspective( result[0] )   if result is not None   else None
+		resultView = ApplyPerspective.defaultPerspective( result )   if executionResult.has_result()   else None
 
 		code = _pythonModuleBorderStyle.applyTo( Border( moduleView.alignHExpand() ).alignHExpand() )
 		outputContents = []
 		for stream in streams:
-			if stream.name == 'out':
-				outputContents.append( execStdout( stream.richString, True ) )
-			elif stream.name == 'err':
-				outputContents.append( execStderr( stream.richString, True ) )
-			else:
-				raise ValueError, 'Unreckognised stream \'{0}\''.format( stream.name )
+			outputContents.append( execution_pres.stream_pres( stream.rich_string, stream.name ) )
 		if caughtExceptionView is not None:
-			outputContents.append( execException( caughtExceptionView ) )
+			outputContents.append( execution_pres.exec_exception( caughtExceptionView ) )
 		if resultView is not None:
-			outputContents.append( execResult( resultView ) )
+			outputContents.append( execution_pres.exec_result( resultView ) )
 		outputColumn = _blockOutputStyle.applyTo( Column( outputContents ).alignHExpand() )
 		return _blockStyle.applyTo( Border( Column( [ code, outputColumn ] ) ) ).alignHExpand()
 

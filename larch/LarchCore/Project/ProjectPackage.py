@@ -22,7 +22,7 @@ class ProjectPackage (ProjectContainer):
 
 	@property
 	def importName(self):
-		return self.parent.importName + '.' + self._name
+		return self._join_import_names(self.parent.importName, self._name)
 
 
 	def __getstate__(self):
@@ -51,6 +51,7 @@ class ProjectPackage (ProjectContainer):
 		self._incr.onChanged()
 		if self.__change_history__ is not None:
 			self.__change_history__.addChange( lambda: self.setName( name ), lambda: self.setName( oldName ), 'Package set name' )
+		self.update_importable_modules()
 
 
 

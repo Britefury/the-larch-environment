@@ -19,7 +19,6 @@ from BritefuryJ.Pres.Primitive import Spacer, Column
 from LarchCore.MainApp import DocumentManagement
 
 from LarchCore.Project.ProjectEditor import View
-from LarchCore.Project.ProjectEditor.ModuleFinder import RootFinder, PackageFinder
 
 
 
@@ -43,19 +42,16 @@ def _saveAs(subject, pageController):
 	DocumentManagement.promptSaveDocumentAs( subject.world, None, handleSaveDocumentAsFn, document.getFilename() )
 
 
-def _reset(subject, pageController):
-	document = subject._document
-	modules = document.unloadAllImportedModules()
-	print 'LarchCore.Project.ProjectEditor.Subject: unloaded modules:'
-	for module in modules:
-		print '\t' + module
+def _restart_kernel(subject, pageController):
+	subject.project.restart_kernel()
 
 	
 	
 _saveCommand = Command( CommandName( '&Save' ), _save, Shortcut( 'S', Modifier.CTRL ) )
 _saveAsCommand = Command( CommandName( '&Save &as' ), _saveAs )
-_resetCommand = Command( CommandName( 'R&eset' ), _reset, Shortcut( 'E', Modifier.CTRL ) )
-_projectCommands = CommandSet( 'LarchCore.Project', [ _saveCommand, _saveAsCommand, _resetCommand ] )
+_restart_kernel_command = Command( CommandName( 'R&estart Kernel' ), _restart_kernel, Shortcut( 'E', Modifier.CTRL ) )
+_projectCommands = CommandSet( 'LarchCore.Project', [ _saveCommand, _saveAsCommand, _restart_kernel_command ] )
+
 
 
 
@@ -65,8 +61,6 @@ class ProjectSubject (Subject):
 		self._document = document
 		self._model = model
 		self._title = title
-		packageFinder = PackageFinder( self, model )
-		self._rootFinder = RootFinder( self, model.pythonPackageName, packageFinder )
 
 
 	@property
@@ -93,13 +87,15 @@ class ProjectSubject (Subject):
 		return self._title
 
 
+	def get_kernel(self, kernel_callback):
+		self._model.get_kernel(kernel_callback)
+
+
+
+
 	def buildBoundCommandSetList(self, cmdSets):
 		cmdSets.add( _projectCommands.bindTo( self ) )
 		self.enclosingSubject.buildBoundCommandSetList( cmdSets )
-
-
-	def import_resolve(self, name, fullname, path):
-		return self._rootFinder.import_resolve( name, fullname, path )
 
 
 	def _pageSubject(self, page):

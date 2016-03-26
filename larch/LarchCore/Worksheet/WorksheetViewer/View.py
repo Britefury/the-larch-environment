@@ -49,7 +49,7 @@ _pythonCodeEditorBorderStyle = StyleSheet.style( Primitive.border( SolidBorder( 
 
 def _worksheetContextMenuFactory(element, menu):
 	def _onRefresh(button, event):
-		model.refreshResults()
+		model.refresh_worksheet_output()
 
 	model = element.getFragmentContext().getModel()
 
@@ -76,7 +76,9 @@ class WorksheetViewer (MethodDispatchView):
 			pageContents = [ linkHeader ]
 
 
-		tip = TipBox( [ NormalText( [ 'To edit this worksheet or add content, click ', EmphSpan( 'Switch to developer mode' ), ' at the top right' ] ) ],
+		tip = TipBox( [ NormalText( [ 'To edit this worksheet or add content, click ', EmphSpan( 'Switch to developer mode' ), ' at the top right' ] ),
+				NormalText( [ 'To execute all code within the worksheet, press ', EmphSpan( 'Control-Shift-Enter' ) ] ),
+				NormalText( [ 'To execute a single block of code or an expression, press ', EmphSpan( 'Control-Enter' ) ] )],
 			      'larchcore.worksheet.view.toedit' )
 
 		w = Page( pageContents + [ bodyView, tip ] )
@@ -143,14 +145,14 @@ class WorksheetViewer (MethodDispatchView):
 			executionResult = node.getResult()
 			if executionResult is not None:
 				if not node.isResultVisible():
-					executionResult = executionResult.suppressStdOut().suppressResult()
+					executionResult = executionResult.errorsOnly()
 				if node.isMinimal():
 					executionResultView = executionResult.minimalView()
 				else:
 					executionResultView = executionResult.view()
 
 			if node.isMinimal():
-				return executionResultView.alignHExpand()   if executionResultView is not None   else Blank()
+				p = executionResultView.alignHExpand()   if executionResultView is not None   else Blank()
 			else:
 				boxContents = []
 				if node.isCodeVisible():
@@ -159,7 +161,14 @@ class WorksheetViewer (MethodDispatchView):
 					boxContents.append( executionResultView.alignHExpand() )
 				box = StyleSheet.style( Primitive.columnSpacing( 5.0 ) ).applyTo( Column( boxContents ) )
 				
-				return _pythonCodeEditorBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
+				p = _pythonCodeEditorBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
+
+			def _on_refresh_output(element):
+				node.refresh_output()
+
+			p = p.withShortcut(_refreshBlockShortcut, _on_refresh_output)
+
+			return p
 		else:
 			return Blank()
 
@@ -189,7 +198,14 @@ class WorksheetViewer (MethodDispatchView):
 				boxContents.append( executionResultView.alignHExpand() )
 			box = StyleSheet.style( Primitive.rowSpacing( 5.0 ) ).applyTo( Row( boxContents ) )
 
-			return _pythonCodeEditorBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
+			p = _pythonCodeEditorBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
+
+			def _on_refresh_output(element):
+				node.refresh_output()
+
+			p = p.withShortcut(_refreshBlockShortcut, _on_refresh_output)
+
+			return p
 		else:
 			return executionResultView.alignHPack()   if executionResultView is not None   else Proxy()
 
@@ -244,10 +260,11 @@ class _WorksheetModuleLoader (object):
 
 
 def _refreshWorksheet(subject, pageController):
-	subject._modelView.refreshResults()
+	subject._get_model_view().refresh_worksheet_output()
 
 
-_refreshCommand = Command( CommandName( '&Refresh worksheet' ), _refreshWorksheet, Shortcut( KeyEvent.VK_ENTER, Modifier.CTRL ) )
+_refreshBlockShortcut = Shortcut( KeyEvent.VK_ENTER, Modifier.CTRL )
+_refreshCommand = Command( CommandName( '&Refresh worksheet' ), _refreshWorksheet, Shortcut( KeyEvent.VK_ENTER, Modifier.CTRL | Modifier.SHIFT ) )
 _worksheetViewerCommands = CommandSet( 'LarchCore.Worksheet.Viewer', [ _refreshCommand ] )
 
 
@@ -285,10 +302,9 @@ class WorksheetViewerSubject (Subject):
 		return self
 
 	
-	@property
-	def _modelView(self):
+	def _get_model_view(self):
 		if self.__modelView is None:
-			self.__modelView = ViewSchema.WorksheetView( None, self._model, self._importName )
+			self.__modelView = ViewSchema.WorksheetView( None, self._model, self._importName, self.get_kernel )
 		return self.__modelView
 
 
@@ -297,9 +313,9 @@ class WorksheetViewerSubject (Subject):
 
 
 	def getFocus(self):
-		f = self._modelView
+		f = self._get_model_view()
 		# This causes execution results to refresh on page view
-		f.refreshResults()
+		# f.refresh_worksheet_output()
 		return f
 	
 	def getPerspective(self):

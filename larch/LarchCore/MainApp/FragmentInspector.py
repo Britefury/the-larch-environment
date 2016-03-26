@@ -15,10 +15,12 @@ from BritefuryJ.StyleSheet import StyleSheet
 from BritefuryJ.Controls import TabbedBox
 from BritefuryJ.Util import TypeUtils
 from BritefuryJ.Logging import LogView
+from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from BritefuryJ.ObjectPresentation import PresentationStateListenerList
 
 from BritefuryJ.DefaultPerspective import DefaultPerspective
+from LarchCore.Kernel.python import inproc_kernel
 
 from LarchCore.PythonConsole import Console
 
@@ -102,7 +104,7 @@ class _FragmentSelectorEntry (object):
 
 
 class _FragmentSelector (object):
-	def __init__(self, tipFragment):
+	def __init__(self, tipFragment, inproc_context):
 		self._listeners = None
 
 		self._tipFragment = tipFragment
@@ -114,9 +116,11 @@ class _FragmentSelector (object):
 
 		self._entries = [ _FragmentSelectorEntry( self, f )   for f in self._fragments ]
 
+		self.__inproc_context = inproc_context
+
 
 	def _onFragmentSelected(self, fragment):
-		inspector = _FragmentInspector( fragment )
+		inspector = _FragmentInspector( fragment, self.__inproc_context )
 		subject = DefaultPerspective.instance.objectSubject( inspector )
 		fragment.fragmentElement.rootElement.pageController.openSubject( subject, PageController.OpenOperation.OPEN_IN_NEW_WINDOW )
 
@@ -136,18 +140,28 @@ class _FragmentSelector (object):
 
 
 class _FragmentInspector (object):
-	def __init__(self, fragment):
+	def __init__(self, fragment, inproc_context):
+		self._incr = IncrementalValueMonitor()
+
 		self._fragment = fragment
 
-		self._console = Console.Console( '<popup_console>', False )
-		self._console.assignVariable( 'm', fragment.model )
-		self._console.assignVariable( 'frag', fragment )
+		self._console = None
+
+		def on_kernel_started(kernel):
+			self._console = Console.Console( kernel, False )
+			self._console.assignVariable( 'm', fragment.model )
+			self._console.assignVariable( 'frag', fragment )
+			self._incr.onChanged()
+
+		inproc_context.start_kernel(on_kernel_started)
 
 		self._explorer = fragment.fragmentElement.treeExplorer()
 
 
 
 	def __present__(self, fragment, inheritedState):
+		self._incr.onAccess()
+
 		def _explorerPres():
 			return Pres.coerce( self._explorer )
 
@@ -160,8 +174,13 @@ class _FragmentInspector (object):
 
 		log = LazyPres( _log )
 
+		if self._console is not None:
+			console = _consoleStyle(self._console)
+		else:
+			console = Label('Waiting for console to start...')
+
 		tabs = [
-			[ Label( 'Console' ), _consoleStyle( self._console ).alignVTop() ],
+			[ Label( 'Console' ), console.alignVTop() ],
 			[ Label( 'Element explorer' ), explorer ],
 			[ Label( 'Page log' ), log ],
 			[ Label( 'Event errors' ), self._fragment.view.presentationRootElement.eventErrorLog ]
@@ -171,7 +190,7 @@ class _FragmentInspector (object):
 
 
 def inspectFragment(fragment, sourceElement, triggeringEvent):
-	selector = _FragmentSelector( fragment )
+	selector = _FragmentSelector( fragment, _fragment_inspector_inproc_context )
 
 	title = SectionHeading1( 'Choose a fragment:' )
 	body = Section( title, selector )
@@ -181,3 +200,6 @@ def inspectFragment(fragment, sourceElement, triggeringEvent):
 
 	BubblePopup.popupInBubbleAdjacentToMouse( content, sourceElement, Anchor.TOP, True, True )
 	return True
+
+
+_fragment_inspector_inproc_context = inproc_kernel.InProcessContext()
