@@ -106,11 +106,11 @@ class GrammarTestCase (ParserTestCase):
 		def ops(self):
 			opTable = OperatorTable( 
 				[
-					InfixLeftLevel( [ BinaryOperator( Literal( '*' ),  lambda input, pos, end, left, right: [ 'mul', left, right ] ) ] ),
-					InfixLeftLevel( [ BinaryOperator( Literal( '+' ),  lambda input, pos, end, left, right: [ 'add', left, right ] ) ] ),
-				],  self.atom() )
+					InfixLeftLevel( [ BinaryOperator( Literal( '*' ),  lambda input, begin, end, left, op, right: [ 'mul', left, right ] ) ] ),
+					InfixLeftLevel( [ BinaryOperator( Literal( '+' ),  lambda input, begin, end, left, op, right: [ 'add', left, right ] ) ] ),
+				])
 			
-			return opTable.buildParsers()
+			return opTable.createAndBuildParsers(self.atom())
 		
 		@Rule
 		def mul(self):

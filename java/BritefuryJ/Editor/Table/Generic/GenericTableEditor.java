@@ -163,4 +163,13 @@ public class GenericTableEditor extends AbstractTableEditor<GenericTableModelInt
 	{
 		model.deleteBlock( x, y, w, h );
 	}
+
+	@Override
+	protected void insertRowBefore(GenericTableModelInterface model, int y, AbstractTableEditorInstance<GenericTableModelInterface> editorInstance) {
+		model.insertRow(y, new Object[] {});
+	}
+	@Override
+	protected void removeRow(GenericTableModelInterface model, int y, AbstractTableEditorInstance<GenericTableModelInterface> editorInstance) {
+		model.removeRow(y);
+	}
 }

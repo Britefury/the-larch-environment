@@ -12,6 +12,8 @@ public interface GenericTableModelInterface
 	int getWidth();
 	int getHeight();
 	List<Object> getRow(int rowIndex);
+	void insertRow(int i, Object[] row);
+	void removeRow(int i);
 	Object get(int x, int y);
 	void set(int x, int y, Object value);
 	Object[][] getBlock(int x, int y, int w, int h);

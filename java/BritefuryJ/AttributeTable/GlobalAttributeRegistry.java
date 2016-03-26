@@ -23,7 +23,17 @@ public class GlobalAttributeRegistry
 		namespaces.put( name, namespace );
 	}
 	
-	
+	protected static void unregisterNamespace(AttributeNamespace namespace)
+	{
+		String name = namespace.getName();
+		if ( !namespaces.containsKey( name ) )
+		{
+			throw new AttributeNamespace.NamespaceAlreadyExistsException( "No attribute namespace exists under the name " + name );
+		}
+		namespaces.remove( name );
+	}
+
+
 	protected static void registerAttribute(AttributeBase attribute)
 	{
 		String fullName = attribute.getFullName();
@@ -34,7 +44,17 @@ public class GlobalAttributeRegistry
 		attributes.put( fullName, attribute );
 	}
 	
-	
+	protected static void unregisterAttribute(AttributeBase attribute)
+	{
+		String fullName = attribute.getFullName();
+		if ( !attributes.containsKey( fullName ) )
+		{
+			throw new AttributeBase.AttributeAlreadyExistsException( "No attribute exists under the name " + fullName );
+		}
+		attributes.remove( fullName );
+	}
+
+
 	public static AttributeNamespace getNamespace(String name)
 	{
 		return namespaces.get( name );

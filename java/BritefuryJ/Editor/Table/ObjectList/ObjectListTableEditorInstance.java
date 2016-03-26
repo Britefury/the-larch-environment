@@ -5,9 +5,12 @@
 //##************************
 package BritefuryJ.Editor.Table.ObjectList;
 
+import BritefuryJ.Controls.PopupMenu;
 import BritefuryJ.Editor.Table.AbstractTableEditor;
 import BritefuryJ.Editor.Table.AbstractTableEditorInstance;
 import BritefuryJ.Editor.Table.TableEditorStyle;
+import BritefuryJ.LSpace.Interactor.ContextMenuElementInteractor;
+import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.GridRow;
 import BritefuryJ.Pres.Primitive.Label;
@@ -58,6 +61,7 @@ public class ObjectListTableEditorInstance extends AbstractTableEditorInstance<O
 			if ( hasLeftHeader() )
 			{
 				Pres title = new Label( String.valueOf( j ) ).withStyleSheetFromAttr( TableEditorStyle.headerAttrs );
+				title = editor.withRowHeaderContextMenu(title, model, j, ObjectListTableEditorInstance.this).alignHExpand().alignVRefYExpand();
 				rows[ey] = new GridRow( new Object[] { title, p } );
 			}
 			else

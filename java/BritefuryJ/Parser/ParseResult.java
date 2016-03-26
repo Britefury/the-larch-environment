@@ -118,9 +118,14 @@ public class ParseResult implements ParseResultInterface, Presentable
 	{
 		return new ParseResult( value, begin, end, false, true, bMerge, bindings );
 	}
-	
-	
-		
+
+	protected ParseResult withValueFrom(ParseResult res)
+	{
+		return new ParseResult( res.value, begin, end, false, res.bValid, bMerge, bindings );
+	}
+
+
+
 	protected ParseResult suppressed()
 	{
 		return new ParseResult( value, begin, end, true, bValid, bMerge, bindings );

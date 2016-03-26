@@ -103,6 +103,12 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 		}
 
 		@Override
+		public void insert(int i, Object x)
+		{
+			model.add( i, x );
+		}
+
+		@Override
 		public void removeRange(int start, int stop)
 		{
 			model.subList( start, stop ).clear();
@@ -114,6 +120,7 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 	private static class PyObjectModelWrapper implements ObjectListInterface
 	{
 		private static final PyString appendName = __builtin__.intern( Py.newString( "append" ) );
+		private static final PyString insertName = __builtin__.intern( Py.newString( "insert" ) );
 		private static final PyString __delitem__Name = __builtin__.intern( Py.newString( "__delitem__" ) );
 		
 		private PyObject model;
@@ -155,6 +162,28 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 				}
 			}
 			append.__call__( Py.java2py( x ) );
+		}
+
+		@Override
+		public void insert(int i, Object x)
+		{
+			PyObject insert;
+			try
+			{
+				insert = __builtin__.getattr( model, insertName );
+			}
+			catch (PyException e)
+			{
+				if ( e.match( Py.AttributeError ) )
+				{
+					throw new UnsupportedOperationException();
+				}
+				else
+				{
+					throw e;
+				}
+			}
+			insert.__call__(Py.java2py(i), Py.java2py(x));
 		}
 
 		@Override
@@ -358,7 +387,29 @@ public class ObjectListTableEditor extends AbstractTableEditor<ObjectListInterfa
 		}
 	}
 
-	
+	@Override
+	protected void insertRowBefore(ObjectListInterface model, int y, AbstractTableEditorInstance<ObjectListInterface> editorInstance) {
+		ObjectListTableEditorInstance instance = (ObjectListTableEditorInstance)editorInstance;
+
+		try {
+			model.insert( y, rowFactory.createRow() );
+		} catch (UnsupportedOperationException e) {
+
+		}
+	}
+
+	@Override
+	protected void removeRow(ObjectListInterface model, int y, AbstractTableEditorInstance<ObjectListInterface> editorInstance) {
+		ObjectListTableEditorInstance instance = (ObjectListTableEditorInstance)editorInstance;
+
+		try {
+			model.removeRange(y, y + 1);
+		} catch (UnsupportedOperationException e) {
+
+		}
+	}
+
+
 	private void growHeight(ObjectListInterface model, int h)
 	{
 		if ( h > model.size() )

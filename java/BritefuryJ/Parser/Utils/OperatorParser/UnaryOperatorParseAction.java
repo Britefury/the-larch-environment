@@ -9,5 +9,5 @@ package BritefuryJ.Parser.Utils.OperatorParser;
 
 public interface UnaryOperatorParseAction
 {
-	public Object invoke(Object input, int begin, int end, Object x);
+	public Object invoke(Object input, int begin, int end, Object x, Object opValue);
 }

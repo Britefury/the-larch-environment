@@ -70,6 +70,19 @@ def _isValidUnparsedStatementValue(value):
 	i = value.indexOf( '\n' )
 	return i != -1   and   i == len( value ) - 1
 
+def _isValidUnparsedSpecialFormStatementValue(value):
+	# Unparsed statement is only valid if there is ONE newline, and it is at the end
+	unparseable = False
+	for item in value.getItems():
+		if not item.isStructural():
+			if len(item.getValue().strip()) > 0:
+				unparseable = True
+				break
+	if unparseable:
+		return _isValidUnparsedStatementValue(value)
+	else:
+		return False
+
 def _commitUnparsedStatment(model, value):
 	withoutNewline = value[:-1]
 	unparsed = Schema.UnparsedStmt( value=Schema.UNPARSED( value=withoutNewline.getItemValues() ) )
@@ -153,6 +166,7 @@ class PythonSyntaxRecognizingController (SyntaxRecognizingController):
 		self._stmt = self.parsingEditFilter( 'Statement', self._grammar.simpleSingleLineStatementValid(), pyReplaceNode )
 		self._compHdr = self.partialParsingEditFilter( 'Compound header', self._grammar.compoundStmtHeader() )
 		self._stmtUnparsed = self.unparsedEditFilter( 'Unparsed statement', _isValidUnparsedStatementValue, _commitUnparsedStatment, _commitInnerUnparsed )
+		self._specialFormStmtUnparsed = self.unparsedEditFilter( 'Unparsed special form stmt', _isValidUnparsedSpecialFormStatementValue, _commitUnparsedStatment, _commitInnerUnparsed )
 		self._topLevel = self.topLevelEditFilter()
 		self._exprOuterValid = self.parsingEditFilter( 'Expression-outer-valid', self._grammar.tupleOrExpression(), _commitExprOuterValid, _commitExprOuterEmpty )
 		self._exprOuterInvalid = self.unparsedEditFilter( 'Expression-outer-invalid', _isValidExprOrTargetOuterUnparsed, _commitExprOuterUnparsed )
@@ -165,7 +179,7 @@ class PythonSyntaxRecognizingController (SyntaxRecognizingController):
 		self._statementEditRule = self.softStructuralEditRule( [ self._stmt, self._compHdr, self._stmtUnparsed ] )
 		self._unparsedStatementEditRule = self.editRule( [ self._stmt, self._compHdr, self._stmtUnparsed ] )
 		self._compoundStatementHeaderEditRule = self.softStructuralEditRule( [ self._compHdr, self._stmtUnparsed ] )
-		self._specialFormStatementEditRule = self.softStructuralEditRule( [ self._stmt, self._compHdr, self._stmtUnparsed ] )
+		self._specialFormStatementEditRule = self.softStructuralEditRule( [ self._stmt, self._compHdr, self._specialFormStmtUnparsed ] )
 		self._targetTopLevelEditRule = self.softStructuralEditRule( _pythonPrecedenceHandler, [ self._targetOuterValid, self._targetOuterInvalid, self._topLevel ] )
 		self._expressionTopLevelEditRule = self.softStructuralEditRule( _pythonPrecedenceHandler, [ self._exprOuterValid, self._exprOuterInvalid, self._topLevel ] )
 

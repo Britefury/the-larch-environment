@@ -125,7 +125,7 @@ public class InfixChainLevel extends OperatorLevel
 		}
 		
 		
-		public Object invoke(Object input, int begin, int end, Object x)
+		public Object invoke(Object input, int begin, int end, Object x, Object opValue)
 		{
 			try
 			{
@@ -149,9 +149,9 @@ public class InfixChainLevel extends OperatorLevel
 			this.callable = callable;
 		}
 
-		public Object invoke(Object input, int begin, int end, Object x)
+		public Object invoke(Object input, int begin, int end, Object x, Object opValue)
 		{
-			return callable.__call__( new PyObject[] { Py.java2py( input ), new PyInteger( begin ), new PyInteger( end ), Py.java2py( x ) } );
+			return callable.__call__( new PyObject[] { Py.java2py( input ), new PyInteger( begin ), new PyInteger( end ), Py.java2py( x ), Py.java2py( opValue ) } );
 		}
 	}
 
@@ -174,7 +174,7 @@ public class InfixChainLevel extends OperatorLevel
 		{
 			List<Object> xs = (List<Object>)x;
 
-			return action.invoke( input, begin, end, xs.get( 1 ) );
+			return action.invoke( input, begin, end, xs.get( 1 ), xs.get(0) );
 		}
 	}
 
