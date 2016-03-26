@@ -12,6 +12,9 @@ import java.util.List;
 
 import BritefuryJ.ClipboardFilter.ClipboardCopier;
 import BritefuryJ.ClipboardFilter.ClipboardCopierMemo;
+import BritefuryJ.Controls.MenuItem;
+import BritefuryJ.Controls.PopupMenu;
+import BritefuryJ.LSpace.Interactor.ContextMenuElementInteractor;
 import BritefuryJ.LSpace.LSElement;
 import BritefuryJ.LSpace.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.LSpace.Focus.Selection;
@@ -333,6 +336,8 @@ public abstract class AbstractTableEditor<ModelType>
 	protected abstract Object[][] getBlock(ModelType model, int x, int y, int w, int h);
 	protected abstract void putBlock(ModelType model, int x, int y, Object[][] data, AbstractTableEditorInstance<ModelType> editorInstance);
 	protected abstract void deleteBlock(ModelType model, int x, int y, int w, int h, AbstractTableEditorInstance<ModelType> editorInstance);
+	protected abstract void insertRowBefore(ModelType model, int y, AbstractTableEditorInstance<ModelType> editorInstance);
+	protected abstract void removeRow(ModelType model, int y, AbstractTableEditorInstance<ModelType> editorInstance);
 
 	protected Object[][] importHTMLBlock(int posX, int posY, Element[][] htmlBlock)
 	{
@@ -390,5 +395,35 @@ public abstract class AbstractTableEditor<ModelType>
 		}
 		
 		return destBlock;
+	}
+
+	public Pres withRowHeaderContextMenu(Pres p, final ModelType model, final int y, final AbstractTableEditorInstance<ModelType> editorInstance) {
+		MenuItem.MenuItemListener onInsertRow = new MenuItem.MenuItemListener() {
+			@Override
+			public void onMenuItemClicked(MenuItem.MenuItemControl menuItem) {
+				insertRowBefore(model, y, editorInstance);
+			}
+		};
+
+		MenuItem.MenuItemListener onRemoveRow = new MenuItem.MenuItemListener() {
+			@Override
+			public void onMenuItemClicked(MenuItem.MenuItemControl menuItem) {
+				removeRow(model, y, editorInstance);
+			}
+		};
+
+
+		final MenuItem insertRowItem = MenuItem.menuItemWithLabel("Insert row before", onInsertRow);
+		final MenuItem removeRowItem = MenuItem.menuItemWithLabel("Remove row", onRemoveRow);
+
+		ContextMenuElementInteractor interactor = new ContextMenuElementInteractor() {
+			@Override
+			public boolean contextMenu(LSElement element, PopupMenu menu) {
+				menu.add(insertRowItem);
+				menu.add(removeRowItem);
+				return true;
+			}
+		};
+		return p.withContextMenuInteractor(interactor);
 	}
 }

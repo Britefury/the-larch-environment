@@ -9,6 +9,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.python.core.Py;
@@ -66,6 +67,12 @@ public class AttributeNamespace implements Presentable
 			throw new InvalidAttributeNamespaceNameException( "Invalid attribute namespace name '" + name + "'; name should be an identifier" );
 		}
 		this.name = name;
+		AttributeNamespace existing = GlobalAttributeRegistry.getNamespace(name);
+		if (existing != null) {
+			System.out.println("WARNING: Unregistering attribute namespace '" + name + "' and all attributes within it, so that it may be replaced.");
+			existing.unregisterAllAttributes();
+			GlobalAttributeRegistry.unregisterNamespace(existing);
+		}
 		GlobalAttributeRegistry.registerNamespace( this );
 	}
 	
@@ -86,6 +93,12 @@ public class AttributeNamespace implements Presentable
 		}
 		attributes.put( attrName, attribute );
 		GlobalAttributeRegistry.registerAttribute( attribute );
+	}
+
+	protected void unregisterAllAttributes() {
+		for (Map.Entry<String, AttributeBase> entry: attributes.entrySet()) {
+			GlobalAttributeRegistry.unregisterAttribute(entry.getValue());
+		}
 	}
 	
 	

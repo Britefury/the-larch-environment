@@ -6,6 +6,7 @@
 package BritefuryJ.Editor.Table.Generic;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.Incremental.IncrementalValueMonitor;
@@ -66,6 +67,16 @@ public class GenericTableModelAbstractBase implements GenericTableModelInterface
 	public List<Object> getRow(int rowIndex)
 	{
 		return data.get( rowIndex );
+	}
+
+	@Override
+	public void insertRow(int i, Object[] row) {
+		data.add(i, Arrays.asList(row));
+	}
+
+	@Override
+	public void removeRow(int i) {
+		data.remove(i);
 	}
 
 

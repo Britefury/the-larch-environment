@@ -330,7 +330,7 @@ public abstract class DMNode implements ClipboardCopyable
 			if ( xx instanceof PyJavaType  ||  xx instanceof PyObjectDerived )
 			{
 				System.out.println( "DMNode.coerceForStorage(): Could not unwrap " + x );
-				return null;
+				return x;
 			}
 			else
 			{

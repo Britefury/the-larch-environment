@@ -14,7 +14,7 @@ from Britefury.Tests.BritefuryJ.Parser.ParserTestCase import ParserTestCase
 
 
 def buildOperatorParser(operatorTable, rootParser):
-	return OperatorTable( [ level   for level in operatorTable ], rootParser ).buildParsers()[-1]
+	return OperatorTable( [ level   for level in operatorTable ] ).createAndBuildParsers(rootParser)[-1]
 
 
 
@@ -524,19 +524,29 @@ class TestCase_Operators (ParserTestCase, TestCase_Impl):
 		return SuffixLevel( x )
 	
 	def _infixChainLvl(self, prefix, xs):
-		return InfixChainLevel( xs, lambda input, begin, end, x, ys: [ prefix, x ] + ys )
+		def handle_chain_level(input, begin, end, x, ys):
+			return [prefix, x] + ys
+		return InfixChainLevel( xs, handle_chain_level )
 	
 	def _infixUniformChainLvl(self, prefix, operator):
-		return InfixUniformChainLevel( operator, lambda input, begin, end, xs: [ prefix ] + xs )
+		def handle_uniform_chain_level(input, begin, end, xs):
+			return [ prefix ] + xs
+		return InfixUniformChainLevel( operator, handle_uniform_chain_level )
 
 	def _unOp(self, x):
-		return UnaryOperator( x, lambda input, begin, end, subexp: [ x, subexp ] )
+		def handle_unary(input, begin, end, subexp, op):
+			return [op, subexp]
+		return UnaryOperator( x, handle_unary )
 	
 	def _binOp(self, x):
-		return BinaryOperator( x, lambda input, begin, end, left, right: [ x, left, right ] )
+		def handle_binary(input, begin, end, left, op, right):
+			return [op, left, right]
+		return BinaryOperator( x, handle_binary )
 	
 	def _chainOp(self, x):
-		return ChainOperator( x, lambda input, begin, end, subexp: [ x, subexp ] )
+		def handle_chain(input, begin, end, subexp, op):
+			return [op, subexp]
+		return ChainOperator( x, handle_chain )
 	
 	
 		
