@@ -531,7 +531,7 @@ def div(x, y, fractionBarContent):
 
 
 def compare(x, cmpOps):
-	return LineBreakCostSpan( [ x ]  +  cmpOps )
+	return LineBreakCostSpan( [ x ]  +  list(cmpOps) )
 
 
 def simpleParam(name):
@@ -1059,7 +1059,7 @@ def dedentElement():
 @PyPresCombinatorFn
 def indentedBlock(ctx, style, indentElement, lines, dedentElement):
 	blockIndentation = style.get( PythonEditorStyle.blockIndentation )
-	return Column( [ indentElement ]  +  lines  +  [ dedentElement ] ).padX( blockIndentation, 0.0 ).present( ctx, style )
+	return Column( [ indentElement ]  +  list(lines)  +  [ dedentElement ] ).padX( blockIndentation, 0.0 ).present( ctx, style )
 
 def compoundStmt(components):
 	return Column( components )
@@ -1077,7 +1077,7 @@ def badIndentedBlock(ctx, style, indentElement, lines, dedentElement):
 	rectStyle = PythonEditorStyle._badIndentationRectangleStyle.get( style )
 	blockIndentation = style.get( PythonEditorStyle.blockIndentation )
 	
-	block = Column( [ indentElement ]  +  lines  +  [ dedentElement ] )
+	block = Column( [ indentElement ]  +  list(lines)  +  [ dedentElement ] )
 
 	return Row( [ rectStyle.applyTo( Box( blockIndentation, 0.0 ).alignVExpand() ), block ] ).alignHPack().present( ctx, style )
 

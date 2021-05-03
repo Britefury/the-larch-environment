@@ -24,6 +24,7 @@ from BritefuryJ.Pres.Primitive import Primitive, Label, Blank, Box, Spacer, Row,
 from BritefuryJ.Pres.ObjectPres import VerticalField, ObjectBorder, ObjectBox
 
 from BritefuryJ.Editor.Table.Generic import GenericTableEditor, GenericTableModel
+from BritefuryJ.Editor.Table import TableHeader
 
 from BritefuryJ.StyleSheet import StyleSheet
 
@@ -57,7 +58,7 @@ class _TableView (object):
 
 	def initialise(self, schema):
 		self._schema = schema
-		self._tableEditor = GenericTableEditor( [ v._name   for v in schema._monitoredExpressions ], True, True, False, False )
+		self._tableEditor = GenericTableEditor.withColumns( [ v._name   for v in schema._monitoredExpressions ], TableHeader.index, True, True )
 		self._tableContent = GenericTableModel( lambda: '', lambda x: x )
 		self._tableRow = None
 		self._numTableRows = None

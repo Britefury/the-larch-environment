@@ -31,7 +31,7 @@ import BritefuryJ.Pres.Sequence.VerticalInlineSequenceView;
 import BritefuryJ.Pres.Sequence.VerticalSequenceView;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
-import com.sun.org.apache.xpath.internal.functions.FuncFalse;
+//import com.sun.org.apache.xpath.internal.functions.FuncFalse;
 
 
 public class DocModelPresenter
